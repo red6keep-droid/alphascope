@@ -1,152 +1,115 @@
 {
-  "updated_at": "2026-11-19 21:46:37 UTC",
+  "updated_at": "2026-11-20 12:47:06 UTC",
   "items": [
     {
-      "title": "Commerce approved sales of more than 879,000 AI chips to Chinese companies, Rep. Mast says",
+      "title": "Anthropic defies the odds, holding record IPO despite ‘massively disruptive’ market",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/19/nvidia-amd-china-chip-sales-congress.html",
-      "published": "2026-11-19 21:43:30",
-      "title_ko": "상무부, 중국 기업에 87만 9천 개 이상의 AI 칩 판매 승인했다고 매스트 의원 밝혀",
-      "summary_ko": "의원들, 젠슨 황 스캔들 이후 중국 대상 칩 판매 수출 통제 강화 법안 추진",
+      "link": "https://www.cnbc.com/2026/11/20/anthropic-defies-odds-holding-ipo-despite-massively-disruptive-market.html",
+      "published": "2026-11-20 12:45:11",
+      "title_ko": "앤트로픽, '대단히 파괴적인' 시장 속에서도 역대 최대 규모 IPO 기록하며 난관 극복",
+      "summary_ko": "시장 매도세, 반AI 정서 및 엔비디아 위기 직면",
       "lines": [
-        "상무부의 대중국 AI 칩 판매 승인",
-        "알리바바와 텐센트 대상 87만9000개 이상 칩 승인"
+        "앤스로픽 나스닥 상장 첫날 주가 17% 상승",
+        "앤스로픽 종가 97.17달러 기록하며 시가총액 1조 8000억 달러 달성",
+        "앤스로픽 IPO 공모 금액 813억 달러로 역대 최대 기록 경신"
       ]
     },
     {
-      "title": "Intuit to sell Mailchimp to Bending Spoons for $3.68 billion",
+      "title": "Rejecting cheap fabrics, higher prices: Why shoppers are asking for better clothes",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/19/intuit-mailchimp-sale-bending-spoons.html",
-      "published": "2026-11-19 21:40:31",
-      "title_ko": "인튜이트, 벤딩 스푼스에 메일침프 36억 8천만 달러에 매각",
+      "link": "https://www.cnbc.com/2026/11/20/clothing-prices-polyester-cotton-quality.html",
+      "published": "2026-11-20 12:00:02",
+      "title_ko": "저가 원단 거부·가격 상승… 소비자, 고급 의류 요구 증가",
+      "summary_ko": "소비자, 고급 의류 선호 확대",
+      "lines": [
+        "2010년 전체 의류의 약 60%를 차지했던 면화 비중이 현재 약 45%로 감소",
+        "폴리에스터와 나일론 등 합성 섬유가 수입 의류의 대다수를 차지",
+        "팬데믹 이전 20년간 하락세를 보였던 의류 가격이 2020년 이후 최고치로 급등"
+      ]
+    },
+    {
+      "title": "White House replaces cyber director Sean Cairncross amid widespread tech outages",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/20/sean-cairncross-white-house-cyber-director.html",
+      "published": "2026-11-20 10:59:24",
+      "title_ko": "백악관, 사이버 국장 교체… 펜타곤 CIO가 새 국장",
+      "summary_ko": "펜타곤 CIO, 새 사이버 국장 임명",
+      "lines": [
+        "숀 케언크로스 백악관 국가사이버 국장의 퇴임",
+        "커스틴 데이비스 펜타곤 최고정보책임자의 임시 국가사이버 국장 임명 예정"
+      ]
+    },
+    {
+      "title": "Kushner says Russia 'comfortable' with idea of NATO-like security guarantees for Ukraine",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/20/kushner-ukraine-nato-russia-trump-putin.html",
+      "published": "2026-11-20 09:56:03",
+      "title_ko": "쿠시너, 러시아가 우크라이나에 NATO식 보안 보장 ‘편안’하다고 언급",
       "summary_ko": "",
       "lines": [
-        "인튜이트의 벤딩 스푼스에 36억 8000만 달러 규모 메일침프 매각 합의",
-        "메일침프 매각 거래 2027년 초 완료 예정"
+        "트럼프·푸틴·시진핑의 아시아태평양경제협력체 양자 회담 개최",
+        "우크라이나 나토식 안보 보장 방안 검토"
       ]
     },
     {
-      "title": "Anthropic IPO: Investors who flip the stock may face brokerage penalty",
+      "title": "SoftBank suffers worst day in over two years as AI sell-off hits Asian tech stocks",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/19/anthropic-ipo-flipping-rules.html",
-      "published": "2026-11-19 21:16:41",
-      "title_ko": "앤스로픽 IPO: 주식 조기 매도 투자자에 대한 브로커리지 페널티 부과 가능성",
-      "summary_ko": "증권사들은 앤스로픽 지분을 너무 빨리 매각하는 투자자들에게 향후 IPO 참여 제한을 둘 수 있음",
+      "link": "https://www.cnbc.com/2026/11/20/softbank-ai-tech-stocks-slide-anthropic-debut.html",
+      "published": "2026-11-20 07:23:06",
+      "title_ko": "소프트뱅크, AI 매도 물결에 2년 만에 최악의 하루 기록",
+      "summary_ko": "나스닥, 2% 이상 하락",
       "lines": [
-        "앤스로픽 기업공개에 찰스슈바브와 피델리티 등 주요 증권사 참여 예정",
-        "찰스슈바브를 제외한 일부 증권사의 조기 매도 제한 정책 적용 가능성"
+        "앤스로픽의 월스트리트 상장 여파로 나스닥종합지수 2% 하락 (예상)",
+        "소프트뱅크 주가 14.48% 급락 (예상)",
+        "오픈에이아이 관련 소프트뱅크의 총 투자금 646억 달러"
       ]
     },
     {
-      "title": "AMD dives on short-seller report of alleged China exposure",
+      "title": "‘More than just a game’: How GTA VI’s blockbuster launch fuels a booming content economy",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/19/amd-falls-on-short-seller-report-of-alleged-china-exposure.html",
-      "published": "2026-11-19 21:14:46",
-      "title_ko": "AMD, 중국 연루 의혹 공매도 보고서에 하락",
-      "summary_ko": "한 공매도 투자자가 AMD의 펌웨어가 블랙리스트에 오른 중국 기업에서 발견되었다고 주장한 후 AMD는 7% 이상 하락 마감했으며 회사는 미국법을 준수한다고 밝힘",
+      "link": "https://www.cnbc.com/2026/11/20/gta-vi-launch-streaming-content-economy.html",
+      "published": "2026-11-20 07:08:36",
+      "title_ko": "GTA VI 대규모 출시, 콘텐츠 경제 급성장 촉진",
+      "summary_ko": "스트리밍·클립·콘텐츠 농장 확대",
       "lines": [
-        "공매도 보고서의 중국향 매출 및 펌웨어 관련 의혹 제기 여파로 AMD 주가 7.72% 하락",
-        "미국 법규 준수 입장 표명과 중국 및 홍콩 매출 비중 20% 상회 (예상)"
+        "그랜드 테프트 오토 VI 약 1,910만 장 판매 기록",
+        "그랜드 테프트 오토 VI 관련 18억 4천만 달러 매출 달성",
+        "그랜드 테프트 오토 프랜차이즈 전 세계 누적 4억 7천만 장 이상 판매"
       ]
     },
     {
-      "title": "Palo Alto stock jumps on earnings beat and company's big bet on securing open-weight models",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/19/palo-alto-networks-earnings-applied-compute.html",
-      "published": "2026-11-19 21:00:57",
-      "title_ko": "팔로알토 주가, 실적 호조 및 오픈웨이트 모델 보안에 대한 대규모 투신에 급등",
-      "summary_ko": "팔로알토 네트워크스는 예상보다 양호한 1분기 실적을 발표하고 AI 스타트업 어플라이드 컴퓨트와 45억 달러 규모의 계약을 체결",
-      "lines": [
-        "팔로알토 네트웍스의 1분기 호실적 발표 및 연간 실적 전망 상향",
-        "인공지능 스타트업 어플라이드 컴퓨트 인수를 위한 45억 달러 규모 계약 체결 (예상)",
-        "사이버보안 지출 증가와 실적 호조 영향으로 팔로알토 주가 6% 상승 (예상)"
-      ]
-    },
-    {
-      "title": "3-step method to influence people and win them over, from a Stanford expert: ‘Your voice is like a muscle’",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/make-it/2026/11/19/matt-abrahams-persuasive-speaking-tips.html",
-      "published": "2026-11-19 20:17:36",
-      "title_ko": "스탠퍼드 전문가가 말하는 사람들의 마음을 사로잡고 설득하는 3단계 방법: '목소리는 근육과 같다'",
-      "summary_ko": "스탠퍼드대학교 커뮤니케이션 강사 매트 아브라함스는 현재와 미래의 리더들에게 목소리를 더 매력적이고 설득력 있게 훈련하는 방법을 교육",
-      "lines": [
-        "스탠퍼드대 매트 아브라함스, 음성 훈련으로 설득력 높이는 법 강의",
-        "엔비디아 임시 CEO 코렛 크레스가 관련 주제 논의"
-      ]
-    },
-    {
-      "title": "S&P 500 heads for 6th straight decline. Plus, J&J advances two key products",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/investingclub/2026/11/19/sp-500-heads-for-6th-straight-decline-plus-jj-advances-two-key-products.html",
-      "published": "2026-11-19 20:10:21",
-      "title_ko": "S&P 500 지수 6거래일 연속 하락, 존슨앤드존슨 주요 제품 2종 개발 진척",
-      "summary_ko": "투자 클럽은 거래 마감 1시간 전 실행 가능한 오후 업데이트인 홈스트레치를 매주 평일 공개",
-      "lines": [
-        "S&P 500, 6거래일 연속 하락 전망",
-        "존슨앤존슨, 주요 제품 2종 개발 진행"
-      ]
-    },
-    {
-      "title": "Walmart hikes outlook as CEO tells CNBC retailer aims to keep prices low despite soaring fuel costs",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/19/walmart-wmt-q3-2026-earnings.html",
-      "published": "2026-11-19 19:58:30",
-      "title_ko": "월마트, 연휴 앞두고 시장 점유율 확대 언급하며 실적 전망 상향",
-      "summary_ko": "회계연도 3분기 매장 충족 픽업 및 배송에서 강세 기록",
-      "lines": [
-        "월마트 3분기 실적 예상치 상회 및 연간 실적 전망 상향",
-        "월마트 글로벌 전자상거래 매출 17% 증가"
-      ]
-    },
-    {
-      "title": "AI 컴퓨팅 인프라 투자",
-      "title_ko": "AI 컴퓨팅 인프라 투자",
-      "summary_ko": "앤트로픽은 다양한 가속기 플랫폼을 활용한 효율적인 컴퓨팅 전략으로 시장 변화에 대응함",
-      "source": "블룸버그",
-      "link": "https://www.youtube.com/watch?v=oaPu57EKffo",
-      "published": "2026-11-19 16:15:48",
+      "title": "미국의 대중 반도체 수출 규제 강화",
+      "title_ko": "미국의 대중 반도체 수출 규제 강화",
+      "summary_ko": "미국의 신규 수출 통제로 TSMC와 삼성전자의 일부 중국 고객사 반도체 출하가 중단되었습니",
+      "source": "삼성증권",
+      "link": "https://www.youtube.com/watch?v=peZfn7X2q1g",
+      "published": "2026-11-20 06:14:18",
       "kind": "media",
-      "tag": "AI 투자 · 반도체 수요",
-      "direction": "positive",
-      "n_channels": 5,
+      "tag": "규제 · 산업정책",
+      "direction": "negative",
+      "n_channels": 3,
       "lines": [
-        "크리슈나 라오 CFO 발언 : 향후 컴퓨팅 인프라에 9,000억 달러 규모의 장기 투자 계획",
-        "크리슈나 라오 CFO 발언 : 컴퓨팅 자원 효율성을 극대화하여 전체 용량의 75%를 R&D에 할당 중",
-        "크리슈나 라오 CFO 발언 : 엔비디아, 아마존, 구글, AMD 등 다양한 플랫폼을 활용한 유연한 컴퓨팅 전략 유지"
+        "미국의 신규 수출 통제 시행",
+        "TSMC 및 삼성전자 일부 중국 고객사 반도체 출하 중단",
+        "AMD의 대중국 수출 통제 위반 의혹 제기",
+        "반도체 기업들의 매출 불확실성 증대"
       ]
     },
     {
-      "title": "AI 산업 성장 및 엔비디아 영향",
-      "title_ko": "AI 산업 성장 및 엔비디아 영향",
-      "summary_ko": "앤트로픽의 상장이 AI 산업의 성장성을 재확인시키며 엔비디아에 집중된 시장의 관심을 분산시킬 것으로 보인",
-      "source": "블룸버그",
-      "link": "https://www.youtube.com/watch?v=Lb3d-p3sUSs",
-      "published": "2026-11-19 15:56:00",
+      "title": "앤트로픽 사상 최대 IPO",
+      "title_ko": "앤트로픽 사상 최대 IPO",
+      "summary_ko": "앤트로픽이 사상 최대 규모의 IPO를 단행했으나 고평가 논란과 거래 부진으로 투자자들에게 상처를 남겼",
+      "source": "Mad Money",
+      "link": "https://www.youtube.com/watch?v=sHWTbaNakd8",
+      "published": "2026-11-20 00:34:08",
       "kind": "media",
-      "tag": "AI 투자 · 반도체 수요",
+      "tag": "기업 사건",
       "direction": "positive",
       "n_channels": 3,
       "lines": [
-        "출연자 발언 : AI 산업은 경제 성장의 핵심 동력으로 자리매김",
-        "출연자 발언 : 앤트로픽 상장 이슈가 엔비디아에 쏠린 시장의 관심을 일시적으로 분산시키는 효과"
-      ]
-    },
-    {
-      "title": "연준 위원들 향후 금리 인상 시사",
-      "title_ko": "연준 위원들 향후 금리 인상 시사",
-      "summary_ko": "최근 공개된 연준 의사록에서 거의 모든 위원들이 향후 몇 달 내 추가 금리 인상에 동의한 것으로 나타났",
-      "source": "블룸버그",
-      "link": "https://www.youtube.com/watch?v=bitiU61OIkU",
-      "published": "2026-11-19 12:49:31",
-      "kind": "media",
-      "tag": "금리 · 연준",
-      "direction": "negative",
-      "n_channels": 7,
-      "lines": [
-        "연준 의사록 공개 : 거의 모든 위원 향후 몇 달 내 금리 인상 동의",
-        "국채 금리 상승세 기록",
-        "블룸버그 달러 지수 안정세 진입",
-        "키트 러너 발언 : 예상치 못한 대규모 금리 인상이 시장의 주요 리스크"
+        "앤트로픽 사상 최대 IPO 진행, 810억 달러 이상 조달",
+        "공모가 83달러에서 115달러까지 치솟았다가 97달러로 하락",
+        "진행자 발언 : 추가 하락 예상"
       ]
     }
   ]
