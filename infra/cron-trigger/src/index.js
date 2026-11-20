@@ -48,8 +48,8 @@ const KST_JOBS = {
   "08:00": [{ workflow: "media-daily.yml", inputs: { scheduled: "true", phase: "1" }, when: WEEKDAY }],
   "10:15": [{ workflow: "media-daily.yml", inputs: { scheduled: "true", phase: "2" }, when: WEEKDAY }],
   // 매드머니 기록 예비 (2026-11-20 사용자: 그날 회차는 그날 인물 발언 글에). 매드머니는 KST 09:30 ~ 10:30 게시 · 요약이 10:15 뒤로 밀리는 날(11-19 11:26)용.
-  // 방송 기록만(AI 0 · 한국장 칸 X). 새 회차를 기록하면 media-daily 가 people-radar mode=madmoney 를 건다. 화 ~ 토(미국 월 ~ 금 방송 다음 날)
-  "11:55": [{ workflow: "media-daily.yml", inputs: { scheduled: "true", phase: "2", records_only: "true" }, when: KST_TUE_SAT }],
+  // 방송 기록만(AI 0 · 한국장 칸 X). 분은 Worker 가 깨는 분(:50) 가운데서. 새 회차를 기록하면 media-daily 가 people-radar mode=madmoney 를 건다. 화 ~ 토(미국 월 ~ 금 방송 다음 날)
+  "11:50": [{ workflow: "media-daily.yml", inputs: { scheduled: "true", phase: "2", records_only: "true" }, when: KST_TUE_SAT }],
   // 한국 종목 페이지 · 한국 증시 리포트 (2026-10-27) — 한국장 마감 15:30 뒤. GitHub cron(07:10 UTC)이 10-26 에 7시간 늦었다.
   // 둘 다 도는 날은 concurrency 로 줄 서고, 뒤 실행은 페이지 해시 같음 · 리포트 이미 게시됨으로 쓰지 않는다. 휴장일은 fresh.txt 가 막는다.
   // 15:50 (2026-11-20 사용자, 옛 16:10): 마감 15:30 + 야후 지연 시세 20분. 워크플로 맨 앞 wait_close.py 가 종가 확정을 보고 늦으면 16:10 까지 기다린다
