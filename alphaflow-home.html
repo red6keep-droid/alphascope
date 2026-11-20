@@ -411,7 +411,7 @@ body[data-home-mkt="us"] [data-hook="notable-kr"], body[data-home-mkt="kr"] [dat
 body[data-home-mkt] #notable-col { grid-column: auto; }
 body[data-home-mkt] .nt-grid { grid-template-columns: minmax(0, 1fr); }
 body[data-home-mkt="kr"] .news-section { display: none; }   /* 한국 뉴스 자료가 아직 없다 — 새 수집 없이 시작 */
-/* 실적 한 줄 자리 — 일정이 없는 날 주요 뉴스 줄 (2026-11-19 사용자). 같은 한 줄 칸(높이 54) · 같은 바탕색 돌림 · 같은 점 */
+/* 실적 한 줄 자리 — 일정이 없는 날 주요 뉴스 줄 (2026-11-19 사용자). 같은 한 줄 칸(높이 47) · 같은 바탕색 돌림 · 같은 점 */
 #event-banner .eb-news { gap: 8px; }
 #event-banner .eb-news .eb-tag { flex: none; font-size: 12px; line-height: 19px; padding: 0 6px; border-radius: 4px; background: rgba(255, 255, 255, .2); color: #fff; font-weight: 700; }
 #event-banner .eb-news .eb-headline { flex: 1 1 auto; min-width: 0; font-size: 15px; line-height: 24px; font-weight: 700; color: #fff;
@@ -425,8 +425,8 @@ body[data-home-mkt="kr"] .news-section { display: none; }   /* 한국 뉴스 자
 .cm-wide img { display: block; width: 100%; height: auto; aspect-ratio: 900 / 374; border-radius: 0; }   /* 배너 900×374 (11-19 사용자 시안 C, 옛 350) */
 .cm-pill { position: absolute; left: 8.0%; bottom: calc(74.9% + 5px); padding: 2px 8px; border-radius: 0; background: rgba(6,18,26,.72);
   color: #fff; font-size: 11px; line-height: 16px; font-weight: 600; }
-/* 실적 발표 배너를 한 줄로(같은 일정 배너, 모양만): 로고 24 · 종목 이름 · 실적 발표 · D-n, 날짜 · 시각 줄은 숨김. 높이 54 */
-#event-banner.cm-strip .eb-slide { gap: 8px; padding: 15px 72px 15px 7px; }
+/* 실적 발표 배너를 한 줄로(같은 일정 배너, 모양만): 로고 24 · 종목 이름 · 실적 발표 · D-n, 날짜 · 시각 줄은 숨김. 높이 47 */
+#event-banner.cm-strip .eb-slide { gap: 8px; padding: 11.5px 72px 11.5px 7px; }   /* 높이 54 → 47 (2026-11-20 사용자 "7 줄여") */
 #event-banner.cm-strip .stock-avatar { width: 24px; height: 24px; font-size: 10px; }
 #event-banner.cm-strip .eb-text { flex-direction: row; align-items: center; gap: 8px; }
 #event-banner.cm-strip .eb-kicker, #event-banner.cm-strip .eb-title-line { display: contents; }

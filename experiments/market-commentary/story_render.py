@@ -53,7 +53,8 @@ def directional(html):
 class Linker:
     """기사 속 종목 링크 — 글 전체에서 처음 나온 이름 하나만 보라 #7C3AED (가이드라인 10절). 페이지가 없는 종목은 글자 그대로."""
 
-    def __init__(self, column, briefing):
+    def __init__(self, column, briefing, ink=None):
+        self.ink = ink or INK
         names = {}
         for m in ((briefing or {}).get("close") or {}).get("movers") or []:
             if m.get("name") and m.get("ticker"):
@@ -77,7 +78,7 @@ class Linker:
             if t in self.seen or name not in html:
                 continue
             html = re.sub(r"(?<![\w])" + re.escape(name),
-                          f'<a href="{dk.esc(href)}" data-stock="{dk.esc(t)}" style="color:{INK};font-weight:400;text-decoration:none;">{name}</a>',
+                          f'<a href="{dk.esc(href)}" data-stock="{dk.esc(t)}" style="color:{self.ink};font-weight:400;text-decoration:none;">{name}</a>',
                           html, count=1)
             self.seen.add(t)
         return html
@@ -135,6 +136,16 @@ FLOW_FS, FLOW_LH = "18px", "32px"   # `지수 · 업종 흐름` 문장 = 본문 
 LISTS_URL = f"{BLOG}p/stock-lists.html"   # 종목 모아보기 — 업종 탭(히트맵) · 오늘 움직임 탭으로 보낸다 (2026-11-19 사용자)
 TOP_N = 3   # 시황 글에는 3줄만, 나머지는 종목 모아보기로 (사용자 결정 — 잘린 줄이 가는 곳 = 그 페이지 탭)
 SIDE_PX = 14   # 폰 본문 좌우 여백 — 배너를 화면 끝까지 (2026-11-19 사용자 "카드 말고 좌우 꽉 차게")
+
+
+# 장 분위기 색 테마 (2026-11-20 사용자 "A안으로 적용" = 기본값 "flow"): 상승 = 주황 · 하락 = 파랑 · 보합 = 지금 보라. 머리글 색(MOOD_INK)은 그대로.
+# 숫자 증감 색(빨강 #d93025 · 파랑 #1a73e8)과 겹치지 않게 글씨는 한 단계 진하게 — 주황 #A8400C(흰 바탕 대비 6.2) · 파랑 #1E40AF(8.7) · 보라 #5012BB(9.8).
+# theme = None(옛 화면: 보라 + 업종 녹색) · "body"(한눈에 보기 · 장을 움직인 변수 · 종목 링크 · 색 강조) · "flow"(body + 업종과 주요 종목 아이콘 · 제목 · 정리 카드)
+MOOD_THEME = {
+    "up":   {"ink": "#A8400C", "solid": "#EA580C", "soft": ("#FED7AA", "#C2410C"), "card": dk.CARD_DIR["positive"][0], "take": (dk.CARD_DIR["positive"][0], "#7C2D12")},
+    "down": {"ink": "#1E40AF", "solid": "#2563EB", "soft": ("#BFDBFE", "#1D4ED8"), "card": dk.CARD_DIR["negative"][0], "take": (dk.CARD_DIR["negative"][0], "#1E3A8A")},
+    "flat": {"ink": INK, "solid": DRIVER_ICON[1], "soft": OVERVIEW_ICON[1:], "card": dk.CARD_DIR["uncertain"][0], "take": (dk.CARD_DIR["uncertain"][0], "#3B0F8C")},
+}
 
 
 def tinted(sec, color):
@@ -209,14 +220,14 @@ TONE_MARK = re.compile(r"==(.+?)==", re.S)
 TONE_INK = INK   # 색 글씨 강조 = 보라 하나로 통일 (2026-11-19 사용자 "빨간색 쓰지 말고 보라로" — 옛 주황 #C2410C)
 
 
-def emph(html, on=True):
+def emph(html, on=True, tone=None):
     """문장 속 강조 두 가지 (2026-11-19 사용자 "굵게 하나, 굵지 않은 색 글씨 하나") — 수집기 표시, 한눈에 보기 · 장을 움직인 변수만.
     `**말**` = 굵게 #111 = 결과(무슨 일이 일어났나) · `==말==` = 보라 글씨(굵지 않게) = 원인 · 변수. 다른 칸에 온 표시는 지운다.
     증감 색 · 종목 링크를 먼저 칠한 뒤 바꾼다(dk.tint 는 태그가 든 덩어리를 건너뛰므로). 굵게 안의 종목 링크도 굵게."""
     if not on:
         return TONE_MARK.sub(r"\1", EMPH_MARK.sub(r"\1", html)).replace("**", "").replace("==", "")
     html = EMPH_MARK.sub(lambda m: '<b style="font-weight:700;color:#111;">' + m.group(1).replace("font-weight:400;", "font-weight:700;") + "</b>", html)
-    html = TONE_MARK.sub(lambda m: f'<span style="color:{TONE_INK};">{m.group(1)}</span>', html)
+    html = TONE_MARK.sub(lambda m: f'<span style="color:{tone or TONE_INK};">{m.group(1)}</span>', html)
     return html.replace("**", "").replace("==", "")   # 짝이 안 맞아 남은 표시는 지운다(글자로 보이지 않게)
 
 
@@ -306,7 +317,7 @@ def sector_name(x, check):
             f'<span style="min-width:0;">{dk.esc(x["name"])}{sub}</span></span>')
 
 
-def render(column, briefing, banner_url=None, banner_alt="", lists_live=True, lists=None, mood_base=MOOD_BASE):
+def render(column, briefing, banner_url=None, banner_alt="", lists_live=True, lists=None, mood_base=MOOD_BASE, theme="flow"):
     """→ (저장 제목, 본문 HTML, meta). 수집기 칸이 비면 그 구획만 뺀다.
     mood_base = 장 분위기 아이콘 폴더 주소(None = 아이콘 없이 — 발행기가 그림이 아직 안 올라간 걸 알면 None).
     lists = 종목 모아보기 목록 파일 rows 를 티커로 찾는 표 {티커: 줄} — 종목 줄 가격 · 로고 · 업종 · 주소. 없으면 배지 · 가격 없이.
@@ -315,10 +326,12 @@ def render(column, briefing, banner_url=None, banner_alt="", lists_live=True, li
     slot = col["slot"]
     close = br.get("close") or {}
     indices = close.get("indices") or []
-    link = Linker(col, br)
+    th = MOOD_THEME[mood_of(indices) or "flat"] if theme else None   # 장 분위기 색 (시안). 아이콘이 없어도 지수로 고른다
+    ink = th["ink"] if th else INK
+    link = Linker(col, br, ink)
 
     def prose(text, strong=False):
-        return who(emph(link(directional(dk.tint(dk.esc(dk.formal(text or ""))))), strong))
+        return who(emph(link(directional(dk.tint(dk.esc(dk.formal(text or ""))))), strong, ink))
 
     _, stored = titles(col)
     m, d = md(col["date"])
@@ -353,8 +366,9 @@ def render(column, briefing, banner_url=None, banner_alt="", lists_live=True, li
                 f'{head}<p {attr}style="margin:0;word-break:keep-all;{style}">{inner}</p></div>')
 
     if col.get("overview"):   # 안쪽 여백 +5 (보이는 23 · 좌우 19)
-        head = head_row(dk.soft_icon(OVERVIEW_ICON[0], bg=OVERVIEW_ICON[1], ink=OVERVIEW_ICON[2]), "한눈에 보기")
-        body.append(soft_card(prose(col["overview"], True), head, "8px 0 8px", dk.CARD_DIR["uncertain"][0], pad=(23, 19), attr=lead_attr))
+        sb, si = th["soft"] if th else OVERVIEW_ICON[1:]
+        head = head_row(dk.soft_icon(OVERVIEW_ICON[0], bg=sb, ink=si), "한눈에 보기")
+        body.append(soft_card(prose(col["overview"], True), head, "8px 0 8px", th["card"] if th else dk.CARD_DIR["uncertain"][0], pad=(23, 19), attr=lead_attr))
     else:
         body.append(f'<p {lead_attr}style="{dk.SEO_LEAD}padding:0 0 0 {dk.ALIGN_PX}px;">'
                     f'{m}월 {d}일 {"아침" if slot == "am" else "저녁"}, {prose(col.get("summary") or "")}</p>')
@@ -367,7 +381,8 @@ def render(column, briefing, banner_url=None, banner_alt="", lists_live=True, li
             return h if i == 1 else h.replace("margin:24px 0 10px;", f"margin:{24 + GROUP_GAP}px 0 10px;", 1)
         drv = "".join(sub(i, x)
                       + para(prose(x["body"], True)) for i, x in enumerate(drivers, 1))
-        body.append(tinted(iconed(dk.section("장을 움직인 변수", drv, line=False), dk.solid_icon(*DRIVER_ICON)), DRIVER_ICON[1]).replace(f"margin:{H2_TOP}px 0 11px;", f"margin:{BIG_TOP}px 0 11px;", 1))
+        dc = th["solid"] if th else DRIVER_ICON[1]
+        body.append(tinted(iconed(dk.section("장을 움직인 변수", drv, line=False), dk.solid_icon(DRIVER_ICON[0], dc)), dc).replace(f"margin:{H2_TOP}px 0 11px;", f"margin:{BIG_TOP}px 0 11px;", 1))
 
     # 지수 · 업종 흐름 = 숫자는 문장이 아니라 표 (2026-11-19 사용자 "숫자 나열 문장은 표로"). 묶음 숫자로 파이썬이 그린다 — 수집기 market 문단은 쓰지 않는다.
     # 업종 = 묶음 전체(크게 움직인 것부터, 5줄 + 접기) · 보조 줄 = 수집기 sectors[].check(다음 장에서 볼 것, 있는 업종만). 종목 = 묶음 movers 전체(크게 움직인 것부터, 5줄 + 접기).
@@ -393,8 +408,9 @@ def render(column, briefing, banner_url=None, banner_alt="", lists_live=True, li
     mk = ""
     if wrap_up:   # 정리 문장 = 구획 제목 바로 아래 (2026-11-19 사용자). 글씨 = 주식 공부와 같이 굵게
         plain = emph(directional(dk.tint(dk.esc(dk.formal(wrap_up)))), False)   # 종목 링크 · 보라 없이 전부 녹색 글씨 (2026-11-19 사용자)
-        mk += soft_card(plain, margin=f"0 0 {CARD_GAP}px", bg=TAKE_BG, left=14 + 5 + 3,   # 글 앞 여백 +5 +3 = 22 (2026-11-19 사용자)
-                          style=f"font-size:{FLOW_FS};line-height:{FLOW_LH};font-weight:700;color:{TAKE_INK};")
+        tb, ti = th["take"] if theme == "flow" else (TAKE_BG, TAKE_INK)
+        mk += soft_card(plain, margin=f"0 0 {CARD_GAP}px", bg=tb, left=14 + 5 + 3,   # 글 앞 여백 +5 +3 = 22 (2026-11-19 사용자)
+                          style=f"font-size:{FLOW_FS};line-height:{FLOW_LH};font-weight:700;color:{ti};")
     if secs:   # 업종 = 흰 카드 줄(구분선 17), 제목 줄 없음 (2026-11-19 사용자 "많이 오른 업종 같은 타이틀 삭제")
         rows = [(sector_name(x, emph(dk.esc(checks.get(x["name"]) or ""), False)), chg(x["chg_pct"]), "", 78) for x in secs]   # 왼쪽 78% — 볼 것이 이름 옆 한 줄에 들어갈 자리
         if lists_live:
@@ -409,7 +425,8 @@ def render(column, briefing, banner_url=None, banner_alt="", lists_live=True, li
         mk += white_card(inner + (tail("오늘 움직인 종목 전체 보기", "오늘 움직임") if lists_live else ""))
     if mk:
         # 제목 = 내용대로 `업종과 주요 종목`(옛 `지수 · 업종 흐름` — 지수 칸은 한눈에 보기 위로 갔다) · 크기 = 장을 움직인 변수와 같은 구획 제목(22/28, 폰 20/26) (2026-11-19 사용자)
-        body.append(tinted(iconed(dk.section("업종과 주요 종목", mk, line=False), dk.solid_icon(*FLOW_ICON)), FLOW_ICON[1]).replace(f"margin:{H2_TOP}px 0 11px;", f"margin:{BIG_TOP}px 0 11px;", 1))
+        fc = th["solid"] if theme == "flow" else FLOW_ICON[1]
+        body.append(tinted(iconed(dk.section("업종과 주요 종목", mk, line=False), dk.solid_icon(FLOW_ICON[0], fc)), fc).replace(f"margin:{H2_TOP}px 0 11px;", f"margin:{BIG_TOP}px 0 11px;", 1))
 
     if col.get("points"):   # 회색 카드 — 핵심 한 줄은 뺐다(머리글과 같은 말)
         nb, nd = dk.CARD_DIR["neutral"]
