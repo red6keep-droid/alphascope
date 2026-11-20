@@ -96,7 +96,7 @@
     return '<div data-cards="1" style="margin:0 0 8px;"><span data-list="1" style="' + LIST + '">' +
       items.slice(0, TOP).map(render).join('') + more + '</span></div>';
   }
-  root.addEventListener('click', function (e) {   // n개 더 보기 ⌄ ↔ 접기 ⌃ — 펼친 줄은 버튼 위, 버튼은 늘 맨 아래
+  document.addEventListener('click', function (e) {   // 목록 칸(#sl-…)은 #as-lists 밖이라 문서에서 받는다 · n개 더 보기 ⌄ ↔ 접기 ⌃ — 펼친 줄은 버튼 위, 버튼은 늘 맨 아래
     var b = e.target.closest && e.target.closest('[data-sl-more]');
     if (!b) return;
     var k = b.getAttribute('data-sl-more'), rest = b.parentNode.querySelector('[data-sl-rest="' + k + '"]');
