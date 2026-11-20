@@ -33,6 +33,7 @@ LABELS = ["주식 공부"]
 SLUGS = {   # 초안 파일 이름 → 영문 주소 이름 (한 번 정하면 바꾸지 않는다 — 주소가 바뀌면 검색 · 공유 링크가 끊긴다)
     "착각-00-들어가며.md": "stock myths for beginners intro",
     "착각-01-실적.md": "stock myths 01 good earnings stock falls",
+    "착각-02-물림.md": "stock myths 02 how long underwater after buying",
 }
 
 
