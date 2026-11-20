@@ -198,7 +198,7 @@ def history():
 # 일별 자금 흐름(외국인 순매수 등)은 상한 없이 받는다(그날 숫자). 호출 하나당 기다림도 짧게: ECOS 30 → 15초, 관세청 60 → 15초
 SLOW_BUDGET_S = 6 * 60
 _DEADLINE = [None]   # run_flows 가 정한다 — 지나면 _ecos · _customs 가 바로 건너뜀
-SLOW_KEYS = ("more_d", "more_q", "more_m", "industry", "bsi", "fin_q", "loan_q")   # 칸마다 지난 값으로 채울 수 있는 묶음
+SLOW_KEYS = ("more_q", "more_m", "industry", "bsi", "fin_q", "loan_q")   # 못 받으면 지난 값으로 채우는 묶음 = 월 · 분기만 (일별 more_d 는 채우지 않는다 — 어제 값이 오늘 값처럼 보이면 안 됨)
 
 
 def _late():
@@ -253,7 +253,7 @@ def _ecos(key, stat, cycle, start, end, item, n=2000):
     if _late():
         raise RuntimeError("시간 상한 — 지난 값으로")
     url = f"{ECOS}/StatisticSearch/{key}/json/kr/1/{n}/{stat}/{cycle}/{start}/{end}/{item}"
-    r = requests.get(url, timeout=15)
+    r = requests.get(url, timeout=15 if _DEADLINE[0] is not None else 30)   # 일별 구간(상한 전)은 30초 그대로 — 여기가 실패하면 자금 흐름 전체가 지난 값이 된다
     r.raise_for_status()
     j = r.json()
     if "StatisticSearch" not in j:
@@ -414,9 +414,15 @@ def run_flows():
     kept = []
     for sec in SLOW_KEYS:   # 못 받은 칸(실패 · 시간 상한) = 지난 값
         for k_, v in ((prev.get(sec) or {}).items()):
-            if not (out.setdefault(sec, {}).get(k_)):
+            cur = out.setdefault(sec, {}).get(k_)
+            if not cur:
                 out[sec][k_] = v
                 kept.append(f"{sec}/{k_}")
+            elif isinstance(cur, dict) and isinstance(v, dict):   # 업종 BSI · 기업경영분석 = 업종 안에 표가 여럿 — 일부만 받은 업종은 빠진 표만 채운다
+                for k2, v2 in v.items():
+                    if not cur.get(k2):
+                        cur[k2] = v2
+                        kept.append(f"{sec}/{k_}/{k2}")
     if kept:
         print(f"[kr] 월 · 분기 표 {len(kept)}칸 지난 값으로 — {', '.join(kept[:12])}{' …' if len(kept) > 12 else ''}")
     print(f"[kr] 자금 흐름 · 경제 지표 {(time.time() - t_flows) / 60:.1f}분")

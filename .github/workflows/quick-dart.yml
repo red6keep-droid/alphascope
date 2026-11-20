@@ -60,7 +60,10 @@ jobs:
           git config core.sshCommand "ssh -i ~/.ssh/state_key -o IdentitiesOnly=yes"
           git remote add state git@github.com:red6keep-droid/alphascope-state.git
           git fetch -q state quick-state && git archive FETCH_HEAD | tar -x -C /tmp/qcache
-          echo "저장값 $(du -sh /tmp/qcache | cut -f1)"
+          N=$(find /tmp/qcache -type f | wc -l)
+          echo "저장값 $(du -sh /tmp/qcache | cut -f1) · 파일 $N"
+          # 빈 저장값으로 돌고 덮어쓰면 간단 종목 캐시 전체(전용 페이지 주소 · 기업 소개 · 상세 값)가 지워진다 — 여기서 멈춘다(아래 단계는 건너뜀)
+          [ "$N" -ge 20 ] || { echo "::error::저장값이 비어 있음(파일 $N) — 받기 · 덮어쓰기 안 함"; exit 1; }
 
       - name: DART fill
         id: fill

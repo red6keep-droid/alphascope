@@ -50,7 +50,7 @@ const KST_JOBS = {
   // 한국 종목 페이지 · 한국 증시 리포트 (2026-10-27) — 한국장 마감 15:30 뒤. GitHub cron(07:10 UTC)이 10-26 에 7시간 늦었다.
   // 둘 다 도는 날은 concurrency 로 줄 서고, 뒤 실행은 페이지 해시 같음 · 리포트 이미 게시됨으로 쓰지 않는다. 휴장일은 fresh.txt 가 막는다.
   // 15:50 (2026-11-20 사용자, 옛 16:10): 마감 15:30 + 야후 지연 시세 20분. 워크플로 맨 앞 wait_close.py 가 종가 확정을 보고 늦으면 16:10 까지 기다린다
-  // retry: 90분 뒤 본 잡이 실패 · 취소면 한 번 자동으로 다시 건다 (2026-11-20 사용자 — 그날 16:51 시간 초과 취소 뒤 사람이 19:54 에 다시 돌려 20:10 에 바뀜)
+  // retry: 100분 뒤(17:30) 본 잡이 실패 · 취소면 한 번 자동으로 다시 건다 (2026-11-20 사용자 — 그날 16:51 시간 초과 취소 뒤 사람이 19:54 에 다시 돌려 20:10 에 바뀜)
   "15:50": [{ workflow: "kr-stocks.yml", when: WEEKDAY, retry: { job: "kr-stocks", inputs: { scheduled: "true" } } }],
   // 간단 종목(853종목) — 미국 = 장 마감 뒤 아침(뉴스 06:40 → 화면 08:20, 정식 07:30 실행이 07:56~59 에 끝난 뒤), 한국 = 장 마감 뒤 17:40 (2026-11-15 사용자).
   // GitHub cron 도 그대로 — 둘 다 도는 날은 워크플로 check 잡이 '최근 6시간 안 같은 실행 성공' 을 보고 뒤 실행을 건너뛴다(뉴스 AI 두 번 X).
@@ -121,7 +121,8 @@ const NAMES = {
   "commentary.yml": "증시 시황 발행 (아침 · 저녁)",
 };
 const WATCH_AFTER_MIN = 60;
-const RETRY_AFTER_MIN = 90;   // retry 가 붙은 일만 — 60분 감시는 '도는 중'이면 통과라, 그 뒤 끊긴 실행을 여기서 잡는다
+const RETRY_AGAIN_MIN = 170;   // 한 번 더 본다(18:40) — 다시 건 실행도 실패했으면 알림, 100분 때 아직 돌다가 그 뒤 끊겼으면 그때 다시 건다
+const RETRY_AFTER_MIN = 100;   // retry 가 붙은 일만 — 60분 감시는 도는 중이면 통과라 그 뒤 끊긴 실행을 여기서 잡는다. 100 = 종가 대기 20 + 본 잡 상한 65 + 여유 (15:50 → 17:30)
 const name = (wf) => NAMES[wf] || wf;
 
 function reason(status) {
@@ -208,22 +209,26 @@ async function retryWatch(at, env) {
     if (res.status !== 200) continue;
     const runs = ((await res.json()).workflow_runs || []).filter((r) => r.event === "workflow_dispatch" || r.event === "schedule");
     if (!runs.length || runs.some((r) => r.status !== "completed")) continue;   // 없음은 60분 감시가 알렸다 · 도는 중이면 기다림
-    let jobOk = false;
-    for (const r of runs) {   // 본 잡이 하나라도 성공했으면 다시 걸지 않는다(뒤 잡만 실패한 것은 60분 감시 · 워크플로 알림이 맡음)
+    // 본 잡이 실제로 돈 실행만 센다 — GitHub 예비 실행은 `성공(본 잡 건너뜀)`으로 남아 실행 수로 세면 '이미 다시 걸었다'로 잘못 본다 (11-18 · 11-19 기록)
+    let jobOk = false, tried = 0, unknown = false, bad = null;   // bad = 본 잡이 돌았는데 성공하지 못한 가장 최근 실행
+    for (const r of runs) {
       const jr = await gh(`/actions/runs/${r.id}/jobs?per_page=50`, env.GITHUB_TOKEN);
-      if (jr.status === 200 && ((await jr.json()).jobs || []).some((x) => x.name === j.retry.job && x.conclusion === "success")) { jobOk = true; break; }
+      if (jr.status !== 200) { unknown = true; continue; }
+      const mine = ((await jr.json()).jobs || []).filter((x) => x.name === j.retry.job && x.conclusion && x.conclusion !== "skipped");
+      if (mine.length) { tried++; if (!bad && !mine.some((x) => x.conclusion === "success")) bad = r; }
+      if (mine.some((x) => x.conclusion === "success")) jobOk = true;   // 뒤 잡만 실패한 것은 60분 감시 · 워크플로 알림이 맡음
     }
-    if (jobOk) continue;
+    if (jobOk || unknown || !tried || !bad) continue;   // 성공 · 확인 못 함(잘못 다시 걸지 않게) · 본 잡이 돈 적 없음(수능일 게이트 등)
     const t = kstTime(at).hm;
-    if (runs.length >= 2) {
-      await slack(env, `🚨 ${name(wf)} (${t} 예정분) — 자동으로 다시 건 실행도 실패했습니다. 직접 확인해 주세요\n🔗 ${runs[0].html_url}`);
+    if (tried >= 2) {
+      await slack(env, `🚨 ${name(wf)} (${t} 예정분) — 자동으로 다시 건 실행도 실패했습니다. 직접 확인해 주세요\n🔗 ${bad.html_url}`);
       continue;
     }
     try {
       await dispatch(wf, env.GITHUB_TOKEN, j.retry.inputs);
-      await slack(env, `⚠️ ${name(wf)} (${t} 예정분) — ${runs[0].conclusion === "cancelled" ? "시간 초과 · 취소" : "실패"}로 끝나 자동으로 한 번 다시 걸었습니다\n🔗 ${runs[0].html_url}`);
+      await slack(env, `⚠️ ${name(wf)} (${t} 예정분) — ${bad.conclusion === "cancelled" ? "시간 초과 · 취소" : "실패"}로 끝나 자동으로 한 번 다시 걸었습니다\n🔗 ${bad.html_url}`);
     } catch (e) {
-      await slack(env, `🚨 ${name(wf)} (${t} 예정분) — 실패했고 다시 걸기도 실패했습니다 (${e.status ? reason(e.status) : "연결 실패"})\n🔗 ${runs[0].html_url}`);
+      await slack(env, `🚨 ${name(wf)} (${t} 예정분) — 실패했고 다시 걸기도 실패했습니다 (${e.status ? reason(e.status) : "연결 실패"})\n🔗 ${bad.html_url}`);
     }
   }
 }
@@ -244,7 +249,9 @@ export default {
     const due = dueAt(at);
     const watchAt = new Date(at.getTime() - WATCH_AFTER_MIN * 60 * 1000);
     ctx.waitUntil(watch(watchAt, env).catch((e) => console.log(`감시 오류: ${e}`)));
-    ctx.waitUntil(retryWatch(new Date(at.getTime() - RETRY_AFTER_MIN * 60 * 1000), env).catch((e) => console.log(`다시 걸기 감시 오류: ${e}`)));
+    for (const min of [RETRY_AFTER_MIN, RETRY_AGAIN_MIN]) {
+      ctx.waitUntil(retryWatch(new Date(at.getTime() - min * 60 * 1000), env).catch((e) => console.log(`다시 걸기 감시 오류: ${e}`)));
+    }
     if (kstTime(at).hm === "09:00") ctx.waitUntil(tokenCheck(env).catch((e) => console.log(`토큰 확인 오류: ${e}`)));
     if (!due.length) return; // 할 일 없는 회차
 
