@@ -147,7 +147,7 @@ ROLE_STYLE = {   # 역할 → (칸 바탕, 칸 글자, 머리 글자 색)
 }
 
 
-def table(lines, links):
+def table(lines, links, top=20):
     rows = [[c.strip() for c in ln.strip().strip("|").split("|")] for ln in lines if not re.match(r"^\s*\|?\s*-{3}", ln)]
     head, body = rows[0], rows[1:]
     role = [None if k == 0 else COL_ROLE.get(re.sub(r"[*`]", "", h).strip()) for k, h in enumerate(head)]
@@ -158,7 +158,8 @@ def table(lines, links):
                        + f'">{inline(c, links)}</td>')
     trs = "".join("<tr>" + "".join(td(k, c) for k, c in enumerate(r)) + "</tr>" for r in body)
     # display:table — 테마가 글 안 표를 display:block 으로 바꿔 칸이 폭을 채우지 못한다(오른쪽이 비던 까닭). 좁으면 표만 가로 스크롤
-    return dk.tint(f'<div data-course-table="1" style="overflow-x:auto;margin:0 0 12px;"><table style="display:table;border-collapse:collapse;width:100%;min-width:100%;margin:0;'
+    # 표 영역 ↔ 본문 글 사이 20px (2026-11-20 사용자). 위에 표 제목(※ 작은 굵은 글씨)이 있으면 위 여백은 제목이 가짐
+    return dk.tint(f'<div data-course-table="1" style="overflow-x:auto;margin:{top}px 0 20px;"><table style="display:table;border-collapse:collapse;width:100%;min-width:100%;margin:0;'
                    f'font-size:17px;line-height:{dk.LH_CARD};">' + f"<tr>{th}</tr>{trs}</table></div>")
 
 
@@ -298,7 +299,8 @@ def render(md, links, next_href="#"):
             while i < len(lines) and lines[i].startswith("|"):
                 blk.append(lines[i])
                 i += 1
-            out.append(chart(blk, links, chart_next) if chart_next is not None else table(blk, links))
+            cap_before = bool(out) and out[-1].startswith('<p data-course-table-title')
+            out.append(chart(blk, links, chart_next) if chart_next is not None else table(blk, links, 0 if cap_before else 20))
             chart_next = None
             continue
         elif re.match(r"^(- |\d+\. )", ln):
@@ -326,14 +328,18 @@ def render(md, links, next_href="#"):
         elif ln.startswith("자료:"):
             out.append(f'<p style="{NOTE}">{inline(ln, links)}</p>')
         elif ln.startswith("(") and ln.endswith(")"):
-            out.append(f'<p style="margin:-4px 0 16px;padding-left:{dk.ALIGN_PX}px;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.NOTE};">{inline(ln, links)}</p>')
+            out.append(f'<p style="margin:-12px 0 20px;padding-left:{dk.ALIGN_PX}px;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.NOTE};">{inline(ln, links)}</p>')
         else:
             para = [ln]
             while i + 1 < len(lines) and lines[i + 1].strip() and not re.match(r"^(#|\||- |\d+\. |---|※|자료:|> )", lines[i + 1]):
                 i += 1
                 para.append(lines[i].rstrip())
             txt = dk.tint(inline(" ".join(para), links))
-            if note_mode:
+            nxt_ln = next((x for x in lines[i + 1:] if x.strip()), "")
+            cap = re.fullmatch(r"\*\*(.+)\*\*", " ".join(para).strip())
+            if cap and not note_mode and nxt_ln.startswith("|") and chart_next is None:   # 표 제목 = ※ + 작은 굵은 글씨, 위 20 · 표와 8 (2026-11-20 사용자)
+                out.append(f'<p data-course-table-title="1" style="margin:20px 0 8px;padding-left:{dk.ALIGN_PX}px;font-size:{dk.TINY};line-height:{dk.LH_TINY};font-weight:700;color:#111;word-break:keep-all;">※ {inline(cap.group(1), links)}</p>')
+            elif note_mode:
                 out.append(f'<p style="{DECO["note_p"]}">{gray(inline(" ".join(para), links))}</p>')
             elif not lead_done:   # 첫 문단 = 맨 위 요약 (0편은 부제 구획 다음)
                 out.append(f'<p data-seo-lead="1" style="{dk.SEO_LEAD}">{txt}</p>')
