@@ -43,7 +43,7 @@ DECO = {   # 강좌 글 꾸밈 — 색 · 모양은 여기 한 곳 (auto-blogspo
     "char_text": "flex:1 1 auto;min-width:0;font-size:20px;line-height:30px;font-weight:700;color:#111;word-break:keep-all;",
     "bubble_char": "margin:2px 0 28px;text-align:center;font-size:44px;line-height:52px;",   # 말풍선 꼬리 아래 캐릭터
     # 안내 구획 = `## 📌 제목` (한계 · 밝혀 둘 것) — 아이콘 없이 작은 회색 글씨 (2026-11-12 사용자: 안내성 글은 작게 · 회색 · 딱딱하게)
-    "note_h2": f"margin:36px 0 8px;padding:16px 0 0 {dk.ALIGN_PX}px;font-size:{dk.TINY};line-height:{dk.LH_TINY};font-weight:700;color:{dk.NOTE};",
+    "note_h2": f"margin:36px 0 8px;padding:16px 0 0 {dk.ALIGN_PX}px;border-top:1px dashed #CBD5E1;font-size:{dk.TINY};line-height:{dk.LH_TINY};font-weight:700;color:{dk.NOTE};",
     "note_li": f"font-size:{dk.TINY};line-height:22px;color:{dk.NOTE};margin:0 0 16px;padding-left:{dk.ALIGN_PX + 18}px;word-break:keep-all;",
     "note_p": f"font-size:{dk.TINY};line-height:22px;color:{dk.NOTE};margin:0 0 10px;padding-left:{dk.ALIGN_PX}px;word-break:keep-all;",
     "bubble": "position:relative;max-width:560px;margin:28px auto 36px;padding:18px 22px;border-radius:20px;background:#ECFDF5;"
@@ -162,6 +162,14 @@ TABLE_JS = ("<script>(function(){function u(w){var b=w.querySelector('[data-tscr
             "window.addEventListener('resize',function(){setTimeout(all,30);});})();</script>")
 
 
+KOME_UP = {"15": 1, "14": 1}   # ※ 를 1px 올림 (2026-11-20 사용자: 미들 정렬). 실측(노토 · 나눔바른 · 애플SD 15px 굵게): ※ 위아래 끝 가운데 = 글자 가운데지만 한글이 ※ 보다 위아래로 1.5px 길어 ※ 가 낮아 보인다
+
+
+def kome(fs):
+    """앞머리 ※ — 뒤 글자의 가운데 높이에 맞춘다."""
+    return f'<span style="display:inline-block;position:relative;top:-{KOME_UP[fs]}px;">※</span>'
+
+
 def table(lines, links, top=30, title=""):
     rows = [[c.strip() for c in ln.strip().strip("|").split("|")] for ln in lines if not re.match(r"^\s*\|?\s*-{3}", ln)]
     head, body = rows[0], rows[1:]
@@ -181,7 +189,7 @@ def table(lines, links, top=30, title=""):
     cap = ""
     if title or hint:
         cap = (f'<div data-course-table-title="1" style="display:flex;flex-wrap:wrap-reverse;align-items:baseline;column-gap:12px;margin:0 0 8px;padding-left:{dk.ALIGN_PX}px;">'
-               + (f'<p style="{TABLE_TITLE}">※ {inline(title, links)}</p>' if title else "") + hint + "</div>")
+               + (f'<p style="{TABLE_TITLE}">{kome("15")} {inline(title, links)}</p>' if title else "") + hint + "</div>")
     shade = TABLE_SHADE if swipe else ""
     css = '<style>@media (min-width:600px){[data-swipe-hint],[data-tshade]{display:none!important}}</style>' if swipe else ""   # JS 없이도 넓은 화면엔 안 보임
     # display:table — 테마가 글 안 표를 display:block 으로 바꿔 칸이 폭을 채우지 못한다(오른쪽이 비던 까닭)
@@ -359,7 +367,7 @@ def render(md, links, next_href="#"):
         elif ln.strip() == "---" or not ln.strip():
             pass
         elif ln.startswith("※"):   # 본문 안 근거 안내 — 그래프 위 작은 회색 한두 줄, 구분선 없이 (2026-11-14 사용자: 그래프가 어떻게 나왔는지 짧게)
-            out.append(f'<p data-course-basis="1" style="{BASIS}">{inline(ln, links)}</p>')
+            out.append(f'<p data-course-basis="1" style="{BASIS}">{kome("14")}{inline(ln[1:], links)}</p>')
         elif ln.startswith("자료:"):
             out.append(f'<p style="{NOTE}">{inline(ln, links)}</p>')
         elif ln.startswith("(") and ln.endswith(")"):
