@@ -99,7 +99,7 @@ LIVE = [
     ("주요 인물 발언", ["people-radar/radar_mock.html"]), ("테마", ["theme-monitor/mock_theme-ai-capex.html"]),
     ("Hot Issue", ["issue_store/mock_issue_watch.html"]),
     ("증시 전망", ["issue_store/mock_forecast-list-eh.html", "issue_store/mock_forecast-2.html", "issue_store/mock_forecast-nvda-2026q3.html"]),
-    ("주식 제대로 알기", ["course/mock_study_list.html", "course/mock_착각-03-공포매도.html"]),   # 목록 + 가장 최근 편 (2026-11-20 3편 발행)
+    ("주식 제대로 알기", ["course/mock_study_list.html", "course/mock_착각-*.html"]),   # 목록 + 나온 편 전부 (2026-11-20 사용자: 모든 편을 목업에서 확인)
     ("검색", ["site-search/mock_search.html"]),
     ("디자인 기준표 (그래프 · 팝업 · 아이콘)", ["design-samples/*"]),
     ("운영 현황 (관리자)", ["ops-dashboard/*"]),

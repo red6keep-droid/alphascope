@@ -133,6 +133,8 @@ def main():
     if "--publish" in sys.argv or "--dry" in sys.argv:
         sys.exit(0 if publish(urls, dry="--dry" in sys.argv) else 1)
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
+    # 목업 안 편 링크 = 같은 폴더의 글 목업(지금 렌더러 기준) — 블로그 주소면 고치기 전 발행본이 열린다 (2026-11-20 사용자: 목업에서 확인)
+    urls = {k: f"mock_{os.path.splitext(k)[0]}.html" for k in urls}
     path = dk.write_mock(page(urls), OUT, TITLE)
     if path:
         pg = open(path, encoding="utf-8").read().replace("</body>", RC.MOCK_HEAD_JS + "</body>", 1)
