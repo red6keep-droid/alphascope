@@ -131,7 +131,7 @@ jobs:
     if: needs.when.outputs.skip != 'true'
     runs-on: ubuntu-latest
     # 40 → 55 (2026-11-20 사용자): 그날 수집이 33.7분(평소 9분) 걸려 16:50 에 마지막 단계(캐시 지우기)에서 끊기고 forecast-kr 도 건너뜀
-    timeout-minutes: 65   # 55 → 65 (2026-11-20): 수집 상한 40 + 게시 약 7 + 게시 뒤 보고서 읽기 12 = 59
+    timeout-minutes: 65   # 55 → 65 (2026-11-20): 수집 상한 40 + 게시 약 7 + 여유
     steps:
       - uses: actions/checkout@v5
 
@@ -207,7 +207,7 @@ jobs:
         # Worker 가 17:20 에 한 번 다시 건다). 30분으로 두면 11-20 같은 날(33.7분, 끝나긴 함)이 실패가 돼 오히려 늦는다
         timeout-minutes: 40
         env:
-          KR_BIZ_AFTER: '1'   # 보고서 AI 읽기(dart_biz)는 게시 뒤 단계로
+          KR_BIZ_AFTER: '1'   # 보고서 AI 읽기(dart_biz)는 새벽 quick-dart.yml 의 biz 잡으로 — 여기선 지난 캐시 (게시 뒤 단계에 두면 본 잡 끝이 밀려 증시 전망 · 간단 종목이 같이 늦는다)
         # -u = 출력 즉시 찍기 (2026-11-20): 버퍼에 모였다 끝에 한꺼번에 찍혀 어느 줄에서 느렸는지 로그 시각으로 가를 수 없었다
         run: python -u "$KR_DIR/main_kr.py"
 
@@ -361,15 +361,6 @@ jobs:
           [ -f deploy-home/search/kr.json ] && curl -sS -f "https://purge.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/search/kr.json" || true
           # 홈 카드는 옛 글로 연결되면 안 된다(11-10 미국 카드) — 내용 확인까지
           [ -f deploy-home/cards/kr-report.json ] && bash .github/scripts/jsd_purge.sh cards/kr-report.json deploy-home/cards/kr-report.json || true
-
-      # 보고서 `매출 및 수주상황` 읽기 (Gemini lite, 정식 하루 30건) — 게시 뒤로 옮김 (2026-11-20 사용자). 결과는 data/ 캐시 → 아래 상태 저장 → 다음 실행 화면
-      - name: Business reports (AI, after publish)
-        if: "!cancelled() && steps.run_kr.outcome == 'success'"
-        continue-on-error: true
-        timeout-minutes: 12
-        env:
-          PYTHONUNBUFFERED: '1'
-        run: python "$KR_DIR/biz_after.py"
 
       # 상태 저장 — snapshot 은 매번 새로 받으므로 빼고, 이어서 쌓는 것 · 마지막 자금 흐름(flows.json)
       - name: Save state (kr-state branch)

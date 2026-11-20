@@ -3,6 +3,7 @@ name: Quick DART (간단 종목 한국 DART 새벽 받기)
 # 간단 종목(한국 316종목) DART 매출 · 손익 · 현금흐름 · 기업개황 받기만 — 새벽에 (2026-11-20 사용자 "①~⑥ 전부 적용").
 #   - 옛: 장 마감 뒤 화면 실행(quick-data kr)이 매일 DART 를 21~30분 받아(손익 표 호출당 5~6초) 한국 간단 종목 · 종목 모아보기가 18시께 바뀌었다.
 #     이제 화면 실행은 QUICK_DART_FETCH=0 으로 저장값만 읽고, 받기는 여기서. 같은 함수(full_kr.dart) · 같은 저장값(비공개 quick-state).
+#   - biz 잡 (같은 날 사용자): 한국 정식 종목 보고서 `매출 및 수주상황` 읽기(dart_biz, Gemini lite 하루 30건까지)도 여기 — 한국 종목 실행에서 옮김. 호출 수 그대로, 시각만.
 #   - 매일 KST 03:25. 새벽이라 상한을 넉넉히(45분 · 하루 80곳 — 처음 채우기가 빨리 끝나게). AI 0 · Blogger 0 · gh-pages 0 · 야후 0.
 #   - DART 호출: 회사 하나 약 30번(보고서 15건 × 매출 · 손익) → 80곳이면 약 2,400번. DART 하루 2만 번 한도.
 #   - 같은 저장값을 간단 종목 실행과 덮어쓰므로 같은 줄(concurrency quick-data)에 선다. GitHub 예비가 늦게 와(06시 뒤) 미국 간단 종목(08:20)과
@@ -94,3 +95,74 @@ jobs:
         run: |
           [ -z "$SLACK_WEBHOOK_URL" ] && exit 0
           curl -sS -X POST -H 'Content-type: application/json' --data "{\"text\":\"🚨 워크플로 실패 — 간단 종목 한국 DART 새벽 받기 (화면은 지난 값으로 나감)\n🔗 https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}" "$SLACK_WEBHOOK_URL" || true
+
+  # 한국 정식 종목 보고서 `매출 및 수주상황` 읽기 (dart_biz, Gemini lite 하루 30건) — 한국 종목 실행에서 옮김 (2026-11-20 사용자).
+  # 장 마감 뒤에 두면 그 실행이 끝나는 시각이 밀려 증시 전망 · 간단 종목 이어 붙이기가 같이 늦는다. 결과 data/dart_biz.json 만 kr-state 에 얹는다
+  # (그 파일 하나만 바꾸는 새 커밋 — 한국 종목 실행이 쓴 다른 파일은 그대로). 실패하면 그날 화면은 지난 캐시.
+  biz:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      DART_API_KEY: ${{ secrets.DART_API_KEY }}
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      OPS_CF_ACCOUNT_ID: ${{ secrets.OPS_CF_ACCOUNT_ID }}
+      OPS_CF_KV_NAMESPACE_ID: ${{ secrets.OPS_CF_KV_NAMESPACE_ID }}
+      OPS_CF_API_TOKEN: ${{ secrets.OPS_CF_API_TOKEN }}
+      PYTHONUNBUFFERED: '1'
+    steps:
+      - name: Too late?
+        id: late
+        run: |
+          H=$(TZ=Asia/Seoul date +%-H)
+          if [ "${{ github.event_name }}" = schedule ] && { [ "$H" -lt 2 ] || [ "$H" -ge 6 ]; }; then echo "skip=true" >> "$GITHUB_OUTPUT"; echo "KST ${H}시 — 건너뜀"; else echo "skip=false" >> "$GITHUB_OUTPUT"; fi
+      - uses: actions/checkout@v5
+        if: steps.late.outputs.skip != 'true'
+      - name: Set up Python
+        if: steps.late.outputs.skip != 'true'
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+          cache: pip
+      - name: Install
+        if: steps.late.outputs.skip != 'true'
+        run: |
+          pip install -r experiments/nvda-report/requirements.txt
+          pip install -r experiments/daily-report/requirements.txt
+      - name: Load kr-state (private)
+        if: steps.late.outputs.skip != 'true'
+        env:
+          STATE_DEPLOY_KEY: ${{ secrets.STATE_DEPLOY_KEY }}
+        run: |
+          mkdir -p ~/.ssh && printf '%s\n' "$STATE_DEPLOY_KEY" > ~/.ssh/state_key && chmod 600 ~/.ssh/state_key
+          ssh-keyscan -t ed25519 github.com >> ~/.ssh/known_hosts 2>/dev/null
+          git config core.sshCommand "ssh -i ~/.ssh/state_key -o IdentitiesOnly=yes"
+          git remote add state git@github.com:red6keep-droid/alphascope-state.git
+          git fetch -q state kr-state:refs/kr-state
+          git archive refs/kr-state experiments/kr-stocks/data | tar -x
+          ls experiments/kr-stocks/data | head -40
+      - name: Business reports (보고서 매출 및 수주상황, AI)
+        id: biz
+        if: steps.late.outputs.skip != 'true'
+        run: python experiments/kr-stocks/biz_after.py
+      - name: Save dart_biz.json to kr-state
+        if: steps.biz.outcome == 'success'
+        run: |
+          F=experiments/kr-stocks/data/dart_biz.json
+          [ -f "$F" ] || { echo "결과 파일 없음"; exit 0; }
+          git fetch -q state kr-state:refs/kr-state   # 받은 뒤 다른 실행이 올렸을 수 있다 — 최신 위에 이 파일만
+          export GIT_INDEX_FILE="$(mktemp -u)"
+          git read-tree refs/kr-state
+          git update-index --add --cacheinfo 100644,"$(git hash-object -w "$F")","$F"
+          TREE="$(git write-tree)"; unset GIT_INDEX_FILE
+          if [ "$TREE" = "$(git rev-parse refs/kr-state^{tree})" ]; then echo "변경 없음"; exit 0; fi
+          git config user.name "alphascope-bot" && git config user.email "bot@users.noreply.github.com"
+          COMMIT="$(git commit-tree "$TREE" -p refs/kr-state -m "dart_biz (dawn) [skip ci]")"
+          git push state "$COMMIT:refs/heads/kr-state" && echo "저장: $COMMIT"
+
+      - name: Notify failure
+        if: failure()
+        run: |
+          [ -z "$SLACK_WEBHOOK_URL" ] && exit 0
+          curl -sS -X POST -H 'Content-type: application/json' --data "{\"text\":\"⚠️ 워크플로 실패 — 한국 보고서 매출 · 수주 새벽 읽기 (화면은 지난 캐시로 나감)\n🔗 https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}" "$SLACK_WEBHOOK_URL" || true

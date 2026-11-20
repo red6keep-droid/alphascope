@@ -66,10 +66,10 @@ if __name__ == "__main__":
             codes = [c[0].split(".")[0] for c in collect_kr.U.CANDIDATES]
             cmap = collect_kr_dart.corp_codes(collect_kr_dart._key())
             dart_prelim.run(codes, cmap, collect_kr_dart.filings_by_code(collect_kr_dart._load(collect_kr_dart.FILINGS)))
-            if os.environ.get("KR_BIZ_AFTER") != "1":   # 워크플로는 게시 뒤 biz_after.py 로 (2026-11-20 사용자 — 수집 시간 줄이기). 손으로 돌릴 땐 여기서
+            if os.environ.get("KR_BIZ_AFTER") != "1":   # 워크플로는 새벽 quick-dart.yml biz 잡(biz_after.py)으로 (2026-11-20 사용자 — 장 마감 뒤 시간 줄이기). 손으로 돌릴 땐 여기서
                 dart_biz.run(codes, cmap, collect_kr_dart._load(collect_kr_fin.CACHE))
             else:
-                print("[kr] 보고서 `매출 및 수주상황` 읽기는 게시 뒤 단계로 — 이번 화면은 지난 캐시")
+                print("[kr] 보고서 `매출 및 수주상황` 읽기는 새벽 실행으로 — 이번 화면은 지난 캐시")
         except Exception as e:  # noqa: BLE001
             print(f"::warning::[kr] 잠정실적 · 사업 부문 실패 (지난 캐시로): {e!r}")
     if not cached:   # 기록 먼저, 렌더링 나중 (2026-11-07, 데이터-기록-계획 3부 10-1 의 5) — 카드 판정 · 애널리스트 · 방송 의견 → data/records (kr-state, A5-4)
