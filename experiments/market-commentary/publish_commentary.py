@@ -33,6 +33,9 @@ KST = datetime.timezone(datetime.timedelta(hours=9))
 RAW = "https://raw.githubusercontent.com/red6keep-droid/alphascope/gh-pages"
 OUT = os.path.join(BASE, "output", "publish")
 LATE = {"am": (12, 0), "pm": (23, 59)}   # 이 시각(KST) 뒤엔 그 편을 내지 않는다
+# 저녁 편은 그날 이 시각(KST) 뒤에 저장된 글만 낸다 (2026-11-20 사용자, News-doc 33절) — 한국장 마감 재료 없이 낮에 미리 써진 rev
+# (11-20 12:58 rev 1)가 17:00 · 21:00 에 나가지 않게. 수집기는 저장할 때마다 createdAt 을 서버 시각으로 새로 찍는다(= 그 rev 를 쓴 시각)
+PM_MIN_WRITTEN = (16, 30)
 
 # 검사 낱말 — 수집기도 거르지만 독자에게 나가기 전 마지막 한 번 (요청 문서 12절 Q13 · Q14, 메모 no-buy-sell-labels-computed)
 ADVICE = re.compile(r"(?:매수|매도|사|팔|담으)세요|(?:매수|매도|투자|손절)하(?:세요|십시오|라)|비중을? ?(?:늘리|줄이)(?:세요|십시오)|추천합니다|권합니다|권유합니다|지금이 기회")
@@ -151,8 +154,9 @@ def stage_prepare(a):
 
     if not a.column_json and os.environ.get("IS_SCHEDULED") == "true":   # 정시 · 예비 실행만 — 사람이 손으로 돌릴 땐 시각 상관없이 준비
         h, mi = LATE[slot]
-        now = kst_now()
-        if now.date().isoformat() == day and (now.hour, now.minute) > (h, mi):
+        # 그 편 날짜의 마감 시각과 비교 — 자정을 넘겨 온 예비(11-19 저녁 예비가 11-20 05:53)도 막는다
+        deadline = datetime.datetime.fromisoformat(day).replace(hour=h, minute=mi, tzinfo=KST)
+        if kst_now() > deadline:
             log(f"{key} — 발행 시각이 지나 내지 않음 ({h:02d}:{mi:02d} KST 뒤)")
             return 0
     col = json.load(open(a.column_json, encoding="utf-8")) if a.column_json else read_column(key)
@@ -163,7 +167,18 @@ def stage_prepare(a):
     if status != "ready":
         log(f"columns/{key} status {status!r} — 내지 않음" + (f" (이유: {col.get('reason')})" if col.get("reason") else ""))
         return 0
-    log(f"columns/{key} 읽음 — rev {col.get('rev')} · 모델 {col.get('model')} · 요청 {col.get('calls')}")
+    written = col.get("createdAt")
+    if isinstance(written, datetime.datetime) and written.tzinfo is None:
+        written = written.replace(tzinfo=datetime.timezone.utc)   # Firestore 시각은 UTC
+    log(f"columns/{key} 읽음 — rev {col.get('rev')} · 저장 {written.astimezone(KST):%m-%d %H:%M} KST" if isinstance(written, datetime.datetime)
+        else f"columns/{key} 읽음 — rev {col.get('rev')} · 저장 시각 없음")
+    log(f"  모델 {col.get('model')} · 요청 {col.get('calls')}")
+    if slot == "pm" and not a.column_json and os.environ.get("IS_SCHEDULED") == "true":   # 정시 · 예비만 — 사람이 손으로 돌릴 땐 막지 않음
+        h, mi = PM_MIN_WRITTEN
+        floor = datetime.datetime.fromisoformat(day).replace(hour=h, minute=mi, tzinfo=KST)
+        if not isinstance(written, datetime.datetime) or written < floor:
+            log(f"{key} — {h:02d}:{mi:02d} KST 전에 저장된 글(rev {col.get('rev')})이라 내지 않음 · 마감 뒤 수집기 1차를 기다림")
+            return 0
 
     briefing = (json.load(open(a.briefing_json, encoding="utf-8")) if a.briefing_json
                 else _get_json(f"{RAW}/briefing/{key}.json"))
@@ -244,10 +259,21 @@ def stage_publish(a):
     creds = PB._credentials()
     blog_id = PB._blog_id(creds, blog_url)
     old = already(creds, blog_id, post["key"])
-    if old and not a.replace:
-        log(f"{post['key']} 이미 발행됨 — {old.get('url')}")
+    newer = False
+    if old:   # 수집기 2차(rev 가 오름) — 저녁 편 17:00 1차 뒤 21:00 에 저녁 방송을 보탠 rev 2 (2026-11-20 사용자, News-doc 31절)
+        m = re.search(r'data-rev="(\d+)"', old.get("content") or "")
+        old_rev = int(m.group(1)) if m else None
+        try:
+            new_rev = int(post.get("rev"))
+        except (TypeError, ValueError):
+            new_rev = None
+        newer = old_rev is not None and new_rev is not None and new_rev > old_rev   # 표시 없는 옛 글은 고치지 않는다
+        if newer:
+            log(f"{post['key']} rev {old_rev} → {new_rev} — 같은 주소에 고쳐 쓴다")
+    if old and not a.replace and not newer:
+        log(f"{post['key']} 이미 발행됨 (rev 같음) — {old.get('url')}")
         return 0
-    if old:   # 고쳐 쓰기 (사람이 --replace 로 부를 때만) — 주소 · 라벨은 그대로, 제목 · 본문만 새로
+    if old:   # 고쳐 쓰기 (rev 가 올랐거나 사람이 --replace 로 부를 때) — 주소 · 라벨은 그대로, 제목 · 본문만 새로
         r = PB._write("put", f"{PB.BLOGGER_API}/blogs/{blog_id}/posts/{old['id']}",
                       headers={"Authorization": f"Bearer {creds.token}", "Content-Type": "application/json"},
                       json={"kind": "blogger#post", "id": old["id"], "title": post["title"], "content": html, "labels": old.get("labels") or post["labels"]}, timeout=60)

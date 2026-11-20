@@ -66,7 +66,7 @@ CSS = """<style>
 .cm-pill { position: absolute; left: 8.1%; bottom: calc(74.6% + 5px); padding: 2px 8px; border-radius: 999px; background: rgba(6,18,26,.72);
   color: #fff; font-size: 11px; line-height: 16px; font-weight: 600; }
 /* C — 실적 발표 배너를 한 줄로 (기존 일정 배너 그대로, 모양만): 로고 24 · 종목 이름 · 실적 발표 · D-n, 날짜 · 시각 줄은 숨김. 높이 44 */
-#event-banner.cm-strip .eb-slide { gap: 8px; padding: 15px 72px 15px 7px; }   /* 오른쪽 72 = 점 6개(9 × 6 + 2 × 5 = 64) + 8 — 긴 이름이 점과 겹치지 않게 */   /* 높이 54 (44 + 10, 11-17 사용자) · 로고 왼쪽 5 더 (12 → 7) */
+#event-banner.cm-strip .eb-slide { gap: 8px; padding: 11.5px 72px 11.5px 7px; }   /* 높이 54 → 47 (2026-11-20 사용자 "7 줄여") */   /* 오른쪽 72 = 점 6개(9 × 6 + 2 × 5 = 64) + 8 — 긴 이름이 점과 겹치지 않게 */   /* 높이 54 (44 + 10, 11-17 사용자) · 로고 왼쪽 5 더 (12 → 7) */
 #event-banner.cm-strip .stock-avatar { width: 24px; height: 24px; font-size: 10px; }
 #event-banner.cm-strip .eb-text { flex-direction: row; align-items: center; gap: 8px; }
 #event-banner.cm-strip .eb-kicker, #event-banner.cm-strip .eb-title-line { display: contents; }

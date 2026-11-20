@@ -3,7 +3,8 @@ name: Market Commentary
 # 증시 시황(AlphaScope 시황 해설) 발행 (2026-11-19 사용자 "발행기 만들어", 처음부터 공개).
 # 수집기(News-sub)가 columns/{날짜}-{am|pm} 에 글을 쓰고(08:10 · 20:30, 마감 08:30 · 20:40), 이 워크플로가 ready 글만 읽어 발행한다.
 # 블로그 AI 0. 순서 = 읽기 · 검사 · 배너(Workers AI 1장) → 배너 gh-pages → CDN 확인 → Blogger 공개 발행.
-# 정시 = Cloudflare Worker(infra/cron-trigger KST 08:40 · 21:00). GitHub cron 은 예비 — 이미 발행됐으면 publish 단계가 건너뛴다,
+# 정시 = Cloudflare Worker(infra/cron-trigger KST 08:40 · 17:00 저녁 1차(평일) · 21:00). GitHub cron 은 예비 — 이미 발행됐으면 publish 단계가 건너뛴다
+# (단 수집기 rev 가 올랐으면 같은 주소에 고쳐 쓴다 — 저녁 편 17:00 1차 → 21:00 rev 2, 2026-11-20 사용자 News-doc 31절),
 # 발행 시각이 한참 지난 글(아침 12:00 · 저녁 23:59 KST 뒤)은 내지 않는다.
 
 on:
@@ -68,13 +69,26 @@ jobs:
 
       - name: Slot
         id: slot
+        env:
+          SCHEDULE: ${{ github.event.schedule }}
         run: |
           if [ "${{ github.event_name }}" = "schedule" ]; then
-            # 00:10 UTC = 아침 편 예비, 12:30 UTC = 저녁 편 예비
-            if [ "$(date -u +%H)" -lt 6 ]; then echo "slot=am" >> "$GITHUB_OUTPUT"; else echo "slot=pm" >> "$GITHUB_OUTPUT"; fi
+            # 편 · 날짜 = 그 cron 의 예정 시각 기준(00:10 UTC = 아침 편, 12:30 UTC = 저녁 편).
+            # 예비가 몇 시간 늦게 와도(11-19 저녁 예비가 11-20 05:53 KST 에 와 2026-11-20-pm 을 찾음) 원래 편 · 날짜를 본다
+            python - <<'PY' >> "$GITHUB_OUTPUT"
+          import datetime as dt, os, sys
+          sys.path.insert(0, ".github/scripts")
+          from run_guard import planned_time, KST
+          cron = os.environ["SCHEDULE"]
+          p = planned_time(cron, dt.datetime.now(dt.timezone.utc)) or dt.datetime.now(dt.timezone.utc)
+          print("slot=" + ("am" if cron.split()[1] == "0" else "pm"))
+          print("date=" + p.astimezone(KST).date().isoformat())
+          PY
           else
             echo "slot=${{ inputs.slot }}" >> "$GITHUB_OUTPUT"
+            echo "date=$(TZ=Asia/Seoul date +%F)" >> "$GITHUB_OUTPUT"
           fi
+          cat "$GITHUB_OUTPUT"
 
       # 수집기 글 읽기(Firestore 1건) · 검사 · 배너 1장 · 본문. 검사에 걸리면 exit 1 → 아래 Notify failure 가 Slack
       - name: Prepare (read · check · banner · body)
@@ -83,7 +97,7 @@ jobs:
           CF_ACCOUNT_ID: ${{ secrets.OPS_CF_ACCOUNT_ID }}
           CF_AI_TOKEN: ${{ secrets.CF_AI_TOKEN }}
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
-        run: python experiments/market-commentary/publish_commentary.py prepare --slot "${{ steps.slot.outputs.slot }}" ${{ inputs.redraw && '--redraw' || '' }}
+        run: python experiments/market-commentary/publish_commentary.py prepare --slot "${{ steps.slot.outputs.slot }}" --date "${{ steps.slot.outputs.date }}" ${{ inputs.redraw && '--redraw' || '' }}
 
       - name: Deploy banner to gh-pages
         id: banner_deploy

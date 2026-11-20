@@ -20,7 +20,7 @@ OUT = os.path.join(HERE, "output")
 KR_SAMPLE = os.path.join(HERE, "samples", "kr_news_2026-11-19.json")
 
 STRIP_CSS = """<style>
-/* 실적 한 줄 자리 — 일정이 없는 날 주요 뉴스 줄 (2026-11-19 사용자). 같은 한 줄 칸(높이 54) · 같은 바탕색 돌림 · 같은 점 */
+/* 실적 한 줄 자리 — 일정이 없는 날 주요 뉴스 줄 (2026-11-19 사용자). 같은 한 줄 칸(높이 47) · 같은 바탕색 돌림 · 같은 점 */
 #event-banner .eb-news { gap: 8px; }
 #event-banner .eb-news .eb-tag { flex: none; font-size: 12px; line-height: 19px; padding: 0 6px; border-radius: 4px; background: rgba(255, 255, 255, .2); color: #fff; font-weight: 700; }
 #event-banner .eb-news .eb-headline { flex: 1 1 auto; min-width: 0; font-size: 15px; line-height: 24px; font-weight: 700; color: #fff;

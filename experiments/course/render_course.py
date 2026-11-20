@@ -49,14 +49,17 @@ DECO = {   # 강좌 글 꾸밈 — 색 · 모양은 여기 한 곳 (auto-blogspo
     "bubble": "position:relative;max-width:560px;margin:28px auto 36px;padding:18px 22px;border-radius:20px;background:#ECFDF5;"
               f"text-align:center;font-size:{dk.BODY};line-height:32px;font-weight:700;color:#134E4A;word-break:keep-all;",
     "tail": "width:0;height:0;margin:-37px auto 0;border:12px solid transparent;border-top-color:#ECFDF5;border-bottom:0;",
-    "check": f"list-style:none;margin:0 0 20px;padding:14px 16px;background:#F8FAFC;border-radius:12px;font-size:{dk.BODY};line-height:{dk.LH_BODY};color:#333;",
+    "check": f"list-style:none;margin:0 0 20px;padding:14px 16px;background:#F8FAFC;border-radius:12px;font-size:{dk.BODY};line-height:{dk.LH_BODY};color:#333;",   # 바탕 회색. `## 🔍` (무엇을 보면 되나) 구획 안 목록만 노랑 — CHECK_TAKE (2026-11-20 사용자)
 }
 # 캐릭터 그림 (2026-11-14 사용자 시트 → cut_chars.py). 초안에 `{상승이-놀람}` 처럼 적으면 그 자리에 그림 — 이모지 자리 셋(강조 줄 · 대결 · 말풍선 아래) 모두
 # 상승이 = 신호 보고 산 사람 · 하락이 = 아무 날 산 사람 · 중심이 = 질문 · 설명하는 안내역
 CHARS = {
     "상승이-매수": "up_buy", "상승이-놀람": "up_surprised", "상승이-식은땀": "up_sweat",
+    "상승이-울상": "up_cry", "상승이-다급": "up_rush", "상승이-후회": "up_regret", "상승이-기다림": "up_wait",   # 2026-11-20 사용자 SVG → svg_to_webp.py
     "하락이-못마땅": "down_grumpy", "하락이-밝게": "down_happy",
+    "하락이-시무룩": "down_sulky", "하락이-담담": "down_calm",   # 2026-11-20 사용자 SVG → 320 WebP
     "중심이-고민": "mid_think", "중심이-설명": "mid_explain",
+    "중심이-주의": "mid_caution", "중심이-돋보기": "mid_magnifier",   # 2026-11-20 사용자 SVG(chars/src/*.svg) → 320 WebP
 }
 CHAR_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "chars")
 CHAR_PX = {"line": 113, "vs": 150, "bubble": 125}   # 강조 줄 · 대결 · 말풍선 아래 — 2026-11-14 사용자: 캐릭터 부각, 30% 키움(72 · 96 · 80 → 94 · 125 · 104) 뒤 20% 더(→ 113 · 150 · 125)
@@ -90,8 +93,9 @@ def is_char(tok):
 # 소품 아이콘 (2026-11-15 사용자 시트 → cut_icons.py). 초안은 지금처럼 이모지를 적고, 아래 표에 있는 이모지는 그림으로 바꾼다 — 없는 이모지는 그대로
 ICONS = {
     "🎬": "theater", "🤔": "question", "📏": "ruler", "📉": "chart", "📈": "chart", "📊": "chart",
-    "⚖": "scale", "🔍": "magnifier", "💡": "bulb", "🗺": "map", "✅": "check", "🎣": "hook", "✌": "calendars", "📅": "calendars", "📝": "memo",
+    "⚖": "scale", "🔍": "magnifier", "💡": "bulb", "🗺": "map", "✅": "check", "🎣": "hook", "✌": "calendars", "📅": "calendars", "📝": "memo", "⏳": "hourglass", "⌛": "hourglass",
 }
+CHECK_TAKE = "#FEF9E7"   # `## 🔍` 정리 구획의 체크 목록 바탕 = 캐릭터 강조 줄과 같은 노랑 (2026-11-20 사용자: 정리 상자만 노랑, 다른 목록은 회색)
 ICON_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "icons")
 ICON_PX = {"h2": 36, "check": 22}   # 소제목 · 체크 목록 글머리. 소제목 = 바탕 없이 네모 아이콘 36 (2026-11-15 사용자: 동그라미 안 28 은 잘려 보임 → 동그라미 없앰)
 
@@ -128,26 +132,43 @@ def inline(t, links):
 
 # 표 칸(세로 줄) 색 — 머리 줄 이름으로 정한다 (2026-11-14 사용자, 1편 표). 아주 연하게, 칸 구분만
 #   `아무 날` = 연한 파랑 · 그 말대로 산 사람 칸(`2010년대` · `2020년 이후`) = 연한 빨강 · 결과 칸(`다음 날 하루`) = 연한 청록
-COL_TONES = {   # 이름 → (머리 줄 바탕, 칸 바탕, 칸 글자 색 또는 "")
-    "아무 날": ("#E6EFFB", "#F5F9FF", ""),
-    "2010년대": ("#FBE7E7", "#FFF7F7", ""),
-    "2020년 이후": ("#FBE7E7", "#FFF7F7", ""),
-    "다음 날 하루": ("#D7F3EA", "#F2FBF8", ""),   # 결과 칸 = 강좌 강조색(청록)을 아주 연하게 (2026-11-14 사용자)
+# 표 규칙 = B6 (2026-11-20 사용자 확정, 시안 B · B1~B8 중): 세로줄 없이 가로줄만 · 머리 줄 연회색 면 + 아래 굵은 검은 줄 ·
+# 그 말대로 산 쪽(시기 · 결과) 칸 = 아주 연한 녹색 면 + 굵은 검정 · 아무 날 칸 = 아주 연한 보라 면 + 회색 글자 · 그 밖 칸 = 면 없음.
+# 칸 역할은 머리 줄 이름으로 정한다 — 새 편 표도 같은 이름을 쓰면 자동. 옛 모양(청록 머리 · 세로줄 · 연빨강 · 연파랑)은 11-20 에 바꿈
+TABLE = {"head_bg": "#F3F4F6", "head_line": "2px solid #111", "row_line": "1px solid #E2E8F0", "pad": "10px 8px", "head_pad": "8px 8px"}
+COL_ROLE = {   # 머리 줄 이름 → 역할
+    "아무 날": "any", "아무 날 산 사람": "any",
+    "2010년대": "main", "2020년 이후": "main", "다음 날 하루": "main", "그때 산 사람": "main", "실적 보고 산 사람": "main",
+}
+ROLE_STYLE = {   # 역할 → (칸 바탕, 칸 글자, 머리 글자 색)
+    "main": ("#F0FDF4", "font-weight:700;color:#111;", "#111"),
+    "any": ("#F5F3FF", f"color:{dk.NOTE};", dk.NOTE),
+    None: ("", "color:#333;", "#111"),
 }
 
 
-def table(lines, links):
+def table(lines, links, top=30):
     rows = [[c.strip() for c in ln.strip().strip("|").split("|")] for ln in lines if not re.match(r"^\s*\|?\s*-{3}", ln)]
     head, body = rows[0], rows[1:]
-    # 강좌 표 — 화면 폭을 꽉 채우고(오른쪽 빈 칸 없이) 머리 줄에 청록 바탕 (2026-11-12 사용자). 칸 폭은 고르게, 좁으면 표만 가로 스크롤
-    tone = [COL_TONES.get(re.sub(r"[*`]", "", h).strip()) for h in head]
-    th = "".join(f'<th style="border:1px solid #CFE9E3;padding:8px 10px;background:{tone[k][0] if tone[k] else "#ECFDF5"};text-align:{"left" if k == 0 else "right"};white-space:nowrap;'
-                 f'font-size:{dk.TINY};line-height:{dk.LH_TINY};color:#134E4A;font-weight:700;">{inline(h, links)}</th>' for k, h in enumerate(head))
-    trs = "".join("<tr>" + "".join(f'<td style="border:1px solid #E2E8F0;padding:8px 10px;white-space:nowrap;text-align:{"left" if k == 0 else "right"};'
-                                   f'{"color:#111;font-weight:600;" if k == 0 else ""}{f"background:{tone[k][1]};" if tone[k] else ""}{f"color:{tone[k][2]};" if tone[k] and tone[k][2] else ""}">{inline(c, links)}</td>' for k, c in enumerate(r)) + "</tr>" for r in body)
+    role = [None if k == 0 else COL_ROLE.get(re.sub(r"[*`]", "", h).strip()) for k, h in enumerate(head)]
+    # 폰에서 넘겨 보기 (2026-11-20 사용자: "표는 넘겨 보기로"): 첫 칸(행 이름)은 왼쪽에 고정(sticky) · 칸 4개 이상이면 폭 좁을 때만 `옆으로 넘겨 보기 ›` 안내
+    stick = lambda bg: f"position:sticky;left:0;z-index:1;background:{bg};box-shadow:1px 0 0 #E2E8F0;"
+    th = "".join(f'<th style="padding:{TABLE["head_pad"]};background:{TABLE["head_bg"]};border-bottom:{TABLE["head_line"]};text-align:{"left" if k == 0 else "right"};white-space:nowrap;'
+                 f'{stick(TABLE["head_bg"]) if k == 0 else ""}'
+                 f'font-size:13px;line-height:18px;font-weight:700;color:{ROLE_STYLE[role[k]][2]};">{inline(h, links)}</th>' for k, h in enumerate(head))
+    td = lambda k, c: (f'<td style="padding:{TABLE["pad"]};border-bottom:{TABLE["row_line"]};white-space:nowrap;text-align:{"left" if k == 0 else "right"};'
+                       + ("font-weight:600;color:#111;" + stick("#fff") if k == 0 else (f"background:{ROLE_STYLE[role[k]][0]};" if ROLE_STYLE[role[k]][0] else "") + ROLE_STYLE[role[k]][1])
+                       + f'">{inline(c, links)}</td>')
+    trs = "".join("<tr>" + "".join(td(k, c) for k, c in enumerate(r)) + "</tr>" for r in body)
+    hint = ""
+    if len(head) >= 4:
+        hint = ('<style>@media (min-width:600px){[data-swipe-hint]{display:none!important}}</style>'
+                f'<div data-swipe-hint="1" style="margin:0 0 4px;text-align:right;font-size:12px;line-height:16px;color:{dk.MUTED};">옆으로 넘겨 보기 ›</div>')
     # display:table — 테마가 글 안 표를 display:block 으로 바꿔 칸이 폭을 채우지 못한다(오른쪽이 비던 까닭)
-    return dk.tint(f'<div data-course-table="1" style="overflow-x:auto;margin:0 0 12px;"><table style="display:table;border-collapse:collapse;width:100%;min-width:100%;margin:0;'
-                   f'font-size:17px;line-height:{dk.LH_CARD};">' + f"<tr>{th}</tr>{trs}</table></div>")
+    # 표 영역 ↔ 본문 글 사이 30px (2026-11-20 사용자: 20 → 30). 위에 표 제목(※ 작은 굵은 글씨)이 있으면 위 여백은 제목이 가짐
+    return dk.tint(f'<div data-course-table="1" style="margin:{top}px 0 30px;">{hint}<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">'
+                   '<table style="display:table;border-collapse:separate;border-spacing:0;width:100%;min-width:100%;margin:0;'
+                   f'font-size:17px;line-height:{dk.LH_CARD};">' + f"<tr>{th}</tr>{trs}</table></div></div>")
 
 
 CHART_COLORS = [dk.CHART_MAIN, dk.CHART_CMP, dk.CHART_SERIES[1]]   # 2026-11-14 그래프 통일: 그래프 색 표 — 신호 쪽 주황 · 비교 기준(아무 날) 회색 · 셋째 청록 (옛 #F59E0B · #0F766E · #9AD1C8). 빨강 · 파랑은 안 씀(오름 · 내림 색)
@@ -199,8 +220,8 @@ def versus(items, links):
 
 
 def is_emoji(tok):
-    """이모지 토큰인가 — 한글 · 영문 · 숫자 · 문장부호가 없는 덩어리."""
-    return bool(tok) and all(ord(c) in (0x200D, 0xFE0F) or ord(c) >= 0x2600 and not 0x3000 <= ord(c) <= 0xD7FF for c in tok)
+    """이모지 토큰인가 — 한글 · 영문 · 숫자 · 문장부호가 없는 덩어리. 0x2300 ~ 0x23FF = ⏳ ⌛ ⏰ (2026-11-20 모래시계 아이콘)."""
+    return bool(tok) and all(ord(c) in (0x200D, 0xFE0F) or 0x2300 <= ord(c) <= 0x23FF or ord(c) >= 0x2600 and not 0x3000 <= ord(c) <= 0xD7FF for c in tok)
 
 
 def next_card(text, href, links):
@@ -230,7 +251,7 @@ def render(md, links, next_href="#"):
     md = md.split("### 발행 전 확인")[0]
     lines = [ln for ln in md.splitlines() if not ln.startswith("> 초안")]
     title, out, i, lead_done = "", [], 0, False
-    note_mode, chart_next = False, None   # note_mode: `## 📌` 안내 구획 안(다음 ## 까지) · chart_next: `[그래프]` 다음 표
+    note_mode, chart_next, take_mode = False, None, False   # take_mode: `## 🔍` 정리 구획 안(체크 목록 바탕 노랑)
     gray = lambda h: h.replace('color:#111;', f'color:{dk.NOTE};')   # 안내 구획 안 굵은 글씨도 회색
     while i < len(lines):
         ln = lines[i].rstrip()
@@ -251,6 +272,7 @@ def render(md, links, next_href="#"):
             if not is_emoji(icon):
                 icon, rest = "📖", ln[3:].strip()
             note_mode = icon.startswith("📌")
+            take_mode = icon.startswith("🔍")
             if note_mode:
                 out.append(f'<div data-course-note="1" style="{DECO["note_h2"]}">{inline(rest, links)}</div>')   # h2 가 아니라 div — 테마가 h2 글자 크기를 키운다
             else:
@@ -278,14 +300,15 @@ def render(md, links, next_href="#"):
             while i < len(lines) and lines[i].startswith("- [v] "):
                 items.append(lines[i][6:].strip())
                 i += 1
-            out.append(f'<ul style="{DECO["check"]}">' + "".join(f'<li style="margin:4px 0;">{icon_html("✅", "check")} {dk.tint(inline(x, links))}</li>' for x in items) + "</ul>")
+            out.append(f'<ul style="{DECO["check"].replace("#F8FAFC", CHECK_TAKE) if take_mode else DECO["check"]}">' + "".join(f'<li style="margin:4px 0;">{icon_html("✅", "check")} {dk.tint(inline(x, links))}</li>' for x in items) + "</ul>")
             continue
         elif ln.startswith("|"):
             blk = []
             while i < len(lines) and lines[i].startswith("|"):
                 blk.append(lines[i])
                 i += 1
-            out.append(chart(blk, links, chart_next) if chart_next is not None else table(blk, links))
+            cap_before = bool(out) and out[-1].startswith('<p data-course-table-title')
+            out.append(chart(blk, links, chart_next) if chart_next is not None else table(blk, links, 0 if cap_before else 30))
             chart_next = None
             continue
         elif re.match(r"^(- |\d+\. )", ln):
@@ -313,14 +336,18 @@ def render(md, links, next_href="#"):
         elif ln.startswith("자료:"):
             out.append(f'<p style="{NOTE}">{inline(ln, links)}</p>')
         elif ln.startswith("(") and ln.endswith(")"):
-            out.append(f'<p style="margin:-4px 0 16px;padding-left:{dk.ALIGN_PX}px;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.NOTE};">{inline(ln, links)}</p>')
+            out.append(f'<p style="margin:-22px 0 30px;padding-left:{dk.ALIGN_PX}px;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.NOTE};">{inline(ln, links)}</p>')
         else:
             para = [ln]
             while i + 1 < len(lines) and lines[i + 1].strip() and not re.match(r"^(#|\||- |\d+\. |---|※|자료:|> )", lines[i + 1]):
                 i += 1
                 para.append(lines[i].rstrip())
             txt = dk.tint(inline(" ".join(para), links))
-            if note_mode:
+            nxt_ln = next((x for x in lines[i + 1:] if x.strip()), "")
+            cap = re.fullmatch(r"\*\*(.+)\*\*", " ".join(para).strip())
+            if cap and not note_mode and nxt_ln.startswith("|") and chart_next is None:   # 표 제목 = ※ + 작은 굵은 글씨, 위 30 · 표와 8 (2026-11-20 사용자)
+                out.append(f'<p data-course-table-title="1" style="margin:30px 0 8px;padding-left:{dk.ALIGN_PX}px;font-size:{dk.TINY};line-height:{dk.LH_TINY};font-weight:700;color:#111;word-break:keep-all;">※ {inline(cap.group(1), links)}</p>')
+            elif note_mode:
                 out.append(f'<p style="{DECO["note_p"]}">{gray(inline(" ".join(para), links))}</p>')
             elif not lead_done:   # 첫 문단 = 맨 위 요약 (0편은 부제 구획 다음)
                 out.append(f'<p data-seo-lead="1" style="{dk.SEO_LEAD}">{txt}</p>')
@@ -341,7 +368,8 @@ def share_tag():
     return f'<img data-share-img="1" src="{IMG_BASE}{SHARE_IMG}" alt="" width="1200" height="600" hidden style="display:none">'
 
 
-HEAD_LABEL = "주식 공부"   # 머리 줄(글 제목 자리)에 보일 메뉴 이름 (2026-11-10 사용자: 여기에 타이틀 쓰지 말고 메뉴명; 2026-11-14 이름 강좌 → 주식 공부). 글 제목 · 검색 제목은 그대로
+HEAD_SUB = "주식공부"   # 머리 줄 옆 아주 작은 글씨 — 검색어 (2026-11-20 사용자)
+HEAD_LABEL = "주식 제대로 알기"   # 머리 줄(글 제목 자리)에 보일 메뉴 이름 (2026-11-10 사용자: 여기에 타이틀 쓰지 말고 메뉴명; 2026-11-14 이름 강좌 → 주식 공부; 2026-11-20 → 주식 제대로 알기 — Blogger 라벨은 `주식 공부` 그대로). 글 제목 · 검색 제목은 그대로
 LIST_URL = "https://alpha-scope.blogspot.com/p/study.html"   # 머리 줄 화살표 · 목록 = 주식 공부 목록 고정 페이지(render_list.py --publish) — 옛 `주식 공부` 라벨 검색 (2026-11-15 사용자: 새 목록 페이지로 안 갔다)
 
 
@@ -355,7 +383,7 @@ def title_block(title):
 
 # 목업 전용 — 테마 JS 가 머리 줄을 다 만든 뒤 글자만 `강좌` 로. 실제 블로그는 테마(alphaflow-home.html)에 같은 동작을 넣는다(data-head-label)
 MOCK_HEAD_JS = ("<script>(function(){function go(){var b=document.querySelector('[data-head-label]');if(!b)return;"
-                "var l=document.querySelector('.post-title-label')||document.querySelector('.post-title');if(l)l.textContent=b.getAttribute('data-head-label');}"
+                "var l=document.querySelector('.post-title-label')||document.querySelector('.post-title');if(l){l.textContent=b.getAttribute('data-head-label');var t=b.getAttribute('data-head-sub');if(t){var s=document.createElement('span');s.textContent=' - '+t;s.style.cssText='font-size:11px;font-weight:500;opacity:.6;margin-left:3px;letter-spacing:0;';l.appendChild(s);}}}"
                 "if(document.readyState==='complete')go();else window.addEventListener('load',go);})();</script>")
 
 
@@ -367,7 +395,7 @@ def main():
         k = files.index(f)
         nxt = links[os.path.basename(files[k + 1])] if k + 1 < len(files) else "#"   # 다음 편 카드 = 다음 파일 목업 (아직 없으면 #)
         title, body = render(open(f, encoding="utf-8").read(), links, nxt)
-        body = (f'<span data-head-label="{HEAD_LABEL}" hidden></span><span data-list-url="{LIST_URL}" data-nav="back" hidden></span>'
+        body = (f'<span data-head-label="{HEAD_LABEL}" data-head-sub="{HEAD_SUB}" hidden></span><span data-list-url="{LIST_URL}" data-nav="back" hidden></span>'
                 + title_block(title) + body)
         path = dk.write_mock(body, os.path.join(OUT, links[os.path.basename(f)]), title)
         if path:

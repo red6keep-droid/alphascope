@@ -25,7 +25,7 @@ COURSES = [
     ("초보가 흔히 하는 착각", "많이 듣는 말을 하나씩 꺼내, 아무 날에 산 사람과 비교해 확인합니다.", [
         ("0", "들어가며", "착각-00-들어가며.md"),
         ("1", "실적이 좋다는데 왜 주가는 떨어질까?", "착각-01-실적.md"),
-        ("2", "고점에 물리면 얼마나 오래 가나?", None),
+        ("2", "고점에 물리면 얼마나 오래 가나?", "착각-02-물림.md"),
         ("3", "크게 빠진 날 팔면 안 되는 때, 괜찮은 때", None),
         ("4", "판 값에 다시 사려다 더 비싸게 사는 이유", None),
         ("5", "분할 매수, 하단을 기다리면 더 싸게 모일까?", None),
@@ -93,17 +93,18 @@ def page(urls):
            'style="display:block;width:252px;height:132px;max-width:100%;object-fit:contain;margin:0 auto;border-radius:0;">')
     head = (f'<div data-study-head="1" style="padding:19px {dk.ALIGN_PX}px 8px;margin:0 0 16px;text-align:center;">'
             f'<div aria-hidden="true" style="margin:0 0 12px;">{art}</div>'
-            '<h1 style="margin:0 0 6px;font-size:26px;line-height:36px;font-weight:800;color:#111;">주식 공부</h1>'
+            # 2026-11-20 사용자: `- 주식공부` 는 큰 제목이 아니라 머리 줄 옆 아주 작은 글씨(data-head-sub)
+            '<h1 style="margin:0 0 6px;font-size:26px;line-height:36px;font-weight:800;color:#111;">주식 제대로 알기</h1>'
             f'<p data-seo-lead="1" style="margin:0;font-size:17px;line-height:26px;color:#333;word-break:keep-all;">{INTRO}</p></div>')
     cards = "".join(course_card(k, *c, urls) for k, c in enumerate(COURSES))
     # 접기 표시 — 사파리 기본 삼각형 숨김 · 펼치면 화살표 위로 (글 안 style 한 줄, 테마 붙여넣기 없이)
     cards = ('<style>details[data-course]>summary::-webkit-details-marker{display:none}'
              'details[data-course] .study-fold svg{transition:transform .15s}details[data-course][open] .study-fold svg{transform:rotate(180deg)}</style>' + cards)
-    return (RC.share_tag() + f'<span data-head-label="{RC.HEAD_LABEL}" hidden></span><span data-nav="home" hidden></span>'
+    return (RC.share_tag() + f'<span data-head-label="{RC.HEAD_LABEL}" data-head-sub="{RC.HEAD_SUB}" hidden></span><span data-nav="home" hidden></span>'
             + dk.WRAP_OPEN + head + cards + dk.WRAP_CLOSE)
 
 
-KEY, TITLE = "study", "주식 공부"   # 주소 /p/study.html — 처음 만들 때 영문 이름으로 정해진다
+KEY, TITLE = "study", "주식 제대로 알기 - 주식공부"   # 주소 /p/study.html(바꾸지 않음) — 처음 만들 때 영문 이름으로 정해진다. 제목 = 검색 결과 제목이라 `주식 공부` 를 남김 (2026-11-20)
 
 
 def publish(urls, dry=False):
@@ -132,7 +133,7 @@ def main():
     if "--publish" in sys.argv or "--dry" in sys.argv:
         sys.exit(0 if publish(urls, dry="--dry" in sys.argv) else 1)
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
-    path = dk.write_mock(page(urls), OUT, "주식 공부")
+    path = dk.write_mock(page(urls), OUT, TITLE)
     if path:
         pg = open(path, encoding="utf-8").read().replace("</body>", RC.MOCK_HEAD_JS + "</body>", 1)
         open(path, "w", encoding="utf-8").write(pg)
