@@ -205,16 +205,6 @@ jobs:
       # 종목 전용 고정 페이지 (2026-11-15 사용자: /p/stock.html?s= 하나로는 Blogger 대표 주소가 ?s= 를 떼어 검색 · 공유가 종목별로 안 잡힌다).
       # 소개가 있는 종목만 · 새 페이지 하루 50 · 고쳐 쓰기 100 · 4초 간격 · 429 면 멈춤. 본문은 작은 불러오기 코드라 스크립트를 고쳐도 다시 안 쓴다.
       # 주소표(/tmp/qd/shells.json) → Pages /shells.json — /p/stock.html?s= 가 전용 페이지로 넘긴다
-      - name: Shell pages (Blogger, 종목 전용 페이지)
-        id: shells
-        if: env.DO_PUBLISH == 'true' && steps.collect.outputs.code == '0'
-        continue-on-error: true
-        env:
-          BLOGGER_CLIENT_ID: ${{ secrets.BLOGGER_CLIENT_ID }}
-          BLOGGER_CLIENT_SECRET: ${{ secrets.BLOGGER_CLIENT_SECRET }}
-          BLOGGER_REFRESH_TOKEN: ${{ secrets.BLOGGER_REFRESH_TOKEN }}
-        run: python experiments/stock-quick/publish_quick_shells.py --cache /tmp/qcache --publish --map /tmp/qd/shells.json
-
       # 하단 메뉴 `종목` 페이지 목록 파일 (2026-11-17 사용자 "1단계 구현", 기획 비공개 기획/종목-탭-그룹-목록-기획.md) — /tmp/qd/<시장>/_lists.json.
       # 같은 폴더라 아래 Pages 배포(/us/_lists.json) · quick-us · quick-kr 브랜치에 그대로 실린다 — 새 푸시 · 수집 · AI 0. 미국 시가총액 = 저장값 주식 수 × 종가.
       # 정식 검색 색인(gh-pages search/)은 S&P 500 · 코스피 200 · 코스닥 150 밖 정식 종목(테마 묶음) · ETF 용. 실패해도 다른 단계는 그대로(페이지는 전날 파일).
@@ -227,6 +217,39 @@ jobs:
           SHELLS=/tmp/qd/shells.json
           [ -f "$SHELLS" ] || { curl -sf https://alpha-scope.pages.dev/shells.json -o /tmp/shells.json && SHELLS=/tmp/shells.json; } || SHELLS=""
           python experiments/stock-lists/build_lists.py --qd /tmp/qd --cache /tmp/qcache --search /tmp/search ${SHELLS:+--shells $SHELLS}
+
+      # 순서 (2026-11-20 사용자): 독자 화면이 읽는 데이터를 Blogger 페이지 정리(약 16분) 앞에 올린다 — 한국 17:16 → 17:01쯤.
+      # 목록 파일은 그래서 전날 페이지 목록(pages.dev shells.json)을 쓴다 — 그날 처음 전용 페이지가 생긴 종목만 목록 링크가 하루 늦게 붙음(받아들임).
+      # 페이지 정리 · 상태 저장(페이지 해시가 cache 에 남음) · Pages 예비는 이 뒤 — 이 단계가 실패해도 지금처럼 돈다(!cancelled)
+      - name: Publish quick-us · quick-kr (no history)
+        if: env.DO_PUBLISH == 'true' && steps.collect.outputs.code == '0'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          for m in us kr; do
+            mkdir -p /tmp/pub-$m/$m && cp -r /tmp/qd/$m/. /tmp/pub-$m/$m/ && mv /tmp/pub-$m/$m/version.json /tmp/pub-$m/version.json
+            cd /tmp/pub-$m
+            git init -q && git checkout -q --orphan quick-$m
+            git config user.name "github-actions[bot]" && git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add -A && git commit -q -m "quick $m $(date -u +%F)"
+            SHA=$(git rev-parse HEAD)
+            python -c "import json,sys;p='version.json';v=json.load(open(p));v['commit']=sys.argv[1];json.dump(v,open(p,'w'),ensure_ascii=False)" "$SHA"
+            git add version.json && git commit -q -m "version $SHA"
+            git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git" HEAD:quick-$m
+            echo "올림: quick-$m 데이터 $SHA · $(du -sh $m | cut -f1)"
+            curl -sS -f "https://purge.jsdelivr.net/gh/${{ github.repository }}@quick-$m/version.json" || echo "purge 실패 — 최대 12시간 뒤 갱신"
+            cd /tmp
+          done
+
+      - name: Shell pages (Blogger, 종목 전용 페이지)
+        id: shells
+        if: "!cancelled() && env.DO_PUBLISH == 'true' && steps.collect.outputs.code == '0'"
+        continue-on-error: true
+        env:
+          BLOGGER_CLIENT_ID: ${{ secrets.BLOGGER_CLIENT_ID }}
+          BLOGGER_CLIENT_SECRET: ${{ secrets.BLOGGER_CLIENT_SECRET }}
+          BLOGGER_REFRESH_TOKEN: ${{ secrets.BLOGGER_REFRESH_TOKEN }}
+        run: python experiments/stock-quick/publish_quick_shells.py --cache /tmp/qcache --publish --map /tmp/qd/shells.json
 
       # 저장값은 게시 여부와 상관없이 남긴다 — 하루 상한으로 나눠 채우는 것이 이어지게. 다시 모을 수 있는 캐시라 기록 없이 덮어쓴다(저장소가 커지지 않게)
       - name: Save quick-state (private, no history)
@@ -247,7 +270,7 @@ jobs:
       # 블로그 Cloudflare 계정(red6)만 — 계정 ID 고정, 토큰 = Pages 쓰기 권한만. 독자가 보는 페이지가 아직 없어 그림자 모드에서도 올린다(확인용).
       # 배포 하나 = 사이트 전체: us/ · kr/ · _headers(CORS · 검색 제외) · robots.txt · 404.html. 바뀐 파일만 올라간다. 실패해도 jsDelivr 길은 그대로.
       - name: Publish Cloudflare Pages (spare)
-        if: steps.collect.outputs.code == '0'
+        if: "!cancelled() && steps.collect.outputs.code == '0'"
         continue-on-error: true
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CF_PAGES_API_TOKEN }}
@@ -264,26 +287,6 @@ jobs:
           npx --yes wrangler@4.162.0 pages deploy /tmp/cfp --project-name alpha-scope --branch main --commit-dirty=true
           code=$(curl -s -o /dev/null -w "%{http_code}" "https://alpha-scope.pages.dev/us/UBER")
           echo "확인 us/UBER → $code"; [ "$code" = 200 ] || echo "::warning::Pages 확인 실패 ($code) — 독자는 jsDelivr 로 읽는다"
-
-      - name: Publish quick-us · quick-kr (no history)
-        if: env.DO_PUBLISH == 'true' && steps.collect.outputs.code == '0'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          for m in us kr; do
-            mkdir -p /tmp/pub-$m/$m && cp -r /tmp/qd/$m/. /tmp/pub-$m/$m/ && mv /tmp/pub-$m/$m/version.json /tmp/pub-$m/version.json
-            cd /tmp/pub-$m
-            git init -q && git checkout -q --orphan quick-$m
-            git config user.name "github-actions[bot]" && git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add -A && git commit -q -m "quick $m $(date -u +%F)"
-            SHA=$(git rev-parse HEAD)
-            python -c "import json,sys;p='version.json';v=json.load(open(p));v['commit']=sys.argv[1];json.dump(v,open(p,'w'),ensure_ascii=False)" "$SHA"
-            git add version.json && git commit -q -m "version $SHA"
-            git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git" HEAD:quick-$m
-            echo "올림: quick-$m 데이터 $SHA · $(du -sh $m | cut -f1)"
-            curl -sS -f "https://purge.jsdelivr.net/gh/${{ github.repository }}@quick-$m/version.json" || echo "purge 실패 — 최대 12시간 뒤 갱신"
-            cd /tmp
-          done
 
       - name: Notify failure
         if: failure()
