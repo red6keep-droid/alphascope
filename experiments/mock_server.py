@@ -78,23 +78,42 @@ ARCHIVE_SEED = [
 # 발행 예정 = 아직 블로그에 없는 기능(남은 일 한 줄) · 발행된 화면 = 블로그에 있는 기능의 목업(접어 둠) · 어느 표에도 없는 파일 = 자동으로 `쓰지 않는 목업`.
 # 기능이 발행되면 Claude 가 PLAN → LIVE 로 옮긴다(사용자 몫 아님). 새 목업 묶음을 만들면 같은 커밋에서 PLAN 에 한 줄.
 PLAN = [   # (기능 이름, 남은 일 — 한 줄, 파일 패턴 "폴더/파일")
-    ("종목 목록 (하단 메뉴 `종목`)", "코드 끝(92f08a01) → main → 간단 종목 실행 뒤 목록 파일 확인 → 고정 페이지 만들기 → 테마 붙여넣기", ["stock-lists/*"]),
-    ("간단 종목 853 (종목을 누르면 나오는 페이지)", "발행 중 — 전용 페이지 하루 50쪽씩(11-17 기준 95쪽), 기업 소개 다 차는 날 약 11-20 · 한국 간단 뉴스 2차는 방식 미정", ["stock-quick/*"]),
     ("종목 이슈 (종목 페이지 가격 카드 아래 Hot Issue)", "목업 확인 → 뉴스 양으로 자동 열고 닫는 코드 (블로그에 아직 없음)", ["issue_store/mock_stock_issue*"]),
     ("회원 `내 종목`", "목업 3화면 → Firebase 규칙 게시 · 댓글 저장 확인이 먼저 → 고정 페이지 · 10명 열기", ["my-stocks/*"]),
     ("검색 `왜 떨어졌어` · 질문하기", "질문하기 버튼 꺼 둠 — 켤지 사용자 결정", ["site-search/mock_why_demo*"]),
-    ("시황 해설 (하루 2편 · 배너 · 홈 카드)", "수집기 자동 실행 꺼짐 · 블로그 발행기 아직 → 홈 = C안 결정(배너 + 실적 한 줄 · Hot Issue · 증시 전망 롤링 · 날짜 11.17 아침 · 카드 순서, 11-17) → 사용자 이어서 수정 · 테마 적용은 발행기와 함께 · 글 화면 목업은 집 PC · 배너 배치는 banner_layout_mock.py", ["market-commentary/*"]),
-    ("홈 · 전체 메뉴 · 공통 디자인", "테마 붙여넣기 때 반영 (11-17 메뉴 Hot Issue · 아이콘 빨강 포함)", ["home-split/*", "design-samples/*", "site-search/mock_search*"]),
 ]
 PLAN_NOMOCK = [   # 목업 파일이 이 PC 에 없는 발행 예정 기능 — 줄만 보인다
 ]
-LIVE = [   # 블로그에 있는 기능 — 목업은 접어서 아래에
-    ("미국 종목 페이지", ["stock-radar/*"]), ("한국 종목 페이지", ["kr-stocks/*"]), ("ETF 페이지", ["stock-etf/*"]),
-    ("미국 증시 리포트", ["daily-report/*"]), ("한국 증시 리포트", ["kr-market-report/*"]), ("주요 인물 발언", ["people-radar/*"]),
-    ("테마", ["theme-monitor/*"]), ("주식 공부", ["course/*"]), ("운영 현황 (관리자)", ["ops-dashboard/*"]),
-    ("Hot Issue", ["issue_store/mock_issue_*"]),
-    ("증시 전망", ["issue_store/mock_forecast*", "issue_store/forecast*", "issue_store/mock_kr_why-forecast*"]),
+# 블로그에 있는 기능 — 대표 목업만 (2026-11-20 사용자: "확정된 시안 목업은 정리, 너무 많아 못 보겠다").
+# 종목 100여 개 · 지난 시안 · 게시용 본문은 표에 안 적어 자동으로 `쓰지 않는 목업` (주소로는 그대로 열림).
+LIVE = [
+    ("홈 (미국 · 한국)", ["home-split/mock_home_kr.html", "home-split/mock_home_us.html"]),
+    ("증시 시황 글", ["market-commentary/mock_story.html", "market-commentary/mock_story_us.html"]),
+    ("종목 모아보기", ["stock-lists/mock_stock-lists-live-kr.html", "stock-lists/mock_stock-lists-live-us.html"]),
+    ("미국 종목 페이지", ["stock-radar/mock_NVDA.html", "stock-radar/mock_AAPL.html"]),
+    ("한국 종목 페이지", ["kr-stocks/mock_005930.html", "kr-stocks/mock_000660.html"]),
+    ("ETF 페이지", ["stock-etf/mock_etf_SPY.html", "stock-etf/mock_etf_069500.html"]),
+    ("간단 종목 (종목을 누르면 나오는 페이지)", ["stock-quick/mock_qpage_UBER.html", "stock-quick/mock_qpage_011200.html"]),
+    ("미국 증시 리포트", ["daily-report/daily_mock.html"]), ("한국 증시 리포트", ["kr-market-report/kr_report_mock.html"]),
+    ("주요 인물 발언", ["people-radar/radar_mock.html"]), ("테마", ["theme-monitor/mock_theme-ai-capex.html"]),
+    ("Hot Issue", ["issue_store/mock_issue_watch.html"]),
+    ("증시 전망", ["issue_store/mock_forecast-list-eh.html", "issue_store/mock_forecast-2.html", "issue_store/mock_forecast-nvda-2026q3.html"]),
+    ("주식 제대로 알기", ["course/mock_study_list.html", "course/mock_착각-01-실적.html"]),
+    ("검색", ["site-search/mock_search.html"]),
+    ("디자인 기준표 (그래프 · 팝업 · 아이콘)", ["design-samples/*"]),
+    ("운영 현황 (관리자)", ["ops-dashboard/*"]),
 ]
+STALE_H = 24   # 같은 묶음의 가장 최근 파일보다 이만큼(시간) 먼저 만든 파일 = 지난 버전 → 자동 보관 (2026-11-20 사용자: "만든 날짜로 예전 버전 정리")
+
+
+def stale_keys(items):
+    """묶음(표의 한 줄)마다 가장 최근 파일보다 STALE_H 시간 넘게 오래된 파일 — rebuild_mocks 가 다시 그리지 않은 옛 시안이다."""
+    top = {}
+    for d, f, t in items:
+        s = stage_of(d, f)
+        if s:
+            top[s] = max(top.get(s, 0), t)
+    return {f"{d}/{f}" for d, f, t in items if (s := stage_of(d, f)) and t < top[s] - STALE_H * 3600}
 
 
 def stage_of(d, f):
@@ -290,7 +309,7 @@ def index_page(archive=False):
     with _lock:
         prefs = load_prefs()
     stars = prefs["star"]
-    arch = set(prefs["archive"]) | {f"{d}/{f}" for d, f, _ in items if stage_of(d, f) is None}   # 표에 없는 파일 = 자동 보관
+    arch = set(prefs["archive"]) | {f"{d}/{f}" for d, f, _ in items if stage_of(d, f) is None} | stale_keys(items)   # 표에 없는 파일 · 지난 버전 = 자동 보관
     old = [x for x in items if f"{x[0]}/{x[1]}" in arch]
     items = old if archive else [x for x in items if f"{x[0]}/{x[1]}" not in arch]
     by_key = {f"{d}/{f}": (d, f, t) for d, f, t in items}
@@ -311,7 +330,7 @@ def index_page(archive=False):
     else:
         newd = prefs["new"]
         every_key = {f"{d}/{f}": (d, f, t) for d, f, t in every}
-        fresh = sorted((k for k in newd if k in every_key), key=lambda k: -newd[k].get("t", 0))
+        fresh = sorted((k for k in newd if k in by_key), key=lambda k: -newd[k].get("t", 0))
         if fresh:   # Claude 가 만들거나 고친 목업 — 열면 사라짐 (2026-11-18 사용자)
             parts += [f'<section><div class="newh"><h2>{NEW_TAG}새로 바뀐 목업 <span class="n">{len(fresh)}</span></h2><button class="clr">모두 확인</button></div>',
                       *(row(*every_key[k], show_dir=True, stars=stars, names=names, ref=ref, new=newd, note=newd[k].get("note", "")) for k in fresh), "</section>"]
@@ -408,10 +427,14 @@ addEventListener('pagehide', () => {{
 }});
 </script></body></html>"""
 
-# 목업 맨 아래에 끼워 넣는 '목록으로' 버튼 — 목업 파일은 건드리지 않고 보낼 때만 붙인다.
-BACK_BAR = ('<div style="padding:24px 16px 40px;text-align:center;background:#f6f7f9;border-top:1px solid #e3e6eb">'
-            '<a href="/" style="display:inline-block;min-width:200px;padding:14px 24px;border-radius:10px;background:#1d2127;'
-            'color:#fff;font:600 16px/1.2 -apple-system,\'Apple SD Gothic Neo\',sans-serif;text-decoration:none">← 목업 목록으로</a></div>')
+# 목업 오른쪽 아래에 떠 있는 작은 '목록' 버튼 — 목업 파일은 건드리지 않고 보낼 때만 붙인다.
+# (2026-11-20 사용자: 맨 끝까지 내려야 목록으로 가던 것 → 보다가 바로 갈 수 있게 플로팅. 높이 44 = 터치 영역 기준)
+BACK_BAR = ('<a href="/" aria-label="목업 목록으로" style="position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));'
+            'z-index:2147483000;display:flex;align-items:center;gap:6px;height:44px;padding:0 16px;border-radius:22px;'
+            'background:rgba(29,33,39,.86);color:#fff;font:600 14px/1 -apple-system,\'Apple SD Gothic Neo\',sans-serif;'
+            'text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.24);-webkit-tap-highlight-color:transparent">'
+            '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">'
+            '<path d="M4 6h16M4 12h16M4 18h16"/></svg>목록</a>')
 
 
 # ---------------------------------------------------------------- 사용자 여정 테스트 (2026-11-12 사용자)
