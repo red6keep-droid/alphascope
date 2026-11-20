@@ -35,7 +35,7 @@ def post(url, *a, **kw):
 
 
 requests.post = post
-FORCE_KEY = os.environ.get("CMP_KEY", "").strip()   # DAILY · NVDA · TRUMP — 비우면 NVDA 는 NVDA 키, 트럼프는 트럼프 키
+# Gemini 키는 하나(GEMINI_API_KEY) — 옛 CMP_KEY(리포트별 키 고르기)는 2026-11-20 없앰 (운영지침 D3-1a, 10-19 "키 · 프로젝트 하나")
 _parse = llm_chain.parse_json
 PARSE_FAILS = [0]
 
@@ -80,7 +80,7 @@ load_pkg("nvda-report")
 import config  # noqa: E402
 import classify_items  # noqa: E402
 
-os.environ["GEMINI_API_KEY"] = ENV[f"GEMINI_API_KEY_{FORCE_KEY or 'NVDA'}"].strip().strip('"')
+os.environ["GEMINI_API_KEY"] = ENV["GEMINI_API_KEY"].strip().strip('"')
 rows = [json.loads(l) for l in open(os.path.join(HERE, "nvda/experiments/nvda-report/output/state/items.jsonl"), encoding="utf-8") if l.strip()]
 truth = sorted((r for r in rows if r.get("ai_model") in ("gemini-3.5-flash", "gemini-3.6-flash") and r["kind"] in config.CLASSIFY_KINDS), key=lambda r: r["published_at"])
 sample = truth[-N_NVDA:]
@@ -129,7 +129,7 @@ import config  # noqa: E402,F811
 import classify_posts  # noqa: E402
 import collect_posts  # noqa: E402
 
-os.environ["GEMINI_API_KEY"] = ENV[f"GEMINI_API_KEY_{FORCE_KEY or 'TRUMP'}"].strip().strip('"')
+os.environ["GEMINI_API_KEY"] = ENV["GEMINI_API_KEY"].strip().strip('"')
 cls = [json.loads(l) for l in open(os.path.join(HERE, "trump/experiments/trump-trend/output/state/classifications.jsonl"), encoding="utf-8") if l.strip()]
 gem = {r["id"]: r for r in cls if r.get("ai_model") in ("gemini-3.5-flash", "gemini-3.6-flash")}
 recs = [collect_posts.normalize(x) for x in collect_posts.fetch_archive()]

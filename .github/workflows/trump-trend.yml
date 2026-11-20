@@ -47,7 +47,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY_TRUMP || secrets.GEMINI_API_KEY }}   # 리포트별 프로젝트 키 (2026-10-15) — 없으면 공용 키
+  GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}   # Gemini 키 하나 — 리포트별 키(_NVDA · _DAILY · _TRUMP)는 2026-11-20 사용자가 시크릿에서 지움, 참조도 없앰 (운영지침 D3-1a)
   SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}   # AI 호출 알림 — 한도 · 예비 사용 · 전부 실패 (llm_chain, 2026-10-14)
   # 운영 기록 → Cloudflare KV (experiments/ops_log.py · infra/ops-console, 2026-10-23). 셋 중 하나라도 없으면 기록하지 않는다
   OPS_CF_ACCOUNT_ID: ${{ secrets.OPS_CF_ACCOUNT_ID }}
