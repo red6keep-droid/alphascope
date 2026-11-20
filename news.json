@@ -1,115 +1,145 @@
 {
-  "updated_at": "2026-11-20 12:47:06 UTC",
+  "updated_at": "2026-11-20 21:46:35 UTC",
   "items": [
     {
-      "title": "Anthropic defies the odds, holding record IPO despite ‘massively disruptive’ market",
+      "title": "Zscaler stock jumps 18% on report that CrowdStrike in talks to buy security vendor",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/20/anthropic-defies-odds-holding-ipo-despite-massively-disruptive-market.html",
-      "published": "2026-11-20 12:45:11",
-      "title_ko": "앤트로픽, '대단히 파괴적인' 시장 속에서도 역대 최대 규모 IPO 기록하며 난관 극복",
-      "summary_ko": "시장 매도세, 반AI 정서 및 엔비디아 위기 직면",
+      "link": "https://www.cnbc.com/2026/11/20/zscaler-crowdstrike-deal.html",
+      "published": "2026-11-20 21:35:24",
+      "title_ko": "지스케일러 주가 18% 급등, 크라우드스트라이크의 인수 협상 보도 여파",
+      "summary_ko": "사이버보안 기업들은 AI 시대에 인수합병을 모색 중",
       "lines": [
-        "앤스로픽 나스닥 상장 첫날 주가 17% 상승",
-        "앤스로픽 종가 97.17달러 기록하며 시가총액 1조 8000억 달러 달성",
-        "앤스로픽 IPO 공모 금액 813억 달러로 역대 최대 기록 경신"
+        "크라우드스트라이크의 인수 협상 보도에 따른 즈스케일러 주가 18% 급등",
+        "크라우드스트라이크 주가 8% 하락 및 시가총액 2350억 달러 기록",
+        "올해 13% 하락한 즈스케일러 시가총액 약 320억 달러 기록"
       ]
     },
     {
-      "title": "Rejecting cheap fabrics, higher prices: Why shoppers are asking for better clothes",
+      "title": "Warsh wants Fed officials to talk less. Instead, they’re talking more",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/20/clothing-prices-polyester-cotton-quality.html",
-      "published": "2026-11-20 12:00:02",
-      "title_ko": "저가 원단 거부·가격 상승… 소비자, 고급 의류 요구 증가",
-      "summary_ko": "소비자, 고급 의류 선호 확대",
+      "link": "https://www.cnbc.com/2026/11/20/warsh-fed-forward-guidance-rate-hikes.html",
+      "published": "2026-11-20 21:10:48",
+      "title_ko": "워시, 연준 인사들의 발언 축소 희망했으나 오히려 발언 증가",
+      "summary_ko": "연준 의장은 관망하는 사이 연준 인사들의 마이크 앞 발언 급증",
       "lines": [
-        "2010년 전체 의류의 약 60%를 차지했던 면화 비중이 현재 약 45%로 감소",
-        "폴리에스터와 나일론 등 합성 섬유가 수입 의류의 대다수를 차지",
-        "팬데믹 이전 20년간 하락세를 보였던 의류 가격이 2020년 이후 최고치로 급등"
+        "통화정책과 금리 방향에 대한 연방준비제도 인사들의 상반된 발언",
+        "인플레이션 대응을 위한 금리 인상 필요성에 대부분 동의",
+        "더 공격적인 금리 인상을 고려하는 크리스토퍼 월러와 알베르토 무살렘"
       ]
     },
     {
-      "title": "White House replaces cyber director Sean Cairncross amid widespread tech outages",
+      "title": "Gap names new Athleta CEO, says Old Navy turnaround is seeing signs of progress",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/20/sean-cairncross-white-house-cyber-director.html",
-      "published": "2026-11-20 10:59:24",
-      "title_ko": "백악관, 사이버 국장 교체… 펜타곤 CIO가 새 국장",
-      "summary_ko": "펜타곤 CIO, 새 사이버 국장 임명",
+      "link": "https://www.cnbc.com/2026/11/19/gap-gap-q3-2026-earnings.html",
+      "published": "2026-11-20 21:04:48",
+      "title_ko": "갭, 새로운 애슬레타 CEO 임명 및 올드 네이비 실적 개선 조짐 보인다고 밝혀",
+      "summary_ko": "소매업체 갭이 목요일 혼조세를 보인 3분기 실적 발표",
       "lines": [
-        "숀 케언크로스 백악관 국가사이버 국장의 퇴임",
-        "커스틴 데이비스 펜타곤 최고정보책임자의 임시 국가사이버 국장 임명 예정"
+        "애슬레타 신임 최고경영자로 애슐리 케크터 선임",
+        "올드 네이비의 반등 조짐과 혼조세를 보인 회계 3분기 실적 발표",
+        "실적 발표 후 11% 이상 상승한 갭 주가"
       ]
     },
     {
-      "title": "Kushner says Russia 'comfortable' with idea of NATO-like security guarantees for Ukraine",
+      "title": "Nvidia stock plunges 14%, wraps up longest weekly losing streak since 2008 financial crisis",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/20/kushner-ukraine-nato-russia-trump-putin.html",
-      "published": "2026-11-20 09:56:03",
-      "title_ko": "쿠시너, 러시아가 우크라이나에 NATO식 보안 보장 ‘편안’하다고 언급",
+      "link": "https://www.cnbc.com/2026/11/20/nvidias-7-week-losing-streak-is-longest-since-2008-financial-crisis.html",
+      "published": "2026-11-20 21:03:41",
+      "title_ko": "엔비디아 주가 14% 폭락, 2008년 금융위기 이후 최장 주간 하락세 마감",
       "summary_ko": "",
       "lines": [
-        "트럼프·푸틴·시진핑의 아시아태평양경제협력체 양자 회담 개최",
-        "우크라이나 나토식 안보 보장 방안 검토"
+        "엔비디아 주가 14% 하락",
+        "시가총액 2조 6000억 달러 감소",
+        "시가총액 순위 3위 기록",
+        "AMD 향후 12개월 수익의 29배로 평가"
       ]
     },
     {
-      "title": "SoftBank suffers worst day in over two years as AI sell-off hits Asian tech stocks",
+      "title": "Trump vows to stop U.S. companies from building data centers abroad, threatens 'tremendous tax'",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/20/softbank-ai-tech-stocks-slide-anthropic-debut.html",
-      "published": "2026-11-20 07:23:06",
-      "title_ko": "소프트뱅크, AI 매도 물결에 2년 만에 최악의 하루 기록",
-      "summary_ko": "나스닥, 2% 이상 하락",
+      "link": "https://www.cnbc.com/2026/11/20/trump-data-centers-ai-companies-tax.html",
+      "published": "2026-11-20 20:47:58",
+      "title_ko": "트럼프, 미국 기업들의 해외 데이터센터 구축 중단 다짐하며 '엄청난 세금' 경고",
+      "summary_ko": "",
       "lines": [
-        "앤스로픽의 월스트리트 상장 여파로 나스닥종합지수 2% 하락 (예상)",
-        "소프트뱅크 주가 14.48% 급락 (예상)",
-        "오픈에이아이 관련 소프트뱅크의 총 투자금 646억 달러"
+        "미국 기업의 해외 데이터센터 건설 금지 및 세금 부과 방침 발표",
+        "등록 유권자의 64% 데이터센터 반대"
       ]
     },
     {
-      "title": "‘More than just a game’: How GTA VI’s blockbuster launch fuels a booming content economy",
+      "title": "Prediction markets outlook for stocks in 2026 dims amid AI sell-off",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/20/gta-vi-launch-streaming-content-economy.html",
-      "published": "2026-11-20 07:08:36",
-      "title_ko": "GTA VI 대규모 출시, 콘텐츠 경제 급성장 촉진",
-      "summary_ko": "스트리밍·클립·콘텐츠 농장 확대",
+      "link": "https://www.cnbc.com/2026/11/20/sp-500-8000-kalshi-odds-ai-selloff.html",
+      "published": "2026-11-20 19:59:03",
+      "title_ko": "AI 매도세 속에서 2026년 주식 시장 예측 시장 전망 어두워져",
+      "summary_ko": "한때 70%를 넘었던 S&P 500 지수 8,000 돌파 확률이 매우 낮은 수준 기록",
       "lines": [
-        "그랜드 테프트 오토 VI 약 1,910만 장 판매 기록",
-        "그랜드 테프트 오토 VI 관련 18억 4천만 달러 매출 달성",
-        "그랜드 테프트 오토 프랜차이즈 전 세계 누적 4억 7천만 장 이상 판매"
+        "S&P 500의 8000선 돌파 확률 6%",
+        "S&P 500 8000선 돌파 확률 10월 13일 72%",
+        "나스닥 종합지수 연간 상승분 반납"
       ]
     },
     {
-      "title": "미국의 대중 반도체 수출 규제 강화",
-      "title_ko": "미국의 대중 반도체 수출 규제 강화",
-      "summary_ko": "미국의 신규 수출 통제로 TSMC와 삼성전자의 일부 중국 고객사 반도체 출하가 중단되었습니",
-      "source": "삼성증권",
-      "link": "https://www.youtube.com/watch?v=peZfn7X2q1g",
-      "published": "2026-11-20 06:14:18",
+      "title": "Jensen Huang to testify publicly before Senate banking panel, Chairman Scott says",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/20/jensen-huang-nvidia-senate-testimony.html",
+      "published": "2026-11-20 19:42:53",
+      "title_ko": "스콧 위원장, 젠슨 황 상원 은행위원회 공개 청문회 증언 예정이라고 밝혀",
+      "summary_ko": "중국 간첩 연루 의혹 이후 젠슨 황이 의회의 거센 비판에 직면",
+      "lines": [
+        "엔비디아 전 CEO 젠슨 황 상원 은행위원회 공개 청문회 증언 합의",
+        "젠슨 황 12월 1일 하원 3개 위원회 비공개 인터뷰 예정"
+      ]
+    },
+    {
+      "title": "반도체 수출 통제 및 중국 관련 우려",
+      "title_ko": "반도체 수출 통제 및 중국 관련 우려",
+      "summary_ko": "중국 시장 매출 노출과 규제 강화 우려로 반도체 및 칩메이커 주가에 하방 압력 작용",
+      "source": "블룸버그",
+      "link": "https://www.youtube.com/watch?v=ts8FgN1vBws",
+      "published": "2026-11-20 18:19:25",
       "kind": "media",
       "tag": "규제 · 산업정책",
       "direction": "negative",
-      "n_channels": 3,
+      "n_channels": 5,
       "lines": [
-        "미국의 신규 수출 통제 시행",
-        "TSMC 및 삼성전자 일부 중국 고객사 반도체 출하 중단",
-        "AMD의 대중국 수출 통제 위반 의혹 제기",
-        "반도체 기업들의 매출 불확실성 증대"
+        "진행자 발언 : 칩메이커들과 AMD의 중국 매출 리스크 우려",
+        "노라 물린다 발언 : 상무부의 대중국 반도체 규제 및 우회로 차단 움직임 강화"
       ]
     },
     {
-      "title": "앤트로픽 사상 최대 IPO",
-      "title_ko": "앤트로픽 사상 최대 IPO",
-      "summary_ko": "앤트로픽이 사상 최대 규모의 IPO를 단행했으나 고평가 논란과 거래 부진으로 투자자들에게 상처를 남겼",
-      "source": "Mad Money",
-      "link": "https://www.youtube.com/watch?v=sHWTbaNakd8",
-      "published": "2026-11-20 00:34:08",
+      "title": "AI 거품론 및 증시 급락",
+      "title_ko": "AI 거품론 및 증시 급락",
+      "summary_ko": "AI 관련주를 중심으로 시장 심리가 악화하며 단기 반등 후 추가 하락 가능성이 제기됨",
+      "source": "CNBC",
+      "link": "https://www.youtube.com/watch?v=b9m_sgVjwzw",
+      "published": "2026-11-20 17:38:05",
       "kind": "media",
-      "tag": "기업 사건",
-      "direction": "positive",
-      "n_channels": 3,
+      "tag": "수급 · 시장 구조",
+      "direction": "negative",
+      "n_channels": 5,
       "lines": [
-        "앤트로픽 사상 최대 IPO 진행, 810억 달러 이상 조달",
-        "공모가 83달러에서 115달러까지 치솟았다가 97달러로 하락",
-        "진행자 발언 : 추가 하락 예상"
+        "맷 메이 발언 : AI 거품 붕괴 시작 여부와 시장 심리 악화",
+        "맷 메이 발언 : 단기 반등 가능하나 2018년 중간선거 시나리오 재현 시 추가 하락 예상",
+        "엔비디아 주가 7% 하락하며 시장 하락 주도",
+        "나스닥 지수 올해 수익률 마이너스 전환"
+      ]
+    },
+    {
+      "title": "연준 12월 금리 인상 가능성",
+      "title_ko": "연준 12월 금리 인상 가능성",
+      "summary_ko": "연준 인사들이 인플레이션 우려로 매파적 발언을 이어가며 시장의 금리 인하 기대감을 억제함",
+      "source": "블룸버그",
+      "link": "https://www.youtube.com/watch?v=oGI2L1qj4sQ",
+      "published": "2026-11-20 16:15:40",
+      "kind": "media",
+      "tag": "금리 · 연준",
+      "direction": "negative",
+      "n_channels": 5,
+      "lines": [
+        "진행자 발언 : 연준 인사들이 12월 금리 인상을 강력히 시사",
+        "토스텐 슬록 발언 : 연준의 매파적 기조는 인플레이션 상방 리스크에 집중된 결과",
+        "리사 아브라모비치 발언 : 연준이 시장의 변동성에도 불구하고 인플레이션 목표치 달성을 위해 긴축을 고수할 것으로 봄"
       ]
     }
   ]
