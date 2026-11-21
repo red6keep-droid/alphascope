@@ -31,6 +31,7 @@ NEWS = os.path.join(BASE, "data", "news.json")
 LEAD_CACHE = os.path.join(BASE, "data", "article_cache.json")   # 깃 · 상태 브랜치에 넣지 않는다 (기사 원문 조각)
 PER_STOCK = 15
 KEEP_DAYS = 8
+RETRY_WAIT = 30   # 429 받은 종목을 다시 받기 전 쉬는 초 (2026-11-21)
 UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36"
 
 
@@ -67,28 +68,45 @@ def collect(store):
     store = {k: v for k, v in store.items() if v["published_at"] >= cut}
     seen = {_key(v["title"]): k for k, v in store.items()}
     new = 0
-    for sym, *_ in U.CANDIDATES:
-        if sym in U.REPORT_TYPE:
-            continue   # 엔비디아는 엔비디아 리포트가 자기 수집 · 분류로 더 깊게 다룬다 — 여기서 또 모아 분류하지 않는다 (2026-10-25 사용자)
-        time.sleep(1)   # 종목당 1회, 사이 1초 — 기획(알파-종목-리포트 341)대로. 49회 연속 요청을 피한다 (2026-10-21)
-        try:
-            items = fetch(sym)
-        except Exception as e:   # noqa: BLE001
-            print(f"[news] {sym} 받기 실패 : {e}")
-            continue
-        for x in items:
-            k = _key(x["title"])
-            if k in seen:
-                store[seen[k]].setdefault("queries", [])
-                if sym not in store[seen[k]]["queries"]:
-                    store[seen[k]]["queries"].append(sym)
+    syms = [sym for sym, *_ in U.CANDIDATES if sym not in U.REPORT_TYPE]   # 엔비디아는 엔비디아 리포트가 자기 수집 · 분류로 더 깊게 다룬다 — 여기서 또 모아 분류하지 않는다 (2026-10-25 사용자)
+    busy = []   # 429(요청이 너무 많음) 받은 종목 — 끝에 한 번 더 (2026-11-21 사용자: 목록 끝 종목이 날마다 몇 개씩 빠졌다)
+    for again in (False, True):
+        if again:
+            if not busy:
+                break
+            print(f"[news] 429 받은 {len(busy)}종목 {RETRY_WAIT}초 뒤 한 번 더 : {' · '.join(busy)}")
+            time.sleep(RETRY_WAIT)
+            syms, busy = busy, []
+        for sym in syms:
+            time.sleep(1)   # 종목당 1회, 사이 1초 — 기획(알파-종목-리포트 341)대로. 49회 연속 요청을 피한다 (2026-10-21)
+            try:
+                items = fetch(sym)
+            except Exception as e:   # noqa: BLE001
+                if not again and "429" in str(e):
+                    busy.append(sym)
+                    continue
+                print(f"[news] {sym} 받기 실패 : {e}")
                 continue
-            iid = hashlib.sha1(k.encode()).hexdigest()[:12]
-            store[iid] = dict(x, item_id=iid, queries=[sym])
-            seen[k] = iid
-            new += 1
+            new += _merge(store, seen, sym, items)
     print(f"[news] 새 기사 {new}건 · 보관 {len(store)}건")
     return store
+
+
+def _merge(store, seen, sym, items):
+    """받은 기사를 보관함에 합친다 — 같은 제목이면 종목만 더한다. 새로 들어간 수."""
+    new = 0
+    for x in items:
+        k = _key(x["title"])
+        if k in seen:
+            store[seen[k]].setdefault("queries", [])
+            if sym not in store[seen[k]]["queries"]:
+                store[seen[k]]["queries"].append(sym)
+            continue
+        iid = hashlib.sha1(k.encode()).hexdigest()[:12]
+        store[iid] = dict(x, item_id=iid, queries=[sym])
+        seen[k] = iid
+        new += 1
+    return new
 
 
 def load():

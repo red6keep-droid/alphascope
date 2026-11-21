@@ -15,7 +15,7 @@ import db
 def _fetch_day(day):
     url = config.FINRA_SHORT_URL.format(ymd=day.replace("-", ""))
     r = requests.get(url, headers={"User-Agent": config.BROWSER_USER_AGENT}, timeout=config.HTTP_TIMEOUT)
-    if r.status_code == 404:
+    if r.status_code in (403, 404):   # FINRA CDN 은 아직 안 올라온 파일에 403 — 실패가 아니라 없는 날(다음 실행이 다시 받는다). 운영 현황 오탐 (2026-11-21)
         return None
     r.raise_for_status()
     for line in r.text.splitlines():

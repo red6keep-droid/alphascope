@@ -4,7 +4,7 @@
     python experiments/issue_store/signal_scan.py --state DIR   # 기록: DIR/records/signals/scan.jsonl 에 하루 한 줄 덧붙임
 
 하는 일 (AI 0 · 외부 쓰기 0):
-1. 지표판(signal_signatures.BOARD, 29개) 최근 120거래일을 직접 받는다 — yfinance(일봉) · FRED 공개 CSV. 로컬 data/store 없이 CI 에서 돈다.
+1. 지표판(signal_signatures.BOARD, 29개) 최근 120거래일을 직접 받는다 — yfinance(일봉) · FRED API(키, 없으면 공개 CSV). 로컬 data/store 없이 CI 에서 돈다.
 2. 지표마다 오늘 하루 z(직전 60거래일 σ 배수) · 10거래일 누적 z.
 3. 경보 = 하루 3σ 지표 2개 이상(검증 D: 연 17번, 5일 안 사건 27% vs 평소 14%) · 느린 경보 = 10일 2σ 지표 2개 이상.
 4. 서명 후보 = 오늘 + 어제 반응 벡터 ↔ results/signal_centroids.json(검증 3-a 의 묶음 평균) 코사인 상위 3. 사건 전 분류는 우연 수준이라 **경보 날만** 적는다.
@@ -54,14 +54,22 @@ def fetch(days=200):
     except Exception as e:  # noqa: BLE001
         print(f"[signal] yfinance 실패: {type(e).__name__}")
     import requests
+    key = os.environ.get("FRED_API_KEY", "").strip()
     for f, name in names.items():
         if f in YAHOO:
             continue
-        try:   # FRED 공개 CSV (fetch_fred_daily 와 같은 방식, 키 없음)
-            r = requests.get(f"https://fred.stlouisfed.org/graph/fredgraph.csv?id={f}&cosd={start}", headers={"User-Agent": "alphascope-research/1.0"}, timeout=30)
-            d = pd.read_csv(io.StringIO(r.text))
-            s = pd.to_numeric(d.iloc[:, 1], errors="coerce")
-            s.index = pd.to_datetime(d.iloc[:, 0])
+        try:
+            if key:   # FRED API(키) — 공개 그래프 CSV 는 GitHub 실행기에서 매번 시간 초과(11-18 ~ 11-21 BAA10Y · T10YIE · DGS2, 2026-11-21 사용자)
+                r = requests.get("https://api.stlouisfed.org/fred/series/observations", timeout=30,
+                                 params={"series_id": f, "api_key": key, "file_type": "json", "observation_start": start})
+                r.raise_for_status()
+                obs = r.json().get("observations") or []
+                s = pd.Series(pd.to_numeric([o["value"] for o in obs], errors="coerce"), index=pd.to_datetime([o["date"] for o in obs]))
+            else:   # 키 없는 로컬 = 공개 CSV (fetch_fred_daily 와 같은 방식)
+                r = requests.get(f"https://fred.stlouisfed.org/graph/fredgraph.csv?id={f}&cosd={start}", headers={"User-Agent": "alphascope-research/1.0"}, timeout=30)
+                d = pd.read_csv(io.StringIO(r.text))
+                s = pd.to_numeric(d.iloc[:, 1], errors="coerce")
+                s.index = pd.to_datetime(d.iloc[:, 0])
             out[name] = s.dropna()
         except Exception as e:  # noqa: BLE001
             print(f"[signal] FRED {f} 실패: {type(e).__name__}")
