@@ -24,6 +24,7 @@ INTRO = "주식에서 흔히 듣는 말, 데이터로 확인해 봤습니다"
 COURSES = [
     ("초보가 흔히 하는 착각", "많이 듣는 말을 하나씩 꺼내, 아무 날에 산 사람과 비교해 확인합니다.", [
         ("0", "들어가며", "착각-00-들어가며.md"),
+        ("", "이 연재는 이렇게 확인합니다", "착각-기준.md"),   # 기준 페이지(편 번호 없음 · 편 수에 안 셈, 2026-11-21)
         ("1", "실적이 좋다는데 왜 주가는 떨어질까?", "착각-01-실적.md"),
         ("2", "고점에 물리면 얼마나 오래 가나?", "착각-02-물림.md"),
         ("3", "크게 빠진 날 팔면, 언제 특히 비쌌나?", "착각-03-공포매도.md"),
@@ -31,9 +32,9 @@ COURSES = [
         ("5", "분할 매수, 하단을 기다리면 더 싸게 모일까?", "착각-05-분할매수.md"),
         ("6", "과열이면 떨어진다고요?", "착각-06-과열.md"),
         ("7", "볼린저 하단에서 샀는데 왜 더 떨어질까?", "착각-07-볼린저.md"),
-        ("8", "골든크로스는 2010년대엔 틀리고 2020년대엔 맞았다", "착각-08-골든크로스.md"),
+        ("8", "골든크로스는 2010년대엔 틀리고 2020년대엔 맞았다?", "착각-08-골든크로스.md"),
         ("9", "동전 던지기에도 파동은 생긴다", "착각-09-파동.md"),
-        ("10", "마치며, 지표는 방향이 아니라 크기를 잰다", None),
+        ("10", "마치며, 지표는 방향이 아니라 크기를 잰다", "착각-10-마치며.md"),
     ]),
     ("숫자 읽는 법", "Newfact 페이지에 나오는 숫자를 어떻게 읽는지 알려 드립니다.", [
         ("1", "평소 하루에 얼마나 움직이나", None),
@@ -55,7 +56,8 @@ CHEV = ('<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" fill
 
 
 def course_card(k, name, intro, eps, urls):
-    done = sum(1 for _, _, f in eps if f and urls.get(f))
+    done = sum(1 for n, _, f in eps if n and f and urls.get(f))
+    total = sum(1 for n, _, _ in eps if n)
     rows = []
     for n, t, f in eps:
         url = urls.get(f) if f else None
@@ -68,7 +70,7 @@ def course_card(k, name, intro, eps, urls):
             rows.append(f'<div style="display:flex;align-items:center;padding:12px {dk.ALIGN_PX}px;border-top:1px solid #E2E8F0;">'
                         f'{num}<span style="flex:1 1 auto;min-width:0;font-size:17px;line-height:26px;color:#9CA3AF;word-break:keep-all;">{html.escape(t)}</span>'
                         '<span style="flex:none;margin-left:8px;font-size:13px;line-height:18px;font-weight:700;color:#9CA3AF;white-space:nowrap;">준비 중</span></div>')
-    state = f"{len(eps)}편 중 {done}편" if done else f"{len(eps)}편 준비 중"
+    state = f"{total}편 중 {done}편" if done else f"{total}편 준비 중"
     # 접기 (2026-11-15 사용자): 과정 이름 줄 오른쪽 접기 버튼 · 0편(들어가며)부터 편 목록 전체가 접힌다. details 라 JS 없이 접히고 접힌 글도 검색엔진이 읽는다.
     # 처음 상태 = 나온 편이 있는 과정만 펼침(지금 1과정), 준비 중뿐인 과정은 접힘. 카드 머리(과정 · 제목 · 소개) 전체가 누르는 자리
     btn = ('<span class="study-fold" aria-hidden="true" style="flex:none;display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;'

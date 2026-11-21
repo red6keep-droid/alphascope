@@ -2,8 +2,9 @@
 
     python experiments/course/svg_to_webp.py chars <원본.svg> <이름>     # 320×320, 아래 맞춤 → chars/<이름>.webp, 원본은 chars/src/<이름>.svg
     python experiments/course/svg_to_webp.py icons <원본.svg> <이름>     # 128×128, 가운데 → icons/<이름>.webp
+    python experiments/course/svg_to_webp.py wide <원본.svg> <이름>      # 가로 컷(여럿이 나오는 그림), 가로 560 비율 그대로 → chars/<이름>.webp
 
-- 그리기 = Windows Edge headless 화면 찍기(투명 바탕). 따로 설치할 것 없음.
+- 그리기 = Windows Edge headless 화면 찍기(투명 바탕), 맥은 Chrome headless. 따로 설치할 것 없음.
 - 투명하지 않은 영역만 잘라 긴 변을 칸에 맞춘다. 원본에 떨어진 점이 있으면 잘림 영역이 넓어지니 SVG 에서 먼저 지운다.
 - 렌더러 이름 표(render_course.py CHARS · ICONS)에는 손으로 한 줄 추가.
 """
@@ -18,7 +19,9 @@ from PIL import Image
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 EDGE = r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
-SIZE = {"chars": (320, "bottom"), "icons": (128, "center")}
+if not os.path.exists(EDGE):   # 맥(집) = Chrome headless — 같은 옵션 (2026-11-21)
+    EDGE = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+SIZE = {"chars": (320, "bottom"), "icons": (128, "center"), "wide": (560, None)}   # wide = 여럿이 나오는 가로 컷: 네모 칸에 넣지 않고 가로 560 그대로 → chars/ (2026-11-21)
 
 
 def shot(svg, png, px=800):
@@ -46,6 +49,7 @@ def shot(svg, png, px=800):
 def main():
     kind, src, name = sys.argv[1], sys.argv[2], sys.argv[3]
     side, align = SIZE[kind]
+    wide, kind = kind == "wide", "chars" if kind == "wide" else kind
     os.makedirs(os.path.join(HERE, kind, "src"), exist_ok=True)
     svg = os.path.join(HERE, kind, "src", name + ".svg")
     if os.path.abspath(src) != os.path.abspath(svg):
@@ -57,9 +61,12 @@ def main():
     im = im.crop(im.getchannel("A").getbbox())
     k = (side - (5 if kind == "icons" else 0)) / max(im.size)
     im = im.resize((round(im.width * k), round(im.height * k)), Image.LANCZOS)
-    out = Image.new("RGBA", (side, side), (0, 0, 0, 0))
-    y = side - im.height if align == "bottom" else (side - im.height) // 2
-    out.paste(im, ((side - im.width) // 2, y), im)
+    if wide:
+        out = im
+    else:
+        out = Image.new("RGBA", (side, side), (0, 0, 0, 0))
+        y = side - im.height if align == "bottom" else (side - im.height) // 2
+        out.paste(im, ((side - im.width) // 2, y), im)
     dst = os.path.join(HERE, kind, name + ".webp")
     out.save(dst, "WEBP", quality=90, method=6)
     print(f"{dst}  {im.size}")
