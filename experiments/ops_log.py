@@ -36,7 +36,7 @@ _installed = False
 
 # LLM 사슬이 찍는 줄은 USAGE · EVENTS 로 따로 남기므로 경고에서 뺀다 — "[people-narrate] groq 실패 — …" · "[x] 예비 → …"
 _LLM_LINE = re.compile(r"^\[[\w-]+\] (\S+ 실패 — |예비 → |대체 → |사슬 |\S+ 분당 한도 간격|Gemini )")
-_WARN = re.compile(r"실패|::warning::|::error::|Forbidden|Traceback|오류|에러|중단|0건|없음 —")
+_WARN = re.compile(r"실패|::warning::|::error::|Forbidden|Traceback|오류|에러|중단|(?<![\d,.])(?<!신규 )0건|없음 —")   # `40건`(CNBC 방송 수) · `신규 0건`(EDGAR 새 공시 없음)은 정상 — 운영 현황 오탐 (2026-11-21)
 _COLLECT = re.compile(r"collect|수집|feeds|edgar|fedreg|finra|calendar|일정|price_source|FRED|yfinance|ARK|rss|options|estimates|analysts|holdings|court|실적|지수|시계열|Firestore", re.I)
 _PUBLISHED = re.compile(r"\[게시 완료\]\s*(\S+)|본문 갱신:\s*(\S+)|\[publish\] 게시:\s*(\S+)")
 _ALREADY = re.compile(r"이미 게시됨:\s*(\S+)|같은 제목의 글이 이미 있습니다:\s*(\S+)")

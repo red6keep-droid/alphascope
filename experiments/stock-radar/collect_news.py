@@ -32,6 +32,7 @@ LEAD_CACHE = os.path.join(BASE, "data", "article_cache.json")   # 깃 · 상태 
 PER_STOCK = 15
 KEEP_DAYS = 8
 BUSY_STOP = 3   # 503 · 429 가 이만큼 연달아 오면 그날 수집 멈춤
+RETRY_WAIT = 30   # 멈추지 않은 날, 429 받은 종목을 끝에 다시 받기 전 쉬는 초 (2026-11-21)
 UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36"
 
 
@@ -69,6 +70,8 @@ def collect(store):
     seen = {_key(v["title"]): k for k, v in store.items()}
     new = 0
     busy = 0   # 연달아 받은 503 · 429 — 구글 뉴스가 이 IP 를 막은 날은 계속 막힌다(11-17: 503 64건, 수집 8분에 새 기사 0)
+    again = []   # 429 받은 종목 — 멈추지 않은 날은 끝에 RETRY_WAIT 초 쉬고 한 번 더 (2026-11-21 사용자: 목록 끝 종목이 날마다 몇 개씩 빠졌다)
+    stopped = False
     for sym, *_ in U.CANDIDATES:
         if sym in U.REPORT_TYPE:
             continue   # 엔비디아는 엔비디아 리포트가 자기 수집 · 분류로 더 깊게 다룬다 — 여기서 또 모아 분류하지 않는다 (2026-10-25 사용자)
@@ -77,26 +80,50 @@ def collect(store):
             items = fetch(sym)
             busy = 0
         except Exception as e:   # noqa: BLE001
-            print(f"[news] {sym} 받기 실패 : {e}")
             code = getattr(getattr(e, "response", None), "status_code", None)
             busy = busy + 1 if code in (429, 503) else 0
+            if code == 429:
+                again.append(sym)
+                print(f"[news] {sym} 429 — 끝에 한 번 더")   # `실패` 를 쓰지 않는다 — 다시 받으면 운영 현황에 실패로 남지 않게. 다시 받기도 안 되면 그때 실패 줄
+            else:
+                print(f"[news] {sym} 받기 실패 : {e}")
             if busy >= BUSY_STOP:   # 그날은 멈추고 받은 것 · 지난 기사로 (2026-11-20 사용자 ⑥)
-                print(f"[news] 구글 뉴스가 {busy}번 연달아 거절({code}) — 오늘 수집은 여기서 멈춤")
+                print(f"[news] 구글 뉴스가 {busy}번 연달아 거절({code}) — 오늘 수집 중단")
+                stopped = True
                 break
             continue
-        for x in items:
-            k = _key(x["title"])
-            if k in seen:
-                store[seen[k]].setdefault("queries", [])
-                if sym not in store[seen[k]]["queries"]:
-                    store[seen[k]]["queries"].append(sym)
+        new += _merge(store, seen, sym, items)
+    if again and not stopped:
+        print(f"[news] 429 받은 {len(again)}종목 {RETRY_WAIT}초 뒤 한 번 더 : {' · '.join(again)}")
+        time.sleep(RETRY_WAIT)
+        for sym in again:
+            time.sleep(1)
+            try:
+                items = fetch(sym)
+            except Exception as e:   # noqa: BLE001
+                print(f"[news] {sym} 다시 받기 실패 : {e}")
                 continue
-            iid = hashlib.sha1(k.encode()).hexdigest()[:12]
-            store[iid] = dict(x, item_id=iid, queries=[sym])
-            seen[k] = iid
-            new += 1
+            print(f"[news] {sym} 다시 받음")
+            new += _merge(store, seen, sym, items)
     print(f"[news] 새 기사 {new}건 · 보관 {len(store)}건")
     return store
+
+
+def _merge(store, seen, sym, items):
+    """받은 기사를 보관함에 합친다 — 같은 제목이면 종목만 더한다. 새로 들어간 수."""
+    new = 0
+    for x in items:
+        k = _key(x["title"])
+        if k in seen:
+            store[seen[k]].setdefault("queries", [])
+            if sym not in store[seen[k]]["queries"]:
+                store[seen[k]]["queries"].append(sym)
+            continue
+        iid = hashlib.sha1(k.encode()).hexdigest()[:12]
+        store[iid] = dict(x, item_id=iid, queries=[sym])
+        seen[k] = iid
+        new += 1
+    return new
 
 
 def load():

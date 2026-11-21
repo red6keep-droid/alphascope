@@ -16,6 +16,7 @@ import html as html_mod
 import os
 import re
 import sys
+import time
 import xml.etree.ElementTree as ET
 
 import requests
@@ -24,6 +25,7 @@ import config
 import db
 
 HEADERS = {"User-Agent": config.BROWSER_USER_AGENT}
+RETRY_WAIT = 30   # 429 받은 소스를 다시 받기 전 쉬는 초 (2026-11-21)
 
 
 # ── 공통 ─────────────────────────────────────────────────────────────────
@@ -262,6 +264,7 @@ def collect(conn, only=None, sources=None):
     since = (datetime.datetime.now(datetime.timezone.utc)
              - datetime.timedelta(hours=config.COLLECT_SINCE_HOURS)).strftime("%Y-%m-%dT%H:%M:%SZ")
     summary = []   # (인물, 소스, 받은 수, 창 안, 신규 | 오류)
+    busy = []      # 429(요청이 너무 많음) 받은 일 — 끝에 RETRY_WAIT 초 쉬고 한 번 더 (2026-11-21 사용자: 구글 뉴스가 날마다 2~4명 0건)
     for key, p in config.PEOPLE.items():
         if only and key not in only:
             continue
@@ -274,10 +277,26 @@ def collect(conn, only=None, sources=None):
             try:
                 rows = job()
             except Exception as e:  # noqa: BLE001
+                if "429" in str(e):
+                    busy.append((key, name, job))
+                    continue
                 summary.append((key, name, 0, 0, f"실패: {str(e)[:100]}"))
                 continue
             in_window = sum(1 for r in rows if r["published_at"] and r["published_at"] >= since)
             summary.append((key, name, len(rows), in_window, _insert(conn, rows, since)))
+        conn.commit()
+    if busy:
+        print(f"[collect] 429 받은 {len(busy)}건 {RETRY_WAIT}초 뒤 한 번 더 : {' · '.join(f'{k}/{n}' for k, n, _ in busy)}")
+        time.sleep(RETRY_WAIT)
+        for key, name, job in busy:
+            try:
+                rows = job()
+            except Exception as e:  # noqa: BLE001
+                summary.append((key, name, 0, 0, f"실패: {str(e)[:100]}"))
+                continue
+            in_window = sum(1 for r in rows if r["published_at"] and r["published_at"] >= since)
+            summary.append((key, name, len(rows), in_window, _insert(conn, rows, since)))
+            time.sleep(2)
         conn.commit()
     for key, name, got, win, new in summary:
         print(f"[collect] {key:9s} {name:14s} 받음 {got:>6,} · 창 안 {win:>4} · 신규 {new}")

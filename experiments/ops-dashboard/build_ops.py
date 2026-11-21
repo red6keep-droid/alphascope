@@ -85,6 +85,9 @@ SCREEN_FILES = [
     ("증시 전망 카드", "hypo.json", "매일 아침"),
 ]
 
+# 지금의 실패 줄 규칙 = ops_log._WARN 과 같게 (import 하면 이 실행도 운영 기록을 남긴다). 이미 쌓인 기록을 다시 거른다 — `40건` · `신규 0건` 오탐 (2026-11-21)
+WARN_NOW = re.compile(r"실패|::warning::|::error::|Forbidden|Traceback|오류|에러|중단|(?<![\d,.])(?<!신규 )0건|없음 —")
+
 # 수집 실패 줄 → 소스 이름 (ops_log warnings cat=collect · notify)
 SOURCES = [
     ("CNN 공포탐욕", r"cnn|fear|공포"), ("Yahoo 시세", r"yahoo|yfinance|yf\b"), ("FRED", r"fred"),
@@ -491,7 +494,7 @@ def feeds_card(now, feeds, I):
 def collect_tab(recs, I, feeds=None, now=None):
     lines = []
     for x in recs or []:
-        lines += [w["text"] for w in x.get("warnings") or [] if w.get("cat") == "collect"]
+        lines += [w["text"] for w in x.get("warnings") or [] if w.get("cat") == "collect" and WARN_NOW.search(w["text"])]   # 이미 쌓인 기록도 지금 규칙으로 다시 거른다(40건 · 신규 0건 오탐, 2026-11-21)
         lines += [k for k in (x.get("notify") or {})]
     by = defaultdict(list)
     for ln in dict.fromkeys(lines):
