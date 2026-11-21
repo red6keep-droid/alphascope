@@ -42,7 +42,7 @@ function config(env) {
     admins: (env.ADMIN_GITHUB_LOGINS || "").split(",").map((x) => x.trim().toLowerCase()).filter(Boolean),
     fbProject: (env.FIREBASE_PROJECT_ID || "").trim(),
     fbUids: (env.ADMIN_FIREBASE_UIDS || "").split(",").map((x) => x.trim()).filter(Boolean),
-    blogOrigin: (env.BLOG_ORIGIN || "").trim(),
+    blogOrigins: (env.BLOG_ORIGIN || "").split(",").map((x) => x.trim()).filter(Boolean),   // 쉼표로 여러 주소 (2026-11-21 www.newfact.app 연결, 옛 blogspot 도 둠)
   };
   const missing = [!c.clientId && "GITHUB_CLIENT_ID", !c.clientSecret && "GITHUB_CLIENT_SECRET", !c.sessionSecret && "SESSION_SECRET", !c.admins.length && "ADMIN_GITHUB_LOGINS"].filter(Boolean);
   return { c, missing };
@@ -153,8 +153,8 @@ async function verifyFirebase(token, c) {
 }
 
 async function firebaseLogin(req, c) {
-  if (!c.fbProject || !c.fbUids.length || !c.blogOrigin) return deny("블로그 로그인 설정이 없습니다.", 403);
-  if (req.headers.get("Origin") !== c.blogOrigin) return deny("블로그 메뉴에서 들어와 주세요.", 403);
+  if (!c.fbProject || !c.fbUids.length || !c.blogOrigins.length) return deny("블로그 로그인 설정이 없습니다.", 403);
+  if (!c.blogOrigins.includes(req.headers.get("Origin"))) return deny("블로그 메뉴에서 들어와 주세요.", 403);
   const form = await req.formData().catch(() => null);
   const uid = await verifyFirebase(form && form.get("id_token"), c).catch(() => null);
   if (!uid || !c.fbUids.includes(uid)) return deny("관리자 계정이 아닙니다.", 403);
