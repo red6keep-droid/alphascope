@@ -47,7 +47,9 @@ def _digest(title, content):
 
 
 def _norm(u):
-    return str(u or "").replace("http://", "https://").rstrip("/")
+    """주소 비교용 — 도메인은 빼고 경로만 (2026-11-21 www.newfact.app 연결 뒤 Blogger API 가 새 도메인 주소를 돌려줌; 옛 blogspot 주소와 같은 페이지로 본다)."""
+    import urllib.parse
+    return urllib.parse.urlsplit(str(u or "").strip()).path.rstrip("/")
 
 
 def targets(only=None):
