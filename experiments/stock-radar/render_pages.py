@@ -738,7 +738,7 @@ def related(s):
 
 PEER_LABEL = "시총 상위 20개"
 MAX_EVENTS = 8      # 뉴스 목록에 펼쳐 두는 수, 나머지는 `그 외 n건`
-MAX_ISSUES = 5      # 중요 이슈 줄 수 (10-3 : 7일, 관련도 높은 순 최대 5줄)
+MAX_ISSUES = 5      # 중요 이슈 줄 수 — 최근 24시간(TODAY_HOURS, 뉴스 목록과 같은 창) · 관련도 높은 순 최대 5줄 (10-3 의 7일 → 2026-11-21 사용자: `오늘` 탭인데 지난 기사가 섞였다)
 MAX_MEDIA = 5       # 방송 줄 최대 수 — 실적 주간엔 한 종목에 하루 십여 줄이라 최근 것만 (2026-10-25)
 NEWS = {}           # 이 실행의 분류된 기사 (write_all 이 채운다)
 PICKS = []          # 방송에서 나온 종목 의견 (media_feed.picks, 최근 5거래일 PICK_SINCE) — `방송 의견은?` 카드 (2026-10-29 P89 · 11-04 P290)
@@ -957,7 +957,7 @@ def sec_crash(s, dc=None, src="Yahoo Finance"):
 
 
 def sec_today_tab(s, news):
-    """오늘 탭 — (급락일이면 `주목할 종목` 카드) · 중요 이슈(파이썬 틀 : 관련도 높은 사실 문장 최대 5줄) · 뉴스(방향 막대 + 기사). AI 는 분류에만 쓴다."""
+    """오늘 탭 — (급락일이면 `주목할 종목` 카드) · 중요 이슈(파이썬 틀 : 최근 24시간 · 관련도 높은 사실 문장 최대 5줄) · 뉴스(방향 막대 + 기사). AI 는 분류에만 쓴다."""
     if not news:   # 오늘 탭은 늘 둔다 — 없으면 가격 카드 · 상태 카드가 다음 탭(실적과 기대)으로 들어간다
         note = _dk.muted("뉴스를 아직 받지 못했습니다. 다음 갱신 때 채웁니다.")
         return sec_crash(s) + R._section("중요 이슈", note, tab="오늘") + R._section("뉴스", "", line=False, tab="오늘")
@@ -970,13 +970,13 @@ def sec_today_tab(s, news):
         dc["week"][sc["direction"]] = dc["week"].get(sc["direction"], 0) + 1
         if _ts(x["published_at"]) >= since:   # `오늘` 막대 = 목록과 같은 최근 24시간 (2026-10-25)
             dc["today"][sc["direction"]] = dc["today"].get(sc["direction"], 0) + 1
-    top = sorted((e for e in events if e["rel"] >= 2 and e["has_fact"]), key=lambda e: e["published_at"], reverse=True)
+    top = sorted((e for e in events if e["rel"] >= 2 and e["has_fact"] and _ts(e["published_at"]) >= since), key=lambda e: e["published_at"], reverse=True)   # 오늘 탭 = 최근 24시간만 (2026-11-21 사용자 A안 — 뉴스 목록 · `오늘 n건` 막대와 같은 창)
     top = sorted(top, key=lambda e: -e["rel"])[:MAX_ISSUES]   # 관련도 높은 순, 같으면 최근 순
     issues = [(f"{R.rr.AREA_KO.get(e['area'], e['area'])} {_dk.headline(e['fact'])}", e.get("url"), e) for e in top if e["has_fact"]]   # 셋째 칸 = 기사 — 줄을 누르면 요약 팝업 (2026-11-15 사용자)   # (글, 기사 주소) — 줄을 누르면 그 기사가 열린다 (2026-10-23 사용자)   # 명사형 헤드라인체 (데일리 · NVDA 중요 이슈와 같게)
     today = _today_list(s, events)
     a = {"events": today[:MAX_EVENTS], "events_overflow": today[MAX_EVENTS:MAX_EVENTS + 12], "direction_counts": dc,
          "brief_events": today, "brief_key": s["sym"], "brief_name": s["name"]}   # 한 줄 소식 키워드 버튼 — 목록 상한 밖 기사까지 (2026-11-15 사용자)
-    issue_html = R.sec_narrative(a, {"today": issues}) if issues else _dk.muted("최근 7일 동안 이 종목을 주로 다룬 큰 소식이 없습니다.")
+    issue_html = R.sec_narrative(a, {"today": issues}) if issues else _dk.muted("오늘은 이 종목을 주로 다룬 큰 소식이 없습니다.")
     return sec_crash(s, dc["today"]) + _dk.keep_tone(R._section("중요 이슈", issue_html, tab="오늘")   # 뉴스 · 중요 이슈는 합니다체로 바꾸지 않는다 (2026-10-18 사용자)
                          + (R._section("뉴스", R.sec_direction_bars(dict(a, empty_text="오늘은 이 종목을 다룬 뉴스가 없습니다.")) + (R.sec_events(a) if today else ""), line=False, tab="오늘")
                             if today or sum(dc["week"].values()) else "")   # 최근 7일 뉴스가 없으면 구획 숨김 · 오늘 0건 안내 = 막대 자리, 아이콘 없음 (2026-11-08 사용자)
