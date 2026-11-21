@@ -7,7 +7,7 @@ report_body.html / title.txt / image_ref.txt를 남긴다.
 
 게시 조건:
     - title.txt / report_body.html 존재
-    - 본문에 S&P 500 봉차트(data-candle) 있음 — 2026-11-16 부터 커버 이미지 · 그림 그래프 없음
+    - 봉차트(data-candle)는 조건 아님 — 없으면 봉차트 없이 게시 (2026-11-21 사용자, 운영지침 D6-2. 옛 11-16 "봉차트 없으면 중단" 폐지)
     - 같은 제목의 글이 아직 없음 (cron 이중화 대비 중복 방지)
 
 사용법:
@@ -63,9 +63,8 @@ def main():
         print("제목 또는 본문이 비어 있어 게시를 중단합니다.")
         sys.exit(1)
 
-    if "data-candle=" not in body:   # 맨 위 = S&P 500 봉차트 (2026-11-16 사용자, 운영지침 D6-2) — 커버 이미지 · 그림 그래프 확인은 없앰
-        print("본문에 S&P 500 봉차트가 없음 — 게시를 중단합니다.")
-        sys.exit(1)
+    if "data-candle=" not in body:   # 맨 위 봉차트가 없으면 그 자리만 빼고 게시 (2026-11-21 사용자, 운영지침 D6-2 — 옛 11-16 게시 중단 폐지)
+        print("::warning::본문에 S&P 500 봉차트 없음 — 봉차트 없이 게시")
 
     # cron 이중화로 하루 두 번 실행될 수 있다. check_published.py가 앞단에서 걸러주지만,
     # 확인 실패나 두 실행이 겹치는 경우를 대비한 2차 방어.

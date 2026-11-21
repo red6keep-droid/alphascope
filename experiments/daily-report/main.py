@@ -245,9 +245,10 @@ def main():
     image_ok, cover_url = False, None
     # 그래프(chart_spx)가 커버 자리라 커버는 그래프가 없는 날만 쓰인다 (render_html.build_body). 커버 생성 실패가 그래프 있는 날의 게시까지
     # 막던 단일 실패점을 풀었다 — 둘 다 없을 때만 멈춘다 (2026-10-21, 운영지침 D6-2; "이미지 없이 게시하지 않는다"는 그대로)
-    if should_publish and not chart_ok:   # 운영지침 D6-2 (2026-11-16): 맨 위 봉차트 자료가 없으면 게시하지 않는다
-        print("[게시 중단] S&P 500 봉차트 자료가 없습니다.")
-        sys.exit(1)
+    if not chart_ok:   # 운영지침 D6-2 (2026-11-21 사용자: 빠진 자료는 빼고 발행 — 옛 11-16 "봉차트 없으면 게시 중단" 폐지). 맨 위 봉차트 자리만 비고 글은 나간다
+        print("::warning::S&P 500 봉차트 자료 없음 — 봉차트 없이 발행")
+        if should_publish:
+            notify.event("수집 실패", "데일리 리포트 S&P 500 봉차트 자료 없음 (야후) — 봉차트 없이 발행")
 
     print("=" * 50)
     print("[5/6] HTML 렌더링")
