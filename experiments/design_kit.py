@@ -57,7 +57,7 @@ LINK_ICON = ('<svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"
              '<path d="M4.5 11.5 11.5 4.5"/><path d="M6 4.5h5.5V10"/></svg>')
 NEW_PILL = ('<span style="display:inline-block;background:#B91C1C;color:#fff;border-radius:3px;padding:1px 4px;font-size:10px;font-weight:700;'
             'line-height:12px;vertical-align:middle;margin-left:4px;">N</span>')   # 10/12 홀짝 · 위아래 1 (2026-11-07, 옛 10/13 · 1 0)
-WRAP_OPEN = ('<div data-design="2" style="font-family:-apple-system,\'Apple SD Gothic Neo\',\'Malgun Gothic\',sans-serif;'
+WRAP_OPEN = ('<div data-design="2" style="font-family:\'AS Num\',-apple-system,\'Apple SD Gothic Neo\',\'Malgun Gothic\',sans-serif;'
              f'font-size:{BODY};line-height:{LH_BODY};color:#333;">')   # 본문 행간 34px — 카드는 각자 LH_CARD 24px 를 단다 (2026-10-12 사용자)
 WRAP_CLOSE = "</div>"
 SEO_LEAD = f"font-size:{BODY};line-height:{LH_BODY};color:#333;margin:0 0 12px;word-break:keep-all;"   # 글 맨 앞 요약 p[data-seo-lead] — 본문과 같은 19px · 행간 34 (2026-10-18 사용자: "이 문장은 폰트 사이즈가 다른데", 16px 이던 것). 모든 리포트 · 종목 페이지 공통

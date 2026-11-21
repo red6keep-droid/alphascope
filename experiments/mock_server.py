@@ -49,6 +49,7 @@ LABELS = {
     "issue_store": "증시 전망",   # 사건 가설 질문 페이지 · 목록 · 홈 카드 목업 (2026-11-06)
     "site-search": "검색 · 질문하기",   # 헤더 검색 아이콘 · 즉답 카드 · 질문하기 (2026-11-10 사용자)
     "mock-invest": "모의투자",   # 가상의 10억 원 · 종가 체결 · 세금 (2026-11-21 사용자)
+    "comments": "댓글 다듬기",   # 신고 · 가려진 댓글 · 하루 30개 · 자리 댓글 · 별명 (2026-11-21 사용자)
     "post-footer": "글 아래 버튼 줄",   # 💬 댓글 · 홈으로 · TOP 한 줄, 함께 보는 페이지는 그 아래 (2026-11-10 사용자)
     "stock-etf": "ETF",   # ETF 고정 페이지 37개 (2026-11-12 사용자 A안)
     "ops-dashboard": "운영 대시보드",   # 관리자 전용 운영 페이지 목업 (2026-11-13 사용자)
@@ -83,8 +84,9 @@ PLAN = [   # (기능 이름, 남은 일 — 한 줄, 파일 패턴 "폴더/파�
     ("종목 이슈 (종목 페이지 가격 카드 아래 Hot Issue)", "목업 확인 → 뉴스 양으로 자동 열고 닫는 코드 (블로그에 아직 없음)", ["issue_store/mock_stock_issue*"]),
     ("회원 `내 종목`", "목업 3화면 → Firebase 규칙 게시 · 댓글 저장 확인이 먼저 → 고정 페이지 · 10명 열기", ["my-stocks/*"]),
     ("종목 새 카드 `발표 때 예상을 넘었나?` · `같은 업종 안 주가 순위는?` · `재무 건전성은?` · `이익에 비해 주가 수준은?`", "목업 확인 → 매출 예상 매일 기록 · 업종 비교 묶음 수집 · 정식 렌더러 (블로그에 아직 없음)", ["stock-radar/mock_earnmom_*"]),
+    ("댓글 다듬기 (신고 · 가려진 댓글 · 하루 30개 · 날짜를 넘어 이어지는 시황 댓글 · 별명)", "목업 확인 → 댓글 저장 확인 → 테마 JS · Firestore 규칙 · 댓글 봇 가림 (2026-11-21 기획 댓글-토론방-기획.md)", ["comments/mock_comments_*"]),
     ("모의투자 (가상의 10억 원 · 종가 체결 · 세금까지 실전처럼 · 순위는 100명부터)", "목업 확인 → 댓글 저장 확인 · 별명 → Cloudflare D1 · R2 · Worker → 정산 코드 (2026-11-21 기획 모의투자-기획.md, 결정 전부 확정)", ["mock-invest/mock_invest-*"]),
-    ("종목별 토론방 (종목 페이지 맨 끝 탭)", "목업 확인 → newfact.app 구입(11-21) 뒤 하위 주소 · Worker 쓰기 · R2 사본 · 신고 처리 화면", ["stock-board/mock_board_*"]),
+    ("종목별 토론방 (종목 페이지 맨 끝 탭) · 보류", "2026-11-21 사용자: 종목마다 토론방은 미룸 → 댓글 다듬기 먼저. 한 종목에 댓글이 꾸준히 달리면 다시", ["stock-board/mock_board_*"]),
     ("검색 `왜 떨어졌어` · 질문하기", "질문하기 버튼 꺼 둠 — 켤지 사용자 결정", ["site-search/mock_why_demo*"]),
     ("주식 제대로 알기 4편 `판 값에 다시 사려다 더 비싸게 사는 이유`", "초안 목업 확인 → \"발행해\" 때 발행(주소 · 목록 연결). 발행되면 이 줄을 빼면 아래 `주식 제대로 알기` 묶음으로", ["course/mock_착각-04-되사기.html"]),
     ("주식 제대로 알기 5편 `분할 매수, 하단을 기다리면 더 싸게 모일까?`", "초안 목업 확인 → \"발행해\" 때 발행(주소 · 목록 연결). 발행되면 이 줄을 빼면 아래 `주식 제대로 알기` 묶음으로", ["course/mock_착각-05-분할매수.html"]),
@@ -441,6 +443,27 @@ addEventListener('pagehide', () => {{
 
 # 목업 오른쪽 아래에 떠 있는 작은 '목록' 버튼 — 목업 파일은 건드리지 않고 보낼 때만 붙인다.
 # (2026-11-20 사용자: 맨 끝까지 내려야 목록으로 가던 것 → 보다가 바로 갈 수 있게 플로팅. 높이 44 = 터치 영역 기준)
+def num_font_css():
+    """숫자 = Inter(테마 'AS Num', 11-21 Roboto → Inter) — 테마를 새로 복사하지 않은 옛 목업 · 단독 목업에도 보여 줄 때 넣는다 (2026-11-21 사용자: 목업 페이지 숫자 통일).
+    값은 늘 저장소 index.html 에서 읽는다(테마와 어긋나지 않게)."""
+    try:
+        t = open(os.path.join(os.path.dirname(BASE), "index.html"), encoding="utf-8").read()
+    except OSError:
+        return ""
+    i = t.find("/* 숫자 글꼴 =")
+    if i < 0:
+        return ""
+    face = t[i:t.index("\n", t.index(".post-body svg text", i))]
+    v = {k: re.search(r"--" + k + r":\s*([^;]+);", t).group(1) for k in ("sans", "num", "report-font")}
+    pc = re.search(r":root \{ --sans: ('AS Num', 'AS Barun'[^;]+); --report-font: ([^;]+); \}", t)   # PC 폭(901 이상) 나눔바른고딕 줄
+    css = (face + f"\n:root {{ --sans: {v['sans']}; --num: {v['num']}; --report-font: {v['report-font']}; }}"
+           "\n[style*=\"font-family:-apple-system\"], [style*=\"font-family: -apple-system\"] { font-family: var(--report-font) !important; }"
+           "\nsvg text { font-family: var(--report-font); }")
+    if pc:
+        css += f"\n@media (min-width: 901px) {{ :root {{ --sans: {pc.group(1)}; --report-font: {pc.group(2)}; }} }}"
+    return "<style data-num-font>" + css + "</style>"
+
+
 BACK_BAR = ('<a href="/" aria-label="목업 목록으로" style="position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));'
             'z-index:2147483000;display:flex;align-items:center;gap:6px;height:44px;padding:0 16px;border-radius:22px;'
             'background:rgba(29,33,39,.86);color:#fff;font:600 14px/1 -apple-system,\'Apple SD Gothic Neo\',sans-serif;'
@@ -957,6 +980,10 @@ class Handler(SimpleHTTPRequestHandler):
                 page = fh.read()
             if journey:
                 page = fresh_theme(page)
+            if "AS Num" not in page:   # 옛 · 단독 목업도 숫자 = Inter
+                h = page.lower().find("</head>")
+                css = num_font_css()
+                page = page[:h] + css + page[h:] if h >= 0 else css + page
             i = page.lower().rfind("</body>")
             extra = journey_bar(seg[0], seg[2]) if journey else BACK_BAR
             page = page[:i] + extra + page[i:] if i >= 0 else page + extra
