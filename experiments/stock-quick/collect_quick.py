@@ -42,6 +42,7 @@ sys.path.insert(0, os.path.join(EXP, "kr-stocks"))
 import tech_signals as ts  # noqa: E402
 sys.path.insert(0, HERE)
 import render_quick as RQ  # noqa: E402
+import design_kit as dk  # noqa: E402  — 늦음 상자(mark_stamp_late, 2026-11-21)
 
 _LAP = [time.time(), time.time()]
 
@@ -311,6 +312,9 @@ def main():
     for m in metas:
         if m["sym"] in got:
             newest[m["mk"]] = max(newest.get(m["mk"], ""), got[m["sym"]][0][-1])
+    # 늦음 상자 기준 = 그 나라 종목이 받은 마지막 날 (2026-11-21 사용자 — 가이드라인 2절 3번). 이보다 이른 종목 · 전날 조각은 늦음 상자로
+    late_day = {d: max((got[m["sym"]][0][-1] for m in metas if m["dir"] == d and m["sym"] in got), default=None) for d in ("us", "kr")}
+    FU.LATE_DAY, FK.LATE_DAY = late_day["us"], late_day["kr"]
 
     # 시장 지수
     bench = {}
@@ -448,7 +452,10 @@ def main():
     for m in metas:   # 오늘 화면을 못 만든 종목 = 전날 조각 그대로
         key = (m["dir"], m["file"])
         if key not in pages and prev and os.path.exists(os.path.join(prev, m["dir"], m["file"] + ".html")):
-            shutil.copy(os.path.join(prev, m["dir"], m["file"] + ".html"), os.path.join(out, m["dir"], m["file"] + ".html"))
+            h = open(os.path.join(prev, m["dir"], m["file"] + ".html"), encoding="utf-8").read()
+            if late_day.get(m["dir"]):   # 오늘 다른 종목보다 날짜가 이르면 늦음 상자 (2026-11-21 사용자: 빠진 건 빼고 나가되 늦은 줄 알게)
+                h = dk.mark_stamp_late(h, dk.kst_close_day(late_day[m["dir"]], "US" if m["dir"] == "us" else "KR"))
+            open(os.path.join(out, m["dir"], m["file"] + ".html"), "w", encoding="utf-8").write(h)
             reused += 1
     for (d, k), h in pages.items():
         open(os.path.join(out, d, k + ".html"), "w", encoding="utf-8").write(h)
@@ -464,8 +471,16 @@ def main():
         print(f"[quick] {d}: 화면 조각 {len(hs)}개 평균 {sum(hs) // max(1, len(hs)) // 1024}KB · 폴더 합계 {tot // 1024 // 1024}MB")
     print(f"[quick] 일봉 {secs}초 · 받음 {fresh}/{total} · 전날 값 {carried} · 없음 {missing} · 전날 조각 {reused} · 기준일 {newest} · 전체 {round(time.time() - t0)}초")
     print(f"[quick] 1년 미만 {stats['short']} · 거래정지 {stats['halted']} · 실적일 {stats['earn']} · 기사 {stats['news']} · 공시 {stats['disc']}")
+    # 옛: 오늘 받은 종목이 90% 밖이면 통째로 안 올림 → 받은 종목은 오늘 값, 못 받은 종목은 전날 값 + 늦음 상자로 올린다 (2026-11-21 사용자: "통으로 안 되는 건 아니다").
+    # 막는 것은 올리면 페이지가 사라질 때뿐 — 오늘 값도 전날 값도 없는 종목이 10% 넘으면(지난 결과를 못 읽은 날 등) 지난 배포를 그대로 둔다
     if fresh < total * MIN_SHARE:
-        print(f"[quick] 받은 종목이 {MIN_SHARE:.0%} 밖 — 올리지 않는다")
+        try:
+            import notify
+            notify.event("수집 실패", f"간단 종목 일봉 {fresh}/{total} — 못 받은 {carried}종목은 전날 값 · 늦음 상자로 올림" + (f", 없음 {missing}" if missing else ""))
+        except Exception as e:  # noqa: BLE001
+            print(f"::warning::[quick] 알림 실패: {e!r}")
+    if fresh + carried < total * MIN_SHARE:
+        print(f"[quick] 오늘 값 · 전날 값이 다 없는 종목이 {missing}개 — 올리면 페이지가 사라져 올리지 않는다")
         sys.exit(3)
 
 

@@ -1763,22 +1763,43 @@ def kst_close_day(day, market):
     return f"{d.month}월 {d.day}일"
 
 
-def price_stamp(day, market):
+def price_stamp(day, market, late=False):
     """가격 페이지(종목 · ETF · 간단 정보 · 목록 · 증시 리포트) 맨 위 안내 상자 — 실시간 가격이 아니라 종가로 만든 리포트라는 것 (2026-11-14 사용자 통일).
     한국 = `11월 13일 종가 기준 · … (오후 4시 10분 무렵)`, 미국 = `11월 14일 새벽 마감 기준 · … (아침 7시 30분 무렵)` — 날짜 · 시각 모두 한국 시간."""
     if market == "US":
-        return report_stamp(kst_close_day(day, "US"), "아침 7시 30분 무렵", close="새벽 마감")
-    return report_stamp(kst_close_day(day, "KR"), "오후 4시 10분 무렵")
+        return report_stamp(kst_close_day(day, "US"), "아침 7시 30분 무렵", close="새벽 마감", late=late)
+    return report_stamp(kst_close_day(day, "KR"), "오후 4시 10분 무렵", late=late)
 
 
-def report_stamp(day_text, when_text, close="종가"):
+LATE_STAMP = "오늘 자료가 늦어 지난 값을 보여 드립니다. 들어오는 대로 바뀝니다."   # 늦은 날 안내 상자 문구 (2026-11-21 사용자, 가이드라인 2절 3번)
+
+
+def report_stamp(day_text, when_text, close="종가", late=False):
     """종목 페이지 제목 바로 아래 안내 — 어느 날 종가 기준인지 · 매 거래일 장 마감 뒤 발행된다는 것 (2026-11-05 사용자: 장중 가격을 볼 수 있게 되니 종가 리포트라는 점을 알리자).
     연한 회색 박스 안 · 장중 차트 안내 문구는 뺐다 (2026-11-06 사용자 P316). 제목 글자(검색어)는 건드리지 않고 본문 첫 줄에 둔다. 날짜는 `어제` 같은 상대어 대신 실제 날짜."""
     ico = ('<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" '
            'style="flex:none;margin-top:2px;"><circle cx="8" cy="8" r="6.2"/><path d="M8 4.5V8l2.4 1.6"/></svg>')
+    if late:   # 늦은 날 = 노랑 상자(바탕 7-5절 #FFF8E1 · 테두리는 7-5절 #F4D37A 를 30% → 다시 20% 연하게 한 #F9E6B5, 2026-11-21 사용자) — 테두리 1 만큼 안쪽을 줄여 상자 높이는 평소와 같게 (2026-11-21 사용자: 빠진 자료는 빼고 나가되 늦은 줄 알게)
+        return (f'<p data-report-stamp="1" data-stamp-late="1" style="display:flex;gap:6px;align-items:flex-start;margin:0 0 14px;padding:9px 11px;background:#FFF8E1;'
+                f'border:1px solid #F9E6B5;border-radius:8px;font-size:13px;line-height:19px;color:#333;word-break:keep-all;">{ico.replace("<svg ", "<svg color=\"#E8710A\" ", 1)}'
+                f'<span>{day_text} {close} 기준 · {LATE_STAMP}</span></p>')
     return (f'<p data-report-stamp="1" style="display:flex;gap:6px;align-items:flex-start;margin:0 0 14px;padding:10px 12px;background:#F3F4F6;border-radius:8px;'
             f'font-size:13px;line-height:19px;color:#6B7280;word-break:keep-all;">{ico}'
             f'<span>{day_text} {close} 기준 · 매 거래일 장을 마감한 뒤 발행되는 리포트입니다. ({when_text})</span></p>')
+
+
+_STAMP_RE = re.compile(r'<p data-report-stamp="1"(?![^>]*data-stamp-late).*?</p>', re.S)
+_STAMP_DAY = re.compile(r"<span>(\d+월 \d+일) (종가|새벽 마감) 기준")
+
+
+def mark_stamp_late(html, fresh_day_text):
+    """이미 만든 화면의 안내 상자를 늦음 모양으로 — 상자 날짜가 오늘 다른 종목의 날짜(fresh_day_text, `11월 14일`)와 다를 때만 (2026-11-21 사용자, 가이드라인 2절 3번).
+    전날 조각을 그대로 다시 올릴 때 쓴다. 상자가 없거나 이미 늦음이거나 날짜가 같으면 그대로 돌려준다."""
+    m = _STAMP_RE.search(html)
+    d = _STAMP_DAY.search(m.group(0)) if m else None
+    if not d or d.group(1) == fresh_day_text:
+        return html
+    return html[:m.start()] + report_stamp(d.group(1), "", close=d.group(2), late=True) + html[m.end():]
 
 
 def intraday_chart_fold(code, bars_url, precision=0):
