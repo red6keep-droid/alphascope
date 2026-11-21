@@ -72,7 +72,7 @@ def overlay(src, dst, mood):
         d.line([(0, y), (W, y)], fill=int(150 * max(0, (y - H * 0.35) / (H * 0.65))))
     im = Image.composite(Image.new("RGB", (W, H), (0, 0, 0)), im, shade.filter(ImageFilter.GaussianBlur(4)))
     d = ImageDraw.Draw(im)
-    d.text((40, H - 118), "뉴팩트 시황 해설", font=font(44), fill="white")
+    d.text((40, H - 118), "Newfact 시황 해설", font=font(44), fill="white")
     d.text((42, H - 60), "2026.11.17 아침" if mood == "down" else "예시 · 오른 날", font=font(26), fill=(230, 230, 230))
     im.save(dst, "WEBP", quality=80)
 
@@ -129,7 +129,7 @@ h2{{font-size:18px;margin:0 0 6px}} .p{{font-size:12px;color:#6b7280;margin:0 0 
 .miss{{aspect-ratio:1024/400;display:flex;align-items:center;justify-content:center;background:#f3f4f6;color:#9ca3af;border-radius:8px}}
 code{{font-size:12px}}
 </style></head><body><main>
-<h1>뉴팩트 시황 해설 — 배너 목업</h1>
+<h1>Newfact 시황 해설 — 배너 목업</h1>
 <p class="intro">화풍 4가지(A~D) × 분위기 2가지. 왼쪽 두 칸 = 오늘 아침(지난밤 기술주 내림 · 파랑 톤), 오른쪽 두 칸 = 비교용 오른 날(빨강 톤). 각 분위기마다 그림만 · 글자 얹음.<br>
 그림 = Pollinations FLUX(목업용, 운영은 Workers AI FLUX schnell). 장면은 파이썬 틀이 주제 낱말(반도체) + 방향으로 만든 것 — AI 글 모델 0. 글 제목 · 본문은 예시.</p>
 {''.join(rows)}

@@ -54,7 +54,7 @@ def compose(s, src=SRC, tag=""):
     acc = UP if s["dir"] == "up" else DOWN
 
     # ① 위 알약
-    pill = f"뉴팩트 시황 해설   |   {s['edition']}"
+    pill = f"Newfact 시황 해설   |   {s['edition']}"
     pf = f(BOLD, 24)
     pw = d.textlength(pill, font=pf)
     rounded(d, (48, 40, 48 + pw + 48, 92), 26, (10, 20, 45, 200), outline=(255, 255, 255, 90), width=2)
@@ -94,7 +94,7 @@ def compose(s, src=SRC, tag=""):
         d.text((cx + 76, top + 66 + (27 - px) / 2), what, font=f(BOLD, px), fill="white")
 
     # ⑤ 아래 표시
-    d.text((48, H - 34), "AI 생성 이미지 · 뉴팩트", font=f(REG, 18), fill=(200, 205, 215), anchor="lm")
+    d.text((48, H - 34), "AI 생성 이미지 · Newfact", font=f(REG, 18), fill=(200, 205, 215), anchor="lm")
     im = Image.alpha_composite(im.convert("RGBA"), ov).convert("RGB")
     os.makedirs(OUT, exist_ok=True)
     p = os.path.join(OUT, f"{s['bg']}{tag}-text.webp")

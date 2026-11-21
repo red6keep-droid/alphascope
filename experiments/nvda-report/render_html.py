@@ -836,7 +836,7 @@ def analysts_card(cells, close, m0=None, m2=None, opened=False):
     return _state_card("애널리스트 의견은?", state, theme, col, lines, "", tip=_dk.with_src(tip, "Yahoo Finance"), fold=True, opened=opened)
 
 
-BRAND = "뉴팩트"   # 독자에게 보이는 브랜드 표기 = 로고와 같은 영문 붙여 쓰기 (2026-11-15 사용자: 옛 `Alpha Scope` · `알파스코프` 대신)
+BRAND = "Newfact"   # 독자에게 보이는 브랜드 표기 = 로고와 같은 영문 붙여 쓰기 (2026-11-15 사용자: 옛 `Alpha Scope` · `알파스코프` 대신)
 BRAND_FONT = "font-family:'Noto Sans KR',sans-serif;font-weight:900;letter-spacing:-0.2px;"   # 로고 글꼴 = 테마 .logo-word (Noto Sans KR Black, SIL OFL) — 제목 · 카드 질문 자리
 def brand_mark(around):
     """문장 속 `AlphaScope` — 블로그 로고 + 로고 글꼴(Noto Sans KR 900), 글자 = 둘레 − 3 (2026-11-15 사용자: "문장 안에서 AlphaScope 를 쓸 때만 · 앞에 로고 · 2포인트 작게" → 같은 날 "1포인트 더").
@@ -857,7 +857,7 @@ def brand_html(text, around):
     return _esc(text).replace(BRAND, brand_mark(around), 1)
 
 
-TOGETHER_Q = "뉴팩트 신호는?"   # 옛 흰 카드 `Alpha Scope 데이터로 함께 보기` → 강조 카드 (P206) → 로고 + `Alpha Scope 전망은?` (P208) → `신호는?` (2026-11-01 사용자 P267: 앞날 예측으로 읽혀서 — 판정을 모은 카드)
+TOGETHER_Q = "Newfact 신호는?"   # 옛 흰 카드 `Alpha Scope 데이터로 함께 보기` → 강조 카드 (P206) → 로고 + `Alpha Scope 전망은?` (P208) → `신호는?` (2026-11-01 사용자 P267: 앞날 예측으로 읽혀서 — 판정을 모은 카드)
 TOGETHER_WORDS = ((1, "상승", UP), (-1, "하락", DOWN), (0, "중립", "#111"))
 TOGETHER_LINE = "rgba(15,23,42,.08)"   # 강조 카드 색 위 줄 구분선 (흰 바탕을 뺀 뒤, P207)
 HOT_KIND = {"호재": "up", "리스크": "down"}   # 엇갈림 · 불확실 = 회색 라벨 (P218)
@@ -1166,7 +1166,7 @@ def picks_word(ps):
 PICK_BOX = {"매수": "up", "매도": "down"}   # 줄 머리 의견 라벨 — 기술지표 라벨 모양, 보유 · 관망은 회색(flat) (P201)
 
 
-TOGETHER_TITLE = "뉴팩트 데이터로 함께 보기"   # 방송 의견 아래 — 같은 종목의 우리 판정을 방향별로 (2026-10-31 사용자 P142, 기록 계획 A5-5)
+TOGETHER_TITLE = "Newfact 데이터로 함께 보기"   # 방송 의견 아래 — 같은 종목의 우리 판정을 방향별로 (2026-10-31 사용자 P142, 기록 계획 A5-5)
 
 
 # 함께 보기 안쪽 카드 (2026-10-31 사용자 P168): 상승 쪽 · 하락 쪽 · 중립을 각자 카드로 감싼다. 바깥 강조 카드와 같은 색이면 한 단계 진하게

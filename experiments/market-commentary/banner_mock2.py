@@ -115,7 +115,7 @@ h1{{font-size:22px;margin:0 0 6px}} .intro{{color:#333;font-size:15px;line-heigh
 .tag{{font-size:12px;color:#6b7280;margin:0 2px 6px}} details{{font-size:12px;color:#6b7280;margin:0 2px}} code{{font-size:11px;word-break:break-all}}
 .miss{{display:flex;align-items:center;justify-content:center;background:#f3f4f6;color:#9ca3af;border-radius:8px}}
 </style></head><body><main>
-<h1>뉴팩트 시황 해설 — 배너 목업 2 · 경제의 하루</h1>
+<h1>Newfact 시황 해설 — 배너 목업 2 · 경제의 하루</h1>
 <p class="intro">마스터 화풍(경제 매거진 시네마틱 실사) 고정 + 소재 7갈래 × 분위기 5가지 × 시장(아침편 = 미국 장면, 저녁편 = 한국 장면)을 파이썬이 조합 — AI 글 모델 0.<br>
 로고 · 간판 · 거래소 정면 · 황소상 없음, 사람은 멀리 · 뒷모습. 배너 아래 `AI 생성 이미지`(운영지침 4-6). 1200×630(공유 썸네일 비율).<br>
 그림은 목업용 Pollinations(오른쪽 아래 워터마크) — 운영은 Workers AI FLUX schnell.</p>
