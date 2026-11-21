@@ -19,7 +19,7 @@ GITHUB_CLIENT_ID = "Ov23liGLCeQmPcV89d16"   # GitHub OAuth App alphascope-ops-co
 # 블로그 구글 로그인 (2026-11-13) — 블로그 메뉴 `운영 현황` 이 Firebase ID 토큰을 POST /fb-login 으로. 셋 다 공개 값(테마 index.html 에 이미 있음)
 FIREBASE_PROJECT_ID = "alphascope-352e9"
 ADMIN_FIREBASE_UIDS = "u1vln4bbDgSgWQDe2F2FaNs81D43"   # 블로그 주인 UID (테마 CFG.owner 와 같게)
-BLOG_ORIGIN = "https://alpha-scope.blogspot.com"
+BLOG_ORIGIN = "https://www.newfact.app,https://alpha-scope.blogspot.com"   # 쉼표로 여러 주소 (2026-11-21 새 도메인)
 
 # 운영 기록 (experiments/ops_log.py 가 Cloudflare API 로 쓴다)
 [[kv_namespaces]]
