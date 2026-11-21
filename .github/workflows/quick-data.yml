@@ -188,6 +188,7 @@ jobs:
       - name: Collect · render
         id: collect
         env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}   # 일봉 90% 밖 = 전날 값 · 늦음 상자로 올렸다는 운영 알림 (2026-11-21, notify.event)
           FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
           DART_API_KEY: ${{ secrets.DART_API_KEY }}
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}

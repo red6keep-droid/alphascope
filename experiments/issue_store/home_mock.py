@@ -99,7 +99,7 @@ def build(card):
           "if(a&&a!==r&&!r.contains(a))return;var h=r.getAttribute('data-href');if(h&&h!=='#'){e.preventDefault();location.href=h;}});</script>")
     return ('<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>'
             '<title>목업 · 홈 — 증시 전망 카드</title><link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"/>'
-            '<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;900&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet"/>'
+            '<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>'
             f'<style>{css}{HYPO_CSS}</style></head><body>{body}{js}</body></html>')
 
 

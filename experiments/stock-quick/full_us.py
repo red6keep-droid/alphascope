@@ -45,6 +45,7 @@ import industry_us  # noqa: E402
 import render_pages as RP  # noqa: E402
 
 R = RP.R
+LATE_DAY = None   # 그날 다른 종목의 마지막 일봉 날짜 — collect_quick 이 넣는다. 이보다 이른 종목 = 늦음 상자 (2026-11-21 사용자)
 WHEN = "오후 5시 40분 무렵"            # 간단 정보 실행 시각 (quick-data.yml 17:40 KST) — 정식 미국 페이지는 아침 7시 30분
 MARKET = sorted({U.BENCH, "^VIX", "SMH", "^GSPC", *__import__("collect").SECTOR_ETFS})
 BUDGET = {"detail": 90, "sec": 100, "hist": 100}   # 한 번 실행에 새로 받는 종목 수 상한 — 첫 주에 나눠 채우고, 그 뒤는 주기만큼만 (기획 6-6 `요일 나눔`)
@@ -421,7 +422,7 @@ def body(s, bars_s, related_links, extra_today=""):
     op, ea = opinions_tab(s), earnings_tab(s)
     ind = RP.sec_industry_tab(s)
     return RP.wrap(f'<div data-quick-title="{dk.esc(U.page_title(s["sym"]).replace(" · 실적 일정", ""))}">'   # wrap = 정식과 같은 틀 · 제목 정렬 · 합니다체
-            + dk.report_stamp(dk.kst_close_day(s["day"], "US"), WHEN, close="새벽 마감")
+            + dk.report_stamp(dk.kst_close_day(s["day"], "US"), WHEN, close="새벽 마감", late=bool(LATE_DAY) and str(s["day"])[:10] < LATE_DAY)
             + RP.lead(s) + CC.card(s["name"], bars_s, 2, title="") + '<div style="height:20px;"></div>'
             + R._section("오늘", today, line=False, tab="오늘")
             + (RP.sec_today_tab(s, RP.NEWS) if news_mode else RP.sec_crash(s))   # 급락일에 버텼을 때만 (정식과 같은 자리 · 같은 카드) — 뉴스 있으면 sec_today_tab 이 급락 카드까지

@@ -630,7 +630,7 @@ TEMPLATE = """<?xml version="1.0" encoding="UTF-8" ?>
     <meta content='yes' name='apple-mobile-web-app-capable'/>
     <meta content='Newfact' name='apple-mobile-web-app-title'/>
     <meta content='default' name='apple-mobile-web-app-status-bar-style'/>
-    <link href='https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&amp;family=Inter:wght@400;600;700;800&amp;display=swap' rel='stylesheet'/>
+    <link href='https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&amp;family=Inter:wght@400;500;600;700;800&amp;display=swap' rel='stylesheet'/>
 
     <b:skin version='1.0'><![CDATA[/*
 <Variable name="keycolor" description="Main Color" type="color" default="#FF3333" value="#FF3333"/>
@@ -1053,7 +1053,7 @@ PC_MIN = 901
 PC_BODY = 16
 PC_RATIO = PC_BODY / 19
 PC_PARA_LH = 2.0           # 네이버 블로그 본문 문단 line-height:2.0
-PC_FONT = "'AS Barun', 'NanumBarunGothic', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif"
+PC_FONT = "'AS Num', 'AS Barun', 'NanumBarunGothic', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif"
 PC_STROKE = "0.25px"       # 한 단계 두껍게 (Medium 대신)
 BARUN = "https://hangeul.pstatic.net/hangeul_static/webfont/NanumBarunGothic/"   # 네이버 한글 글꼴 공식 배포
 PC_FIXED = {".post-title": (28, 36)}
@@ -1131,7 +1131,7 @@ def pc_type_css(css):
                        f' {{ margin-top: {round((new_lh - dot) / 2)}px !important; }}')
     # 테마의 3px 점 — 본문 행간(17 × 1.56 = 26.5)의 첫 줄 가운데
     out.append(f"  .report-columns li::before, .kv-row--block li::before {{ margin-top: {round((round(PC_BODY * PC_PARA_LH * 2) / 2 - 3) / 2)}px; }}")
-    # 글꼴 — 나눔바른고딕. 테마의 글꼴 변수와 리포트 본문 인라인 글꼴(design_kit.WRAP_OPEN)을 바꾼다. 숫자 칸(--num, Inter)은 그대로
+    # 글꼴 — 나눔바른고딕. 테마의 글꼴 변수와 리포트 본문 인라인 글꼴(design_kit.WRAP_OPEN)을 바꾼다. 숫자 칸(--num · 'AS Num' = Inter, 2026-11-21 사용자)은 그대로
     out.append(f"  :root {{ --sans: {PC_FONT}; --report-font: {PC_FONT}; }}")
     out.append("  .logo-word { font-family: 'Noto Sans KR', sans-serif; }")   # 로고 글자는 그대로
     out.append("  .post-body [style*=\"font-family\"]:not([style*=\"monospace\"]):not([data-brand-font]) { font-family: var(--report-font) !important; }")
@@ -2017,7 +2017,7 @@ PREVIEW_TEMPLATE = """<!DOCTYPE html>
 <title>Newfact — 디자인 미리보기</title>
 <!-- build_theme.py --preview 가 생성한 파일입니다. 직접 고치지 마십시오.
      디자인은 alphaflow-home.html, 블로거 전용 영역은 build_theme.py 에서 고칩니다. -->
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&amp;family=Inter:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&amp;family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
 <style>
 __CSS__
 
