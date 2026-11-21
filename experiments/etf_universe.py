@@ -84,7 +84,7 @@ US_SYMS = [t[0] for t in US]
 KR_SYMS = [t[0] for t in KR]
 
 # ── 고정 페이지 (2026-11-12 사용자 A안: ETF 마다 고정 페이지) ──
-BLOG = "https://alpha-scope.blogspot.com"
+BLOG = "https://www.newfact.app"
 BY_SYM = {t[0]: t for t in US + KR}
 
 

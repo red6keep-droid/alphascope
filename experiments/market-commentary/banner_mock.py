@@ -44,7 +44,7 @@ def prompt(style, mood):
 
 def fetch(p, seed):
     url = (f"https://image.pollinations.ai/prompt/{urllib.parse.quote(p)}"
-           f"?model=flux&nologo=true&width={W}&height={H}&seed={seed}&referrer=alpha-scope.blogspot.com")
+           f"?model=flux&nologo=true&width={W}&height={H}&seed={seed}&referrer=www.newfact.app")
     for i in range(3):
         try:
             r = requests.get(url, timeout=120, headers={"User-Agent": "alpha-scope-mock/1.0"})

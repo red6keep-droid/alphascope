@@ -4,7 +4,7 @@ daily-report 의 publish_blogger.py 와 동일한 OAuth refresh token 방식으�
 
 환경변수:
     BLOGGER_CLIENT_ID / BLOGGER_CLIENT_SECRET / BLOGGER_REFRESH_TOKEN (필수)
-    BLOG_URL (선택, 기본 alpha-scope.blogspot.com)
+    BLOG_URL (선택, 기본 www.newfact.app)
 """
 
 import os
@@ -16,7 +16,7 @@ from google.oauth2.credentials import Credentials
 BLOGGER_API = "https://www.googleapis.com/blogger/v3"
 TOKEN_URI = "https://oauth2.googleapis.com/token"
 SCOPES = ["https://www.googleapis.com/auth/blogger"]
-DEFAULT_BLOG_URL = "http://alpha-scope.blogspot.com/"
+DEFAULT_BLOG_URL = "http://www.newfact.app/"
 REQUIRED_ENV = ["BLOGGER_CLIENT_ID", "BLOGGER_CLIENT_SECRET", "BLOGGER_REFRESH_TOKEN"]
 
 

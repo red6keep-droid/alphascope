@@ -75,7 +75,7 @@ BENCH_NAME = "KOSPI"
 KOSDAQ = "^KQ11"
 CURRENCY = "KRW"
 
-BLOG = "https://alpha-scope.blogspot.com"
+BLOG = "https://www.newfact.app"
 LIST_SLUG = "kr-market-cap-top10"
 LIST_TITLE = "한국 시가총액 상위 10개 종목 주가"
 LIST_SLUG_TITLE = "kr market cap top10"   # 처음 만들 때 이 제목으로 → 주소 고정, 바로 한글 제목으로 바꾼다

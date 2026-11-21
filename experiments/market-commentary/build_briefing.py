@@ -50,7 +50,7 @@ V = 1
 KST = ZoneInfo("Asia/Seoul")
 NY = ZoneInfo("America/New_York")
 RAW = "https://raw.githubusercontent.com/red6keep-droid/alphascope/gh-pages"
-SITE = "https://alpha-scope.blogspot.com"
+SITE = "https://www.newfact.app"
 UA = {"User-Agent": "alpha-scope/market-briefing"}
 
 # 일정 이름 (collect_calendar.py kind) · 발표 시각(뉴욕 기준)

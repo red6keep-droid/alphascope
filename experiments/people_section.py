@@ -13,7 +13,7 @@ import design_kit as dk
 
 KST = datetime.timezone(datetime.timedelta(hours=9))
 PATH = os.environ.get("PEOPLE_MENTIONS_JSON") or os.path.join(os.path.dirname(os.path.abspath(__file__)), "people-radar", "output", "state", "people_mentions.json")
-ALL_URL = "https://alpha-scope.blogspot.com/search/label/%EC%9D%B8%EB%AC%BC%20%EB%B0%9C%EC%96%B8"   # 라벨 `인물 발언` 목록 — 발행 때 최신 글 주소로
+ALL_URL = "https://www.newfact.app/search/label/%EC%9D%B8%EB%AC%BC%20%EB%B0%9C%EC%96%B8"   # 라벨 `인물 발언` 목록 — 발행 때 최신 글 주소로
 SHOWN = 3   # 3건 + 더 보기 (2026-11-15 사용자 "세 개까지만", 옛 5 — P340)
 TOPIC_KO = {"Trade": "무역", "Fed": "연준 · 금리", "Tax": "세금", "Energy": "에너지", "Immigration": "이민", "Regulation": "규제",
             "Geopolitics": "지정학", "Company": "기업", "Stock Call": "종목 의견", "Position": "매매", "Sector Call": "업종 의견",

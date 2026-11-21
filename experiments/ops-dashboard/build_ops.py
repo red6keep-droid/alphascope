@@ -37,7 +37,7 @@ esc, V = dk.esc, dk.violet
 ok, warn, idle, over, white_card, chart_top = M.ok, M.warn, M.idle, M.over, M.white_card, M.chart_top
 
 REPO = "red6keep-droid/alphascope"
-BLOG = "https://alpha-scope.blogspot.com"
+BLOG = "https://www.newfact.app"
 RAW = f"https://raw.githubusercontent.com/{REPO}/gh-pages/"
 KST = dt.timezone(dt.timedelta(hours=9))
 PT_OFFSET = -8   # 태평양 표준시(11월 ~ 3월). 서머타임이면 -7 — Gemini 하루 한도가 이 자정에 초기화된다 (AI-모델-현황 7절)

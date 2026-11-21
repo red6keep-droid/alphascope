@@ -14,7 +14,7 @@ sys.path.insert(0, os.path.join(BASE, ".."))
 import design_kit as dk  # noqa: E402
 
 OUT = os.path.join(BASE, "output", "mock_story.html")
-BLOG = "https://alphascope.blogspot.com/"
+BLOG = "https://www.newfact.app/"
 
 # 새 틀 목업 재료 (2026-11-19 사용자 "요약하되 맥락이 이어지게") — 수집기 11-18 저녁 시험 글의 사실만으로 블로그가 손으로 다시 쓴 것.
 # 수집기에 부탁한 꼴(요청 27절): 한눈에 보기 3문장 · 변수마다 3문장(일 → 시장에 왜 → 남은 것) · `**결과**` · `==원인 · 변수==` · takeaway.

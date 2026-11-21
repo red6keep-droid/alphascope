@@ -138,7 +138,7 @@ def sector_etf(sym):
 
 REPORT_TYPE = set()   # 매일 리포트가 나가는 종목 = 상세가 리포트형. 2026-11-01 사용자: 엔비디아도 고정 페이지 → 비움 (옛 값 {"NVDA"})
 
-BLOG = "https://alpha-scope.blogspot.com"
+BLOG = "https://www.newfact.app"
 LIST_SLUG = "us-market-cap-top10"
 LIST_TITLE = "미국 시가총액 상위 10개 종목 주가"
 LIST_SLUG_TITLE = "us market cap top10"   # 처음 만들 때 이 제목으로 → 주소 고정, 바로 한글 제목으로 바꾼다

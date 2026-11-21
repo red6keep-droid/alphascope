@@ -13,7 +13,7 @@ fillPicks 는 JSON 의 구획 HTML 을 DOMParser 로 다시 요소로 만들어 
         --body experiments/kr-market-report/output/report_body.html \
         --meta experiments/kr-market-report/output/post_meta.json \
         --out deploy-home/cards/kr-report.json
-    meta = {"title": "...", "url": "https://alpha-scope.blogspot.com/...", "day": "YYYY-MM-DD"(선택)}
+    meta = {"title": "...", "url": "https://www.newfact.app/...", "day": "YYYY-MM-DD"(선택)}
     --page <글 페이지 HTML> 를 주면 .post-body 안쪽만 본문으로 쓴다 (로컬 검증용)
 """
 import argparse

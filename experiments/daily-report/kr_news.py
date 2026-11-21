@@ -22,7 +22,7 @@ import design_kit as dk  # noqa: E402
 import media_feed  # noqa: E402
 
 TITLE = "한국 종목과 연결된 미국 뉴스"   # 2026-11-07 사용자 P373 (옛 `한국장에 영향을 줄 만한 소식` — 한국 증시 리포트와 같은 뉴스였다)
-KR_REPORT_URL = "https://alpha-scope.blogspot.com/search/label/%ED%95%9C%EA%B5%AD%20%EC%A6%9D%EC%8B%9C%20%EB%A6%AC%ED%8F%AC%ED%8A%B8"   # 한국 증시 리포트 목록 — 한국 증시 이야기는 그쪽에
+KR_REPORT_URL = "https://www.newfact.app/search/label/%ED%95%9C%EA%B5%AD%20%EC%A6%9D%EC%8B%9C%20%EB%A6%AC%ED%8F%AC%ED%8A%B8"   # 한국 증시 리포트 목록 — 한국 증시 이야기는 그쪽에
 TAB = "한국장"   # render_html.TAB_KOREA 와 같다
 HOURS, SHOWN = 48, 5   # 최근 48시간 전부, 앞 5건만 펼치고 나머지는 접기 (2026-10-30 사용자). 옛: 6건 · 12시간(어제 아침 한국 방송은 뺌)
 MARK_OPEN, MARK_CLOSE = "<!--kr-news-->", "<!--/kr-news-->"

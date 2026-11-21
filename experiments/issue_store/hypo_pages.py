@@ -38,7 +38,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(_HERE), "daily-report"))
 import cards as qc  # noqa: E402
 import tech_signals as TS  # noqa: E402  종목 페이지 강조 카드 안 라벨 박스(BOX)
 
-BLOG = "https://alpha-scope.blogspot.com/"
+BLOG = "https://www.newfact.app/"
 PROOF_REPO = "red6keep-droid/alphascope"   # 공개 저장소 — gh-pages/proof/{slug}.json 커밋 시각 = 등록 증명 (비공개 alphascope-state 는 독자가 못 연다)
 LIST_SLUG = "forecast-list"
 CARD_NAME = "증시 전망"

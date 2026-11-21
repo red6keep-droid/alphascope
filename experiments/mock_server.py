@@ -846,7 +846,7 @@ body{{padding-bottom:calc({BAR_H + BAR_PAD}px + env(safe-area-inset-bottom)) !im
   }});
   function map(href) {{   // 블로그 주소 → 목업 주소. null = 바깥 링크(그대로), '' = 목업 없음
     var u; try {{ u = new URL(href, location.href); }} catch (e) {{ return null; }}
-    var blog = u.host === 'alpha-scope.blogspot.com';
+    var blog = u.host === 'www.newfact.app' || u.host === 'alpha-scope.blogspot.com';   // 2026-11-21 새 도메인
     if (!blog && u.host !== location.host) return null;
     var p = decodeURIComponent(u.pathname);
     if (!blog && p.indexOf(J) === 0) return null;   // 이미 여정 안

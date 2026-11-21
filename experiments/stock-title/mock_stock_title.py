@@ -12,8 +12,8 @@ import urllib.request
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
 OUT = os.path.join(HERE, "output")
-PAGES = {"kr": "https://alpha-scope.blogspot.com/p/samsung-cnt-028260-stock.html",
-         "us": "https://alpha-scope.blogspot.com/p/nvidia-nvda-stock.html"}
+PAGES = {"kr": "https://www.newfact.app/p/samsung-cnt-028260-stock.html",
+         "us": "https://www.newfact.app/p/nvidia-nvda-stock.html"}
 
 
 def theme_bits():

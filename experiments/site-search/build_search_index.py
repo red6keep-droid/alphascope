@@ -25,7 +25,7 @@ import universe as U  # noqa: E402
 import universe_kr as UK  # noqa: E402
 import etf_universe as E  # noqa: E402
 
-BLOG = "https://alpha-scope.blogspot.com"
+BLOG = "https://www.newfact.app"
 _LOGOS = None
 
 

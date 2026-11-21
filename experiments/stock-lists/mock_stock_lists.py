@@ -37,7 +37,7 @@ sys.path.insert(0, HERE)
 import build_lists as BL  # noqa: E402  업종 11개로 맞추기(sector11) — 실제 목록 파일과 같은 셈
 
 OUT = os.path.join(HERE, "output")
-BLOG = "https://alpha-scope.blogspot.com"
+BLOG = "https://www.newfact.app"
 esc = lambda t: html.escape(str(t), quote=False)  # noqa: E731
 attr = lambda t: html.escape(str(t), quote=True)  # noqa: E731
 

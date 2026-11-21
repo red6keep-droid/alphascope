@@ -28,7 +28,7 @@ from google.oauth2.credentials import Credentials
 BLOGGER_API = "https://www.googleapis.com/blogger/v3"
 TOKEN_URI = "https://oauth2.googleapis.com/token"
 SCOPES = ["https://www.googleapis.com/auth/blogger"]
-DEFAULT_BLOG_URL = "http://alpha-scope.blogspot.com/"
+DEFAULT_BLOG_URL = "http://www.newfact.app/"
 LABELS = ["데일리 브리핑", "미국 증시", "자동 리포트"]
 
 REQUIRED_ENV = ["BLOGGER_CLIENT_ID", "BLOGGER_CLIENT_SECRET", "BLOGGER_REFRESH_TOKEN"]

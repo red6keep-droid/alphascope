@@ -7,7 +7,7 @@
  */
 (function () {
   'use strict';
-  var BLOG = 'https://alpha-scope.blogspot.com';
+  var BLOG = 'https://www.newfact.app';
   /* 색인 = 시장마다 한 파일 (2026-11-11): 미국은 nvda-report 실행, 한국은 kr-stocks 실행이 gh-pages 에 올린다.
      둘 중 하나만 받아도 그 시장으로 답한다 — 둘 다 실패해야 "불러오지 못했습니다" */
   var INDEX_BASE = 'https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/search/';

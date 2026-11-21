@@ -20,7 +20,7 @@ sys.path[:0] = [EXP, os.path.join(EXP, "stock-radar"), os.path.join(EXP, "kr-sto
 import universe as U  # noqa: E402
 import universe_kr as K  # noqa: E402
 
-BLOG = "https://alpha-scope.blogspot.com"
+BLOG = "https://www.newfact.app"
 try:
     from build_search_index import EXTRA_ALIAS as ALIAS   # noqa: E402
 except Exception:  # noqa: BLE001 — 줄임말 없이도 목록은 만든다
