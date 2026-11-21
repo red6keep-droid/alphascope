@@ -117,7 +117,7 @@ def publish_guide_page(blog_url=None):
     r = requests.get(base, params={"fetchBodies": "false"}, headers=headers, timeout=30)
     r.raise_for_status()
     pages = r.json().get("items", [])
-    norm = lambda u: str(u or "").replace("http://", "https://").rstrip("/")   # noqa: E731
+    norm = lambda u: __import__("urllib.parse").parse.urlsplit(str(u or "").strip()).path.rstrip("/")   # noqa: E731 — 도메인 빼고 경로만 (2026-11-21 www.newfact.app 연결)
     existing = next((p for p in pages if norm(p.get("url")) == norm(config.GUIDE_URL)), None)
     if existing:
         r = requests.put(f"{base}/{existing['id']}", headers=headers, json={"kind": "blogger#page", "id": existing["id"], "title": GUIDE_TITLE, "content": content}, timeout=30)
