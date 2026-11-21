@@ -1,6 +1,94 @@
 {
-  "updated_at": "2026-11-21 12:46:46 UTC",
+  "updated_at": "2026-11-21 21:46:34 UTC",
   "items": [
+    {
+      "title": "Trump says there could be a 'positive spin' from the latest FBI database hack",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/21/trump-fbi-database-hack.html",
+      "published": "2026-11-21 16:57:34",
+      "title_ko": "트럼프, 최신 FBI 데이터베이스 해킹에서 '긍정적 측면' 있을 수 있다고 언급",
+      "summary_ko": "FBI 시스템에 대한 최근 두 번째 침해 발생",
+      "lines": [
+        "연방수사국 컴퓨터 데이터베이스 해킹 두 차례 발생",
+        "해커들의 국가형사정보센터 침입 확인"
+      ]
+    },
+    {
+      "title": "Anthropic’s record IPO collides with tech’s worst week on Wall Street since 2020",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/21/anthropic-ipo-tech-selloff.html",
+      "published": "2026-11-21 16:40:05",
+      "title_ko": "앤스로픽의 기록적인 IPO, 2020년 이후 월스트리트 최악의 주간을 맞이한 기술주 시장과 충돌",
+      "summary_ko": "",
+      "lines": [
+        "앤스로픽 나스닥 상장 및 935억 달러 조달",
+        "상장 첫날 주가 17% 상승 및 시가총액 1조 8000억 달러 기록",
+        "테크 기업들의 공모가 매입으로 260억 달러 추가 확보"
+      ]
+    },
+    {
+      "title": "Retirees face a looming deadline for required withdrawals — missing it could trigger a tax penalty",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/21/rmd-deadline-penalty-2026.html",
+      "published": "2026-11-21 14:30:02",
+      "title_ko": "은퇴자들, 의무 인출 마감일 임박, 놓치면 세금 벌금 부과 가능성",
+      "summary_ko": "바쁜 연휴 시즌으로 인해 주요 마감일 누락 우려",
+      "lines": [
+        "세전 계좌 은퇴자의 인출 의무 연령 73세",
+        "은퇴 계좌 최소 인출 금액 산정 기준",
+        "최초 연간 인출금 마감일 4월 1일"
+      ]
+    },
+    {
+      "title": "Why Anthropic's blockbuster IPO couldn't escape the stock market correction",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/20/anthropic-ipo-ai-stock-market-selloff.html",
+      "published": "2026-11-21 14:07:53",
+      "title_ko": "앤트로픽의 대형 IPO가 시장 조정을 피하지 못한 이유",
+      "summary_ko": "AI 주식의 가치 평가 변동성 지속",
+      "lines": [
+        "앤트로픽의 기업공개 진행",
+        "금요일 증시 매도세 발생"
+      ]
+    },
+    {
+      "title": "State and federal battle over prediction markets regulation heats up after midterms",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/21/prediction-market-regulation-kalshi-cftc.html",
+      "published": "2026-11-21 13:12:41",
+      "title_ko": "중간선거 이후 예측 시장 규제를 둘러싼 주 정부와 연방 정부의 공방 격화",
+      "summary_ko": "중간선거 이후 주 정부와 의회 및 CFTC의 규제 갈등 심화",
+      "lines": [
+        "중간선거 이후 예측 시장 규제 관련 주와 연방정부 간 갈등 심화",
+        "상품선물거래위원회의 예측 시장 감독 강화"
+      ]
+    },
+    {
+      "title": "Warren Buffett quadruples Thanksgiving gifts: A breakdown of how much wealth he's giving away",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/21/warren-buffett-quadruples-thanksgiving-gifts.html",
+      "published": "2026-11-21 13:01:44",
+      "title_ko": "버크셔 해서웨이 워런 버핏, 추수감사절 기부금 55억 달러로 확대",
+      "summary_ko": "올해 4곳의 가족 재단에 기부금 전달",
+      "lines": [
+        "워런 버핏의 올해 추수감사절 가족 재단 기부금 55억 달러 기록",
+        "버핏의 버크셔 해서웨이 클래스 B 주식 이전 진행",
+        "수잔 톰슨 버핏 재단에 약 22억 달러 규모 주식 전달",
+        "자녀 운영 3개 재단에 각각 11억 달러 규모 주식 배분"
+      ]
+    },
+    {
+      "title": "An early breakdown in the polar vortex is threatening already depleted gas stocks",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/21/polar-vortex-europe-gas-prices.html",
+      "published": "2026-11-21 12:47:25",
+      "title_ko": "극소용돌이의 조기 붕괴가 이미 고갈된 가스 재고를 위협하는 이유",
+      "summary_ko": "한파와 낮은 풍속으로 인한 유럽 가스 시장 압박",
+      "lines": [
+        "유럽 천연가스 재고 10년 만에 최저 수준으로 겨울 시작",
+        "성층권 극소용돌이의 이례적인 조기 붕괴 발생"
+      ]
+    },
     {
       "title": "International first class is over for U.S. airlines. Enter the mega business-class cabin",
       "source": "CNBC",
@@ -11,146 +99,6 @@
       "lines": [
         "아메리칸항공의 마지막 퍼스트클래스 운항 종료",
         "미국 항공사들의 대형 비즈니스클래스 객실 확대"
-      ]
-    },
-    {
-      "title": "S&P 500 correction: Five forces behind the market sell-off",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/20/sp-500-correction-market-sell-off.html",
-      "published": "2026-11-21 11:29:25",
-      "title_ko": "S&P 500 및 다우지수 조정 진입",
-      "summary_ko": "지수가 최고점에서 10% 하락하며 나스닥 연간 상승분 소멸",
-      "lines": [
-        "나스닥종합지수의 연간 상승분 소멸",
-        "나스닥100지수의 장중 약세장 진입"
-      ]
-    },
-    {
-      "title": "How China is using summits to expand its global influence",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/21/china-xi-trump-putin-global-diplomacy-shenzhen.html",
-      "published": "2026-11-21 06:00:02",
-      "title_ko": "중국이 정상회담을 이용해 글로벌 영향력을 확대하는 법",
-      "summary_ko": "시진핑 주석의 글로벌 영향력 확대",
-      "lines": [
-        "중국 선전에서 미중러 정상의 3자 회동 개최",
-        "중국 시진핑 주석과 러시아 푸틴 대통령의 회동"
-      ]
-    },
-    {
-      "title": "연준 금리 인상과 주식 시장 영향",
-      "title_ko": "연준 금리 인상과 주식 시장 영향",
-      "summary_ko": "연준의 과도한 금리 인상은 주식 시장에 부담을 주며 고배당주의 매력을 떨어뜨린",
-      "source": "Mad Money",
-      "link": "https://www.youtube.com/watch?v=4fQW__mvEcs",
-      "published": "2026-11-21 00:15:36",
-      "kind": "media",
-      "tag": "금리 · 연준",
-      "direction": "negative",
-      "n_channels": 3,
-      "lines": [
-        "진행자 발언 : 연준의 급격한 금리 인상은 인플레이션을 잡기 위한 조치이나 경제에 부담을 줌",
-        "진행자 발언 : 단기 국채 금리가 5%를 넘어서면서 주식 시장의 강력한 경쟁 상대로 부상",
-        "진행자 발언 : 금리 인상 시기에는 고배당주가 채권과의 경쟁으로 인해 부진한 성과를 보일 것으로 봄",
-        "진행자 발언 : 연준이 경제를 망치지 않는 한 일반적인 조정장은 대응 가능한 수준임"
-      ]
-    },
-    {
-      "title": "Nvidia stock plunges 14%, wraps up longest weekly losing streak since 2008 financial crisis",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/20/nvidias-7-week-losing-streak-is-longest-since-2008-financial-crisis.html",
-      "published": "2026-11-20 22:59:33",
-      "title_ko": "엔비디아 주가 14% 폭락, 2008년 금융위기 이후 최장 주간 하락세 마감",
-      "summary_ko": "",
-      "lines": [
-        "엔비디아 주가 14% 하락",
-        "시가총액 2조 6000억 달러 감소",
-        "시가총액 순위 3위 기록",
-        "AMD 향후 12개월 수익의 29배로 평가"
-      ]
-    },
-    {
-      "title": "Trump says he discussed Jensen Huang with Xi; Bessent tells CNBC Nvidia chip export policy is unchanged",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/20/treasury-secretary-scott-bessent.html",
-      "published": "2026-11-20 22:08:41",
-      "title_ko": "트럼프, 베센트의 발언과 명백히 배치되듯 시진핑과 젠슨 황에 대해 논의했다고 밝혀",
-      "summary_ko": "베센트가 해임된 엔비디아 CEO가 회담에서 거론되지 않았다고 밝힌 지 몇 시간 만에 트럼프가 발언",
-      "lines": [
-        "도널드 트럼프 대통령과 시진핑 주석의 중국 회담",
-        "스콧 베센트 재무장관의 중국 관료 면담"
-      ]
-    },
-    {
-      "title": "Zscaler stock jumps 18% on report that CrowdStrike in talks to buy security vendor",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/20/zscaler-crowdstrike-deal.html",
-      "published": "2026-11-20 21:35:24",
-      "title_ko": "지스케일러 주가 18% 급등, 크라우드스트라이크의 인수 협상 보도 여파",
-      "summary_ko": "사이버보안 기업들은 AI 시대에 인수합병을 모색 중",
-      "lines": [
-        "크라우드스트라이크의 인수 협상 보도에 따른 즈스케일러 주가 18% 급등",
-        "크라우드스트라이크 주가 8% 하락 및 시가총액 2350억 달러 기록",
-        "올해 13% 하락한 즈스케일러 시가총액 약 320억 달러 기록"
-      ]
-    },
-    {
-      "title": "Warsh wants Fed officials to talk less. Instead, they’re talking more",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/20/warsh-fed-forward-guidance-rate-hikes.html",
-      "published": "2026-11-20 21:10:48",
-      "title_ko": "워시, 연준 인사들의 발언 축소 희망했으나 오히려 발언 증가",
-      "summary_ko": "연준 의장은 관망하는 사이 연준 인사들의 마이크 앞 발언 급증",
-      "lines": [
-        "통화정책과 금리 방향에 대한 연방준비제도 인사들의 상반된 발언",
-        "인플레이션 대응을 위한 금리 인상 필요성에 대부분 동의",
-        "더 공격적인 금리 인상을 고려하는 크리스토퍼 월러와 알베르토 무살렘"
-      ]
-    },
-    {
-      "title": "Gap names new Athleta CEO, says Old Navy turnaround is seeing signs of progress",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/19/gap-gap-q3-2026-earnings.html",
-      "published": "2026-11-20 21:04:48",
-      "title_ko": "갭, 새로운 애슬레타 CEO 임명 및 올드 네이비 실적 개선 조짐 보인다고 밝혀",
-      "summary_ko": "소매업체 갭이 목요일 혼조세를 보인 3분기 실적 발표",
-      "lines": [
-        "애슬레타 신임 최고경영자로 애슐리 케크터 선임",
-        "올드 네이비의 반등 조짐과 혼조세를 보인 회계 3분기 실적 발표",
-        "실적 발표 후 11% 이상 상승한 갭 주가"
-      ]
-    },
-    {
-      "title": "AI 인프라 투자 지속 가능성",
-      "title_ko": "AI 인프라 투자 지속 가능성",
-      "summary_ko": "AI 지출 규모와 비즈니스 모델의 수익성에 대한 불확실성이 시장의 하락 압력으로 작용 중",
-      "source": "CNBC",
-      "link": "https://www.youtube.com/watch?v=7yuxLar3WEA",
-      "published": "2026-11-20 20:04:00",
-      "kind": "media",
-      "tag": "AI 투자 · 반도체 수요",
-      "direction": "negative",
-      "n_channels": 2,
-      "lines": [
-        "에이미 호 고 발언 : AI 인프라에 수조 달러를 지출하고 있으나 매출 증가 속도가 이를 따라가지 못함",
-        "에이미 호 고 발언 : 데이터센터 건설 비용이 상승하고 향후 몇 년간 자본 지출이 성장을 앞지를 것으로 봄",
-        "스테파니 링크 발언 : 데이터센터 지출 규모가 2030년까지 7조 달러에서 2~3조 달러 수준으로 줄어들 수 있음"
-      ]
-    },
-    {
-      "title": "반도체 수출 통제 및 중국 관련 우려",
-      "title_ko": "반도체 수출 통제 및 중국 관련 우려",
-      "summary_ko": "중국 시장 매출 노출과 규제 강화 우려로 반도체 및 칩메이커 주가에 하방 압력 작용",
-      "source": "블룸버그",
-      "link": "https://www.youtube.com/watch?v=ts8FgN1vBws",
-      "published": "2026-11-20 18:19:25",
-      "kind": "media",
-      "tag": "규제 · 산업정책",
-      "direction": "negative",
-      "n_channels": 2,
-      "lines": [
-        "진행자 발언 : 칩메이커들과 AMD의 중국 매출 리스크 우려",
-        "노라 물린다 발언 : 상무부의 대중국 반도체 규제 및 우회로 차단 움직임 강화"
       ]
     }
   ]

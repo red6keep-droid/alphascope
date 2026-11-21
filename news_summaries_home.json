@@ -1,283 +1,4 @@
 {
- "9a2034b63080": {
-  "lines": [
-   "엔비디아 주주 2곳의 젠슨 황 복귀 촉구 공개 서한 발표",
-   "알티미터 캐피털과 아트레이데스 매니지먼트의 엔비디아 지분 보유 공개"
-  ],
-  "tags": [
-   {
-    "scope": "stock",
-    "tickers": [
-     "NVDA"
-    ],
-    "sector": "SMH",
-    "issue": "CORP_EVENT",
-    "dir": "positive",
-    "stage": "done"
-   },
-   {
-    "scope": "stock",
-    "tickers": [
-     "NVDA"
-    ],
-    "sector": "SMH",
-    "issue": "INVESTOR_CALLS",
-    "dir": "neutral",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-14T18:29:14.798826+00:00",
-  "n_src": 900
- },
- "90e0a44e38f7": {
-  "lines": [
-   "엔비디아 경영진 혼란과 민주당의 의회 통제로 인한 AI 수요 변화 전망"
-  ],
-  "tags": [
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "SMH",
-    "issue": "AI_CAPEX",
-    "dir": "uncertain",
-    "stage": "talk"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-14T21:46:28.169451+00:00",
-  "n_src": 900,
-  "retry": true
- },
- "3f887a4ae919": {
-  "lines": [
-   "블랙스톤과 브룩필드의 미국 산업용 야외 보관 부지 투자",
-   "AI 인프라 확장에 따른 중장비 수요 증가"
-  ],
-  "tags": [
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLRE",
-    "issue": "REAL_ESTATE",
-    "dir": "neutral",
-    "stage": "done"
-   },
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLRE",
-    "issue": "AI_CAPEX",
-    "dir": "positive",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-14T21:46:28.900626+00:00",
-  "n_src": 900,
-  "retry": true
- },
- "e62244f38033": {
-  "lines": [
-   "테이크투인터랙티브의 락스타게임즈 11월 19일 그랜드 테프트 오토 VI 출시 예정",
-   "그랜드 테프트 오토 VI 개발 비용 10억 달러 초과 (예상)",
-   "센서타워 11월 13일 기준 사전 주문 1200만 건 추산 (예상)",
-   "모건스탠리 2027년 3월까지 4000만 장 판매 전망"
-  ],
-  "tags": [
-   null,
-   null,
-   null,
-   null
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-14T18:29:18.033340+00:00",
-  "n_src": 900
- },
- "cafdcfb9c10c": {
-  "lines": [
-   "11월 9일 기준 전국 난방유 평균 가격 갤런당 약 5.91달러 기록",
-   "전국 난방유 평균 가격 전년 동기 대비 59% 상승",
-   "메인주 난방유 평균 가격 갤런당 약 약 5.83달러 기록",
-   "메인주 난방유 평균 가격 전년 동기 대비 약 75% 급등"
-  ],
-  "tags": [
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLE",
-    "issue": "OIL_ENERGY",
-    "dir": "negative",
-    "stage": "done"
-   },
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLE",
-    "issue": "MARKET_STRUCTURE",
-    "dir": "neutral",
-    "stage": "done",
-    "price": true
-   },
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLE",
-    "issue": "OIL_ENERGY",
-    "dir": "negative",
-    "stage": "done"
-   },
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLE",
-    "issue": "MARKET_STRUCTURE",
-    "dir": "neutral",
-    "stage": "done",
-    "price": true
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-14T18:29:18.033340+00:00",
-  "n_src": 900
- },
- "8e6bc56f8d35": {
-  "lines": [
-   "고용주와 직원의 평균 총 가족 의료보험료 2만 8303달러 기록",
-   "평균 총 가족 의료보험료 전년 대비 5% 상승",
-   "직원 10명 이상이고 의료혜택 제공하는 기업의 약 약 40% 건강저축계좌 연계형 요금제 보유"
-  ],
-  "tags": [
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLV",
-    "issue": "GROWTH_JOBS",
-    "dir": "negative",
-    "stage": "done"
-   },
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLV",
-    "issue": "MARKET_STRUCTURE",
-    "dir": "neutral",
-    "stage": "done",
-    "price": true
-   },
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLV",
-    "issue": "CORP_EVENT",
-    "dir": "neutral",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-14T18:29:18.033340+00:00",
-  "n_src": 900
- },
- "c3b558a2b152": {
-  "lines": [
-   "버크셔해서웨이 주가 4분기 19.1% 상승하며 사상 최고치 경신",
-   "버크셔해서웨이 A주 11회, B주 10회 사상 최고치 마감 기록",
-   "S&P 500 지수 1.2% 하락과 대비되는 버크셔 주가 강세",
-   "버크셔해서웨이 B주 연초 이후 S&P 500 대비 7.5%p 초과 수익"
-  ],
-  "tags": [
-   null,
-   null,
-   null,
-   null
-  ],
-  "model": "groq:qwen/qwen3.8-27b",
-  "at": "2026-11-14T18:29:20.663947+00:00",
-  "n_src": 900
- },
- "544569cde872": {
-  "lines": [
-   "갭(Gap) 엔터테인먼트 총괄 책임자(CEO) 직책 신설 및 파라마운트 출신 임원 영입",
-   "갭(Gap) 엔터테인먼트 스튜디오 투자 확대 및 콘텐츠 라이선싱 플랫폼 구축"
-  ],
-  "tags": [
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLY",
-    "issue": "CORP_EVENT",
-    "dir": "neutral",
-    "stage": "done"
-   },
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLY",
-    "issue": "CORP_EVENT",
-    "dir": "neutral",
-    "stage": "done"
-   }
-  ],
-  "model": "groq:qwen/qwen3.8-27b",
-  "at": "2026-11-14T18:29:20.663947+00:00",
-  "n_src": 900
- },
- "daadbbb0bd00": {
-  "lines": [
-   "스타십 15차 시험 비행에서 상단부 회수 성공",
-   "텍사스 스타베이스 발사대의 기계식 팔을 이용한 로켓 회수"
-  ],
-  "tags": [
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLI",
-    "issue": "CORP_EVENT",
-    "dir": "positive",
-    "stage": "done"
-   },
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLI",
-    "issue": "CORP_EVENT",
-    "dir": "positive",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-14T21:46:28.169451+00:00",
-  "n_src": 900
- },
- "10ab3d931d5f": {
-  "lines": [
-   "S&P 500 주간 2.5% 상승 기록",
-   "나스닥 지수 주간 2.3% 상승"
-  ],
-  "tags": [
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "MARKET_STRUCTURE",
-    "dir": "neutral",
-    "stage": "done",
-    "price": true
-   },
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "MARKET_STRUCTURE",
-    "dir": "neutral",
-    "stage": "done",
-    "price": true
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-14T21:46:28.169451+00:00",
-  "n_src": 334
- },
  "7cd4b72a2ec5": {
   "lines": [
    "다음 주 뉴욕 미술품 경매 총매출 24억 달러 예상",
@@ -3688,9 +3409,18 @@
  },
  "6c1ec217033b": {
   "lines": [
-   "유럽 가스 시장의 재고 부족과 한파 우려"
+   "유럽 천연가스 재고 10년 만에 최저 수준으로 겨울 시작",
+   "성층권 극소용돌이의 이례적인 조기 붕괴 발생"
   ],
   "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLE",
+    "issue": "OIL_ENERGY",
+    "dir": "negative",
+    "stage": "done"
+   },
    {
     "scope": "sector",
     "tickers": [],
@@ -3701,8 +3431,9 @@
    }
   ],
   "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-21T12:46:45.261891+00:00",
-  "n_src": 900
+  "at": "2026-11-21T21:46:34.139628+00:00",
+  "n_src": 900,
+  "retry": true
  },
  "52351803aa21": {
   "lines": [
@@ -3724,20 +3455,247 @@
  },
  "a7d3acf250eb": {
   "lines": [
-   "앤스로픽 기업공개 및 주가 변동성 확대"
+   "앤트로픽의 기업공개 진행",
+   "금요일 증시 매도세 발생"
   ],
   "tags": [
    {
     "scope": "sector",
     "tickers": [],
     "sector": "XLK",
+    "issue": "CORP_EVENT",
+    "dir": "positive",
+    "stage": "done"
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
     "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-21T21:46:32.873843+00:00",
+  "n_src": 900,
+  "retry": true
+ },
+ "c75aad69646d": {
+  "lines": [
+   "연방수사국 컴퓨터 데이터베이스 해킹 두 차례 발생",
+   "해커들의 국가형사정보센터 침입 확인"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "GEOPOLITICS",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "GEOPOLITICS",
+    "dir": "negative",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-21T21:46:30.207011+00:00",
+  "n_src": 900
+ },
+ "0382cab26d50": {
+  "lines": [
+   "앤스로픽 나스닥 상장 및 935억 달러 조달",
+   "상장 첫날 주가 17% 상승 및 시가총액 1조 8000억 달러 기록",
+   "테크 기업들의 공모가 매입으로 260억 달러 추가 확보"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLK",
+    "issue": "CORP_EVENT",
+    "dir": "positive",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLK",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLK",
+    "issue": "CORP_EVENT",
+    "dir": "positive",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-21T21:46:30.207011+00:00",
+  "n_src": 900
+ },
+ "2ca0a4842535": {
+  "lines": [
+   "항공편 운항 중단 및 이메일 접속 장애 등 기술적 오류 발생"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLK",
+    "issue": "OTHER",
+    "dir": "negative",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-21T21:46:30.207011+00:00",
+  "n_src": 900
+ },
+ "37cc6b7e66d7": {
+  "lines": [
+   "세피 타비비안의 2015년 스페인 이주"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "OTHER",
     "dir": "neutral",
     "stage": "done"
    }
   ],
   "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-21T12:46:45.261891+00:00",
+  "at": "2026-11-21T21:46:31.597160+00:00",
+  "n_src": 900
+ },
+ "7ab476a90e49": {
+  "lines": [
+   "세전 계좌 은퇴자의 인출 의무 연령 73세",
+   "은퇴 계좌 최소 인출 금액 산정 기준",
+   "최초 연간 인출금 마감일 4월 1일"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLF",
+    "issue": "REGULATION",
+    "dir": "neutral",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLF",
+    "issue": "REGULATION",
+    "dir": "neutral",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLF",
+    "issue": "REGULATION",
+    "dir": "neutral",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-21T21:46:31.597160+00:00",
+  "n_src": 900
+ },
+ "0337d3d7172f": {
+  "lines": [
+   "월스트리트의 1년 이상 만에 최악의 주간 기록"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "MARKET_STRUCTURE",
+    "dir": "negative",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-21T21:46:31.597160+00:00",
+  "n_src": 301
+ },
+ "9c51c8dfa587": {
+  "lines": [
+   "캘리포니아 금광 채굴자들의 수백만 달러 수익 기록"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLB",
+    "issue": "EARNINGS",
+    "dir": "positive",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-21T21:46:32.873843+00:00",
+  "n_src": 76
+ },
+ "df0f7a36186c": {
+  "lines": [
+   "중간선거 이후 예측 시장 규제 관련 주와 연방정부 간 갈등 심화",
+   "상품선물거래위원회의 예측 시장 감독 강화"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "REGULATION",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "REGULATION",
+    "dir": "negative",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-21T21:46:32.873843+00:00",
+  "n_src": 900
+ },
+ "41ad7f35d848": {
+  "lines": [
+   "워런 버핏의 올해 추수감사절 가족 재단 기부금 55억 달러 기록",
+   "버핏의 버크셔 해서웨이 클래스 B 주식 이전 진행",
+   "수잔 톰슨 버핏 재단에 약 22억 달러 규모 주식 전달",
+   "자녀 운영 3개 재단에 각각 11억 달러 규모 주식 배분"
+  ],
+  "tags": [
+   null,
+   null,
+   null,
+   null
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-21T21:46:34.139628+00:00",
   "n_src": 900
  }
 }
