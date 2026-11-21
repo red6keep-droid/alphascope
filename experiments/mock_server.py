@@ -78,7 +78,7 @@ ARCHIVE_SEED = [
 # 발행 예정 = 아직 블로그에 없는 기능(남은 일 한 줄) · 발행된 화면 = 블로그에 있는 기능의 목업(접어 둠) · 어느 표에도 없는 파일 = 자동으로 `쓰지 않는 목업`.
 # 기능이 발행되면 Claude 가 PLAN → LIVE 로 옮긴다(사용자 몫 아님). 새 목업 묶음을 만들면 같은 커밋에서 PLAN 에 한 줄.
 PLAN = [   # (기능 이름, 남은 일 — 한 줄, 파일 패턴 "폴더/파일")
-    ("푸터 링크 줄 `소개 · 개인정보처리방침 · 문의`", "목업 확인 → index.html · alphaflow-home.html 푸터에 넣고 테마 붙여넣기 (개인정보처리방침 공개 = 법 의무 · 애드센스)", ["site-pages/mock_footer_links.html"]),
+    ("푸터 링크 줄 `소개 · 개인정보처리방침 · 문의`", "테마에 넣음(11-21) → 사용자 테마 붙여넣기 뒤 블로그 확인되면 이 줄 빼기", ["site-pages/mock_footer_links.html"]),
     ("종목 이슈 (종목 페이지 가격 카드 아래 Hot Issue)", "목업 확인 → 뉴스 양으로 자동 열고 닫는 코드 (블로그에 아직 없음)", ["issue_store/mock_stock_issue*"]),
     ("회원 `내 종목`", "목업 3화면 → Firebase 규칙 게시 · 댓글 저장 확인이 먼저 → 고정 페이지 · 10명 열기", ["my-stocks/*"]),
     ("종목 새 카드 `발표 때 예상을 넘었나?` · `같은 업종 안 주가 순위는?` · `재무 건전성은?` · `이익에 비해 주가 수준은?`", "목업 확인 → 매출 예상 매일 기록 · 업종 비교 묶음 수집 · 정식 렌더러 (블로그에 아직 없음)", ["stock-radar/mock_earnmom_*"]),
@@ -745,6 +745,7 @@ def journey_bar(d, f):
     cfg = json.dumps({"pages": J_PAGES, "slugs": _slug_map(), "fore": fore, "dir": d, "file": f, "icons": icons}, ensure_ascii=False)
     footer = ('<footer class="site-footer"><details class="footer-disclaimer"><summary><span class="footer-title">뉴팩트 주식 리포트</span></summary>'
               '<p>해설 문장 일부는 AI 가 씁니다. 모든 정보는 참고용이며, 앞으로의 결과는 지난 기록과 다를 수 있습니다.</p></details>'
+              '<nav class="footer-links" aria-label="사이트 안내"><a href="/p/about.html">소개</a>·<a class="fl-privacy" href="/p/privacy.html">개인정보처리방침</a>·<a href="/p/contact.html">문의</a></nav>'   # 테마와 같은 링크 줄 (2026-11-21)
               '<p class="footer-copy">© 2026 뉴팩트. All rights reserved.</p></footer>')
     bar_css_esc = bar_css()
     return f"""
