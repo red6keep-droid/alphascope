@@ -114,7 +114,8 @@ def _q_end(y, q):
 def run(force=False):
     d = load()
     today = datetime.date.today()
-    if not force and d.get("checked") and (today - datetime.date.fromisoformat(d["checked"])).days < CHECK_DAYS:
+    empty = not d.get("major") and not d.get("annual")   # 받은 공시가 하나도 없으면 주 1회를 기다리지 않는다(11-16 연결 실패가 확인한 날로 남아 일주일 0건, 2026-11-21 사용자)
+    if not force and not empty and d.get("checked") and (today - datetime.date.fromisoformat(d["checked"])).days < CHECK_DAYS:
         print(f"[nps] {d['checked']} 에 확인함 — 건너뜀 (주 1회)")
         return d
     first = not d.get("major")
