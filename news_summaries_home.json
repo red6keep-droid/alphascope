@@ -1,263 +1,4 @@
 {
- "f8e3a2670000": {
-  "lines": [
-   "연방준비제도 설문조사 결과 금융시스템 최대 위협 요소로 인공지능 지목",
-   "인공지능 관련 부채와 주식시장 밸류에이션 및 보안 위험 부각"
-  ],
-  "tags": [
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "AI_CAPEX",
-    "dir": "negative",
-    "stage": "done"
-   },
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "AI_CAPEX",
-    "dir": "negative",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-14T01:46:07.345819+00:00",
-  "n_src": 900,
-  "retry": true
- },
- "6d82c3026cea": {
-  "lines": [
-   "링크드인 등에서 호감을 가장해 정보와 접근 권한을 탈취하는 허니팟 사기 수법 경계"
-  ],
-  "tags": [
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLK",
-    "issue": "CORP_EVENT",
-    "dir": "negative",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-14T01:46:07.345819+00:00",
-  "n_src": 900,
-  "retry": true
- },
- "be9027e9137a": {
-  "lines": [
-   "트럼프 미 대통령의 중국 방문",
-   "일론 머스크의 아시아태평양경제협력체 정상회의 동행 예정"
-  ],
-  "tags": [
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "GEOPOLITICS",
-    "dir": "neutral",
-    "stage": "talk"
-   },
-   {
-    "scope": "stock",
-    "tickers": [
-     "TSLA"
-    ],
-    "sector": "XLY",
-    "issue": "CORP_EVENT",
-    "dir": "neutral",
-    "stage": "talk"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-14T01:46:06.150213+00:00",
-  "n_src": 900
- },
- "00a1f632da43": {
-  "lines": [
-   "스페이스엑스의 스타십 로켓 시험비행 실시",
-   "부스터 및 상단 회수 시도 실패",
-   "미국 연방항공청의 전국적 운항 중단 조치 발령"
-  ],
-  "tags": [
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLI",
-    "issue": "CORP_EVENT",
-    "dir": "neutral",
-    "stage": "done"
-   },
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLI",
-    "issue": "CORP_EVENT",
-    "dir": "negative",
-    "stage": "done"
-   },
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "REGULATION",
-    "dir": "negative",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-14T01:46:06.150213+00:00",
-  "n_src": 900
- },
- "11b76f57c271": {
-  "lines": [
-   "북한 연계 해킹 그룹의 바이낸스에서 63억 달러 규모 암호화폐 탈취"
-  ],
-  "tags": [
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLF",
-    "issue": "CRYPTO",
-    "dir": "negative",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-14T12:46:32.757118+00:00",
-  "n_src": 900,
-  "retry": true
- },
- "90efe7abd3ca": {
-  "lines": [
-   "연방항공청의 이륙 중단 조치 이후 항공편 운항 재개",
-   "토요일 3000편 이상 취소 및 1000편 가까이 지연 발생",
-   "금요일 9000편 이상 취소 및 7000편 이상 지연 기록"
-  ],
-  "tags": [
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLI",
-    "issue": "REGULATION",
-    "dir": "positive",
-    "stage": "done"
-   },
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLI",
-    "issue": "MARKET_STRUCTURE",
-    "dir": "negative",
-    "stage": "done"
-   },
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLI",
-    "issue": "MARKET_STRUCTURE",
-    "dir": "negative",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-14T12:46:31.500916+00:00",
-  "n_src": 900
- },
- "0ff364750688": {
-  "lines": [
-   "연구원과 전직 기자 및 공직자와 엔지니어 등 7명이 2021년 앤스로픽 공동 창립",
-   "11월 19일 거래 시작 예정인 기업공개 추진"
-  ],
-  "tags": [
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLK",
-    "issue": "CORP_EVENT",
-    "dir": "positive",
-    "stage": "done"
-   },
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLK",
-    "issue": "CORP_EVENT",
-    "dir": "positive",
-    "stage": "talk"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-14T12:46:31.500916+00:00",
-  "n_src": 900
- },
- "e4dfe4f27195": {
-  "lines": [
-   "로봇 스타트업 재단퓨처인더스트리스의 자금 부족으로 직원 급여 미지급",
-   "CEO 산카에트 파탁의 주택 구입용 460만 달러 회사 대출"
-  ],
-  "tags": [
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLI",
-    "issue": "CORP_EVENT",
-    "dir": "negative",
-    "stage": "done"
-   },
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLI",
-    "issue": "CORP_EVENT",
-    "dir": "negative",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-14T12:46:31.500916+00:00",
-  "n_src": 900
- },
- "b777df82a2fc": {
-  "lines": [
-   "콜레트 크레스 임시 CEO 겸 최고재무책임자의 2013년 입사"
-  ],
-  "tags": [
-   {
-    "scope": "stock",
-    "tickers": [
-     "NVDA"
-    ],
-    "sector": "SMH",
-    "issue": "CORP_EVENT",
-    "dir": "neutral",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-14T12:46:32.757118+00:00",
-  "n_src": 900
- },
- "e324a24b50f1": {
-  "lines": [
-   "에콰도르의 1억 2000만 달러 규모 생물다양성 채권 발행"
-  ],
-  "tags": [
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLF",
-    "issue": "CORP_EVENT",
-    "dir": "positive",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-14T12:46:32.757118+00:00",
-  "n_src": 900
- },
  "9a2034b63080": {
   "lines": [
    "엔비디아 주주 2곳의 젠슨 황 복귀 촉구 공개 서한 발표",
@@ -3713,21 +3454,15 @@
  },
  "d276313a8c39": {
   "lines": [
-   "도널드 트럼프 하워드 루트닉 상무장관 신임 유지 표명"
+   "하워드 러트닉 상무장관에 대한 도널드 트럼프 대통령의 신임 유지"
   ],
   "tags": [
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "CORP_EVENT",
-    "dir": "positive",
-    "stage": "done"
-   }
+   null
   ],
   "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-20T21:46:32.351536+00:00",
-  "n_src": 900
+  "at": "2026-11-21T12:46:46.399011+00:00",
+  "n_src": 900,
+  "retry": true
  },
  "3505a492be43": {
   "lines": [
@@ -3853,23 +3588,17 @@
  },
  "3116f89aeeaf": {
   "lines": [
-   "트럼프와 시진핑 회담 중 엔비디아 전 CEO 젠슨 황 언급"
+   "도널드 트럼프 대통령과 시진핑 주석의 중국 회담",
+   "스콧 베센트 재무장관의 중국 관료 면담"
   ],
   "tags": [
-   {
-    "scope": "stock",
-    "tickers": [
-     "NVDA"
-    ],
-    "sector": "SMH",
-    "issue": "GEOPOLITICS",
-    "dir": "neutral",
-    "stage": "done"
-   }
+   null,
+   null
   ],
   "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-20T21:46:35.117050+00:00",
-  "n_src": 900
+  "at": "2026-11-21T12:46:46.399011+00:00",
+  "n_src": 900,
+  "retry": true
  },
  "8cc845a80444": {
   "lines": [
@@ -3887,6 +3616,128 @@
   ],
   "model": "gemini-3.5-flash-lite",
   "at": "2026-11-20T21:46:35.117050+00:00",
+  "n_src": 900
+ },
+ "77255295200c": {
+  "lines": [
+   "아메리칸항공의 마지막 퍼스트클래스 운항 종료",
+   "미국 항공사들의 대형 비즈니스클래스 객실 확대"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLY",
+    "issue": "CORP_EVENT",
+    "dir": "neutral",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLY",
+    "issue": "CORP_EVENT",
+    "dir": "positive",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-21T12:46:43.328320+00:00",
+  "n_src": 900
+ },
+ "ef625298acf3": {
+  "lines": [
+   "나스닥종합지수의 연간 상승분 소멸",
+   "나스닥100지수의 장중 약세장 진입"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "MARKET_STRUCTURE",
+    "dir": "negative",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-21T12:46:43.328320+00:00",
+  "n_src": 900
+ },
+ "e0907b24b566": {
+  "lines": [
+   "중국 선전에서 미중러 정상의 3자 회동 개최",
+   "중국 시진핑 주석과 러시아 푸틴 대통령의 회동"
+  ],
+  "tags": [
+   null,
+   null
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-21T12:46:43.328320+00:00",
+  "n_src": 900
+ },
+ "6c1ec217033b": {
+  "lines": [
+   "유럽 가스 시장의 재고 부족과 한파 우려"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLE",
+    "issue": "OIL_ENERGY",
+    "dir": "negative",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-21T12:46:45.261891+00:00",
+  "n_src": 900
+ },
+ "52351803aa21": {
+  "lines": [
+   "프랑스 및 스웨덴 유통업체 매장의 냉동 설비 사이버 공격 피해"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLY",
+    "issue": "CORP_EVENT",
+    "dir": "negative",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-21T12:46:45.261891+00:00",
+  "n_src": 900
+ },
+ "a7d3acf250eb": {
+  "lines": [
+   "앤스로픽 기업공개 및 주가 변동성 확대"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLK",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-21T12:46:45.261891+00:00",
   "n_src": 900
  }
 }
