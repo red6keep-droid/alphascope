@@ -17,6 +17,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import time
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
@@ -36,6 +37,13 @@ SLUGS = {   # 초안 파일 이름 → 영문 주소 이름 (한 번 정하면 �
     "착각-02-물림.md": "stock myths 02 how long underwater after buying",
     "착각-03-공포매도.md": "stock myths 03 selling on big drop days",
     "착각-04-되사기.md": "stock myths 04 buying back at sell price",
+    "착각-05-분할매수.md": "stock myths 05 waiting for the dip when buying monthly",
+    "착각-06-과열.md": "stock myths 06 overbought does it fall",
+    "착각-07-볼린저.md": "stock myths 07 bollinger lower band not bottom",
+    "착각-08-골든크로스.md": "stock myths 08 golden cross dead cross",
+    "착각-09-파동.md": "stock myths 09 waves appear even in coin flips",
+    "착각-10-마치며.md": "stock myths 10 indicators measure size not direction",
+    "착각-기준.md": "stock myths how we check 15 stocks two periods",   # 기준 페이지(편 번호 없음, 2026-11-21)
 }
 
 
@@ -77,19 +85,30 @@ def upload_images():
 
 
 def build(files, urls):
-    """초안마다 (제목, 본문). urls = {파일 이름: 글 주소} — 없는 편은 # (다음 바퀴에서 채움)."""
+    """초안마다 (제목, 본문). urls = {파일 이름: 글 주소} — 없는 편은 # (다음 바퀴에서 채움).
+    목업(render_course.main)과 같은 순서: 기준 페이지 조각 → 각 편 본문 팝업(쓴 조각만 글 끝에 숨은 글) · 기준 페이지는 다음 편 사슬에 안 낌 (2026-11-21)."""
+    import re
     RC.IMG_BASE = IMG_BASE
-    links = {os.path.basename(f): urls.get(os.path.basename(f), "#") for f in files}
+    names = sorted(set(SLUGS) | {os.path.basename(f) for f in files})
+    links = {n: urls.get(n, "#") for n in names}
+    pieces = RC.load_pieces(links)
+    order = sorted(n for n in SLUGS if re.match(r"착각-\d", n))   # 다음 편 = 번호 순 다음 편(이번에 안 올리는 편이어도 주소가 있으면 연결)
     out = []
-    for k, f in enumerate(files):
-        nxt = links[os.path.basename(files[k + 1])] if k + 1 < len(files) else "#"
-        title, body = RC.render(open(f, encoding="utf-8").read(), links, nxt)
+    for f in files:
+        name = os.path.basename(f)
+        k = order.index(name) if name in order else -1
+        nxt = links.get(order[k + 1], "#") if 0 <= k < len(order) - 1 else "#"
+        RC.CUR_FILE = name
+        is_basis = name == RC.PIECE_SRC
+        used = set()
+        title, body = RC.render(open(f, encoding="utf-8").read(), links, nxt, pieces=None if is_basis else pieces, used=used)
+        body += RC.piece_bodies(pieces, used, links)
         body = (RC.share_tag() + f'<span data-head-label="{RC.HEAD_LABEL}" data-head-sub="{RC.HEAD_SUB}" hidden></span><span data-list-url="{RC.LIST_URL}" data-nav="back" hidden></span>'
                 + RC.title_block(title) + body)
         series, _, ep = title.partition(" — ")
         post_title = ep if " — " in title and not ep.startswith("들어가며") else series.split(" #")[0]
         assert "data:image" not in body, "목업 그림(data URI)이 남았다"
-        out.append((os.path.basename(f), post_title, body))
+        out.append((name, post_title, body))
     return out
 
 
@@ -98,7 +117,7 @@ def main(dry, published_only=False):
     src = next((p for p in RC._SRC_CANDIDATES if os.path.isdir(p)), None)   # RC.SRC 는 명령 인자(--dry)를 폴더로 읽는다 — 여기선 후보 폴더만
     if not src:
         sys.exit(f"초안 폴더 없음: {RC._SRC_CANDIDATES}")
-    files = sorted(glob.glob(os.path.join(src, "*.md")))
+    files = sorted(sorted(glob.glob(os.path.join(src, "*.md"))), key=lambda f: os.path.basename(f) != RC.PIECE_SRC)   # 기준 페이지 먼저 — 모든 편 팝업 끝 링크가 이 페이지로 간다
     if published_only:   # 이미 나간 편만 다시 그려 고쳐 쓴다 — 새 편은 올리지 않음(다음 편 카드는 `준비 중` 그대로) (2026-11-20 사용자: 바뀐 모양을 과거 글에 일괄 적용)
         done = json.load(open(os.path.join(HERE, "published.json"), encoding="utf-8"))
         files = [f for f in files if os.path.basename(f) in done]
@@ -112,25 +131,35 @@ def main(dry, published_only=False):
         for name, t, body in posts:
             print(f"[dry] {name} → 제목 `{t}` · 주소 이름 `{SLUGS[name]}` · 본문 {len(body) // 1024}KB · 그림 {body.count(IMG_BASE)}개")
         return
-    urls = {}
-    for name, t, body in posts:   # 1바퀴: 없으면 올린다
+    pj = os.path.join(HERE, "published.json")
+    urls = json.load(open(pj, encoding="utf-8")) if os.path.exists(pj) else {}
+    blocked = False
+    for name, t, body in posts:   # 1바퀴: 없으면 올린다 — 새 글이 거절되면(429 등) 거기서 새 글만 멈추고, 올라간 편까지 2바퀴 (2026-11-21: 11-20 4편 429)
         found = NP.find_post_id(t, max_results=50)
         if found:
             urls[name] = found["url"]
             print(f"[있음] {t} → {found['url']}")
         elif published_only:
             sys.exit(f"이미 나간 편인데 Blogger 에서 못 찾음: {t} — 제목이 바뀌었는지 확인")
+        elif blocked:
+            print(f"[다음에] {t} — 새 글 거절 뒤라 이번엔 안 올림")
         else:
-            urls[name] = PB.publish(t, body, labels=LABELS, slug_title=SLUGS[name])
-    for name, t, body in build(files, urls):   # 2바퀴: 편끼리 링크를 채워 전부 갱신
+            try:
+                urls[name] = PB.publish(t, body, labels=LABELS, slug_title=SLUGS[name])
+                print(f"[새 글] {t} → {urls[name]}")
+                json.dump(urls, open(pj, "w", encoding="utf-8"), ensure_ascii=False, indent=2)   # 목록 페이지(render_list.py)가 읽는다 — 나온 편 = 링크
+                time.sleep(20)
+            except Exception as e:   # noqa: BLE001
+                blocked = True
+                print(f"[거절] {t} — {e}")
+    done = [f for f in files if os.path.basename(f) in urls]
+    for name, t, body in build(done, urls):   # 2바퀴: 편끼리 링크를 채워 올라간 편 전부 갱신
         found = NP.find_post_id(t, max_results=50)
         url = NP.update_post(found["id"], t, body, LABELS)
         print(f"[갱신] {t} → {url}")
-    if published_only:
-        return
-    with open(os.path.join(HERE, "published.json"), "w", encoding="utf-8") as f:   # 목록 페이지(render_list.py)가 읽는다 — 나온 편 = 링크
-        json.dump(urls, f, ensure_ascii=False, indent=2)
-
+    json.dump(urls, open(pj, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
+    if blocked:
+        sys.exit("새 글 일부가 거절됨 — 내일 같은 명령을 다시 실행하면 남은 편부터 올린다")
 
 if __name__ == "__main__":
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
