@@ -9,7 +9,7 @@ BLOGGER_CLIENT_ID / BLOGGER_CLIENT_SECRET / BLOGGER_REFRESH_TOKEN 로 Blogger AP
 
 확인 내용:
 - OAuth refresh token으로 액세스 토큰 자동 갱신 성공 여부
-- 대상 블로그(기본 alpha-scope.blogspot.com) 정보 + blogId
+- 대상 블로그(기본 www.newfact.app) 정보 + blogId
 """
 
 import sys

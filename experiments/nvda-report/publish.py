@@ -97,7 +97,7 @@ def publish_draft(output_dir=None):
 
 GUIDE_TITLE = "리포트 읽는 법"
 GUIDE_SLUG_TITLE = "nvda report guide"   # 영문 주소 /p/nvda-report-guide.html (검색 노출, 2026-10-18 — 처음 만들 때만 이 제목, 바로 한글로)
-GUIDE_OLD_URL = "https://alpha-scope.blogspot.com/p/blog-page.html"   # 2026-10-11 한글 제목으로 만든 옛 주소 — 옮김 안내만 남긴다
+GUIDE_OLD_URL = "https://www.newfact.app/p/blog-page.html"   # 2026-10-11 한글 제목으로 만든 옛 주소 — 옮김 안내만 남긴다
 GUIDE_PATH = os.path.join(config.STATIC_DIR, "reading_guide.html")
 
 

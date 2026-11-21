@@ -54,7 +54,7 @@ def _full_prompt(image_prompt):
 
 
 def _referrer():
-    return os.environ.get("BLOG_URL", "https://alpha-scope.blogspot.com/").strip()
+    return os.environ.get("BLOG_URL", "https://www.newfact.app/").strip()
 
 
 def _pollinations_url(prompt, model):

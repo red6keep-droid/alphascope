@@ -1621,7 +1621,7 @@ def footer(data_line, disclaimer_line, indent=True):
 # 상세 페이지 목록 = 홈 종목 카드가 쓰는 gh-pages stocks.json 의 page 플래그 (stock-radar/home_feed.py · publish_pages 의 pages_live.json).
 # 없는 페이지로는 링크하지 않는다. 목록을 못 읽으면 링크 없이(안전).
 STOCK_LINK = "#7C3AED"   # 기사 속 종목 링크 — 보라색 · 굵게 아님 (2026-10-25 사용자: 파란색 → 보라색, 하락 파랑과 겹치지 않게)
-STOCK_BLOG = "https://alpha-scope.blogspot.com"
+STOCK_BLOG = "https://www.newfact.app"
 _STOCKS_URL = "https://raw.githubusercontent.com/red6keep-droid/alphascope/gh-pages/stocks.json"
 _stock_pages = None
 
@@ -2303,7 +2303,7 @@ OUT_ICON = ('<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" 
             'style="flex:none;"><path d="M6.5 3.5H4a1.5 1.5 0 0 0-1.5 1.5v7A1.5 1.5 0 0 0 4 13.5h7a1.5 1.5 0 0 0 1.5-1.5V9.5"/><path d="M9.5 2.5h4v4"/><path d="M13.5 2.5 8 8"/></svg>')
 
 
-BLOG_URL = "https://alpha-scope.blogspot.com"
+BLOG_URL = "https://www.newfact.app"
 # 리포트 목록 주소 — `함께 보는 페이지` 링크를 리포트마다 같은 이름 · 같은 주소로 (2026-11-09 사용자: 함께 보는 블록 공통 적용)
 REPORT_LINKS = {
     "us": ("미국 증시 리포트", f"{BLOG_URL}/search/label/%EB%8D%B0%EC%9D%BC%EB%A6%AC%20%EB%B8%8C%EB%A6%AC%ED%95%91"),   # 라벨 `데일리 브리핑`

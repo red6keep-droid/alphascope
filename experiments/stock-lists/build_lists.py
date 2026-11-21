@@ -50,7 +50,7 @@ def _load(path, default=None):
 
 
 def _path(url):
-    """https://alpha-scope.blogspot.com/p/x.html → /p/x.html (블로그 안 주소만 — 파일이 작아지고, 폰 주소 ?m=1 에서도 같은 블로그로 간다)."""
+    """https://www.newfact.app/p/x.html → /p/x.html (블로그 안 주소만 — 파일이 작아지고, 폰 주소 ?m=1 에서도 같은 블로그로 간다)."""
     if not url:
         return None
     u = urlparse(url)

@@ -407,7 +407,7 @@ def share_tag():
 
 HEAD_SUB = "주식공부"   # 머리 줄 옆 아주 작은 글씨 — 검색어 (2026-11-20 사용자)
 HEAD_LABEL = "주식 제대로 알기"   # 머리 줄(글 제목 자리)에 보일 메뉴 이름 (2026-11-10 사용자: 여기에 타이틀 쓰지 말고 메뉴명; 2026-11-14 이름 강좌 → 주식 공부; 2026-11-20 → 주식 제대로 알기 — Blogger 라벨은 `주식 공부` 그대로). 글 제목 · 검색 제목은 그대로
-LIST_URL = "https://alpha-scope.blogspot.com/p/study.html"   # 머리 줄 화살표 · 목록 = 주식 공부 목록 고정 페이지(render_list.py --publish) — 옛 `주식 공부` 라벨 검색 (2026-11-15 사용자: 새 목록 페이지로 안 갔다)
+LIST_URL = "https://www.newfact.app/p/study.html"   # 머리 줄 화살표 · 목록 = 주식 공부 목록 고정 페이지(render_list.py --publish) — 옛 `주식 공부` 라벨 검색 (2026-11-15 사용자: 새 목록 페이지로 안 갔다)
 
 
 def title_block(title):

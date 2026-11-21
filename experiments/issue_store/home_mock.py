@@ -16,7 +16,7 @@ import design_kit as dk  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(_HERE))
 HOME = os.path.join(ROOT, "alphaflow-home.html")
-LIST_URL = "https://alpha-scope.blogspot.com/p/forecast-list.html"
+LIST_URL = "https://www.newfact.app/p/forecast-list.html"
 
 # 홈 카드 전용 CSS — 적용 때 alphaflow-home.html 의 #radar-col 블록 옆에 옮긴다
 HYPO_CSS = """

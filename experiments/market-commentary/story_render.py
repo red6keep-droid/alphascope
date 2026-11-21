@@ -16,7 +16,7 @@ sys.path.insert(0, os.path.join(BASE, "..", "kr-stocks"))
 import design_kit as dk  # noqa: E402
 import universe_kr as UKR  # noqa: E402  한국 종목 페이지 주소
 
-BLOG = "https://alpha-scope.blogspot.com/"
+BLOG = "https://www.newfact.app/"
 LABELS = {"am": ["증시 시황", "미국 증시"], "pm": ["증시 시황", "한국 증시"]}   # Blogger 라벨 — `증시 시황` 하나로 아침 · 저녁을 모아 본다
 REPORT_LABEL = {"am": ("미국 증시 리포트", "%EB%AF%B8%EA%B5%AD%20%EC%A6%9D%EC%8B%9C%20%EB%A6%AC%ED%8F%AC%ED%8A%B8"),
                 "pm": ("한국 증시 리포트", "%ED%95%9C%EA%B5%AD%20%EC%A6%9D%EC%8B%9C%20%EB%A6%AC%ED%8F%AC%ED%8A%B8")}
