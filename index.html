@@ -1140,7 +1140,9 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
 #nav-progress.on { opacity: 1; width: 88%; }
 #nav-veil { position: fixed; inset: 0; z-index: 9999; display: none; align-items: center; justify-content: center; background: rgba(255, 255, 255, .5); }
 #nav-veil.on { display: flex; }
-#nav-veil span { width: 34px; height: 34px; border: 3px solid #CBD5E1; border-top-color: #111; border-radius: 50%; animation: nav-spin .8s linear infinite; }
+#nav-veil span { position: relative; width: 56px; height: 56px; border-radius: 50%; background: #fff; box-shadow: 0 2px 10px rgba(0, 0, 0, .14), 0 0 0 1px rgba(0, 0, 0, .04); display: flex; align-items: center; justify-content: center; }   /* 흰 원 + 로고, 둘레를 로고 색 줄이 돈다 (2026-11-21 사용자 시안 5번) */
+#nav-veil span::after { content: ""; position: absolute; inset: -4px; border-radius: 50%; border: 3px solid transparent; border-top-color: #DD0000; border-right-color: #111; animation: nav-spin .9s linear infinite; }
+#nav-veil svg { width: 30px; height: 28px; display: block; }
 @keyframes nav-spin { to { transform: rotate(360deg); } }
 /* ===== 장중 가격 토글 · 장중 차트 (2026-11-05 사용자) — 구획 제목 줄 오른쪽: 기준 표시 · 토글 · 미국 | 한국 한 줄. 토글 · 표시는 한국 탭에서만 보인다 ===== */
 .head-right { display: flex; align-items: center; gap: 12px; margin-left: auto; flex: none; white-space: nowrap; }
@@ -6324,7 +6326,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
         function startNav() {
           if (!bar) {
             bar = document.createElement('div'); bar.id = 'nav-progress'; document.body.appendChild(bar);
-            veil = document.createElement('div'); veil.id = 'nav-veil'; veil.appendChild(document.createElement('span')); document.body.appendChild(veil);
+            veil = document.createElement('div'); veil.id = 'nav-veil'; var vs = document.createElement('span'); vs.innerHTML = '<svg viewBox="0 0 126 116" aria-hidden="true"><path d="M66.228 0H115.534L51.9111 59.1757H0L66.228 0Z" fill="#111"/><path d="M126 53.9424L66.4091 115.131H14.0898L76.0954 53.9424H126Z" fill="#DD0000"/></svg>'; veil.appendChild(vs); document.body.appendChild(veil);
           }
           bar.classList.remove('on'); void bar.offsetWidth; bar.classList.add('on');
           clearTimeout(veilTimer);
