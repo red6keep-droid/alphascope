@@ -36,7 +36,7 @@
     <meta content='#FFFFFF' name='theme-color'/>
     <meta content='yes' name='mobile-web-app-capable'/>
     <meta content='yes' name='apple-mobile-web-app-capable'/>
-    <meta content='AlphaScope' name='apple-mobile-web-app-title'/>
+    <meta content='뉴팩트' name='apple-mobile-web-app-title'/>
     <meta content='default' name='apple-mobile-web-app-status-bar-style'/>
     <link href='https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&amp;family=Inter:wght@400;600;700;800&amp;display=swap' rel='stylesheet'/>
 
@@ -55,7 +55,7 @@
 */
 
 /* ==========================================================================
-   AlphaScope — main home
+   뉴팩트 — main home
    Figma: alphaflow-main-home (1440 x 2674)
    ========================================================================== */
 
@@ -778,7 +778,7 @@ img[src$="/CEG.svg"], img[src$="/CRCL.svg"], img[src$="/CRWV.svg"], img[src$="/C
 .footer-disclaimer[open] .footer-more svg { transform: rotate(180deg); }
 .footer-disclaimer > p { margin: 4px 0 0; }
 /* 상세 화면(글 · 고정 페이지) = 작은 푸터 (2026-11-12 사용자 "푸터는 홈에만?" → Claude 안: 면책은 투자 정보를 보는 화면에 있어야 한다) —
-   제목 `ALPHASCOPE 주식 리포트` 는 빼고, 면책 첫 문장(접지 않음) 한 줄 + 오른쪽 더 보기 버튼(AI 고지 · 외부 의견 안내는 접힌 채) + 저작권 줄. 홈 · 목록은 그대로 */
+   제목 `뉴팩트 주식 리포트` 는 빼고, 면책 첫 문장(접지 않음) 한 줄 + 오른쪽 더 보기 버튼(AI 고지 · 외부 의견 안내는 접힌 채) + 저작권 줄. 홈 · 목록은 그대로 */
 body.item-view .footer-name { display: none; }
 body.item-view .footer-disclaimer summary { display: flex; align-items: flex-start; gap: 8px; }
 body.item-view .footer-title { order: 2; flex: none; margin: 0; }
@@ -2026,14 +2026,14 @@ html.as-lock, html.as-lock body { overflow: hidden; }
     <header class='navbar'>
       <div class='nav-left'>
         <b:section class='logo-holder' id='header' maxwidgets='1' name='Header' showaddelement='false'>
-          <b:widget id='Header1' locked='true' title='AlphaScope (Header)' type='Header' visible='true'>
+          <b:widget id='Header1' locked='true' title='뉴팩트 (Header)' type='Header' visible='true'>
             <b:includable id='main'>
               <a class='logo' expr:href='data:blog.homepageUrl'>
                 <svg class='logo-mark' viewBox='0 0 313 286'>
                   <path d='M313 134L164.968 286H35L189.03 134H313Z' fill='#DD0000'/>
                   <path d='M164.519 0H287L128.954 147H0L164.519 0Z' fill='#000000'/>
                 </svg>
-                <span class='logo-word'>AlphaScope</span>
+                <span class='logo-word'>뉴팩트</span>
               </a>
             </b:includable>
           </b:widget>
@@ -2318,7 +2318,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
       <!-- 게시글: 홈 하단의 최신 리포트 목록 / 글 보기 본문 -->
       <b:section class='page-body' id='page_body' name='Page Body' showaddelement='false'>
         <b:widget id='FeaturedPost1' locked='true' title='' type='FeaturedPost' visible='true'>
-          <b:includable id='main'><b:comment>AlphaScope 테마에서는 표시하지 않음</b:comment></b:includable>
+          <b:includable id='main'><b:comment>뉴팩트 테마에서는 표시하지 않음</b:comment></b:includable>
         </b:widget>
 
         <b:widget id='Blog1' locked='true' title='Blog Posts' type='Blog' visible='true'>
@@ -2840,7 +2840,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
         </b:widget>
 
         <b:widget id='PopularPosts1' locked='true' title='' type='PopularPosts' visible='true'>
-          <b:includable id='main'><b:comment>AlphaScope 테마에서는 표시하지 않음</b:comment></b:includable>
+          <b:includable id='main'><b:comment>뉴팩트 테마에서는 표시하지 않음</b:comment></b:includable>
         </b:widget>
       </b:section>
     </main>
@@ -2854,7 +2854,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
            첫 줄에 "권유하지 않습니다"까지 둔다 — 투자 권유 아님은 접지 않는다(운영지침 5절). 접힌 글도 HTML 에 있어 검색엔진이 읽는다(details, JS 없음).
            같은 날 사용자: "코드가 계산" 은 첫 문장과 중복이라 뺌, AI 는 목록 대신 한 줄(AI 기본법 생성형 AI 고지), "늦거나 틀릴 수" → 참고용 한 문장. 문구 확정(사용자): "해설 문장 일부는 AI 가 씁니다." · "모든 정보는 참고용이며, 앞으로의 결과는 지난 기록과 다를 수 있습니다." -->
       <details class='footer-disclaimer'>
-        <summary><span class='footer-title'><span class='footer-name'>ALPHASCOPE 주식 리포트</span><span class='footer-more' role='img' aria-label='더 보기'><svg viewBox='0 0 16 16' width='14' height='14' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 6l4 4 4-4'/></svg></span></span><span class='footer-lead'>ALPHASCOPE 리포트는 공개된 시세 · SEC 공시 · FRED 경제 지표 · 뉴스를 정해진 규칙으로 계산해 정리한 기록이며, 특정 종목의 매수 · 매도를 권유하지 않습니다.</span></summary>
+        <summary><span class='footer-title'><span class='footer-name'>뉴팩트 주식 리포트</span><span class='footer-more' role='img' aria-label='더 보기'><svg viewBox='0 0 16 16' width='14' height='14' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 6l4 4 4-4'/></svg></span></span><span class='footer-lead'>뉴팩트 리포트는 공개된 시세 · SEC 공시 · FRED 경제 지표 · 뉴스를 정해진 규칙으로 계산해 정리한 기록이며, 특정 종목의 매수 · 매도를 권유하지 않습니다.</span></summary>
         <p>해설 문장 일부는 AI 가 씁니다. 모든 정보는 참고용이며, 앞으로의 결과는 지난 기록과 다를 수 있습니다. 애널리스트 의견 · 목표가는 외부 의견을 옮긴 것입니다.
         개별 투자 상담을 하지 않으며, 투자 판단과 책임은 투자자 본인에게 있습니다.
         종목 로고는 각 회사의 상표이며, 종목을 구분하는 용도로만 쓰고 해당 회사와 제휴 관계가 없습니다.</p>
@@ -2869,7 +2869,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
               <b:if cond='data:copyright != &quot;&quot;'>
                 <data:copyright/>
               <b:else/>
-                © 2026 ALPHASCOPE. All rights reserved.
+                © 2026 뉴팩트. All rights reserved.
               </b:if>
             </p>
           </b:includable>
@@ -4703,7 +4703,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
               body.appendChild(lg);
             } else {
               title.textContent = '내 계정';
-              var me = mk('div', 'as-acct-me'); me.appendChild(face(user)); me.appendChild(mk('span', null, user.uid === CFG.owner ? 'AlphaScope 운영자' : (user.displayName || '이름 없음')));
+              var me = mk('div', 'as-acct-me'); me.appendChild(face(user)); me.appendChild(mk('span', null, user.uid === CFG.owner ? '뉴팩트 운영자' : (user.displayName || '이름 없음')));
               body.appendChild(me);
               if (user.uid === CFG.owner) {
                 var ob = mk('button', 'as-acct-btn', '운영 현황'); ob.type = 'button';
@@ -5148,7 +5148,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
           return p.year + '.' + p.month + '.' + p.day + ' ' + pad(parseInt(p.hour, 10) % 24) + ':' + p.minute;
         }
         /* 운영자 댓글은 이름 `AlphaScope` · 사진 자리에 로고 (2026-10-14 사용자: "다른 이름처럼 보이게") — 저장된 이름(구글 프로필)은 그대로, 보일 때만 바꾼다 */
-        var OWNER_NAME = 'AlphaScope';
+        var OWNER_NAME = '뉴팩트';
         var LOGO_SVG = '<svg viewBox="0 0 313 286" width="18" height="16" aria-hidden="true"><path d="M313 134L164.968 286H35L189.03 134H313Z" fill="#DD0000"/><path d="M164.519 0H287L128.954 147H0L164.519 0Z" fill="#000000"/></svg>';
         function isOwnerC(c) { return !!OWNER && c.uid === OWNER; }
         function nameOf(c) { return isOwnerC(c) ? OWNER_NAME : c.name; }
@@ -6269,7 +6269,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
         box.innerHTML =
           '<div class="a2hs-head">' +
             '<img class="a2hs-icon" alt="" width="44" height="44" src="' + ICON + '"/>' +
-            '<div class="a2hs-text"><p class="a2hs-title">홈 화면에 AlphaScope 추가</p><p class="a2hs-sub">' + TEXT.sub + '</p></div>' +
+            '<div class="a2hs-text"><p class="a2hs-title">홈 화면에 뉴팩트 추가</p><p class="a2hs-sub">' + TEXT.sub + '</p></div>' +
             '<button type="button" class="a2hs-close" aria-label="닫기"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>' +
           '</div>' +
           '<button type="button" class="a2hs-btn">' + TEXT.btn + '</button>' +
@@ -6761,7 +6761,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
             return row(md(p.d) + ' 거래량', big(p.v) + ' 주') + (p.va ? row('직전 20일 평균', big(p.va) + ' 주 <small>(' + (p.v / p.va).toFixed(1) + '배)</small>') : '');
           },
           cap: function (s) {
-            return row('시가총액', bigMoney(s, s.cap)) + (s.rank ? row('순위', 'AlphaScope가 다루는 ' + (s.m === 'us' ? '미국' : '한국') + ' 종목 중 ' + s.rank + '위') : '');
+            return row('시가총액', bigMoney(s, s.cap)) + (s.rank ? row('순위', '뉴팩트가 다루는 ' + (s.m === 'us' ? '미국' : '한국') + ' 종목 중 ' + s.rank + '위') : '');
           },
           earnDate: function (s) {
             return row('다음 실적 발표', s.ne ? s.ne + ' <small>(예정)</small>' : '아직 잡힌 날짜가 없습니다');
@@ -6905,7 +6905,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
           // ④ 알파스코프 신호 — 종목 페이지 판정 가운데 질문 방향과 같은 쪽 (증시 전망 갈래 근거와 같은 나눔: 단기 · 중기)
           if (W.sig && W.sig.rows && W.sig.rows.length) {
             var want = down ? -1 : 1, same = W.sig.rows.filter(function (r) { return r[2] === want; }), opp = W.sig.rows.filter(function (r) { return r[2] === -want; });
-            out += '<div class="as-sec"><h4>' + ico('tech') + (down ? '하락' : '상승') + ' 쪽 AlphaScope 신호 <small>(' + md(W.sig.d) + ' 종목 페이지)</small></h4>';
+            out += '<div class="as-sec"><h4>' + ico('tech') + (down ? '하락' : '상승') + ' 쪽 뉴팩트 신호 <small>(' + md(W.sig.d) + ' 종목 페이지)</small></h4>';
             if (same.length) {
               ['단기', '중기'].forEach(function (hz) {
                 var rs = same.filter(function (r) { return r[3] === hz; });
@@ -6943,7 +6943,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
           var extra = priceFirst ? (compact ? ['change'] : ['change', 'earnDate']) : [];
           var body = '';
           if (c.why) {   // 왜 떨어졌어 → 전제 확인 · 같은 기간 비교 · 같은 기간 소식 (오늘 주가 칸은 첫 문장과 겹쳐 두지 않는다)
-            body += '<p class="as-note as-why-note">AlphaScope는 등락 이유를 짐작해서 답하지 않습니다. 증시 전망과 같은 기준으로 꼽힌 이유와 숫자를 모았습니다.</p>' + whyPart(s, c, doc);
+            body += '<p class="as-note as-why-note">뉴팩트는 등락 이유를 짐작해서 답하지 않습니다. 증시 전망과 같은 기준으로 꼽힌 이유와 숫자를 모았습니다.</p>' + whyPart(s, c, doc);
           } else {
           /* 검색어가 가리킨 구획 = .as-hit — 기본 글자 · 구분명 보라, 값 보라 굵게, 굵은 값 검정 · 증감 색 그대로 (2026-11-19 사용자). 이름만 친 요약에는 칠하지 않는다 */
           var askPrice = list.indexOf('price') >= 0;
@@ -6964,13 +6964,13 @@ html.as-lock, html.as-lock body { overflow: hidden; }
 
         function answer(doc, q, compact) {
           var c = classify(q), stocks = findStocks(doc, q), html = '';
-          if (c.advice) html += '<div class="as-notice">AlphaScope는 개별 종목을 사라 · 팔라는 의견을 드리지 않습니다. 판단에 쓸 수 있는 숫자를 모아 드릴게요.</div>';
+          if (c.advice) html += '<div class="as-notice">뉴팩트는 개별 종목을 사라 · 팔라는 의견을 드리지 않습니다. 판단에 쓸 수 있는 숫자를 모아 드릴게요.</div>';
           if (stocks.length) {
             stocks.forEach(function (s) { html += card(s, c, compact, doc); });
           } else if (c.market) {
             html += '<div class="as-empty">지수 · 환율 · 금리는 홈의 시장 칸과 <a href="' + BLOG + '/search/label/데일리%20브리핑">데일리 리포트</a>에서 매일 정리합니다.</div>';
           } else {
-            html += '<div class="as-empty">질문에서 AlphaScope가 다루는 종목을 찾지 못했습니다. 미국 주요 ' + doc.stocks.filter(function (s) { return s.m === 'us'; }).length
+            html += '<div class="as-empty">질문에서 뉴팩트가 다루는 종목을 찾지 못했습니다. 미국 주요 ' + doc.stocks.filter(function (s) { return s.m === 'us'; }).length
               + '종목 · 한국 주요 ' + doc.stocks.filter(function (s) { return s.m === 'kr'; }).length + '종목의 주가 · 등락 · 실적 · EPS · 기술 지표 · 회사 정보를 답할 수 있어요.'
               // 선정 기준 — stock-radar/universe.py · kr-stocks/universe_kr.py (2026-11-10 사용자: "주요" 표시 + 기준 짧게)
               + '<p class="as-basis"><span aria-hidden="true">ⓘ</span>주요 종목 = 미국은 S&amp;P 500 시가총액 상위 · 섹터 대표 · 이슈 종목, 한국은 시가총액 상위 · 반도체 · 2차전지 · 바이오 · 방산 테마 대표 종목입니다.</p></div>';
@@ -7112,10 +7112,10 @@ html.as-lock, html.as-lock body { overflow: hidden; }
           pane.hidden = true;
           pane.setAttribute('aria-label', '질문하기');
           /* 머리 = 블로그 로고(그림 + 로고 글꼴 900) + `에 물어보기` 보통 굵기 (2026-11-12 사용자) */
-          pane.innerHTML = '<header><span class="as-chat-title"><svg class="as-chat-logo" viewBox="0 0 313 286" aria-hidden="true"><path d="M313 134L164.968 286H35L189.03 134H313Z" fill="#DD0000"/><path d="M164.519 0H287L128.954 147H0L164.519 0Z" fill="#000"/></svg><span><span class="as-chat-word">AlphaScope</span>에 물어보기</span></span><button type="button" class="as-x" aria-label="닫기"><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="16"/><path d="M11.5 11.5l9 9M20.5 11.5l-9 9"/></svg></button></header>'
+          pane.innerHTML = '<header><span class="as-chat-title"><svg class="as-chat-logo" viewBox="0 0 313 286" aria-hidden="true"><path d="M313 134L164.968 286H35L189.03 134H313Z" fill="#DD0000"/><path d="M164.519 0H287L128.954 147H0L164.519 0Z" fill="#000"/></svg><span><span class="as-chat-word">뉴팩트</span>에 물어보기</span></span><button type="button" class="as-x" aria-label="닫기"><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="16"/><path d="M11.5 11.5l9 9M20.5 11.5l-9 9"/></svg></button></header>'
             + '<div class="as-log" aria-live="polite"></div>'
             + '<form><input name="q" placeholder="예: 삼성전자 실적 알려줘" autocomplete="off" enterkeyhint="send"><button type="submit">보내기</button></form>'
-            + '<footer>AI가 아니라 AlphaScope가 모은 자료로 답합니다 · 투자 권유가 아닙니다</footer>';
+            + '<footer>AI가 아니라 뉴팩트가 모은 자료로 답합니다 · 투자 권유가 아닙니다</footer>';
           document.body.appendChild(fab);
           document.body.appendChild(pane);
           var log = pane.querySelector('.as-log'), form = pane.querySelector('form');

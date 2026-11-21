@@ -314,7 +314,7 @@
       return row(md(p.d) + ' 거래량', big(p.v) + ' 주') + (p.va ? row('직전 20일 평균', big(p.va) + ' 주 <small>(' + (p.v / p.va).toFixed(1) + '배)</small>') : '');
     },
     cap: function (s) {
-      return row('시가총액', bigMoney(s, s.cap)) + (s.rank ? row('순위', 'AlphaScope가 다루는 ' + (s.m === 'us' ? '미국' : '한국') + ' 종목 중 ' + s.rank + '위') : '');
+      return row('시가총액', bigMoney(s, s.cap)) + (s.rank ? row('순위', '뉴팩트가 다루는 ' + (s.m === 'us' ? '미국' : '한국') + ' 종목 중 ' + s.rank + '위') : '');
     },
     earnDate: function (s) {
       return row('다음 실적 발표', s.ne ? s.ne + ' <small>(예정)</small>' : '아직 잡힌 날짜가 없습니다');
@@ -458,7 +458,7 @@
     // ④ 알파스코프 신호 — 종목 페이지 판정 가운데 질문 방향과 같은 쪽 (증시 전망 갈래 근거와 같은 나눔: 단기 · 중기)
     if (W.sig && W.sig.rows && W.sig.rows.length) {
       var want = down ? -1 : 1, same = W.sig.rows.filter(function (r) { return r[2] === want; }), opp = W.sig.rows.filter(function (r) { return r[2] === -want; });
-      out += '<div class="as-sec"><h4>' + ico('tech') + (down ? '하락' : '상승') + ' 쪽 AlphaScope 신호 <small>(' + md(W.sig.d) + ' 종목 페이지)</small></h4>';
+      out += '<div class="as-sec"><h4>' + ico('tech') + (down ? '하락' : '상승') + ' 쪽 뉴팩트 신호 <small>(' + md(W.sig.d) + ' 종목 페이지)</small></h4>';
       if (same.length) {
         ['단기', '중기'].forEach(function (hz) {
           var rs = same.filter(function (r) { return r[3] === hz; });
@@ -496,7 +496,7 @@
     var extra = priceFirst ? (compact ? ['change'] : ['change', 'earnDate']) : [];
     var body = '';
     if (c.why) {   // 왜 떨어졌어 → 전제 확인 · 같은 기간 비교 · 같은 기간 소식 (오늘 주가 칸은 첫 문장과 겹쳐 두지 않는다)
-      body += '<p class="as-note as-why-note">AlphaScope는 등락 이유를 짐작해서 답하지 않습니다. 증시 전망과 같은 기준으로 꼽힌 이유와 숫자를 모았습니다.</p>' + whyPart(s, c, doc);
+      body += '<p class="as-note as-why-note">뉴팩트는 등락 이유를 짐작해서 답하지 않습니다. 증시 전망과 같은 기준으로 꼽힌 이유와 숫자를 모았습니다.</p>' + whyPart(s, c, doc);
     } else {
     /* 검색어가 가리킨 구획 = .as-hit — 기본 글자 · 구분명 보라, 값 보라 굵게, 굵은 값 검정 · 증감 색 그대로 (2026-11-19 사용자). 이름만 친 요약에는 칠하지 않는다 */
     var askPrice = list.indexOf('price') >= 0;
@@ -517,13 +517,13 @@
 
   function answer(doc, q, compact) {
     var c = classify(q), stocks = findStocks(doc, q), html = '';
-    if (c.advice) html += '<div class="as-notice">AlphaScope는 개별 종목을 사라 · 팔라는 의견을 드리지 않습니다. 판단에 쓸 수 있는 숫자를 모아 드릴게요.</div>';
+    if (c.advice) html += '<div class="as-notice">뉴팩트는 개별 종목을 사라 · 팔라는 의견을 드리지 않습니다. 판단에 쓸 수 있는 숫자를 모아 드릴게요.</div>';
     if (stocks.length) {
       stocks.forEach(function (s) { html += card(s, c, compact, doc); });
     } else if (c.market) {
       html += '<div class="as-empty">지수 · 환율 · 금리는 홈의 시장 칸과 <a href="' + BLOG + '/search/label/데일리%20브리핑">데일리 리포트</a>에서 매일 정리합니다.</div>';
     } else {
-      html += '<div class="as-empty">질문에서 AlphaScope가 다루는 종목을 찾지 못했습니다. 미국 주요 ' + doc.stocks.filter(function (s) { return s.m === 'us'; }).length
+      html += '<div class="as-empty">질문에서 뉴팩트가 다루는 종목을 찾지 못했습니다. 미국 주요 ' + doc.stocks.filter(function (s) { return s.m === 'us'; }).length
         + '종목 · 한국 주요 ' + doc.stocks.filter(function (s) { return s.m === 'kr'; }).length + '종목의 주가 · 등락 · 실적 · EPS · 기술 지표 · 회사 정보를 답할 수 있어요.'
         // 선정 기준 — stock-radar/universe.py · kr-stocks/universe_kr.py (2026-11-10 사용자: "주요" 표시 + 기준 짧게)
         + '<p class="as-basis"><span aria-hidden="true">ⓘ</span>주요 종목 = 미국은 S&amp;P 500 시가총액 상위 · 섹터 대표 · 이슈 종목, 한국은 시가총액 상위 · 반도체 · 2차전지 · 바이오 · 방산 테마 대표 종목입니다.</p></div>';
@@ -665,10 +665,10 @@
     pane.hidden = true;
     pane.setAttribute('aria-label', '질문하기');
     /* 머리 = 블로그 로고(그림 + 로고 글꼴 900) + `에 물어보기` 보통 굵기 (2026-11-12 사용자) */
-    pane.innerHTML = '<header><span class="as-chat-title"><svg class="as-chat-logo" viewBox="0 0 313 286" aria-hidden="true"><path d="M313 134L164.968 286H35L189.03 134H313Z" fill="#DD0000"/><path d="M164.519 0H287L128.954 147H0L164.519 0Z" fill="#000"/></svg><span><span class="as-chat-word">AlphaScope</span>에 물어보기</span></span><button type="button" class="as-x" aria-label="닫기"><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="16"/><path d="M11.5 11.5l9 9M20.5 11.5l-9 9"/></svg></button></header>'
+    pane.innerHTML = '<header><span class="as-chat-title"><svg class="as-chat-logo" viewBox="0 0 313 286" aria-hidden="true"><path d="M313 134L164.968 286H35L189.03 134H313Z" fill="#DD0000"/><path d="M164.519 0H287L128.954 147H0L164.519 0Z" fill="#000"/></svg><span><span class="as-chat-word">뉴팩트</span>에 물어보기</span></span><button type="button" class="as-x" aria-label="닫기"><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="16"/><path d="M11.5 11.5l9 9M20.5 11.5l-9 9"/></svg></button></header>'
       + '<div class="as-log" aria-live="polite"></div>'
       + '<form><input name="q" placeholder="예: 삼성전자 실적 알려줘" autocomplete="off" enterkeyhint="send"><button type="submit">보내기</button></form>'
-      + '<footer>AI가 아니라 AlphaScope가 모은 자료로 답합니다 · 투자 권유가 아닙니다</footer>';
+      + '<footer>AI가 아니라 뉴팩트가 모은 자료로 답합니다 · 투자 권유가 아닙니다</footer>';
     document.body.appendChild(fab);
     document.body.appendChild(pane);
     var log = pane.querySelector('.as-log'), form = pane.querySelector('form');

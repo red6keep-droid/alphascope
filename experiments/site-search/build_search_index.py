@@ -206,7 +206,7 @@ def why_block(sym, bars, news, data_dir, state_dir):
             if sg and sg.get("rows"):
                 out["sig"] = {"d": sg.get("as_of"), "rows": [[r["name"], r["state"], r["dir"], r["hz"]] for r in sg["rows"] if r.get("dir")]}
         except Exception as e:  # noqa: BLE001
-            print(f"[search] {sym} 알파스코프 신호 실패: {type(e).__name__}: {e}")
+            print(f"[search] {sym} 뉴팩트 신호 실패: {type(e).__name__}: {e}")
     return out
 
 
@@ -279,7 +279,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--market", choices=("us", "kr", "all"), default="all")
     ap.add_argument("--out", default=OUT)
-    ap.add_argument("--state", default=None, help="상태 저장소 폴더 — 있으면 알파스코프 신호(radar/records/verdicts)를 근거에 넣는다")
+    ap.add_argument("--state", default=None, help="상태 저장소 폴더 — 있으면 뉴팩트 신호(radar/records/verdicts)를 근거에 넣는다")
     a = ap.parse_args()
     today = date.today().isoformat()
     stocks = (us_stocks(today, a.state) if a.market in ("us", "all") else []) + (kr_stocks(today) if a.market in ("kr", "all") else [])
