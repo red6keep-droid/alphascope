@@ -3,7 +3,7 @@
     python experiments/site-pages/mock_footer_links.py   # → experiments/site-pages/output/mock_footer_links.html
 
 푸터 CSS 는 테마(index.html)의 `6. footer` 구획을 그대로 읽어 쓴다 — 목업과 블로그가 어긋나지 않게.
-새 규칙(링크 줄)만 이 파일의 NEW_CSS 에 있고, 확정되면 index.html · alphaflow-home.html 푸터에 같은 줄을 넣는다.
+링크 줄 CSS 도 2026-11-21 부터 테마에 있다(NEW_CSS 는 기록용, 그리지 않음).
 """
 import os
 import re
@@ -57,7 +57,7 @@ def phone(title, note, item):
 
 
 def _doc(cls, inner):
-    page = (f"<!doctype html><html><head><meta charset='utf-8'><style>{CSS}{NEW_CSS}"
+    page = (f"<!doctype html><html><head><meta charset='utf-8'><style>{CSS}"
             "body{margin:0;font-family:'Noto Sans KR',-apple-system,sans-serif;background:#fff;--gutter:14px;}"
             ".card{margin:16px 14px 16px;padding:24px;border:1px solid #E2E8F0;border-radius:12px;color:#94A3B8;font-size:14px;text-align:center;}"
             ".endbar{margin:0 14px 16px;padding:12px 0 20px;border-bottom:1px solid #E2E8F0;font-size:14px;color:#111;}"

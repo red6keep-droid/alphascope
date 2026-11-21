@@ -793,6 +793,13 @@ body.item-view .footer-disclaimer { margin-bottom: 0; }   /* 저작권 줄 위 1
   line-height: 19px;
   color: var(--gray-400);
 }
+/* 푸터 링크 줄 — 소개 · 개인정보처리방침 · 문의 (2026-11-21 사용자: 개인정보처리방침은 모든 화면에서 보여야 함 · 개인정보보호법 30조 공개 의무 · 애드센스).
+   13/19 회색, 개인정보처리방침만 굵게 · 검정(개인정보위 작성지침: 다른 고지와 구분). 누르는 칸 높이 31. 홈 · 목록 = 저작권 줄 위, 상세 = 면책 줄 아래 */
+.footer-links { margin: 0 0 6px; font-size: 13px; line-height: 19px; text-align: center; color: #CBD5E1; }
+.footer-links a { display: inline-block; padding: 6px 6px; color: #6B7280; text-decoration: none; -webkit-tap-highlight-color: transparent; }
+.footer-links a:active { opacity: .55; }
+.footer-links a.fl-privacy { color: #111; font-weight: 700; }
+body.item-view .footer-links { margin: 5px 0 -6px; }   /* 상세 = 면책 줄 아래 11(5 + 글자 칸 6), 아래 푸터 여백 19 그대로 */
 
 /* ==========================================================================
    홈 카드 (2026-10-15 사용자) — 회색 바탕 #F3F4F6 위 흰 카드,
@@ -2859,6 +2866,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
         개별 투자 상담을 하지 않으며, 투자 판단과 책임은 투자자 본인에게 있습니다.
         종목 로고는 각 회사의 상표이며, 종목을 구분하는 용도로만 쓰고 해당 회사와 제휴 관계가 없습니다.</p>
       </details>
+      <nav class='footer-links' aria-label='사이트 안내'><a href='/p/about.html'>소개</a>·<a class='fl-privacy' href='/p/privacy.html'>개인정보처리방침</a>·<a href='/p/contact.html'>문의</a></nav>
       <b:section class='attribution' id='footer' name='Footer' showaddelement='false' tag='div'>
         <b:widget id='Attribution1' locked='true' title='' type='Attribution' visible='true'>
           <b:widget-settings>
