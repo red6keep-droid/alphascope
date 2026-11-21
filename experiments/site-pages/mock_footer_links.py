@@ -26,7 +26,7 @@ body.item-view .footer-links { margin: 5px 0 -6px; }   /* 상세 = 면책 줄 �
 LINKS = ('<nav class="footer-links" aria-label="사이트 안내">'
          '<a href="/p/about.html">소개</a>·<a class="fl-privacy" href="/p/privacy.html">개인정보처리방침</a>·<a href="/p/contact.html">문의</a></nav>')
 
-LEAD = ("뉴팩트 리포트는 공개된 시세 · SEC 공시 · FRED 경제 지표 · 뉴스를 정해진 규칙으로 정리한 기록이며, 투자를 권유하지 않습니다.")
+LEAD = ("Newfact 리포트는 공개된 시세 · SEC 공시 · FRED 경제 지표 · 뉴스를 정해진 규칙으로 정리한 기록이며, 투자를 권유하지 않습니다.")
 MORE = ("<p>해설 문장 일부는 AI 가 씁니다. 모든 정보는 참고용이며, 앞으로의 결과는 지난 기록과 다를 수 있습니다. "
         "애널리스트 의견 · 목표가는 외부 의견을 옮긴 것입니다.</p>")
 CHEV = ("<span class='footer-more' role='img' aria-label='더 보기'><svg viewBox='0 0 16 16' width='14' height='14' fill='none' stroke='currentColor' "
@@ -44,9 +44,9 @@ def theme_footer_css():
 
 def footer(item):
     return ("<footer class='site-footer'><details class='footer-disclaimer'><summary><span class='footer-title'>"
-            "<span class='footer-name'>뉴팩트 주식 리포트</span>" + CHEV + "</span>"
+            "<span class='footer-name'><span class='brand-word'>Newfact</span> 주식 리포트</span>" + CHEV + "</span>"
             "<span class='footer-lead'>" + LEAD + "</span></summary>" + MORE + "</details>"
-            + LINKS + "<p class='footer-copy'>© 2026 뉴팩트. All rights reserved.</p></footer>")
+            + LINKS + "<p class='footer-copy'>© 2026 <span class='brand-word'>Newfact</span>. All rights reserved.</p></footer>")
 
 
 def phone(title, note, item):

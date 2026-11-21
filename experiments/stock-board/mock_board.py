@@ -108,7 +108,7 @@ def mood_card():
             f'<div style="font-size:18px;line-height:28px;font-weight:700;color:#B91C1C;">{dk.tri_span(True, 18)}상승 쪽이 많습니다</div>'
             f'<div class="bd-bar">{seg(up, "#ED8E87")}{seg(flat, "#CBD5E1")}{seg(down, "#82B1F0")}</div>'
             f'<div class="bd-legend"><span>▲상승 {up}</span><span>중립 {flat}</span><span>▼하락 {down}</span></div>'
-            + dk.excl_note("최근 7일 글에서 쓴 분이 고른 방향을 센 것입니다. 뉴팩트의 판단이 아닙니다.", margin="10px 0 0"))
+            + dk.excl_note("최근 7일 글에서 쓴 분이 고른 방향을 센 것입니다. Newfact의 판단이 아닙니다.", margin="10px 0 0"))
     return dk.dcard(body, theme="positive")
 
 
@@ -125,7 +125,7 @@ def write_box():
 
 
 def rules():
-    return dk.excl_note("회원이 쓴 의견이며 뉴팩트의 의견이 아닙니다. 투자 권유가 아니고, 판단과 책임은 읽는 분에게 있습니다.", margin="12px 0 0")
+    return dk.excl_note("회원이 쓴 의견이며 Newfact의 의견이 아닙니다. 투자 권유가 아니고, 판단과 책임은 읽는 분에게 있습니다.", margin="12px 0 0")
 
 
 def tab(member=True, empty=False):

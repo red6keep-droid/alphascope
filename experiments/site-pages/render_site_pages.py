@@ -43,6 +43,13 @@ def table(head, rows):
             f'background:#fff;border:1px solid #E2E8F0;border-radius:8px;"><thead><tr>{h}</tr></thead><tbody>{b}</tbody></table></div>')
 
 
+def brand():
+    """문장 속 `Newfact` = 로고 + 로고 글꼴(Noto Sans KR 900) — 리포트 문장과 같은 render_html.brand_mark (2026-11-21 사용자: 영어 Newfact · 노토 산스)."""
+    sys.path.insert(0, os.path.join(HERE, "..", "nvda-report"))
+    import render_html as R  # noqa: E402
+    return R.brand_mark(int(str(dk.BODY).rstrip("px")))
+
+
 def lead(t):
     return f'<p data-seo-lead="1" style="{dk.SEO_LEAD}padding-left:{dk.ALIGN_PX}px;">{t}</p>'
 
@@ -61,7 +68,7 @@ def wrap(body):
 # ── 소개 ─────────────────────────────────────────────────────────────
 def about():
     return wrap(
-        lead("뉴팩트는 미국 · 한국 주식시장의 공개 데이터를 정해진 규칙으로 계산해, 매일 기록으로 남기는 주식 데이터 리포트입니다.")
+        lead(brand() + "는 미국 · 한국 주식시장의 공개 데이터를 정해진 규칙으로 계산해, 매일 기록으로 남기는 주식 데이터 리포트입니다.")
         + dk.section("무엇을 하나요", ul([
             "<b>증시 리포트</b> — 장이 끝나면 지수 · 금리 · 환율 · 업종 움직임과 그날의 주요 뉴스를 정리합니다.",
             "<b>종목 페이지</b> — 시가총액 상위 종목의 가격 흐름, 평소 움직임과의 비교, 공시, 함께 움직이는 종목을 한 화면에 모읍니다.",
@@ -95,7 +102,7 @@ def privacy():
                 '<a href="https://www.aboutads.info" rel="nofollow noopener" target="_blank">www.aboutads.info</a> 에서 다른 제3자 업체의 맞춤 광고 쿠키도 거부할 수 있습니다. '
                 'Google 이 정보를 쓰는 방식은 <a href="https://policies.google.com/technologies/partner-sites" rel="nofollow noopener" target="_blank">Google 파트너 사이트 정책</a>에 있습니다.'))]
     return wrap(
-        lead(f"뉴팩트(이하 '블로그')는 이용자의 개인정보를 필요한 만큼만 받고, 받은 목적에만 씁니다. 이 방침은 {EFFECTIVE}부터 적용합니다.")
+        lead(brand() + f"(이하 '블로그')는 이용자의 개인정보를 필요한 만큼만 받고, 받은 목적에만 씁니다. 이 방침은 {EFFECTIVE}부터 적용합니다.")
         + dk.section("1. 받는 정보와 쓰는 곳", table(
             ["언제", "받는 정보", "쓰는 곳"],
             [["글만 읽을 때", "블로그가 직접 받는 정보 없음", "—"],
@@ -141,7 +148,7 @@ def contact():
     return wrap(
         # 2026-11-16 사용자 결정: 이메일은 누구나(비회원 포함) 보낼 수 있는 세 주제만 — 개인정보 · 권리 · 오류 정정.
         # 일반 의견 · 제안은 댓글, 개별 투자 상담은 회원이어도 받지 않음(유사투자자문 위험).
-        lead("뉴팩트는 개인정보 요청 · 권리 침해 · 내용 오류를 이메일로 받습니다. 회원이 아니어도 보낼 수 있습니다.")
+        lead(brand() + "는 개인정보 요청 · 권리 침해 · 내용 오류를 이메일로 받습니다. 회원이 아니어도 보낼 수 있습니다.")
         + dk.section("이메일", p(mail()) + p("보통 영업일 기준 3일 안에 답장합니다."))
         + dk.section("이메일로 받는 것", ul([
             "<b>개인정보</b> — 내 댓글 · 로그인 정보를 보거나 지워 달라는 요청 (<a href=\"/p/privacy.html\">개인정보처리방침</a>)",

@@ -78,7 +78,7 @@ def demo_why(html, index_js):
     out = html.replace(index_js, js, 1)
     head, tail = out.split("<body", 1)
     k = tail.index(">") + 1
-    out = head + "<body" + tail[:k] + '<div style="position:fixed;top:0;left:0;right:0;z-index:999;background:#FFF8E1;border-bottom:1px solid #F4D37A;padding:6px 12px;font-size:13px;color:#333;text-align:center;">목업 예시 값: 엔비디아 근거(기사 · 애널리스트 · 뉴팩트 신호)는 모양을 보이려고 넣은 예시입니다</div>' + tail[k:]
+    out = head + "<body" + tail[:k] + '<div style="position:fixed;top:0;left:0;right:0;z-index:999;background:#FFF8E1;border-bottom:1px solid #F4D37A;padding:6px 12px;font-size:13px;color:#333;text-align:center;">목업 예시 값: 엔비디아 근거(기사 · 애널리스트 · Newfact 신호)는 모양을 보이려고 넣은 예시입니다</div>' + tail[k:]
     out = out.replace("<title>검색 · 질문하기 목업</title>", "<title>질문하기 · 왜 떨어졌어 예시</title>", 1)
     with open(os.path.join(HERE, "output", DEMO), "w", encoding="utf-8") as f:
         f.write(out)

@@ -112,7 +112,7 @@ def main():
     load_dotenv()
 
     if args.test_notification:
-        notify_slack.send(f"✅ 뉴팩트 댓글 알림 테스트 ({_now()} KST)\nSlack 연동이 정상입니다.")
+        notify_slack.send(f"✅ Newfact 댓글 알림 테스트 ({_now()} KST)\nSlack 연동이 정상입니다.")
         print("[Slack] 테스트 메시지 전송 완료")
         return
 

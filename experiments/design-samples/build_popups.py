@@ -172,7 +172,7 @@ def samples():
               '<p class="as-hint">이렇게도 물어보세요</p><div class="as-chips"><button type="button">삼성전자 실적</button><button type="button">코스피 전망</button></div></div></div></div>')
     s.append(("B1", "검색 창", "헤더 돋보기", "위에서 내려오는 판(PC 760) · 폰은 화면 전체 · 닫기 회색 원 · 행간 정수 px",
               frame(search)))
-    chat = ('<div class="as-chat"><header><b>뉴팩트에 물어보기</b><button type="button" class="as-x" aria-label="닫기"><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="16"/><path d="M11.5 11.5l9 9M20.5 11.5l-9 9"/></svg></button></header><div class="as-log">'
+    chat = ('<div class="as-chat"><header><b>Newfact에 물어보기</b><button type="button" class="as-x" aria-label="닫기"><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="16"/><path d="M11.5 11.5l9 9M20.5 11.5l-9 9"/></svg></button></header><div class="as-log">'
             '<div class="as-msg as-me">코스피 왜 올랐어?</div><div class="as-msg as-bot"><p>오늘 코스피는 반도체가 이끌었습니다.</p></div></div>'
             '<form onsubmit="return false"><input placeholder="질문을 적어 주세요"><button type="button">보내기</button></form><footer>AI 답변은 틀릴 수 있습니다</footer></div>')
     s.append(("B2", "질문하기 창", "오른쪽 아래 버튼 (지금 꺼 둠)", "PC 오른쪽 아래 400 패널 · 폰은 화면 전체 · 닫기 회색 원 · 행간 정수 px",
