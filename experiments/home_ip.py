@@ -3,6 +3,7 @@
 막힌 곳(11-17 시험, News-sub trial run 44086583552 — 바로 = GitHub 주소, 집 = VPN):
   - 미래에셋 TIGER 상품 페이지 · 구성 JSON   바로 403 · 집 200
   - 마이클 버리 substack RSS                 바로 403 · 집 200
+  - 비즈니스포스트 RSS                       바로 약 85% 403(CloudFront, 실행기 IP 마다 다름) · 집 200 (11-21 kr_rss_probe 시험, 2026-11-21 사용자 "집 IP 경로로 받자")
   (국민연금 공시는 바로도 200 — 11-16 실패는 일시적, 집 IP 에 넣지 않는다)
 
 흐름: 하루 한 번 14:30 KST `.github/workflows/home-ip.yml` 이 VPN 을 열어 이 곳들만 받아 비공개 상태 저장소
@@ -25,6 +26,7 @@ DIR = os.environ.get("HOMEIP_DIR") or os.path.join(HERE, "home-ip", "data")
 # 집 IP 로 받아 파일로 두는 RSS — 주소 → 파일 이름
 FEEDS = {
     "https://michaeljburry.substack.com/feed": "burry_feed.xml",
+    "https://www.businesspost.co.kr/rss/Article.xml": "businesspost_feed.xml",   # 한국 기사 공용 저장소(만들기 전)가 읽을 곳 — 피드 약 5일치 · 약 480KB
 }
 MIRAE_FILE = "mirae.json"   # 미래에셋 TIGER 구성 · 보수 — {sym: kr_holdings._mirae 결과 + got}
 
