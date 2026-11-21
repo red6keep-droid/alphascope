@@ -626,7 +626,7 @@ TEMPLATE = """<?xml version="1.0" encoding="UTF-8" ?>
     <meta content='#FFFFFF' name='theme-color'/>
     <meta content='yes' name='mobile-web-app-capable'/>
     <meta content='yes' name='apple-mobile-web-app-capable'/>
-    <meta content='AlphaScope' name='apple-mobile-web-app-title'/>
+    <meta content='뉴팩트' name='apple-mobile-web-app-title'/>
     <meta content='default' name='apple-mobile-web-app-status-bar-style'/>
     <link href='https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&amp;family=Inter:wght@400;600;700;800&amp;display=swap' rel='stylesheet'/>
 
@@ -738,14 +738,14 @@ __SEARCH_CSS__
     <header class='navbar'>
       <div class='nav-left'>
         <b:section class='logo-holder' id='header' maxwidgets='1' name='Header' showaddelement='false'>
-          <b:widget id='Header1' locked='true' title='AlphaScope (Header)' type='Header' visible='true'>
+          <b:widget id='Header1' locked='true' title='뉴팩트 (Header)' type='Header' visible='true'>
             <b:includable id='main'>
               <a class='logo' expr:href='data:blog.homepageUrl'>
                 <svg class='logo-mark' viewBox='0 0 313 286'>
                   <path d='M313 134L164.968 286H35L189.03 134H313Z' fill='#DD0000'/>
                   <path d='M164.519 0H287L128.954 147H0L164.519 0Z' fill='#000000'/>
                 </svg>
-                <span class='logo-word'>AlphaScope</span>
+                <span class='logo-word'>뉴팩트</span>
               </a>
             </b:includable>
           </b:widget>
@@ -800,7 +800,7 @@ __DASHBOARD__
       <!-- 게시글: 홈 하단의 최신 리포트 목록 / 글 보기 본문 -->
       <b:section class='page-body' id='page_body' name='Page Body' showaddelement='false'>
         <b:widget id='FeaturedPost1' locked='true' title='' type='FeaturedPost' visible='true'>
-          <b:includable id='main'><b:comment>AlphaScope 테마에서는 표시하지 않음</b:comment></b:includable>
+          <b:includable id='main'><b:comment>뉴팩트 테마에서는 표시하지 않음</b:comment></b:includable>
         </b:widget>
 
         <b:widget id='Blog1' locked='true' title='Blog Posts' type='Blog' visible='true'>
@@ -882,7 +882,7 @@ __BLOG_INCLUDABLES__
         </b:widget>
 
         <b:widget id='PopularPosts1' locked='true' title='' type='PopularPosts' visible='true'>
-          <b:includable id='main'><b:comment>AlphaScope 테마에서는 표시하지 않음</b:comment></b:includable>
+          <b:includable id='main'><b:comment>뉴팩트 테마에서는 표시하지 않음</b:comment></b:includable>
         </b:widget>
       </b:section>
     </main>
@@ -1219,7 +1219,7 @@ def footer_with_attribution(footer_html):
         "          <b:if cond='data:copyright != &quot;&quot;'>\n"
         "            <data:copyright/>\n"
         "          <b:else/>\n"
-        "            © 2026 ALPHASCOPE. All rights reserved.\n"
+        "            © 2026 뉴팩트. All rights reserved.\n"
         "          </b:if>\n"
         "        </p>\n"
         "      </b:includable>\n"
@@ -1375,7 +1375,7 @@ PREVIEW_POSTS = [
 PREVIEW_COMMENTS = [   # 우리 댓글(Firestore 문서)과 같은 꼴 — avatar 는 미리보기용 색 (2026-10-14)
     {"id": "c1", "uid": "u1", "name": "김투자", "avatar": "#2563EB", "parent": "", "created": "2026-09-03T00:12:00Z",
      "text": "반도체 비중 확대 의견 잘 봤습니다. 다만 밸류에이션 부담은 어떻게 보시나요?"},
-    {"id": "c2", "uid": "owner", "name": "AlphaScope", "avatar": "#DD0000", "parent": "c1", "created": "2026-09-03T01:04:00Z",
+    {"id": "c2", "uid": "owner", "name": "뉴팩트", "avatar": "#DD0000", "parent": "c1", "created": "2026-09-03T01:04:00Z",
      "text": "선행 PER 기준으로는 5년 평균을 웃돌지만, 실적 상향 속도가 더 빨라 부담이 완화되는 구간으로 "
              "보고 있습니다. 다만 가이던스가 꺾이면 되돌림이 클 수 있어 분할 접근을 권합니다."},
     {"id": "c3", "uid": "u3", "name": "장기보유", "avatar": "#14B8A6", "parent": "", "created": "2026-09-03T05:47:00Z",
@@ -1745,7 +1745,7 @@ def preview_post():
         "      <article class=\"post-outer-container\">\n"
         "        <div class=\"post\">\n"
         "          <h3 class=\"post-title entry-title\">%s</h3>\n"
-        "          <div class=\"byline post-author vcard\">글쓴이 <span class=\"fn\">AlphaScope</span></div>\n"
+        "          <div class=\"byline post-author vcard\">글쓴이 <span class=\"fn\">뉴팩트</span></div>\n"
         "          <div class=\"byline post-timestamp\">2026년 9월 3일 오전 6:00</div>\n"
         "          <div class=\"post-body entry-content float-container\">\n"
         "%s\n"
@@ -1918,7 +1918,7 @@ def preview_mock_js():
         "    return Promise.resolve({ json: function () { return Promise.resolve(body); } });\n"
         "  };\n"
         "\n"
-        "  /* 댓글 미리보기 — Firebase 대신 메모리. 로그인 버튼을 누르면 운영자(AlphaScope)로 로그인한 셈이 된다 (2026-10-14) */\n"
+        "  /* 댓글 미리보기 — Firebase 대신 메모리. 로그인 버튼을 누르면 운영자(뉴팩트)로 로그인한 셈이 된다 (2026-10-14) */\n"
         "  var PV_CM = %s, pvUser = null, pvCb = function () {};\n"
         "  window.PV_COMMENTS_MOCK = {\n"
         "    owner: 'owner',\n"
@@ -1927,7 +1927,7 @@ def preview_mock_js():
         "    del: function (id) { PV_CM = PV_CM.filter(function (c) { return c.id !== id; }); return Promise.resolve({}); },\n"
         "    auth: {\n"
         "      onAuth: function (cb) { pvCb = cb; cb(pvUser); },\n"
-        "      login: function () { pvUser = { uid: 'owner', name: 'AlphaScope', photo: '' }; pvCb(pvUser); return Promise.resolve(); },\n"
+        "      login: function () { pvUser = { uid: 'owner', name: '뉴팩트', photo: '' }; pvCb(pvUser); return Promise.resolve(); },\n"
         "      logout: function () { pvUser = null; pvCb(null); return Promise.resolve(); },\n"
         "      token: function () { return Promise.resolve('mock'); }\n"
         "    }\n"
@@ -2016,7 +2016,7 @@ PREVIEW_TEMPLATE = """<!DOCTYPE html>
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>AlphaScope — 디자인 미리보기</title>
+<title>뉴팩트 — 디자인 미리보기</title>
 <!-- build_theme.py --preview 가 생성한 파일입니다. 직접 고치지 마십시오.
      디자인은 alphaflow-home.html, 블로거 전용 영역은 build_theme.py 에서 고칩니다. -->
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&amp;family=Inter:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>

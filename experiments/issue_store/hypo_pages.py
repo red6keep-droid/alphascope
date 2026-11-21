@@ -714,7 +714,7 @@ WHY_WORD = "관련 주식 정보"   # 옛 `근거` (P488, 2026-11-11 사용자)
 WHY_HEAD_FS, WHY_HEAD_LH = 17, 28   # 갈래 카드 `근거` 제목 = 고리 줄 이름과 같은 17 (2026-11-11 사용자)
 CHAIN_FS = 17   # 갈래 카드 고리 줄 이름(`급락 폭의 4분의 1 회복`) — 카드 줄 18 에서 한 단계 작게 (2026-11-11 사용자)
 WHY_FS, WHY_LH = 16, 26
-SIG_NAME = "AlphaScope 신호"   # 독자 문장에서 `우리 신호` 대신 (2026-11-11 사용자: 독자는 `우리`가 누군지 모른다)
+SIG_NAME = "뉴팩트 신호"   # 독자 문장에서 `우리 신호` 대신 (2026-11-11 사용자: 독자는 `우리`가 누군지 모른다)
 WHY_NOTE = "전망에 따른 주식 정보를 모은 것입니다. 판단하거나 어느 쪽이 맞을지 고른 것은 아닙니다."   # P498, 2026-11-11 사용자 문구
 EXCL_ICON = ('<svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true" style="flex:none;display:block;" fill="none" stroke="currentColor" stroke-width="1.6">'
              '<circle cx="8" cy="8" r="6.5"/><path d="M8 4.6v4.4" stroke-linecap="round"/><circle cx="8" cy="11.2" r=".9" fill="currentColor" stroke="none"/></svg>')   # 느낌표 = INFO_ICON(i) 뒤집은 모양

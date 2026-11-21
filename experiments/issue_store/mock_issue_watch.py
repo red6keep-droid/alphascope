@@ -1239,7 +1239,7 @@ def q_news(iran, counts, days, r48):
     t, w = sum(x["side"] == "종전" for x in r2w), sum(x["side"] == "확전" for x in r2w)
     cap = sorted(c for c in iran["capped"] if c in days)
     note = "같은 소식을 여러 곳이 옮긴 기사도 모두 센 숫자라, 관심의 크기만 보여 줍니다."   # 방향은 바늘 · `어디까지 왔나?` 가 사건 단위로 (2026-11-13 사용자: 복사 기사 수 ≠ 중요도)
-    tip = ("출처 : AlphaScope 뉴스 모음(CNBC) + 구글 뉴스 한국어 검색, 방송은 아직 안 셈\n평소 = 직전 4주 동안 48시간마다 나온 기사 수의 평균\n"
+    tip = ("출처 : 뉴팩트 뉴스 모음(CNBC) + 구글 뉴스 한국어 검색, 방송은 아직 안 셈\n평소 = 직전 4주 동안 48시간마다 나온 기사 수의 평균\n"
            "그래프 점 하나 = 지금 시각에서 24시간씩 끊어 센 기사 수, 마지막 점 = 최근 24시간")
     lines = [(first, "plain"), (news_chart(counts, NOW_LABEL[0], base / 2 if base else None), "html"), (note, "note")]
     return qc.question_card("얼마나 화제인가?", ans, th, ink, lines, tip=tip), r2w   # 펼침은 `어디까지 왔나?` 로 옮김
@@ -1411,7 +1411,7 @@ def q_align(word, links, gs, oil_gr, oil_line, hist, asof):
     tip = ("뉴스 = 위 바늘과 같은 셈(최근 7일 소식, 실제로 일어난 일 1 · 발언 0.5).\n"
            f"시장 = {W()}되면 움직인다고 흔히 설명하는 지표를 묶음별로 — 묶음 안 2개 이상이 한쪽으로 평소보다 크게 움직이면 그 쪽.\n"
            "평소의 몇 배 = 이 지표가 보통 5거래일에 움직이는 폭(직전 60거래일 기준)의 몇 배인지, 1배 넘으면 그 쪽.\n"
-           "흔한 설명 = 시장에서 흔히 쓰는 설명(교과서 · 언론), AlphaScope의 주장이 아님.\n"
+           "흔한 설명 = 시장에서 흔히 쓰는 설명(교과서 · 언론), 뉴팩트의 주장이 아님.\n"
            "예측이 아니라 지금까지 일어난 일입니다.")
     # 카드 색 = 답 방향 (가이드라인 7-1: 답에 보라 금지, 2026-11-15 사용자) — 같은 쪽 · 시장만 한쪽 = 그 쪽 색(좋은 쪽 빨강 · 나쁜 쪽 파랑),
     # 엇갈림 · 시장 안에서 엇갈림 · 평소 범위 = 회색. 옛: 움직임이 있으면 보라(_theme)
@@ -1595,7 +1595,7 @@ def if_fold(chain_id, scs):
         v = [r["S&P 500"] for r in cs if r.get("S&P 500") and r["S&P 500"][0] is not None]
         v20 = [x[1] for x in v if x[1] is not None]
         lead = (f"지난 {lab} 사례에서 S&P 500 은 그날 " + _cnt([x[0] for x in v], "올랐고")
-                + (", 20거래일 뒤에는 " + _cnt(v20, "올라 있었습니다") if v20 else "") + ".") if v else f"AlphaScope 사건표에 {lab} 사례가 아직 없습니다."
+                + (", 20거래일 뒤에는 " + _cnt(v20, "올라 있었습니다") if v20 else "") + ".") if v else f"뉴팩트 사건표에 {lab} 사례가 아직 없습니다."
         html = H._plain_rows(lead, [], lines=False)
         if forks:
             html += _ttl_plain("시장에서 흔히 하는 설명") + H._plain_rows("", [(_fork(a), "", _fork(c)) for a, c in forks])
@@ -1800,7 +1800,7 @@ def bene_card(px, scs):
     if len(avg) == 2 and avg["확전"] - avg["종전"] >= 1:   # 이번 주 앞선 쪽 탭이 첫째 — 확전이 앞서면 `확전되면` 이 앞 · 처음 열림 (2026-11-14 사용자)
         panes = panes[::-1]
     lines = [(first, "plain"), (seg_tabs(panes) + SEG_JS, "html")]   # 카드 끝 `알파스코프의 추천이 아닙니다` 줄 삭제 — 면책은 블로그 공통 푸터 하나(꼬리말 금지), 툴팁엔 남김 (2026-11-14)
-    tip = ("수혜 테마 = 그 일이 생기면 좋아진다고 시장에서 흔히 꼽는 테마(교과서 · 언론), AlphaScope의 주장 · 추천이 아님.\n"
+    tip = ("수혜 테마 = 그 일이 생기면 좋아진다고 시장에서 흔히 꼽는 테마(교과서 · 언론), 뉴팩트의 주장 · 추천이 아님.\n"
            "주도주 = 테마 안 시가총액 1위, 미국 · 한국 하나씩. 오른쪽 = 최근 5거래일 그 나라 시장 대비(미국 = S&P 500 · 한국 = 코스피).")   # 테마 평균 · 셌던 때 줄 삭제 (2026-11-14 사용자)
     if th_ != "neutral":
         lab = g if th_ == "positive" else b
@@ -1821,7 +1821,7 @@ def q_if(chain_id, cs):
     lines += [(_ttl("지난 휴전 · 종전 때 실제로는") + cases_card(cs), "html"),
               ("3번뿐이라 ‘보통 이렇다’고 말할 수는 없습니다. 03.31 과 04.08 은 20거래일이 겹칩니다. 04.08 휴전 뒤 전쟁은 다시 이어졌습니다(10월 해협 공격 · 11.07 타격)." + case_gap(cs), "note")]
     tip = ("갈림 = 시장에서 흔히 쓰는 설명(교과서 · 언론), 우리 주장이 아님.\n"
-           "사례 = AlphaScope 사건표의 `휴전 · 종전` 날, 그날 종가와 20거래일 뒤 종가를 전날 종가와 비교\n"
+           "사례 = 뉴팩트 사건표의 `휴전 · 종전` 날, 그날 종가와 20거래일 뒤 종가를 전날 종가와 비교\n"
            "한국 (EWY) = 미국에 상장된 한국 증시 ETF, 미국 장 시간에 같이 잴 수 있어서")
     return qc.question_card("이렇게 되면?", f"지난 사례 {len(cs)}번", "neutral", "#111", lines, tip=tip)
 
@@ -1829,9 +1829,9 @@ def q_if(chain_id, cs):
 def bottom(chain_id, cs):
     """증시 전망 페이지 아래쪽과 같은 접는 줄 묶음 + 안내 글 (2026-11-13 사용자: `이렇게 되면?` = 과거 기록, `증시 전망으로 넘어가나?` = 안내 글)."""
     ch = CH.CHAINS[chain_id]
-    forks = H._plain_rows("시장에서 흔히 쓰는 설명입니다. AlphaScope의 주장은 아닙니다.",
+    forks = H._plain_rows("시장에서 흔히 쓰는 설명입니다. 뉴팩트의 주장은 아닙니다.",
                           [(a, "", b.replace("전쟁 사슬로 돌아감", "유가 오름 · 위험 회피로 돌아감")) for a, b in ch["forks"]])
-    past = (H._plain_rows(f"AlphaScope 사건표의 {C['case_name']} 날 {len(cs)}번입니다. 그날 종가와 20거래일 뒤 종가를 전날 종가와 비교했습니다.", [])
+    past = (H._plain_rows(f"뉴팩트 사건표의 {C['case_name']} 날 {len(cs)}번입니다. 그날 종가와 20거래일 뒤 종가를 전날 종가와 비교했습니다.", [])
             + f'<div style="padding:0 {dk.ALIGN_PX}px;">{cases_card(cs)}</div>'
             + H._plain_rows("", [], note=C["case_note"] + case_gap(cs))) if cs else ""
     grp = ""   # 접는 줄 둘은 `종전되면 · 확전되면 주가는?` 카드로 올림 (2026-11-14) — forks · past 는 비교용으로 계산만

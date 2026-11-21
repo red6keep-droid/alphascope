@@ -21,7 +21,7 @@ from google.oauth2 import service_account
 
 SCOPES = ["https://www.googleapis.com/auth/datastore"]
 DEFAULT_OWNER_UID = "u1vln4bbDgSgWQDe2F2FaNs81D43"   # 테마 CFG.owner · firestore.rules isOwner 와 같다
-OWNER_NAME = "AlphaScope"
+OWNER_NAME = "뉴팩트"
 
 
 def _service_account_info():

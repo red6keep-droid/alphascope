@@ -476,7 +476,7 @@ ICON_STYLES = [   # (키, 이름, 설명)
     ("D", "지금 칸만 채움", "다른 칸은 선, 지금 칸만 채운 모양 (앱에서 흔한 방식)"),
     ("E", "둥근 바탕", "지금 칸 아이콘 뒤에 옅은 둥근 바탕"),
     ("F", "글자만", "아이콘 없이 글자, 지금 칸 아래 짧은 막대"),
-    ("G", "컬러 네모", "홈 카드 제목 앞과 같은 색 네모 + 흰 그림, 모든 칸 컬러 · 홈 = Alpha Scope 로고(신호 카드와 같음)"),
+    ("G", "컬러 네모", "홈 카드 제목 앞과 같은 색 네모 + 흰 그림, 모든 칸 컬러 · 홈 = 뉴팩트 로고(신호 카드와 같음)"),
     ("H", "지금 칸만 컬러", "다른 칸은 같은 그림을 회색으로, 지금 칸만 색 네모"),
 ]
 # 컬러 아이콘 = 홈 카드 제목 앞 .report-icon 과 같은 그림 · 색 (index.html, 2026-11-12 사용자: 강조 카드 컬러 아이콘도 비교에). 그림 viewBox 16
@@ -714,7 +714,7 @@ def journey_head():
             items = "".join(f'<a data-jk="{k}" href="#">{html.escape(n)}<span aria-hidden="true">›</span></a>' for n, k in subs)
             rows.append(f'<div class="jgrp"><div class="jgt">{html.escape(title)}</div>{items}</div>')
     return f"""
-<header id="jhead"><a class="jlogo" data-jk="home" href="#">{LOGO}<b>AlphaScope</b></a>
+<header id="jhead"><a class="jlogo" data-jk="home" href="#">{LOGO}<b>뉴팩트</b></a>
   <span class="jr"><a class="jflag" href="#"></a>
   <button class="jic" data-jsearch type="button" aria-label="검색"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></button>
   <button class="jic" data-jmenu type="button" aria-label="전체 메뉴"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button></span></header>
@@ -736,9 +736,9 @@ def journey_bar(d, f):
     btns = "".join(f'<a data-jt="{k}" href="#"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" '
                    f'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{_ICON[k]}</svg><span>{t}</span></a>' for k, t in tabs)
     cfg = json.dumps({"pages": J_PAGES, "slugs": _slug_map(), "fore": fore, "dir": d, "file": f, "icons": icons}, ensure_ascii=False)
-    footer = ('<footer class="site-footer"><details class="footer-disclaimer"><summary><span class="footer-title">ALPHASCOPE 주식 리포트</span></summary>'
+    footer = ('<footer class="site-footer"><details class="footer-disclaimer"><summary><span class="footer-title">뉴팩트 주식 리포트</span></summary>'
               '<p>해설 문장 일부는 AI 가 씁니다. 모든 정보는 참고용이며, 앞으로의 결과는 지난 기록과 다를 수 있습니다.</p></details>'
-              '<p class="footer-copy">© 2026 ALPHASCOPE. All rights reserved.</p></footer>')
+              '<p class="footer-copy">© 2026 뉴팩트. All rights reserved.</p></footer>')
     bar_css_esc = bar_css()
     return f"""
 {footer}
