@@ -274,7 +274,7 @@ def wallet_page(st, held):
             + tax_tab() + record_tab(st) + rank_locked()
             + f'<p style="{MS.SMALL}text-align:right;margin:16px 0 0;">모의투자 켜기 · 다시 시작 · 순위 이름은 <a href="mock_invest-mypage.html" style="color:#111;font-weight:700;">내 정보</a>에서 바꿉니다.</p>'
             + disclaim())
-    write(body, "mock_invest-wallet.html", nav=("b", "wallet"), tail=RESET_POP.replace("__B1__", MS.WHITE_BTN).replace("__B2__", MS.WHITE_BTN + f"color:{dk.UP};"))
+    write(body, "mock_invest-wallet.html", nav=("b", "wallet"), share=False, tail=RESET_POP.replace("__B1__", MS.WHITE_BTN).replace("__B2__", MS.WHITE_BTN + f"color:{dk.UP};"))
 
 
 # ─────────────────────────── 순위 (열린 뒤) ───────────────────────────
@@ -605,7 +605,7 @@ def mypage(held):
             + dk.section("내 것", mine, one_line=True)
             + dk.section("모의투자 설정", swcard + reset, one_line=True)
             + dk.section("계정", acct, one_line=True))
-    write(body, "mock_invest-mypage.html", label="내 정보", nav=("b", "me"),
+    write(body, "mock_invest-mypage.html", label="내 정보", nav=("b", "me"), share=False,
           tail=RESET_POP.replace("__B1__", MS.WHITE_BTN).replace("__B2__", MS.WHITE_BTN + f"color:{dk.UP};"))
 
 
@@ -641,11 +641,14 @@ def alerts_page():
             + lst
             + f'<p style="{MS.SMALL}">체결 · 배당 · 세금 정산 알림은 한국 장 마감 뒤(오후 4시쯤) · 미국 장 마감 뒤(아침 7시쯤) 정산 때 생깁니다. '
               f'휴대전화 알림(푸시)은 보내지 않고, 블로그를 열면 하단 메뉴 알림 칸에 빨간 점으로 보입니다. 알림 목록은 최근 30일이고, 모든 기록은 지갑의 거래 기록에 남습니다.</p>')
-    write(body, "mock_invest-alerts.html", label="알림", nav=("b", "bell"))
+    write(body, "mock_invest-alerts.html", label="알림", nav=("b", "bell"), share=False)
 
 
-def write(body, name, label="모의투자", tail="", nav=("b", "")):
-    path = dk.write_mock(MS.head_label(label) + dk.align_titles(dk.WRAP_OPEN + body + dk.WRAP_CLOSE), os.path.join(OUT, name), label)
+NO_SHARE = '<span data-no-share="1" hidden></span>'   # 본인만 보는 화면 = 공유 버튼 없음 (2026-11-21 사용자, 테마가 .post-body [data-no-share] 를 보고 숨김)
+
+
+def write(body, name, label="모의투자", tail="", nav=("b", ""), share=True):
+    path = dk.write_mock(MS.head_label(label) + ("" if share else NO_SHARE) + dk.align_titles(dk.WRAP_OPEN + body + dk.WRAP_CLOSE), os.path.join(OUT, name), label)
     if path:
         pg = open(path, encoding="utf-8").read()
         pg = pg.replace("</body>", MS.MOCK_JS + tail + POP_JS + nav_html(*nav) + "</body>", 1)

@@ -388,7 +388,7 @@ def picker_js(st):
 
 
 def write(body, name, title):
-    path = dk.write_mock(head_label() + dk.align_titles(dk.WRAP_OPEN + body + dk.WRAP_CLOSE), os.path.join(OUT, name), title)
+    path = dk.write_mock(head_label() + '<span data-no-share="1" hidden></span>' + dk.align_titles(dk.WRAP_OPEN + body + dk.WRAP_CLOSE), os.path.join(OUT, name), title)
     if path:
         pg = open(path, encoding="utf-8").read().replace("</body>", MOCK_JS + (PICKER or "") + "</body>", 1)
         open(path, "w", encoding="utf-8").write(pg)
