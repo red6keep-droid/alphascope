@@ -353,18 +353,32 @@ def quote(symbol, skip=()):
     return None
 
 
-def daily_bars(symbol, start=None):
-    """일봉 [{"day","open","high","low","close","volume"}] 오래된 날이 앞. FRED 는 종가만(OHL = 종가)."""
+def daily_bars(symbol, start=None, after=None, why=None):
+    """일봉 [{"day","open","high","low","close","volume"}] 오래된 날이 앞. FRED 는 종가만(OHL = 종가).
+    after: 이 날보다 늦은 봉이 있는 답만 받는다 — 늦은 봉 채우기에서 앞 공급자가 같은 날까지만 주면 다음 공급자로 (2026-11-22).
+    why: 리스트를 주면 공급자마다 왜 못 받았는지 적어 준다 (`키 없음` · `빈 값` · `늦음` · 오류)."""
     if start is None:
         start = (datetime.date.today() - datetime.timedelta(days=45)).isoformat()
     for name, fn in _BARS_CHAIN:
+        if name != "FRED" and not KEYS[name.lower()]():
+            if why is not None:
+                why.append(f"{name} 키 없음")
+            continue
         try:
             rows = fn(symbol, start)
         except Exception as e:  # noqa: BLE001
             print(f"[price_source] {symbol} {name} 실패: {e}")
+            if why is not None:
+                why.append(f"{name} {e}"[:60])
+            continue
+        if rows and after and rows[-1]["day"] <= after:
+            if why is not None:
+                why.append(f"{name} {rows[-1]['day']}까지만")
             continue
         if rows:
             return rows
+        if why is not None and name != "FRED":
+            why.append(f"{name} 빈 값")
     return []
 
 
