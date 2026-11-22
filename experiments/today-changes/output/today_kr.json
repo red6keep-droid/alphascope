@@ -1,0 +1,59 @@
+{
+ "market": "kr",
+ "day": "2026-11-20",
+ "generated": "2026-11-22T05:00:58Z",
+ "rows": [
+  {
+   "kind": "움직임",
+   "what": "코스피",
+   "change": "▼5.2%",
+   "dir": -1,
+   "cmp": "평소의 1.9배",
+   "z": 101.89375307167832,
+   "href": "https://www.newfact.app/search/label/한국%20증시%20리포트"
+  },
+  {
+   "kind": "움직임",
+   "what": "SK텔레콤",
+   "change": "▼13.1%",
+   "dir": -1,
+   "cmp": "코스피보다 ▼7.9%p · 평소의 3.0배",
+   "z": 3.0280292283191006,
+   "href": "https://www.newfact.app/p/sk-telecom-017670-stock.html"
+  },
+  {
+   "kind": "움직임",
+   "what": "한국전력",
+   "change": "▲1.2%",
+   "dir": 1,
+   "cmp": "코스피보다 ▲6.4%p · 평소의 2.1배",
+   "z": 2.0606323090038865,
+   "href": "https://www.newfact.app/p/kepco-015760-stock.html"
+  },
+  {
+   "kind": "움직임",
+   "what": "헬스케어 업종",
+   "change": "코스피보다 ▲4.7%p",
+   "dir": 1,
+   "cmp": "평소의 1.5배 · 3종목 평균",
+   "z": 1.532758131857299,
+   "href": "https://www.newfact.app/p/stock-lists.html?m=kr",
+   "members": [
+    {
+     "name": "알테오젠",
+     "change": "▲1.0%",
+     "rel": "코스피보다 ▲6.2%p",
+     "times": "평소의 1.8배",
+     "href": "https://www.newfact.app/p/alteogen-196170-stock.html"
+    },
+    {
+     "name": "셀트리온",
+     "change": "▼0.9%",
+     "rel": "코스피보다 ▲4.3%p",
+     "times": "평소의 1.3배",
+     "href": "https://www.newfact.app/p/celltrion-068270-stock.html"
+    }
+   ]
+  }
+ ]
+}
