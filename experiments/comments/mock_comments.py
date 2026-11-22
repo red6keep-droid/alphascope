@@ -20,10 +20,12 @@
   mock_comments_write.html          글쓰기 — 화면 전체(제목 · 스티커 · 종목 붙이기 · 내용), 예시로 채운 채 열림
   mock_comments_profile.html        내 프로필 — 별명 · 소개 · 내가 쓴 글
 스티커 = 주식 공부 캐릭터 컷(course/chars/c_*.webp → output/stickers/ 사본). 종목 카드 값은 예시.
+프로필 그림 = 사용자 그림 24종(동물 a01~a12 · 일반 p01~p12) — cut_avatars.py 가 output/avatars/ 에 자른다(2026-11-22, 수정 모음 P631).
 댓글 · 별명은 예시 값. 인터넷 · AI 0. 테마 댓글 JS 는 data-post-id 가 없어 이 칸을 건드리지 않는다.
 """
 import html
 import json
+import hashlib
 import os
 import re
 import shutil
@@ -221,10 +223,17 @@ CSS = """<style>
 .cv-reroll svg{width:14px;height:14px;}
 .cv-hint{margin:6px 0 0;font-size:14px;line-height:20px;color:#6B7280;}
 .cv-hint.is-bad{color:#B91C1C;}
-.cv-big-av{display:flex;align-items:center;justify-content:center;width:72px;height:72px;margin:8px auto 0;border-radius:50%;background:#475569;color:#fff;font-size:30px;line-height:72px;font-weight:700;}
+.cv-big-av{display:block;width:72px;height:72px;margin:8px auto 0;border-radius:50%;overflow:hidden;}
+.cv-big-av img{display:block;width:100%;height:100%;}
+/* 프로필 그림 고르기 — 스티커 칸과 같은 밑줄 탭(동물 · 일반) · 4 × 3 · 원 48 · 고른 그림 = 검은 테두리 2 */
+.cv-ava-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:12px 0 0;}
+.cv-ava-grid[hidden]{display:none;}
+.cv-ava-pick{display:flex;align-items:center;justify-content:center;height:56px;margin:0;padding:0;border:0;background:none;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.cv-ava-pick img{display:block;width:48px;height:48px;border-radius:50%;box-sizing:border-box;border:2px solid transparent;}
+.cv-ava-pick.is-on img{border-color:#111;}
 .cv-prof{display:flex;align-items:center;gap:12px;}
 .cv-prof-name{flex:1;min-width:0;font-size:19px;line-height:28px;font-weight:700;color:#111;}
-.cv-prof .cv-big-av{flex:none;width:56px;height:56px;margin:0;font-size:24px;line-height:56px;}
+.cv-prof .cv-big-av{flex:none;width:56px;height:56px;margin:0;}
 .cv-prof-intro{margin:8px 0 14px;font-size:16px;line-height:26px;color:#333;}
 .cv-edit{display:block;width:100%;box-sizing:border-box;margin:0;padding:8px 12px;background:#fff;border:1px solid #B5BAC0;border-radius:8px;font:inherit;font-size:14px;line-height:20px;font-weight:700;color:#111;text-align:center;cursor:pointer;}
 .cv-mine-h{margin:28px 0 0;padding:0 0 8px;border-bottom:1px solid #E2E8F0;font-size:16px;line-height:24px;font-weight:700;color:#111;}
@@ -256,6 +265,31 @@ GO = f'<svg viewBox="0 0 16 16" {_SVG} stroke-width="1.6"><path d="M6 3.5 10.5 8
 WARN = f'<svg viewBox="0 0 16 16" {_SVG} stroke-width="1.6"><path d="M8 2 14.5 13.5h-13z"/><path d="M8 6.5v3.2M8 11.6v.1"/></svg>'
 REASONS = ("리딩방 · 광고", "욕설 · 비방", "개인정보", "거짓 정보 · 시세 조종 의심", "기타")
 ME = "주린이탈출"
+# 프로필 그림 24종(2026-11-22 사용자 그림, 수정 모음 P631) — cut_avatars.py 가 output/avatars/ 에 자른다.
+# 처음엔 회원마다 자동 배정(목록이 한 그림으로 도배되지 않게) · 내 프로필에서 바꾼다. 서버엔 번호만(a01 · p07).
+AVA_TABS = [("동물", "a"), ("일반", "p")]
+ME_AVA = "a06"   # 목업: 나 = 곰
+
+
+def ava_of(name):
+    """회원 → 그림 번호. 목업은 별명 글자 합으로 고정 배정(실서비스 = 가입 때 회원 번호로 배정 · 바꾸면 고른 값)."""
+    if name == ME:
+        return ME_AVA
+    n = int(hashlib.md5(name.encode()).hexdigest(), 16) % 24
+    return f'{"ap"[n // 12]}{n % 12 + 1:02d}'
+
+
+def ava_src(k):
+    return f"avatars/{k}.webp"
+
+
+def ava_picker(on):
+    tabs = "".join(f'<button class="cv-stk-tab" type="button" role="tab" data-atab="{p}" aria-selected="{str(p == on[0]).lower()}">{n}</button>' for n, p in AVA_TABS)
+    grids = "".join(f'<div class="cv-ava-grid" data-agrid="{p}"{"" if p == on[0] else " hidden"}>'
+                    + "".join(f'<button class="cv-ava-pick{" is-on" if f"{p}{i:02d}" == on else ""}" type="button" data-ava="{p}{i:02d}" aria-label="{n} 그림 {i}">'
+                              f'<img src="{ava_src(f"{p}{i:02d}")}" alt="" width="48" height="48"></button>' for i in range(1, 13))
+                    + '</div>' for n, p in AVA_TABS)
+    return f'<div class="cv-lab">프로필 그림</div><div class="cv-stk-tabs" role="tablist">{tabs}</div>{grids}'
 GUARD = "신고가 3번 쌓인 댓글은 자동으로 가려집니다. 오픈채팅 · 텔레그램 주소와 연락처는 등록되지 않습니다."
 
 # 글 = (별명, 날짜, 제목, 글, 상태, [답글 (별명, 날짜, 글)…]) · 상태: "" · "hidden" 가려짐 · "me" 내 글. 답글 별명이 "" 이면 가려진 답글
@@ -344,8 +378,7 @@ def avatar(name, kind=""):
         return f'<span class="cm-avatar is-owner">{LOGO}</span>'
     if kind == "hidden":
         return '<span class="cm-avatar" style="background:#CBD5E1;"></span>'
-    mine = ' style="background:#475569;"' if name == ME else ""
-    return f'<span class="cm-avatar"{mine}>{esc(name[:1])}</span>'
+    return f'<span class="cm-avatar" style="background:none;"><img src="{ava_src(ava_of(name))}" alt="" width="24" height="24"></span>'
 
 
 def head(name, when, key, member, date=True):
@@ -516,15 +549,16 @@ def write_full(left):
 
 
 def profile_set():
-    """프로필 설정 — 별명(추천 별명 다시 뽑기) · 소개. 사진은 받지 않고 머리글자 원."""
+    """프로필 설정 — 별명(추천 별명 다시 뽑기) · 소개. 사진은 받지 않고 그림 24종(동물 · 일반 탭)에서 고른다."""
     return (f'<div class="cv-full" data-win="pset" hidden>{bar("프로필 설정", "완료", "data-pdone")}<div class="cv-full-body">'
-            '<div class="cv-big-av" data-pav>느</div>'
+            f'<div class="cv-big-av"><img data-pav src="{ava_src("a01")}" alt="" width="72" height="72"></div>'
             f'<div class="cv-lab">별명<button class="cv-reroll" type="button" data-reroll>{ROLL}추천</button><small data-pcount>0 / 12</small></div>'
             '<input class="cv-in" data-pnick maxlength="12" placeholder="별명 2~12자" aria-label="별명">'
             '<p class="cv-hint" data-phint>추천 별명입니다. 바꿔 쓰셔도 됩니다.</p>'
             '<div class="cv-lab">소개<small data-icount>0 / 100</small></div>'
             '<textarea class="cv-in" data-pintro maxlength="100" placeholder="소개를 적어 주세요. 비워 두셔도 됩니다." aria-label="소개" style="min-height:104px;"></textarea>'
-            '<p class="cv-hint">댓글에는 구글 이름과 사진 대신 별명이 보입니다. 별명은 30일에 한 번 바꿀 수 있습니다.</p>'
+            + ava_picker("a01") +
+            '<p class="cv-hint">댓글에는 구글 이름과 사진 대신 별명과 고른 그림이 보입니다. 별명은 30일에 한 번 바꿀 수 있습니다.</p>'
             '</div></div>')
 
 
@@ -557,7 +591,7 @@ def profile_page():
     rows = "".join(f'<a class="cv-mine" href="mock_comments_thread.html"><small>{esc(w)}</small><b>{esc(t)}</b>'
                    f'<span class="cv-reply{" has" if n else ""}">{BUBBLE}<span>{n}</span></span></a>' for w, t, n in mine)
     return (f'<div class="cv-full comments" data-win="profile">{bar("내 프로필", close_href="mock_comments_member.html")}<div class="cv-full-body">'
-            f'<div class="cv-prof"><div class="cv-prof-name">{ME}</div><div class="cv-big-av">{ME[:1]}</div></div>'
+            f'<div class="cv-prof"><div class="cv-prof-name">{ME}</div><div class="cv-big-av"><img src="{ava_src(ME_AVA)}" alt="" width="56" height="56"></div></div>'
             '<p class="cv-prof-intro">적립식으로 모으는 3년 차입니다.</p>'
             '<button class="cv-edit" type="button">프로필 편집</button>'
             f'<div class="cv-mine-h">내가 쓴 글 {len(mine)}</div>{rows}'
@@ -601,10 +635,12 @@ if(!wrange){wrange=document.createRange();wrange.selectNodeContents(wed);wrange.
 wrange.deleteContents();wrange.insertNode(im);wrange.setStartAfter(im);wrange.collapse(true);var s=window.getSelection();s.removeAllRanges();s.addRange(wrange);if(window.cvChk)cvChk();}
 qa('[data-stk]').forEach(function(b){b.addEventListener('mousedown',function(e){e.preventDefault();});b.addEventListener('click',function(){putStk(b.getAttribute('data-stk'));});});
 qa('[data-stab]').forEach(function(t){t.addEventListener('click',function(){var i=t.getAttribute('data-stab');qa('[data-stab]').forEach(function(x){x.setAttribute('aria-selected',String(x===t));});qa('[data-sgrid]').forEach(function(g){g.hidden=g.getAttribute('data-sgrid')!==i;});});});
+qa('[data-atab]').forEach(function(t){t.addEventListener('click',function(){var p=t.getAttribute('data-atab');qa('[data-atab]').forEach(function(x){x.setAttribute('aria-selected',String(x===t));});qa('[data-agrid]').forEach(function(g){g.hidden=g.getAttribute('data-agrid')!==p;});});});
+qa('[data-ava]').forEach(function(b){b.addEventListener('click',function(){qa('[data-ava]').forEach(function(x){x.classList.toggle('is-on',x===b);});q('[data-pav]').src='avatars/'+b.getAttribute('data-ava')+'.webp';});});
 qa('[data-sym]').forEach(function(b){b.addEventListener('click',function(){attach('sym',q('template[data-card="'+b.getAttribute('data-sym')+'"]').innerHTML);});});
 qa('[data-att-x]').forEach(function(b){b.addEventListener('click',function(){b.closest('[data-att]').hidden=true;if(window.cvChk)cvChk();});});
 var A=__NICK_A__,B=__NICK_B__,pn=q('[data-pnick]'),pd=q('[data-pdone]'),ph=q('[data-phint]'),pi=q('[data-pintro]');
-function pchk(){var v=pn.value.trim();q('[data-pcount]').textContent=v.length+' / 12';q('[data-pav]').textContent=v.charAt(0)||'?';pd.disabled=v.length<2;}
+function pchk(){var v=pn.value.trim();q('[data-pcount]').textContent=v.length+' / 12';pd.disabled=v.length<2;}
 function roll(){if(!pn)return;pn.value=A[Math.floor(Math.random()*A.length)]+B[Math.floor(Math.random()*B.length)];ph.className='cv-hint';ph.textContent='추천 별명입니다. 바꿔 쓰셔도 됩니다.';pchk();}
 if(pn){pn.addEventListener('input',function(){ph.className='cv-hint';ph.textContent='2~12자로 적어 주세요.';pchk();});q('[data-reroll]').addEventListener('click',roll);
 pi.addEventListener('input',function(){q('[data-icount]').textContent=pi.value.length+' / 100';});
