@@ -15,6 +15,11 @@ on:
     # 정시 실행은 Cloudflare Worker가 뉴욕 18:00(KST 07:00 서머타임 / 08:00 표준시)에 건다 (infra/cron-trigger).
     # 이 cron 은 예비 — 23:00 UTC = KST 08:00. 트럼프(22:15 UTC) · 데일리(22:00 UTC) GitHub cron 예비 시각보다 뒤.
     - cron: '0 23 * * *'
+  # 이어 붙이기 (2026-11-20 사용자 "미국 실행 한 줄로"): 엔비디아 · 미국 종목 실행이 홈 종목 줄을 올리면 바로 — 리포트 기록(report-state)이 이미 있고,
+  # 같은 Groq 를 쓰는 엔비디아 뉴스 처리와 겹치지 않는다. 옛 18:00 NY 고정 시각은 예비(오늘 글이 있으면 check 가 건너뜀)
+  workflow_run:
+    workflows: ["NVDA Report"]
+    types: [completed]
   workflow_dispatch:
     inputs:
       publish:
@@ -56,12 +61,32 @@ env:
   BLOGGER_REFRESH_TOKEN: ${{ secrets.BLOGGER_REFRESH_TOKEN }}
   PYTHONUNBUFFERED: "1"   # 로그를 바로 찍는다 — 10-28 시간 초과 때 출력이 버퍼에 묶여 어디서 멈췄는지 안 보였다
   STATE_DIR: experiments/people-radar/output/state
-  DO_PUBLISH: ${{ github.event_name == 'schedule' || inputs.scheduled == true || inputs.publish == true }}
-  IS_SCHEDULED: ${{ github.event_name == 'schedule' || inputs.scheduled == true }}
+  DO_PUBLISH: ${{ github.event_name == 'schedule' || github.event_name == 'workflow_run' || inputs.scheduled == true || inputs.publish == true }}
+  IS_SCHEDULED: ${{ github.event_name == 'schedule' || github.event_name == 'workflow_run' || inputs.scheduled == true }}
   MODE: ${{ inputs.mode || 'full' }}
 
 jobs:
+  # 이어 붙이기 문 — 엔비디아 실행의 `Deploy home stocks.json` 단계가 성공했고 KST 05~10시(아침 본 실행)일 때만. 다른 실행 방식은 늘 통과
+  gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      go: ${{ steps.g.outputs.go }}
+    steps:
+      - id: g
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          UP_ID: ${{ github.event.workflow_run.id }}
+        run: |
+          if [ "${{ github.event_name }}" != workflow_run ]; then echo "go=true" >> "$GITHUB_OUTPUT"; exit 0; fi
+          H=$(TZ=Asia/Seoul date +%-H)
+          ok=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$UP_ID/jobs?per_page=50" -q '[.jobs[] | select(.name == "nvda-report") | .steps[] | select((.name | startswith("Deploy home stocks.json")) and .conclusion == "success")] | length' || echo 0)
+          go=false; [ "${ok:-0}" -gt 0 ] && [ "$H" -ge 5 ] && [ "$H" -le 10 ] && go=true
+          echo "go=$go" >> "$GITHUB_OUTPUT"; echo "이어 붙이기 · 홈 종목 줄 올림 ${ok:-?} · KST ${H}시 → $go"
+
   people-radar:
+    needs: gate
+    if: needs.gate.outputs.go == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 60   # 10-26: Groq 를 실제로 쓰게 되며 호출 간격(60초+) 대기가 늘었다. 10-28: 하루치(추출 11 + 분류 7배치)가 45분을 넘겨 60으로
     steps:

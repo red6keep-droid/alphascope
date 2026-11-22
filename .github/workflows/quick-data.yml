@@ -81,7 +81,7 @@ jobs:
           go=false
           H=$(TZ=Asia/Seoul date +%-H); W=$(TZ=Asia/Seoul date +%u)   # W: 1=월 … 7=일
           if [ "$MARKET" = kr ]; then JOB=kr-stocks; [ "$W" -le 5 ] && [ "$H" -ge 15 ] && [ "$H" -le 21 ] && go=true
-          else JOB=nvda-report; [ "$W" -ge 2 ] && [ "$W" -le 6 ] && [ "$H" -ge 6 ] && [ "$H" -le 10 ] && go=true; fi
+          else JOB=nvda-report; [ "$W" -ge 2 ] && [ "$W" -le 6 ] && [ "$H" -ge 5 ] && [ "$H" -le 10 ] && go=true; fi   # 05시부터 (2026-11-20 — 미국 실행을 한 줄로 당겨 서머타임 땐 06시 전에 끝남)
           if [ "$go" = true ]; then
             if [ "$MARKET" = kr ]; then
               # 한국 = 본 잡의 `Deploy kr.json to gh-pages` 단계가 성공했으면 붙는다 — 그 뒤(캐시 비우기 등)에서 끊긴 날에도 (2026-11-20 사용자:

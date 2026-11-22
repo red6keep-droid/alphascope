@@ -19,6 +19,11 @@ on:
     # 낮 갱신 — 종목 페이지만 다시 그린다 (2026-11-04 사용자 P290: 아침 실행 뒤 들어온 방송 의견이 다음 날까지 안 보였다).
     # 04:00 UTC = 13:00 KST, 미국 장 밖. check 가 `오늘 본 실행 끝남` 이면 mode=refresh (13:00 UTC 넘으면 skip — 장중 값 게시 금지)
     - cron: '0 4 * * *'
+  # 이어 붙이기 (2026-11-20 사용자 "미국 실행 한 줄로"): 미국 증시 리포트(16:40 NY)가 글을 게시하면 바로 — 옛 17:30 NY 고정 시각은 예비로 남는다.
+  # 붙을지는 check 잡이 가린다(리포트의 `Publish to Blogger` 단계 성공 · KST 05~10시). 오전에 이미 돌았으면 예비는 건너뛴다(아래 모드)
+  workflow_run:
+    workflows: ["Test Daily Report"]
+    types: [completed]
   workflow_dispatch:
     inputs:
       narrate:
@@ -39,13 +44,14 @@ on:
 
 permissions:
   contents: write
+  actions: read   # 이어 붙이기 확인 — 리포트 실행의 단계 결과를 읽는다
 
 concurrency:
   group: nvda-report
   cancel-in-progress: false
 
 env:
-  GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY_NVDA || secrets.GEMINI_API_KEY }}   # 리포트별 프로젝트 키 (2026-10-15) — 없으면 공용 키
+  GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}   # Gemini 키 하나 — 리포트별 키(_NVDA · _DAILY · _TRUMP)는 2026-11-20 사용자가 시크릿에서 지움, 참조도 없앰 (운영지침 D3-1a)
   SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}   # AI 호출 알림 — 한도 · 예비 사용 · 전부 실패 (llm_chain, 2026-10-14)
   # 운영 기록 → Cloudflare KV (experiments/ops_log.py · infra/ops-console, 2026-10-23). 셋 중 하나라도 없으면 기록하지 않는다
   OPS_CF_ACCOUNT_ID: ${{ secrets.OPS_CF_ACCOUNT_ID }}
@@ -67,8 +73,8 @@ env:
   STATE_DIR: experiments/nvda-report/output/state
   # GitHub cron은 자주 늦거나 빠진다(2026-10-13 하루치 전부 누락). 같은 시각에 Cloudflare Worker가
   # scheduled=true 로 workflow_dispatch를 건다 — 그 실행도 스케줄로 취급한다 (infra/cron-trigger).
-  IS_SCHEDULED: ${{ github.event_name == 'schedule' || inputs.scheduled == true }}
-  DO_PUBLISH: ${{ ((github.event_name == 'schedule' || inputs.scheduled == true) && vars.NVDA_PUBLISH == 'true') || (github.event_name == 'workflow_dispatch' && inputs.publish) }}
+  IS_SCHEDULED: ${{ github.event_name == 'schedule' || github.event_name == 'workflow_run' || inputs.scheduled == true }}
+  DO_PUBLISH: ${{ ((github.event_name == 'schedule' || github.event_name == 'workflow_run' || inputs.scheduled == true) && vars.NVDA_PUBLISH == 'true') || (github.event_name == 'workflow_dispatch' && inputs.publish) }}
 
 jobs:
   # 스케줄(외부 cron 포함)은 GitHub cron과 외부 cron이 하루 두 번 넘게 걸 수 있다. 실행 모드(check.mode):
@@ -105,13 +111,26 @@ jobs:
       - name: Check if today's run already finished
         id: check
         if: env.IS_SCHEDULED == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          UP_ID: ${{ github.event.workflow_run.id }}
         run: |
+          H=$(TZ=Asia/Seoul date +%-H)
+          if [ "${{ github.event_name }}" = workflow_run ]; then
+            # 리포트가 오늘 글을 게시한 실행 뒤에만 (이미 게시돼 건너뛴 재시도 · 낮 실행 뒤에는 붙지 않음)
+            ok=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$UP_ID/jobs?per_page=50" -q '[.jobs[] | select(.name == "daily-report") | .steps[] | select(.name == "Publish to Blogger" and .conclusion == "success")] | length' || echo 0)
+            if [ "${ok:-0}" -eq 0 ] || [ "$H" -lt 5 ] || [ "$H" -gt 10 ]; then
+              echo "이어 붙일 실행이 아님 (리포트 게시 ${ok:-?} · KST ${H}시) → 건너뜀"; echo "mode=skip" >> "$GITHUB_OUTPUT"; exit 0
+            fi
+            echo "리포트 게시 뒤 이어 붙임 (KST ${H}시)"
+          fi
           MODE=full
           if git fetch -q state nvda-state 2>/dev/null; then
-            LAST=$(git log -1 --format=%ct FETCH_HEAD)
+            LAST=$(git log -1 --format=%ct --invert-grep --grep='news-early' FETCH_HEAD)   # 04:30 뉴스 먼저 실행(radar-news-early.yml)의 커밋은 세지 않는다
             SINCE=$(TZ=Asia/Seoul date -d "$(TZ=Asia/Seoul date +%F) 05:00" +%s)
             if [ "$LAST" -ge "$SINCE" ]; then
-              if [ "$(date -u +%H)" -lt 13 ]; then MODE=refresh; else MODE=skip; fi   # 13:00 UTC 전 = 미국 장 전(프리마켓 포함)만 갱신
+              if [ "$H" -lt 11 ]; then MODE=skip   # 오전 = 리포트 뒤 이어 붙인 실행이 이미 함 → 07:30 예비는 건너뜀 (2026-11-20, 옛: 갱신으로 한 번 더 돌았다)
+              elif [ "$(date -u +%H)" -lt 13 ]; then MODE=refresh; else MODE=skip; fi   # 13:00 UTC 전 = 미국 장 전(프리마켓 포함)만 갱신
             fi
           fi
           echo "실행 모드: $MODE"
@@ -202,8 +221,6 @@ jobs:
           mkdir -p experiments/issue_store/output
           [ -f "$STATE_DIR/forecast/page_hashes.json" ] && cp "$STATE_DIR/forecast/page_hashes.json" experiments/issue_store/output/forecast_page_hashes.json || true
           python experiments/issue_store/forecast_daily.py --state "$STATE_DIR"
-          # 신호 서명 매일 스캔 — 그림자 모드(기획 8-19 3-b): 독자 노출 · 알림 없음, nvda-state records/signals/scan.jsonl 하루 한 줄만. 실패해도 넘어간다
-          python experiments/issue_store/signal_scan.py --state "$STATE_DIR" || echo "::warning::신호 스캔 실패 — 오늘 기록 없음"
           if [ "$DO_PUBLISH" = "true" ]; then
             python experiments/issue_store/publish_forecast.py
           else
@@ -220,9 +237,9 @@ jobs:
       - name: Issue watch pages (이슈 모니터링)
         continue-on-error: true
         run: |
-          # AI 판정은 하루 한 번 = 본 실행만 (2026-11-13 사용자: 매시간 말고 하루 한 번 묶어서). 갱신 실행은 저장된 판정만
-          if [ "${{ needs.check.outputs.mode }}" != "refresh" ]; then AI="--ai"; else AI=""; fi
-          python experiments/issue_store/issue_watch_daily.py --state "$STATE_DIR" $AI
+          # 먼저 저장된 판정으로(AI 없이) 게시 — 홈 Hot Issue 가 AI 판정(약 4분, Groq 60초 간격 대기)을 기다리지 않게 (2026-11-20 사용자 ③).
+          # AI 판정(하루 한 번, 본 실행만)은 종목 페이지 게시 뒤 `Issue watch AI` 단계가 하고 바뀐 것만 다시 올린다
+          python experiments/issue_store/issue_watch_daily.py --state "$STATE_DIR"
           mkdir -p deploy-forecast && cp experiments/issue_store/output/issue/issues.json deploy-forecast/issues.json 2>/dev/null || true   # 홈 Hot Issue 카드 자료 — 아래 hypo.json 배포와 같이 gh-pages 로 (07:30 본 실행, 2026-11-16 사용자)
           if [ "$DO_PUBLISH" = "true" ]; then
             python experiments/issue_store/publish_issue.py --state "$STATE_DIR"
@@ -259,6 +276,8 @@ jobs:
         continue-on-error: true
         env:
           NEWS_MAX_MINUTES: '15'   # 뉴스 분류 시간 예산 30 → 15분 (2026-11-10) — 남은 기사는 다음 실행, 1시간 안에 끝까지 가게
+          RADAR_COURT: '0'   # 소송 일정 조회(17건 × 13초 ≈ 4분)는 게시 뒤 `Court schedule` 단계에서 하루 한 번 — 화면은 전날 일정 (2026-11-20 사용자 ②)
+          PYTHONUNBUFFERED: '1'   # 출력 바로 — 수집 · 분류 구간 시간을 로그로 가를 수 있게
         run: |
           mkdir -p experiments/stock-radar/data
           if [ -d "$STATE_DIR/radar" ]; then cp "$STATE_DIR"/radar/*.json experiments/stock-radar/data/ 2>/dev/null || true; fi
@@ -267,6 +286,36 @@ jobs:
           for f in news.json news_summaries.json iv_history.json history.json rank_state.json capex.json est_history.json court.json last_good.json detail_cache.json; do   # last_good.json = 빈 값 막기의 지난 좋은 값 (data_guard) · detail_cache.json = 칸별 주기로 받은 상세 값 (2026-11-12)   # news_summaries.json = 기사 요약 캐시 (P341, 같은 기사를 다시 AI 에 보내지 않게)   # court.json = 소송 일정 (P270)   # capex.json = 돈을 어디에 쓰나 분기 표 (기록 보존, 2026-10-30)
             [ -f "experiments/stock-radar/data/$f" ] && cp "experiments/stock-radar/data/$f" "$STATE_DIR/radar/$f"
           done
+
+      # 홈 종목 줄(stocks.json) · 검색 색인 먼저 (2026-11-20 사용자 ④) — 옛: 종목 76쪽 게시(약 7분) · ETF · 테마 뒤라 홈 종목 카드가 가장 늦었다.
+      # 발행된 페이지 목록 = 지난 게시가 남긴 페이지 해시(publish_pages 의 live 와 같은 셈). 오늘 새로 생기는 페이지(하루 10쪽까지)는 게시 뒤 단계가 다시 올린다
+      - name: Home stocks.json early
+        id: home_early
+        if: env.DO_PUBLISH == 'true' && steps.run_radar.outcome == 'success'
+        continue-on-error: true
+        run: |
+          D=experiments/stock-radar/data
+          [ -f "$D/pages_live.json" ] || python -c "import json,sys;h=json.load(open(sys.argv[1]));json.dump(sorted(h),open(sys.argv[2],'w'))" "$D/page_hashes.json" "$D/pages_live.json"
+          python experiments/stock-radar/home_feed.py
+          mkdir -p deploy-home-early/search && cp experiments/stock-radar/output/home/stocks.json deploy-home-early/stocks.json
+          python experiments/site-search/build_search_index.py --market us --out deploy-home-early/search/us.json || rm -rf deploy-home-early/search
+          rm -f "$D/pages_live.json"   # 게시 단계가 진짜 목록을 새로 쓴다
+      - name: Deploy home stocks.json early
+        id: home_early_deploy
+        if: steps.home_early.outcome == 'success' && hashFiles('deploy-home-early/stocks.json') != ''
+        continue-on-error: true
+        uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453   # v4.1.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./deploy-home-early
+          publish_branch: gh-pages
+          keep_files: true
+      - name: Purge home stocks.json cache (early)
+        if: steps.home_early_deploy.outcome == 'success'
+        continue-on-error: true
+        run: |
+          bash .github/scripts/jsd_purge.sh stocks.json deploy-home-early/stocks.json || true
+          [ -f deploy-home-early/search/us.json ] && curl -sS -f "https://purge.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/search/us.json" || true
 
       # 돈이 어디로 가나 — 업종 11 · 세부 업종 20 · 시장의 하루 한 줄 기록 (experiments/flow_records.py, 2026-11-20 사용자 "스마트 머니 · 순환매 … 진행해줘").
       # 화면 · AI 없음. 위 레이더가 받은 일봉만 읽고, 야후 ETF 순자산 32개만 새로 받는다(지난 값은 다시 못 받아 오늘부터 쌓는다).
@@ -374,6 +423,51 @@ jobs:
           curl -sS -f "https://purge.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/stocks.json" || true
           curl -sS -f "https://purge.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/themes.json" || true
           [ -f deploy-home/search/us.json ] && curl -sS -f "https://purge.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/search/us.json" || true
+
+      # ── 게시 뒤로 옮긴 일 (2026-11-20 사용자 ②③⑤) — 독자 화면이 모두 나간 다음. 본 실행만(갱신 실행은 하지 않음)
+      # 소송 일정 — 추적 사건 법원 문서(CourtListener, 사건 사이 13초). 결과 court.json 은 상태에 저장 → 다음 실행 화면
+      - name: Court schedule (after publish)
+        if: "!cancelled() && needs.check.outputs.mode != 'refresh' && steps.run_radar.outcome == 'success'"
+        continue-on-error: true
+        timeout-minutes: 10
+        env:
+          COURTLISTENER_TOKEN: ${{ secrets.COURTLISTENER_TOKEN }}
+        run: |
+          cd experiments/stock-radar && python -c "import court; court.fetch()"
+          cd - >/dev/null && mkdir -p "$STATE_DIR/radar" && cp experiments/stock-radar/data/court.json "$STATE_DIR/radar/court.json" 2>/dev/null || true
+
+      # 핫 이슈 AI 판정 — 하루 한 번(본 실행). 위에서 저장된 판정으로 먼저 게시했고, 여기서 판정한 뒤 바뀐 페이지 · 홈 카드만 다시 올린다
+      - name: Issue watch AI (after publish)
+        id: iw_ai
+        if: "!cancelled() && needs.check.outputs.mode != 'refresh'"
+        continue-on-error: true
+        timeout-minutes: 12
+        run: |
+          python experiments/issue_store/issue_watch_daily.py --state "$STATE_DIR" --ai
+          mkdir -p deploy-issue-ai && cp experiments/issue_store/output/issue/issues.json deploy-issue-ai/issues.json 2>/dev/null || true
+          if cmp -s deploy-issue-ai/issues.json deploy-forecast/issues.json; then rm -rf deploy-issue-ai; echo "홈 카드 그대로"; fi
+          if [ "$DO_PUBLISH" = "true" ]; then python experiments/issue_store/publish_issue.py --state "$STATE_DIR"; else python experiments/issue_store/publish_issue.py --state "$STATE_DIR" --dry; fi
+      - name: Deploy issues.json (AI)
+        id: iw_ai_deploy
+        if: env.DO_PUBLISH == 'true' && steps.iw_ai.outcome == 'success' && hashFiles('deploy-issue-ai/issues.json') != ''
+        continue-on-error: true
+        uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453   # v4.1.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./deploy-issue-ai
+          publish_branch: gh-pages
+          keep_files: true
+      - name: Purge issues.json cache (AI)
+        if: steps.iw_ai_deploy.outcome == 'success'
+        continue-on-error: true
+        run: bash .github/scripts/jsd_purge.sh issues.json deploy-issue-ai/issues.json || true
+
+      # 신호 서명 매일 스캔 — 그림자 모드(기획 8-19 3-b): 독자 노출 · 알림 없음, records/signals/scan.jsonl 하루 한 줄. 옛 자리 = 전망 게시 앞(1.6분)
+      - name: Signal scan (shadow)
+        if: "!cancelled() && needs.check.outputs.mode != 'refresh'"
+        continue-on-error: true
+        timeout-minutes: 8
+        run: python experiments/issue_store/signal_scan.py --state "$STATE_DIR" || echo "::warning::신호 스캔 실패 — 오늘 기록 없음"
 
       # 판정까지 끝난 상태가 있으면 뒤 단계가 실패했어도 저장한다 — Gemini 분류를 헛되게 하지 않기 위해.
       - name: Save state + report (nvda-state branch)

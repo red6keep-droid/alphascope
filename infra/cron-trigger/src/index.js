@@ -57,7 +57,9 @@ const KST_JOBS = {
   "15:50": [{ workflow: "kr-stocks.yml", when: WEEKDAY, retry: { job: "kr-stocks", inputs: { scheduled: "true" } } }],
   // 간단 종목(853종목) — 미국 = 장 마감 뒤 아침(뉴스 06:40 → 화면 08:20, 정식 07:30 실행이 07:56~59 에 끝난 뒤), 한국 = 장 마감 뒤 17:40 (2026-11-15 사용자).
   // GitHub cron 도 그대로 — 둘 다 도는 날은 워크플로 check 잡이 '최근 6시간 안 같은 실행 성공' 을 보고 뒤 실행을 건너뛴다(뉴스 AI 두 번 X).
-  "06:40": [{ workflow: "quick-news.yml", when: KST_TUE_SAT }],
+  // 미국 종목 뉴스 먼저 분류 (2026-11-20 사용자) — 장 마감 뒤 엔비디아 실행이 남은 기사만 분류하게. 화~토(= 미국 월~금). 늦게 오면 워크플로가 건너뜀
+  "04:30": [{ workflow: "radar-news-early.yml", inputs: { scheduled: "true" }, when: KST_TUE_SAT }],
+  "06:20": [{ workflow: "quick-news.yml", when: KST_TUE_SAT }],   // 옛 06:40 (2026-11-20 사용자 — 미국 실행 한 줄로, 엔비디아 실행과 lite 분당 한도 안 겹치게)
   "08:20": [{ workflow: "quick-data.yml", inputs: { scheduled: "true", market: "us" }, when: KST_TUE_SAT }],
   "16:40": [{ workflow: "quick-data.yml", inputs: { scheduled: "true", market: "kr" }, when: WEEKDAY }],   // 옛 17:40 (2026-11-20 사용자) — 15:50 한국 종목 뒤 이어 붙이기의 예비
   "13:00": [{ workflow: "nvda-report.yml" }],
@@ -75,6 +77,9 @@ const KST_JOBS = {
 
 const JOBS = {
   // 데일리 리포트 (뉴욕 월~금) — 장 마감 1시간 뒤. KST 06:00 (EDT) / 07:00 (EST).
+  // 미국 실행 한 줄로 (2026-11-20 사용자): 리포트 16:40 NY(장 마감 40분 뒤 — 장 마감 뒤 실적 발표가 16:05~16:30 에 몰림) → 엔비디아 · 미국 종목(이어 붙이기)
+  // → 인물 발언 · 간단 종목(이어 붙이기). 아래 17:00 · 17:30 · 18:00 · 18:30 은 예비 — 이미 했으면 각 워크플로가 건너뛴다
+  "16:40": [{ workflow: "test-daily-report.yml", when: WEEKDAY }],
   "17:00": [{ workflow: "test-daily-report.yml", when: WEEKDAY }],
   // 트럼프 트렌드(17:15)는 2026-11-04 중단 — 발언 → 주가 반응이 3개월 동안 확인되지 않음. 워크플로는 수동 실행만 남김.
   // NVDA 리포트(매일). KST 06:30 / 07:30. (trump_bridge 는 trump-state 가 멈춘 뒤 0건으로 조용히 지나간다)
@@ -122,6 +127,7 @@ const NAMES = {
   "kr-rss-probe.yml": "한국 간단 종목 뉴스 매체 시험",
   "home-ip.yml": "집 IP 받기 (미래에셋 · 버리)",
   "commentary.yml": "증시 시황 발행 (아침 · 저녁)",
+  "radar-news-early.yml": "미국 종목 뉴스 먼저 분류",
 };
 const WATCH_AFTER_MIN = 60;
 const RETRY_AGAIN_MIN = 170;   // 한 번 더 본다(18:40) — 다시 건 실행도 실패했으면 알림, 100분 때 아직 돌다가 그 뒤 끊겼으면 그때 다시 건다
@@ -185,7 +191,7 @@ function dueAt(at) {
 
 // 본 일을 한 실행인가 — 확인 잡(when · check)만 돌고 본 잡이 건너뛴 실행은 GitHub 에 `성공`으로 남는다(예비 중복 · 이어 붙이기가 이미 함 · 수능일 게이트).
 // → 'ok'(본 잡 성공) · 'skipped'(확인 잡만) · 'unknown'(못 읽음 — 잘못 알리지 않게 통과로 본다)
-const GUARD_JOBS = new Set(["when", "check"]);
+const GUARD_JOBS = new Set(["when", "check", "gate"]);   // gate = 인물 발언 이어 붙이기 문 (2026-11-20)
 async function realRun(r, env) {
   const jr = await gh(`/actions/runs/${r.id}/jobs?per_page=50`, env.GITHUB_TOKEN);
   if (jr.status !== 200) return "unknown";
