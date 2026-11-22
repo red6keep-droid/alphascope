@@ -371,6 +371,7 @@ def row(d, f, t, show_dir=False, stars=(), restore=False, names=None, ref=0, new
             f'<button class="mv" data-k="{key}" aria-label="휴지통으로 옮기기">휴지통</button></div>')
 
 
+RELOAD_BTN = '<button class="edit-btn reload-btn" type="button" aria-label="새로고침 — 목록 다시 읽기" onclick="location.reload()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg></button>'   # 목업 목록 오른쪽 위 연필 왼쪽 — 누르면 목록 새로 읽기 (2026-11-22 사용자)
 EDIT_BTN = '<button class="edit-btn" aria-label="수정 — 휴지통 버튼 보이기" aria-pressed="false"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>'   # 목업 목록 오른쪽 위 연필 — 누르면 줄마다 `쓰지 않음` (2026-11-13 사용자)
 
 
@@ -498,14 +499,15 @@ details .row{{border:0;border-top:1px solid #eef0f3;border-radius:0;margin:0}}
 body.edit .mv{{display:block}}
 .top{{display:flex;justify-content:space-between;align-items:center;gap:12px}}
 .edit-btn{{flex:0 0 auto;width:44px;height:44px;border:1px solid #e3e6eb;border-radius:10px;background:#fff;color:#5b6370;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}}
-body.edit .edit-btn{{background:#1d2127;border-color:#1d2127;color:#fff}}
+.tbtns{{display:flex;gap:8px}} .reload-btn:active{{background:#eef2f8}}
+body.edit .edit-btn:not(.reload-btn){{background:#1d2127;border-color:#1d2127;color:#fff}}
 .back{{flex:0 0 auto;border:0;background:none;font-size:13px;color:#5b6370;cursor:pointer;padding:0 14px}}
 .big{{display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:48px;padding:0 14px;margin:0 0 16px;background:#fff;border:1px solid #e3e6eb;border-radius:10px;color:inherit;text-decoration:none;font-weight:600}}
 .big span{{color:#8a919c;font-weight:400;font-size:13px}} .ti{{display:inline-flex;align-items:center;gap:8px}}
 .when{{display:block;margin-top:4px;color:#2563EB;font-size:13px;font-weight:400}} .cut{{color:#5b6370;font-size:13px;margin:-6px 0 16px}} .cut a{{color:#2563EB}}
 .foot{{margin-top:24px}} details.more{{background:none;border:0}} details.more>summary{{padding:10px 14px;color:#2563EB;font-weight:600;font-size:14px}} details.more .row{{border:1px solid #e3e6eb;border-radius:10px;margin-bottom:8px}} .big.dark{{background:#1d2127;border-color:#1d2127;color:#fff}} .big.dark span{{color:#c3c8d0}}
 </style></head><body>
-<div class="top"><h1>{"휴지통" if archive else "목업 목록" if mode == "main" else "일주일 넘은 목업"}</h1>{"" if archive else EDIT_BTN}</div><div class="meta">{len(items)}개 · 불러온 시각 {now} · 새로고침하면 최신 목록{"" if archive or not n_old else f" · 옛 버전 {n_old}개(공통 디자인보다 먼저 만듦 — rebuild_mocks.py 로 다시 그림)"}</div>
+<div class="top"><h1>{"휴지통" if archive else "목업 목록" if mode == "main" else "일주일 넘은 목업"}</h1><span class="tbtns">{RELOAD_BTN}{"" if archive else EDIT_BTN}</span></div><div class="meta">{len(items)}개 · 불러온 시각 {now} · 새로고침하면 최신 목록{"" if archive or not n_old else f" · 옛 버전 {n_old}개(공통 디자인보다 먼저 만듦 — rebuild_mocks.py 로 다시 그림)"}</div>
 {''.join(parts)}
 <script>
 const ds = [...document.querySelectorAll('details')];

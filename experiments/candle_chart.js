@@ -134,7 +134,8 @@
       ind.setAttribute('aria-label', '지표'); ind.onclick = function () { self.menu = !self.menu; self.topBar(); self.draw(); }; t.appendChild(ind);
       return this.menuDraw();
     }
-    var fs = el('button', IB + 'border:1px solid #E2E8F0;background:#fff;',
+    var fs = el('button', IB + 'border:1px solid #94A3B8;background:#fff;',   // 테두리 = `일` 버튼과 같은 살짝 진한 색 (2026-11-22 사용자)
+     
       '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#111" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2h4v4M14 2l-4 4M6 2H2v4M2 2l4 4M10 14h4v-4M14 14l-4-4M6 14H2v-4M2 14l4-4"/></svg>');   // 네 방향 화살표 (2026-11-14 사용자 C안)
     fs.setAttribute('aria-label', '전체 화면');
     fs.onclick = function () { self.toggleFull(); }; t.appendChild(fs);
