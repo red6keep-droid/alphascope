@@ -20,7 +20,7 @@ ALLOWED_ORIGINS = "https://www.newfact.app,https://newfact.app,https://alpha-sco
 [[d1_databases]]
 binding = "DB"
 database_name = "newfact-board"
-database_id = "00000000-0000-0000-0000-000000000000"   # 만든 뒤 바꾼다: npx wrangler d1 create newfact-board
+database_id = "48170ce7-f0bc-4cb1-86de-ea1b144cb880"   # 2026-11-22 만듦(APAC)
 
 [[r2_buckets]]
 binding = "FILES"
