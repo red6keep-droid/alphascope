@@ -29,6 +29,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HERE, "..", ".."))
 sys.path.insert(0, HERE)
 import render_pages as RP  # noqa: E402
+import mock_fin_cards as FC  # noqa: E402  — 세로 순위 막대(rank_cols)를 같이 쓴다
 
 R, dk = RP.R, RP._dk
 CACHE = os.path.join(HERE, "data", "mock_earn_mom.json")
@@ -220,38 +221,6 @@ def _zone(pct):
     return 2 if pct >= 75 else 0 if pct < 25 else 1
 
 
-def rank_cols(rows):
-    """기간별 순위 세로 막대 (2026-11-22 사용자: 가로막대 → 넘겨 보기 그래프, 세로 막대로 확정).
-    0선 = 업종 중앙값, 위 끝 = 1위 · 아래 끝 = 꼴찌. 눈금은 25% 단위로 고정(상위 25% · 하위 25% 경계가 그대로 눈금선).
-    틀 = 공용 col_frame 오른쪽 모양(축 오른쪽 · 넘칠 때만 `‹ 넘겨 보기`)."""
-    vals = [x["pct"] - 50 for x in rows]
-    txt = [f"{x['rank']}위" for x in rows]
-    fs = R._chart_label_px(len(rows))
-    lbl = max(R.CHART_LBL, fs + 4) + max(dk.LBL_LIFT, dk.LBL_LIFT_DN)
-    height = 180
-    scale = (height - lbl - lbl - dk.AXIS_PAD) / 100
-    top = lbl + 50 * scale
-    ticks = [-50, -25, 0, 25, 50]
-    names = {50: "1위", 25: "상위 25%", 0: "중앙값", -25: "하위 25%", -50: "꼴찌"}
-    fmt = lambda v: names[int(round(v))]   # noqa: E731
-    gut = int(max(dk.text_px(t, dk.GRID_FS) for t in names.values()) + 6)
-    label_px = max(dk.text_px(t, fs) for t in txt) + 4
-    axis_px = min(max(dk.text_px(x["lb"], 13) for x in rows) + 8, dk.AXIS_MAX)
-    bw, lw, min_w = dk.col_layout(len(rows), 1, label_px, axis_px)
-    bg = {2: R._PASTEL_UP, 1: R._GRAY_BAR, 0: R._PASTEL_DN}
-    fg = {2: R.UP, 1: "#111", 0: R.DOWN}
-    parts = []
-    for i, (x, v, t) in enumerate(zip(rows, vals, txt)):
-        z = _zone(x["pct"])
-        h = max(1.0, abs(v) * scale)
-        y, ly = (top - h, top - h - (lbl - dk.LBL_LIFT) + 1 - dk.LBL_LIFT) if v >= 0 else (top, top + h + 1 + dk.LBL_LIFT_DN)
-        rad = "3px 3px 0 0" if v >= 0 else "0 0 3px 3px"
-        parts.append(f'<span style="position:absolute;{dk.bar_x(i, 0, len(rows), 1, bw, lw)}top:{y:.1f}px;height:{h:.1f}px;background:{bg[z]};border-radius:{rad};"></span>')
-        parts.append(f'<span style="position:absolute;{dk.bar_x(i, 0, len(rows), 1, bw, lw, label=True)}top:{ly:.1f}px;height:{lbl - dk.LBL_LIFT - 2}px;line-height:{lbl - dk.LBL_LIFT - 2}px;'
-                     f'text-align:center;font-size:{fs}px;font-weight:700;white-space:nowrap;color:{fg[z]};">{t}</span>')
-    return dk._col_frame_right("".join(parts), [x["lb"] for x in rows], height, top, scale, ticks, min_w, fmt, gut)
-
-
 def mom_card(name, sym, m):
     gname = PEER_GROUP[sym][0]
     rows = []
@@ -272,7 +241,7 @@ def mom_card(name, sym, m):
     first = (f"{name} 주가는 최근 {base['lb']} 동안 {RP._sgn(base['ret'])}% 움직여, S&P 500 안 {gname} {base['n']}종목 가운데 {base['rank']}위입니다. "
              f"같은 기간 {gname} 종목의 중앙값은 {RP._sgn(base['med'])}%입니다.")
     missing = [lb for lb, _ in PERIODS if lb not in {x["lb"] for x in rows}]
-    chart = rank_cols(rows[::-1])   # 5년 → 1주, 가까운 기간 오른쪽 (P165 · 기간별 수익률 막대와 같은 방향)
+    chart = FC.rank_cols(R, dk, rows[::-1])   # 5년 → 1주, 가까운 기간 오른쪽 (P165 · 기간별 수익률 막대와 같은 방향)
     chart = R.axis_dot(chart, base["lb"], "#111")   # 답을 정하는 기준 기간 = 축 이름 위 점 (P175 막대 하나 강조 규칙)
     chart = (f'<span style="{R.MULTI}margin:0 {dk.CHART_CARD_X}px;"><span style="display:block;padding:{dk.CHART_CARD_PAD}px 12px 0;">{chart}</span></span>')
     lines = [(first, "plain"), (f'{dk.CHART_TITLE_M}기간별 상승률 순위 (위로 갈수록 1위)</span>{chart}', "html"),
@@ -415,7 +384,6 @@ def main():
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     data = load("--fetch" in sys.argv)
     bal = load_balance("--fetch" in sys.argv)
-    import mock_fin_cards as FC
     u_ = json.load(open(os.path.join(HERE, "..", "ref", "universe_all.json"), encoding="utf-8"))["us"]
     fin_groups = {s_: sorted({r["sym"] for r in u_ if fn(r)} | {s_}) for s_, (_, fn) in PEER_GROUP.items()}
     fin = FC.load(fin_groups, SYMS, "--fetch" in sys.argv)

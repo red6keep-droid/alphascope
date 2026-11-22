@@ -158,30 +158,54 @@ def _rank(me, others, high_right):
     return {"rank": rank, "n": n, "pct": (n - rank) / max(n - 1, 1) * 100, "med": statistics.median(vals)}
 
 
-def strip(R, dk, rows, left, mid, right):
-    """줄마다 점 하나 — mock_earn_mom.mom_card 와 같은 모양. rows = [{lb, rank, n, pct, sub(html)}], 오른쪽 = 1위."""
-    colors = [dk.lighten(b, 0.6) for b in R.RANGE_BASE]
-    strong = [dk.lighten(b, 0.2) for b in R.RANGE_BASE]
-    head = (f'<span style="display:flex;margin:0 84px 0 0;font-size:13px;line-height:18px;color:{R.NOTE};">'
-            f'<span style="flex:0 0 25%;">{left}</span><span style="flex:0 0 50%;text-align:center;">{mid}</span><span style="flex:0 0 25%;text-align:right;">{right}</span></span>')
-    body = ""
-    for x in rows:
+def rank_cols(R, dk, rows, top_word="1위", bottom_word="꼴찌", flip=False):
+    """같은 업종 안 순위 세로 막대 (2026-11-22 사용자: 가로막대 → 넘겨 보기 그래프, 세로 막대로 확정) — 주가 순위 · 재무 건전성 · 주가 수준 세 카드가 같이 쓴다.
+    rows = [{lb(가로축 이름, 줄바꿈 가능), rank, pct(0 = 꼴찌 · 100 = 1위)}]. 0선 = 업종 중앙값, 위 끝 = 1위(top_word) · 아래 끝 = 꼴찌(bottom_word).
+    눈금은 25% 단위로 고정(상위 25% · 하위 25% 경계가 그대로 눈금선). 색 = 위 4분의 1 빨강 · 아래 4분의 1 파랑 · 사이 회색, flip 이면 반대(주가 수준 = 높으면 파랑).
+    틀 = 공용 col_frame 오른쪽 모양(축 오른쪽 · 넘칠 때만 `‹ 넘겨 보기`)."""
+    vals = [x["pct"] - 50 for x in rows]
+    txt = [f"{x['rank']}위" for x in rows]
+    fs = R._chart_label_px(len(rows))
+    lbl = max(R.CHART_LBL, fs + 4) + max(dk.LBL_LIFT, dk.LBL_LIFT_DN)
+    height = 180
+    scale = (height - lbl - lbl - dk.AXIS_PAD) / 100
+    top = lbl + 50 * scale
+    ticks = [-50, -25, 0, 25, 50]
+    names = {50: top_word, 25: "상위 25%", 0: "중앙값", -25: "하위 25%", -50: bottom_word}
+    fmt = lambda v: names[int(round(v))]   # noqa: E731
+    gut = int(max(dk.text_px(t, dk.GRID_FS) for t in names.values()) + 6)
+    label_px = max(dk.text_px(t, fs) for t in txt) + 4
+    axis_px = min(max(dk.text_px(ln, 13) for x in rows for ln in x["lb"].split("\n")) + 8, dk.AXIS_MAX)
+    bw, lw, min_w = dk.col_layout(len(rows), 1, label_px, axis_px)
+    up, dn = (R.DOWN, R.UP) if flip else (R.UP, R.DOWN)
+    bg = {2: R._PASTEL_DN if flip else R._PASTEL_UP, 1: R._GRAY_BAR, 0: R._PASTEL_UP if flip else R._PASTEL_DN}
+    fg = {2: up, 1: "#111", 0: dn}
+    parts = []
+    for i, (x, v, t) in enumerate(zip(rows, vals, txt)):
         z = 2 if x["pct"] >= 75 else 0 if x["pct"] < 25 else 1
-        segs = "".join(f'<span style="position:absolute;top:0;left:calc({l}% + {1 if i else 0}px);width:calc({w}% - {1 if i in (0, 2) else 2}px);height:6px;border-radius:3px;background:{colors[i]};"></span>'
-                       for i, (l, w) in enumerate(((0, 25), (25, 50), (75, 25))))
-        midl = '<span style="position:absolute;left:50%;top:-4px;width:2px;height:14px;margin-left:-1px;background:#94A3B8;"></span>'
-        dot = (f'<span style="position:absolute;top:-4px;left:clamp(0px, calc({x["pct"]:.1f}% - 7px), calc(100% - 14px));width:14px;height:14px;border-radius:50%;'
-               f'background:{strong[z]};box-shadow:0 0 0 2px #fff;"></span>')
-        body += (f'<span style="display:block;padding:14px 0 6px;font-size:15px;line-height:20px;color:#111;font-weight:700;">{x["lb"]}</span>'   # 이름은 막대 위 한 줄 — 긴 이름(주가순자산비율)이 좁은 칸에서 끊기지 않게
-                 f'<span style="display:flex;align-items:center;">'
-                 f'<span style="flex:1;position:relative;height:6px;">{segs}{midl}{dot}</span>'
-                 f'<span style="flex:0 0 84px;text-align:right;font-size:15px;line-height:22px;color:#111;white-space:nowrap;">{dk.violet(str(x["rank"]) + "위")} / {x["n"]}</span></span>'
-                 f'<span style="display:block;margin:4px 84px 0 0;font-size:13px;line-height:18px;color:{R.NOTE};">{x["sub"]}</span>')
-    return f'<span style="{R.MULTI}margin:0 {dk.CHART_CARD_X}px;"><span style="display:block;padding:{dk.CHART_CARD_PAD}px 12px 12px;">{head}{body}</span></span>'
+        h = max(1.0, abs(v) * scale)
+        y, ly = (top - h, top - h - (lbl - dk.LBL_LIFT) + 1 - dk.LBL_LIFT) if v >= 0 else (top, top + h + 1 + dk.LBL_LIFT_DN)
+        rad = "3px 3px 0 0" if v >= 0 else "0 0 3px 3px"
+        parts.append(f'<span style="position:absolute;{dk.bar_x(i, 0, len(rows), 1, bw, lw)}top:{y:.1f}px;height:{h:.1f}px;background:{bg[z]};border-radius:{rad};"></span>')
+        parts.append(f'<span style="position:absolute;{dk.bar_x(i, 0, len(rows), 1, bw, lw, label=True)}top:{ly:.1f}px;height:{lbl - dk.LBL_LIFT - 2}px;line-height:{lbl - dk.LBL_LIFT - 2}px;'
+                     f'text-align:center;font-size:{fs}px;font-weight:700;white-space:nowrap;color:{fg[z]};">{t}</span>')
+    return dk._col_frame_right("".join(parts), [x["lb"] for x in rows], height, top, scale, ticks, min_w, fmt, gut)
+
+
+def rank_chart(R, dk, rows, base_lb, **kw):
+    """rank_cols 를 흰 그래프 카드에 담고, 답을 정하는 항목(base_lb)은 오른쪽 끝 + 축 이름 위에 점 (P175).
+    오른쪽 끝 = 그래프가 처음 보여 주는 자리(넘칠 때 왼쪽으로 넘겨 봄) — 시간 그래프의 `최신 = 오른쪽` 과 같은 뜻으로 `답 = 오른쪽`. 나머지는 항목 순서를 거꾸로 왼쪽에."""
+    rows = [x for x in rows if x["lb"] != base_lb][::-1] + [x for x in rows if x["lb"] == base_lb]
+    chart = R.axis_dot(rank_cols(R, dk, rows, **kw), base_lb, "#111")
+    return f'<span style="{R.MULTI}margin:0 {dk.CHART_CARD_X}px;"><span style="display:block;padding:{dk.CHART_CARD_PAD}px 12px 0;">{chart}</span></span>'
 
 
 def _b(v):
     return f'<b style="color:#111;">{v}</b>'
+
+
+AXIS = {"dr": "부채비율", "cr": "유동비율", "ic": "이자보상\n배율", "fm": "잉여현금\n비율", "dc": "현금 대비\n빚",
+        "pe": "주가\n수익비율\n(지난 1년)", "fpe": "주가\n수익비율\n(1년 예상)", "pb": "주가\n순자산비율", "ps": "주가\n매출비율", "pf": "주가 대비\n잉여현금"}   # 가로축 이름 — 좁은 칸이라 짧은 줄로 나눈다(한 줄 5글자 안쪽, 휴대폰 폭에 다섯 칸)
 
 
 HEALTH = (("dr", "부채비율", False, lambda v: "자본잠식" if v == float("inf") else f"{v:.0f}%", "총부채 ÷ 자본"),
@@ -189,6 +213,11 @@ HEALTH = (("dr", "부채비율", False, lambda v: "자본잠식" if v == float("
           ("ic", "이자보상배율", True, lambda v: f"{v:.1f}배", "지난 1년 영업이익 ÷ 이자 비용"),
           ("fm", "잉여현금 비율", True, lambda v: f"{v:.0f}%".replace("-", "−"), "지난 1년 잉여현금 ÷ 매출"),
           ("dc", "현금 대비 빚", False, lambda v: f"{v:.2f}배", "장기 부채 ÷ 현금"))
+
+
+def values_rows(rows):
+    """그래프 아래 항목마다 한 줄 — 이 종목 값 · 업종 중앙값 · 뜻 (옛 가로막대 줄의 작은 글씨를 옮김, 비교 대상 = 중앙값)."""
+    return [("row", x["name"], x["val"], f"중앙값 {x['med_s']} · {x['mean']}") for x in rows]
 
 
 def health_card(R, dk, RP, name, sym, gname, peers, d):
@@ -202,7 +231,7 @@ def health_card(R, dk, RP, name, sym, gname, peers, d):
         if not rk:
             missing.append(lb)
             continue
-        rows.append(dict(rk, lb=lb, k=k, sub=f'{_b(fmt(me[k]))} · 중앙값 {fmt(rk["med"])} · {mean}'))
+        rows.append(dict(rk, lb=AXIS[k], name=lb, k=k, val=fmt(me[k]), med_s=fmt(rk["med"]), mean=mean))
     dr = next((x for x in rows if x["k"] == "dr"), None)
     if not dr:
         return None
@@ -213,7 +242,8 @@ def health_card(R, dk, RP, name, sym, gname, peers, d):
     end = f"{int(r['end'][5:7])}월 말"
     first = (f"{name}의 {end} 부채비율(총부채 ÷ 자본)은 {HEALTH[0][3](me['dr'])}로, S&P 500 안 {gname} {dr['n']}종목 가운데 빚이 적은 쪽부터 {dr['rank']}번째입니다. "
              f"아래 줄마다 같은 업종 안 위치를 따로 보여 드리며, 항목을 합쳐 점수를 내지는 않습니다.")
-    lines = [(first, "plain"), (f'{dk.CHART_TITLE_M}같은 업종 안 위치 (오른쪽이 여유 있는 쪽)</span>{strip(R, dk, rows, "빠듯한 쪽", "중앙값", "여유 있는 쪽")}', "html")]
+    lines = [(first, "plain"), (f'{dk.CHART_TITLE_M}같은 업종 안 위치 (위로 갈수록 여유)</span>{rank_chart(R, dk, rows, dr["lb"], top_word="가장 여유", bottom_word="가장 빠듯")}', "html")]
+    lines += values_rows(rows)
     facts = []   # 사실 기준선 — 해당할 때만
     if me.get("dr") == float("inf"):
         facts.append(("자본잠식", "부채가 자산보다 많습니다", "주주 몫(자본)이 0 아래"))
@@ -251,7 +281,7 @@ def value_card(R, dk, RP, name, sym, gname, peers, d):
         if not rk:
             skipped.append(lb)
             continue
-        rows.append(dict(rk, lb=lb, k=k, val=fmt(me[k]), sub=f'{_b(fmt(me[k]))} · 중앙값 {fmt(rk["med"])} · {mean}'))
+        rows.append(dict(rk, lb=AXIS[k], name=lb, k=k, val=fmt(me[k]), med_s=fmt(rk["med"]), mean=mean))
     base = next((x for x in rows if x["k"] == "pe"), None) or next((x for x in rows if x["k"] == "ps"), None)
     if not base:
         return None
@@ -259,11 +289,12 @@ def value_card(R, dk, RP, name, sym, gname, peers, d):
     state = ("업종보다 낮음", "업종 수준", "업종보다 높음")[z]
     # 숫자와 반대 색 — 업종보다 낮으면 빨강 · 높으면 파랑, 사이는 중립 (2026-11-20 사용자: `하락에 거는 돈은?` 처럼, 낮게 매겨지면 좋은 쪽이라 빨강. 옛 중립 회색 폐지)
     theme = {"업종보다 낮음": ("positive", R.UP), "업종보다 높음": ("negative", R.DOWN)}.get(state, ("neutral", "#111"))
-    first = (f"{name}의 {base['lb']}은 {base['val']}로, S&P 500 안 {gname} {base['n']}종목 가운데 높은 쪽부터 {base['rank']}번째입니다. "
+    first = (f"{name}의 {base['name']}은 {base['val']}로, S&P 500 안 {gname} {base['n']}종목 가운데 높은 쪽부터 {base['rank']}번째입니다. "
              f"높을수록 이익 · 매출에 비해 주가가 높게 매겨져 있다는 뜻입니다.")
     if base["k"] == "ps":
         first = f"{name}는 지난 1년 순이익이 적자라 주가수익비율 대신 주가매출비율로 견줍니다. " + first
-    lines = [(first, "plain"), (f'{dk.CHART_TITLE_M}같은 업종 안 위치 (오른쪽이 높은 쪽)</span>{strip(R, dk, rows, "낮은 쪽", "중앙값", "높은 쪽")}', "html")]
+    lines = [(first, "plain"), (f'{dk.CHART_TITLE_M}같은 업종 안 위치 (위로 갈수록 높음)</span>{rank_chart(R, dk, rows, base["lb"], top_word="가장 높음", bottom_word="가장 낮음", flip=True)}', "html")]
+    lines += values_rows(rows)
     h = history(sym, d)
     for k, lb in (("pe", "주가수익비율"), ("ps", "주가매출비율")):
         hs, now = h.get(k) or [], me.get(k)
