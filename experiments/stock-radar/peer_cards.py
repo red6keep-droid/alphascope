@@ -419,7 +419,7 @@ def rank_cols(R, dk, rows, top_word="1위", bottom_word="꼴찌", flip=False):
     fmt = lambda v: names[int(round(v))]   # noqa: E731
     gut = int(max(dk.text_px(t, dk.GRID_FS) for t in names.values()) + 6)
     label_px = max(dk.text_px(t, fs) for t in txt) + 4
-    axis_px = min(max(dk.text_px(ln, 13) for x in rows for ln in x["lb"].split("\n")) + 8, dk.AXIS_MAX)
+    axis_px = min(max(dk.text_px(ln, 13) for x in rows for ln in x["lb"].split("\n")) + 14, dk.AXIS_MAX)   # +14 — 숫자 글꼴(Inter)이 text_px 어림보다 넓어 `+158%` 의 % 가 꺾였다 (2026-11-22)
     bw, lw, min_w = dk.col_layout(len(rows), 1, label_px, axis_px)
     up, dn = (R.DOWN, R.UP) if flip else (R.UP, R.DOWN)
     bg = {2: R._PASTEL_DN if flip else R._PASTEL_UP, 1: R._GRAY_BAR, 0: R._PASTEL_UP if flip else R._PASTEL_DN}
@@ -470,7 +470,12 @@ def mom_card(name, sym, gname, group, rets):
     first = (f"{name} 주가는 최근 {base['lb']} 동안 {RP._sgn(base['ret'])}% 움직여, S&P 500 안 {gname} {base['n']}종목 가운데 {base['rank']}위입니다. "
              f"같은 기간 {gname} 종목의 중앙값은 {RP._sgn(base['med'])}%입니다.")
     missing = [lb for lb, _ in PERIODS if lb not in {x["lb"] for x in rows}]
-    chart = rank_chart(R, dk, rows[::-1], base["lb"], keep_order=True)   # 5년 → 1주, 가까운 기간 오른쪽 (P165 · 기간별 수익률 막대와 같은 방향)
+    ax = lambda x: f"{x['lb']}\n{x['ret']:+.0f}%".replace("-", "−")   # noqa: E731 — 가로축 둘째 줄 = 이 종목 상승률(정수 %, 회색). 중앙값은 0선이 보여 준다 (2026-11-22 사용자 "복잡하지 않게")
+    chart = rank_chart(R, dk, [dict(x, lb=ax(x)) for x in rows[::-1]], ax(base), keep_order=True)   # 5년 → 1주, 가까운 기간 오른쪽 (P165 · 기간별 수익률 막대와 같은 방향)
+    for x in rows:   # 둘째 줄(상승률) = 한 포인트 작게 12 · 오름 빨강 · 내림 파랑, 부호 +/− (2026-11-22 사용자, 가이드라인 9절 가로축 아래 보조 숫자)
+        t = ax(x).split("\n")[1]
+        col = R.UP if round(x["ret"]) > 0 else R.DOWN if round(x["ret"]) < 0 else "#111"
+        chart = chart.replace(f"<br>{t}</span>", f'<br><span style="font-size:12px;color:{col};">{t}</span></span>')
     lines = [(first, "plain"), (f'{dk.CHART_TITLE_M}기간별 상승률 순위 (위로 갈수록 1위)</span>{chart}', "html"),
              ("row", "비교 묶음", f"{gname} {base['n']}종목", f"S&P 500 안 같은 업종 · {name} 포함"),
              ("row", "기준 기간", base["lb"], "답(상위 · 중간 · 하위)을 정하는 기간")]
@@ -480,7 +485,7 @@ def mom_card(name, sym, gname, group, rets):
         lines.append((" · ".join(f"{x['lb']} {x['n']}종목" for x in rows if x["n"] != base["n"]) + "은 그 기간만큼 상장하지 않은 종목을 빼고 견줬습니다.", "note"))
     tip = ("같은 업종 종목들과 견준 기간별 주가 상승률 순위. 가운데 가로선이 업종 중앙값, 위로 뻗으면 중앙값보다 많이 오른 것이고 맨 위가 1위\n"
            f"· 나누는 법 : {base['lb']} 순위가 위 4분의 1이면 상위 25%, 아래 4분의 1이면 하위 25%, 그 사이는 중간\n"
-           "· 상승률 : 배당을 다시 넣은 수정 종가 기준\n"
+           "· 상승률 : 기간 이름 아래 숫자. 배당을 다시 넣은 수정 종가 기준\n"
            "· 비교 묶음 : S&P 500 구성 종목의 업종 분류(GICS). 반도체는 반도체끼리")
     return state, theme, lines, tip
 
