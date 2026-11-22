@@ -63,6 +63,8 @@ CHARS = {
     "분석이-고민": "mid_think", "분석이-설명": "mid_explain",
     "하락이-동전": "down_coin", "하락이-달력찍기": "down_calendar", "상승이-갸웃": "up_wonder", "상승이-홀가분": "up_relief", "분석이-카드섞기": "mid_cards",   # 2026-11-21 사용자 SVG — 상황을 직접 만드는 컷(동전 던지기 · 눈 가리고 달력 찍기 · 카드 섞기)
     "분석이-주의": "mid_caution", "분석이-돋보기": "mid_magnifier",   # 2026-11-20 사용자 SVG(chars/src/*.svg) → 320 WebP
+    # 댓글 스티커(c_*.webp 만 있음 → 강조 줄 `> {이름} 글` 에서만) — 입문 과정 이야기 꼴 대사 줄 (2026-11-22 사용자: 스티커 · 캐릭터를 적극적으로)
+    "상승이-환호": "up_cheer", "상승이-당황": "up_panic", "하락이-으쓱": "down_shrug", "하락이-저금통": "down_piggy", "분석이-칠판": "mid_chalk", "둘-갸웃": "pair_wonder",
 }
 # 가로 컷 — 여럿이 나오는 그림(네모 칸에 안 들어감). 초안 `[컷] {이름} | 한 줄 글` → 노란 상자에 그림(가로 280) + 아래 굵은 한 줄 (2026-11-21 사용자 SVG → svg_to_webp.py wide)
 # 이름 → (파일, 보이는 가로, 세로 — 정수, 글 위치 "top" · "bottom", 그림 위 여백). 원본 비율 280 × 184 · 152 · 194
@@ -112,6 +114,13 @@ def img_src(folder, name):
 def char(tok, where):
     """`{이름-상황}` → 그림(목업은 data URI, 발행 때 gh-pages 주소로). 이모지면 그대로."""
     m = re.fullmatch(r"\{(.+?)\}", tok or "")
+    if m and m.group(1) not in CHARS and re.match(r"(상승이|하락이|분석이|둘)-", m.group(1)):   # 입문 과정 대사 칸 새 그림 = chars/solo_이름.webp, 아직 없으면 점선 자리 (2026-11-22 그림-프롬프트.md)
+        solo = "solo_" + m.group(1)
+        if os.path.exists(os.path.join(CHAR_DIR, solo + ".webp")):
+            px = CHAR_PX[where]
+            return f'<img src="{img_src(CHAR_DIR, solo)}" alt="" width="{px}" height="{px}" style="display:block;width:{px}px;height:{px}px;max-width:none;border-radius:0;margin:0 auto;">'
+        return (f'<div style="width:{CHAR_PX[where]}px;height:{CHAR_PX[where]}px;box-sizing:border-box;border:2px dashed #E7C873;border-radius:12px;display:flex;align-items:center;justify-content:center;'
+                f'text-align:center;font-size:12px;line-height:17px;font-weight:700;color:#B45309;padding:6px;word-break:keep-all;margin:0 auto;">그림 자리<br>{html.escape(m.group(1))}</div>')
     if not m or m.group(1) not in CHARS:
         return tok
     f = CHARS[m.group(1)]
@@ -141,7 +150,7 @@ def vs_width(name, h):
 
 
 def is_char(tok):
-    return bool(re.fullmatch(r"\{(.+?)\}", tok or "")) and tok[1:-1] in CHARS
+    return bool(re.fullmatch(r"\{(.+?)\}", tok or "")) and (tok[1:-1] in CHARS or bool(re.match(r"(상승이|하락이|분석이|둘)-", tok[1:-1])))   # 입문 대사 칸 새 그림(solo_) 이름도 (2026-11-22)
 
 
 # 소품 아이콘 (2026-11-15 사용자 시트 → cut_icons.py). 초안은 지금처럼 이모지를 적고, 아래 표에 있는 이모지는 그림으로 바꾼다 — 없는 이모지는 그대로
@@ -450,6 +459,14 @@ def render(md, links, next_href="#", piece=False, pieces=None, used=None):
             continue
         elif ln.startswith("## "):
             icon, _, rest = ln[3:].strip().partition(" ")
+            sm = re.match(r"(하나|둘|셋|넷|다섯|여섯)\.\s*(.+)$", ln[3:].strip())
+            if sm:   # `## 하나. 제목` = 이야기 장면 — 아이콘 대신 동그라미 숫자 (2026-11-22 입문 과정: 1과정 아이콘 세트와 다르게)
+                note_mode = take_mode = False
+                num = ["하나", "둘", "셋", "넷", "다섯", "여섯"].index(sm.group(1)) + 1
+                out.append(f'<h2 style="scroll-margin-top:72px;{DECO["h2"]}"><span aria-hidden="true" style="flex:none;display:flex;align-items:center;justify-content:center;width:32px;height:32px;'
+                           f'border-radius:16px;background:#FDE68A;color:#92400E;font-size:17px;line-height:32px;font-weight:800;">{num}</span><span>{inline(sm.group(2), links)}</span></h2>')
+                i += 1
+                continue
             if not is_emoji(icon):
                 icon, rest = "📖", ln[3:].strip()
             note_mode = icon.startswith("📌")
@@ -497,6 +514,17 @@ def render(md, links, next_href="#", piece=False, pieces=None, used=None):
                 cap_txt = (f'<div style="margin:{12 if where == "bottom" else img_top}px 0 0;font-size:20px;line-height:30px;font-weight:700;color:#111;word-break:keep-all;">{dk.tint(inline(said.strip(), links))}</div>' if said.strip() else "")
                 out.append(f'<div data-course-cut="1" style="margin:32px 0;padding:{16 + extra // 2}px 18px {16 + extra - extra // 2}px;border-radius:16px;background:#FEF9E7;text-align:center;">'
                            + (img + cap_txt if where == "bottom" else cap_txt + img) + '</div>')
+        elif ln.startswith("[장면]"):   # `[장면] 파일이름 | 그림 설명` — 입문 과정 이야기 그림(가로 3:2, chars/scene_파일이름.webp). 그림이 아직 없으면 점선 자리 + 설명 (2026-11-22 사용자: 동화처럼 상황 컷을 여러 장)
+            name, _, desc = ln[4:].strip().partition("|")
+            f = "scene_" + name.strip()
+            if os.path.exists(os.path.join(CHAR_DIR, f + ".webp")):
+                out.append(f'<div data-course-scene="1" style="margin:28px 0;"><img src="{img_src(CHAR_DIR, f)}" alt="{html.escape(desc.strip())}" width="480" height="320" '
+                           'style="display:block;width:100%;max-width:480px;height:auto;aspect-ratio:3/2;margin:0 auto;border-radius:16px;"></div>')
+            else:
+                out.append('<div data-course-scene="1" style="margin:28px auto;max-width:480px;aspect-ratio:3/2;box-sizing:border-box;border:2px dashed #E7C873;border-radius:16px;background:#FEF9E7;'
+                           'display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:16px 20px;text-align:center;">'
+                           f'<div style="font-size:13px;line-height:19px;font-weight:700;color:#B45309;">그림 자리 · {html.escape(name.strip())}</div>'
+                           f'<div style="font-size:14px;line-height:22px;color:#7C5A12;word-break:keep-all;">{html.escape(desc.strip())}</div></div>')
         elif ln.startswith("[그림]"):   # `[그림] 이름` → figs/이름.html 조각(글 안 SVG, make_shuffle_fig.py)을 그대로 (2026-11-21 진짜 · 가짜 주가 그림)
             fig = os.path.join(os.path.dirname(os.path.abspath(__file__)), "figs", ln[4:].strip() + ".html")
             if os.path.exists(fig):
@@ -621,7 +649,7 @@ def main():
     pieces = load_pieces(links)
     for f in files:
         k = files.index(f)
-        nxt = links[os.path.basename(files[k + 1])] if k + 1 < len(files) and re.match(r"착각-\d", os.path.basename(files[k + 1])) else "#"   # 다음 편 카드 = 다음 파일 목업 (아직 없으면 #). 편 번호 없는 파일(착각-기준.md = 기준 페이지)은 다음 편이 아니다 (2026-11-21)
+        nxt = links[os.path.basename(files[k + 1])] if k + 1 < len(files) and re.match(r"(착각|입문)-\d", os.path.basename(files[k + 1])) else "#"   # 다음 편 카드 = 다음 파일 목업 (아직 없으면 #). 편 번호 없는 파일(착각-기준.md = 기준 페이지)은 다음 편이 아니다 (2026-11-21) · 입문 과정 폴더(강좌-입문, 인자로 줌)의 `입문-NN` 도 편 (2026-11-22)
         global CUR_FILE
         CUR_FILE = os.path.basename(f)
         is_basis = CUR_FILE == PIECE_SRC
