@@ -654,12 +654,18 @@ def forecast_tab(now, I):
     live = j.get("open") or []
     done = j.get("done_count") or {}
     rows = [(x.get("title", ""), "미국" if x.get("market") == "us" else "한국", f"등록 {x.get('posted', '')} · {x.get('event', '')}") for x in live]
-    I.area["증시 전망"] = (V(f"{len(live)}건"), "진행 중 · 끝난 " + " · ".join(f"{'미국' if k == 'us' else '한국'} {v}" for k, v in done.items()))
+    stalled = (j.get("ops") or {}).get("stalled") or []   # 판정이 멈춘 전망 — forecast_daily(event_results.stalled)가 hypo.json ops 에 (2026-11-22 사용자: 엔비디아 전망이 11.16 에서 멈췄는데 안 잡혔다)
+    I.area["증시 전망"] = ((warn(f"판정 멈춤 {len(stalled)}건"), " · ".join(x.get("title", "") for x in stalled)[:60]) if stalled else
+                          (V(f"{len(live)}건"), "진행 중 · 끝난 " + " · ".join(f"{'미국' if k == 'us' else '한국'} {v}" for k, v in done.items())))
+    stall_rows = [(x.get("title", ""), warn("판정 멈춤"), x.get("why", "")[:80]) for x in stalled]
+    if stalled:   # 요약 탭 `지금 문제` 에도
+        I.add("증시 전망 판정 멈춤", warn(f"{len(stalled)}건"), " · ".join(x.get("title", "") for x in stalled)[:80])
     head = QC.question_card("진행 중인 전망은?", f"{len(live)}건", "neutral", "#111",
-                            [(f"공개된 전망 {len(live)}건이 진행 중입니다. 판정일 · 근거 상태는 다음 단계에서 붙입니다.", "plain")]
+                            [(f"공개된 전망 {len(live)}건이 진행 중입니다. 판정이 2거래일 넘게 안 쌓이거나 사건 뒤 결과 칸이 비면 아래 `판정 멈춤` 에 올라옵니다.", "plain")]
                             + [("row", mk, f"{n}건", " · ".join(t for t, m, _ in rows if m == mk)[:60])
                                for mk, n in Counter(m for _, m, _ in rows).items()], opened=True)
     return (dk.h2("전망", tab="전망") + head
+            + dk.sub_label("판정 멈춤") + white_card(stall_rows or [("멈춘 전망", "없음", "매일 아침 전망 실행이 검사")])
             + dk.sub_label("진행중") + white_card(rows or [("진행 중인 전망", "없음", "")], fold_at=3, noun="전망")
             + dk.sub_label("끝난 전망") + white_card([(f"{'미국' if k == 'us' else '한국'}", V(f"{v}건"), "목록의 끝난 전망") for k, v in done.items()] or [("끝난 전망", "없음", "")]))
 

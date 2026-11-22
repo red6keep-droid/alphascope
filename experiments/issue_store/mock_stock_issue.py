@@ -164,7 +164,7 @@ def page(c, public=False):
     ])
     body = q + gauge + qcards + sec_list + ("" if public else op + tail) + link
     body = body.replace('data-cards="1" ', "")
-    return dk.fix_colons(f'<div data-head-title="{IW.HEAD_TITLE}" data-seo-lead="{dk.esc(IW.HEAD_TITLE + " — " + ISS["q"] + " 뉴스와 주가 " + align)}">{body}</div>')
+    return dk.fix_colons(f'<div data-head-title="{IW.HEAD_TITLE}"{IW.H.head_date_attr()} data-seo-lead="{dk.esc(IW.HEAD_TITLE + " — " + ISS["q"] + " 뉴스와 주가 " + align)}">{body}</div>')
 
 
 HOT_PILL = ("#EDE9FE", "#DDD6FE")   # `세부전망` 보라 라벨과 같은 바탕 · 테두리 (가이드라인 14절 증시 전망 P481)

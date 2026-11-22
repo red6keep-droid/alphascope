@@ -1407,6 +1407,8 @@ body.detail-nav .pr-sticky .nav-toggle { display: flex; align-items: center; jus
 .pr-sticky .post-title { display: flex; align-items: center; }
 .pr-sticky .post-title { flex: 1 1 auto; }   /* 날짜가 든 제목(미디어 데일리, 2026-10-23)도 날짜는 오른쪽 끝 — 가이드라인 3-1 */
 .pr-sticky .post-title .post-title-date, .pr-sticky .post-title .post-title-meta { margin-left: auto; }
+.pr-sticky .post-title .post-title-asof { flex: none; font-family: var(--num); font-size: 14px; line-height: 20px; font-weight: 400; letter-spacing: 0; color: #7A7A7A; white-space: nowrap; }   /* 머리 줄 `11.22 아침` = 본문 data-head-date(Hot Issue · 증시 전망) — 공유 버튼 앞, 홈 카드 날짜와 같은 말 (2026-11-22 사용자) */
+.pr-sticky .post-title > .post-title-asof { margin-left: auto; }
 .pr-sticky .post-title .pr-photo { flex: none; width: 36px; height: 36px; margin-right: 10px; border-radius: 50%; object-fit: cover; background: #F1F5F9; border: 1px solid #E2E8F0; }   /* 상세 제목 앞 공직자 얼굴 */
 @media (max-width: 680px) { .pr-sticky { background: var(--bg); padding-top: 2px; } .pr-sticky .post-title .pr-role { font-size: 14px; line-height: 20px; margin-left: 8px; } }
 .img-pop[hidden] { display: none; }
@@ -6086,6 +6088,13 @@ html.as-lock, html.as-lock body { overflow: hidden; }
           else {
             var texts = [].slice.call(title.childNodes).filter(function (n) { return n.nodeType === 3 && n.nodeValue.trim(); });
             texts.forEach(function (n, i) { n.nodeValue = i ? '' : ht.getAttribute('data-head-title'); });
+          }
+          /* 머리 줄 오른쪽 날짜 (2026-11-22 사용자: 홈 카드는 `11.22 아침` 인데 상세에선 언제 화면인지 안 보였다) — 본문 data-head-date 를 공유 버튼 앞에 회색 글자로 */
+          var hd = ht.getAttribute('data-head-date');
+          if (hd && !title.querySelector('.post-title-asof')) {
+            var asof = document.createElement('span'); asof.className = 'post-title-asof'; asof.textContent = hd;
+            var meta = title.querySelector('.post-title-meta');
+            if (meta) meta.insertBefore(asof, meta.firstChild); else title.appendChild(asof);
           }
         }
       })();

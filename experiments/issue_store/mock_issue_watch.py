@@ -946,7 +946,7 @@ def news_timeline(evs, days_desc, px=None):
     by = {}
     for e in evs:
         by.setdefault(e["first"].astimezone(KST).date().isoformat(), []).append(e)
-    days = [d for d in days_desc if by.get(d)]
+    days = list(days_desc)   # 모든 날짜를 줄로 — 기사 없는 날 = `관련 기사 없음`, 휴장 = `토요일 휴장` (2026-11-22 사용자: 빈 날은 에러처럼 보인다). 옛: 기사 있는 날만
     pops = ""
     node = (f'<span style="display:inline-block;width:{H.TL_DOT}px;height:{H.TL_DOT}px;box-sizing:border-box;border:2px solid {H.TL_LINE};border-radius:50%;background:#fff;"></span>')
     ref_nm, ref_sym, ref_fmt = TL_REF[C["iss"]["id"]]
@@ -954,9 +954,9 @@ def news_timeline(evs, days_desc, px=None):
 
     def price(d):
         """날짜 옆 기준 가격 = 그날 소식 뒤 첫 종가(한국 시간 다음 날 아침 도착하는 미국 종가) · 전날 대비 ▲▼ — 주말 · 휴장 · 아직 안 닫힌 날은 비움."""
-        if ref is None:
-            return ""
         t = pd.Timestamp(d)
+        if ref is None:   # 기준 가격이 없는 이슈도 주말은 `휴장` (2026-11-22)
+            return off_word(d)
         if t not in ref.index:
             # 주말 · 공휴일(값이 없는 지난 평일) = `휴장` — 뉴스만 있는 날이 값 빠진 것처럼 보이지 않게 (2026-11-15 사용자). 아직 안 닫힌 날(마지막 종가 뒤 평일)은 그대로 비움.
             if len(ref) and (t.weekday() >= 5 or t < ref.index[-1]):
@@ -977,9 +977,27 @@ def news_timeline(evs, days_desc, px=None):
                 f'<span style="font-weight:400;color:#111;white-space:nowrap;">{dk.esc(ref_fmt.format(c))}</span>'
                 f'<span style="white-space:nowrap;">{val}</span>')
 
+    def off_word(d):
+        w = H.WEEK_OFF.get(pd.Timestamp(d).weekday())
+        return f'<span style="font-weight:400;color:{dk.SUB};white-space:nowrap;">{w} 휴장</span>' if w else ""
+
+    def empty_row(d, last, first):
+        """기사 없는 날 = 날짜 · 기준 가격(또는 휴장) 한 줄 + 아래 회색 `관련 기사 없음`(오늘이면 `오늘 관련 기사 없음`). 휴장인 날은 날짜 줄 하나로 끝. 팝업 없음."""
+        pad = 12 - dk.VP
+        pv = price(d)
+        off = "휴장" in pv
+        note = "" if off else (f'<div style="margin:-4px 0 {pad}px;font-size:{dk.NAME};line-height:{dk.LH_CARD};color:{dk.SUB};">'
+                               f'{"오늘 관련 기사 없음" if d == days_desc[0] else "관련 기사 없음"}</div>')
+        content = (f'<div style="display:flex;align-items:center;gap:8px;padding:{0 if first else pad}px 0 {pad}px;font-size:{dk.NAME};line-height:{dk.LH_CARD};font-weight:700;color:#111;">'
+                   f'<span style="white-space:nowrap;">{H.md(d)}</span>{pv}</div>' + note
+                   + ("" if last else f'<div style="height:{H.TL_DAY_GAP}px;"></div>'))
+        return H._tl_row(node, int(dk.LH_CARD.rstrip("px")), 0 if first else pad, content, False, last), ""
+
     def row(d, last, first=False):
         """증시 전망 타임라인(H._waiting · day_why_html)과 같은 꼴 (2026-11-14 사용자): 날짜 굵게 한 줄 → 아래 근거 한 줄 = 쪽 라벨 + 한 줄 글(말줄임) + ›.
         라벨은 줄바꿈 없이 글 앞, 논의중은 글 뒤 작은 표시(H._talk_mark). 줄 전체 = 그날 팝업."""
+        if not by.get(d):
+            return empty_row(d, last, first)
         es = sorted(by[d], key=ev_rank)   # 그날 대표 = 실제 일 · 높은 단계 먼저 (옛: 가장 많이 옮겨진 기사)
         top = es[0]
         pid = dk.news_pop_id("iwday", d)
@@ -1956,7 +1974,7 @@ def page(cur, watch, items, px, now, today, days, sums, logs):
     op = "" if PUBLIC else H.operator_box(op_rows)
     body = (top + q + gauge + qcards + sec_list + op + if_fold(cur["chain"], scs) + bottom(cur["chain"], cs) + (H.RELATED if PUBLIC else ""))   # `주가는?` = 원래 아래 접는 줄 자리 (2026-11-14 사용자)
     body = body.replace('data-cards="1" ', "")   # data-cards 는 테마(엔비디아 탭) JS 가 글 머리로 옮긴다 — 이 페이지 카드는 제자리에
-    return dk.fix_colons(f'<div data-head-title="{HEAD_TITLE}" data-seo-lead="{dk.esc(HEAD_TITLE + " — " + cur["q"] + " 뉴스와 시장 " + align)}">{body}</div>')
+    return dk.fix_colons(f'<div data-head-title="{HEAD_TITLE}"{H.head_date_attr()} data-seo-lead="{dk.esc(HEAD_TITLE + " — " + cur["q"] + " 뉴스와 시장 " + align)}">{body}</div>')
 
 
 BENE_HTML = {}
