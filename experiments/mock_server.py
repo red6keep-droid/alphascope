@@ -99,7 +99,6 @@ PLAN = [   # (기능 이름, 남은 일 — 한 줄, 파일 패턴 "폴더/파�
     ("모의투자 (가상의 10억 원 · 종가 체결 · 세금까지 실전처럼 · 순위는 100명부터)", "목업 확인 → 댓글 저장 확인 · 별명 → Cloudflare D1 · R2 · Worker → 정산 코드 (2026-11-21 기획 모의투자-기획.md, 결정 전부 확정)", ["mock-invest/mock_invest-*"]),
     ("종목별 토론방 (종목 페이지 맨 끝 탭) · 보류", "2026-11-21 사용자: 종목마다 토론방은 미룸 → 댓글 다듬기 먼저. 한 종목에 댓글이 꾸준히 달리면 다시", ["stock-board/mock_board_*"]),
     ("검색 `왜 떨어졌어` · 질문하기", "질문하기 버튼 꺼 둠 — 켤지 사용자 결정", ["site-search/mock_why_demo*"]),
-    ("주식 처음 시작하기 1편 `주식이 뭔가요? 주가는 왜 날마다 바뀌나요?` (도토리 숲 이야기)", "입문 과정(1과정 앞, 12편 · 커리큘럼 2-0절) = 동화 꼴(2026-11-22 사용자). 점선 상자 = 그림 자리 여섯 곳(프롬프트 문서 저장소 강좌-입문/자료/그림-프롬프트.md) → 사용자 그림 받으면 넣음 → 2편도 이야기 꼴로", ["course/mock_입문-*.html"]),
     ("늦은 날 기준일 상자 (자료가 늦으면 노랑 상자 · `오늘 자료가 늦어 지난 값을 보여 드립니다`)", "목업 확인 → 가이드라인 2절 3번 · 853종목 통 차단 풀기에 연결 (2026-11-21)", ["stock-quick/mock_qpage_late_*"]),
 ]
 PLAN_NOMOCK = [   # 목업 파일이 이 PC 에 없는 발행 예정 기능 — 줄만 보인다
@@ -119,7 +118,7 @@ LIVE = [
     ("Hot Issue", ["issue_store/mock_issue_watch.html"]),
     ("증시 전망", ["issue_store/mock_forecast-list-eh.html", "issue_store/mock_forecast-2.html", "issue_store/mock_forecast-nvda-2026q3.html",
                 "issue_store/mock_real_forecast-nvda-2026q3.html", "issue_store/mock_real_forecast-list.html", "issue_store/mock_real_forecast-2026-007.html", "issue_store/mock_real_forecast-2026-008.html", "issue_store/mock_real_forecast-2.html"]),   # mock_real_ = 상태 저장소 실제 판정 기록으로 그린 것 (2026-11-22 모든 날짜 줄 확인용)
-    ("주식 제대로 알기", ["course/mock_study_list.html", "course/mock_착각-*.html"]),   # 목록 + 나온 편 전부 (2026-11-20 사용자: 모든 편을 목업에서 확인)
+    ("주식 제대로 알기", ["course/mock_study_list.html", "course/mock_입문-*.html", "course/mock_착각-*.html"]),   # 목록 + 나온 편 전부 (2026-11-20 사용자: 모든 편을 목업에서 확인) · 입문 12편 발행 11-22
     ("검색", ["site-search/mock_search.html"]),
     ("디자인 기준표 (그래프 · 팝업 · 아이콘)", ["design-samples/*"]),
     ("운영 현황 (관리자)", ["ops-dashboard/*"]),

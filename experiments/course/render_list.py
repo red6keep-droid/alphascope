@@ -22,6 +22,20 @@ INTRO = "주식에서 흔히 듣는 말, 데이터로 확인해 봤습니다"
 
 # (과정 이름, 한 줄 소개, [(번호, 편 제목, 초안 파일 이름 또는 None)])
 COURSES = [
+    ("주식 처음 시작하기", "도토리 숲 이야기로 주식의 기본을 처음부터 배웁니다.", [   # 입문 과정 — 1과정 앞, 이름표 `입문` (2026-11-22 발행)
+        ("1", "주식이 뭔가요? 주가는 왜 날마다 바뀌나요?", "입문-01-주식이란.md"),
+        ("2", "얼마가 있어야 시작하나요? 잃으면 어떻게 되나요?", "입문-02-얼마로-시작.md"),
+        ("3", "계좌는 어디서 만들고 주문은 어떻게 넣나요?", "입문-03-계좌와-주문.md"),
+        ("4", "앱 화면의 숫자와 색은 무슨 뜻인가요?", "입문-04-화면-읽기.md"),
+        ("5", "사고팔 때 드는 돈과 세금은 얼마인가요?", "입문-05-수수료와-세금.md"),
+        ("6", "종목 하나를 고르나요, 시장을 통째로 사나요?", "입문-06-종목과-시장.md"),
+        ("7", "한국 주식과 미국 주식은 무엇이 다른가요?", "입문-07-한국과-미국.md"),
+        ("8", "회사는 주주에게 어떤 소식을 보내나요?", "입문-08-회사-소식.md"),
+        ("9", "뉴스는 왜 금리와 환율로 주가를 설명하나요?", "입문-09-금리와-환율.md"),
+        ("10", "이 주식, 비싼 건가요 싼 건가요?", "입문-10-비싼가-싼가.md"),
+        ("11", "차트의 선과 지표는 무엇을 알려 주나요?", "입문-11-차트와-지표.md"),
+        ("12", "정보는 어디서 얻고, 누구 말을 믿어야 하나요?", "입문-12-정보와-리딩방.md"),
+    ]),
     ("초보가 흔히 하는 착각", "많이 듣는 말을 하나씩 꺼내, 아무 날에 산 사람과 비교해 확인합니다.", [
         ("0", "들어가며", "착각-00-들어가며.md"),
         ("", "이 연재는 이렇게 확인합니다", "착각-기준.md"),   # 기준 페이지(편 번호 없음 · 편 수에 안 셈, 2026-11-21)
@@ -80,7 +94,7 @@ def course_card(k, name, intro, eps, urls):
     return (f'<details data-course="{k + 1}"{" open" if done else ""} style="margin:0 0 20px;background:#fff;border:1px solid #E2E8F0;border-radius:12px;overflow:hidden;">'
             f'<summary style="display:block;list-style:none;cursor:pointer;padding:16px {dk.ALIGN_PX + 10}px 14px;">'
             f'<span style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 4px;">'
-            f'<span style="font-size:14px;line-height:20px;font-weight:700;color:#0F766E;">{k + 1}과정</span>'
+            f'<span style="font-size:14px;line-height:20px;font-weight:700;color:#0F766E;">{"입문" if k == 0 else f"{k}과정"}</span>'   # 맨 앞 = 입문 과정, 그다음부터 1과정 (2026-11-22)
             f'<span style="display:flex;align-items:center;gap:8px;"><span style="font-size:13px;line-height:18px;color:{dk.NOTE};">{state}</span>{btn}</span></span>'
             f'<span style="display:block;margin:0 0 6px;font-size:21px;line-height:30px;font-weight:800;color:#111;word-break:keep-all;">{html.escape(name)}</span>'
             f'<span style="display:block;font-size:15px;line-height:24px;color:#4B5563;word-break:keep-all;">{html.escape(intro)}</span></summary>'
