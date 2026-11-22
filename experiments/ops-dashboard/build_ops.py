@@ -86,7 +86,7 @@ SCREEN_FILES = [
 ]
 
 # 지금의 실패 줄 규칙 = ops_log._WARN 과 같게 (import 하면 이 실행도 운영 기록을 남긴다). 이미 쌓인 기록을 다시 거른다 — `40건` · `신규 0건` 오탐 (2026-11-21)
-WARN_NOW = re.compile(r"실패|::warning::|::error::|Forbidden|Traceback|오류|에러|중단|(?<![\d,.])(?<!신규 )0건|없음 —")
+WARN_NOW = re.compile(r"실패|::warning::|::error::|Forbidden|Traceback|오류|에러|중단|(?<![\d,.])(?<!신규 )(?<!변경 )0건|없음 —")
 
 # 수집 실패 줄 → 소스 이름 (ops_log warnings cat=collect · notify)
 SOURCES = [
