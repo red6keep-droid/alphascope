@@ -45,7 +45,7 @@ JOBS = [
     ("증시 전망 · 한국 근거", ["experiments/issue_store/mock_kr_why.py"]),
     ("증시 전망 · 홈 카드", ["experiments/issue_store/home_mock.py"]),
     ("Hot Issue", ["experiments/issue_store/mock_issue_watch.py"]),
-    ("종목 새 카드 · 실적 예상 · 업종 순위", ["experiments/stock-radar/mock_earn_mom.py"]),   # 스페이스X · 엔비디아 (2026-11-20, 받아 둔 data/mock_earn_mom.json 으로)
+    ("종목 새 카드 · 실적 예상 · 업종 순위", ["experiments/stock-radar/mock_earn_mom.py"]),   # 스페이스X · 엔비디아 — 정식 렌더러 + 정식 수집 파일 data/peer_fin.json (2026-11-22)
     ("Hot Issue · 종목 이슈", ["experiments/issue_store/mock_stock_issue.py"]),   # 엔비디아 CEO 사임 시안 (2026-11-15)
     ("디자인 샘플 · 그래프", ["experiments/design-samples/build_graphs.py"]),
     ("디자인 샘플 · 팝업", ["experiments/design-samples/build_popups.py"]),
