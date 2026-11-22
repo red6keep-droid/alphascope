@@ -45,6 +45,13 @@ if __name__ == "__main__":
         except Exception as e:  # noqa: BLE001
             print(f"::warning::[radar] 빈 값 검사 실패 (예전처럼 계속): {e!r}")
     news = collect_news.load() if cached else collect_news.run()
+    import peer_cards   # 같은 업종 S&P 500 과 견주는 카드 넷 (2026-11-22 사용자 "전부 발행") — 실패해도 지난 값 · 없으면 카드 없이
+    try:
+        peer_cards.DATA = peer_cards.load() if cached else peer_cards.collect(snap)
+    except Exception as e:  # noqa: BLE001
+        print(f"::warning::[radar] 업종 비교 수집 실패 — 지난 값: {e!r}")
+        peer_cards.DATA = peer_cards.load()
+    peer_cards.REV = (extra.get("revenue") or {}).get("series") or {}
     a = analyze.run(snap)
     import industry_us   # 업계 카드 — FRED (2026-11-01 사용자 P268, 실패해도 페이지는 만든다)
     try:

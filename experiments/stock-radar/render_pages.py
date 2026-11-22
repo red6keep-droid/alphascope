@@ -27,6 +27,7 @@ import signal_groups as SG  # noqa: E402 — 판정 묶음 분류표 (함께 보
 import universe as U  # noqa: E402
 import court  # noqa: E402 — 소송 일정 (P270)
 import crash_watch as CW  # noqa: E402 — 급락장에서 어땠나? (오늘 탭, 2026-11-04)
+import peer_cards as PC  # noqa: E402 — 같은 업종 S&P 500 과 견주는 카드 넷 (2026-11-22 사용자 "전부 발행")
 
 UP, DOWN, NOTE, TINY = _dk.UP, _dk.DOWN, _dk.NOTE, _dk.TINY
 PAD = _dk.SEP_GAP - _dk.VP - 1
@@ -549,6 +550,8 @@ def sec_states(s):
 def sec_momentum(s):
     """12개월 모멘텀 — 한국과 같은 카드(R.momentum_in). 미국은 검증을 통과하지 못해(64종목 −0.30%p/월 p .51, doc/검증/미국-모멘텀-검증.md)
     함께 보기 방향 분류에 넣지 않는다 (2026-10-31 사용자)."""
+    if PC.has_rank(s):   # `같은 업종 안 주가 순위는?` 카드로 합침 (2026-11-20 사용자 "합치는 쪽으로", 11-22 발행) — 순위 카드가 없을 때만 옛 줄
+        return ""
     mom, mr = s.get("mom_12_1"), s.get("mom_rank")
     if mom is None or not mr:
         return ""
@@ -1142,13 +1145,22 @@ def card_revenue(c):
 
 def sec_expect(s, open_first=True):
     """실적과 기대 탭 — NVDA 리포트 sec_expect 와 같은 질문 카드 넷 + 돈을 어디에 쓰나(2026-10-30). 비교 묶음 = 시총 상위 20개 (중앙값)."""
-    ex = s.get("expect") or {}
-    spec = [("회사는 돈을 더 벌고 있나?", "revenue", card_revenue), (R.EPS_TITLE, "eps", R.card_eps),
-            ("시장 예상 흔들림은?", "move", R.card_move), ("하락에 거는 돈은?", "short", R.card_short), ("돈을 어디에 쓰나?", "capex", card_capex)]
+    ex = dict(s.get("expect") or {})
+    ex.update(PC.expect_cards(s))   # 발표 때 예상 · 재무 건전성 · 주가 수준 (2026-11-22 발행) — 재료가 없으면 카드 없이
+
+    def capex_plus(c):   # 돈 카드 + 현금흐름 세 줄 (같은 최근 분기, 출처 줄은 맨 끝 그대로)
+        lines, tip = card_capex(c)
+        cq = (c.get("bars") or [{}])[-1].get("cq")
+        lines = list(lines)
+        at = next((i for i, x in enumerate(lines) if "출처" in str(x[0])), len(lines))
+        return lines[:at] + PC.cash_rows(PC.sym_rows(s["sym"]), cq) + lines[at:], tip
+    spec = [("회사는 돈을 더 벌고 있나?", "revenue", card_revenue), ("발표 때 예상을 넘었나?", "beat", lambda c: c["_lt"]), (R.EPS_TITLE, "eps", R.card_eps),
+            ("시장 예상 흔들림은?", "move", R.card_move), ("하락에 거는 돈은?", "short", R.card_short), ("돈을 어디에 쓰나?", "capex", capex_plus),
+            ("재무 건전성은?", "health", lambda c: c["_lt"]), ("이익에 비해 주가 수준은?", "value", lambda c: c["_lt"])]
     out = ""
     for i, (title, key, fn) in enumerate(spec):
         c = ex.get(key)
-        if key == "capex" and not c:   # 외국 회사(TSM · ASML, 20-F) · 은행처럼 표가 없는 회사는 카드 자체를 안 둔다 — '다음 실행에서 다시' 가 아니다
+        if key in ("capex", "beat", "health", "value") and not c:   # 외국 회사(TSM · ASML, 20-F) · 은행처럼 표가 없는 회사는 카드 자체를 안 둔다 — '다음 실행에서 다시' 가 아니다
             continue
         if c:
             lines, tip = _rename(fn(c), s["name"])
@@ -1260,7 +1272,7 @@ def _josa(t):
 
 def detail_body(s, today, news=None):
     """NVDA 리포트 순서 : 맨 위 요약 → 그래프 → 가격 카드(펼치면 1층 · 2층) → 상태 카드. 갱신 날짜 줄은 뺐다 — 요약 첫 마디에 날짜가 있다 (2026-10-18 사용자)."""
-    return wrap(_dk.price_stamp(s["day"], "US") + lead(s) + sec_chart(s) + R.day_path_chart(s["tech"].get("path"), s["tech"].get("bench_path"), s["name"], "S&P 500") + price_card(s, today) + sec_regime(s) + sec_tech(s) + sec_pairs(s) + sec_states(s) + sec_targets(s)
+    return wrap(_dk.price_stamp(s["day"], "US") + lead(s) + sec_chart(s) + R.day_path_chart(s["tech"].get("path"), s["tech"].get("bench_path"), s["name"], "S&P 500") + price_card(s, today) + PC.rank_section(s) + sec_regime(s) + sec_tech(s) + sec_pairs(s) + sec_states(s) + sec_targets(s)
                 + sec_today_tab(s, news or {})
                 + R._section("매수의견", sec_opinions(s), tab="매수의견")   # 애널리스트 · 방송 의견 — 오늘 탭에서 옮김 (2026-11-01 사용자 P196) · 탭 이름 붙여 쓴 `매수의견` (P203)
                 + R._section("실적", sec_earnings_tab(s), tab="실적")   # 옛 `일정` 탭을 합침 (P196)
