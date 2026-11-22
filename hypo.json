@@ -1,23 +1,9 @@
 {
  "id": "hypo-card",
  "label": "증시 전망",
- "generated": "2026-11-22T00:31:03Z",
+ "generated": "2026-11-22T22:32:26Z",
  "list_url": "https://www.newfact.app/p/forecast-list.html",
  "open": [
-  {
-   "no": 1,
-   "eh": "EH-2026-002",
-   "title": "엔비디아 실적 뒤 반도체는?",
-   "url": "https://www.newfact.app/p/forecast-nvda-2026q3.html",
-   "posted": "11.07",
-   "tags": [
-    "실적",
-    "반도체"
-   ],
-   "event": "11.17 엔비디아 실적",
-   "market": "us",
-   "lean": 0
-  },
   {
    "no": 1,
    "eh": "EH-2026-007",
@@ -62,7 +48,10 @@
   }
  ],
  "done_count": {
-  "us": 4,
+  "us": 5,
   "kr": 0
+ },
+ "ops": {
+  "stalled": []
  }
 }
