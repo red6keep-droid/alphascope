@@ -1,0 +1,27 @@
+name = "newfact-board"
+main = "src/index.js"
+compatibility_date = "2026-10-01"
+account_id = "a8718df7edc5f8f6ce88e75b6545e5cb"   # red6 — 블로그 Worker · 운영 콘솔과 같은 계정
+workers_dev = false   # 쓰기 주소는 api.newfact.app 하나(아래 routes)
+preview_urls = false
+
+# 토론 쓰기 API (2026-11-22, 기획 alphascope-docs doc/기획/댓글-토론방-기획.md 3절)
+#   읽기는 이 Worker 를 거치지 않는다 — R2 버킷을 board.newfact.app 공개 주소로 열고 Cloudflare 캐시(1분)로 읽는다.
+#   비밀값: ADMIN_KEY (댓글 봇 · 운영 콘솔이 /v1/admin/* 에 쓰는 무작위 값)  →  npx wrangler secret put ADMIN_KEY
+#   시험(로컬)만: .dev.vars 에 TEST_MODE=1 — X-Test-Uid · X-Test-Now 머리말과 /__file 을 연다. 배포 값에는 절대 넣지 않는다.
+routes = [{ pattern = "api.newfact.app", custom_domain = true }]
+keep_vars = true
+
+[vars]
+FIREBASE_PROJECT_ID = "alphascope-352e9"
+OWNER_UID = "u1vln4bbDgSgWQDe2F2FaNs81D43"   # 블로그 주인 — 이름 `Newfact` 로 보이고 모든 글을 지우고 가린다
+ALLOWED_ORIGINS = "https://www.newfact.app,https://newfact.app,https://alpha-scope.blogspot.com"   # 브라우저 CORS. 앱은 CORS 와 무관
+
+[[d1_databases]]
+binding = "DB"
+database_name = "newfact-board"
+database_id = "00000000-0000-0000-0000-000000000000"   # 만든 뒤 바꾼다: npx wrangler d1 create newfact-board
+
+[[r2_buckets]]
+binding = "FILES"
+bucket_name = "newfact-board"

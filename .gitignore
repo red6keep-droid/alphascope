@@ -71,3 +71,6 @@ experiments/stock-etf/data/
 
 # 집 IP(VPN)로 받은 자료 — 비공개 상태 저장소 homeip-state 에만 (2026-11-17)
 experiments/home-ip/data/
+
+# 토론 Worker 로컬 시험 값 (infra/board/test/run.sh 가 만들고 지움)
+infra/board/.dev.vars
