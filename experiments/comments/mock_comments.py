@@ -313,7 +313,7 @@ STICKERS = [   # (탭 이름, [컷 …]) — 2026-11-21 사용자 그림 여섯 
     ("하락이", ["down_hammock", "down_nap", "down_extinguish", "down_airport", "down_piggy", "down_noear", "down_shrug", "down_spa",
                 "down_thumb", "down_frown", "down_float", "down_bye",
                 "down_happy", "down_calm", "down_grumpy", "down_sulky"]),
-    ("중심이", ["mid_whistle", "mid_balance", "mid_chalk", "mid_egg", "mid_measure", "mid_gavel",
+    ("분석이", ["mid_whistle", "mid_balance", "mid_chalk", "mid_egg", "mid_measure", "mid_gavel",
                 "mid_question", "mid_clap", "mid_proof", "mid_peace", "mid_hourglass", "mid_thanks",
                 "mid_travel", "mid_workout", "mid_sleep", "mid_music", "mid_eat", "mid_photo", "mid_map", "mid_stretch",
                 "mid_think", "mid_caution", "mid_explain"]),

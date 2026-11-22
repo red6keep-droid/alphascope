@@ -89,7 +89,7 @@ def course_card(k, name, intro, eps, urls):
 
 
 def page(urls):
-    # 맨 위 그림 = 사용자 그림 한 장(중심이 음악 · 상승이 · 하락이 책 읽기, 2026-11-15) — 요청 1회.
+    # 맨 위 그림 = 사용자 그림 한 장(분석이 음악 · 상승이 · 하락이 책 읽기, 2026-11-15) — 요청 1회.
     # 크기 252 × 132 (11-15 사용자: 30% 작게 — 폰 약 360 → 252, 정수 px 라 높이 132 · 비율 차이는 contain 으로)
     art = (f'<img src="{RC.img_src(os.path.join(HERE, "banner"), "study_head")}" alt="" width="252" height="132" '
            'style="display:block;width:252px;height:132px;max-width:100%;object-fit:contain;margin:0 auto;border-radius:0;">')
