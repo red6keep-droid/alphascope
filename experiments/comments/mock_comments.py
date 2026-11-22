@@ -52,6 +52,12 @@ CSS = """<style>
 .comments .cv-head{display:flex;align-items:center;gap:7px;min-height:32px;}
 .comments .cv-head .cm-avatar{flex:none;}
 .comments .cv-head .cm-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+/* P614 숫자 = Inter: 토론 칸 · 화면 전체 창 글꼴 = 테마 --report-font('AS Num' 맨 앞) · 숫자만 있는 자리 = --num (2026-11-22 사용자) */
+.comments,.cv-full,.cv-page{font-family:var(--report-font);}
+/* P615 날짜 = 가장 작은 글씨 13/19 (2026-11-22 사용자) */
+.comments .cm-date,.cv-pmeta,.cv-rtime{font-family:var(--num);font-size:13px;line-height:19px;font-variant-numeric:tabular-nums;}
+.comments .cv-react span,.comments .cv-reply span,.cm-count,.cv-lab small,.cv-frow{font-family:var(--num);}
+.cv-mine small{font-size:13px;line-height:19px;}
 .comments .cv-head .cm-date{margin-left:auto;}
 .comments .cv-menu{flex:none;display:flex;align-items:center;justify-content:center;width:32px;height:32px;margin:0 -8px 0 0;padding:0;background:none;border:0;color:#6B7280;cursor:pointer;-webkit-tap-highlight-color:transparent;}
 .comments .cv-main{display:block;margin:2px 0 0 31px;color:inherit;text-decoration:none;}
@@ -73,16 +79,14 @@ CSS = """<style>
 .cv-page .comments{margin:0;padding:0;border:0;}
 .cv-page .cv-head .cm-date:empty{flex:1;}
 .cv-ptitle{margin:14px 0 0;font-size:22px;line-height:32px;font-weight:700;color:#111;word-break:keep-all;overflow-wrap:anywhere;}
-.cv-pmeta{margin:4px 0 0;font-size:14px;line-height:20px;color:#7A7A7A;font-variant-numeric:tabular-nums;}
+.cv-pmeta{margin:4px 0 0;color:#7A7A7A;}
 .cv-ptext{margin:18px 0 0;font-size:16px;line-height:26px;color:#333;white-space:pre-wrap;word-break:keep-all;overflow-wrap:anywhere;}
-.cv-big-react{display:flex;justify-content:center;gap:8px;margin:24px 0 0;padding:0 0 24px;border-bottom:1px solid #E2E8F0;}
-.comments .cv-big-react .cv-react{min-width:120px;justify-content:center;padding:9px 16px;border:1px solid #E2E8F0;border-radius:8px;font-size:16px;line-height:24px;}
-.comments .cv-big-react .cv-react.is-on{border-color:#111;}
+.cv-big-react{display:flex;gap:12px;margin:16px 0 0;padding:0 0 16px;border-bottom:1px solid #E2E8F0;}   /* P617 목록과 같은 아이콘 꼴(2026-11-22 사용자, 옛 테두리 상자 120 · 16/24) */
 .cv-me{display:flex;align-items:center;gap:7px;margin:0 0 10px;}
-.cv-myprof{margin-left:auto;padding:5px 11px;border-radius:8px;background:#fff;border:1px solid #111;color:#111;font-size:14px;line-height:20px;font-weight:700;text-decoration:none;}
+.cv-myprof{margin-left:auto;padding:5px 11px;border-radius:8px;background:#fff;border:1px solid #111;color:#111;font-size:13px;line-height:19px;font-weight:700;text-decoration:none;}
 .cv-page .comments .cv-rlist .cv-text{margin:6px 0 0;}
 .cv-page .comments .cv-rlist .cv-stk,.cv-page .comments .cv-rlist .cv-stock,.cv-page .comments .cv-pop,.cv-page .comments .cv-hidden{margin-left:0;}
-.cv-rtime{margin:6px 0 0;font-size:14px;line-height:20px;color:#7A7A7A;font-variant-numeric:tabular-nums;}
+.cv-rtime{margin:6px 0 0;color:#7A7A7A;}
 .cv-page .comments .cv-rlist .cv-foot{margin:4px 0 0;}
 .cv-page .cv-post-menu{margin-left:0;}
 .cv-page .cm-submit{background:#fff;border:1px solid #111;color:#111;}   /* 검은 바탕 버튼 금지(목록 버튼만) */
@@ -91,7 +95,9 @@ CSS = """<style>
 .cv-toast[hidden]{display:none;}
 .comments .cv-text{margin:4px 0 0;font-size:16px;line-height:26px;color:#333;white-space:pre-wrap;word-break:keep-all;overflow-wrap:anywhere;}
 .comments .cv-main .cv-text{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
-.comments .cv-hidden{margin:0 0 0 31px;font-size:14px;line-height:20px;color:#94A3B8;}
+.comments .cv-hidden{margin:0;font-size:14px;line-height:20px;color:#94A3B8;}   /* P620 아바타 원 옆 한 줄 */
+.comments .cm-avatar.is-hidden{background:#CBD5E1;color:#fff;}
+.comments .cm-avatar.is-hidden svg{width:14px;height:14px;display:block;}
 .comments .cv-foot{display:flex;align-items:center;margin:8px 0 0 31px;}
 .comments .cv-reply{display:inline-flex;align-items:center;gap:6px;padding:4px 8px 4px 0;color:#333;text-decoration:none;font-size:14px;line-height:20px;font-weight:700;font-variant-numeric:tabular-nums;-webkit-tap-highlight-color:transparent;}
 .comments .cv-reply.has{color:#333;}
@@ -105,8 +111,8 @@ CSS = """<style>
 .comments .cv-chip.is-on{border-color:#111;color:#111;font-weight:700;}
 .comments .cv-done{margin:0;font-size:14px;line-height:20px;color:#6B7280;}
 /* 안내 상자 — 주의 색(노랑 안내 상자 dk.notice 와 같은 바탕 · 테두리), 느낌표 아이콘 + 14/20 */
-.comments .cv-guard{display:flex;align-items:flex-start;gap:6px;margin:14px 0 4px;padding:10px 12px;background:#FFF8E1;border:1px solid #F4D37A;border-radius:8px;font-size:14px;line-height:20px;color:#333;word-break:keep-all;}
-.comments .cv-guard svg{flex:none;width:16px;height:16px;margin-top:2px;color:#B45309;}
+.comments .cv-guard{display:flex;align-items:flex-start;gap:6px;margin:14px 0 4px;padding:9px 11px;background:#FFF8E1;border:1px solid #F9E6B5;border-radius:8px;font-size:13px;line-height:19px;color:#333;word-break:keep-all;}   /* P619 = 자료 늦음 상자(dk.report_stamp late)와 같은 꼴 */
+.comments .cv-guard svg{flex:none;width:14px;height:14px;margin-top:2px;color:#E8710A;}
 /* 이전 댓글 더 보기 · 로그인 버튼 = 페이지 이동 버튼(R.out_btn)의 글자 14/20 굵게 · 안쪽 8 12 · 높이 38. 아이콘 없음 */
 .comments .cm-more,.comments .cm-login{padding:8px 12px;font-size:14px;line-height:20px;}
 /* 글 화면 */
@@ -238,7 +244,7 @@ CSS = """<style>
 .cv-edit{display:block;width:100%;box-sizing:border-box;margin:0;padding:8px 12px;background:#fff;border:1px solid #B5BAC0;border-radius:8px;font:inherit;font-size:14px;line-height:20px;font-weight:700;color:#111;text-align:center;cursor:pointer;}
 .cv-mine-h{margin:28px 0 0;padding:0 0 8px;border-bottom:1px solid #E2E8F0;font-size:16px;line-height:24px;font-weight:700;color:#111;}
 .cv-mine{display:block;padding:14px 0;border-bottom:1px solid #E2E8F0;color:inherit;text-decoration:none;}
-.cv-mine small{display:block;font-size:14px;line-height:20px;color:#6B7280;}
+.cv-mine small{display:block;color:#6B7280;}
 .cv-mine b{display:block;margin:2px 0 0;font-size:16px;line-height:24px;font-weight:700;color:#111;}
 .cv-mine .cv-reply{padding:6px 0 0;}
 .cv-rules{margin:0;padding:0;list-style:none;}
@@ -262,6 +268,7 @@ THUMB = (f'<svg viewBox="0 0 24 24" width="20" height="20" {_SVG} stroke-width="
 UP_ICON, DOWN_ICON = THUMB.format(""), THUMB.format(' style="transform:rotate(180deg)"')
 SHARE = f'<svg viewBox="0 0 16 16" {_SVG} stroke-width="1.6"><path d="M9.5 2.5H13.5V6.5M13.5 2.5 8 8M11.5 9.5v3a1 1 0 0 1-1 1h-7a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1h3"/></svg>'
 GO = f'<svg viewBox="0 0 16 16" {_SVG} stroke-width="1.6"><path d="M6 3.5 10.5 8 6 12.5"/></svg>'
+SIREN = f'<svg viewBox="0 0 16 16" {_SVG} stroke-width="1.6"><path d="M4.5 12.5V9a3.5 3.5 0 0 1 7 0v3.5M3 12.5h10M8 2v1.3M2.8 4.2l.9.9M13.2 4.2l-.9.9"/></svg>'   # 신고 = 경광등(가려진 글 원 안, P620)
 WARN = f'<svg viewBox="0 0 16 16" {_SVG} stroke-width="1.6"><path d="M8 2 14.5 13.5h-13z"/><path d="M8 6.5v3.2M8 11.6v.1"/></svg>'
 REASONS = ("리딩방 · 광고", "욕설 · 비방", "개인정보", "거짓 정보 · 시세 조종 의심", "기타")
 ME = "주린이탈출"
@@ -377,7 +384,7 @@ def avatar(name, kind=""):
     if name == "owner":
         return f'<span class="cm-avatar is-owner">{LOGO}</span>'
     if kind == "hidden":
-        return '<span class="cm-avatar" style="background:#CBD5E1;"></span>'
+        return f'<span class="cm-avatar is-hidden">{SIREN}</span>'
     return f'<span class="cm-avatar" style="background:none;"><img src="{ava_src(ava_of(name))}" alt="" width="24" height="24"></span>'
 
 
@@ -430,8 +437,8 @@ def extras(key):
 
 
 def hidden_row():   # 신고 3번 = 자동으로 가린다 — 운영자가 보고 되살리거나 지운다
-    return (f'<li class="cv-item"><div class="cv-head">{avatar("", "hidden")}</div>'
-            '<p class="cv-hidden">신고가 쌓여 가려진 댓글입니다. 운영자가 확인하고 있습니다.</p></li>')
+    return (f'<li class="cv-item"><div class="cv-head">{avatar("", "hidden")}'
+            '<span class="cv-hidden">신고가 쌓여 가려진 댓글입니다.</span></div></li>')
 
 
 def reacts(seed, member):
