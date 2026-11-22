@@ -6,6 +6,7 @@
     판정 오류   판정 계산이 멈춤 — 페이지 갱신 안 함                            → 바로
     등록 놓침   사전 등록할 사건을 실행 실패로 놓침 / 늦게 등록                 → 모아서
     상태        전망이 무효 · 보류가 됨 (일정 변경 · 결과 판정 불능)             → 모아서
+    판정 멈춤   지켜보는 전망의 기록이 2거래일 넘게 안 쌓임 · 사건 뒤 결과 칸이 빔 → 바로 (2026-11-22, 엔비디아 실적 뒤 11.16 에서 멈춘 일)
     저장 실패   기록(상태 저장소) · 게시(Blogger) 실패                           → 바로
 안 보내는 것: 맞음 · 틀림 · 조짐 같은 정상 결과, AI 예비 전환(llm_chain 규칙대로 Gemini 문제만), 외부 지수(GPR · EPU) 한 줄 생략.
 
@@ -62,6 +63,13 @@ def registration_missed(event, late=False):
 
 def status_changed(title, state, why=""):
     notify.event("상태", f"{NAME} — ‘{title}’ {state}" + (f" ({why})" if why else ""))
+
+
+def stalled(items):
+    """event_results.stalled 결과 — 하루 한 번(전망 실행 1회) 한 통. 전망 이름 · 까닭만, 원문 없음."""
+    if items:
+        notify.now(f"{NAME} — 판정이 멈춘 전망 {len(items)}건 : " + " / ".join(f"‘{x['title']}’ {x['why']}" for x in items[:5])
+                   + ". 운영 페이지 전망 탭에 같은 내용")
 
 
 def save_failed(where, e):

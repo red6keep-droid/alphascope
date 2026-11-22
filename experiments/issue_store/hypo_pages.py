@@ -29,7 +29,7 @@ import json
 import os
 import re as _re
 import sys
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta, timezone
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(_HERE))
@@ -965,6 +965,80 @@ def timeline_lead(fc, log):
     return out
 
 
+def kst_now():
+    return datetime.now(timezone(timedelta(hours=9)))
+
+
+def asof_text(now=None):
+    """머리 줄(제목 막대) 오른쪽 `11.22 아침` — 홈 카드 날짜(테마 genKo)와 같은 말. 값 = 페이지를 만든 한국 시각, 12시 전 아침 · 뒤 오후.
+    본문 data-head-date 로 넘기면 테마가 공유 버튼 앞에 회색 글자로 붙인다(.post-title-asof). 홈 카드 날짜와 상세 페이지가 어긋나 보이지 않게 (2026-11-22 사용자)."""
+    k = now or kst_now()
+    return f'{k:%m.%d} {"아침" if k.hour < 12 else "오후"}'
+
+
+def head_date_attr(now=None):
+    return f' data-head-date="{asof_text(now)}"'
+
+
+WEEK_OFF = {5: "토요일", 6: "일요일"}
+
+
+def day_gap_word(day, market="us", now=None):
+    """기록 줄이 없는 날의 한 마디 — 모든 날짜를 줄로 낸다(2026-11-22 사용자: 빈 날은 에러처럼 보인다).
+    토 · 일 = `토요일 휴장` · `일요일 휴장`, 휴장 달력(dk.US_HOLIDAYS · KR_HOLIDAYS) = `공휴일 휴장`,
+    아직 종가가 날 때가 아닌 평일 = `장 마감 전`(미국 = 다음 날 06시 · 한국 = 그날 16시, 한국 시간), 그 뒤인데 값이 없으면 `종가 확인 중`."""
+    d = date.fromisoformat(day)
+    if d.weekday() in WEEK_OFF:
+        return f"{WEEK_OFF[d.weekday()]} 휴장"
+    if day in (dk.KR_HOLIDAYS if market == "kr" else dk.US_HOLIDAYS):
+        return "공휴일 휴장"
+    k = (now or kst_now()).replace(tzinfo=None)
+    ready = datetime.combine(d, datetime.min.time()) + (timedelta(hours=16) if market == "kr" else timedelta(hours=30))
+    return "장 마감 전" if k < ready else "종가 확인 중"
+
+
+def gap_row(day, word, last=False, first=False):
+    """빈 날 한 줄 = 점 마디 + 날짜(굵게) + 회색 한 마디. 펼침 · 팝업 없음 (2026-11-22 사용자)."""
+    lh = int(dk.LH_CARD.rstrip("px"))
+    pad = 12 - dk.VP
+    dot = f'<span style="display:block;width:{TL_DOT}px;height:{TL_DOT}px;box-sizing:border-box;border:2px solid {TL_LINE};border-radius:50%;background:#fff;"></span>'
+    body = (f'<div style="display:flex;align-items:center;gap:8px;padding:{0 if first else pad}px 0 {pad}px;font-size:{dk.NAME};line-height:{dk.LH_CARD};font-weight:700;color:#111;">'
+            f'<span style="white-space:nowrap;">{dk.esc(md(day))}</span><span style="font-weight:400;color:{dk.SUB};white-space:nowrap;">{dk.esc(word)}</span></div>'
+            + ("" if last else f'<div style="height:{TL_DAY_GAP}px;"></div>'))
+    return _tl_row(dot, lh, 0 if first else pad, body, False, last)
+
+
+def with_gaps(log, market="us", today=None, until_today=True, wait_from=None, wait_word=""):
+    """기록(오래된 → 최근)에 빈 날을 끼운 목록 — 기록 사이 빈 날 + (until_today) 마지막 기록 뒤 ~ 오늘(한국 날짜).
+    빈 날 = {"gap": 한 마디, "day": iso}. 판정 · 계산은 그대로, 화면 줄만 더한다.
+    wait_from = 사건 날(iso) — 그날부터 종가는 났는데 결과 칸이 비어 판정을 못 한 평일은 `종가 확인 중` 대신 wait_word(`실적 결과 확인 중`)."""
+    today = today or kst_now().date()
+    out, prev = [], None
+
+    def word(g):
+        w = day_gap_word(g.isoformat(), market)
+        return wait_word if wait_from and w == "종가 확인 중" and g.isoformat() >= wait_from else w
+    for e in log:
+        try:
+            d = date.fromisoformat(str(e["day"])[:10])
+        except ValueError:   # `11.07` 처럼 연도 없는 옛 날짜 — 빈 날을 셀 수 없어 그대로 둔다
+            out.append(e)
+            continue
+        if prev is not None:
+            g = prev + timedelta(days=1)
+            while g < d:
+                out.append({"gap": word(g), "day": g.isoformat()})
+                g += timedelta(days=1)
+        out.append(e)
+        prev = d
+    if until_today and prev is not None:
+        g = prev + timedelta(days=1)
+        while g <= today:
+            out.append({"gap": word(g), "day": g.isoformat()})
+            g += timedelta(days=1)
+    return out
+
+
 def timeline_title():
     """타임라인 구획 제목 `Timeline`(영어) — `향방미정` 줄 위, 위 여백 +30 (P484 · P485, 2026-11-11 사용자). 구획 제목 글씨(dk.h2), 밑줄 없음."""
     h = (dk.h2("Timeline", line=False).replace(f"font-size:{dk.H2_SIZE};", f"font-size:{TL_TITLE_FS}px;", 1).replace("align-items:baseline;", "align-items:center;", 1)
@@ -1814,6 +1888,13 @@ def _waiting(log, unit="%", subj="", fc=None):
     e = days[0]
     lh = int(dk.LH_CARD.rstrip("px"))
     cws = _col_widths(days, unit, subj)
+    # 모든 날짜를 줄로 (2026-11-22 사용자: 매일 보는 독자에게 빈 날은 에러처럼 보인다) — 기록 사이 빈 날 + 지켜보는 중이면 마지막 기록 뒤 ~ 오늘.
+    # 판정이 난 전망은 기록이 멈춘 날까지만(그 뒤 빈 날은 붙이지 않음). 빈 날 = 휴장 · 장 마감 전 · 종가 확인 중 한 마디(gap_row)
+    wait = (fc or {}).get("event_day") if (fc or {}).get("kind") == "pre" and not (fc or {}).get("cond_known") and not (fc or {}).get("ambiguous") else None   # 결과 칸 기다리는 사건 전 전망
+    what = "실적" if "실적" in (fc or {}).get("event", "") else "사건"
+    full = list(reversed(with_gaps(log, mkt_of(fc) if fc else "us", until_today=e.get("key") not in RESULT, wait_from=wait, wait_word=f"{what} 결과 확인 중")))
+    at = next(i for i, x in enumerate(full) if x is e)
+    head_gaps, after = full[:at], full[at + 1:]
 
     def head(x):   # 맞추는 줄(값 있는 지켜보는 중 · 우세) = 네 칸 격자, 나머지 = 글 길이대로 이어 쓰기 (P427 · P440)
         a, b, c = _day_cols(x, unit, subj)[0]
@@ -1833,9 +1914,9 @@ def _waiting(log, unit="%", subj="", fc=None):
                 f'{a}{b}{c}{tail}</summary>')
     clock = f'<span style="display:block;width:{TL_DOT}px;height:{TL_DOT}px;box-sizing:border-box;border:2px solid {TL_LINE};border-radius:50%;background:#fff;"></span>'   # 오늘 줄 마디 = 지난 날과 같은 동그라미 (2026-11-11 사용자: 시계는 Timeline 제목 앞으로)
     # 아래 여백 = 지난 날 줄과 같은 10 (접혀도 펼쳐도) — 옛 4px 띄움은 접으면 다음 줄과 붙어 좁았다 (P436, 2026-11-08 사용자)
-    past = days[1:]
+    past = after
     gap = f'<div style="height:{TL_DAY_GAP}px;"></div>'   # 날짜와 날짜 사이 +10 (2026-11-11 사용자) — 마지막 줄 아래엔 없음
-    today = (f'<details class="fc-day" open style="margin:0;padding:0 0 {12 - dk.VP}px;">' + head(e).replace("{pad}", "0") + f'{_day_text(e)}</details>') + (day_why_html(e, fc) if fc else "") + (gap if past else "")
+    today = (f'<details class="fc-day" open style="margin:0;padding:0 0 {12 - dk.VP}px;">' + head(e).replace("{pad}", str(12 - dk.VP) if head_gaps else "0") + f'{_day_text(e)}</details>') + (day_why_html(e, fc) if fc else "") + (gap if past else "")
     out = PLUS_CSS + '<div style="margin:0 0 24px;">' + (timeline_lead(fc, log) if fc else "")
     lead = bool(fc)
     end = e.get("key") in RESULT   # 판정이 난 전망 — 시계 줄 위에 끝 줄 하나 (P465, 2026-11-08 사용자): 세부 전망이 이어받으면 `세부 전망으로 이어집니다 ›`, 아니면 `전망이 종료되었습니다`
@@ -1853,13 +1934,17 @@ def _waiting(log, unit="%", subj="", fc=None):
                         f'<span style="flex:none;display:inline-flex;transform:rotate(-90deg);">{dk.ACC_CHEV.replace("acc-chev", "fc-right")}</span></a>')
         out += _tl_row(f'<span style="display:inline-flex;color:{dk.SUB};">{node}</span>', lh, 0,
                        f'<div style="padding:0 0 {12 - dk.VP}px;font-size:{dk.NAME};line-height:{dk.LH_CARD};font-weight:700;color:#111;">{txt}</div>', not lead, False)
-    out += _tl_row(clock, lh, 0, today, not end and not lead, False)   # 오늘 줄은 지난 날이 없어도 문장 끝까지 점선을 내린다
+    for i, x in enumerate(head_gaps):   # 마지막 기록 뒤 ~ 오늘 빈 날 — 맨 위가 늘 오늘 (2026-11-22 사용자)
+        out += gap_row(x["day"], x["gap"], first=i == 0 and not end and not lead)
+    out += _tl_row(clock, lh, 0 if not head_gaps else 12 - dk.VP, today, not end and not lead and not head_gaps, False)   # 오늘 줄은 지난 날이 없어도 문장 끝까지 점선을 내린다
     if past:
         shown = past if len(past) <= PAST_SHOWN + 2 else past[:PAST_SHOWN]   # 1~2개 숨기려고 버튼을 두지 않는다
         rest = past[len(shown):]
         dot = f'<span style="display:block;width:{TL_DOT}px;height:{TL_DOT}px;box-sizing:border-box;border:2px solid {TL_LINE};border-radius:50%;background:#fff;"></span>'
 
         def row(x, last):
+            if "gap" in x:   # 빈 날 (휴장 · 장 마감 전 · 종가 확인 중)
+                return gap_row(x["day"], x["gap"], last=last)
             fold = (f'<details class="fc-day" style="margin:0;">' + head(x).replace("{pad}", str(12 - dk.VP)) +
                     f'<div style="padding:0 0 {12 - dk.VP}px;margin-top:-4px;">{_day_text(x)}</div></details>') + (day_why_html(x, fc) if fc else "") + ("" if last else gap)   # 근거 줄 = 접어도 보인다
             return _tl_row(dot, lh, 12 - dk.VP, fold, False, last)
@@ -2176,7 +2261,9 @@ def forecast_body(reg, state=None, fc=None, others=None, op=None):
             + (operator_box(op + _op_mood(fc) + ([("거래량", f'평소의 {st["volume_x"]:.1f}배 — 기록만 — 우리 전망 고르기엔 안 씀')] if fc["kind"] == "after" and st.get("volume_x") else [])) if op else "")
             + more + why_note_html(fc)   # 근거 안내 = `현재 증시는?` 아래 한 번 (2026-11-11 사용자)   # `더 궁금한 것` 제목 삭제 — 기록 · 앞으로 볼 것은 각자 구분선 구획 (2026-11-07 사용자)
             )   # `다른 전망` 구획 삭제 — 글 아래 [목록] 버튼이 전망 목록으로 간다, 이어진 전망은 겹침 카드 안 링크로 (P442, 2026-11-08 사용자)
-    return dk.fix_colons(f'<div data-list-url="{page_url(LIST_SLUG)}" data-head-title="{HEAD_FORECAST}" data-nav="list" data-title-back="{page_url(LIST_SLUG)}" data-title-back-label="목록" data-seo-lead="{dk.esc(seo_lead(fc, st))}">{body}{RELATED}</div>')
+    # 머리 줄 오른쪽 `11.22 아침` = 지켜보는 중인 전망만 — 판정이 난 전망은 기록이 멈춰 매일 다시 올릴 까닭이 없다(날짜만 바뀌어 Blogger 쓰기가 늘지 않게) (2026-11-22)
+    live = ((st or {}).get("log") or [{}])[-1].get("key") not in RESULT
+    return dk.fix_colons(f'<div data-list-url="{page_url(LIST_SLUG)}" data-head-title="{HEAD_FORECAST}"{head_date_attr() if live else ""} data-nav="list" data-title-back="{page_url(LIST_SLUG)}" data-title-back-label="목록" data-seo-lead="{dk.esc(seo_lead(fc, st))}">{body}{RELATED}</div>')
 
 
 def seo_lead(fc, st=None):
@@ -2305,10 +2392,12 @@ def end_text(fc, st):
     sc, k = fc["scenarios"], (st.get("log") or [{}])[-1].get("key")
     c = res.get("crossed")
     name = (sc[fc["pick"] - 1]["name"] if fc.get("pick") and k == "hit" else sc[c - 1]["name"]) if (c or (fc.get("pick") and k == "hit")) else ""
+    ov = res.get("overlap")
+    tail = f'. {md(ov["day"])} {ov["event"]} 소식이 겹쳐 성적에는 따로 셉니다' if ov else ""   # 판정 날 겹침 (2026-11-22 사용자)
     if k == "hit" and name:
-        return f"‘{name}’{_ig(name)} 맞아 전망을 마쳤습니다"
+        return f"‘{name}’{_ig(name)} 맞아 전망을 마쳤습니다{tail}"
     if k == "miss":
-        return "미리 적은 전망이 틀려 마쳤습니다"
+        return f"미리 적은 전망이 틀려 마쳤습니다{tail}"
     if k == "neither":
         return "정해 둔 기간 안에 기준을 넘지 않아 전망을 마쳤습니다"
     if k in ("hold", "void"):
@@ -2337,6 +2426,10 @@ def split_done(pub, states):
         nx = [f for _, f in opened if f.get("subject") and f.get("subject") == fc.get("subject")]
         fc["next_fc"] = {"title": nx[-1]["title"], "slug": nx[-1]["slug"]} if nx else None
         if res.get("unscored"):
+            continue
+        if res.get("overlap"):   # 판정 난 날 다른 사건이 겹친 전망 — 맞음 · 틀림에 넣지 않고 `여러 사건이 겹친 전망` 으로 따로 (2026-11-22 사용자)
+            score["crowded"] = score.get("crowded", 0) + 1
+            score["n"] += 1
             continue
         if k in score:
             score[k] += 1
