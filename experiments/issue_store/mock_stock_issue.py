@@ -44,6 +44,7 @@ IW.CFG["NVDA_CEO"] = dict(
             "확전": [("의혹 · 보도", r"의혹|보도|연루|스캔들|간첩|스파이|report"), ("조사", r"조사|probe|investigat"),
                      ("사임", r"사임|퇴임|해임|resign|step(s|ped)? down"), ("소송 · 제재", r"소송|기소|제재|벌금|lawsuit|indict|charge")]})
 IW.TL_REF["NVDA_CEO"] = (SYM_NM, SYM, "{:,.2f}달러")
+IW.REF2["NVDA_CEO"] = [(SYM_NM, SYM, None, "{:,.2f}달러", -1), ("엔비디아 반도체 대비", SYM, SECTOR, None, -1)]   # 비교 지표 둘 — 회사 일인지 업계 일인지 (과거 사례 없음 · 이유로만, 2026-11-22)
 IW.STAGE_Q["NVDA_CEO"] = "사태 진행 상황"   # Hot Issue `전쟁 진행 상황` 자리
 
 

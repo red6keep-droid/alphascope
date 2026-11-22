@@ -150,6 +150,55 @@ CFG = {
 TL_REF = {"IRAN": ("브렌트유", "BZ=F", "{:,.1f}달러"), "TARIFF": ("S&P 500", "^GSPC", "{:,.0f}"), "EXPORT": ("반도체 지수", "^SOX", "{:,.0f}")}
 C = {}   # 지금 그리는 이슈 설정 (use() 가 채운다)
 
+# 비교 지표 둘 — 헌법 제1조(모든 데이터에는 비교 대상) · doc/검증/HotIssue-비교지표-검증.md (2026-11-22 사용자)
+# (이름, 기호, 빼는 기호 또는 None = 상대 지표 %p, 값 표기 또는 None, 나쁜 쪽(확전 · 강화 · 악화)일 때 방향 +1 오름 · −1 내림)
+# 타임라인 날짜 줄 = 둘 다 그날 움직임, `시장도 같은 쪽인가?` 카드 = 둘의 5거래일 움직임과 읽는 법. 새 수집 없음(prices() 가 이미 받는 기호)
+REF2 = {"IRAN": [("브렌트유", "BZ=F", None, "{:,.1f}달러", 1), ("에너지 업종 시장 대비", "XLE", "^GSPC", None, 1)],
+        "TARIFF": [("S&P 500", "^GSPC", None, "{:,.0f}", -1), ("불안 지수", "^VIX", None, "{:.1f}", 1)],
+        "EXPORT": [("반도체 시장 대비", "^SOX", "^GSPC", None, -1), ("엔비디아 반도체 대비", "NVDA", "^SOX", None, -1)]}
+PAIR = [[]]   # 지금 그리는 이슈의 카드 줄 (page 가 채우고 q_align 이 읽는다)
+
+
+def _ref_series(px, sym, base):
+    """비교 지표 계열 — 상대 지표는 두 종가의 비(같은 날만). 없으면 None."""
+    if px is None or sym not in px or (base and base not in px):
+        return None
+    s = px[sym].dropna()
+    if base:
+        b = px[base].dropna()
+        ix = s.index.intersection(b.index)
+        s = s[ix] / b[ix]
+    return s
+
+
+def pair_lines(px):
+    """`시장도 같은 쪽인가?` 카드 맨 위 — 비교 지표 둘의 5거래일 움직임 + 읽는 법 한 줄. 쪽 = 평소(직전 60거래일)의 1배 넘게 움직인 방향."""
+    refs = REF2.get(C["iss"]["id"]) or []
+    rows, sides = [], []
+    for name, sym, base, fmt, sgn in refs:
+        s = _ref_series(px, sym, base)
+        if s is None or len(s) < BASE + WIN + 2:
+            continue
+        z, pct, _, _ = z10(s, n=WIN)
+        side = C["bad"] if z * sgn >= 1 else C["good"] if z * sgn <= -1 else None
+        val = (f'<span style="color:{dk.UP if pct > 0 else dk.DOWN};white-space:nowrap;">{dk.tri_span(pct > 0, 18)}{abs(pct):.1f}{"%p" if base else "%"}</span>'
+               if round(pct, 1) != 0 else "0.0" + ("%p" if base else "%"))
+        rows.append(("row", name, val, f"{side} 쪽 · 평소의 {abs(z):.1f}배" if side else "평소 범위"))
+        sides.append((name, side))
+    if len(sides) < 2:
+        return []
+    (n1, s1), (n2, s2) = sides
+    if s1 and s1 == s2:
+        read = f"두 지표 모두 {s1} 쪽으로 움직였습니다."
+    elif s1 and s2:
+        read = f"두 지표가 서로 다른 쪽을 가리킵니다. {josa(n1, ('은', '는'))} {s1} 쪽, {josa(n2, ('은', '는'))} {s2} 쪽입니다."
+    elif s1 or s2:
+        a, b, sd = (n1, n2, s1) if s1 else (n2, n1, s2)
+        read = f"{josa(a, ('만', '만'))} {sd} 쪽으로 움직였고 {josa(b, ('은', '는'))} 평소 범위입니다."
+    else:
+        read = "두 지표 모두 평소 범위입니다."
+    return [(_ttl("대표 지표 둘 (최근 5거래일)"), "html")] + rows + [(read, "plain")]
+
 # `종전되면 · 확전되면 주가는?` — 쪽마다 흔한 설명(사슬 갈림) + 사건표 사례 (2026-11-14 사용자: 독자가 궁금한 건 확전 때 · 종전 때 주가)
 #   chain = 흔한 설명을 가져올 사슬(None = 없음) · kinds = 사건표 분류 · inc / exc = 제목 낱말 · note = 표 아래 안내
 IF_SIDES = {
@@ -951,6 +1000,26 @@ def news_timeline(evs, days_desc, px=None):
     node = (f'<span style="display:inline-block;width:{H.TL_DOT}px;height:{H.TL_DOT}px;box-sizing:border-box;border:2px solid {H.TL_LINE};border-radius:50%;background:#fff;"></span>')
     ref_nm, ref_sym, ref_fmt = TL_REF[C["iss"]["id"]]
     ref = px[ref_sym].dropna() if px is not None and ref_sym in px else None
+    refs2 = [(nm, _ref_series(px, sym, base), base, fmt) for nm, sym, base, fmt, _ in REF2.get(C["iss"]["id"]) or []]   # 비교 지표 둘 (헌법 제1조, 2026-11-22)
+    refs2 = [x for x in refs2 if x[1] is not None]
+
+    def pair_price(t):
+        """날짜 옆 = 비교 지표 둘의 그날 움직임 — 값이 있는 지표는 `이름 값 ▲n%`, 상대 지표는 `이름 ▲n%p`. 둘 사이는 줄바꿈 허용."""
+        out = ""
+        for nm, s, base, fmt in refs2:
+            if t not in s.index:
+                continue
+            i = s.index.get_loc(t)
+            if i == 0 or float(s.iloc[i]) == float(s.iloc[i - 1]):
+                continue
+            chg = (float(s.iloc[i]) / float(s.iloc[i - 1]) - 1) * 100
+            unit = "%p" if base else "%"
+            val = (f'<span style="color:{dk.UP if chg > 0 else dk.DOWN};font-weight:400;white-space:nowrap;">{dk.tri_span(chg > 0, TL_TRI_PX / 0.8)}{abs(chg):.1f}{unit}</span>'
+                   if round(chg, 1) != 0 else f'<span style="font-weight:400;color:#111;">0.0{unit}</span>')
+            lvl = f'<span style="font-weight:400;color:#111;white-space:nowrap;">{dk.esc(fmt.format(float(s.iloc[i])))}</span>' if fmt and not base else ""
+            out += (f'<span style="display:inline-flex;align-items:center;gap:6px;white-space:nowrap;">'
+                    f'<span style="font-weight:400;color:{dk.SUB};">{dk.esc(nm)}</span>{lvl}{val}</span>')
+        return out
 
     def price(d):
         """날짜 옆 기준 가격 = 그날 소식 뒤 첫 종가(한국 시간 다음 날 아침 도착하는 미국 종가) · 전날 대비 ▲▼ — 주말 · 휴장 · 아직 안 닫힌 날은 비움."""
@@ -963,6 +1032,8 @@ def news_timeline(evs, days_desc, px=None):
                 why = {5: "토요일", 6: "일요일"}.get(t.weekday(), "공휴일")   # 왜 쉬는지까지 — `토요일 휴장` · `일요일 휴장` · 평일은 `공휴일 휴장` (2026-11-15 사용자), 기준 가격 이름은 뺌(시장 전체가 쉬는 날)
                 return f'<span style="font-weight:400;color:{dk.SUB};white-space:nowrap;">{why} 휴장</span>'
             return ""
+        if refs2:   # 비교 지표 둘이 정해진 이슈 = 둘 다 (2026-11-22)
+            return pair_price(t)
         i = ref.index.get_loc(t)
         if i == 0:
             return ""
@@ -988,7 +1059,7 @@ def news_timeline(evs, days_desc, px=None):
         off = "휴장" in pv
         note = "" if off else (f'<div style="margin:-4px 0 {pad}px;font-size:{dk.NAME};line-height:{dk.LH_CARD};color:{dk.SUB};">'
                                f'{"오늘 관련 기사 없음" if d == days_desc[0] else "관련 기사 없음"}</div>')
-        content = (f'<div style="display:flex;align-items:center;gap:8px;padding:{0 if first else pad}px 0 {pad}px;font-size:{dk.NAME};line-height:{dk.LH_CARD};font-weight:700;color:#111;">'
+        content = (f'<div style="display:flex;flex-wrap:wrap;align-items:center;gap:0 8px;padding:{0 if first else pad}px 0 {pad}px;font-size:{dk.NAME};line-height:{dk.LH_CARD};font-weight:700;color:#111;">'
                    f'<span style="white-space:nowrap;">{H.md(d)}</span>{pv}</div>' + note
                    + ("" if last else f'<div style="height:{H.TL_DAY_GAP}px;"></div>'))
         return H._tl_row(node, int(dk.LH_CARD.rstrip("px")), 0 if first else pad, content, False, last), ""
@@ -1006,7 +1077,7 @@ def news_timeline(evs, days_desc, px=None):
         talk = H._talk_mark().replace(f"margin:0 {dk.PILL_GAP}px;", f"margin:0 0 0 {dk.PILL_GAP}px;flex:none;", 1) if top["talk"] else ""
         chev = f'<span aria-hidden="true" style="flex:none;display:inline-flex;transform:rotate(-90deg);color:#333;">{H.CHEV14}</span>'
         content = (f'<div data-news-pop="{dk.esc(pid)}" role="button" tabindex="0" style="cursor:pointer;">'
-                   f'<div style="display:flex;align-items:center;gap:8px;padding:{0 if first else pad}px 0 {pad}px;font-size:{dk.NAME};line-height:{dk.LH_CARD};font-weight:700;color:#111;"><span style="white-space:nowrap;">{H.md(d)}</span>{price(d)}</div>'
+                   f'<div style="display:flex;flex-wrap:wrap;align-items:center;gap:0 8px;padding:{0 if first else pad}px 0 {pad}px;font-size:{dk.NAME};line-height:{dk.LH_CARD};font-weight:700;color:#111;"><span style="white-space:nowrap;">{H.md(d)}</span>{price(d)}</div>'
                    f'<div style="display:flex;align-items:center;gap:4px;margin:-4px 0 {pad}px;">'
                    f'<span style="display:flex;align-items:center;min-width:0;flex:0 1 auto;">{lab}{H._one_line(dk.esc(top["title"]), grow=False, color=H.TL_WHY_INK)}{talk}</span>{chev}</div>'
                    + ("" if last else f'<div style="height:{H.TL_DAY_GAP}px;"></div>') + '</div>')
@@ -1421,7 +1492,7 @@ def q_align(word, links, gs, oil_gr, oil_line, hist, asof):
     md = (" · ".join(mv) + " 움직였습니다." if mv else "") + ((" " if mv else "") + f"{josa(' · '.join(calm), ('은', '는'))} 평소 범위입니다." if calm else "")
     verdict = ("" if mk == "평소 범위" or ns is None else " 뉴스와 시장이 같은 쪽을 가리킵니다." if ns == mk else " 뉴스와 시장이 서로 다른 쪽을 가리킵니다.")
     first = f"최근 일주일 뉴스는 {nd}. 같은 기간({H.md(d0.strftime('%Y-%m-%d'))} → {H.md(d1.strftime('%Y-%m-%d'))} 종가) 시장은 " + md + verdict
-    lines = [(first, "plain"), (_align_table(gs), "html")]
+    lines = [(first, "plain")] + PAIR[0] + [(_align_table(gs), "html")]   # 대표 지표 둘 = 묶음 표 위 (헌법 제1조, 2026-11-22)
     lines += [(_ttl("날마다 어느 쪽이었나") + _hist_grid(hist), "html"),
               ("칸 하나 = 그날까지 일주일입니다. 미국 종가 기준이라 날짜는 뉴욕 날짜입니다.", "note")]
     lines += ([(oil_gr, "html")] if oil_gr else []) + ([(oil_line, "note")] if oil_line else [])
@@ -1935,6 +2006,7 @@ def page(cur, watch, items, px, now, today, days, sums, logs):
     gauge = gauge_card(evs, today)
     links5 = link_rows(px, cur["chain"], n=WIN)
     gs5 = group_side(links5)
+    PAIR[0] = pair_lines(px)
     c_align, align = q_align(gauge_word(evs, today), links5, gs5, chart_gr, chart_line, hist, asof)
     cur["align"] = align
 
