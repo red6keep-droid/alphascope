@@ -1,134 +1,4 @@
 {
- "7cd4b72a2ec5": {
-  "lines": [
-   "다음 주 뉴욕 미술품 경매 총매출 24억 달러 예상",
-   "소더비 경매 단독 매출 11억 달러 상회 전망",
-   "블라키에르-아리에타 컬렉션 추정가 4억 5000만 달러",
-   "빈센트 반 고흐 작품 추정가 1억 8000만 달러",
-   "폴 세잔 작품 추정가 1억 2000만 달러"
-  ],
-  "tags": [
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "MARKET_STRUCTURE",
-    "dir": "positive",
-    "stage": "talk"
-   },
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "MARKET_STRUCTURE",
-    "dir": "positive",
-    "stage": "talk"
-   },
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "MARKET_STRUCTURE",
-    "dir": "neutral",
-    "stage": "talk"
-   },
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "MARKET_STRUCTURE",
-    "dir": "neutral",
-    "stage": "talk"
-   },
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "MARKET_STRUCTURE",
-    "dir": "neutral",
-    "stage": "talk"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-15T01:18:56.361711+00:00",
-  "n_src": 900
- },
- "3effc3d40526": {
-  "lines": [
-   "앤트로픽 나스닥 상장 목요일 예정",
-   "아마존 초기 투자자 참여",
-   "공모가 70달러에서 78달러 전망"
-  ],
-  "tags": [
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLK",
-    "issue": "CORP_EVENT",
-    "dir": "neutral",
-    "stage": "talk"
-   },
-   {
-    "scope": "stock",
-    "tickers": [
-     "AMZN"
-    ],
-    "sector": "XLY",
-    "issue": "CORP_EVENT",
-    "dir": "positive",
-    "stage": "done"
-   },
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLK",
-    "issue": "CORP_EVENT",
-    "dir": "neutral",
-    "stage": "talk"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-15T12:46:29.433162+00:00",
-  "n_src": 900
- },
- "9a8a0a7e5148": {
-  "lines": [
-   "앨리스 황 2025년 8월 퇴사",
-   "젠슨 황 11월 12일 사임",
-   "메가스피드 내부 조사 착수"
-  ],
-  "tags": [
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLK",
-    "issue": "CORP_EVENT",
-    "dir": "neutral",
-    "stage": "done"
-   },
-   {
-    "scope": "stock",
-    "tickers": [
-     "NVDA"
-    ],
-    "sector": "SMH",
-    "issue": "CORP_EVENT",
-    "dir": "negative",
-    "stage": "done"
-   },
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLK",
-    "issue": "CORP_EVENT",
-    "dir": "negative",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-15T12:46:29.433162+00:00",
-  "n_src": 900
- },
  "b3730a3128e5": {
   "lines": [
    "2025년 국가별 디지털 노마드 순위에서 헝가리의 5위 기록"
@@ -147,42 +17,6 @@
   "at": "2026-11-15T19:06:23.289025+00:00",
   "n_src": 900,
   "retry": true
- },
- "c93d4f671850": {
-  "lines": [
-   "미국 전역 항공편 운항 중단의 정확한 원인 미확정",
-   "라우터와 네트워킹 장비가 기술적 장애와 연관된 상태",
-   "연방항공청장의 발표에 따른 항공기 운항 중단 조치"
-  ],
-  "tags": [
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLI",
-    "issue": "MARKET_STRUCTURE",
-    "dir": "neutral",
-    "stage": "talk"
-   },
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLI",
-    "issue": "MARKET_STRUCTURE",
-    "dir": "negative",
-    "stage": "talk"
-   },
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLI",
-    "issue": "MARKET_STRUCTURE",
-    "dir": "negative",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-15T12:46:30.351328+00:00",
-  "n_src": 900
  },
  "389a713d68b8": {
   "lines": [
@@ -3548,39 +3382,39 @@
  },
  "2ca0a4842535": {
   "lines": [
-   "항공편 운항 중단 및 이메일 접속 장애 등 기술적 오류 발생"
+   "최근 기술 장애로 항공기 운항 중단 및 이메일 접속 차단 발생",
+   "정부 당국이 시스템 오작동 관련 악의적 배후설 부인"
   ],
   "tags": [
    {
     "scope": "sector",
     "tickers": [],
-    "sector": "XLK",
-    "issue": "OTHER",
+    "sector": "XLU",
+    "issue": "MARKET_STRUCTURE",
     "dir": "negative",
     "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-21T21:46:30.207011+00:00",
-  "n_src": 900
- },
- "37cc6b7e66d7": {
-  "lines": [
-   "세피 타비비안의 2015년 스페인 이주"
-  ],
-  "tags": [
+   },
    {
-    "scope": "market",
+    "scope": "sector",
     "tickers": [],
-    "sector": null,
-    "issue": "OTHER",
+    "sector": "XLU",
+    "issue": "GEOPOLITICS",
     "dir": "neutral",
     "stage": "done"
    }
   ],
   "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-21T21:46:31.597160+00:00",
-  "n_src": 900
+  "at": "2026-11-22T12:47:00.647858+00:00",
+  "n_src": 900,
+  "retry": true
+ },
+ "37cc6b7e66d7": {
+  "lines": [],
+  "tags": [],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-22T12:47:00.647858+00:00",
+  "n_src": 900,
+  "retry": true
  },
  "7ab476a90e49": {
   "lines": [
@@ -3620,7 +3454,7 @@
  },
  "0337d3d7172f": {
   "lines": [
-   "월스트리트의 1년 이상 만에 최악의 주간 기록"
+   "월스트리트 증시가 1년여 만에 최악의 주간 하락 기록"
   ],
   "tags": [
    {
@@ -3628,31 +3462,34 @@
     "tickers": [],
     "sector": null,
     "issue": "MARKET_STRUCTURE",
-    "dir": "negative",
-    "stage": "done"
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
    }
   ],
   "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-21T21:46:31.597160+00:00",
-  "n_src": 301
+  "at": "2026-11-22T12:47:00.647858+00:00",
+  "n_src": 301,
+  "retry": true
  },
  "9c51c8dfa587": {
   "lines": [
-   "캘리포니아 금광 채굴자들의 수백만 달러 수익 기록"
+   "캘리포니아 금광에서 광부들이 수백만 달러 수익 기록"
   ],
   "tags": [
    {
     "scope": "sector",
     "tickers": [],
     "sector": "XLB",
-    "issue": "EARNINGS",
-    "dir": "positive",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
     "stage": "done"
    }
   ],
   "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-21T21:46:32.873843+00:00",
-  "n_src": 76
+  "at": "2026-11-22T12:47:01.333885+00:00",
+  "n_src": 76,
+  "retry": true
  },
  "df0f7a36186c": {
   "lines": [
@@ -3696,6 +3533,88 @@
   ],
   "model": "gemini-3.5-flash-lite",
   "at": "2026-11-21T21:46:34.139628+00:00",
+  "n_src": 900
+ },
+ "41788f30a1d5": {
+  "lines": [
+   "데본 에너지 3분기 실적 예상치 상회",
+   "데본 에너지 분기 배당금 32센트 발표"
+  ],
+  "tags": [
+   null,
+   null
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-22T12:46:53.790667+00:00",
+  "n_src": 900
+ },
+ "bb3fc249a39b": {
+  "lines": [
+   "아마존 클라우드 사업부 3분기 매출 39.3% 증가",
+   "아마존 3분기 백로그 5780억 달러 기록",
+   "아마존 최근 12개월 영업 현금흐름 1683억 달러로 29% 증가"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "AMZN"
+    ],
+    "sector": "XLY",
+    "issue": "EARNINGS",
+    "dir": "positive",
+    "stage": "done"
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "AMZN"
+    ],
+    "sector": "XLY",
+    "issue": "EARNINGS",
+    "dir": "positive",
+    "stage": "done"
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "AMZN"
+    ],
+    "sector": "XLY",
+    "issue": "EARNINGS",
+    "dir": "positive",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-22T12:46:53.790667+00:00",
+  "n_src": 900
+ },
+ "f6c5198b3c7f": {
+  "lines": [
+   "페이스크래프트 2025년 시리즈 B 펀딩으로 3400만 달러 조달",
+   "페이스크래프트 9월 미국 본사 설립 계획 발표"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "SMH",
+    "issue": "CORP_EVENT",
+    "dir": "positive",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "SMH",
+    "issue": "CORP_EVENT",
+    "dir": "neutral",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-22T12:46:53.790667+00:00",
   "n_src": 900
  }
 }
