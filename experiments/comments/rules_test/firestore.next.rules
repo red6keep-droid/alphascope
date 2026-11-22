@@ -1,0 +1,248 @@
+// Newfact 댓글 — Firestore 보안 규칙
+// 처음 2026-10-14(사용자: "우리가 댓글 프로그램을 만드는 건 어때?") · 새 판 2026-11-22(기획 alphascope-docs doc/기획/댓글-토론방-기획.md 3 · 4절)
+//
+// 블로거 댓글(iframe)은 아이폰 사파리가 다른 도메인 쿠키를 막아 로그인을 못 보고, 폰에서 입력창이 좁다 → 우리 페이지 안에서
+// Firebase 로 돌린다. 테마 JS 는 Firestore REST 로 읽고 쓰며, 로그인은 Firebase Auth(Google 팝업).
+//
+// ── 새 판 구조 (네이버 토론 꼴: 제목 있는 글 → 글 화면 → 답글) ─────────────────────────────────
+//  posts/{열쇠}/comments/{cid}                       글(목록에 보이는 것)
+//      uid · nick · title(1~40) · text(1~2000) · created · up · down · replies · [post 쓴 날 글 주소] · [sym 종목 코드] · [hidden 봇만]
+//  posts/{열쇠}/comments/{cid}/replies/{rid}          답글   uid · nick · text · created · up · down · [sym]
+//  …/{글 또는 답글}/reacts/{uid}                      좋아요 · 싫어요 한 표   v('up'|'down') · created
+//  …/{글 또는 답글}/reports/{uid}                     신고 하나              why(다섯 중 하나) · created
+//  users/{uid}      last(20초) · day · n(하루 글 · 답글 30) · rday · rn · rlast(하루 반응 30) · nick · intro · nickAt(30일) · lastC · lastD
+//  nicks/{별명}     uid — 같은 별명 막기
+//  bans/{uid}       쓰기 정지(운영자가 콘솔 · 서비스 계정으로만 만든다)
+//  열쇠 = 블로거 글 id(숫자) 또는 자리 이름(place-market-kr · place-market-us · place-kr-report — 날마다 새 글이 나와도 댓글이 이어지게)
+//
+//  숫자 칸(up · down · replies)은 볼 때마다 세면 방문자마다 읽기가 늘어서 칸으로 둔다. 남이 고치는 칸이라
+//  "같은 commit 안에서 그 사람 표 · 답글이 실제로 생기거나 없어질 때만 ±1" 을 getAfter 로 확인한다.
+//  하루 상한 · 20초 간격은 users 문서를 같은 commit 에서 같이 고치게 해 건다(last · rlast == request.time 이 그 증거).
+//
+// ── 옛 판(지금 블로그에 붙은 테마) ───────────────────────────────────────────────────────────
+//  comments 에 uid · name · photo · text · created · [parent] 를 쓰고 users 에 last 하나만 쓴다. 새 테마를 붙여넣을 때까지
+//  댓글이 끊기지 않게 그대로 받는다(링크 막기 · 쓰기 정지는 같이 건다). 새 테마 붙여넣은 뒤 legacy* 를 지운다.
+//
+// 블로그 주인(isOwner — 2026-10-14 사용자 계정 "keep red6")은 모든 글을 지우고 가릴 수 있다. 수정은 없다 — 지우고 다시 쓴다.
+// 적용: Firebase 콘솔 → Firestore Database → 규칙 → 이 파일 내용 붙여넣기 → 게시.
+// 시험: experiments/comments/rules_test/ (에뮬레이터, 막힘 · 통과 경우 표)
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function me() { return request.auth.uid; }
+    function isOwner() { return signedIn() && me() == 'u1vln4bbDgSgWQDe2F2FaNs81D43'; }
+    function db() { return /databases/$(database)/documents; }
+    function userPath() { return /databases/$(database)/documents/users/$(me()); }
+    function userAfter() { return getAfter(userPath()).data; }
+    function notBanned() { return !exists(/databases/$(database)/documents/bans/$(me())); }
+
+    // 한국 날짜 번호(1970-01-01 KST 부터 며칠째) — 하루 상한이 한국 자정에 풀린다
+    function today() { return (request.time.toMillis() + 32400000) / 86400000; }
+
+    // 열쇠 = 글 id(숫자 5~25자리) 또는 정해 둔 자리 이름 — 임의 경로에 쓰레기를 쌓지 못하게
+    function keyOk(key) { return key.matches('^([0-9]{5,25}|place-(market-kr|market-us|kr-report))$'); }
+
+    // 오픈채팅 · 텔레그램 · 밴드 · 주소 · 휴대전화 번호는 받지 않는다(기획 4절 — 1단계는 일반 주소도 막는다)
+    function clean(s) {
+      return !s.matches('(?is).*(open[.]kakao|kakao[.]com/o/|t[.]me/|telegram|band[.]us|https?://|www[.]|01[016789][-. ]?[0-9]{3,4}[-. ]?[0-9]{4}).*');
+    }
+    function textOk(s) { return s is string && s.size() >= 1 && s.size() <= 2000 && clean(s); }
+    function symOk(d) { return !('sym' in d) || (d.sym is string && d.sym.matches('^[A-Z0-9][A-Z0-9.-]{0,11}$')); }
+
+    function notTooFast() {
+      return !exists(userPath()) || !('last' in get(userPath()).data)
+        || get(userPath()).data.last < request.time - duration.value(20, 's');
+    }
+    // 새 판 쓰기 공통 — 별명이 있어야 하고(users.nick), 같은 commit 에서 users 의 last · lastC 를 이 문서로 고쳐야 한다(하루 30 · 20초)
+    function newWriteOk(id) {
+      let u = userAfter();
+      return 'nick' in u && request.resource.data.nick == u.nick
+        && u.last == request.time && u.lastC == id
+        && request.resource.data.uid == me()
+        && request.resource.data.created == request.time
+        && request.resource.data.up == 0 && request.resource.data.down == 0
+        && notTooFast() && notBanned();
+    }
+
+    // 표 문서가 같은 commit 에서 생기거나 · 바뀌거나 · 없어질 때만 up · down 이 그만큼 움직인다
+    function voteMoveOk(target) {
+      let r = path('/databases/' + database + '/documents/' + target + '/reacts/' + me());
+      let was = exists(r) ? get(r).data.v : 'none';
+      let now = existsAfter(r) ? getAfter(r).data.v : 'none';
+      return was != now
+        && request.resource.data.up == resource.data.up + (now == 'up' ? 1 : 0) - (was == 'up' ? 1 : 0)
+        && request.resource.data.down == resource.data.down + (now == 'down' ? 1 : 0) - (was == 'down' ? 1 : 0);
+    }
+    function onlyChanged(keys) { return request.resource.data.diff(resource.data).affectedKeys().hasOnly(keys); }
+
+    // ── 글 ───────────────────────────────────────────────────────────────────────────────
+    match /posts/{key}/comments/{cid} {
+      allow read: if true;
+
+      allow create: if signedIn() && keyOk(key) && (newCommentOk() || legacyCreateOk());
+
+      // 숫자 칸만 — 답글 ±1 · 표 ±1. 주인은 hidden(되살리기 포함). 댓글 봇은 서비스 계정이라 규칙 밖.
+      allow update: if signedIn() && (
+        (onlyChanged(['replies']) && (replyAdded() || replyRemoved()))
+        || (onlyChanged(['up', 'down']) && voteMoveOk('posts/' + key + '/comments/' + cid))
+        || (isOwner() && onlyChanged(['hidden']))
+      );
+
+      allow delete: if signedIn() && (resource.data.uid == me() || isOwner());
+
+      function newCommentOk() {
+        let d = request.resource.data;
+        return d.keys().hasOnly(['uid', 'nick', 'title', 'text', 'created', 'up', 'down', 'replies', 'post', 'sym'])
+          && d.title is string && d.title.size() >= 1 && d.title.size() <= 40 && clean(d.title)
+          && textOk(d.text) && symOk(d)
+          && (!('post' in d) || (d.post is string && d.post.size() <= 300))
+          && d.replies == 0
+          && newWriteOk(cid);
+      }
+      // 옛 테마(지금 블로그) — 새 테마 붙여넣은 뒤 지운다
+      function legacyCreateOk() {
+        let d = request.resource.data;
+        return d.keys().hasOnly(['uid', 'name', 'photo', 'text', 'created', 'parent'])
+          && d.uid == me()
+          && d.name is string && d.name.size() >= 1 && d.name.size() <= 60
+          && d.photo is string && d.photo.size() <= 400
+          && textOk(d.text)
+          && d.created == request.time
+          && (!('parent' in d) || (d.parent is string && d.parent.size() <= 40 && exists(/databases/$(database)/documents/posts/$(key)/comments/$(d.parent))))
+          && notTooFast() && notBanned();
+      }
+      // 같은 commit 에서 답글이 새로 생겼다(users.lastC = 그 답글 id)
+      function replyAdded() {
+        let rp = /databases/$(database)/documents/posts/$(key)/comments/$(cid)/replies/$(userAfter().lastC);
+        return request.resource.data.replies == resource.data.replies + 1
+          && existsAfter(rp) && getAfter(rp).data.created == request.time;
+      }
+      // 같은 commit 에서 답글이 지워졌다(users.lastD = 그 답글 id)
+      function replyRemoved() {
+        let rp = /databases/$(database)/documents/posts/$(key)/comments/$(cid)/replies/$(userAfter().lastD);
+        return request.resource.data.replies == resource.data.replies - 1
+          && exists(rp) && !existsAfter(rp);
+      }
+
+      // ── 답글 ─────────────────────────────────────────────────────────────────────────────
+      match /replies/{rid} {
+        allow read: if true;
+        allow create: if signedIn() && keyOk(key) && newReplyOk();
+        allow update: if signedIn() && onlyChanged(['up', 'down']) && voteMoveOk('posts/' + key + '/comments/' + cid + '/replies/' + rid);
+        allow update: if isOwner() && onlyChanged(['hidden']);
+        allow delete: if signedIn() && (resource.data.uid == me() || isOwner());
+
+        function newReplyOk() {
+          let d = request.resource.data;
+          let parent = /databases/$(database)/documents/posts/$(key)/comments/$(cid);
+          return d.keys().hasOnly(['uid', 'nick', 'text', 'created', 'up', 'down', 'sym'])
+            && textOk(d.text) && symOk(d)
+            && exists(parent)
+            && getAfter(parent).data.replies == get(parent).data.replies + 1
+            && newWriteOk(rid);
+        }
+
+        match /reacts/{uid} {
+          allow get: if signedIn() && uid == me();
+          allow create, update: if reactOk(uid, 'posts/' + key + '/comments/' + cid + '/replies/' + rid);
+          allow delete: if reactDelOk(uid, 'posts/' + key + '/comments/' + cid + '/replies/' + rid);
+        }
+        match /reports/{uid} {
+          allow create: if reportOk(uid);
+        }
+      }
+
+      match /reacts/{uid} {
+        allow get: if signedIn() && uid == me();
+        allow create, update: if reactOk(uid, 'posts/' + key + '/comments/' + cid);
+        allow delete: if reactDelOk(uid, 'posts/' + key + '/comments/' + cid);
+      }
+      match /reports/{uid} {
+        allow create: if reportOk(uid);
+      }
+    }
+
+    // 표 — 한 사람 한 표, 바꾸기는 update. 같은 commit 에서 users.rlast(하루 30번)와 대상 숫자 칸이 같이 움직여야 한다
+    function reactOk(uid, target) {
+      let d = request.resource.data;
+      let t = path('/databases/' + database + '/documents/' + target);
+      return signedIn() && uid == me()
+        && d.keys().hasOnly(['v', 'created']) && d.v in ['up', 'down'] && d.created == request.time
+        && userAfter().rlast == request.time
+        && getAfter(t).data.get(d.v, 0) == get(t).data.get(d.v, 0) + 1
+        && notBanned();
+    }
+    // 표 취소 — 대상 숫자 칸이 같은 commit 에서 1 줄어야 한다(하루 30번은 돌려주지 않는다)
+    function reactDelOk(uid, target) {
+      let t = path('/databases/' + database + '/documents/' + target);
+      let v = resource.data.v;
+      return signedIn() && uid == me() && getAfter(t).data.get(v, 0) == get(t).data.get(v, 0) - 1;
+    }
+    // 신고 — 한 사람 한 번(문서 id = 내 uid, 만든 뒤 못 고침). 3명이면 댓글 봇이 hidden
+    function reportOk(uid) {
+      let d = request.resource.data;
+      return signedIn() && uid == me()
+        && d.keys().hasOnly(['why', 'created'])
+        && d.why in ['ad', 'abuse', 'privacy', 'false', 'etc']
+        && d.created == request.time;
+    }
+
+    // 내 프로필 · 내가 쓴 글 — uid 로 모든 곳 글을 찾는 컬렉션 그룹 질의(콘솔 색인: comments · uid 오름 + created 내림, 컬렉션 그룹)
+    match /{path=**}/comments/{cid} {
+      allow read: if true;
+    }
+
+    // ── 사용자 ───────────────────────────────────────────────────────────────────────────
+    match /users/{uid} {
+      allow get: if signedIn() && uid == me();   // 내 별명 · 오늘 남은 수 보이기
+      allow list: if false;
+      allow create, update: if signedIn() && uid == me() && (legacyUserOk() || newUserOk());
+      allow delete: if false;
+
+      function legacyUserOk() {   // 옛 테마 — last 하나만 덮어쓴다. 새 테마 붙여넣은 뒤 지운다
+        return request.resource.data.keys().hasOnly(['last']) && request.resource.data.last == request.time;
+      }
+      function was(f, dflt) { return resource != null && f in resource.data ? resource.data[f] : dflt; }
+      function newUserOk() {
+        let d = request.resource.data;
+        let ch = resource == null ? d.keys().toSet() : d.diff(resource.data).affectedKeys();
+        return d.keys().hasOnly(['last', 'day', 'n', 'lastC', 'lastD', 'rday', 'rn', 'rlast', 'nick', 'intro', 'nickAt'])
+          && (!ch.hasAny(['last', 'day', 'n', 'lastC']) || writeBumpOk(d))
+          && (!ch.hasAny(['rday', 'rn', 'rlast']) || reactBumpOk(d))
+          && (!ch.hasAny(['lastD']) || d.lastD is string)
+          && (!ch.hasAny(['nick', 'nickAt']) || nickOk(d))
+          && (!ch.hasAny(['intro']) || (d.intro is string && d.intro.size() <= 100));
+      }
+      // 글 · 답글 하나 = last 지금 · n +1(날이 바뀌면 1) · 30 까지
+      function writeBumpOk(d) {
+        return d.last == request.time && d.lastC is string && d.lastC.size() <= 40
+          && d.day == today() && d.n == (was('day', -1) == today() ? was('n', 0) + 1 : 1) && d.n <= 30;
+      }
+      // 좋아요 · 싫어요 한 번 = rn +1 · 30 까지(취소해도 돌려주지 않는다 — 11-21 확정)
+      function reactBumpOk(d) {
+        return d.rlast == request.time
+          && d.rday == today() && d.rn == (was('rday', -1) == today() ? was('rn', 0) + 1 : 1) && d.rn <= 30;
+      }
+      // 별명 = 한글 · 영문 · 숫자 2~12자, 30일에 한 번, nicks/{별명} 을 같은 commit 에서 내 것으로
+      function nickOk(d) {
+        return d.nick is string && d.nick.matches('^[가-힣A-Za-z0-9]{2,12}$')
+          && d.nickAt == request.time
+          && (was('nickAt', null) == null || was('nickAt', null) < request.time - duration.value(30, 'd'))
+          && getAfter(/databases/$(database)/documents/nicks/$(d.nick)).data.uid == uid;
+      }
+    }
+
+    match /nicks/{nick} {
+      allow get: if true;   // 프로필 설정 때 "이미 쓰는 별명" 확인
+      allow create: if signedIn() && request.resource.data.keys().hasOnly(['uid']) && request.resource.data.uid == me()
+        && nick.matches('^[가-힣A-Za-z0-9]{2,12}$') && userAfter().nick == nick;
+      // 별명을 바꿀 때 옛 별명을 놓아준다
+      allow delete: if signedIn() && resource.data.uid == me() && userAfter().nick != nick;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

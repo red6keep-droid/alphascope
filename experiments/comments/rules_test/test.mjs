@@ -1,3 +1,4 @@
+// **보류(2026-11-22 같은 날): 토론 저장소를 Cloudflare(D1 · R2 · Worker)로 바꿔 이 규칙은 게시하지 않는다.** 경우 표는 Worker 시험으로 옮긴다. 규칙 = 같은 폴더 firestore.next.rules
 // 댓글 규칙 새 판 시험 (2026-11-22) — 공개 저장소 firestore.rules 를 에뮬레이터에 올려 막힘 · 통과 경우를 하나씩 확인한다.
 //
 //   실행(에뮬레이터 안에서):  firebase emulators:exec --only firestore --project demo-newfact "node experiments/comments/rules_test/test.mjs"
@@ -9,7 +10,7 @@ import { initializeTestEnvironment, assertSucceeds, assertFails } from '@firebas
 import { doc, setDoc, getDoc, deleteDoc, writeBatch, serverTimestamp, increment, Timestamp,
          collectionGroup, query, where, getDocs, updateDoc } from 'firebase/firestore';
 
-const RULES = readFileSync(process.env.RULES_FILE || new URL('../../../firestore.rules', import.meta.url), 'utf8');   // 임시 폴더로 옮겨 돌릴 때 RULES_FILE
+const RULES = readFileSync(process.env.RULES_FILE || new URL('./firestore.next.rules', import.meta.url), 'utf8');   // 임시 폴더로 옮겨 돌릴 때 RULES_FILE
 const OWNER = 'u1vln4bbDgSgWQDe2F2FaNs81D43';
 const env = await initializeTestEnvironment({
   projectId: 'demo-newfact',
