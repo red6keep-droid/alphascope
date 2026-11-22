@@ -45,6 +45,32 @@ SLUGS = {   # 초안 파일 이름 → 영문 주소 이름 (한 번 정하면 �
     "착각-10-마치며.md": "stock myths 10 indicators measure size not direction",
     "착각-기준.md": "stock myths how we check 15 stocks two periods",   # 기준 페이지(편 번호 없음, 2026-11-21)
 }
+# 입문 과정 `주식 처음 시작하기`(도토리 숲 이야기, 2026-11-22) — `--intro` 로 실행. 초안 = 강좌-입문/, 그림 = Pages newfact-img(img_store.py 로 먼저 올림)
+INTRO_SRC = [os.path.expanduser("~/Desktop/alphascope-docs/doc/기획/강좌-입문"), "D:/alphascope-docs/doc/기획/강좌-입문"]
+INTRO_IMG_BASE = "https://img.newfact.app/study/"
+INTRO_SLUGS = {
+    "입문-01-주식이란.md": "stock basics 01 what is a stock and why price changes",
+    "입문-02-얼마로-시작.md": "stock basics 02 how much money to start and what if price falls",
+    "입문-03-계좌와-주문.md": "stock basics 03 how to open an account and place an order",
+    "입문-04-화면-읽기.md": "stock basics 04 how to read numbers and colors on the app",
+    "입문-05-수수료와-세금.md": "stock basics 05 fees and taxes when buying and selling",
+    "입문-06-종목과-시장.md": "stock basics 06 single stock or the whole market",
+    "입문-07-한국과-미국.md": "stock basics 07 korean stocks versus us stocks",
+    "입문-08-회사-소식.md": "stock basics 08 what news a company sends to shareholders",
+    "입문-09-금리와-환율.md": "stock basics 09 why news explains stocks with interest rates and exchange rates",
+    "입문-10-비싼가-싼가.md": "stock basics 10 is this stock expensive or cheap",
+    "입문-11-차트와-지표.md": "stock basics 11 what chart lines and indicators tell you",
+    "입문-12-정보와-리딩방.md": "stock basics 12 where to get information and whom to trust",
+}
+ORDER_RE = r"착각-\d"
+
+
+def use_intro():
+    """입문 과정으로 바꿔 끼움 — 초안 폴더 · 주소 이름 · 다음 편 순서 · 그림 주소. 기준 페이지 조각(팝업)은 없음."""
+    global SLUGS, IMG_BASE, ORDER_RE
+    SLUGS, IMG_BASE, ORDER_RE = INTRO_SLUGS, INTRO_IMG_BASE, r"입문-\d"
+    RC._SRC_CANDIDATES = INTRO_SRC
+    RC.SRC = next((p for p in INTRO_SRC if os.path.isdir(p)), INTRO_SRC[-1])
 
 
 def _env():
@@ -92,7 +118,7 @@ def build(files, urls):
     names = sorted(set(SLUGS) | {os.path.basename(f) for f in files})
     links = {n: urls.get(n, "#") for n in names}
     pieces = RC.load_pieces(links)
-    order = sorted(n for n in SLUGS if re.match(r"착각-\d", n))   # 다음 편 = 번호 순 다음 편(이번에 안 올리는 편이어도 주소가 있으면 연결)
+    order = sorted(n for n in SLUGS if re.match(ORDER_RE, n))   # 다음 편 = 번호 순 다음 편(이번에 안 올리는 편이어도 주소가 있으면 연결)
     out = []
     for f in files:
         name = os.path.basename(f)
@@ -165,4 +191,6 @@ if __name__ == "__main__":
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     if "--images" in sys.argv:
         sys.exit(0 if upload_images() else 1)
+    if "--intro" in sys.argv:
+        use_intro()
     main("--dry" in sys.argv, "--published-only" in sys.argv)

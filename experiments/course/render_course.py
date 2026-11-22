@@ -54,15 +54,17 @@ DECO = {   # 강좌 글 꾸밈 — 색 · 모양은 여기 한 곳 (auto-blogspo
     "check": f"list-style:none;margin:24px 0 28px;padding:14px 16px;background:#F8FAFC;border-radius:12px;font-size:{dk.BODY};line-height:{dk.LH_BODY};color:#333;",   # 바탕 회색. `## 🔍` (무엇을 보면 되나) 구획 안 목록만 노랑 — CHECK_TAKE (2026-11-20 사용자)
 }
 # 캐릭터 그림 (2026-11-14 사용자 시트 → cut_chars.py). 초안에 `{상승이-놀람}` 처럼 적으면 그 자리에 그림 — 이모지 자리 셋(강조 줄 · 대결 · 말풍선 아래) 모두
-# 상승이 = 신호 보고 산 사람 · 하락이 = 아무 날 산 사람 · 중심이 = 질문 · 설명하는 안내역
+# 상승이 = 신호 보고 산 사람 · 하락이 = 아무 날 산 사람 · 분석이 = 질문 · 설명하는 안내역
 CHARS = {
     "상승이-매수": "up_buy", "상승이-놀람": "up_surprised", "상승이-식은땀": "up_sweat",
     "상승이-울상": "up_cry", "상승이-다급": "up_rush", "상승이-후회": "up_regret", "상승이-기다림": "up_wait",   # 2026-11-20 사용자 SVG → svg_to_webp.py
     "하락이-못마땅": "down_grumpy", "하락이-밝게": "down_happy",
     "하락이-시무룩": "down_sulky", "하락이-담담": "down_calm",   # 2026-11-20 사용자 SVG → 320 WebP
-    "중심이-고민": "mid_think", "중심이-설명": "mid_explain",
-    "하락이-동전": "down_coin", "하락이-달력찍기": "down_calendar", "상승이-갸웃": "up_wonder", "상승이-홀가분": "up_relief", "중심이-카드섞기": "mid_cards",   # 2026-11-21 사용자 SVG — 상황을 직접 만드는 컷(동전 던지기 · 눈 가리고 달력 찍기 · 카드 섞기)
-    "중심이-주의": "mid_caution", "중심이-돋보기": "mid_magnifier",   # 2026-11-20 사용자 SVG(chars/src/*.svg) → 320 WebP
+    "분석이-고민": "mid_think", "분석이-설명": "mid_explain",
+    "하락이-동전": "down_coin", "하락이-달력찍기": "down_calendar", "상승이-갸웃": "up_wonder", "상승이-홀가분": "up_relief", "분석이-카드섞기": "mid_cards",   # 2026-11-21 사용자 SVG — 상황을 직접 만드는 컷(동전 던지기 · 눈 가리고 달력 찍기 · 카드 섞기)
+    "분석이-주의": "mid_caution", "분석이-돋보기": "mid_magnifier",   # 2026-11-20 사용자 SVG(chars/src/*.svg) → 320 WebP
+    # 댓글 스티커(c_*.webp 만 있음 → 강조 줄 `> {이름} 글` 에서만) — 입문 과정 이야기 꼴 대사 줄 (2026-11-22 사용자: 스티커 · 캐릭터를 적극적으로)
+    "상승이-환호": "up_cheer", "상승이-축하": "up_flowers", "상승이-당황": "up_panic", "하락이-으쓱": "down_shrug", "하락이-저금통": "down_piggy", "분석이-칠판": "mid_chalk", "둘-갸웃": "pair_wonder",
 }
 # 가로 컷 — 여럿이 나오는 그림(네모 칸에 안 들어감). 초안 `[컷] {이름} | 한 줄 글` → 노란 상자에 그림(가로 280) + 아래 굵은 한 줄 (2026-11-21 사용자 SVG → svg_to_webp.py wide)
 # 이름 → (파일, 보이는 가로, 세로 — 정수, 글 위치 "top" · "bottom", 그림 위 여백). 원본 비율 280 × 184 · 152 · 194
@@ -70,18 +72,21 @@ CHARS = {
 # 마지막 값 = 그림 아래 여백 — 줄자 15(P594, 이 컷만 상자가 15 커짐)
 # 마지막 = 상자 세로 더하기(위아래 반씩) — 같은상자 · 저울 +20 (P602 · P601), 저울 글 위로 (P601)
 # 글 위 여백(다섯째) — 같은상자 · 저울 15 (P606 · P605, 글 위에만)
-WIDE = {"둘-같은상자": ("pair_box", 224, 147, "top", 15, 0, 20), "중심이-저울": ("mid_scale", 252, 137, "top", 15, 0, 20), "중심이-줄자": ("mid_ruler", 196, 136, "top", 20, 15, 0)}   # 줄자 = 글 위 여백 20 (P563)
+WIDE = {"둘-같은상자": ("pair_box", 224, 147, "top", 15, 0, 20), "분석이-저울": ("mid_scale", 252, 137, "top", 15, 0, 20), "분석이-줄자": ("mid_ruler", 196, 136, "top", 20, 15, 0)}   # 줄자 = 글 위 여백 20 (P563)
 CHAR_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "chars")
 # 강조 줄에서 이 그림만 크게 (2026-11-21 사용자): 카드섞기 136(P554) · 갸웃 136 → 177(P555 뒤 30% 더) · 달력찍기 136(P562) · 홀가분 124(P564) · 기다림 147(P571) · 후회 136(P573)
 #   + 시무룩 124(P580) · 다급 136(P581). 강조 줄은 가운데 맞춘 그림(chars/c_*.webp, center_chars.py)이라 상자 안 세로 가운데 (P592)
-CHAR_BIG = {"중심이-카드섞기": 136, "상승이-갸웃": 177, "하락이-달력찍기": 136, "상승이-홀가분": 124, "상승이-기다림": 147, "상승이-후회": 136,
+CHAR_BIG = {"분석이-카드섞기": 136, "상승이-갸웃": 177, "하락이-달력찍기": 136, "상승이-홀가분": 124, "상승이-기다림": 147, "상승이-후회": 136,
             "하락이-시무룩": 124, "상승이-다급": 136}
 CHAR_LIFT = {}   # 가운데 맞춘 뒤에도 낮아 보이는 그림만 위로 몇 px (P595 홀가분 5 — 화면 보고)
-CHAR_GAP = {"상승이-갸웃": 12, "중심이-돋보기": 5, "중심이-카드섞기": 10}   # 돋보기 +5 (P607) · 카드섞기 +10 (P608)   # 그림 ↔ 글 사이 더 띄우기 (P590 — 갸웃은 양옆 소품이 글에 붙어 보임)
+# 입문 1편 세 이웃 카드 · `나도 이제 빵집 주인이야!` 줄 그림 113 → 130 (+15%, 2026-11-22 사용자 P624 · P626)
+CHAR_BIG.update({k: 130 for k in ("분석이-칠판", "상승이-축하", "하락이-으쓱", "상승이-잎자랑")})
+CHAR_BIG["하락이-으쓱"] = 117   # 세 이웃 카드의 하락이만 10% 작게(130 → 117), 카드 높이는 130 그대로 (2026-11-22 사용자 P631)
+CHAR_GAP = {"상승이-갸웃": 12, "분석이-돋보기": 5, "분석이-카드섞기": 10}   # 돋보기 +5 (P607) · 카드섞기 +10 (P608)   # 그림 ↔ 글 사이 더 띄우기 (P590 — 갸웃은 양옆 소품이 글에 붙어 보임)
 # 강조 줄 상자 높이는 그림을 키워도 그대로 — 그림 칸 높이를 고정하고 큰 그림은 위아래로 넘쳐 보이게 (2026-11-21 사용자: "카드 사이즈는 유지, 캐릭터만 크게").
 # 기본 칸 = 113(상자 145). 카드섞기는 상자 15 줄임 → 칸 98 (P574)
-CHAR_BOX = {"상승이-갸웃": 123, "중심이-돋보기": 123}   # 돋보기 상자 +10 (P607)   # 카드섞기 98 → 기본 113 으로 되돌림(P603 상자 +15) · 갸웃 상자 +10 → 123(P604)
-CHAR_SHIFT = {"중심이-카드섞기": 10}   # 그림 오른쪽으로 몇 px (P603)
+CHAR_BOX = {"상승이-갸웃": 123, "분석이-돋보기": 123, **{k: 130 for k in ("분석이-칠판", "상승이-축하", "하락이-으쓱")}}   # 잎자랑 카드 높이 = 바로 위 하락이-빵맛보기 카드와 같게(기본 113, 그림만 130 · P632)   # 돋보기 상자 +10 (P607)   # 카드섞기 98 → 기본 113 으로 되돌림(P603 상자 +15) · 갸웃 상자 +10 → 123(P604)
+CHAR_SHIFT = {"분석이-카드섞기": 10}   # 그림 오른쪽으로 몇 px (P603)
 # 대결 그림 크기 — 편마다 두 캐릭터 크기 맞춤 (2026-11-21 사용자): 0편 · 기준 페이지 매수 135 · 달력찍기 165(P566) · 3편 다급 165 · 담담 135(P569) · 4편 기다림 165 · 담담 135(P572)
 #   + 2편 매수 135(P579) · 4편 담담 122(P585) · 5편 담담 135(P587)
 # P609 (2026-11-21 사용자: 이름 줄 기준선이 어긋남, 모든 편 같은 문제) — 대결 그림을 가로가 아니라 **보이는 키**로 맞춘다.
@@ -112,6 +117,13 @@ def img_src(folder, name):
 def char(tok, where):
     """`{이름-상황}` → 그림(목업은 data URI, 발행 때 gh-pages 주소로). 이모지면 그대로."""
     m = re.fullmatch(r"\{(.+?)\}", tok or "")
+    if m and m.group(1) not in CHARS and re.match(r"(상승이|하락이|분석이|둘)-", m.group(1)):   # 입문 과정 대사 칸 새 그림 = chars/solo_이름.webp, 아직 없으면 점선 자리 (2026-11-22 그림-프롬프트.md)
+        solo = "solo_" + m.group(1)
+        if os.path.exists(os.path.join(CHAR_DIR, solo + ".webp")):
+            px = CHAR_BIG.get(m.group(1), CHAR_PX[where]) if where == "line" else CHAR_PX[where]
+            return f'<img src="{img_src(CHAR_DIR, solo)}" alt="" width="{px}" height="{px}" style="display:block;width:{px}px;height:{px}px;max-width:none;border-radius:0;margin:0 auto;">'
+        return (f'<div style="width:{CHAR_PX[where]}px;height:{CHAR_PX[where]}px;box-sizing:border-box;border:2px dashed #E7C873;border-radius:12px;display:flex;align-items:center;justify-content:center;'
+                f'text-align:center;font-size:12px;line-height:17px;font-weight:700;color:#B45309;padding:6px;word-break:keep-all;margin:0 auto;">그림 자리<br>{html.escape(m.group(1))}</div>')
     if not m or m.group(1) not in CHARS:
         return tok
     f = CHARS[m.group(1)]
@@ -141,7 +153,7 @@ def vs_width(name, h):
 
 
 def is_char(tok):
-    return bool(re.fullmatch(r"\{(.+?)\}", tok or "")) and tok[1:-1] in CHARS
+    return bool(re.fullmatch(r"\{(.+?)\}", tok or "")) and (tok[1:-1] in CHARS or bool(re.match(r"(상승이|하락이|분석이|둘)-", tok[1:-1])))   # 입문 대사 칸 새 그림(solo_) 이름도 (2026-11-22)
 
 
 # 소품 아이콘 (2026-11-15 사용자 시트 → cut_icons.py). 초안은 지금처럼 이모지를 적고, 아래 표에 있는 이모지는 그림으로 바꾼다 — 없는 이모지는 그대로
@@ -198,12 +210,15 @@ def inline(t, links):
 TABLE = {"head_bg": "#F3F4F6", "head_line": "1.5px solid #111", "row_line": "1px solid rgba(15,23,42,.11)", "pad": "10px 8px", "head_pad": "8px 8px"}
 COL_ROLE = {   # 머리 줄 이름 → 역할
     "아무 날": "any", "아무 날 산 사람": "any", "가짜 주가": "any",   # 9편: 비교 대상 = 순서를 섞은 가짜 주가 (2026-11-21)
+    "팝니다": "any", "이야기에서는": "any",   # 입문 1편 표: 두 칸 모두 색 · 가운데 (2026-11-22 사용자 P627 · P629)
+    "삽니다": "main", "진짜 주식에서는": "main",
     "2010년대": "main", "2020년 이후": "main", "다음 날 하루": "main", "그때 산 사람": "main", "실적 보고 산 사람": "main", "실제 주가": "main",
 }
 MAIN_FG, ANY_FG = "#15402A", "#33245E"   # 녹색 섞인 검정 · 보라 섞인 검정 (2026-11-20 사용자)
 ROLE_STYLE = {   # 역할 → (칸 바탕, 칸 글자, 머리 글자 색)
     "main": ("#F0FDF4", f"font-weight:700;color:{MAIN_FG};", MAIN_FG),
     "any": ("#F5F3FF", f"font-weight:700;color:{ANY_FG};", ANY_FG),
+    "third": ("#FFF7ED", "font-weight:700;color:#5A3412;", "#5A3412"),   # 입문 표 셋째 색 칸 = 연한 주황 · 갈색 섞인 검정 (2026-11-22)
     None: ("", "color:#333;", "#111"),
 }
 TABLE_TITLE = "margin:0;font-size:15px;line-height:22px;font-weight:700;color:#111;word-break:keep-all;"   # 표 제목 = 그래프 상자 제목과 같은 15/22 (2026-11-20 사용자: 13 → 15)
@@ -227,19 +242,23 @@ def kome(fs):
     return f'<span style="display:inline-block;position:relative;top:-{KOME_UP[fs]}px;">※</span>'
 
 
-def table(lines, links, top=30, title=""):
+def table(lines, links, top=30, title="", intro=False):
     rows = [[c.strip() for c in ln.strip().strip("|").split("|")] for ln in lines if not re.match(r"^\s*\|?\s*-{3}", ln)]
     head, body = rows[0], rows[1:]
-    role = [None if k == 0 else COL_ROLE.get(re.sub(r"[*`]", "", h).strip()) for k, h in enumerate(head)]
+    role = [COL_ROLE.get(re.sub(r"[*`]", "", h).strip()) for k, h in enumerate(head)]
+    if not all(role):   # 첫 칸 = 행 이름(색 없음). 모든 칸에 색 이름이 있는 표(입문)만 첫 칸도 색
+        role[0] = None
+        if intro:   # 입문: 흰 칸만 있는 표 금지 — 첫 칸 흰색, 나머지 칸 = 녹색 · 보라 · 주황 차례 (2026-11-22 사용자: 흰색 · 색 · 다른 색 · 색)
+            role = [None] + [("main", "any", "third")[(k - 1) % 3] for k in range(1, len(head))]
     # 폰에서 넘겨 보기 (2026-11-20 사용자: "표는 넘겨 보기로"): 첫 칸(행 이름)은 왼쪽에 고정(sticky, 세로선 없음) · 칸 4개 이상이면 넘칠 때만 `옆으로 넘겨 보기 ›` + 오른쪽 그림자
     # 두 칸 표(15종목 묶음 · 회사)는 첫 칸 고정 없이 표 통째로 넘긴다 — 고정하면 회사 칸만 넘어가 잘 안 넘겨진다 (2026-11-21 사용자 P548)
-    stick = (lambda bg: f"position:sticky;left:0;z-index:1;background:{bg};") if len(head) > 2 else (lambda bg: f"background:{bg};")
+    stick = (lambda bg: f"position:sticky;left:0;z-index:1;background:{bg};") if len(head) > 2 and not all(role) else (lambda bg: f"background:{bg};")
     th = "".join(f'<th style="padding:{TABLE["head_pad"]};background:{TABLE["head_bg"]};border-bottom:{TABLE["head_line"]};text-align:center;white-space:nowrap;'
                  f'{stick(TABLE["head_bg"]) if k == 0 else ""}'
                  f'font-size:13px;line-height:18px;font-weight:700;color:{ROLE_STYLE[role[k]][2]};">{inline(h, links)}</th>' for k, h in enumerate(head))
-    align = "left" if len(head) == 2 else "center"   # 두 칸 표(15종목) 내용 칸 = 왼쪽 정렬, 머리 줄은 가운데 그대로 (2026-11-21 사용자 P577)
+    align = "center" if intro else "left" if len(head) == 2 and not all(role) else "center"   # 입문 표 = 모두 가운데 (2026-11-22 사용자)   # 색 칸 두 칸 표(입문) = 가운데 (P627 · P629)   # 두 칸 표(15종목) 내용 칸 = 왼쪽 정렬, 머리 줄은 가운데 그대로 (2026-11-21 사용자 P577)
     td = lambda k, c: (f'<td style="padding:{TABLE["pad"]};border-bottom:{TABLE["row_line"]};white-space:nowrap;text-align:{align};'
-                       + ("font-weight:600;color:#111;" + stick("#fff") if k == 0 else (f"background:{ROLE_STYLE[role[k]][0]};" if ROLE_STYLE[role[k]][0] else "") + ROLE_STYLE[role[k]][1])
+                       + ("font-weight:600;color:#111;" + stick("#fff") if k == 0 and role[0] is None else (f"background:{ROLE_STYLE[role[k]][0]};" if ROLE_STYLE[role[k]][0] else "") + ROLE_STYLE[role[k]][1])
                        + f'">{inline(c, links)}</td>')
     trs = "".join("<tr>" + "".join(td(k, c) for k, c in enumerate(r)) + "</tr>" for r in body)
     swipe = True   # 칸 수와 상관없이 — 화면보다 넓을 때만 안내 · 그림자가 보인다(TABLE_JS), 3칸 표도 작은 폰에서 넘치면 같게 (2026-11-20 사용자)
@@ -432,6 +451,7 @@ def render(md, links, next_href="#", piece=False, pieces=None, used=None):
     # 본문 문장 속 브랜드 = 영어 `Newfact` + 로고 글꼴(테마 .brand-word = Noto Sans KR 900) — 16px 이상 문장만, 자료 및 한계(14px)는 글자 그대로 (2026-11-21 사용자: 한글 표기 금지 · 브랜딩)
     mk = lambda h: mark_pieces(re.sub(r"(?<![\w-])Newfact(?!\w)", '<span class="brand-word">Newfact</span>', h), pieces, used)   # noqa: E731
     table_title = ""   # 표 바로 위 굵은 한 줄(**…**) = 표 제목 — 표가 받아 넘겨 보기 안내와 한 줄로
+    intro = md.lstrip().startswith("# 주식 처음 시작하기")   # 입문 과정 글만 (2026-11-22 사용자 P623 · P625 · P628 · P630 — 1과정 글은 그대로)
     note_mode, chart_next, take_mode = False, None, False   # take_mode: `## 🔍` 정리 구획 안(체크 목록 바탕 노랑)
     gray = lambda h: h.replace('color:#111;', f'color:{dk.NOTE};')   # 안내 구획 안 굵은 글씨도 회색
     while i < len(lines):
@@ -450,6 +470,14 @@ def render(md, links, next_href="#", piece=False, pieces=None, used=None):
             continue
         elif ln.startswith("## "):
             icon, _, rest = ln[3:].strip().partition(" ")
+            sm = re.match(r"(하나|둘|셋|넷|다섯|여섯)\.\s*(.+)$", ln[3:].strip())
+            if sm:   # `## 하나. 제목` = 이야기 장면 — 아이콘 대신 동그라미 숫자 (2026-11-22 입문 과정: 1과정 아이콘 세트와 다르게)
+                note_mode = take_mode = False
+                num = ["하나", "둘", "셋", "넷", "다섯", "여섯"].index(sm.group(1)) + 1
+                out.append(f'<h2 style="scroll-margin-top:72px;{DECO["h2"]}"><span aria-hidden="true" style="flex:none;display:flex;align-items:center;justify-content:center;width:32px;height:32px;'
+                           f'border-radius:16px;background:#FDE68A;color:#92400E;font-size:17px;line-height:32px;font-weight:800;">{num}</span><span>{inline(sm.group(2), links)}</span></h2>')
+                i += 1
+                continue
             if not is_emoji(icon):
                 icon, rest = "📖", ln[3:].strip()
             note_mode = icon.startswith("📌")
@@ -473,7 +501,8 @@ def render(md, links, next_href="#", piece=False, pieces=None, used=None):
             px_l = CHAR_BIG.get(nm, CHAR_PX["line"])
             hold = (f"display:flex;align-items:center;justify-content:center;width:{px_l}px;height:{box}px;overflow:visible;"
                     + (f"margin-right:{CHAR_GAP[nm]}px;" if nm in CHAR_GAP else "")) if box else ""   # 칸 높이 고정 · 큰 그림은 위아래로 넘침
-            out.append(f'<div data-course-char="1" style="{DECO["char"]}"><span aria-hidden="true" style="{DECO["char_icon"]}{hold}">{char(who, "line")}</span>'
+            tight = "margin-top:-22px;" if intro and out and out[-1].startswith('<div data-course-char="1"') else ""   # 입문: 바로 이어진 캐릭터 카드 사이 32 → 10 (P623 · P625)
+            out.append(f'<div data-course-char="1" style="{DECO["char"]}{tight}"><span aria-hidden="true" style="{DECO["char_icon"]}{hold}">{char(who, "line")}</span>'
                        f'<span style="{DECO["char_text"]}">{dk.tint(inline(said.strip(), links))}</span></div>')
         elif ln.strip() == "[강조]":
             out.append("<!--강조-->")
@@ -497,6 +526,17 @@ def render(md, links, next_href="#", piece=False, pieces=None, used=None):
                 cap_txt = (f'<div style="margin:{12 if where == "bottom" else img_top}px 0 0;font-size:20px;line-height:30px;font-weight:700;color:#111;word-break:keep-all;">{dk.tint(inline(said.strip(), links))}</div>' if said.strip() else "")
                 out.append(f'<div data-course-cut="1" style="margin:32px 0;padding:{16 + extra // 2}px 18px {16 + extra - extra // 2}px;border-radius:16px;background:#FEF9E7;text-align:center;">'
                            + (img + cap_txt if where == "bottom" else cap_txt + img) + '</div>')
+        elif ln.startswith("[장면]"):   # `[장면] 파일이름 | 그림 설명` — 입문 과정 이야기 그림(가로 16:9 — 사용자 최종 그림 1000×562, chars/scene_파일이름.webp). 그림이 아직 없으면 점선 자리 + 설명 (2026-11-22 사용자: 동화처럼 상황 컷을 여러 장)
+            name, _, desc = ln[4:].strip().partition("|")
+            f = "scene_" + name.strip()
+            if os.path.exists(os.path.join(CHAR_DIR, f + ".webp")):
+                out.append(f'<div data-course-scene="1" style="margin:28px 0;"><img src="{img_src(CHAR_DIR, f)}" alt="{html.escape(desc.strip())}" width="480" height="270" '
+                           'style="display:block;width:100%;max-width:480px;height:auto;aspect-ratio:16/9;object-fit:cover;margin:0 auto;border-radius:16px;"></div>')
+            else:
+                out.append('<div data-course-scene="1" style="margin:28px auto;max-width:480px;aspect-ratio:16/9;box-sizing:border-box;border:2px dashed #E7C873;border-radius:16px;background:#FEF9E7;'
+                           'display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:16px 20px;text-align:center;">'
+                           f'<div style="font-size:13px;line-height:19px;font-weight:700;color:#B45309;">그림 자리 · {html.escape(name.strip())}</div>'
+                           f'<div style="font-size:14px;line-height:22px;color:#7C5A12;word-break:keep-all;">{html.escape(desc.strip())}</div></div>')
         elif ln.startswith("[그림]"):   # `[그림] 이름` → figs/이름.html 조각(글 안 SVG, make_shuffle_fig.py)을 그대로 (2026-11-21 진짜 · 가짜 주가 그림)
             fig = os.path.join(os.path.dirname(os.path.abspath(__file__)), "figs", ln[4:].strip() + ".html")
             if os.path.exists(fig):
@@ -510,15 +550,19 @@ def render(md, links, next_href="#", piece=False, pieces=None, used=None):
             def brk(x):
                 m = re.match(r"^\*\*(.+?)\*\*\s*(?:—\s*)?(.+)$", x)
                 return f"**{m.group(1).rstrip('.')}**<br>{m.group(2)}" if m and "<br>" not in x else x
-            out.append(f'<ul style="{DECO["check"].replace("#F8FAFC", CHECK_TAKE) if take_mode else DECO["check"]}">' + "".join(
-                f'<li style="margin:{4 if k == 0 else 14}px 0 4px;">{icon_html("✅", "check")} {mk(dk.tint(inline(brk(x), links)))}</li>' for k, x in enumerate(items)) + "</ul>")
+            out.append(f'<ul style="{DECO["check"].replace("#F8FAFC", CHECK_TAKE) if take_mode or intro else DECO["check"]}">' + "".join(
+                (f'<li style="margin:{14 if k == 0 else 24}px 0 4px;display:flex;align-items:flex-start;line-height:32px;">'   # 행간 35 → 32(10%, 정수) · 항목 사이 14 → 24 · 맨 위 4 → 14 · 체크 위 5(첫 줄 32 가운데) (2026-11-22 사용자)   # 입문: 체크 오른쪽 세로선에 제목 · 설명 줄을 모두 맞춤(둘째 줄이 체크 밑으로 안 들어감) — 체크 22 = 첫 줄 35 가운데(위 7) (2026-11-22 사용자)
+                 f'<span style="flex:none;display:block;margin:5px 8px 0 0;">{icon_html("✅", "check").replace("vertical-align:-5px;margin-right:4px;", "display:block;")}</span>'
+                 f'<span style="flex:1 1 0;min-width:0;">{mk(dk.tint(inline(brk(x), links)))}</span></li>' if intro else
+                 f'<li style="margin:{4 if k == 0 else 14}px 0 4px;">{icon_html("✅", "check")} {mk(dk.tint(inline(brk(x), links)))}</li>') for k, x in enumerate(items)) + "</ul>")
             continue
         elif ln.startswith("|"):
             blk = []
             while i < len(lines) and lines[i].startswith("|"):
                 blk.append(lines[i])
                 i += 1
-            out.append(chart(blk, links, chart_next) if chart_next is not None else table(blk, links, 30, table_title))
+            top = -4 if intro and not table_title and out and out[-1].startswith("<h2") else 30   # 입문: 소제목 바로 아래 표 = 제목 ↔ 표 30 → 12 (P628)
+            out.append(chart(blk, links, chart_next) if chart_next is not None else table(blk, links, top, table_title, intro))
             table_title = ""
             chart_next = None
             continue
@@ -621,7 +665,7 @@ def main():
     pieces = load_pieces(links)
     for f in files:
         k = files.index(f)
-        nxt = links[os.path.basename(files[k + 1])] if k + 1 < len(files) and re.match(r"착각-\d", os.path.basename(files[k + 1])) else "#"   # 다음 편 카드 = 다음 파일 목업 (아직 없으면 #). 편 번호 없는 파일(착각-기준.md = 기준 페이지)은 다음 편이 아니다 (2026-11-21)
+        nxt = links[os.path.basename(files[k + 1])] if k + 1 < len(files) and re.match(r"(착각|입문)-\d", os.path.basename(files[k + 1])) else "#"   # 다음 편 카드 = 다음 파일 목업 (아직 없으면 #). 편 번호 없는 파일(착각-기준.md = 기준 페이지)은 다음 편이 아니다 (2026-11-21) · 입문 과정 폴더(강좌-입문, 인자로 줌)의 `입문-NN` 도 편 (2026-11-22)
         global CUR_FILE
         CUR_FILE = os.path.basename(f)
         is_basis = CUR_FILE == PIECE_SRC
