@@ -56,11 +56,31 @@ def _bars(symbols):
         late = [s for s, v in out.items() if v and v[-1]["day"] < top and "." not in s and not s.startswith("^")][:15]   # 미국 종목 · ETF 만, 많아야 15개(Polygon 무료 분당 5회 — 실행이 3분 넘게 늘지 않게)
         for s in late:
             v = out[s]
-            fb = [b for b in price_source.daily_bars(s, v[-1]["day"]) if b["day"] > v[-1]["day"]]
+            fb = _single(s, v[-1]["day"])   # 먼저 야후 한 종목만 다시 — 묶음 요청에서만 한 종목 마지막 날이 빠지는 일(2026-11-22 SNDK 11-20, 같은 야후 단독 요청은 받힘)
+            src = "야후 한 종목 다시"
+            why = []
+            if not fb:
+                fb = [b for b in price_source.daily_bars(s, v[-1]["day"], after=v[-1]["day"], why=why) if b["day"] > v[-1]["day"]]
+                src = "예비 사슬"
             if fb:
-                v += [{"day": b["day"], "open": b["open"], "high": b["high"], "low": b["low"], "close": b["close"], "adj": b["close"], "volume": float(b["volume"] or 0)} for b in fb]
-                print(f"[collect] {s}: 늦은 봉 {len(fb)}일 예비로 채움")
+                v += [{"day": b["day"], "open": b["open"], "high": b["high"], "low": b["low"], "close": b["close"], "adj": b.get("adj", b["close"]), "volume": float(b["volume"] or 0)} for b in fb]
+                print(f"[collect] {s}: 늦은 봉 {len(fb)}일 {src}로 채움")
+            else:   # 조용히 넘어가지 않기 — 무엇이 왜 못 받았나 (2026-11-22 사용자)
+                print(f"::warning::[collect] {s}: 늦은 봉 못 채움 ({v[-1]['day']}까지) — 야후 한 종목 다시 빈 값 · {' · '.join(why) or '예비 공급자 없음'}")
     return out
+
+
+def _single(s, last):
+    """야후 한 종목만 다시 받아 last 보다 늦은 봉. 실패 · 없음 = []."""
+    try:
+        h = yf.Ticker(s).history(start=last, interval="1d", auto_adjust=False)
+        h = h.dropna(subset=["Close"])
+    except Exception as e:  # noqa: BLE001
+        print(f"[collect] {s}: 야후 한 종목 다시 실패 {type(e).__name__}")
+        return []
+    return [{"day": i.strftime("%Y-%m-%d"), "open": float(r["Open"]) if r["Open"] == r["Open"] else None, "high": float(r["High"]), "low": float(r["Low"]),
+             "close": float(r["Close"]), "adj": float(r["Adj Close"]) if "Adj Close" in r else float(r["Close"]), "volume": float(r["Volume"] or 0)}
+            for i, r in h.iterrows() if i.strftime("%Y-%m-%d") > last]
 
 
 def _cap(s):
