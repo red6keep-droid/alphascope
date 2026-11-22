@@ -220,6 +220,38 @@ def _zone(pct):
     return 2 if pct >= 75 else 0 if pct < 25 else 1
 
 
+def rank_cols(rows):
+    """기간별 순위 세로 막대 (2026-11-22 사용자: 가로막대 → 넘겨 보기 그래프, 세로 막대로 확정).
+    0선 = 업종 중앙값, 위 끝 = 1위 · 아래 끝 = 꼴찌. 눈금은 25% 단위로 고정(상위 25% · 하위 25% 경계가 그대로 눈금선).
+    틀 = 공용 col_frame 오른쪽 모양(축 오른쪽 · 넘칠 때만 `‹ 넘겨 보기`)."""
+    vals = [x["pct"] - 50 for x in rows]
+    txt = [f"{x['rank']}위" for x in rows]
+    fs = R._chart_label_px(len(rows))
+    lbl = max(R.CHART_LBL, fs + 4) + max(dk.LBL_LIFT, dk.LBL_LIFT_DN)
+    height = 180
+    scale = (height - lbl - lbl - dk.AXIS_PAD) / 100
+    top = lbl + 50 * scale
+    ticks = [-50, -25, 0, 25, 50]
+    names = {50: "1위", 25: "상위 25%", 0: "중앙값", -25: "하위 25%", -50: "꼴찌"}
+    fmt = lambda v: names[int(round(v))]   # noqa: E731
+    gut = int(max(dk.text_px(t, dk.GRID_FS) for t in names.values()) + 6)
+    label_px = max(dk.text_px(t, fs) for t in txt) + 4
+    axis_px = min(max(dk.text_px(x["lb"], 13) for x in rows) + 8, dk.AXIS_MAX)
+    bw, lw, min_w = dk.col_layout(len(rows), 1, label_px, axis_px)
+    bg = {2: R._PASTEL_UP, 1: R._GRAY_BAR, 0: R._PASTEL_DN}
+    fg = {2: R.UP, 1: "#111", 0: R.DOWN}
+    parts = []
+    for i, (x, v, t) in enumerate(zip(rows, vals, txt)):
+        z = _zone(x["pct"])
+        h = max(1.0, abs(v) * scale)
+        y, ly = (top - h, top - h - (lbl - dk.LBL_LIFT) + 1 - dk.LBL_LIFT) if v >= 0 else (top, top + h + 1 + dk.LBL_LIFT_DN)
+        rad = "3px 3px 0 0" if v >= 0 else "0 0 3px 3px"
+        parts.append(f'<span style="position:absolute;{dk.bar_x(i, 0, len(rows), 1, bw, lw)}top:{y:.1f}px;height:{h:.1f}px;background:{bg[z]};border-radius:{rad};"></span>')
+        parts.append(f'<span style="position:absolute;{dk.bar_x(i, 0, len(rows), 1, bw, lw, label=True)}top:{ly:.1f}px;height:{lbl - dk.LBL_LIFT - 2}px;line-height:{lbl - dk.LBL_LIFT - 2}px;'
+                     f'text-align:center;font-size:{fs}px;font-weight:700;white-space:nowrap;color:{fg[z]};">{t}</span>')
+    return dk._col_frame_right("".join(parts), [x["lb"] for x in rows], height, top, scale, ticks, min_w, fmt, gut)
+
+
 def mom_card(name, sym, m):
     gname = PEER_GROUP[sym][0]
     rows = []
@@ -240,32 +272,18 @@ def mom_card(name, sym, m):
     first = (f"{name} 주가는 최근 {base['lb']} 동안 {RP._sgn(base['ret'])}% 움직여, S&P 500 안 {gname} {base['n']}종목 가운데 {base['rank']}위입니다. "
              f"같은 기간 {gname} 종목의 중앙값은 {RP._sgn(base['med'])}%입니다.")
     missing = [lb for lb, _ in PERIODS if lb not in {x["lb"] for x in rows}]
-    colors = [dk.lighten(b, 0.6) for b in R.RANGE_BASE]
-    strong = [dk.lighten(b, 0.2) for b in R.RANGE_BASE]
-    head = ('<span style="display:flex;margin:0 0 4px 64px;margin-right:84px;font-size:13px;line-height:18px;color:%s;">'
-            '<span style="flex:0 0 25%%;">하위 25%%</span><span style="flex:0 0 50%%;text-align:center;">중앙값</span><span style="flex:0 0 25%%;text-align:right;">상위 25%%</span></span>') % R.NOTE
-    body = ""
-    for x in rows:
-        z = _zone(x["pct"])
-        segs = "".join(f'<span style="position:absolute;top:0;left:calc({l}% + {1 if i else 0}px);width:calc({w}% - {1 if i in (0, 2) else 2}px);height:6px;border-radius:3px;background:{colors[i]};"></span>'
-                       for i, (l, w) in enumerate(((0, 25), (25, 50), (75, 25))))
-        mid = '<span style="position:absolute;left:50%;top:-4px;width:2px;height:14px;margin-left:-1px;background:#94A3B8;"></span>'
-        dot = (f'<span style="position:absolute;top:-4px;left:clamp(0px, calc({x["pct"]:.1f}% - 7px), calc(100% - 14px));width:14px;height:14px;border-radius:50%;'
-               f'background:{strong[z]};box-shadow:0 0 0 2px #fff;"></span>')
-        ret_col = R.UP if x["ret"] > 0 else R.DOWN if x["ret"] < 0 else "#111"
-        body += (f'<span style="display:flex;align-items:center;gap:0;padding:10px 0 0;">'
-                 f'<span style="flex:0 0 64px;font-size:15px;line-height:22px;color:#111;font-weight:700;">{x["lb"]}</span>'
-                 f'<span style="flex:1;position:relative;height:6px;">{segs}{mid}{dot}</span>'
-                 f'<span style="flex:0 0 84px;text-align:right;font-size:15px;line-height:22px;color:#111;white-space:nowrap;">{dk.violet(str(x["rank"]) + "위")} / {x["n"]}</span></span>'
-                 f'<span style="display:block;margin:2px 84px 0 64px;font-size:13px;line-height:18px;color:{R.NOTE};white-space:nowrap;">'
-                 f'<span style="color:{ret_col};font-weight:700;">{RP._sgn(x["ret"])}%</span> · 중앙값 {RP._sgn(x["med"])}%</span>')
-    chart = (f'<span style="{R.MULTI}margin:0 {dk.CHART_CARD_X}px;"><span style="display:block;padding:{dk.CHART_CARD_PAD}px 12px 12px;">{head}{body}</span></span>')
-    lines = [(first, "plain"), (f'{dk.CHART_TITLE_M}기간별 상승률 순위 (오른쪽이 1위)</span>{chart}', "html"),
+    chart = rank_cols(rows[::-1])   # 5년 → 1주, 가까운 기간 오른쪽 (P165 · 기간별 수익률 막대와 같은 방향)
+    chart = R.axis_dot(chart, base["lb"], "#111")   # 답을 정하는 기준 기간 = 축 이름 위 점 (P175 막대 하나 강조 규칙)
+    chart = (f'<span style="{R.MULTI}margin:0 {dk.CHART_CARD_X}px;"><span style="display:block;padding:{dk.CHART_CARD_PAD}px 12px 0;">{chart}</span></span>')
+    lines = [(first, "plain"), (f'{dk.CHART_TITLE_M}기간별 상승률 순위 (위로 갈수록 1위)</span>{chart}', "html"),
              ("row", "비교 묶음", f"{gname} {base['n']}종목", "S&P 500 안 같은 업종 · " + (f"{sym} 포함" if sym == "SPCX" else "엔비디아 포함")),
              ("row", "기준 기간", base["lb"], "답(상위 · 중간 · 하위)을 정하는 기간")]
     if missing:
         lines.append((f"{' · '.join(missing)}은 상장한 지 그만큼 되지 않아 뺐습니다.", "note"))
-    tip = (f"같은 업종 종목들과 견준 기간별 주가 상승률 순위. 오른쪽 끝이 1위, 가운데 세로선이 업종 중앙값\n"
+    ns = sorted({x["n"] for x in rows})
+    if len(ns) > 1:   # 긴 기간은 그만큼 상장하지 않은 종목이 빠져 묶음이 작아진다
+        lines.append((" · ".join(f"{x['lb']} {x['n']}종목" for x in rows if x["n"] != base["n"]) + "은 그 기간만큼 상장하지 않은 종목을 빼고 견줬습니다.", "note"))
+    tip = (f"같은 업종 종목들과 견준 기간별 주가 상승률 순위. 가운데 가로선이 업종 중앙값, 위로 뻗으면 중앙값보다 많이 오른 것이고 맨 위가 1위\n"
            f"· 나누는 법 : {base['lb']} 순위가 위 4분의 1이면 상위 25%, 아래 4분의 1이면 하위 25%, 그 사이는 중간\n"
            "· 비교 묶음 : S&P 500 구성 종목의 업종 분류(GICS)")
     return state, theme, lines, tip
