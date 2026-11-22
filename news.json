@@ -1,6 +1,66 @@
 {
-  "updated_at": "2026-11-22 12:47:01 UTC",
+  "updated_at": "2026-11-22 21:46:32 UTC",
   "items": [
+    {
+      "title": "Employees at Eric Trump-backed robot startup lose health benefits as company's cash crunch deepens",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/22/foundation-future-industries-health-benefits-payroll-base-group.html",
+      "published": "2026-11-22 18:55:05",
+      "title_ko": "에릭 트럼프 지원 로봇 스타트업 직원들, 자금 경색 심화로 건강보험 혜택 상실",
+      "summary_ko": "비영리재단 파운데이션은 긴급 브릿지 론 추진 및 1억 5천만 달러 투자 협상 중",
+      "lines": [
+        "재정난을 겪는 로봇 스타트업 파운데이션의 직원 건강보험 혜택 중단",
+        "한국 베이스 그룹의 1억 5000만 달러 투자 대기 중인 파운데이션의 긴급 브릿지 론 추진"
+      ]
+    },
+    {
+      "title": "Director of National Intelligence Jay Clayton warns Americans of 'bumps in the road' after tech outages",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/22/jay-clayton-tech-outages-faa-microsoft-thanksgiving.html",
+      "published": "2026-11-22 17:14:03",
+      "title_ko": "제이 클레이튼 국가정보국 국장, 기술 장애 이후 미국인들에게 차질 경고",
+      "summary_ko": "항공 여행, 마이크로소프트 365, 은행 거래 장애 발생",
+      "lines": [
+        "항공편과 마이크로소프트 365 및 은행 거래를 중단시킨 기술 장애 발생",
+        "국가정보국장 제이 클레이튼의 추수감사절 여행을 앞둔 미국인들의 시스템 업그레이드 대비 경고"
+      ]
+    },
+    {
+      "title": "Social Security benefits are rising in 2027, but other changes could affect what you keep",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/22/social-security-changes-cola-taxes-medicare.html",
+      "published": "2026-11-22 14:30:01",
+      "title_ko": "2027년 사회보장 혜택은 증가하지만 다른 변화들이 보유 자금에 영향을 줄 수 있다",
+      "summary_ko": "메디케어와 세제 개편도 은퇴자들에게 영향",
+      "lines": [
+        "2027년 사회보장연금 물가조정분 3.6% 인상 예정",
+        "2027년 사회보장세 과세 소득 상한선 19만2300달러로 상향"
+      ]
+    },
+    {
+      "title": "Saudi Arabia, Bahrain report new attacks as Iran says it remains open to a deal with U.S.",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/22/saudi-houthi-bahrain-iran-attacks-araghchi-talks.html",
+      "published": "2026-11-22 13:25:47",
+      "title_ko": "사우디아라비아와 바레인은 이란이 미국과의 협상에 개방적이라고 밝힌 가운데 새로운 공격을 보고했다",
+      "summary_ko": "사우디아라비아는 후티 반군이 발사한 드론을 파괴했으며 바레인은 산업 시설 피격",
+      "lines": [
+        "사우디아라비아 리야드 향해 발사된 후티 드론 요격 및 파괴",
+        "이란 외무장관 미국과의 전쟁 종식을 위한 협상 용의 표명"
+      ]
+    },
+    {
+      "title": "Pizza chains are under pressure. GLP-1 use is only one part of the problem",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/22/pizza-chains-sales-glp-1-demand.html",
+      "published": "2026-11-22 13:00:01",
+      "title_ko": "피자 체인점들이 압박을 받고 있다. GLP-1 사용은 문제의 일부분일 뿐이다",
+      "summary_ko": "도미노피자, 파파존스, 피자헛의 수요 부진과 배달 경쟁 심화",
+      "lines": [
+        "대형 피자 체인들의 수요 감소와 경쟁 심화",
+        "외식 선택지 증가와 배달 경쟁 확대"
+      ]
+    },
     {
       "title": "Top Wall Street analysts favor these 3 dividend stocks for strong returns",
       "source": "CNBC",
@@ -61,55 +121,6 @@
         "앤스로픽 나스닥 상장 및 935억 달러 조달",
         "상장 첫날 주가 17% 상승 및 시가총액 1조 8000억 달러 기록",
         "테크 기업들의 공모가 매입으로 260억 달러 추가 확보"
-      ]
-    },
-    {
-      "title": "Tech outages are fueling a new doomsday economy",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/21/emergency-prep-spending-tech-outages.html",
-      "published": "2026-11-21 15:04:56",
-      "title_ko": "기술적 중단 사태가 부추기는 새로운 종말론적 경제",
-      "summary_ko": "최근 IT 장애로 AI 사이버 공격 및 미국 전력망 우려 고조",
-      "lines": [
-        "최근 기술 장애로 항공기 운항 중단 및 이메일 접속 차단 발생",
-        "정부 당국이 시스템 오작동 관련 악의적 배후설 부인"
-      ]
-    },
-    {
-      "title": "Retirees face a looming deadline for required withdrawals — missing it could trigger a tax penalty",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/21/rmd-deadline-penalty-2026.html",
-      "published": "2026-11-21 14:30:02",
-      "title_ko": "은퇴자들, 의무 인출 마감일 임박, 놓치면 세금 벌금 부과 가능성",
-      "summary_ko": "바쁜 연휴 시즌으로 인해 주요 마감일 누락 우려",
-      "lines": [
-        "세전 계좌 은퇴자의 인출 의무 연령 73세",
-        "은퇴 계좌 최소 인출 금액 산정 기준",
-        "최초 연간 인출금 마감일 4월 1일"
-      ]
-    },
-    {
-      "title": "Why Anthropic's blockbuster IPO couldn't escape the stock market correction",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/20/anthropic-ipo-ai-stock-market-selloff.html",
-      "published": "2026-11-21 14:07:53",
-      "title_ko": "앤트로픽의 대형 IPO가 시장 조정을 피하지 못한 이유",
-      "summary_ko": "AI 주식의 가치 평가 변동성 지속",
-      "lines": [
-        "앤트로픽의 기업공개 진행",
-        "금요일 증시 매도세 발생"
-      ]
-    },
-    {
-      "title": "State and federal battle over prediction markets regulation heats up after midterms",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/21/prediction-market-regulation-kalshi-cftc.html",
-      "published": "2026-11-21 13:12:41",
-      "title_ko": "중간선거 이후 예측 시장 규제를 둘러싼 주 정부와 연방 정부의 공방 격화",
-      "summary_ko": "중간선거 이후 주 정부와 의회 및 CFTC의 규제 갈등 심화",
-      "lines": [
-        "중간선거 이후 예측 시장 규제 관련 주와 연방정부 간 갈등 심화",
-        "상품선물거래위원회의 예측 시장 감독 강화"
       ]
     }
   ]

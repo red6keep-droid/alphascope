@@ -1,216 +1,4 @@
 {
- "b3730a3128e5": {
-  "lines": [
-   "2025년 국가별 디지털 노마드 순위에서 헝가리의 5위 기록"
-  ],
-  "tags": [
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLRE",
-    "issue": "OTHER",
-    "dir": "positive",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-15T19:06:23.289025+00:00",
-  "n_src": 900,
-  "retry": true
- },
- "389a713d68b8": {
-  "lines": [
-   "연방항공청의 전국 항공기 이륙 중단 조치 2일 후 항공편 운항 차질 지속",
-   "플라이트어웨어 데이터 기준 미국 항공편 1600편 이상 취소 및 4000편 이상 지연 발생"
-  ],
-  "tags": [
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "REGULATION",
-    "dir": "negative",
-    "stage": "done"
-   },
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "MARKET_STRUCTURE",
-    "dir": "negative",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-15T19:06:20.731747+00:00",
-  "n_src": 900
- },
- "818dc1b648e3": {
-  "lines": [
-   "스콧 베센트 재무장관의 엔비디아 최고경영자 사임 이후 대대적 개편 촉구",
-   "베센트 장관의 엔비디아 이사회 외부 출신 최고경영자 선임 요구"
-  ],
-  "tags": [
-   {
-    "scope": "stock",
-    "tickers": [
-     "NVDA"
-    ],
-    "sector": "SMH",
-    "issue": "CORP_EVENT",
-    "dir": "negative",
-    "stage": "talk"
-   },
-   {
-    "scope": "stock",
-    "tickers": [
-     "NVDA"
-    ],
-    "sector": "SMH",
-    "issue": "CORP_EVENT",
-    "dir": "negative",
-    "stage": "talk"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-15T19:06:20.731747+00:00",
-  "n_src": 900
- },
- "fede03bce120": {
-  "lines": [
-   "도널드 트럼프 대통령의 연방항공청 전국 이륙 중단 사태 관련 바이든 행정부 비판",
-   "트럼프 대통령의 노후 관제 시스템 현대화를 위한 의회 예산 승인 촉구"
-  ],
-  "tags": [
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "FISCAL_POLITICS",
-    "dir": "negative",
-    "stage": "done"
-   },
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "FISCAL_POLITICS",
-    "dir": "positive",
-    "stage": "talk"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-15T19:06:20.731747+00:00",
-  "n_src": 900
- },
- "921b12fcef3f": {
-  "lines": [
-   "엔비디아와 앤스로픽의 인공지능 관련 시장 집중"
-  ],
-  "tags": [
-   {
-    "scope": "stock",
-    "tickers": [
-     "NVDA"
-    ],
-    "sector": "SMH",
-    "issue": "AI_CAPEX",
-    "dir": "neutral",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-15T21:46:06.999443+00:00",
-  "n_src": 309,
-  "retry": true
- },
- "abbe913370fd": {
-  "lines": [
-   "민주당의 고소득자 대상 소셜시큐리티 급여세 부과 촉구",
-   "65세 이상 성인 대상 세액 공제 제도의 2년 뒤 만료 예정",
-   "소셜시큐리티 은퇴 급여 삭감 방지를 위한 의회의 6년 내 법 개정 시한"
-  ],
-  "tags": [
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "FISCAL_POLITICS",
-    "dir": "positive",
-    "stage": "talk"
-   },
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "FISCAL_POLITICS",
-    "dir": "negative",
-    "stage": "talk"
-   },
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "FISCAL_POLITICS",
-    "dir": "uncertain",
-    "stage": "talk"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-15T19:06:22.142362+00:00",
-  "n_src": 900
- },
- "27f1bc5ed4dd": {
-  "lines": [
-   "마크 트래버스의 현대 부부 관계 내 공존 질환 언급",
-   "셰리 터클의 소통 부재 및 대화 능력 저하 지적"
-  ],
-  "tags": [
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "OTHER",
-    "dir": "neutral",
-    "stage": "done"
-   },
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "OTHER",
-    "dir": "negative",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-15T19:06:22.142362+00:00",
-  "n_src": 900
- },
- "6eed0b95e9ae": {
-  "lines": [
-   "리비안과 루시드 및 스카우트 최고경영자들의 연방 전기차 지원 미의존 방침"
-  ],
-  "tags": [
-   null
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-15T21:46:06.999443+00:00",
-  "n_src": 900,
-  "retry": true
- },
- "1c324a85ab91": {
-  "lines": [
-   "팔로알토 네트웍스의 11월 18일 회계연도 1분기 실적 발표 예정"
-  ],
-  "tags": [
-   null
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-15T21:46:06.999443+00:00",
-  "n_src": 900,
-  "retry": true
- },
  "2d11eefeddda": {
   "lines": [
    "이란 전쟁 영향의 에너지 가격 상승으로 일본 3분기 경제 연율 0.1% 위축",
@@ -3615,6 +3403,170 @@
   ],
   "model": "gemini-3.5-flash-lite",
   "at": "2026-11-22T12:46:53.790667+00:00",
+  "n_src": 900
+ },
+ "2e34b198714b": {
+  "lines": [
+   "재정난을 겪는 로봇 스타트업 파운데이션의 직원 건강보험 혜택 중단",
+   "한국 베이스 그룹의 1억 5000만 달러 투자 대기 중인 파운데이션의 긴급 브릿지 론 추진"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLY",
+    "issue": "CORP_EVENT",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLY",
+    "issue": "CORP_EVENT",
+    "dir": "positive",
+    "stage": "talk"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-22T21:46:26.693003+00:00",
+  "n_src": 900
+ },
+ "633bafb2e035": {
+  "lines": [],
+  "tags": [],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-22T21:46:26.693003+00:00",
+  "n_src": 900
+ },
+ "76ab22259b01": {
+  "lines": [
+   "항공편과 마이크로소프트 365 및 은행 거래를 중단시킨 기술 장애 발생",
+   "국가정보국장 제이 클레이튼의 추수감사절 여행을 앞둔 미국인들의 시스템 업그레이드 대비 경고"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "MSFT"
+    ],
+    "sector": "XLK",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "GEOPOLITICS",
+    "dir": "neutral",
+    "stage": "talk"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-22T21:46:26.693003+00:00",
+  "n_src": 900
+ },
+ "db36fc52d8cf": {
+  "lines": [
+   "2027년 사회보장연금 물가조정분 3.6% 인상 예정",
+   "2027년 사회보장세 과세 소득 상한선 19만2300달러로 상향"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "INFLATION",
+    "dir": "positive",
+    "stage": "talk"
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "CORP_EVENT",
+    "dir": "negative",
+    "stage": "talk"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-22T21:46:31.257019+00:00",
+  "n_src": 900
+ },
+ "5fc40e14f76e": {
+  "lines": [
+   "구글 AI 보안 분석가 연봉 32만3000달러 기록"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "GOOGL"
+    ],
+    "sector": "XLC",
+    "issue": "EARNINGS",
+    "dir": "positive",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-22T21:46:31.257019+00:00",
+  "n_src": 900
+ },
+ "4376aeb53496": {
+  "lines": [
+   "사우디아라비아 리야드 향해 발사된 후티 드론 요격 및 파괴",
+   "이란 외무장관 미국과의 전쟁 종식을 위한 협상 용의 표명"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLE",
+    "issue": "GEOPOLITICS",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "GEOPOLITICS",
+    "dir": "positive",
+    "stage": "talk"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-22T21:46:31.257019+00:00",
+  "n_src": 900
+ },
+ "499f2d102e16": {
+  "lines": [
+   "대형 피자 체인들의 수요 감소와 경쟁 심화",
+   "외식 선택지 증가와 배달 경쟁 확대"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLY",
+    "issue": "EARNINGS",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLY",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-22T21:46:32.026873+00:00",
   "n_src": 900
  }
 }
