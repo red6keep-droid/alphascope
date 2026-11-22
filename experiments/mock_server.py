@@ -23,6 +23,9 @@
   로 지난 시안을 바로 휴지통에 넣는다(파일은 그대로, 휴지통에서 복원).
   `고친 시각` = --new 기록(열어도 남는 "changed") 과 git 마지막 커밋(`목업 다시 그리기` 커밋 · 합치기 제외) 중 늦은 것.
   파일 수정 시각은 rebuild_mocks 가 모든 목업을 다시 써서 쓰지 않는다. git 에 없는 파일(.gitignore 폴더)은 만든 시각(birthtime).
+- 2026-11-22 사용자: "발행한 강좌는 일주일 넘은 목업으로". 발행이 끝난 목업은 7일이 안 지나도
+      python experiments/mock_server.py --week "course/mock_study_list.html" "course/mock_착각-*"
+  로 바로 `일주일 넘은 목업` 으로 넘긴다(기록 = .mock_prefs.json "week"). 그 뒤에 다시 고치면(--new · 실제 커밋) 첫 화면으로 돌아온다.
 """
 import html
 import re
@@ -94,12 +97,6 @@ PLAN = [   # (기능 이름, 남은 일 — 한 줄, 파일 패턴 "폴더/파�
     ("모의투자 (가상의 10억 원 · 종가 체결 · 세금까지 실전처럼 · 순위는 100명부터)", "목업 확인 → 댓글 저장 확인 · 별명 → Cloudflare D1 · R2 · Worker → 정산 코드 (2026-11-21 기획 모의투자-기획.md, 결정 전부 확정)", ["mock-invest/mock_invest-*"]),
     ("종목별 토론방 (종목 페이지 맨 끝 탭) · 보류", "2026-11-21 사용자: 종목마다 토론방은 미룸 → 댓글 다듬기 먼저. 한 종목에 댓글이 꾸준히 달리면 다시", ["stock-board/mock_board_*"]),
     ("검색 `왜 떨어졌어` · 질문하기", "질문하기 버튼 꺼 둠 — 켤지 사용자 결정", ["site-search/mock_why_demo*"]),
-    ("주식 제대로 알기 4편 `판 값에 다시 사려다 더 비싸게 사는 이유`", "초안 목업 확인 → \"발행해\" 때 발행(주소 · 목록 연결). 발행되면 이 줄을 빼면 아래 `주식 제대로 알기` 묶음으로", ["course/mock_착각-04-되사기.html"]),
-    ("주식 제대로 알기 5편 `분할 매수, 하단을 기다리면 더 싸게 모일까?`", "초안 목업 확인 → \"발행해\" 때 발행(주소 · 목록 연결). 발행되면 이 줄을 빼면 아래 `주식 제대로 알기` 묶음으로", ["course/mock_착각-05-분할매수.html"]),
-    ("주식 제대로 알기 6편 `과열이면 떨어진다고요?`", "초안 목업 확인 → \"발행해\" 때 발행(주소 · 목록 연결). 발행되면 이 줄을 빼면 아래 `주식 제대로 알기` 묶음으로", ["course/mock_착각-06-과열.html"]),
-    ("주식 제대로 알기 7편 `볼린저 하단에서 샀는데 왜 더 떨어질까?`", "초안 목업 확인 → \"발행해\" 때 발행(주소 · 목록 연결). 발행되면 이 줄을 빼면 아래 `주식 제대로 알기` 묶음으로", ["course/mock_착각-07-볼린저.html"]),
-    ("주식 제대로 알기 8편 `골든크로스는 2010년대엔 틀리고 2020년대엔 맞았다?`", "초안 목업 확인 · 제목 끝 ? 승인 → \"발행해\" 때 발행(주소 · 목록 연결). 발행되면 이 줄을 빼면 아래 `주식 제대로 알기` 묶음으로", ["course/mock_착각-08-골든크로스.html"]),
-    ("주식 제대로 알기 9편 `동전 던지기에도 파동은 생긴다`", "초안 목업 확인 · 가짜 주가 파동 길이 재확인 → \"발행해\" 때 발행(주소 · 목록 연결). 발행되면 이 줄을 빼면 아래 `주식 제대로 알기` 묶음으로", ["course/mock_착각-09-파동.html"]),
     ("늦은 날 기준일 상자 (자료가 늦으면 노랑 상자 · `오늘 자료가 늦어 지난 값을 보여 드립니다`)", "목업 확인 → 가이드라인 2절 3번 · 853종목 통 차단 풀기에 연결 (2026-11-21)", ["stock-quick/mock_qpage_late_*"]),
 ]
 PLAN_NOMOCK = [   # 목업 파일이 이 PC 에 없는 발행 예정 기능 — 줄만 보인다
@@ -213,7 +210,7 @@ def load_prefs():
     except (OSError, ValueError):
         p = {}
     return {"star": p.get("star", []), "archive": p.get("archive", list(ARCHIVE_SEED)), "new": p.get("new", {}),
-            "changed": p.get("changed", {}), "trash_note": p.get("trash_note", {})}
+            "changed": p.get("changed", {}), "trash_note": p.get("trash_note", {}), "week": p.get("week", {})}
 
 
 def save_prefs(p):
@@ -399,7 +396,8 @@ def index_page(mode="main"):
     from datetime import timedelta
     cut = datetime.combine(datetime.now().date() - timedelta(days=WEEK_D), datetime.min.time()).timestamp()   # 달력 기준 — `7일 전 고침` 까지 첫 화면
     newd = prefs["new"]
-    recent = [x for x in kept if lc[f"{x[0]}/{x[1]}"][0] >= cut or f"{x[0]}/{x[1]}" in newd]
+    wk = prefs["week"]   # --week 로 넘긴 목업 = 그 뒤에 다시 고치기 전까지 `일주일 넘은 목업` (2026-11-22 사용자: 발행된 강좌)
+    recent = [x for x in kept if (lc[k := f"{x[0]}/{x[1]}"][0] >= cut or k in newd) and not (k in wk and wk[k] >= lc[k][0] and k not in newd)]
     stale = [x for x in kept if x not in recent]
     items = old if archive else recent if mode == "main" else stale
     items = sorted(items, key=lambda x: -lc[f"{x[0]}/{x[1]}"][0])   # 고친 순
@@ -1152,6 +1150,21 @@ def mark_trash(pats, note):
     print(f"휴지통 {len(hit)}개: " + ", ".join(hit) if hit else f"맞는 목업 없음: {pats}")
 
 
+def mark_week(pats):
+    """--week 패턴… — 발행이 끝나 이번 주 목록에 둘 필요 없는 목업을 `일주일 넘은 목업` 으로 (2026-11-22 사용자). 다시 고치면 첫 화면으로 돌아온다."""
+    from fnmatch import fnmatch
+    import time
+    keys = [f"{d}/{f}" for d, f, _ in mockups()]
+    hit = [k for k in keys if any(fnmatch(k, x) for x in pats)]
+    with _lock:
+        p = load_prefs()
+        for k in hit:
+            p["week"][k] = time.time()
+            p["new"].pop(k, None)
+        save_prefs(p)
+    print(f"일주일 넘은 목업으로 {len(hit)}개: " + ", ".join(hit) if hit else f"맞는 목업 없음: {pats}")
+
+
 def lan_ip():
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -1166,6 +1179,9 @@ if __name__ == "__main__":
         a = sys.argv[sys.argv.index("--new") + 1:]
         note = a[a.index("--note") + 1] if "--note" in a else ""
         mark_new([x for x in (a[:a.index("--note")] if "--note" in a else a)], note)
+        sys.exit(0)
+    if "--week" in sys.argv:
+        mark_week(sys.argv[sys.argv.index("--week") + 1:])
         sys.exit(0)
     if "--trash" in sys.argv:
         a = sys.argv[sys.argv.index("--trash") + 1:]
