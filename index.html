@@ -1401,6 +1401,13 @@ body.detail-nav .navbar { display: none; }
 body.detail-nav .pr-sticky .nav-toggle { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; flex: none; padding: 0; background: #fff; border: 1px solid var(--border-strong); border-radius: 8px; color: var(--gray-600); }   /* 글 보기: 로고 줄은 스크롤되어 사라지고 제목 줄(.pr-sticky)만 맨 위에 고정 (2026-10-23 사용자, 모든 상세 페이지) */
 .pr-sticky { position: sticky; top: 0; z-index: 40; display: flex; align-items: center; gap: 12px; margin: 0 0 14px; padding: 4px 0 12px; background: var(--surface, #fff); border-bottom: 1px solid #E2E8F0; }
 .pr-sticky .post-title { margin: 0; min-width: 0; }
+.nf-title { display: inline-flex; align-items: center; gap: 8px; }
+.post-title:has(.nf-title) .post-title-text, .post-title:has(.nf-title) .post-title-label { display: flex; align-items: center; line-height: 22px; }   /* 로고 · 주요 기사 · 오른쪽 11.23 기사를 한 가로선에 — 제목 줄 행간(48)이 로고 칸을 아래로 밀던 것 (2026-11-23 사용자) */
+@media (min-width: 681px) { .post-title:has(.nf-title) .post-title-text, .post-title:has(.nf-title) .post-title-label { line-height: 28px; } }
+.nf-title-logo { width: 122px; height: 28px; flex: none; display: block; }   /* Newfact 주요 기사 제목 줄 로고 = 머리 줄 로고 144 × 33 의 85% (2026-11-23 사용자 "15% 작게", 505:116 정수) */
+.nf-title-sub { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; line-height: 19px; font-weight: 400; letter-spacing: 0; color: #6B7280; white-space: nowrap; }
+.nf-title-sub::before { content: ''; width: 1px; height: 13px; background: #CBD5E1; }   /* 로고 | 주요 기사 — 사이 막대 (2026-11-23 사용자) */
+@media (max-width: 680px) { .nf-title-logo { width: 96px; height: 22px; } }   /* 폰 113 × 26 의 85% */
 .pr-sticky .post-title .pr-role { margin-left: 10px; font-size: 16px; line-height: 24px; font-weight: 400; letter-spacing: 0; color: #7A7A7A; white-space: nowrap; }
 .pr-back { display: inline-flex; flex: none; align-items: center; justify-content: center; width: 36px; height: 36px; padding: 0; background: #fff; border: 1px solid #E2E8F0; border-radius: 8px; color: #111 !important; cursor: pointer; text-decoration: none; }   /* 네모 박스 안 화살표 — 공식 접기 버튼과 같은 상자 */
 .pr-back svg { width: 20px; height: 20px; }
@@ -4844,7 +4851,22 @@ html.as-lock, html.as-lock body { overflow: hidden; }
                 var w = document.createTreeWalker(h, NodeFilter.SHOW_TEXT, null), n;
                 while ((n = w.nextNode())) {
                   var i = n.nodeValue.indexOf(' : ');
-                  if (i > 0) { n.nodeValue = n.nodeValue.slice(0, i).replace(/\s+$/, ''); return; }
+                  if (i > 0) { n.nodeValue = n.nodeValue.slice(0, i).replace(/\s+$/, ''); break; }
+                }
+                /* Newfact 주요 기사 글([data-news-post]): 제목 줄 `Newfact 주요 기사` → 머리 줄과 같은 Newfact 로고 + 작은 글씨 `주요 기사` (2026-11-23 사용자) */
+                if (!document.querySelector('.post-body [data-news-post]') || h.querySelector('.nf-title-logo')) return;
+                var tp = document.querySelector('.post-body template[data-nf-logo]'), logo = document.querySelector('svg.logo-full') || (tp && tp.content.querySelector('svg'));   /* 목업엔 머리 줄이 없어 본문 template */
+                w = document.createTreeWalker(h, NodeFilter.SHOW_TEXT, null);
+                while ((n = w.nextNode())) {
+                  var j = n.nodeValue.indexOf('Newfact ');
+                  if (j < 0 || !logo) continue;
+                  var rest = n.nodeValue.slice(j + 8).trim(), box = document.createElement('span');
+                  box.className = 'nf-title';
+                  var lg = logo.cloneNode(true); lg.setAttribute('class', 'nf-title-logo');
+                  var sm = document.createElement('span'); sm.className = 'nf-title-sub'; sm.textContent = rest;
+                  box.appendChild(lg); box.appendChild(sm);
+                  n.parentNode.replaceChild(box, n);
+                  return;
                 }
               }
               trim();
@@ -5096,7 +5118,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
           after.parentNode.insertBefore(r, after.nextSibling); after = r;
           r.classList.add('is-moved');
           /* 최대 3줄 (2026-11-10 사용자) — 이미 게시된 글의 4줄 이상도 앞 3줄만. 렌더러(dk.related_buttons)도 3개로 자른다 */
-          [].slice.call(r.querySelectorAll('a[data-row-link]')).slice(3).forEach(function (x) { x.parentNode.removeChild(x); });
+          if (!r.hasAttribute('data-related-all')) [].slice.call(r.querySelectorAll('a[data-row-link]')).slice(3).forEach(function (x) { x.parentNode.removeChild(x); });   /* Newfact 주요 기사 = 연결되는 서비스 전부 (data-related-all, 2026-11-23 사용자) */
         });
         /* 글 끝 순서 = 본문 → 함께 보는 페이지 → [댓글 · TOP] → 푸터 (2026-11-12 사용자 여정 테스트) — 버튼 줄 · 댓글 칸을 마지막 함께 보는 페이지 뒤로 */
         var rels = [].slice.call(shell.querySelectorAll('.post-shell > [data-related].is-moved'));

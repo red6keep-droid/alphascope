@@ -70,6 +70,9 @@ def load(name, fallback):
 
 
 _cache = {}
+import re as _re0
+_svg = _re0.search(r"<svg class='logo-full'.*?</svg>", open(os.path.join(BASE, "..", "..", "index.html"), encoding="utf-8").read(), _re0.S)
+LOGO_TPL = f"<template data-nf-logo>{_svg.group(0)}</template>" if _svg else ""
 
 
 def closes_of(sym):
@@ -89,21 +92,142 @@ if __name__ == "__main__":
     sys.stdout.reconfigure(encoding="utf-8")
     os.makedirs(OUT, exist_ok=True)
     lists = {r["t"]: dict(r, mk=mk) for mk, p in LISTS.items() if os.path.exists(p) for r in json.load(open(p, encoding="utf-8"))["rows"]}
+    themes = {mk: json.load(open(p, encoding="utf-8")).get("themes") or [] for mk, p in LISTS.items() if os.path.exists(p)}   # 테마 구성 = 종목 모아보기와 같은 파일
+    _iss = os.path.join(BASE, "..", "issue_store", "output", "issue", "issues.json")      # Hot Issue · 증시 전망 = 홈 카드와 같은 파일
+    _hyp = os.path.join(BASE, "..", "issue_store", "output", "forecast", "hypo.json")
+    issues = json.load(open(_iss, encoding="utf-8"))["issues"] if os.path.exists(_iss) else []
+    forecasts = json.load(open(_hyp, encoding="utf-8"))["open"] if os.path.exists(_hyp) else []
     posts, real = load("posts.json", [SAMPLE_POST])
     print("글 재료:", "수집기 실제 글" if real else "예시 글", len(posts), "편")
     upto = closed_through()
     jobs = [("mock_news_post.html" if i == 0 else f"mock_news_post_{i + 1}.html", post)
             for i, post in enumerate(sorted(posts, key=lambda p: str(p.get("createdAt") or p["date"]), reverse=True))]
-    if real:   # 실제 글에 종목이 없을 때도 종목 줄(한국 + 미국)을 볼 수 있게 예시 글도 함께
-        jobs.append(("mock_news_post_example.html", SAMPLE_POST))
-    for name, post in jobs:
-        market = NR.same_day(post, lists, closes_of, upto)
-        _, html, meta = NR.render(post, market, lists)
+    extra, _ = load("posts_extra.json", [])   # 시안만: 수집기 원래 저장소의 v2 글 중 보라 강조가 든 것(검사 실패라 블로그엔 안 옴) — 홈 카드 · 목록엔 넣지 않는다
+    extra_jobs = [(f"mock_news_post_{len(jobs) + k + 1}.html", post) for k, post in enumerate(extra)]
+    for name, post in jobs + extra_jobs:
+        market = NR.same_day(post, lists, closes_of, upto, themes=themes)
+        _, html, meta = NR.render(post, market, lists, issues, forecasts)
+        html = html.replace(dk.WRAP_OPEN, dk.WRAP_OPEN + LOGO_TPL, 1)   # 목업만: 머리 줄 로고가 없어 테마 JS 가 쓸 로고 원본
         out = os.path.join(OUT, name)
-        print(dk.write_mock(html, out, NR.titles(post)[0]) or "index.html 없음", "· 기준", meta["basis"], "· 종목", [s["name"] for s in market["stocks"]])
+        print(dk.write_mock(html, out, NR.titles(post)[0]) or "index.html 없음", "· 기준", meta["basis"], "· 관련 종목", len(market["stocks"]), [s["name"] for s in market["stocks"]][:6],
+              "· 함께 보는 페이지", [t for t, _ in NR.follow_links(post, market, lists, issues, forecasts)])
     docs, real_h = load("headlines.json", SAMPLE_HEADLINES)
     day = max(str(it.get("publishedAt") or it.get("foundAt") or "")[:10] for d in docs for it in d.get("items") or [])
     sec = NR.headlines_section(docs, day)
     page = dk.WRAP_OPEN + sec + dk.WRAP_CLOSE
     print(dk.write_mock(page, os.path.join(OUT, "mock_news_headlines.html"), "한국 증시 리포트 · 뉴스 (한국 기사 묶음)"),
           "·", "수집기 실제 제목" if real_h else "예시 제목", "·", day)
+    facts, real_f = load("facts.json", [])
+    if real_f:   # 시안 = 수집기 eventsets 를 facts 모양으로 바꾼 표본(ca7a6b8 전이라 사실마다 보도 수 1 → 사건 기준만)
+        fday = max(str(d.get("createdAt"))[:10] for d in facts)
+        import difflib
+        import re as _re
+
+        def _key(t):
+            return _re.sub(r"[^0-9가-힣a-zA-Z]", "", t)
+
+        for d in facts:   # 시안만: R22(수집기가 같은 사실끼리 묶기) 전 자료라 비슷한 문장을 블로그에서 대신 합친다 — 합친 수를 sources 로
+            for e in d["events"]:
+                kept = []
+                for f in e["facts"]:
+                    k = _key(f["what"])
+                    hit = next((g for g in kept if difflib.SequenceMatcher(None, k, g["_k"]).ratio() >= 0.55), None)
+                    if hit:
+                        hit["sources"] += 1
+                    else:
+                        kept.append(dict(f, _k=k, sources=1))
+                e["facts"] = sorted(kept, key=lambda f: -f["sources"])
+        page = dk.WRAP_OPEN + NR.facts_section(facts, docs, fday, fact_min=1) + dk.WRAP_CLOSE
+        print(dk.write_mock(page, os.path.join(OUT, "mock_news_facts.html"), "한국 증시 리포트 · 뉴스 (사건별 사실)"), "·", fday,
+              "· 사건", len(NR.fact_events(facts)))
+
+    # ── 한국 홈 카드 `Newfact 주요 기사` (2026-11-23 사용자 "홈 카드도 새로") — 한국 홈 목업(home-split)에 끼워 본다 ──
+    # 자리 = 한국 증시 리포트 카드 바로 아래 · 꼴 = 홈 주요 뉴스와 같은 줄(제목 17 굵게 · 요약 16 · 라벨 + 날짜), 5편 + 더 보기(버리지 않음).
+    # 제목 = 글 제목 줄과 같은 Newfact 로고 + 작은 `주요 기사`. 적용 때 자료 = Pages posts/index.json(앱 대비 원칙 4절), 방문자 요청 1번.
+    import html as _h
+    home = os.path.join(BASE, "..", "home-split", "output", "mock_home_kr.html")
+    if os.path.exists(home):
+        svg = _svg.group(0).replace("class='logo-full'", "class='nf-home-logo'") if _svg else ""
+        rows = []
+        for k, (name, post) in enumerate(jobs):
+            d = NR.DIR_KIND.get(post.get("direction"), "neutral")
+            tags = (f'<span class="news-tag">{_h.escape(dk.ISSUE_KO.get(post.get("cat"), "그 밖"))}</span>'
+                    f'<span class="news-tag issue-tag {d}">{_h.escape(dk.DIR_KO.get(d))}</span>')
+            y, m, dd = post["date"].split("-")
+            summ = (post.get("summary") or "").strip()
+            rows.append(f'<article class="news-item"{" hidden data-news-more=1" if k >= 5 else ""}><a href="{name}">{_h.escape(post["title"])}</a>'
+                        + (f'<span class="news-sum">{_h.escape(summ)}</span>' if summ else "")
+                        + f'<span class="news-labels">{tags}<span class="news-sub">{int(m)}.{dd}</span></span></article>')
+        last = max(post["date"] for _, post in jobs)
+        card = ('<style>#nf-posts-col .report-title{gap:8px;}'
+                '.nf-home-logo{width:96px;height:22px;flex:none;display:block;}'
+                '.nf-home-sub{display:inline-flex;align-items:center;gap:8px;font-size:13px;line-height:19px;font-weight:400;letter-spacing:0;color:#6B7280;}.nf-home-sub::before{content:'';width:1px;height:13px;background:#CBD5E1;}'
+                '#nf-posts-card{gap:0;}#nf-posts-card .news-item:first-child{padding-top:0;}#nf-posts-card .news-item:last-child{padding-bottom:0;}</style>'
+                '<div class="report-col" id="nf-posts-col">'
+                f'<h3 class="report-title">{svg}<span class="nf-home-sub">주요 기사</span>'
+                f'<span class="report-card-date">{int(last[5:7])}.{last[8:10]}</span></h3>'
+                f'<div class="report-card" id="nf-posts-card">{"".join(rows)}</div></div>')
+        src = open(home, encoding="utf-8").read()
+        mark = '<!-- 엔비디아 리포트 카드는 삭제'   # 한국 증시 카드 바로 다음
+        page = src.replace(mark, card + mark, 1)
+        page = page.replace('href="mock_home_us.html"', 'href="../../home-split/output/mock_home_us.html"').replace('href="mock_home_kr.html"', 'href="mock_news_home_kr.html"')
+        page = _re0.sub(r"<title>.*?</title>", "<title>Newfact 주요 기사 — 한국 홈 카드</title>", page, count=1, flags=_re0.S)
+        out = os.path.join(OUT, "mock_news_home_kr.html")
+        open(out, "w", encoding="utf-8").write(page)
+        print(out, "· 홈 카드", len(rows), "편")
+
+    # ── 한국 홈 맨 아래 `주요 뉴스` (2026-11-23 사용자: 미국 홈과 같은 자리 · 이름 `주요 뉴스` 일단) ──
+    # 재료 둘을 시각 순으로 섞는다: ① 유튜브 방송 한국 이슈(media_feed.korea — 한국 증시 리포트 뉴스 탭과 같은 재료, 라벨 `방송` · 채널)
+    # ② 뉴스 수집기 사건(facts, 보도 2곳 이상 — `보도 n곳`). 5건 + 더 보기(버리지 않음). 목업 = 한국 홈 목업의 가짜 뉴스를 덮어쓴다.
+    if os.path.exists(home):
+        import datetime as _dt
+        sys.path.insert(0, os.path.join(BASE, ".."))
+        import media_feed as MF
+        KST = _dt.timezone(_dt.timedelta(hours=9))
+        day = max(post["date"] for _, post in jobs)
+        bc = MF.korea(MF.issues(MF.rows(MF.load(day, days=2))), n=10 ** 6)
+        items = []
+        for r in bc:
+            at = _dt.datetime.fromisoformat(str(r["published_at"]).replace("Z", "+00:00")).astimezone(KST)
+            d = MF.DIRECTION.get(r.get("direction"), "neutral")
+            items.append((at, r.get("topic") or "", r.get("note") or "", r.get("category"), d, "", r.get("url") or "", list(r.get("lines") or []), "media", r.get("channel")))
+        if real_f:
+            last_run = max(facts, key=lambda d: str(d.get("createdAt")))
+            at0 = _dt.datetime.fromisoformat(str(last_run["createdAt"]).replace("Z", "+00:00")).astimezone(KST)
+            for e in NR.fact_events(facts):
+                d = NR.DIR_KIND.get(e.get("direction"), "neutral")
+                first = (e.get("facts") or [{}])[0].get("what", "")
+                lines = [f.get("what", "") for f in e.get("facts") or []]
+                items.append((at0, e["event"], first, e.get("cat"), d, "", "", lines, "fact", f'보도 {e.get("sourceCount")}곳'))
+        # 한 줄짜리(팝업 줄 2개 미만) = 같은 분야끼리 2 ~ 4줄 묶음 한 줄 — 굵은 제목 = 첫 줄 · 요약 = 둘째 줄 · 누르면 묶인 줄 팝업 (news-bundle-rules, 11-15 · 11-17 재확인)
+        one = [x for x in items if len(x[7]) < 2]
+        items = [x for x in items if len(x[7]) >= 2]
+        by_cat = {}
+        for x in one:
+            by_cat.setdefault(x[3], []).append(x)
+        lone = [xs[0] for c, xs in by_cat.items() if len(xs) == 1]   # 이슈에 한 줄뿐이면 `그 밖` 으로 모아 묶음 (news-bundle-rules), 전체 하나뿐이면 싣지 않음
+        by_cat = {c: xs for c, xs in by_cat.items() if len(xs) > 1}
+        if len(lone) >= 2:
+            by_cat["OTHER"] = lone
+        for cat, xs in by_cat.items():
+            xs.sort(key=lambda x: x[0])
+            sizes, k = dk.bundle_sizes(len(xs)) or [1], 0
+            for n in sizes:
+                part, k = xs[k:k + n], k + n
+                heads = [p_[1] for p_ in part]
+                dirs = {p_[4] for p_ in part}   # 방향 = 모두 같으면 그 방향, 섞이면 중립
+                src = part[0][9] + (f" 외 {len(part) - 1}건" if len(part) > 1 else "")
+                items.append((max(p_[0] for p_ in part), heads[0], heads[1], cat, dirs.pop() if len(dirs) == 1 else "neutral", "", "", heads, part[0][8], src))   # 팝업 줄 = 묶인 줄 전부(미국 render_html 묶음 pop_lines 와 같게)
+        items.sort(key=lambda x: x[0], reverse=True)
+        # 미국 홈과 같은 테마 코드로 그린다(news.json 꼴) — 줄을 누르면 팝업(요약 줄), 원문 · 영상은 팝업 안 작은 링크로만 (2026-11-23 사용자 "외부로 바로 보내지 마")
+        feed = []
+        for at, t, sm, cat, d, sub, url, lines, kind, src in items:
+            feed.append({"title": t, "summary_ko": sm, "kind": kind, "tag": dk.ISSUE_KO.get(cat, "그 밖"), "source": src,
+                         "published": at.astimezone(_dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), "link": url, "lines": lines})
+        page = open(out, encoding="utf-8").read()
+        page = _re0.sub(r"<script>window\.addEventListener\('load',function\(\)\{setTimeout\(function\(\)\{var l=document\.getElementById\('news-list'\).*?</script>", "", page, flags=_re0.S)   # 한국 홈 목업의 가짜 뉴스 덮어쓰기 빼기
+        page = page.replace("body = PV_NEWS;", "body = (window.__KR_NEWS || PV_NEWS);", 1)
+        page = page.replace("function newsCategory(item) {", "function newsCategory(item) { if (item.tag) return item.tag;   /* 목업: 한국 줄은 분야 이름 */", 1)
+        page = page.replace("<head>", "<head>\n<script>window.__KR_NEWS = " + json.dumps({"items": feed}, ensure_ascii=False).replace("</", "<\\/") + ";</script>", 1)
+        open(out, "w", encoding="utf-8").write(page)
+        print(out, "· 주요 뉴스 방송", len(bc), "· 수집기 사건", len(items) - len(bc))

@@ -29,7 +29,7 @@ NAME = "Newfact 주요 기사"   # 글 이름 = 제목 줄 · 연재 라벨 (요
 LABEL_Q = "Newfact%20%EC%A3%BC%EC%9A%94%20%EA%B8%B0%EC%82%AC"
 KR_REPORT = f"{BLOG}search/label/%ED%95%9C%EA%B5%AD%20%EC%A6%9D%EC%8B%9C%20%EB%A6%AC%ED%8F%AC%ED%8A%B8"
 DIR_KIND = {"up": "positive", "down": "negative", "neutral": "neutral"}
-STAGE_KO = {"confirmed": "확정", "discussing": "논의 중"}   # 방향 + 단계 두 칸 (논의 중 뉴스도 방향을 붙인다)
+STAGE_KO = {"confirmed": "확정", "discussing": "논의 중"}   # 화면에 싣지 않는다 — 단계 라벨 뺌 (2026-11-23 사용자 "확정 라벨은 빼"). 라벨 = 분야 · 방향 둘
 USUAL_N = 60   # 평소 움직임 = 직전 60거래일 하루 등락 폭(절댓값)의 중앙값
 INDEX = [("^KS11", "코스피"), ("^KQ11", "코스닥")]
 US_INDEX = [("^GSPC", "S&P 500"), ("^IXIC", "나스닥")]   # 미국 종목이 있을 때만 — 미국 종목의 비교 대상 = S&P 500 (같은 시장 전체, 2026-11-23 사용자 "미국 종목도 싣게")
@@ -75,6 +75,58 @@ def match_stocks(post, lists):
     return out
 
 
+THEME_PAT = {   # 테마 이름(블로그 _lists.json themes) → 글 낱말 (기획 3-3 ②, 2026-11-23 다시 살림 — 11-22 목업의 관련 종목 25개)
+    "kr": {"반도체": r"반도체|메모리|HBM|D램|디램|낸드|파운드리",
+           "2차전지": r"2차 ?전지|이차 ?전지|배터리|양극재|음극재|전기차",
+           "바이오": r"바이오|제약|신약|임상",
+           "방산·조선·원전": r"방산|방위 ?산업|조선|선박|원전|원자력|SMR"},
+    "us": {"AI 칩": r"AI ?(칩|반도체)|GPU|엔비디아|가속기",
+           "메모리": r"메모리|HBM|D램|디램|낸드",
+           "칩 생산": r"파운드리|TSMC|위탁 ?생산",
+           "반도체 장비": r"반도체 ?장비|노광|ASML",
+           "데이터 센터": r"데이터 ?센터",
+           "우주항공": r"우주|위성|발사체|항공우주",
+           "가상자산": r"비트코인|가상 ?자산|암호 ?화폐|코인",
+           "에너지": r"유가|원유|천연가스|정유",
+           "양자 컴퓨터": r"양자",
+           "하이퍼스케일러": r"클라우드|하이퍼스케일러|빅테크|오픈AI|앤트로픽|구글|마이크로소프트|아마존|메타"},
+}
+
+
+def _text(post):
+    return " ".join(str(post.get(k) or "") for k in ("title", "summary", "body", "sector"))
+
+
+NAME_STOP = {"나스닥", "코스피", "코스닥", "다우존스"}   # 지수 · 시장 이름과 같은 종목(나스닥 Inc. NDAQ) — 글의 `나스닥 시장` 에 걸리던 것
+
+
+def related_stocks(post, lists, themes=None):
+    """→ [(ticker, name, mk, why)] 관련 종목 전부(자르지 않음 — 화면은 5개 + 더 보기). why = "기사" | 테마 이름.
+    ① 수집기 stocks(match_stocks) ② 글에 이름이 그대로 나온 블로그 종목(한글 이름 3글자 이상 — `기아` 같은 두 글자는 낱말 속에서 잘못 걸려 뺀다)
+    ③ 글 낱말이 테마에 걸리면 그 테마 구성 종목(한국 · 미국). 블로그 목록에 있는 종목만."""
+    text = _text(post)
+    out, seen = [], set()
+
+    def add(t, why):
+        r = lists.get(t)
+        if r and t not in seen:
+            seen.add(t)
+            out.append((t, r["n"], r.get("mk") or ("kr" if re.fullmatch(r"\d{6}", t) else "us"), why))
+    for t, _, _ in match_stocks(post, lists):
+        add(t, "기사")
+    for t, r in sorted(lists.items(), key=lambda kv: -(kv[1].get("c") or 0)):
+        n = r.get("n") or ""
+        if len(n) >= 3 and n not in NAME_STOP and n in text:
+            add(t, "기사")
+    for mk, pats in THEME_PAT.items():
+        for name, members in (themes or {}).get(mk, []):
+            pat = pats.get(name)
+            if pat and re.search(pat, text, re.I):
+                for t in members:
+                    add(t, name)
+    return out
+
+
 def us_day(post_date, now_kst):
     """미국 종목 기준일 = 한국 날짜로 글 날짜까지 마감한 마지막 미국 거래일. 미국 D일 종가는 한국 D+1일 아침(06:30 뒤 확정으로 본다)에 나온다(날짜 = 한국 시간 하나로)."""
     ready = now_kst.date() if now_kst.hour * 60 + now_kst.minute >= 6 * 60 + 30 else now_kst.date() - datetime.timedelta(days=1)
@@ -96,7 +148,7 @@ def _indices(pairs, closes_of, day):
     return out
 
 
-def same_day(post, lists, closes_of, closed_through, now_kst=None):
+def same_day(post, lists, closes_of, closed_through, now_kst=None, themes=None):
     """→ market = {"basis", "indices", "us_basis", "us_indices", "stocks": [{ticker, name, mk, chg_pct, usual, base, vs}]}.
     closes_of(symbol) → [(날짜, 종가)]. closed_through = 한국 마감이 끝난 마지막 날(장중 값은 쓰지 않는다).
     종목 = match_stocks. 비교 대상(헌법 제1조) = 한국 종목은 코스피, 미국 종목은 S&P 500 — 같은 시장 전체 · 같은 날."""
@@ -105,18 +157,18 @@ def same_day(post, lists, closes_of, closed_through, now_kst=None):
     out = {"indices": _indices(INDEX, closes_of, day), "us_indices": [], "stocks": []}
     out["basis"] = out["indices"][0]["day"] if out["indices"] else None
     k = next((x["chg_pct"] for x in out["indices"] if x["name"] == "코스피"), None)
-    hits = match_stocks(post, lists)
+    hits = related_stocks(post, lists, themes)
     if any(h[2] == "us" for h in hits):
         out["us_indices"] = _indices(US_INDEX, closes_of, us_day(post["date"], now_kst))
         out["us_basis"] = out["us_indices"][0]["day"] if out["us_indices"] else None
     spx = next((x["chg_pct"] for x in out["us_indices"] if x["name"] == "S&P 500"), None)
-    for t, name, mk in hits:
+    for t, name, mk, why in hits:
         cl = closes_of(kr_symbol(t) if mk == "kr" else t)
         basis, base, bchg = (out.get("basis"), "코스피", k) if mk == "kr" else (out.get("us_basis"), "S&P 500", spx)
         m = _move(cl, basis) if cl and basis else None
         if not m or m["day"] != basis:
             continue
-        out["stocks"].append({"ticker": t, "name": name, "mk": mk, "chg_pct": m["chg"], "usual": m["usual"], "base": base,
+        out["stocks"].append({"ticker": t, "name": name, "mk": mk, "why": why, "chg_pct": m["chg"], "usual": m["usual"], "base": base,
                               "vs": round(m["chg"] - bchg, 2) if bchg is not None else None, "base_chg": bchg})
     return out
 
@@ -154,36 +206,100 @@ def _cmp_line(x):
     if x.get("usual"):
         r = abs(x["chg_pct"]) / x["usual"] if x["usual"] else 0
         bits.append(f'평소 하루 움직임({_pct(x["usual"])})' + (f"의 {r:.1f}배" if r >= 1.5 else "과 비슷" if r >= 0.5 else "보다 작음"))
-    return " · ".join(bits)
+    return bits   # 줄마다 한 비교 — 화면은 줄바꿈으로 (2026-11-23 사용자)
 
 
 def _md(d):
     return f"{int(d[5:7])}.{d[8:10]}"
 
 
+def _idx_card(cells_src):
+    """지수 칸 = 카드 하나를 넷(2 × 2)으로 — 코스피 · 코스닥 / S&P 500 · 나스닥 (2026-11-23 사용자 "하나의 카드로 4등분"). 한국만이면 한 줄 둘.
+    칸 꼴 = 시황 해설 지수 칸(SR.index_row)과 같은 이름 · 종가 · 증감."""
+    cells = []
+    for x in cells_src:
+        if x.get("close") is None or x.get("chg_pct") is None:
+            continue
+        ink = dk.UP if x["chg_pct"] > 0 else dk.DOWN if x["chg_pct"] < 0 else "#111"
+        cells.append(f'<span style="font-weight:700;color:#111;font-size:{dk.NAME};line-height:{dk.LH_CARD};white-space:nowrap;display:block;">{dk.paren(dk.esc(SR.INDEX_NAMES.get(x["name"], x["name"])))}</span>'
+                     f'<span style="display:block;margin-top:4px;line-height:25px;white-space:nowrap;"><span style="font-size:{dk.NAME};color:{ink};">{x["close"]:,.2f}</span> '
+                     f'<span style="font-size:{dk.CHG_SIZE};">{SR.chg(x["chg_pct"])}</span></span>')
+    if not cells:
+        return ""
+    line = dk.card_line("neutral")
+    pad = f"padding:{14 - dk.VP}px 12px;"
+    inner = "".join(f'<span data-idx-cell="1" style="display:block;min-width:0;box-sizing:border-box;background:#fff;{pad}'
+                    f'{"" if k % 2 == 0 else f"border-left:1px solid {line};"}{"" if k < 2 else f"border-top:1px solid {line};"}">{c}</span>' for k, c in enumerate(cells))
+    return (f'<div data-cards="1" style="margin:0 0 8px;"><span style="display:grid;grid-template-columns:1fr 1fr;border:1px solid {dk.CARD_DIR["neutral"][1]};'
+            f'border-radius:8px;overflow:hidden;">{inner}</span></div>')
+
+
+STOCKS_SHOWN = 2   # 관련 종목 = 2개 펼침 + 카드 안 더 보기 (2026-11-23 사용자 "페이지를 길게 만들지 마", 옛 5)
+WHITE_BOX = "display:block;background:#fff;border:1px solid #E2E8F0;border-radius:8px;overflow:hidden;"
+
+
 def market_section(market, lists, ink):
     idx, us_idx = market.get("indices") or [], market.get("us_indices") or []
     if not idx and not us_idx:
         return ""
-    inner = SR.index_row(idx) + SR.index_row(us_idx)   # 한국 칸 아래 미국 칸(미국 종목이 있을 때만)
+    inner = _idx_card(idx + us_idx)   # 비교 기준 지수 — 미국 두 칸은 미국 종목이 있을 때만
     stocks = market.get("stocks") or []
     if stocks:
         rows = []
         for i, x in enumerate(stocks):
-            r = SR.stock_row(x, lists.get(x["ticker"]), "am" if x.get("mk") == "us" else "pm", i == 0)   # 미국 = 달러 · 티커 · 업종
+            r = SR.stock_row(x, lists.get(x["ticker"]), "am" if x.get("mk") == "us" else "pm", i in (0, STOCKS_SHOWN))   # 미국 = 달러 · 티커 · 업종
             line = _cmp_line(x)
             if line:
                 r = r.replace(f"padding:{SR.LIST_ROW_PAD}px 12px;", f"padding:{SR.LIST_ROW_PAD}px 12px 6px;", 1)
                 r += (f'<span style="display:block;padding:0 12px {SR.LIST_ROW_PAD}px {12 + SR.LOGO_Z + SR.LOGO_GAP}px;font-size:{dk.TINY};line-height:{dk.LH_TINY};'
-                      f'color:#6B7280;word-break:keep-all;">{dk.esc(line)}</span>')
+                      f'color:#6B7280;word-break:keep-all;">{"<br>".join(dk.esc(x) for x in line)}</span>')
             rows.append(r)
-        inner += SR.white_card("".join(rows))
+        if len(rows) > STOCKS_SHOWN:   # 전부 싣고 접기 — 버튼은 카드 안 맨 아래 줄(dk.fold_card, `관련 종목 n개 더 보기 ⌄`)
+            inner += dk.fold_card("".join(rows[:STOCKS_SHOWN]), "".join(rows[STOCKS_SHOWN:]), f"관련 종목 {len(rows) - STOCKS_SHOWN}개 더 보기", box=WHITE_BOX)
+        else:
+            inner += SR.white_card("".join(rows))
     b, ub = market.get("basis") or "", market.get("us_basis") or ""
     bits = ([f"한국 {_md(b)} 종가"] if b else []) + ([f"미국 {_md(_close_kst(ub))} 아침 마감 종가"] if ub else [])
-    note = (" · ".join(bits) + " 기준. 같은 날 움직임을 나란히 적은 것으로, 기사 때문에 움직였다는 뜻은 아닙니다.") if bits else ""
-    inner += dk.excl_note(note, margin="10px 0 0") if note else ""
-    sec = dk.section("같은 날 시장 움직임", inner, line=False)
-    return SR.tinted(SR.iconed(sec, dk.solid_icon("bars", ink)), ink).replace(f"margin:{SR.H2_TOP}px 0 11px;", f"margin:{SR.BIG_TOP}px 0 11px;", 1)
+    note = (" · ".join(bits) + " 기준") if bits else ""   # 느낌표 아이콘 · 인과 아님 문장 뺌 (2026-11-23 사용자)
+    inner += f'<p style="margin:10px 0 0;font-size:13px;line-height:19px;color:#6B7280;word-break:keep-all;">{dk.esc(note)}</p>' if note else ""
+    sec = dk.section("관련 종목" if stocks else "같은 날 지수", inner, line=False)   # 이름 = 관련 종목 (기획 3-3, 수혜주 X)
+    sec = SR.tinted(SR.iconed(sec, dk.solid_icon("bars", ink, size=20)), ink).replace(f"margin:{SR.H2_TOP}px 0 11px;", f"margin:{SR.BIG_TOP}px 0 11px;", 1)
+    return sec.replace("font-size:22px;font-weight:700;line-height:28px;", f"font-size:{dk.NAME};font-weight:700;line-height:{dk.LH_CARD};", 1)   # 제목 = 지수 칸 이름(코스피) 크기 16/24 (2026-11-23 사용자 "공간 효율")
+
+
+ISSUE_PAT = {"IRAN": r"이란|호르무즈", "TARIFF": r"관세(?!청)|무역 ?전쟁", "EXPORT": r"수출 ?통제|거래 제한 명단",
+             "NVDA_CEO": r"젠슨 ?황|엔비디아 (CEO|최고경영자)"}   # Hot Issue 열쇠(이슈 페이지 mock_issue_watch.ISSUES pat 의 한국어 쪽)
+MARKET_CATS = {"MARKET_STRUCTURE", "RATES_FED", "FX_GLOBAL", "INFLATION", "GROWTH_JOBS", "FISCAL_POLITICS", "CREDIT_BANKS", "TARIFF_TRADE", "GEOPOLITICS"}   # 시장 전체 사건 → 한국 증시 전망
+
+
+def follow_links(post, market, lists, issues=(), forecasts=()):
+    """함께 보는 페이지에 싣는 연결 (기획 3-4 `이어서 보기`, 11-23 사용자: 따로 칸 없이 함께 보는 페이지로) — 기사에 이어지는 우리 서비스 전부, 맞는 것만(빈 칸 금지). 링크는 발행 때 박는다(방문자 요청 0).
+    종목 페이지(기사에 나온 종목) · Hot Issue(낱말) · 증시 전망(기사 종목 이름이 걸린 전망, 시장 전체 사건이면 한국 전망) · 테마(종목 모아보기) · 지난 기사."""
+    text = _text(post)
+    out = []
+    for x in market.get("stocks") or []:
+        r = lists.get(x["ticker"]) or {}
+        if x.get("why") == "기사" and r.get("u"):
+            out.append((f'{x["name"]} 종목 페이지', BLOG.rstrip("/") + r["u"]))
+    for it in issues:
+        pat = ISSUE_PAT.get(it.get("id"))
+        if pat and re.search(pat, text, re.I):
+            out.append((f'Hot Issue · {it.get("q") or it.get("name")}', BLOG.rstrip("/") + it["url"] if it["url"].startswith("/") else it["url"]))
+    names = [x["name"] for x in market.get("stocks") or [] if x.get("why") == "기사"]
+    for f in forecasts:
+        hit = any(n and n in (f.get("event") or "") + (f.get("title") or "") for n in names)
+        if hit or (post.get("cat") in MARKET_CATS and f.get("market") == "kr" and "종목" not in " ".join(f.get("tags") or [])):
+            out.append((f'증시 전망 · {f["title"]}', f["url"]))
+    if post.get("cat") in MARKET_CATS:
+        out.append(("증시 전망 · 지금 지켜보는 전망 전부", f"{BLOG}p/forecast-list.html"))
+    for th in dict.fromkeys(x["why"] for x in market.get("stocks") or [] if x.get("why") not in (None, "기사")):
+        out.append((f"테마 · {th} 종목 모아보기", f"{BLOG}p/stock-lists.html"))
+    seen, uniq = set(), []
+    for t, u in out:
+        if u not in seen or t.startswith("테마"):
+            seen.add(u)
+            uniq.append((t, u))
+    return uniq
 
 
 def titles(post):
@@ -191,12 +307,12 @@ def titles(post):
     return NAME, f"{NAME} : {post['title'].strip()}"
 
 
-def render(post, market, lists=None):
+def render(post, market, lists=None, issues=(), forecasts=()):
     """lists = 한국 · 미국 목록을 합친 {티커: 행(mk = kr | us)}. → (저장 제목, 본문 HTML, meta). summary 가 비면 본문 첫 문장(요청 12절 대체 규칙). 종목이 안 맞으면 지수만."""
     lists = lists or {}
     th = SR.MOOD_THEME["flat"]   # 글 전체 = 보라 테마 하나 (2026-11-23 사용자 "전체적으로 보라색") — 기사 방향으로 색을 바꾸지 않는다(방향은 라벨이 말한다)
     ink = th["ink"]
-    col = {"tickers": [t for t, _, _ in match_stocks(post, lists)]}
+    col = {"tickers": [x["ticker"] for x in market.get("stocks") or [] if x.get("why") == "기사"]}
     link = SR.Linker(col, {"close": {"movers": [{"name": lists[c]["n"], "ticker": c} for c in col["tickers"]]}}, ink)
 
     def prose(text, strong=True):
@@ -206,25 +322,20 @@ def render(post, market, lists=None):
     y, m, d = post["date"].split("-")
     style = ('<style>body:has([data-headline]) .pr-sticky{border-bottom:0;margin-bottom:0;}</style>')
     body = [style + f'<p data-title-basis="1" data-news-post="{dk.esc(post.get("slug") or "")}" style="margin:0 0 14px;font-size:13px;line-height:19px;color:#6B7280;">{int(m)}.{d} 기사</p>']
-    body.append(f'<h2 data-headline="1" style="margin:0 0 14px;padding:10px 0 0 {dk.ALIGN_PX}px;font-size:26px;line-height:38px;font-weight:700;color:#111;word-break:keep-all;">'
+    body.append(f'<h2 data-headline="1" style="margin:0 0 14px;padding:25px 0 0 {dk.ALIGN_PX}px;font-size:26px;line-height:38px;font-weight:700;color:#111;word-break:keep-all;">'
                 f'<span style="display:block;font-size:26px;line-height:38px;">{SR.emph(dk.esc(post["title"]), False)}</span></h2>')   # 폰 테마가 h2 에 20/26 !important — 크기는 안쪽 span 이 갖는다
     pills = [dk.pill(dk.ISSUE_KO.get(post.get("cat"), "그 밖"), "area", bare=True),
-             dk.pill(dk.DIR_KO.get(DIR_KIND.get(post.get("direction"), "neutral")), DIR_KIND.get(post.get("direction"), "neutral"), bare=True)]
-    if post.get("stage") in STAGE_KO:
-        pills.append(dk.pill(STAGE_KO[post["stage"]], "neutral", bare=True))
-    body.append(f'<p style="margin:0 0 18px;padding:0 0 0 {dk.ALIGN_PX}px;line-height:1;">{dk.pill_row("".join(pills))}</p>')
+             dk.pill(dk.DIR_KO.get(DIR_KIND.get(post.get("direction"), "neutral")) + "적", DIR_KIND.get(post.get("direction"), "neutral"), bare=True)]   # 상세 = 긍정적 · 부정적 · 중립적 (2026-11-23 사용자, 목록 라벨은 두 글자 그대로)
+    body.append(f'<p style="margin:0 0 18px;padding:0 0 0 {dk.ALIGN_PX}px;line-height:1;display:flex;justify-content:flex-end;">{dk.pill_row("".join(pills))}</p>')   # 라벨 = 오른쪽 정렬 (2026-11-23 사용자)
     summary = (post.get("summary") or "").strip() or _first_sentence(post.get("body"))
     body.append(f'<div style="background:{th["card"]};border-radius:10px;padding:{23 - dk.VP}px 19px;margin:0 0 26px;">'
                 f'<p data-seo-lead="1" data-lead="1" style="margin:0;word-break:keep-all;font-weight:700;color:#111;">{prose(SR.emph(summary, False), False)}</p></div>')
     for p in _paras(post.get("body")):
         body.append(SR.para(prose(p)))
     body.append(market_section(market, lists, th["solid"]))
-    rel = []
-    first = next((s for s in market.get("stocks") or []), None)
-    if first and lists.get(first["ticker"], {}).get("u"):
-        rel.append((f'{first["name"]} 종목 페이지', BLOG.rstrip("/") + lists[first["ticker"]]["u"]))
+    rel = follow_links(post, market, lists, issues, forecasts)   # 이어서 보기 칸을 따로 두지 않고 함께 보는 페이지에 합친다 (2026-11-23 사용자)
     rel += [("한국 증시 리포트", KR_REPORT), (f"지난 {NAME}", f"{BLOG}search/label/{LABEL_Q}")]
-    body.append(dk.related_buttons(rel))
+    body.append(f'<div data-related="1" data-related-all="1" style="margin-top:49px;">{dk.related_title("함께 보는 페이지")}{dk.related_rows(rel)}</div>')   # 이 글만 3줄 상한 없이(테마도 data-related-all 은 안 자름) — 연결되는 서비스 전부
     html = dk.WRAP_OPEN + dk.fix_colons("".join(body)) + dk.WRAP_CLOSE
     return stored, html, {"labels": [NAME], "slug": post.get("slug"), "basis": market.get("basis"), "linked": sorted(link.seen)}
 
@@ -276,3 +387,65 @@ def headlines_section(docs, day, title="한국 주요 뉴스"):
     if not bs:
         return dk.section(title, dk.muted("오늘은 아직 들어온 한국 기사가 없습니다."))
     return dk.section(title, dk.more_list([headline_item(b, k) for k, b in enumerate(bs)], noun="뉴스"))
+
+
+# ── 사건별 사실 층 (요청 15 · 16절, 2026-11-23 사용자 "오늘자 사실로 시안") ──
+# 같은 날 facts 문서 중 가장 늦은 실행의 문서(part 여럿)만 쓴다. 2곳 이상이 보도한 사건만 사실로 싣고,
+# 사실 한 줄은 `sources` 2 이상만(R22 — 수집기 ca7a6b8 전 자료는 사실마다 1이라 사건 기준만 쓴다: fact_min=1).
+# 비교 대상(헌법 제1조) = 보도한 곳 수. 발언은 verified · 익명 아님만 인용. 같은 event 제목 묶음은 팝업 `원문 보기` 로.
+FACTS_MIN_SOURCES = 2
+
+
+def fact_events(fact_docs, min_sources=FACTS_MIN_SOURCES):
+    seen, out = set(), []
+    last = max((str(d.get("run")) for d in fact_docs), key=lambda r: max(str(d.get("createdAt") or "") for d in fact_docs if str(d.get("run")) == r), default=None)
+    for doc in [d for d in fact_docs if str(d.get("run")) == last]:   # 그날 가장 늦은 실행만 — ⑤ 는 지난 36시간을 다시 묶어 앞 실행을 다 담는다(사건 이름이 실행마다 달라 합치면 겹침)
+        for e in doc.get("events") or []:
+            if e.get("event") in seen or (e.get("sourceCount") or 0) < min_sources:
+                continue
+            seen.add(e.get("event"))
+            out.append(dict(e, at=str(doc.get("createdAt") or "")))
+    out.sort(key=lambda e: e["at"], reverse=True)
+    out.sort(key=lambda e: -(e.get("sourceCount") or 0))   # 많이 보도된 순, 같으면 늦은 실행 먼저
+    return out
+
+
+def _fact_line(f):
+    """사실 한 줄 = what + (출처 기관 — origin 이 있으면 그것, 아니면 who). 발언은 확인된 것만 따옴표로."""
+    line = (f.get("what") or "").strip()
+    q = f.get("quote") or {}
+    if q.get("verified") and not q.get("anonymous") and q.get("text"):
+        who = " ".join(x for x in (q.get("speaker"), q.get("title")) if x)
+        line += f' "{q["text"]}"' + (f" ({who}" + (f", {q['venue']}" if q.get("venue") else "") + ")" if who else "")
+    src = (f.get("origin") or "").strip()
+    return line + (f" ({src})" if src and src not in line else "")
+
+
+def fact_item(e, k, rows_by_event, fact_min=FACTS_MIN_SOURCES):
+    facts = [f for f in e.get("facts") or [] if (f.get("sources") or 1) >= fact_min] or []
+    if not facts:
+        return ""
+    d = DIR_KIND.get(e.get("direction"), "neutral")
+    labels = dk.pill(dk.ISSUE_KO.get(e.get("cat"), "그 밖"), "area") + dk.pill(dk.DIR_KO.get(d), d)
+    meta = [f'보도 {e.get("sourceCount")}곳', f"사실 {len(facts)}개"]
+    inner = dk.news_item(dk.esc(e["event"]), None, facts[0]["what"], (), labels, meta)
+    pid = dk.news_pop_id("kf", f'{e["event"]}:{k}')
+    rows = [{"line": e["event"]}] + [{"line": _fact_line(f)} for f in facts]
+    rows += [{"line": "", "source": r.get("outlet"), "url": r["url"]} for r in rows_by_event.get(e["event"], [])]
+    body = dk.bundle_pop_body(pid, e["event"], [r for r in rows if r.get("line") or r.get("url")])
+    return dk.news_pop_wrap(inner, pid) + body
+
+
+def facts_section(fact_docs, head_docs, day, title="한국 주요 뉴스", fact_min=FACTS_MIN_SOURCES):
+    """위 = 사실로 정리된 사건(보도 2곳 이상, 많이 보도된 순) · 아래 = 그 밖의 기사 제목 묶음(사실 층에 들어간 사건 제목은 원문 보기로 옮겨 빼고).
+    둘 다 전부 싣고 5개 + 더 보기."""
+    evs = fact_events(fact_docs)
+    by_ev = {}
+    for b in headline_bundles(head_docs, day):
+        by_ev.setdefault(b["event"], []).extend(b["rows"])
+    items = [x for x in (fact_item(e, k, by_ev, fact_min) for k, e in enumerate(evs)) if x]
+    used = {e["event"] for e in evs}
+    rest = [b for b in headline_bundles(head_docs, day) if b["event"] not in used]
+    top = dk.section(title, dk.more_list(items, noun="사건") if items else dk.muted("오늘은 아직 2곳 이상이 보도한 사건이 없습니다."))
+    low = dk.section("그 밖의 기사", dk.more_list([headline_item(b, k) for k, b in enumerate(rest)], noun="뉴스")) if rest else ""
+    return top + low
