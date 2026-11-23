@@ -184,8 +184,9 @@
       '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#111" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l4 4-4 4M8 3l4 4-4 4"/></svg>');
     this.latest.setAttribute('aria-label', '최신으로');
     this.volLeg = el('div', 'position:absolute;left:0;font-size:13px;line-height:20px;color:' + INK + ';display:flex;align-items:center;');
+    this.tip = el('div', 'position:absolute;display:none;pointer-events:none;z-index:2;box-sizing:border-box;padding:8px 10px;border:1px solid #E2E8F0;border-radius:8px;background:rgba(255,255,255,.92);box-shadow:0 2px 8px rgba(0,0,0,.10);font-size:11px;line-height:16px;white-space:nowrap;font-variant-numeric:tabular-nums;');   // 누른 날 정보 창 — 글자 11 · 숫자 굵게 (2026-11-15 사용자)
     this.restore = el('div', 'display:flex;gap:6px;margin:6px 0 0;');
-    [this.cv, this.legend, this.scaleB, this.latest, this.volLeg].forEach(function (e) { self.wrap.appendChild(e); });
+    [this.cv, this.legend, this.scaleB, this.latest, this.volLeg, this.tip].forEach(function (e) { self.wrap.appendChild(e); });
     [this.top, this.sub, this.ohlc, this.menuBox, this.wrap, this.restore].forEach(function (e) { root.appendChild(e); });
     this.scaleB.onclick = function () { self.log = !self.log; self.draw(); };
     this.latest.onclick = function () { self.end = self.bars.length; self.cross = null; self.draw(); };
@@ -219,7 +220,8 @@
       ind.setAttribute('aria-label', '지표'); ind.onclick = function () { self.menu = !self.menu; self.topBar(); self.draw(); }; t.appendChild(ind);
       return this.menuDraw();
     }
-    var fs = el('button', IB + 'border:1px solid #E2E8F0;background:#fff;',
+    var fs = el('button', IB + 'border:1px solid #94A3B8;background:#fff;',   // 테두리 = `일` 버튼과 같은 살짝 진한 색 (2026-11-22 사용자)
+     
       '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#111" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2h4v4M14 2l-4 4M6 2H2v4M2 2l4 4M10 14h4v-4M14 14l-4-4M6 14H2v-4M2 14l4-4"/></svg>');   // 네 방향 화살표 (2026-11-14 사용자 C안)
     fs.setAttribute('aria-label', '전체 화면');
     fs.onclick = function () { self.toggleFull(); }; t.appendChild(fs);
@@ -348,12 +350,7 @@
     this.wrap.style.marginRight = -padR + 'px'; this.root.style.marginBottom = -padB + 'px'; W += padR;
     if (this.n > this.maxN()) { this.n = Math.min(this.maxN(), this.bars.length); this.end = Math.max(this.end, this.n); }
     var land = this.isLand();   // 가로로 돌린 전체 화면 = 아래 칸 없음 · 머리 한 줄 · 화면에 꽉 (2026-11-14 사용자)
-    var maRows = 1;
-    if (this.full) {   // 이동평균 값 줄(누를 때) 이 몇 줄이 되는지 — 최신 값 길이로 미리 (누를 때마다 그래프가 움직이지 않게)
-      var mc = this._mc || (this._mc = document.createElement('canvas').getContext('2d')), xw = 0, lim = W - 4, li = this.bars.length - 1;
-      mc.font = '13px ' + getComputedStyle(this.root).fontFamily;
-      [5, 20, 60, 120, 200].forEach(function (k) { if (!(self.maOn && self.on.ma[k])) return; var v = self.ma[k][li]; var w = mc.measureText(k + ' ' + (v === null ? '-' : fmt(v, self.dec))).width + 14; if (xw && xw + w > lim) { maRows++; xw = 0; } xw += w; });
-    }
+    var maRows = 1;   // 누른 날 이동평균 값은 정보 창으로 옮김 — 범례는 늘 한 줄 (2026-11-15 사용자)
     var TOPS = this.full ? 30 + 20 * maRows : 22;   // 전체 화면 위 띠 = 범례 줄 20 + 누른 날 검은 날짜 칸 22 (범례 아래로 내림, 2026-11-14 사용자)   // 전체 화면 = 이동평균 범례와 최고 글자 사이 15 더 (2026-11-14 사용자)
     var lowerH = this.on.lower === 'none' || !this.full || land ? 0 : 90, priceH = 264, gap = lowerH ? 31 : 0;   // 36 → 31 (2026-11-14 사용자) gap = 거래량 범례 줄(범례와 막대 사이 10 더, 2026-11-14 사용자)
     if (this.full) {
@@ -507,10 +504,8 @@
       tag(cy, fmt(vOf(cy), self.dec), INK);
       var dl = this.dateText(this.bars[sel][0], true);
       g.font = TFS + 'px ' + font; var dw = Math.ceil(g.measureText(dl).width) + 14, dx = Math.round(Math.min(Math.max(X(sel) - dw / 2, 0), pw - dw));
-      // 위 날짜 칸 = 범례 줄 아래(전체 화면). 그날 이동평균 값 줄이 너무 길어(가격 100만 원대 · 선 5개) 두 줄이 되면 위 칸은 빼고 아래 칸만
-      var maW = 0; g.font = '13px ' + font; [5, 20, 60, 120, 200].forEach(function (n) { if (maShow(n) && self.ma[n][sel] !== null) maW += g.measureText(n + ' ' + fmt(self.ma[n][sel], self.dec)).width + 14; });
       g.font = TFS + 'px ' + font;
-      var boxes = [[H - XH, XH], this.full ? [TOPS - 24, 22] : [0, TOPS]];   // 작은 화면은 누르는 동안 이동평균 범례를 숨겨 위 칸과 겹치지 않게
+      var boxes = this.full ? [] : [[H - XH, XH], [0, TOPS]];   // 전체 화면 = 날짜 칸 없음(날짜는 정보 창에, 2026-11-15 사용자 — 아래 검은 칸도 뺌)   // 전체 화면 = 아래 날짜 칸만(날짜는 정보 창에, 2026-11-15 사용자) · 작은 화면은 누르는 동안 이동평균 범례를 숨겨 위 칸과 겹치지 않게
       boxes.forEach(function (r) { g.fillStyle = INK; g.fillRect(dx, r[0], dw, r[1]); g.fillStyle = '#fff'; g.textAlign = 'center'; g.fillText(dl, dx + dw / 2, r[0] + r[1] / 2 + 0.5); });
     }
     // 머리 — 현재가 · 전날 대비 금액 · % (늘 최신), 오늘 거래량, 시가 · 고가 · 저가 · 종가(누른 날이면 그날)
@@ -522,7 +517,7 @@
     var volShort = last[5] >= 1e8 ? (last[5] / 1e8).toFixed(1) + '억' : last[5] >= 1e4 ? (last[5] / 1e4).toFixed(1) + '만' : fmt(last[5], 0), volDown = false;
     if (!land && this.price.scrollWidth > this.price.clientWidth + 1) { this.price.innerHTML = head0 + volS(volShort); if (this.price.scrollWidth > this.price.clientWidth + 1) { this.price.innerHTML = head0; volDown = true; } }   // 거래량 = 증감 옆 한 줄 (전체 화면도, 2026-11-14 사용자)   // 작은 화면 = 증감 옆 한 줄
     this.sub.innerHTML = volDown ? volS(volShort).trim() : ''; this.sub.style.display = volDown ? '' : 'none'; this.ohlc.style.display = this.full && !land ? '' : 'none';   // 가로 화면 = 시가 · 고가 · 저가 · 종가도 거래량 옆 한 줄(아래)   // 작은 화면 = 시가 · 고가 · 저가 · 종가 없음
-    var ob = this.bars[sel === null ? this.bars.length - 1 : sel], obp = this.bars[(sel === null ? this.bars.length - 1 : sel) - 1], ref = obp ? obp[4] : ob[1];
+    var ob = last, obp = prevL, ref = obp ? obp[4] : ob[1];   // 늘 최신 — 누른 날 값은 정보 창 (2026-11-15 사용자)
     this.ohlc.innerHTML = [['시가', 1], ['고가', 2], ['저가', 3], ['종가', 4]].map(function (k) {
       var v = ob[k[1]], c = v > ref ? UP : v < ref ? DN : INK;
       return '<span style="white-space:nowrap;margin-right:14px;"><span style="color:' + NOTE + ';">' + k[0] + '</span> <span style="color:' + c + ';">' + fmt(v, self.dec) + '</span></span>';
@@ -530,10 +525,7 @@
     if (land) this.price.innerHTML += ' <span style="font-size:13px;margin-left:10px;">' + this.ohlc.innerHTML + '</span>';
     // 왼쪽 위 = 이동평균 범례(숫자 = 선 색) + 닫기 — 누르면 그날 이동평균 값 표
     var mas = [5, 20, 60, 120, 200].filter(function (n) { return maShow(n); });
-    if (sel !== null && mas.length && this.full) {   // 누른 날 이동평균 값 표 = 전체 화면만 (2026-11-14 사용자)
-      this.legend.style.top = '0px'; this.legend.style.display = 'flex'; this.legend.style.maxWidth = '100%';   // 그날 이동평균 값 = 가로 한 줄(넘치면 다음 줄) (2026-11-14 사용자)
-      this.legend.innerHTML = mas.map(function (n) { var v = self.ma[n][sel]; return '<span style="white-space:nowrap;margin-right:14px;"><span style="color:' + NOTE + ';">' + n + '</span> <span style="color:' + MA_COL[n] + ';font-variant-numeric:tabular-nums;">' + (v === null ? '-' : fmt(v, self.dec)) + '</span></span>'; }).join('');
-    } else if (sel !== null && !this.full) { this.legend.style.display = 'none';   // 작은 화면 누르는 동안 = 범례 숨김(위 검은 날짜 칸 자리)
+    if (sel !== null && !this.full) { this.legend.style.display = 'none';   // 작은 화면 누르는 동안 = 범례 숨김(위 검은 날짜 칸 자리)
     } else if (mas.length) {
       this.legend.style.top = '0px'; this.legend.style.display = 'flex'; this.legend.style.maxWidth = '70%';
       this.legend.innerHTML = '<span style="color:' + INK + ';margin-right:5px;">이동평균</span>' + mas.map(function (n) { return '<span style="color:' + MA_COL[n] + ';margin-right:4px;">' + n + '</span>'; }).join('') +
@@ -546,6 +538,7 @@
     } else { this.legend.style.display = 'none'; }
     this.scaleB.innerHTML = (this.log ? 'Log' : 'Linear') + ' <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="#111" stroke-width="1.3" stroke-linecap="round" style="vertical-align:0;"><path d="M2 4l3 3 3-3"/></svg>';
     this.scaleB.setAttribute('aria-label', '가격축 일반 · 로그 바꾸기'); this.scaleB.style.right = '4px'; this.scaleB.style.display = 'none';   // Linear · Log 버튼 = 없음 (2026-11-14 사용자, 전체 화면도)
+    this.tipDraw(sel, sel === null ? 0 : X(sel), pw, TOPS, H - XH, land);
     // 최신으로 (넘겨본 뒤에만)
     this.latest.style.display = this.end < this.bars.length ? 'flex' : 'none';
     this.latest.style.left = (pw - 36) + 'px'; this.latest.style.top = (TOPS + priceH - 34) + 'px';
@@ -568,7 +561,35 @@
       self.restore.appendChild(b);
     });
   };
-  function init() { document.querySelectorAll('[data-candle]').forEach(function (r) { if (!r.__c) r.__c = new Chart(r); }); }
+  // 누른 날 정보 창 — 전체 화면에서 꾹 누르면(PC = 마우스 올리면) 그날 날짜 · 시가 · 고가 · 저가 · 종가(전날 종가 대비) · 거래량(전날 대비) · 켜 둔 이동평균을 한 창에 (2026-11-15 사용자).
+  // 자리 = 누른 날 세로선 바로 왼쪽 위(선을 따라 움직임, 왼쪽 자리가 없으면 오른쪽). 가로 화면처럼 높이가 모자라면 이동평균 줄을 뺀다.
+  Chart.prototype.tipDraw = function (sel, x, pw, top, bottom, land) {
+    var self = this, t = this.tip;
+    if (sel === null || !this.full) { t.style.display = 'none'; return; }
+    var b = this.bars[sel], p = this.bars[sel - 1], ref = p ? p[4] : null, WD = ['일', '월', '화', '수', '목', '금', '토'];
+    var date = this.dateText(b[0], true); if (this.unit === 'D') date += ' (' + WD[new Date(b[0] + 'T00:00:00Z').getUTCDay()] + ')';
+    var pct = function (v, base) { if (!base) return ''; var d = (v - base) / base * 100; return '<span style="color:' + (d > 0 ? UP : d < 0 ? DN : INK) + ';">' + sgnPct(d) + '</span>'; };
+    var row = function (k, v, r, kc) { return '<span style="color:' + (kc || NOTE) + ';">' + k + '</span><span style="text-align:right;font-weight:700;color:' + INK + ';">' + v + '</span><span style="text-align:right;font-weight:700;">' + r + '</span>'; };
+    var rows = [['시가', 1], ['고가', 2], ['저가', 3], ['종가', 4]].map(function (k) { return row(k[0], fmt(b[k[1]], self.dec), pct(b[k[1]], ref)); });
+    rows.push(row('거래량', fmt(b[5], 0), pct(b[5], p ? p[5] : null)));
+    var mas = [5, 20, 60, 120, 200].filter(function (n) { return self.maOn && self.on.ma[n] && self.ma[n][sel] !== null; });
+    var maRows = mas.length ? '<span style="grid-column:1 / -1;height:1px;background:#E2E8F0;margin:4px 0;"></span><span style="grid-column:1 / -1;color:' + NOTE + ';">이동평균</span>' +
+      mas.map(function (n) { return row(n, fmt(self.ma[n][sel], self.dec), '', MA_COL[n]); }).join('') : '';
+    var html = function (ma) { return '<div style="font-weight:700;color:' + INK + ';margin:0 0 2px;">' + date + '</div><div style="display:grid;grid-template-columns:auto auto auto;column-gap:10px;">' + rows.join('') + (ma ? maRows : '') + '</div>'; };
+    t.style.display = 'block'; t.style.width = ''; t.innerHTML = html(true);
+    if (t.offsetHeight > bottom - top - 8) t.innerHTML = html(false);
+    t.style.width = Math.ceil(t.getBoundingClientRect().width) + 'px';   // 폭 = 정수 px
+    var tw = t.offsetWidth, lx = Math.round(x) - 8 - tw;   // 세로선을 따라다님 — 선 왼쪽 8, 자리가 없으면 선 오른쪽 (2026-11-15 사용자)
+    t.style.top = (top + 4) + 'px'; t.style.left = (lx >= 0 ? lx : Math.min(Math.round(x) + 8, Math.max(0, pw - tw))) + 'px';
+  };
+
+  // 한국 종목 `실시간 가격은 네이버 증권에서 보기` — 장중(평일 9:00~15:30 한국 시간)에만 보이고 장이 끝나면 사라진다 (2026-11-23 사용자). 휴장일은 모른다.
+  function krLive() {
+    var n = new Date(Date.now() + 9 * 3600e3), d = n.getUTCDay(), m = n.getUTCHours() * 60 + n.getUTCMinutes(), on = d > 0 && d < 6 && m >= 540 && m < 930;
+    document.querySelectorAll('[data-kr-live="1"]').forEach(function (e) { e.style.display = on ? 'flex' : 'none'; });
+  }
+  function init() { document.querySelectorAll('[data-candle]').forEach(function (r) { if (!r.__c) r.__c = new Chart(r); }); krLive(); }
+  setInterval(krLive, 60000);
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
 

@@ -463,7 +463,7 @@ def body(s, a, peers, by, related_links, extra_today=""):
     title = f"{s['name']} 주가"
     return render_kr.wrap(f'<div data-quick-title="{dk.esc(title)}"><span data-kr-code="{s["code"]}" hidden></span>'
             + dk.report_stamp(dk.kst_close_day(s["day"], "KR"), WHEN, late=bool(LATE_DAY) and str(s["day"])[:10] < LATE_DAY)
-            + render_kr.lead(s) + CC.card(s["name"], render_kr.BARS.get(s["sym"]) or [], 0, title="") + '<div style="height:20px;"></div>'   # 봉차트 하나만 — 정식 page_block 은 목업 · 발행 두 벌 + 스크립트(조각엔 페이지 본문 스크립트 하나로)
+            + render_kr.lead(s) + CC.card(s["name"], render_kr.BARS.get(s["sym"]) or [], 0, title="") + CC.kr_live(s.get("code")) + '<div style="height:20px;"></div>'   # 봉차트 하나만 — 정식 page_block 은 목업 · 발행 두 벌 + 스크립트(조각엔 페이지 본문 스크립트 하나로)
             + R._section("오늘", today, line=False, tab="오늘") + render_kr.RP.sec_crash(s)   # 급락일에 버텼을 때만
             + ((lambda n: dk.keep_tone(R._section("뉴스", n, tab="오늘")) if n else "")(render_kr.sec_today(s) if MEDIA_OK else ""))   # 방송 뉴스 — 정식과 같은 구획, 최근 7일 0건이면 숨김
             + (R._section("매수의견", op, tab="매수의견") if op else "")

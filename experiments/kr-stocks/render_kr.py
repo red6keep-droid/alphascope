@@ -113,7 +113,7 @@ def chart_url(sym, day=""):
 
 def sec_chart(s):
     """가격 그래프 — 페이지 안 실제 봉차트(candle_chart, 2026-11-14 사용자 일괄 적용). 일봉이 없을 때만 옛 그림(PNG)."""
-    block = CDL.page_block(s["name"], BARS.get(s["sym"]) or [], 0) if BARS.get(s["sym"]) else ""
+    block = CDL.page_block(s["name"], BARS.get(s["sym"]) or [], 0, kr_code=s.get("code")) if BARS.get(s["sym"]) else ""   # 장중 네이버 링크 (2026-11-23 사용자)
     if block:
         return block
     if not s.get("chart"):
