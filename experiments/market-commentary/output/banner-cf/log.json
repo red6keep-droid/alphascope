@@ -1,0 +1,98 @@
+[
+ {
+  "model": "flux-1-schnell",
+  "scene": "today-am",
+  "ok": true,
+  "sec": 3.0,
+  "raw": "1024x1024",
+  "kb": 45
+ },
+ {
+  "model": "flux-1-schnell",
+  "scene": "strong-up",
+  "ok": true,
+  "sec": 2.3,
+  "raw": "1024x1024",
+  "kb": 63
+ },
+ {
+  "model": "flux-1-schnell",
+  "scene": "uncertain",
+  "ok": true,
+  "sec": 2.8,
+  "raw": "1024x1024",
+  "kb": 40
+ },
+ {
+  "model": "flux-1-schnell",
+  "scene": "plunge-city",
+  "ok": true,
+  "sec": 2.9,
+  "raw": "1024x1024",
+  "kb": 55
+ },
+ {
+  "model": "flux-1-schnell",
+  "scene": "rebound",
+  "ok": true,
+  "sec": 3.1,
+  "raw": "1024x1024",
+  "kb": 67
+ },
+ {
+  "model": "flux-1-schnell",
+  "scene": "kr-pm",
+  "ok": true,
+  "sec": 3.2,
+  "raw": "1024x1024",
+  "kb": 63
+ },
+ {
+  "model": "lucid-origin",
+  "scene": "today-am",
+  "ok": true,
+  "sec": 3.3,
+  "raw": "1200x630",
+  "kb": 35
+ },
+ {
+  "model": "lucid-origin",
+  "scene": "strong-up",
+  "ok": true,
+  "sec": 2.9,
+  "raw": "1200x630",
+  "kb": 87
+ },
+ {
+  "model": "lucid-origin",
+  "scene": "uncertain",
+  "ok": true,
+  "sec": 14.2,
+  "raw": "1200x630",
+  "kb": 41
+ },
+ {
+  "model": "lucid-origin",
+  "scene": "plunge-city",
+  "ok": true,
+  "sec": 9.7,
+  "raw": "1200x630",
+  "kb": 46
+ },
+ {
+  "model": "lucid-origin",
+  "scene": "rebound",
+  "ok": true,
+  "sec": 5.6,
+  "raw": "1200x630",
+  "kb": 54
+ },
+ {
+  "model": "lucid-origin",
+  "scene": "kr-pm",
+  "ok": true,
+  "sec": 5.6,
+  "raw": "1200x630",
+  "kb": 70
+ }
+]

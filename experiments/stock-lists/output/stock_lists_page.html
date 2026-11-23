@@ -1,0 +1,214 @@
+<script>if(!/#tab-/.test(location.hash))try{history.replaceState(null,'',location.pathname+location.search+'#tab-1');}catch(e){}</script><style>[data-sl-panel][hidden]{display:none !important;}.sl-joined{display:flex;gap:0 !important;padding:0 !important;margin:0 0 12px;overflow-x:auto;scrollbar-width:none;}.sl-joined::-webkit-scrollbar{display:none;}.sl-joined .seg{flex:1 0 auto;padding:6px 14px;border:1px solid #E2E8F0;border-radius:0;background:#fff;color:#4B5563;font-weight:400;text-align:center;}.sl-joined .seg+.seg{border-left:0;}.sl-joined .seg:first-child{border-radius:7px 0 0 7px;}.sl-joined .seg:last-child{border-radius:0 7px 7px 0;}.sl-joined .seg:only-child{border-radius:7px;}.sl-joined .seg[aria-selected="true"]{background:#fff;color:#111;font-weight:700;box-shadow:inset 0 0 0 1px #111;}.sl-title-day{flex:none;font-size:14px;line-height:20px;font-weight:400;color:#6B7280;white-space:nowrap;letter-spacing:0;}#sl-day{margin:0 0 8px;padding-left:6px;text-align:right;}</style><div id="as-lists"></div><div id="sl-day" hidden></div><span data-lead="1" hidden></span><h2 data-tab="관심">관심</h2><div id="sl-watch"><p style="font-size:15px;line-height:24px;color:#6B7280;margin:12px 0;padding-left:6px;">불러오는 중…</p></div><h2 data-tab="오늘 움직임">오늘 움직임</h2><div id="sl-move"><p style="font-size:15px;line-height:24px;color:#6B7280;margin:12px 0;padding-left:6px;">불러오는 중…</p></div><h2 data-tab="테마">테마</h2><div id="sl-theme"><p style="font-size:15px;line-height:24px;color:#6B7280;margin:12px 0;padding-left:6px;">불러오는 중…</p></div><h2 data-tab="업종">업종</h2><div id="sl-sector"><p style="font-size:15px;line-height:24px;color:#6B7280;margin:12px 0;padding-left:6px;">불러오는 중…</p></div><h2 data-tab="시가총액">시가총액</h2><div id="sl-cap"><p style="font-size:15px;line-height:24px;color:#6B7280;margin:12px 0;padding-left:6px;">불러오는 중…</p></div><h2 data-tab="ETF">ETF</h2><div id="sl-etf"><p style="font-size:15px;line-height:24px;color:#6B7280;margin:12px 0;padding-left:6px;">불러오는 중…</p></div>
+<script>
+/* 하단 메뉴 `종목` 페이지 /p/stock-lists.html (2026-11-17 사용자 "1단계 구현 진행해") — 기획 비공개 기획/종목-탭-그룹-목록-기획.md, 목업 mock_stock_lists.py.
+   본문(publish_stock_lists_page.py)에 탭 뼈대(h2 data-tab 여섯 개 + 빈 칸)가 있고, 테마가 페이지를 열 때 그 h2 로 탭을 만든다. 이 스크립트는 목록 파일을 받아 빈 칸을 채운다.
+   - 나라 = 주소 ?m=us|kr(하단 메뉴가 붙임) → 고른 홈(as-home-mkt, 헤더 국기 스위치가 적음) → 미국. 페이지 안 나라 버튼 없음 (2026-11-17 사용자).
+   - 목록 파일 = 간단 종목 실행이 매일 올리는 <시장>/_lists.json (build_lists.py). 읽는 순서 Cloudflare Pages → jsDelivr(quick-<시장> 브랜치) → GitHub 원본. 방문자 1명 = 요청 1번 · 압축 약 18KB.
+   - 목록은 탭 · 묶음마다 10개까지, 접기 없음(2026-11-17 사용자). 줄 전체 = 종목 페이지(테마의 [data-row-link] 장치).
+   - 관심 탭(1단계) = 이 기기에서 최근 본 종목(테마가 종목 페이지를 열 때 브라우저에 남기는 as-recent). 로그인 · ☆ 담기는 2단계.
+   - 기준일 = 제목 줄 오른쪽(공유 버튼 앞).
+   목업(로컬): <div id="as-lists" data-local="lists/"> — 같은 폴더의 lists/<시장>/_lists.json 을 읽는다. */
+(function () {
+  'use strict';
+  var root = document.getElementById('as-lists');
+  if (!root) return;
+  var PAGES = 'https://alpha-scope.pages.dev/';
+  var CDN = 'https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@';
+  var RAW = 'https://raw.githubusercontent.com/red6keep-droid/alphascope/';
+  var LOGO = 'https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/', LOGO_VER = '2';   // design_kit.LOGO_BASE · LOGO_VER
+  var TOP = 10;                                  // 10개까지 (2026-11-17 사용자)
+  var UP = 3, DOWN = -3, VOL = 2, NEAR = -2;     // 오늘 움직임 기준 (기획 2-3)
+  var C_UP = '#d93025', C_DOWN = '#1a73e8', C_MUTED = '#9CA3AF', NOTE = '#6B7280';
+  var MULTI = 'display:block;margin:0 0 6px;background:#fff;border:1px solid #E2E8F0;border-radius:8px;font-size:19px;line-height:24px;';
+  var ROW = 'display:flex;justify-content:space-between;gap:12px;padding:19px 12px;white-space:nowrap;line-height:24px;align-items:flex-start;';
+  var SEP = 'border-top:1px solid #E2E8F0;';
+  var BADGE = [['#2F6F68', '#FFFFFF'], ['#5B6B3A', '#FFFFFF'], ['#86683A', '#FFFFFF']];   // design_kit.BADGE_COLORS
+
+  var m = '';
+  try { m = (new URLSearchParams(location.search).get('m') || '').toLowerCase(); } catch (e) { m = ''; }
+  if (m !== 'us' && m !== 'kr') { try { m = localStorage.getItem('as-home-mkt') || ''; } catch (e) { m = ''; } }
+  if (m !== 'us' && m !== 'kr') m = 'us';
+  root.setAttribute('data-m', m);
+
+  function esc(t) { return String(t == null ? '' : t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function box(id) { return document.getElementById('sl-' + id); }
+  function put(id, html) { var b = box(id); if (b) b.innerHTML = html; }
+  function note(t) { return '<p style="font-size:13px;line-height:19px;color:' + NOTE + ';margin:4px 0 12px;padding-left:6px;word-break:keep-all;">' + esc(t) + '</p>'; }
+  function line(html) { return '<p style="font-size:15px;line-height:24px;color:#333;margin:0 0 10px;padding-left:6px;word-break:keep-all;">' + html + '</p>'; }
+
+  function price(r) {
+    if (m === 'us') return '$' + Number(r.p).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    return Math.round(r.p).toLocaleString('ko-KR') + '원';
+  }
+  function pct(v, bold) {
+    if (v == null) return '<span style="color:' + C_MUTED + ';">—</span>';
+    var col = v > 0 ? C_UP : v < 0 ? C_DOWN : C_MUTED, tri = v > 0 ? '▲' : v < 0 ? '▼' : '';
+    return '<span style="color:' + col + ';white-space:nowrap;' + (bold === false ? '' : 'font-weight:700;') + '">' +
+      (tri ? '<span style="font-size:12px;vertical-align:1px;margin-right:2px;">' + tri + '</span>' : '') + Math.abs(v).toFixed(2) + '%</span>';
+  }
+  function capText(c) {
+    if (!c) return '';
+    if (m === 'us') return c >= 1e12 ? (c / 1e12).toFixed(2) + '조 달러' : Math.round(c / 1e8).toLocaleString('ko-KR') + '억 달러';
+    if (c >= 1e12) return c >= 1e13 ? Math.round(c / 1e12).toLocaleString('ko-KR') + '조 원' : (c / 1e12).toFixed(1) + '조 원';
+    return Math.round(c / 1e8).toLocaleString('ko-KR') + '억 원';
+  }
+  function logo(r) {
+    var st = 'display:inline-block;width:22px;height:22px;border-radius:50%;vertical-align:0;margin-right:6px;';
+    if (r.lg) return '<img src="' + LOGO + esc(r.lg) + '?v=' + LOGO_VER + '" alt="" width="22" height="22" loading="lazy" style="' + st + 'background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;">';
+    var k = String(r.t), n = 0; for (var i = 0; i < k.length; i++) n += k.charCodeAt(i);
+    var c = BADGE[n % BADGE.length];
+    return '<span aria-hidden="true" style="' + st + 'line-height:22px;background:' + c[0] + ';color:' + c[1] + ';font-size:9px;font-weight:700;text-align:center;letter-spacing:0;overflow:hidden;">' +
+      esc(k.replace(/[-.]/g, '').slice(0, 2)) + '</span>';
+  }
+  function href(r) { return r.u || ('/p/stock.html?s=' + encodeURIComponent(r.t)); }
+  function row(r, i, o) {
+    o = o || {};
+    var rank = o.rank ? '<span style="flex:none;width:26px;color:' + NOTE + ';font-weight:700;font-size:15px;line-height:24px;">' + o.rank + '</span>' : '';
+    var sub = o.sub != null ? o.sub : esc(r.t) + ' · ' + esc(r.s);
+    var left = '<span style="display:flex;align-items:flex-start;min-width:0;flex:1 1 auto;">' + rank +
+      '<span style="flex:none;display:flex;height:24px;align-items:center;">' + logo(r) + '</span>' +
+      '<span style="min-width:0;"><span style="display:block;font-size:16px;line-height:24px;font-weight:700;color:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + esc(r.n) + '</span>' +
+      '<span style="display:block;font-size:14px;line-height:20px;color:' + NOTE + ';white-space:nowrap;">' + sub + '</span></span></span>';
+    var right = '<span style="flex:none;display:flex;flex-direction:column;align-items:flex-end;white-space:nowrap;">' +
+      '<span style="font-size:15px;line-height:24px;color:#111;">' + esc(price(r)) + '</span>' +
+      '<span style="font-size:15px;line-height:20px;">' + (o.right != null ? o.right : pct(r.r)) + '</span></span>';
+    return '<span data-row-link="1" data-href="' + esc(href(r)) + '" style="' + ROW + (i ? SEP : '') + '">' + left + right + '</span>';   // 테마 줄 장치가 data-href 로 이동
+  }
+  function card(items, render) {
+    if (!items.length) return '';
+    return '<div data-cards="1" style="margin:0 0 8px;"><span data-grid="2" style="' + MULTI + '">' +
+      items.slice(0, TOP).map(render).join('') + '</span></div>';
+  }
+  /* 묶음 줄 = 홈 `테마 종목` 아래 줄(#watch-tabs) 모양 — CSS 는 본문 <style> 의 .sl-joined */
+  function pills(key, names) {
+    return '<div class="seg-row sl-joined" role="tablist" data-sl-pills="' + key + '">' + names.map(function (n, i) {
+      return '<button class="seg" type="button" role="tab" data-sl-pill="' + i + '" aria-selected="' + (i ? 'false' : 'true') + '">' + esc(n) + '</button>';
+    }).join('') + '</div>';
+  }
+  function panels(key, bodies) {
+    return bodies.map(function (b, i) { return '<div data-sl-panel="' + key + ':' + i + '"' + (i ? ' hidden' : '') + '>' + b + '</div>'; }).join('');
+  }
+  function bind() {
+    [].forEach.call(document.querySelectorAll('[data-sl-pills]'), function (bar) {
+      if (bar.getAttribute('data-bound')) return; bar.setAttribute('data-bound', '1');
+      var k = bar.getAttribute('data-sl-pills');
+      [].forEach.call(bar.querySelectorAll('[data-sl-pill]'), function (b) {
+        b.addEventListener('click', function () {
+          var i = b.getAttribute('data-sl-pill');
+          [].forEach.call(bar.querySelectorAll('[data-sl-pill]'), function (x) { x.setAttribute('aria-selected', x === b ? 'true' : 'false'); });
+          [].forEach.call(document.querySelectorAll('[data-sl-panel^="' + k + ':"]'), function (p) { p.hidden = p.getAttribute('data-sl-panel') !== k + ':' + i; });
+        });
+      });
+    });
+  }
+
+  function byDesc(f) { return function (a, b) { return (f(b) == null ? -1e18 : f(b)) - (f(a) == null ? -1e18 : f(a)); }; }
+
+  function move(rows) {
+    var xs = rows.filter(function (r) { return r.r != null; });
+    var G = [
+      ['많이 오름', function (r) { return r.r >= UP; }, function (r) { return r.r; }, '오늘 ' + UP + '% 넘게 오른 종목이 없습니다. 가장 많이 오른 10개입니다.', null],
+      ['많이 내림', function (r) { return r.r <= DOWN; }, function (r) { return -r.r; }, '오늘 ' + (-DOWN) + '% 넘게 내린 종목이 없습니다. 가장 많이 내린 10개입니다.', null],
+      ['거래 급증', function (r) { return (r.v || 0) >= VOL; }, function (r) { return r.v; }, '평소 거래량의 2배를 넘은 종목이 없습니다. 거래가 가장 많이 늘어난 10개입니다.',
+        function (r) { return '<span style="color:#333;">평소의 ' + r.v.toFixed(1) + '배</span> · ' + pct(r.r, false); }],
+      ['52주 최고가 근처', function (r) { return r.h != null && r.h >= NEAR; }, function (r) { return r.h; }, '52주 최고가에 2% 안으로 다가선 종목이 없습니다. 가장 가까운 10개입니다.',
+        function (r) { return '<span style="color:#333;">' + (r.h >= 0 ? '최고가' : '최고가까지 ' + Math.abs(r.h).toFixed(1) + '%') + '</span>'; }]
+    ];
+    var bodies = G.map(function (g) {
+      var pool = xs.filter(function (r) { return g[2](r) != null; }).sort(byDesc(g[2]));
+      var hit = pool.filter(g[1]);
+      var render = function (r, i) { return row(r, i, { right: g[4] ? g[4](r) : null }); };
+      return hit.length ? card(hit, render) : note(g[3]) + card(pool, render);
+    });
+    return pills('move', G.map(function (g) { return g[0]; })) + panels('move', bodies) +
+      note('등락률 · 거래량은 마지막 종가 기준입니다. 거래 급증 = 오늘 거래량 ÷ 지난 20거래일 평균, 52주 최고가 근처 = 지난 1년 가장 높은 종가에서 2% 안. ' +
+        (m === 'us' ? '미국 S&P 500 종목' : '한국 코스피 200 · 코스닥 150 종목') + '을 봅니다.');
+  }
+  function theme(doc, by) {
+    var gs = (doc.themes || []).map(function (g) { return [g[0], g[1].map(function (t) { return by[t]; }).filter(Boolean)]; }).filter(function (g) { return g[1].length; });
+    if (!gs.length) return note('묶음을 불러오지 못했습니다.');
+    var bodies = gs.map(function (g) {
+      var xs = g[1].slice().sort(byDesc(function (r) { return r.r; }));
+      var up = xs.filter(function (r) { return (r.r || 0) > 0; }).length;
+      var avg = xs.reduce(function (s, r) { return s + (r.r || 0); }, 0) / xs.length;
+      var link = (m === 'us' && (g[0] === '반도체' || g[0] === '데이터 센터'))
+        ? '<a href="/p/theme-ai-capex.html" style="display:block;margin:4px 0 12px;padding-left:6px;font-size:15px;line-height:24px;color:#111;font-weight:700;text-decoration:none;">AI 투자 자금 흐름 보기 →</a>' : '';
+      return line(xs.length + '종목 중 ' + up + '개 오름 · 평균 ' + pct(avg, false)) + card(xs, function (r, i) { return row(r, i); }) + link;
+    });
+    return pills('theme', gs.map(function (g) { return g[0]; })) + panels('theme', bodies);
+  }
+  function sector(rows) {
+    var by = {};
+    rows.forEach(function (r) { (by[r.s] = by[r.s] || []).push(r); });
+    var order = Object.keys(by).sort(function (a, b) { return by[b].length - by[a].length; });
+    var bodies = order.map(function (k) {
+      return card(by[k].sort(byDesc(function (r) { return r.c; })), function (r, i) { return row(r, i, { sub: esc(r.t) + (r.c ? ' · ' + capText(r.c) : '') }); });
+    });
+    return pills('sec', order) + panels('sec', bodies);
+  }
+  function caps(rows) {
+    var xs = rows.filter(function (r) { return r.c; }).sort(byDesc(function (r) { return r.c; }));
+    return card(xs, function (r, i) { return row(r, i, { rank: i + 1, sub: esc(r.t) + ' · ' + capText(r.c) }); }) +
+      '<a href="/p/' + m + '-market-cap-top10.html" style="display:block;margin:4px 0 12px;padding-left:6px;font-size:15px;line-height:24px;color:#111;font-weight:700;text-decoration:none;">' +
+      (m === 'us' ? '미국' : '한국') + ' 시가총액 상위 10 종목 페이지 →</a>';
+  }
+  function etf(doc) {
+    return card(doc.etf || [], function (r, i) { return row(r, i, { sub: esc(r.s) }); }) + note('지수 · 업종을 따라가는 상품입니다. 줄을 누르면 ETF 페이지로 갑니다.');
+  }
+  function watch(by) {
+    var seen = [];
+    try { seen = JSON.parse(localStorage.getItem('as-recent') || '[]') || []; } catch (e) { seen = []; }
+    var xs = seen.filter(function (x) { return x && x.m === m && by[x.t]; }).map(function (x) { return by[x.t]; });
+    var head = '<h3 style="font-size:17px;line-height:24px;font-weight:700;color:#111;margin:0 0 10px;padding-left:6px;">이 기기에서 최근 본 종목</h3>';
+    if (!xs.length) return head + line('아직 본 종목이 없습니다. 종목 페이지를 열면 여기에 최근 본 순서로 남습니다.');
+    return head + card(xs, function (r, i) { return row(r, i); }) + note('최근 본 종목은 이 브라우저에만 남고 서버로 보내지 않습니다.');
+  }
+  function dayText(d) {
+    var x = new Date(d + 'T00:00:00Z');
+    if (isNaN(x)) return '';
+    if (m === 'us') x = new Date(x.getTime() + 864e5);   // 미국 종가 = 한국 다음 날 새벽 (design_kit.kst_close_day)
+    return (x.getUTCMonth() + 1) + '월 ' + x.getUTCDate() + '일' + (m === 'us' ? ' 새벽 마감 기준' : ' 종가 기준');
+  }
+  function stamp(d) {
+    var t = dayText(d);
+    if (!t) return;
+    function go() {
+      if (document.querySelector('.sl-title-day')) return;
+      var meta = document.querySelector('.post-title .post-title-meta');
+      var sp = document.createElement('span'); sp.className = 'sl-title-day'; sp.textContent = t;
+      if (meta) meta.insertBefore(sp, meta.firstChild);
+      else { var b = box('day'); if (b) { b.appendChild(sp); b.hidden = false; } }   // 제목 줄을 못 찾으면 본문 맨 위
+    }
+    if (document.readyState === 'complete') go(); else window.addEventListener('load', go);
+  }
+
+  function render(doc) {
+    var rows = doc.rows || [], by = {};
+    rows.concat(doc.etf || []).forEach(function (r) { by[r.t] = r; });
+    put('watch', watch(by));
+    put('move', move(rows));
+    put('theme', theme(doc, by));
+    put('sector', sector(rows));
+    put('cap', caps(rows));
+    put('etf', etf(doc));
+    bind();
+    stamp(doc.d);
+  }
+  function fail() {
+    var t = '<p style="font-size:17px;line-height:30px;color:#333;margin:12px 0;padding-left:6px;word-break:keep-all;">잠시 목록을 불러오지 못했습니다. ' +
+      '<a href="/p/' + m + '-market-cap-top10.html" style="color:#111;">' + (m === 'us' ? '미국' : '한국') + ' 시가총액 상위 10 종목</a>을 먼저 보세요.</p>';
+    ['watch', 'move', 'theme', 'sector', 'cap', 'etf'].forEach(function (k) { put(k, t); });
+  }
+
+  var local = root.getAttribute('data-local');
+  var urls = local ? [local + m + '/_lists.json']
+    : [PAGES + m + '/_lists.json', CDN + 'quick-' + m + '/' + m + '/_lists.json', RAW + 'quick-' + m + '/' + m + '/_lists.json'];
+  (function next(i) {
+    if (i >= urls.length) return fail();
+    fetch(urls[i], { cache: 'default' }).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function (doc) { if (!doc || !doc.rows || !doc.rows.length) throw new Error('empty'); render(doc); })
+      .catch(function () { next(i + 1); });
+  })(0);
+})();
+
+</script>
