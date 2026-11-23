@@ -497,6 +497,12 @@
     t.style.top = (top + 4) + 'px'; t.style.left = (lx >= 0 ? lx : Math.min(Math.round(x) + 8, Math.max(0, pw - tw))) + 'px';
   };
 
-  function init() { document.querySelectorAll('[data-candle]').forEach(function (r) { if (!r.__c) r.__c = new Chart(r); }); }
+  // 한국 종목 `실시간 가격은 네이버 증권에서 보기` — 장중(평일 9:00~15:30 한국 시간)에만 보이고 장이 끝나면 사라진다 (2026-11-23 사용자). 휴장일은 모른다.
+  function krLive() {
+    var n = new Date(Date.now() + 9 * 3600e3), d = n.getUTCDay(), m = n.getUTCHours() * 60 + n.getUTCMinutes(), on = d > 0 && d < 6 && m >= 540 && m < 930;
+    document.querySelectorAll('[data-kr-live="1"]').forEach(function (e) { e.style.display = on ? 'flex' : 'none'; });
+  }
+  function init() { document.querySelectorAll('[data-candle]').forEach(function (r) { if (!r.__c) r.__c = new Chart(r); }); krLive(); }
+  setInterval(krLive, 60000);
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();

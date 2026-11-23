@@ -352,7 +352,7 @@ E_MOCK, E_REAL = ("<!--etf-mock-->", "<!--/etf-mock-->"), ("<!--etf-real-->", "<
 MOCK_AVG = 0.97   # 목업에만 보이는 `내 평단 (예시)` = 마지막 종가의 97% — 실제 페이지엔 없다(회원 본인 화면에서만 브라우저가 그린다, 회원 기능 때)
 
 
-def candle(name, bars, dec):
+def candle(name, bars, dec, kr_code=None):
     """맨 위 = 봉차트(일 · 주 · 월 · 넘겨보기 · 확대 · 전체 화면 지표) — 옛 `1년 전 대비 등락` 선 그래프 자리 (2026-11-13 사용자). 1년 비교는 `기간별 수익률` 막대에 있다."""
     real = CC.card(name, bars, dec, title="")   # 제목 없음 (2026-11-13 사용자: `가격 흐름` 삭제)
     if not real:
@@ -360,7 +360,7 @@ def candle(name, bars, dec):
     last = bars[-1]["close"]
     mock = CC.card(name, bars, dec, avg={"price": round(last * MOCK_AVG, dec), "label": "내 평단"}, title="")
     gap = '<div style="height:20px;"></div>'   # 차트와 탭 사이 20 더 (2026-11-14 사용자)
-    return E_MOCK[0] + mock + gap + E_MOCK[1] + E_REAL[0] + real + gap + E_REAL[1] + CC.SCRIPT   # ETF 전용 표시 — 한국 ETF 본문은 render_kr 를 거치며 mock-only 를 먼저 지운다
+    return E_MOCK[0] + mock + CC.kr_live(kr_code, always=True) + gap + E_MOCK[1] + E_REAL[0] + real + CC.kr_live(kr_code) + gap + E_REAL[1] + CC.SCRIPT   # 한국 ETF = 장중 네이버 링크 (2026-11-23 사용자)   # ETF 전용 표시 — 한국 ETF 본문은 render_kr 를 거치며 mock-only 를 먼저 지운다
 
 
 def load_live(market):
@@ -631,7 +631,7 @@ def kr_pages(snap, flows, hist, live, us_fund, kfund=None):
 
     def chart(s):   # 봉차트 그림 자리 → 오늘 탭 머리 + 1년 선 그래프 (미국 ETF 와 같게)
         b = snap["bars"][s["sym"]][-252:]
-        return candle(s["name"], snap["bars"][s["sym"]], 0) + render_kr.R._section("오늘", "", line=False, tab="오늘")   # 차트 = 탭 위(증시 리포트와 같은 자리, 2026-11-13 사용자)
+        return candle(s["name"], snap["bars"][s["sym"]], 0, kr_code=s.get("code")) + render_kr.R._section("오늘", "", line=False, tab="오늘")   # 차트 = 탭 위(증시 리포트와 같은 자리, 2026-11-13 사용자)
     render_kr.sec_chart = chart
     render_kr.sec_pairs = lambda s, a=None: move_card(s["sym"], snap, stocks_kr, K, s)   # 종목 페이지 `함께 움직이는 종목은?` 자리 → ETF 는 선 그래프
     tmp = os.path.join(OUT, "_kr_tmp")
