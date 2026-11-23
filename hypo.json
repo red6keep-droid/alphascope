@@ -1,22 +1,22 @@
 {
  "id": "hypo-card",
  "label": "증시 전망",
- "generated": "2026-11-23T12:30:58Z",
+ "generated": "2026-11-23T22:32:28Z",
  "list_url": "https://www.newfact.app/p/forecast-list.html",
  "open": [
   {
    "no": 1,
-   "eh": "EH-2026-007",
-   "title": "브로드컴 급등, 조정 올까 더 오를까?",
-   "url": "https://www.newfact.app/p/forecast-2026-007.html",
-   "posted": "11.13",
+   "eh": "EH-2026-009",
+   "title": "S&P 500 급락, 반등할까 더 빠질까?",
+   "url": "https://www.newfact.app/p/forecast-2026-009.html",
+   "posted": "11.23",
    "tags": [
-    "종목",
-    "조정"
+    "미국 증시",
+    "반등"
    ],
-   "event": "11.12 브로드컴 급등",
+   "event": "11.20 S&P 500 급락",
    "market": "us",
-   "lean": 1
+   "lean": 0
   },
   {
    "no": 1,
@@ -48,7 +48,7 @@
   }
  ],
  "done_count": {
-  "us": 5,
+  "us": 6,
   "kr": 0
  },
  "ops": {
