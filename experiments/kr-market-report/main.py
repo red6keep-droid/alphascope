@@ -78,11 +78,39 @@ def _times(z):
 def _count_year(vals, v):
     """지난 1년(오늘 제외) 중 |값| 이 오늘 이상이던 날 수."""
     past = [abs(x) for x in vals[-253:-1] if x is not None]
+    if v is None:   # 오늘 시가를 어디서도 못 받은 날 — 멈추지 않고 0번으로 (2026-11-23)
+        return 0, len(past)
     return sum(1 for x in past if x >= abs(v)), len(past)
 
 
-def index_day(bars):
+NAVER_INDEX = {U.BENCH: "KOSPI", U.KOSDAQ: "KOSDAQ"}
+
+
+def _naver_open(sym, day):
+    """네이버 지수 일봉의 시가 — 야후가 그날 지수 시가를 0 으로 줄 때 채운다(2026-11-23 코스피 · 코스닥 open 0.0 → 리포트 멈춤). 못 받으면 None."""
+    code = NAVER_INDEX.get(sym)
+    if not code:
+        return None
+    import requests   # yfinance 의존성으로 늘 깔려 있다
+    d = day.replace("-", "")
+    url = f"https://api.finance.naver.com/siseJson.naver?symbol={code}&requestType=1&startTime={d}&endTime={d}&timeframe=day"
+    try:
+        txt = requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=10).text
+        m = re.search(r'\["%s",\s*([0-9.]+)' % d, txt)
+        v = float(m.group(1)) if m else 0.0
+        return v if v > 0 else None
+    except Exception as e:   # noqa: BLE001 — 예비 출처라 실패해도 리포트는 계속
+        print(f"[지수 시가] 네이버 {code} {day} 실패: {e}")
+        return None
+
+
+def index_day(bars, sym=None):
     """하루 = 시가 갭(전일 종가 → 시가, 밤사이 몫) + 장중(시가 → 종가, 한국장 몫). 평소 범위는 종목 페이지와 같은 자(A.normal_range)."""
+    if not bars[-1].get("open"):
+        o = _naver_open(sym, bars[-1]["day"])
+        print(f"[지수 시가] {sym} {bars[-1]['day']} 야후 시가 없음 → 네이버 {o}")
+        if o:
+            bars = bars[:-1] + [dict(bars[-1], open=o)]
     t, p = bars[-1], bars[-2]
     gaps = [(bars[i]["open"] / bars[i - 1]["close"] - 1) * 100 if bars[i].get("open") else None for i in range(1, len(bars))]
     intra = [(bars[i]["close"] / bars[i]["open"] - 1) * 100 if bars[i].get("open") else None for i in range(1, len(bars))]
@@ -148,7 +176,7 @@ def earnings(day, top, snap, extra):
 
 def build(a, snap, extra):
     bars = snap["bars"]
-    idx = {k: index_day(bars[k]) for k in INDEX if len(bars.get(k) or []) > 60}
+    idx = {k: index_day(bars[k], k) for k in INDEX if len(bars.get(k) or []) > 60}
     top = sorted((s for s in a["stocks"] if s["in_top"]), key=lambda s: s["rank"])
     kr = idx[U.BENCH]
     return {"day": a["day"], "idx": idx, "kospi_bars": bars[U.BENCH], "top": top, "groups": group_moves(a["stocks"], kr["ret"]), "market": a.get("market") or {},
