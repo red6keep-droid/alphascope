@@ -71,3 +71,6 @@ experiments/stock-etf/data/
 
 # 집 IP(VPN)로 받은 자료 — 비공개 상태 저장소 homeip-state 에만 (2026-11-17)
 experiments/home-ip/data/
+
+# 뉴스 수집기 블로그 저장소에서 받은 목업 재료 — 기사 제목 · 주소가 섞임 (2026-11-23)
+experiments/news-posts/samples/
