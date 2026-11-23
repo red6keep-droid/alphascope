@@ -9,6 +9,7 @@ ECOS 는 공공데이터포털 "이용허락범위 제한 없음" (D4-15). 하�
 """
 import datetime
 import json
+import re
 import os
 import sys
 import time
@@ -111,6 +112,73 @@ def _bars(symbols, period="2y"):
     return out
 
 
+NAVER_INDEX = {U.BENCH: "KOSPI", U.KOSDAQ: "KOSDAQ"}
+
+
+def _naver_code(sym):
+    if sym in NAVER_INDEX:
+        return NAVER_INDEX[sym]
+    code = sym.split(".")[0]
+    return code if sym.endswith((".KS", ".KQ")) and len(code) == 6 else None
+
+
+def _naver_bars(sym, start, end):
+    """네이버 일봉(수정 전 가격) — {날짜: 봉}. 못 받으면 빈 dict. 무료 · 키 없음."""
+    code = _naver_code(sym)
+    if not code:
+        return {}
+    url = (f"https://api.finance.naver.com/siseJson.naver?symbol={code}&requestType=1"
+           f"&startTime={start.replace('-', '')}&endTime={end.replace('-', '')}&timeframe=day")
+    try:
+        txt = requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=10).text
+    except Exception as e:   # noqa: BLE001
+        print(f"[kr] 네이버 {sym} 실패: {str(e)[:80]}")
+        return {}
+    out = {}
+    for m in re.finditer(r'\["(\d{8})",\s*([0-9.]+),\s*([0-9.]+),\s*([0-9.]+),\s*([0-9.]+),\s*([0-9.]+)', txt):
+        d, o, h, lo, c, v = m.groups()
+        day = f"{d[:4]}-{d[4:6]}-{d[6:]}"
+        out[day] = {"day": day, "open": float(o), "high": float(h), "low": float(lo), "close": float(c), "adj": float(c), "volume": float(v)}
+    return out
+
+
+def _naver_fill(bars):
+    """한국 예비 = 네이버 (2026-11-23 사용자). 야후가 ① 마지막 봉의 시가 · 고가 · 저가를 0/빈 값으로 주거나
+    (11-23 코스피 · 코스닥 · 전 종목 open 0.0 → 한국 증시 리포트 멈춤 · 종목 시가 갭 빠짐)
+    ② 다른 종목보다 하루 늦은 봉을 줄 때 그 종목만 네이버로 채운다. 채운 것 · 못 채운 것은 로그에 남긴다."""
+    if not bars:
+        return bars
+    last_day = max(b[-1]["day"] for b in bars.values() if b)
+    fixed, failed = [], []
+    for s, bs in bars.items():
+        if not bs or not _naver_code(s):
+            continue
+        t = bs[-1]
+        bad = not t.get("open") or not t.get("high") or not t.get("low")
+        late = t["day"] < last_day
+        if not (bad or late):
+            continue
+        nb = _naver_bars(s, t["day"], last_day)
+        time.sleep(0.3)
+        if bad and t["day"] in nb:
+            n = nb[t["day"]]
+            for k in ("open", "high", "low"):
+                if not t.get(k):
+                    t[k] = n[k]
+            fixed.append(f"{s} {t['day']} 시가")
+        elif bad:
+            failed.append(f"{s} {t['day']} 시가")
+        if late:
+            add = [nb[d] for d in sorted(nb) if d > t["day"]]
+            bs.extend(add)
+            (fixed if add else failed).append(f"{s} {last_day} 봉")
+    if fixed:
+        print(f"[kr] 네이버 예비로 채움 {len(fixed)}건: {', '.join(fixed[:10])}{' …' if len(fixed) > 10 else ''}")
+    if failed:
+        print(f"::warning::[kr] 야후 빈 값 · 네이버도 못 채움 {len(failed)}건: {', '.join(failed[:10])}")
+    return bars
+
+
 def _caps(symbols):
     """시총 — 종목마다 fast_info 한 번, 0.5초 간격 (원화)."""
     out = {}
@@ -128,6 +196,7 @@ def run_prices():
     syms = [c[0] for c in U.CANDIDATES]
     base = syms + [U.BENCH, U.KOSDAQ] + sorted(U.SECTOR_ETF_LIST)   # 업종 ETF — 업종 자금 카드 (2026-10-31)
     bars = _bars(base + sorted(set(etf_universe.KR_SYMS) - set(base)))   # 회원 `내 종목` ETF (2026-11-12)
+    bars = _naver_fill(bars)   # 한국 예비 = 네이버 — 야후 시가 0 · 늦은 봉 (2026-11-23)
     got = [s for s in syms if s in bars]
     if len(got) < len(syms) // 2:
         notify.event("수집 실패", f"한국 종목 일봉 {len(got)}/{len(syms)} — yfinance 응답 부족, 이 실행은 자료 지연")
