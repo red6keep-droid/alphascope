@@ -1,7 +1,7 @@
 {
  "id": "hypo-card",
  "label": "증시 전망",
- "generated": "2026-11-22T22:32:26Z",
+ "generated": "2026-11-23T07:07:43Z",
  "list_url": "https://www.newfact.app/p/forecast-list.html",
  "open": [
   {
@@ -30,7 +30,7 @@
    ],
    "event": "11.10 기아 급락",
    "market": "kr",
-   "lean": -1
+   "lean": 0
   },
   {
    "no": 1,
