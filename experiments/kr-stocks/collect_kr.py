@@ -157,61 +157,56 @@ def _kis_ref(path=None):
     return j.get("bars") or None
 
 
+def _market_day(kis, yahoo_last):
+    """오늘 거래소의 마지막 거래일 — 한국투자증권 대조 파일의 가장 늦은 날, 없으면 네이버 코스피 한 번. 둘 다 없으면 야후의 가장 늦은 날."""
+    days = [d for v in (kis or {}).values() for d in (v or {})]
+    if not days:
+        days = list(_naver_bars(U.BENCH, (datetime.date.fromisoformat(yahoo_last) - datetime.timedelta(days=10)).isoformat(),
+                                datetime.datetime.now(KST).date().isoformat()))
+    return max([yahoo_last] + days)
+
+
 def _fix_last(bars, kis_path=None):
-    """마지막 봉 대조 (2026-11-23 사용자). 11-23 야후가 ① 전 종목 · 지수 시가를 0.0 으로 주고
-    ② 삼성전자 177,500 · SK하이닉스 1,085,000 처럼 장 막판 전에서 멈춘 종가를 줬다(거래소 180,600 · 1,101,000).
-    대조 = 한국투자증권(집 IP 로 미리 받은 kis_last.json, 없으면 네이버). 야후와 다른 칸 · 빈 칸 · 하루 늦은 봉은 **네이버 값**으로 바꾼다
-    — 한국투자증권 값은 맞나 틀리나를 가르는 데만 쓰고 싣지 않는다(사용자: 개인 API 시세를 공개 게시하지 않게).
-    네이버도 못 받으면 야후 값 그대로 + 경고. 과거 봉 · 수정주가는 야후 그대로 — 바꾼 날의 adj 는 야후 adj/종가 비율을 지킨다."""
+    """야후가 막힌 칸만 네이버로 채운다 (2026-11-23 사용자: "출처는 야후. 야후가 막혔을 때만 잠깐 — 오늘처럼 리포트가 못 나갈 때만").
+    채우는 경우 = 마지막 봉의 시가 · 고가 · 저가가 0 · 빈 값(11-23 전 종목 시가 0.0 → 리포트 멈춤) · 그날 봉이 아예 없음(하루 늦은 봉).
+    야후 값이 있는데 거래소와 다른 것은 바꾸지 않는다 — 야후 한국 종가는 늘 동시호가 전 값이라 거래소와 다르다(11-23 실측 185봉 중 163, 사용자가 알고 고름).
+    한국투자증권(kis_last.json)은 오늘 거래일이 언제인지 · 야후와 몇 종목이 다른지 기록하는 데만 쓰고 싣지 않는다. 네이버도 못 받으면 야후 그대로 + 경고."""
     if not bars:
         return bars
     kis = _kis_ref(kis_path)
-    last_day = max(b[-1]["day"] for b in bars.values() if b)
-    changed, added, failed, n_chk = [], [], [], 0
+    day = _market_day(kis, max(b[-1]["day"] for b in bars.values() if b))
+    filled, added, failed, n_diff = [], [], [], 0
     for s, bs in bars.items():
         if not bs or not _naver_code(s):
             continue
         t = bs[-1]
-        keys = ("open", "high", "low", "close")   # 거래량은 대조 안 함 — 한국투자증권은 시간외까지 넣어 늘 조금 다르다(11-23 KODEX 200 29,581,658 vs 네이버 · 야후 28,980,975)
-        ref = (kis or {}).get(s) or {}
-        nav = None
-        if t["day"] not in ref:   # 한국투자증권 대조가 없으면 네이버가 대조 겸 값
-            nav = _naver_bars(s, t["day"], last_day)
-            time.sleep(0.3)
-            ref = nav
-        if t["day"] not in ref:
-            if not t.get("open") or t["day"] < last_day:
-                failed.append(f"{s} {t['day']}")
+        r = ((kis or {}).get(s) or {}).get(t["day"])
+        if r and r.get("close") and abs(t["close"] - r["close"]) > 1e-6 * r["close"]:
+            n_diff += 1   # 기록만 — 바꾸지 않는다
+        empty = [k for k in ("open", "high", "low") if not t.get(k)]
+        late = t["day"] < day
+        if not (empty or late):
             continue
-        n_chk += 1
-        r = ref[t["day"]]
-        diff = [k for k in keys if r.get(k) and abs((t.get(k) or 0) - r[k]) > 1e-6 * max(1.0, r[k])]
-        late = t["day"] < last_day and any(d > t["day"] for d in ref)
-        if not (diff or late):
-            continue
-        if nav is None:   # 다르다고 나온 종목만 네이버에서 실을 값을 받는다
-            nav = _naver_bars(s, t["day"], last_day)
-            time.sleep(0.3)
-        if diff:
+        nav = _naver_bars(s, t["day"], day)
+        time.sleep(0.3)
+        if empty:
             v = nav.get(t["day"])
-            if not v:
-                failed.append(f"{s} {t['day']} 값 다름(네이버 없음)")
-            else:
-                ratio = (t["adj"] / t["close"]) if t.get("close") and t.get("adj") else 1.0
-                if "close" in diff:
-                    changed.append(f"{s} 종가 {t.get('close'):,.2f}→{v['close']:,.2f}")
-                for k in diff:
+            if v:
+                for k in empty:
                     t[k] = v[k]
-                t["adj"] = t["close"] * ratio
+                filled.append(f"{s} {'·'.join(empty)}")
+            else:
+                failed.append(f"{s} {t['day']} 빈 칸(네이버 없음)")
         if late:
             add = [nav[d] for d in sorted(nav) if d > t["day"]]
             bs.extend(add)
-            (added if add else failed).append(f"{s} {last_day}")
-    print(f"[kr] 마지막 봉 대조({'한국투자증권' if kis else '네이버'}) {n_chk}종목 — 종가 바꿈 {len(changed)} · 늦은 봉 붙임 {len(added)} (바꾼 값 = 네이버)")
-    if changed:
-        print(f"[kr] 야후 종가 다름 → 네이버 값: {', '.join(changed[:15])}{' …' if len(changed) > 15 else ''}")
+            (added if add else failed).append(f"{s} {day}")
+    print(f"[kr] 야후 빈 칸 네이버로 채움 {len(filled)} · 늦은 봉 붙임 {len(added)} (거래일 {day}"
+          + (f", 한국투자증권과 종가 다른 종목 {n_diff} — 기록만" if kis else "") + ")")
+    if filled:
+        print(f"[kr] 채운 칸: {', '.join(filled[:15])}{' …' if len(filled) > 15 else ''}")
     if failed:
-        print(f"::warning::[kr] 마지막 봉 대조 · 바꾸기 못 함 {len(failed)}건(야후 값 그대로): {', '.join(failed[:10])}")
+        print(f"::warning::[kr] 야후 빈 칸 · 늦은 봉 못 채움 {len(failed)}건(야후 값 그대로): {', '.join(failed[:10])}")
     return bars
 
 
@@ -232,7 +227,7 @@ def run_prices():
     syms = [c[0] for c in U.CANDIDATES]
     base = syms + [U.BENCH, U.KOSDAQ] + sorted(U.SECTOR_ETF_LIST)   # 업종 ETF — 업종 자금 카드 (2026-10-31)
     bars = _bars(base + sorted(set(etf_universe.KR_SYMS) - set(base)))   # 회원 `내 종목` ETF (2026-11-12)
-    bars = _fix_last(bars)   # 마지막 봉 대조 = 한국투자증권(집 IP) · 바꾸는 값 = 네이버 — 야후 시가 0 · 장 막판 전 종가 · 늦은 봉 (2026-11-23)
+    bars = _fix_last(bars)   # 야후가 막힌 칸(시가 · 고가 · 저가 0 · 그날 봉 없음)만 네이버로 — 출처는 야후 (2026-11-23 사용자)
     got = [s for s in syms if s in bars]
     if len(got) < len(syms) // 2:
         notify.event("수집 실패", f"한국 종목 일봉 {len(got)}/{len(syms)} — yfinance 응답 부족, 이 실행은 자료 지연")
