@@ -6,7 +6,7 @@ name: Home IP fetch
 #
 # 유튜브 수집(red9keep/News-sub collect.yml)이 같은 공유기 VPN 을 쓴다. 공유기 L2TP 는 동시 접속을 못 버틴다(같은 시험: 둘째 접속이 곧 끊김).
 # 저장소가 달라 concurrency 그룹으로 줄 세울 수 없으므로 ① 유튜브 수집이 없는 14:30 KST 에 걸고(그쪽 회차: 07:30~11:57 · 17:00~20:50 · 21:20~07:55)
-# ② VPN 을 열기 전에 News-sub 의 collect · trial 실행이 도는 중인지 공개 API 로 보고, 돌면 끝날 때까지(최대 25분) 기다린다. 끝내 안 비면 그날은 건너뛴다.
+# ② (옛) VPN 을 열기 전에 News-sub 실행을 기다렸다 → 2026-11-23 계정을 나눠(VPN_USER_NEWFACT) 기다리지 않는다.
 # 집 IP 로 가는 요청은 home_ip.py 에 적힌 곳만(국민연금 · 야후 · DART · 구글 뉴스는 넣지 않는다 — 유튜브 수집 IP 차단 위험).
 # 정시는 Cloudflare Worker(infra/cron-trigger KST_JOBS 14:30)가 건다. 아래 cron 은 예비 — 오늘 이미 받았으면 건너뛴다.
 on:
@@ -63,25 +63,12 @@ jobs:
             echo "오늘($today) 이미 받음 — 예비 실행 건너뜀"; echo "done=true" >> "$GITHUB_OUTPUT"
           fi
 
-      # 유튜브 수집이 VPN 을 쓰는 중이면 기다린다 — 동시에 붙으면 한쪽이 끊긴다
-      - name: Wait for YouTube collector (News-sub)
+      # 유튜브 수집과 계정을 나눴다(2026-11-23 사용자, VPN_USER_NEWFACT · 할당 IP 따로) — 동시 접속 시험 run 45178786653 에서 두 계정 4분 겹쳐 15/15 유지.
+      # 그래서 유튜브 수집을 기다리지 않는다. 아래 단계들이 보는 출력(free)만 남긴다
+      - name: VPN 계정 = newfact (유튜브 수집과 따로)
         id: wait
         if: steps.load.outputs.done != 'true'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          for i in $(seq 1 26); do
-            busy=0
-            for st in in_progress queued; do
-              n=$(curl -s -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" \
-                "https://api.github.com/repos/red9keep/News-sub/actions/runs?status=$st&per_page=20" \
-                | python3 -c "import json,sys; d=json.load(sys.stdin); print(sum(1 for r in d.get('workflow_runs',[]) if r.get('path','').split('@')[0] in ('.github/workflows/collect.yml','.github/workflows/trial.yml')))" 2>/dev/null || echo 0)
-              busy=$((busy + n))
-            done
-            if [ "$busy" = 0 ]; then echo "유튜브 수집 비어 있음 → VPN 연결"; echo "free=true" >> "$GITHUB_OUTPUT"; exit 0; fi
-            echo "유튜브 수집 도는 중($busy) — 1분 뒤 다시 ($i/26)"; sleep 60
-          done
-          echo "::warning::유튜브 수집이 25분 넘게 안 끝나 오늘은 건너뜀"
+        run: echo "free=true" >> "$GITHUB_OUTPUT"
 
       - uses: actions/setup-python@v5
         if: steps.load.outputs.done != 'true'
@@ -101,8 +88,8 @@ jobs:
         env:
           VPN_SERVER: ${{ secrets.VPN_SERVER }}
           VPN_PSK: ${{ secrets.VPN_PSK }}
-          VPN_USER: ${{ secrets.VPN_USER }}
-          VPN_PASSWORD: ${{ secrets.VPN_PASSWORD }}
+          VPN_USER: ${{ secrets.VPN_USER_NEWFACT }}       # 유튜브 수집(VPN_USER)과 다른 계정 (2026-11-23)
+          VPN_PASSWORD: ${{ secrets.VPN_PASSWORD_NEWFACT }}
 
       - name: Fetch via home IP
         if: steps.load.outputs.done != 'true'
