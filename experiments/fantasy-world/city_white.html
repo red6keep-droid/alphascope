@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>흰 도시 판</title>
+<!-- 원본 = experiments/fantasy-world/city_white.html, build_village.py 가 output 으로 복사
+     (2026-11-23 사용자: 5초 보고 나가는 포스터 — 흰 모형 도시, 오른 종목 빨강 · 내린 종목 파랑, 누르기 · 숫자 없음, 영화 같은 빛) -->
+<style>
+:root{--bg:#F8FAFC;--ink:#0F172A;--sub:#64748B;--line:#E2E8F0;--btn:#FFFFFF;--btnline:#94A3B8}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0B1220;--ink:#E2E8F0;--sub:#94A3B8;--line:#1E293B;--btn:#111A2E;--btnline:#475569}}
+:root[data-theme="dark"]{--bg:#0B1220;--ink:#E2E8F0;--sub:#94A3B8;--line:#1E293B;--btn:#111A2E;--btnline:#475569}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Pretendard","Malgun Gothic",sans-serif;line-height:1.5}
+.wrap{max-width:980px;margin:0 auto;padding:16px 16px 40px}
+.stage{position:relative;height:min(78vh,720px);min-height:440px;border-radius:18px;overflow:hidden;background:#E9EEF5;touch-action:none}
+.stage canvas{display:block;width:100%;height:100%}
+.cap{position:absolute;left:20px;top:16px;color:#0F172A;pointer-events:none}
+.cap b{display:block;font-size:30px;font-weight:800;letter-spacing:-.5px;line-height:1.15}
+.cap span{font-size:13px;color:#475569}
+.key{position:absolute;left:20px;bottom:14px;display:flex;gap:12px;font-size:12px;color:#475569;pointer-events:none}
+.key i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.fps{position:absolute;right:12px;top:12px;font-size:11px;color:#64748B;pointer-events:none}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+button.b{font:inherit;font-size:13px;padding:6px 11px;border:1px solid var(--btnline);background:var(--btn);color:var(--ink);border-radius:8px;cursor:pointer}
+button.b[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.note{font-size:13px;color:var(--sub);margin:12px 0 0;padding-left:18px}
+.note li{margin:3px 0}
+.err{padding:40px 16px;text-align:center;color:#64748B}
+</style>
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}
+</script>
+</head>
+<body>
+<div class="wrap">
+  <div class="stage" id="stage">
+    <div class="cap"><b id="cName"></b><span id="cDate"></span></div>
+    <div class="key"><span><i style="background:#E5484D"></i>오른 종목</span><span><i style="background:#2F6BFF"></i>내린 종목</span><span>높이 = 시가총액</span></div>
+    <div class="fps" id="fps"></div>
+  </div>
+  <div class="chips" id="chips"></div>
+  <ul class="note">
+    <li>한 손가락(마우스)으로 끌면 돌아가고 기울어집니다. 두 손가락 · 휠로 확대 · 축소합니다. 가만히 두면 천천히 돕니다.</li>
+    <li>건물 하나 = 종목 하나, 업종의 종목 전부입니다. 한가운데 가장 높은 건물이 시가총액 1위입니다.</li>
+    <li>오늘 등락이 ±1% 안이면 흰색, 그 밖은 크게 움직일수록 진하게 물듭니다. 전체 빛은 업종이 내린 날 차갑게, 오른 날 따뜻하게 바뀝니다.</li>
+    <li>시안입니다. 건물 모양은 종목마다 고정된 꼴이고, 세부 업종별 모양은 자료가 붙은 뒤에 합니다.</li>
+  </ul>
+</div>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { GTAOPass } from 'three/addons/postprocessing/GTAOPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+
+const $ = id => document.getElementById(id);
+const QS = new URLSearchParams(location.search);
+const stage = $('stage');
+const MOBILE = matchMedia('(pointer: coarse)').matches;
+
+// ── 자료 (마을 시안과 같은 파일: 고정 배치 + 하루 숫자)
+async function loadData() {
+  const daily = await (await fetch('village/daily_us.json', { cache: 'no-cache' })).json();
+  const layout = await (await fetch('village/' + daily.layout_file)).json();
+  const med = a => { if (!a.length) return 0; const s = [...a].sort((x, y) => x - y), m = s.length >> 1; return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2; };
+  const sectors = layout.sectors.map(L => {
+    const rows = L.stocks.map(x => ({ t: x.t, r: (daily.q[x.t] || [])[0] ?? null, c: (daily.q[x.t] || [])[1] || 0 })).sort((a, b) => b.c - a.c);
+    return { name: L.name, rows, med: med(rows.map(x => x.r).filter(x => x != null)) };
+  });
+  return { date: daily.date, market: daily.market, sectors };
+}
+let DATA;
+try { DATA = await loadData(); } catch (e) { stage.innerHTML = '<div class="err">자료를 불러오지 못했습니다.</div>'; throw e; }
+let vi = Math.max(0, DATA.sectors.findIndex(s => s.name === (QS.get('v') || '기술')));
+
+// ── 장면
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.NeutralToneMapping; renderer.toneMappingExposure = 1.0;
+stage.insertBefore(renderer.domElement, stage.firstChild);
+const scene = new THREE.Scene();
+scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), 0.04).texture;
+const camera = new THREE.PerspectiveCamera(26, 1, 5, 1200);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true; controls.dampingFactor = 0.08; controls.rotateSpeed = 0.7; controls.zoomSpeed = 0.9;
+controls.minPolarAngle = THREE.MathUtils.degToRad(8); controls.maxPolarAngle = THREE.MathUtils.degToRad(84);
+controls.touches = { ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_PAN };
+controls.autoRotate = QS.get('auto') !== '0'; controls.autoRotateSpeed = 0.55;
+let idleT = null;
+controls.addEventListener('start', () => { controls.autoRotate = false; clearTimeout(idleT); });
+controls.addEventListener('end', () => { if (QS.get('auto') !== '0') idleT = setTimeout(() => { controls.autoRotate = true; }, 5000); });
+
+const hemi = new THREE.HemisphereLight(0xF4F7FF, 0xE4E7EC, 1.0); scene.add(hemi);
+const sun = new THREE.DirectionalLight(0xFFF4E6, 3.0); scene.add(sun, sun.target);
+sun.castShadow = true; sun.shadow.mapSize.set(MOBILE ? 2048 : 4096, MOBILE ? 2048 : 4096); sun.shadow.bias = -0.0004; sun.shadow.normalBias = 0.04; sun.shadow.radius = 5;
+
+// ── 부품(전부 밑면이 y = 0)
+function roundRect(w, d, r, h, bevel = 0) {
+  const s = new THREE.Shape(), x = -w / 2, y = -d / 2;
+  s.moveTo(x + r, y); s.lineTo(x + w - r, y); s.quadraticCurveTo(x + w, y, x + w, y + r); s.lineTo(x + w, y + d - r); s.quadraticCurveTo(x + w, y + d, x + w - r, y + d);
+  s.lineTo(x + r, y + d); s.quadraticCurveTo(x, y + d, x, y + d - r); s.lineTo(x, y + r); s.quadraticCurveTo(x, y, x + r, y);
+  return new THREE.ExtrudeGeometry(s, { depth: h, bevelEnabled: bevel > 0, bevelSize: bevel, bevelThickness: bevel, bevelSegments: 4, curveSegments: 10 }).rotateX(-Math.PI / 2);
+}
+const GEO = {
+  box: new THREE.BoxGeometry(1, 1, 1).translate(0, 0.5, 0),
+  cyl: new THREE.CylinderGeometry(0.5, 0.5, 1, 28).translate(0, 0.5, 0),
+  taper: new THREE.CylinderGeometry(0.32, 0.5, 1, 20).translate(0, 0.5, 0),
+  cone: new THREE.ConeGeometry(0.5, 1, 24).translate(0, 0.5, 0),
+  dome: new THREE.SphereGeometry(0.5, 28, 12, 0, Math.PI * 2, 0, Math.PI / 2),
+  ball: new THREE.SphereGeometry(0.5, 16, 12).translate(0, 0.5, 0),
+  vault: new THREE.CylinderGeometry(0.5, 0.5, 1, 24, 1, false, 0, Math.PI).rotateZ(Math.PI / 2),          // 반원통 지붕 — 길이 x, 폭 z
+  gable: (() => { const sh = new THREE.Shape([new THREE.Vector2(-0.5, 0), new THREE.Vector2(0.5, 0), new THREE.Vector2(0.5, 1)]); return new THREE.ExtrudeGeometry(sh, { depth: 1, bevelEnabled: false }).translate(0, 0, -0.5); })(),   // 톱날 지붕 한 칸
+  block: roundRect(1, 1, 0.09, 1),
+};
+// 흰 모형 재질 — 물든 건물은 그늘에서도 색이 살도록 제 색을 조금 스스로 낸다
+const MAT = new THREE.MeshStandardMaterial({ roughness: 0.78, metalness: 0 });
+MAT.onBeforeCompile = sh => { sh.fragmentShader = sh.fragmentShader.replace('#include <emissivemap_fragment>',
+  '#include <emissivemap_fragment>\n float sat_ = max(vColor.r, max(vColor.g, vColor.b)) - min(vColor.r, min(vColor.g, vColor.b)); totalEmissiveRadiance += vColor.rgb * sat_ * 0.16;'); };
+function radialTex() { const c = document.createElement('canvas'); c.width = c.height = 128; const g = c.getContext('2d'), gr = g.createRadialGradient(64, 64, 0, 64, 64, 64);
+  gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(0.45, 'rgba(255,255,255,0.5)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.fillRect(0, 0, 128, 128); return new THREE.CanvasTexture(c); }
+const spillMat = new THREE.MeshBasicMaterial({ map: radialTex(), transparent: true, depthWrite: false, opacity: 0.55 });
+const spillGeo = new THREE.PlaneGeometry(1, 1).rotateX(-Math.PI / 2);
+const floor = new THREE.Mesh(new THREE.PlaneGeometry(1600, 1600).rotateX(-Math.PI / 2), new THREE.ShadowMaterial({ opacity: 0.16 })); floor.position.y = -1.5; floor.receiveShadow = true; scene.add(floor);
+
+const WHITE = new THREE.Color(0xFFFFFF), UPC = new THREE.Color(0xE5484D), DOWNC = new THREE.Color(0x2F6BFF);
+const PLATE = 0xDDE2EA, SLAB = 0xF5F7FA, TREE = 0xEEF1F5;
+const LOT = 6.2, STREET = 3.4, PITCH = LOT * 2 + STREET;
+const hash = s => { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return (h >>> 0) || 1; };
+const seeded = s => () => { s = (s * 16807) % 2147483647; return (s - 1) / 2147483646; };
+const tint = r => { if (r == null || Math.abs(r) < 1) return 0xFFFFFF; const k = 0.22 + 0.7 * Math.min(1, (Math.abs(r) - 1) / 9); return WHITE.clone().lerp(r > 0 ? UPC : DOWNC, k).getHex(); };
+
+let city = null, SIZE = 80, HMAX = 40;
+function build() {
+  if (city) { scene.remove(city); city.traverse(o => { if (o.isInstancedMesh) o.dispose(); if (o.userData.own) o.geometry.dispose(); }); }
+  city = new THREE.Group(); scene.add(city);
+  const S = DATA.sectors[vi], rows = S.rows, n = rows.length;
+  const parts = {}, spills = [];
+  const add = (g, x, y, z, sx, sy, sz, color, ry = 0) => { (parts[g] || (parts[g] = [])).push({ x, y, z, sx, sy, sz, color, ry }); };
+
+  // 자리 — 블록(2 × 2 필지)을 바둑판으로, 가운데 블록 = 1위. 필지는 가운데에서 가까운 순서로 시가총액 순위에 준다
+  const B = n - 1 <= 32 ? 3 : n - 1 <= 96 ? 5 : 7, half = (B - 1) / 2;
+  let lots = [];
+  for (let bi = -half; bi <= half; bi++) for (let bj = -half; bj <= half; bj++) { if (!bi && !bj) continue;
+    for (const [ox, oz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) lots.push({ bi, bj, x: bi * PITCH + ox * LOT / 2, z: bj * PITCH + oz * LOT / 2 }); }
+  lots.forEach(l => { l.d = Math.hypot(l.x, l.z) + (hash(l.x + ':' + l.z) % 100) / 100; }); lots.sort((a, b) => a.d - b.d);
+  const used = lots.slice(0, n - 1), spare = lots.slice(n - 1);
+  const blocksUsed = new Set(used.map(l => l.bi + ',' + l.bj)); blocksUsed.add('0,0');
+  // 쓰는 블록만 판에 올린다 — 판 크기는 가장 먼 블록까지
+  let ext = 0; blocksUsed.forEach(k => { const [a, b] = k.split(',').map(Number); ext = Math.max(ext, Math.abs(a), Math.abs(b)); });
+  SIZE = (ext * 2 + 1) * PITCH - STREET + 9;
+  const plate = new THREE.Mesh(roundRect(SIZE, SIZE, 6, 1.2, 0.3), new THREE.MeshStandardMaterial({ color: PLATE, roughness: 0.85 }));
+  plate.position.y = -1.5; plate.castShadow = plate.receiveShadow = true; plate.userData.own = true; city.add(plate);
+  for (let bi = -ext; bi <= ext; bi++) for (let bj = -ext; bj <= ext; bj++) add('block', bi * PITCH, 0, bj * PITCH, LOT * 2 + 0.6, 0.3, LOT * 2 + 0.6, SLAB);
+
+  const cmax = rows[0].c || 1, Y0 = 0.3;
+  const fins = (x, z, w, d, y0, h, c, ry = 0, step = 1.25) => { for (let y = y0 + step; y < y0 + h - 0.35; y += step) add('box', x, y, z, w + 0.24, 0.11, d + 0.24, c, ry); };
+  const body = (x, z, w, d, y0, h, c, ry = 0, step = 1.25) => { add('box', x, y0, z, w, h, d, c, ry); fins(x, z, w, d, y0, h, c, ry, step); add('box', x, y0 + h, z, w + 0.3, 0.2, d + 0.3, c, ry); };
+  const mull = (x, z, w, d, y0, h, c, k) => { for (let i = 0; i < k; i++) { const u = (i + 0.5) / k - 0.5;
+    add('box', x + u * w, y0, z + d / 2 + 0.05, 0.11, h, 0.11, c); add('box', x + u * w, y0, z - d / 2 - 0.05, 0.11, h, 0.11, c);
+    add('box', x + w / 2 + 0.05, y0, z + u * d, 0.11, h, 0.11, c); add('box', x - w / 2 - 0.05, y0, z + u * d, 0.11, h, 0.11, c); } };
+  const roofKit = (x, z, w, d, y, c, R) => { const k = R(), m = 1 + Math.floor(R() * 3);
+    for (let i = 0; i < m; i++) { const s = 0.45 + R() * 0.5; add('box', x + (R() - 0.5) * w * 0.55, y, z + (R() - 0.5) * d * 0.55, s, 0.28 + R() * 0.3, s * (0.7 + R() * 0.6), c); }
+    if (k < 0.3) add('cyl', x + (R() - 0.5) * w * 0.3, y, z + (R() - 0.5) * d * 0.3, 0.09, 2 + R() * 3, 0.09, c);
+    else if (k < 0.5) { const tx = x + (R() - 0.5) * w * 0.4, tz = z + (R() - 0.5) * d * 0.4; add('cyl', tx, y, tz, 0.95, 0.9, 0.95, c); add('cone', tx, y + 0.9, tz, 1.05, 0.4, 1.05, c); }
+    else if (k < 0.62 && w > 3) add('cyl', x, y, z, Math.min(w, d) * 0.6, 0.07, Math.min(w, d) * 0.6, c); };
+  const tree = (x, z, s = 1) => { add('cyl', x, Y0, z, 0.13 * s, 0.75 * s, 0.13 * s, TREE); add(hash(x + 't' + z) % 3 ? 'ball' : 'cone', x, Y0 + 0.6 * s, z, 0.95 * s, 1.25 * s, 0.95 * s, TREE); };
+
+  const TYPES = {
+    setback(x, z, w, h, c, R) { const p = Math.max(1.2, h * 0.14); body(x, z, w, w, Y0, p, c, 0, 99); const a = w * 0.82, b = w * 0.6, t = w * 0.36, h1 = (h - p) * 0.58, h2 = (h - p) * 0.3, h3 = (h - p) * 0.12;
+      body(x, z, a, a, Y0 + p, h1, c); body(x, z, b, b, Y0 + p + h1, h2, c); body(x, z, t, t, Y0 + p + h1 + h2, h3, c, 0, 99); add('cyl', x, Y0 + h, z, 0.1, h * 0.14 + 1, 0.1, c); },
+    slab(x, z, w, h, c, R) { const turn = R() < 0.5, ww = turn ? w * 0.52 : w, dd = turn ? w : w * 0.52; add('box', x, Y0, z, w, 0.9, w, c); body(x, z, ww, dd, Y0 + 0.9, h - 0.9, c); mull(x, z, ww, dd, Y0 + 0.9, h - 0.9, c, 5); roofKit(x, z, ww, dd, Y0 + h + 0.2, c, R); },
+    round(x, z, w, h, c, R) { const dia = w * 0.86; add('cyl', x, Y0, z, w, 0.8, w, c); add('cyl', x, Y0 + 0.8, z, dia, h - 0.8, dia, c);
+      for (let y = Y0 + 2; y < Y0 + h - 0.3; y += 1.25) add('cyl', x, y, z, dia + 0.26, 0.11, dia + 0.26, c);
+      if (R() < 0.6) { add('dome', x, Y0 + h, z, dia, dia * 0.7, dia, c); add('cyl', x, Y0 + h + dia * 0.33, z, 0.09, 1.6, 0.09, c); } else add('cyl', x, Y0 + h, z, dia + 0.3, 0.22, dia + 0.3, c); },
+    twist(x, z, w, h, c, R) { const k = Math.max(4, Math.round(h / 1.3)), sh = h / k, dir = R() < 0.5 ? 1 : -1, a = w * 0.7; add('box', x, Y0, z, w, 0.7, w, c);
+      for (let i = 0; i < k; i++) add('box', x, Y0 + 0.7 + i * sh * ((h - 0.7) / h), z, a, sh * ((h - 0.7) / h) - 0.1, a, c, dir * i * (Math.PI / 2) / k); },
+    twin(x, z, w, h, c, R) { const a = w * 0.42, o = w * 0.27; add('box', x, Y0, z, w, 1.1, w * 0.7, c); body(x - o, z, a, w * 0.6, Y0 + 1.1, h - 1.1, c); body(x + o, z, a, w * 0.6, Y0 + 1.1, (h - 1.1) * 0.8, c);
+      add('box', x, Y0 + h * 0.5, z, o * 2, 0.8, w * 0.3, c); roofKit(x - o, z, a, w * 0.6, Y0 + h + 0.2, c, R); },
+    terrace(x, z, w, h, c, R) { const k = 4; for (let i = 0; i < k; i++) { const s = w * (1 - i * 0.19); body(x - i * w * 0.07, z, s, s, Y0 + i * h / k, h / k, c, 0, 99); } roofKit(x - 0.21 * w, z, w * 0.4, w * 0.4, Y0 + h + 0.2, c, R); },
+    factory(x, z, w, h, c, R) { const hh = Math.max(1.8, h * 0.45), d = w * 0.62; add('box', x, Y0, z + w * 0.18, w, hh, d, c);
+      for (let i = 0; i < 4; i++) add('gable', x - w / 2 + (i + 0.5) * w / 4, Y0 + hh, z + w * 0.18, w / 4, 0.8, d, c);
+      for (let i = 0; i < 3; i++) { const tx = x - w * 0.3 + i * w * 0.3, tz = z - w * 0.32; add('cyl', tx, Y0, tz, w * 0.24, h * 0.7, w * 0.24, c); add('dome', tx, Y0 + h * 0.7, tz, w * 0.24, w * 0.16, w * 0.24, c); add('cyl', tx, Y0 + h * 0.35, tz, w * 0.26, 0.1, w * 0.26, c); }
+      add('taper', x + w * 0.36, Y0 + hh, z + w * 0.3, 0.6, h * 0.9, 0.6, c); add('taper', x + w * 0.16, Y0 + hh, z + w * 0.3, 0.5, h * 0.6, 0.5, c); },
+    hall(x, z, w, h, c, R) { const hh = Math.max(1.5, h * 0.5), d = w * 0.6; add('box', x, Y0, z, w, hh, d, c); add('vault', x, Y0 + hh, z, w, d, d, c);
+      for (let i = 0; i < 5; i++) add('box', x - w / 2 + (i + 0.5) * w / 5, Y0, z + d / 2 + 0.05, 0.14, hh, 0.14, c); add('box', x - w * 0.3, Y0, z - d / 2 - w * 0.12, w * 0.3, h, w * 0.22, c); },
+  };
+  const pickType = (h, R) => { const a = h > 14 ? ['setback', 'slab', 'round', 'twist', 'twin', 'slab', 'setback'] : h > 7.5 ? ['setback', 'slab', 'round', 'terrace', 'twin', 'twist'] : ['factory', 'terrace', 'hall', 'slab', 'round', 'factory']; return a[Math.floor(R() * a.length)]; };
+
+  // 1위 — 가운데 블록을 혼자 쓰는 큰 탑
+  { const b = rows[0], c = tint(b.r), H = 44, w = 8.4, R = seeded(hash(b.t));
+    body(0, 0, w + 2.6, w + 2.6, Y0, 1.6, c, 0, 99); body(0, 0, w + 1, w + 1, Y0 + 1.6, 3.2, c);
+    body(0, 0, w, w, Y0 + 4.8, H * 0.52, c); mull(0, 0, w, w, Y0 + 4.8, H * 0.52, c, 7);
+    const y1 = Y0 + 4.8 + H * 0.52; body(0, 0, w * 0.76, w * 0.76, y1, H * 0.2, c); mull(0, 0, w * 0.76, w * 0.76, y1, H * 0.2, c, 5);
+    const y2 = y1 + H * 0.2; body(0, 0, w * 0.52, w * 0.52, y2, H * 0.11, c); const y3 = y2 + H * 0.11; body(0, 0, w * 0.3, w * 0.3, y3, H * 0.06, c, 0, 99);
+    add('taper', 0, y3 + H * 0.06 + 0.2, 0, 0.9, 3, 0.9, c); add('cyl', 0, y3 + H * 0.06 + 3.2, 0, 0.12, 5, 0.12, c);
+    for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) { tree(sx * 5.9, sz * 5.9, 1.1); tree(sx * 5.9, sz * 3.2, 0.9); tree(sx * 3.2, sz * 5.9, 0.9); }
+    if (c !== 0xFFFFFF) spills.push({ x: 0, z: 0, s: 34, c }); HMAX = Y0 + H + 8; }
+  // 나머지 종목
+  used.forEach((l, i) => { const b = rows[i + 1], c = tint(b.r), R = seeded(hash(b.t)), k = Math.pow(b.c / cmax, 0.45);
+    const h = 2.6 + 32 * k, w = Math.min(LOT - 0.9, 3.7 + 1.6 * Math.min(1, h / 22));
+    TYPES[pickType(h, R)](l.x, l.z, w, h, c, R); if (c !== 0xFFFFFF) spills.push({ x: l.x, z: l.z, s: w * 2.6 + h * 0.25, c }); });
+  // 빈 필지 = 흰 나무 몇 그루(쓰는 블록 안에서만)
+  spare.forEach(l => { if (Math.abs(l.bi) > ext || Math.abs(l.bj) > ext) return; const R = seeded(hash('p' + l.x + l.z)), m = 2 + Math.floor(R() * 3);
+    for (let i = 0; i < m; i++) tree(l.x + (R() - 0.5) * 4, l.z + (R() - 0.5) * 4, 0.9 + R() * 0.6); });
+
+  // 인스턴스로 묶기
+  const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), UP = new THREE.Vector3(0, 1, 0), col = new THREE.Color();
+  for (const g in parts) { const arr = parts[g], im = new THREE.InstancedMesh(GEO[g], MAT, arr.length);
+    arr.forEach((p, i) => { q.setFromAxisAngle(UP, p.ry); m4.compose(new THREE.Vector3(p.x, p.y, p.z), q, new THREE.Vector3(p.sx, p.sy, p.sz)); im.setMatrixAt(i, m4); im.setColorAt(i, col.setHex(p.color)); });
+    im.castShadow = im.receiveShadow = true; city.add(im); }
+  if (spills.length) { const im = new THREE.InstancedMesh(spillGeo, spillMat, spills.length);      // 물든 건물 둘레 바닥에 색이 묻어남
+    spills.forEach((p, i) => { m4.compose(new THREE.Vector3(p.x, 0.33, p.z), q.identity(), new THREE.Vector3(p.s, 1, p.s)); im.setMatrixAt(i, m4); im.setColorAt(i, col.setHex(p.c)); }); im.renderOrder = 2; city.add(im); }
+
+  // 분위기 — 업종 가운데 값이 내린 날은 차갑고 가라앉게, 오른 날은 따뜻하고 밝게
+  const t = THREE.MathUtils.clamp(S.med / 5, -1, 1), cool = Math.max(0, -t), warm = Math.max(0, t);
+  const bg = new THREE.Color(0xECF0F6).lerp(new THREE.Color(0xDFE7F3), cool).lerp(new THREE.Color(0xF7EDE3), warm);
+  scene.background = bg; scene.fog = new THREE.Fog(bg, SIZE * 3.2, SIZE * 7); stage.style.background = '#' + bg.getHexString();
+  sun.color.set(0xFFF4E6).lerp(new THREE.Color(0xF1F5FF), cool).lerp(new THREE.Color(0xFFDFBD), warm); sun.intensity = 3.1 - 0.35 * cool + 0.3 * warm;
+  hemi.intensity = 1.0 - 0.1 * cool; scene.environmentIntensity = 0.6 - 0.08 * cool;
+  fx.uniforms.tint.value.set(1, 1, 1).lerp(new THREE.Color(0.975, 0.99, 1.02), cool).lerp(new THREE.Color(1.04, 1.0, 0.95), warm);
+  sun.position.set(-SIZE * 0.9, SIZE * 0.62, SIZE * 0.55); sun.target.position.set(0, 0, 0);
+  const sc = SIZE * 1.7; Object.assign(sun.shadow.camera, { left: -sc, right: sc, top: sc, bottom: -sc, near: 1, far: SIZE * 4 }); sun.shadow.camera.updateProjectionMatrix();
+  controls.minDistance = SIZE * 0.7; controls.maxDistance = SIZE * 4.2;
+
+  $('cName').textContent = S.name; $('cDate').textContent = DATA.market + ' · ' + DATA.date.replace(/-/g, '.') + ' 장 마감';
+  document.querySelectorAll('#chips button').forEach((b, i) => b.setAttribute('aria-pressed', i === vi));
+}
+
+// ── 후처리: 접촉 그림자 → 색 보정 → 가장자리 흐림(모형 사진 느낌) · 둘레 어둡게 · 필름 입자
+const composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples: 4 }));
+composer.addPass(new RenderPass(scene, camera));
+const gtao = new GTAOPass(scene, camera, 1, 1);
+gtao.updateGtaoMaterial({ radius: 3.2, distanceExponent: 1.6, thickness: 2.0, scale: 1.35, samples: 16 }); gtao.blendIntensity = 1.0;
+gtao.enabled = QS.get('ao') ? QS.get('ao') === '1' : !MOBILE;                                    // 휴대폰은 처음에 끔
+composer.addPass(gtao); composer.addPass(new OutputPass());
+const fx = new ShaderPass({
+  uniforms: { tDiffuse: { value: null }, res: { value: new THREE.Vector2(1, 1) }, time: { value: 0 }, tint: { value: new THREE.Color(1, 1, 1) }, blur: { value: MOBILE ? 3.0 : 5.0 } },
+  vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+  fragmentShader: `uniform sampler2D tDiffuse; uniform vec2 res; uniform float time; uniform vec3 tint; uniform float blur; varying vec2 vUv;
+    float hash(vec2 p){ return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
+    void main(){
+      float b = pow(clamp(abs(vUv.y - 0.5) * 2.0 - 0.28, 0.0, 1.0), 1.6) * blur;
+      vec3 c = texture2D(tDiffuse, vUv).rgb; float n = 1.0;
+      for (int i = 0; i < 12; i++) { float a = float(i) * 2.39996, r = sqrt((float(i) + 0.5) / 12.0) * b; c += texture2D(tDiffuse, vUv + vec2(cos(a), sin(a)) * r / res).rgb; n += 1.0; }
+      c /= n; c *= tint;
+      c *= 1.0 - 0.12 * smoothstep(0.5, 1.0, length(vUv - 0.5) * 1.3);
+      c += (hash(vUv * res + fract(time) * 91.7) - 0.5) * 0.028;
+      gl_FragColor = vec4(c, 1.0);
+    }`,
+});
+composer.addPass(fx);
+
+function fit() { const az = THREE.MathUtils.degToRad(+QS.get('az') || 38), pol = THREE.MathUtils.degToRad(+QS.get('pol') || 56);
+  const dist = (+QS.get('zoom') || 2.25) * SIZE * Math.max(1, 0.85 / camera.aspect);
+  controls.target.set(0, HMAX * 0.2, 0); camera.position.setFromSphericalCoords(dist, pol, az).add(controls.target); controls.update(); }
+function resize() { const w = stage.clientWidth, h = stage.clientHeight; renderer.setSize(w, h, false); composer.setPixelRatio(renderer.getPixelRatio()); composer.setSize(w, h);
+  fx.uniforms.res.value.set(w, h); camera.aspect = w / h; camera.updateProjectionMatrix(); }
+new ResizeObserver(resize).observe(stage); resize();
+let visible = true; new IntersectionObserver(es => { visible = es[0].isIntersecting; }).observe(stage);
+
+const chips = $('chips'); DATA.sectors.forEach((s, i) => { const b = document.createElement('button'); b.className = 'b'; b.textContent = s.name; b.onclick = () => { vi = i; build(); fit(); }; chips.appendChild(b); });
+build(); fit();
+
+const clock = new THREE.Clock(); let fpsN = 0, fpsT = 0;
+function frame() {
+  requestAnimationFrame(frame); if (!visible) return;
+  const dt = Math.min(clock.getDelta(), 0.05), t = clock.elapsedTime;
+  controls.update(); fx.uniforms.time.value = t; composer.render(dt);
+  fpsN++; if (t - fpsT >= 1) { $('fps').textContent = '초당 ' + Math.round(fpsN / (t - fpsT)) + '장'; fpsN = 0; fpsT = t; }
+}
+frame();
+</script>
+</body>
+</html>

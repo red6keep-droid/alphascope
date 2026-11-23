@@ -8,6 +8,7 @@
                                     캐시(일주일)가 길어도 안전하고, 붙박이가 바뀐 날에만 새 파일이 생긴다. 휴대폰에도 저장(IndexedDB)한다.
     village/daily_us.json           날마다 바뀌는 숫자 — 등락 · 시가총액 · 시장 중앙값 · 지금 쓸 배치 파일 이름. 운영에서는 gh-pages 쪽.
     mock_village_flat.html          시안 (원본 = village_flat.html)
+    mock_village_polish.html        다듬은 판 (원본 = village_polish.html — 모양 · 빛만 다름)
 (2026-11-23 사용자: 고정된 것은 고정 저장소 + 사용자 캐시, 날짜 붙은 것만 따로 — "그렇게 해")
 
 붙박이 규칙:
@@ -91,6 +92,12 @@ def main():
         os.remove(old)
     html = open(os.path.join(BASE, "village_flat.html"), encoding="utf-8").read()
     open(os.path.join(OUTD, "mock_village_flat.html"), "w", encoding="utf-8").write(html)
+    html = open(os.path.join(BASE, "village_polish.html"), encoding="utf-8").read()       # 다듬은 판 (2026-11-23)
+    open(os.path.join(OUTD, "mock_village_polish.html"), "w", encoding="utf-8").write(html)
+    html = open(os.path.join(BASE, "city_white.html"), encoding="utf-8").read()            # 흰 도시 판 — 포스터 (2026-11-23)
+    open(os.path.join(OUTD, "mock_city_white.html"), "w", encoding="utf-8").write(html)
+    html = open(os.path.join(BASE, "city_weather.html"), encoding="utf-8").read()          # 날씨 도시 판 (2026-11-23)
+    open(os.path.join(OUTD, "mock_city_weather.html"), "w", encoding="utf-8").write(html)
     kb = lambda f: os.path.getsize(os.path.join(VD, f)) / 1024
     print(f"[village] {d['d']} sectors {len(secs)} stocks {len(q)} layout v{v} {kb(lname):.1f}KB"
           f" changed {changed} daily {kb('daily_us.json'):.1f}KB")

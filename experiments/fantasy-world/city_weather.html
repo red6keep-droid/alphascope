@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>날씨 도시 판</title>
+<!-- 원본 = experiments/fantasy-world/city_weather.html, build_village.py 가 output 으로 복사
+     (2026-11-23 사용자: 정보를 끼워 넣지 않은 예쁜 가상 도시 하나 — 업종을 누르면 색만 바뀜, 계속 천천히 돎, 날씨 연출이 얼마나 아름답고 극적인지 확인.
+      먼저 다섯 가지: 햇살 · 비 · 천둥 번개 · 밤 · 물에 잠김) -->
+<style>
+:root{--bg:#F8FAFC;--ink:#0F172A;--sub:#64748B;--btn:#FFFFFF;--btnline:#94A3B8}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0B1220;--ink:#E2E8F0;--sub:#94A3B8;--btn:#111A2E;--btnline:#475569}}
+:root[data-theme="dark"]{--bg:#0B1220;--ink:#E2E8F0;--sub:#94A3B8;--btn:#111A2E;--btnline:#475569}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Pretendard","Malgun Gothic",sans-serif;line-height:1.5}
+.wrap{max-width:980px;margin:0 auto;padding:16px 16px 40px}
+.stage{position:relative;height:min(78vh,720px);min-height:440px;border-radius:18px;overflow:hidden;background:#E9EEF5;touch-action:none}
+.stage canvas{display:block;width:100%;height:100%}
+.cap{position:absolute;left:20px;top:16px;color:#0F172A;pointer-events:none;transition:color 1.5s}
+.cap b{display:block;font-size:30px;font-weight:800;letter-spacing:-.5px;line-height:1.15}
+.cap span{font-size:13px;opacity:.7}
+.key{position:absolute;left:20px;bottom:14px;display:flex;gap:12px;font-size:12px;color:#0F172A;opacity:.7;pointer-events:none;transition:color 1.5s}
+.key i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.stage.dark .cap,.stage.dark .key{color:#F1F5F9}
+.fps{position:absolute;right:12px;top:12px;font-size:11px;color:#94A3B8;pointer-events:none}
+.row{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;align-items:center}
+.row>span{font-size:13px;color:var(--sub);margin-right:4px}
+button.b{font:inherit;font-size:13px;padding:6px 11px;border:1px solid var(--btnline);background:var(--btn);color:var(--ink);border-radius:8px;cursor:pointer}
+button.b[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.note{font-size:13px;color:var(--sub);margin:12px 0 0;padding-left:18px}
+.note li{margin:3px 0}
+.err{padding:40px 16px;text-align:center;color:#64748B}
+</style>
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}
+</script>
+</head>
+<body>
+<div class="wrap">
+  <div class="stage" id="stage">
+    <div class="cap"><b id="cName"></b><span id="cDate"></span></div>
+    <div class="key"><span><i style="background:#E5484D"></i>오른 종목</span><span><i style="background:#2F6BFF"></i>내린 종목</span></div>
+    <div class="fps" id="fps"></div>
+  </div>
+  <div class="row" id="gW"><span>날씨</span><button class="b" data-w="sunny">햇살</button><button class="b" data-w="rain">비</button><button class="b" data-w="storm">천둥 번개</button><button class="b" data-w="night">밤</button><button class="b" data-w="flood">물에 잠김</button></div>
+  <div class="row" id="chips"><span>업종</span></div>
+  <ul class="note">
+    <li>도시는 하나로 고정이고 계속 천천히 돕니다. 한 손가락(마우스)으로 끌면 돌아가고 기울어지며, 두 손가락 · 휠로 확대 · 축소합니다.</li>
+    <li>업종을 누르면 같은 도시에서 색만 바뀝니다. 건물은 종목 하나하나가 아니라, 업종 안에서 오른 종목 · 내린 종목이 차지하는 몫만큼 물듭니다(오늘 등락 ±1% 안은 흰색).</li>
+    <li>날씨 단추는 연출을 보기 위한 시안용입니다. 어떤 숫자가 어떤 날씨가 되는지는 아직 정하지 않았습니다.</li>
+  </ul>
+</div>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { GTAOPass } from 'three/addons/postprocessing/GTAOPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+import { Reflector } from 'three/addons/objects/Reflector.js';
+
+const $ = id => document.getElementById(id);
+const QS = new URLSearchParams(location.search);
+const stage = $('stage');
+const MOBILE = matchMedia('(pointer: coarse)').matches;
+const L = THREE.MathUtils.lerp, C = h => new THREE.Color(h);
+
+// ── 자료: 업종마다 오늘 등락 목록만 쓴다(건물에 종목을 맞추지 않음)
+async function loadData() {
+  const daily = await (await fetch('village/daily_us.json', { cache: 'no-cache' })).json();
+  const layout = await (await fetch('village/' + daily.layout_file)).json();
+  return { date: daily.date, market: daily.market, sectors: layout.sectors.map(S => ({ name: S.name, rs: S.stocks.map(x => (daily.q[x.t] || [])[0]).filter(x => x != null).sort((a, b) => b - a) })) };
+}
+let DATA;
+try { DATA = await loadData(); } catch (e) { stage.innerHTML = '<div class="err">자료를 불러오지 못했습니다.</div>'; throw e; }
+let vi = Math.max(0, DATA.sectors.findIndex(s => s.name === (QS.get('v') || '헬스케어')));
+
+// ── 장면
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.NeutralToneMapping;
+stage.insertBefore(renderer.domElement, stage.firstChild);
+const scene = new THREE.Scene();
+scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), 0.04).texture;
+scene.background = C(0xECF0F6); scene.fog = new THREE.Fog(0xECF0F6, 300, 700);
+const camera = new THREE.PerspectiveCamera(26, 1, 5, 1600);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true; controls.dampingFactor = 0.08; controls.rotateSpeed = 0.7; controls.zoomSpeed = 0.9; controls.enablePan = false;
+controls.minPolarAngle = THREE.MathUtils.degToRad(8); controls.maxPolarAngle = THREE.MathUtils.degToRad(84);
+controls.touches = { ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_PAN };
+const AUTO = QS.get('auto') !== '0'; controls.autoRotate = AUTO; controls.autoRotateSpeed = 0.7;
+let idleT = null;
+controls.addEventListener('start', () => { controls.autoRotate = false; clearTimeout(idleT); });
+controls.addEventListener('end', () => { if (AUTO) idleT = setTimeout(() => { controls.autoRotate = true; }, 3000); });
+
+const hemi = new THREE.HemisphereLight(0xF4F7FF, 0xE4E7EC, 1.0); scene.add(hemi);
+const sun = new THREE.DirectionalLight(0xFFF1DC, 3.2); scene.add(sun, sun.target);
+sun.castShadow = true; sun.shadow.mapSize.set(MOBILE ? 2048 : 4096, MOBILE ? 2048 : 4096); sun.shadow.bias = -0.0004; sun.shadow.normalBias = 0.04;
+const flashL = new THREE.DirectionalLight(0xDCE6FF, 0); scene.add(flashL);
+
+// ── 재질. 공용 값: 밤 정도 · 시간 · 바람
+const U = { uNight: { value: 0 }, uTime: { value: 0 }, uWind: { value: 0 } };
+const SAT = 'float sat_ = max(vColor.r, max(vColor.g, vColor.b)) - min(vColor.r, min(vColor.g, vColor.b));';
+const mkStd = () => { const m = new THREE.MeshStandardMaterial({ roughness: 0.78 });       // 흰 모형 — 물든 건물은 그늘에서도 색이 살게
+  m.onBeforeCompile = sh => { sh.fragmentShader = sh.fragmentShader.replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\n' + SAT + ' totalEmissiveRadiance += vColor.rgb * sat_ * 0.16;'); }; return m; };
+const MAT = { std: mkStd(), bld: new THREE.MeshStandardMaterial({ roughness: 0.78 }), tree: new THREE.MeshStandardMaterial({ roughness: 0.85 }),
+  lamp: new THREE.MeshStandardMaterial({ roughness: 0.5, emissive: 0xFFD28A, emissiveIntensity: 0 }) };
+MAT.bld.onBeforeCompile = sh => {                                                           // 건물 몸체 — 창 무늬(낮엔 살짝 들어간 칸, 밤엔 불 켜진 창)
+  sh.uniforms.uNight = U.uNight;
+  sh.vertexShader = sh.vertexShader.replace('#include <common>', 'varying vec3 vWPos; varying vec3 vWNrm;\n#include <common>')
+    .replace('#include <begin_vertex>', '#include <begin_vertex>\n vWPos = (modelMatrix * instanceMatrix * vec4(transformed, 1.0)).xyz; vWNrm = normalize(mat3(modelMatrix) * mat3(instanceMatrix) * objectNormal);');
+  sh.fragmentShader = sh.fragmentShader.replace('#include <common>', 'varying vec3 vWPos; varying vec3 vWNrm; uniform float uNight; float h21(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }\n#include <common>')
+    .replace('#include <color_fragment>', `#include <color_fragment>
+      float wall_ = 1.0 - smoothstep(0.3, 0.6, abs(vWNrm.y));
+      vec2 g_ = vec2(dot(vWPos.xz, vec2(-vWNrm.z, vWNrm.x)) / 0.8, (vWPos.y - 0.5) / 1.25); vec2 f_ = fract(g_);
+      float win_ = wall_ * step(0.2, f_.x) * step(f_.x, 0.8) * step(0.28, f_.y) * step(f_.y, 0.78);
+      float lit_ = step(0.66, h21(floor(g_) + floor(vWNrm.xz * 3.0 + 0.5) * 17.0));
+      diffuseColor.rgb *= 1.0 - 0.15 * win_;`)
+    .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\n' + SAT + ' totalEmissiveRadiance += vColor.rgb * sat_ * 0.16 + mix(vec3(1.0, 0.78, 0.46), vColor.rgb * 1.3, min(1.0, sat_ * 3.0)) * win_ * lit_ * uNight * 1.5;');
+};
+MAT.tree.onBeforeCompile = sh => {                                                          // 나무 — 바람에 흔들림
+  sh.uniforms.uTime = U.uTime; sh.uniforms.uWind = U.uWind;
+  sh.vertexShader = sh.vertexShader.replace('#include <common>', 'uniform float uTime; uniform float uWind;\n#include <common>')
+    .replace('#include <begin_vertex>', `#include <begin_vertex>
+      float hgt_ = instanceMatrix[3].y - 0.3 + position.y * length(instanceMatrix[1].xyz);
+      transformed.x += (sin(uTime * 2.7 + instanceMatrix[3].x * 0.9 + instanceMatrix[3].z * 0.6) * 0.6 + 0.5) * uWind * 0.2 * hgt_ / length(instanceMatrix[0].xyz);`);
+};
+const PLAIN = new THREE.MeshStandardMaterial({ color: 0xFFFFFF, roughness: 0.78 });        // 인스턴스가 아닌 것(관람차 · 비행기 · 열기구)
+const plateMat = new THREE.MeshStandardMaterial({ color: 0xD9DEE6, roughness: 0.85 });
+
+function roundRect(w, d, r, h, bevel = 0) {
+  const s = new THREE.Shape(), x = -w / 2, y = -d / 2;
+  s.moveTo(x + r, y); s.lineTo(x + w - r, y); s.quadraticCurveTo(x + w, y, x + w, y + r); s.lineTo(x + w, y + d - r); s.quadraticCurveTo(x + w, y + d, x + w - r, y + d);
+  s.lineTo(x + r, y + d); s.quadraticCurveTo(x, y + d, x, y + d - r); s.lineTo(x, y + r); s.quadraticCurveTo(x, y, x + r, y);
+  return new THREE.ExtrudeGeometry(s, { depth: h, bevelEnabled: bevel > 0, bevelSize: bevel, bevelThickness: bevel, bevelSegments: 4, curveSegments: 10 }).rotateX(-Math.PI / 2);
+}
+const prism = pts => new THREE.ExtrudeGeometry(new THREE.Shape(pts.map(p => new THREE.Vector2(p[0], p[1]))), { depth: 1, bevelEnabled: false }).translate(0, 0, -0.5);
+const GEO = {
+  box: new THREE.BoxGeometry(1, 1, 1).translate(0, 0.5, 0),
+  cyl: new THREE.CylinderGeometry(0.5, 0.5, 1, 28).translate(0, 0.5, 0),
+  taper: new THREE.CylinderGeometry(0.32, 0.5, 1, 20).translate(0, 0.5, 0),
+  cone: new THREE.ConeGeometry(0.5, 1, 20).translate(0, 0.5, 0),
+  pyr: new THREE.ConeGeometry(Math.SQRT1_2, 1, 4).rotateY(Math.PI / 4).translate(0, 0.5, 0),
+  dome: new THREE.SphereGeometry(0.5, 28, 12, 0, Math.PI * 2, 0, Math.PI / 2),
+  ball: new THREE.SphereGeometry(0.5, 16, 12).translate(0, 0.5, 0),
+  roof: prism([[-0.5, 0], [0.5, 0], [0, 1]]),                                               // 박공지붕(용마루 z 방향)
+  saw: prism([[-0.5, 0], [0.5, 0], [0.5, 1]]),                                              // 톱날 지붕 한 칸
+  ring: new THREE.TorusGeometry(0.5, 0.11, 12, 40).rotateX(Math.PI / 2).translate(0, 0.11, 0),
+  block: roundRect(1, 1, 0.09, 1),
+};
+const WHITE = C(0xFFFFFF), UPC = C(0xE5484D), DOWNC = C(0x2F6BFF);
+const SLAB = 0xF5F7FA, TREE = 0xEEF1F5, DASH = 0xF4F6F9;
+const LOT = 6.2, STREET = 4.4, PITCH = LOT * 2 + STREET, NB = 5, HALF = 2, SIZE = NB * PITCH - STREET + 9.6, Y0 = 0.3;
+const hash = s => { let h = 2166136261; s = String(s); for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return (h >>> 0) || 1; };
+const seeded = s => () => { s = (s * 16807) % 2147483647; return (s - 1) / 2147483646; };
+const tintOf = r => { if (r == null || Math.abs(r) < 1) return WHITE.clone(); return WHITE.clone().lerp(r > 0 ? UPC : DOWNC, 0.22 + 0.7 * Math.min(1, (Math.abs(r) - 1) / 9)); };
+
+// ── 도시 짓기(한 번만). own = 지금 짓는 건물 번호(색이 바뀌는 단위), -1 = 색 안 바뀜
+const city = new THREE.Group(); scene.add(city);
+const parts = {}, BLD = [], spills = [], lamps = [];
+let own = -1;
+const add = (g, x, y, z, sx, sy, sz, color = 0xFFFFFF, ry = 0, mat = 'std') => { const k = g + '|' + mat; (parts[k] || (parts[k] = [])).push({ x, y, z, sx, sy, sz, color, ry, own }); };
+const newB = (x, z, s) => { own = BLD.length; BLD.push({ cur: WHITE.clone(), tgt: WHITE.clone() }); spills.push({ x, z, s, own }); };
+const fins = (x, z, w, d, y0, h, step = 2.5) => { for (let y = y0 + step; y < y0 + h - 0.4; y += step) add('box', x, y, z, w + 0.24, 0.12, d + 0.24); };
+const body = (x, z, w, d, y0, h, ry = 0) => { add('box', x, y0, z, w, h, d, 0xFFFFFF, ry, 'bld'); if (!ry) fins(x, z, w, d, y0, h); add('box', x, y0 + h, z, w + 0.3, 0.2, d + 0.3, 0xFFFFFF, ry); };
+const roofKit = (x, z, w, d, y, R) => { const k = R(), m = 1 + Math.floor(R() * 3);
+  for (let i = 0; i < m; i++) { const s = 0.45 + R() * 0.5; add('box', x + (R() - 0.5) * w * 0.55, y, z + (R() - 0.5) * d * 0.55, s, 0.28 + R() * 0.3, s * (0.7 + R() * 0.6)); }
+  if (k < 0.3) add('cyl', x + (R() - 0.5) * w * 0.3, y, z + (R() - 0.5) * d * 0.3, 0.09, 2 + R() * 3, 0.09);
+  else if (k < 0.5) { const tx = x + (R() - 0.5) * w * 0.4, tz = z + (R() - 0.5) * d * 0.4; add('cyl', tx, y, tz, 0.95, 0.9, 0.95); add('cone', tx, y + 0.9, tz, 1.05, 0.4, 1.05); }
+  else if (k < 0.62 && w > 3) add('cyl', x, y, z, Math.min(w, d) * 0.6, 0.07, Math.min(w, d) * 0.6); };
+const tree = (x, z, s = 1) => { const o = own; own = -1; add('cyl', x, Y0, z, 0.13 * s, 0.75 * s, 0.13 * s, TREE, 0, 'tree'); add(hash(x + 't' + z) % 3 ? 'ball' : 'cone', x, Y0 + 0.6 * s, z, 0.95 * s, 1.25 * s, 0.95 * s, TREE, 0, 'tree'); own = o; };
+const lamp = (x, z) => { const o = own; own = -1; add('cyl', x, Y0, z, 0.08, 1.5, 0.08); add('ball', x, Y0 + 1.45, z, 0.3, 0.3, 0.3, 0xFFFFFF, 0, 'lamp'); lamps.push({ x, z }); own = o; };
+const bench = (x, z, ry = 0) => { const o = own; own = -1; add('box', x, Y0 + 0.22, z, 0.9, 0.08, 0.32, 0xFFFFFF, ry); add('box', x, Y0, z, 0.7, 0.22, 0.1, 0xFFFFFF, ry); own = o; };
+
+const TALL = {
+  setback(x, z, w, h, R) { const p = Math.max(1.2, h * 0.14), a = w * 0.82, b = w * 0.6, t = w * 0.36, h1 = (h - p) * 0.58, h2 = (h - p) * 0.3, h3 = (h - p) * 0.12;
+    body(x, z, w, w, Y0, p); body(x, z, a, a, Y0 + p, h1); body(x, z, b, b, Y0 + p + h1, h2); body(x, z, t, t, Y0 + p + h1 + h2, h3); add('cyl', x, Y0 + h, z, 0.1, h * 0.14 + 1, 0.1); },
+  slab(x, z, w, h, R) { const turn = R() < 0.5, ww = turn ? w * 0.55 : w, dd = turn ? w : w * 0.55; add('box', x, Y0, z, w, 0.9, w); body(x, z, ww, dd, Y0 + 0.9, h - 0.9); roofKit(x, z, ww, dd, Y0 + h + 0.2, R); },
+  round(x, z, w, h, R) { const dia = w * 0.86; add('cyl', x, Y0, z, w, 0.8, w); add('cyl', x, Y0 + 0.8, z, dia, h - 0.8, dia);
+    for (let y = Y0 + 2; y < Y0 + h - 0.3; y += 1.25) add('cyl', x, y, z, dia + 0.26, 0.11, dia + 0.26);
+    if (R() < 0.6) { add('dome', x, Y0 + h, z, dia, dia * 0.7, dia); add('cyl', x, Y0 + h + dia * 0.33, z, 0.09, 1.6, 0.09); } else add('cyl', x, Y0 + h, z, dia + 0.3, 0.22, dia + 0.3); },
+  twist(x, z, w, h, R) { const k = Math.max(4, Math.round(h / 2.5)), sh = (h - 0.7) / k, dir = R() < 0.5 ? 1 : -1, a = w * 0.7; add('box', x, Y0, z, w, 0.7, w);
+    for (let i = 0; i < k; i++) add('box', x, Y0 + 0.7 + i * sh, z, a, sh - 0.1, a, 0xFFFFFF, dir * i * (Math.PI / 2) / k, 'bld'); },
+  twin(x, z, w, h, R) { const a = w * 0.42, o = w * 0.27; add('box', x, Y0, z, w, 1.1, w * 0.7); body(x - o, z, a, w * 0.6, Y0 + 1.1, h - 1.1); body(x + o, z, a, w * 0.6, Y0 + 1.1, (h - 1.1) * 0.8);
+    add('box', x, Y0 + h * 0.5, z, o * 2, 0.8, w * 0.3); roofKit(x - o, z, a, w * 0.6, Y0 + h + 0.2, R); },
+  terrace(x, z, w, h, R) { for (let i = 0; i < 4; i++) { const s = w * (1 - i * 0.19); body(x - i * w * 0.07, z, s, s, Y0 + i * h / 4, h / 4); } roofKit(x - 0.21 * w, z, w * 0.4, w * 0.4, Y0 + h + 0.2, R); },
+};
+const lots4 = (bx, bz) => [[-1, -1], [1, -1], [-1, 1], [1, 1]].map(([a, b]) => [bx + a * LOT / 2, bz + b * LOT / 2]);
+const KIND = {
+  tower(bx, bz, R) { lots4(bx, bz).forEach(([x, z]) => { const h = 13 + R() * 21, w = 4.3 + R() * 0.9; newB(x, z, w * 2.6 + h * 0.25); const t = ['setback', 'slab', 'round', 'twist', 'twin', 'slab'][Math.floor(R() * 6)]; TALL[t](x, z, w, h, R); }); },
+  mid(bx, bz, R) { lots4(bx, bz).forEach(([x, z]) => { const h = 6 + R() * 7, w = 4.2 + R() * 0.8; newB(x, z, w * 2.6); const t = ['setback', 'slab', 'round', 'terrace', 'twin', 'terrace'][Math.floor(R() * 6)]; TALL[t](x, z, w, h, R); }); },
+  house(bx, bz, R) { for (let i = -1; i <= 1; i++) for (let j = -1; j <= 1; j++) { const x = bx + i * 4.2, z = bz + j * 4.2;
+      if (R() < 0.26) { tree(x + (R() - 0.5), z + (R() - 0.5), 0.9 + R() * 0.5); if (R() < 0.5) tree(x + 1.1, z - 0.9, 0.7); continue; }
+      const along = R() < 0.5, w = along ? 2.9 : 2.3, d = along ? 2.3 : 2.9, h = 1.7 + (R() < 0.3 ? 1.25 : 0); newB(x, z, 6.5);
+      add('box', x, Y0, z, w, h, d, 0xFFFFFF, 0, 'bld');
+      if (along) add('roof', x, Y0 + h, z, d + 0.5, 1.15, w + 0.5, 0xFFFFFF, Math.PI / 2); else add('roof', x, Y0 + h, z, w + 0.5, 1.15, d + 0.5);
+      add('box', x + (along ? 0.7 : 0.45), Y0 + h + 0.3, z + (along ? 0.3 : 0.7), 0.36, 1.1, 0.36); add('box', x + w / 2 + 0.25, Y0, z, 0.5, 0.12, 0.8);
+      own = -1; if (R() < 0.5) tree(x - w / 2 - 0.5, z + d / 2 + 0.3, 0.6); } },
+  shop(bx, bz, R) { for (const side of [-1, 1]) for (let i = -1; i <= 1; i++) { const x = bx + i * 4.2, z = bz + side * 3.3, w = 3.7, d = 5.2, h = 2.3 + R() * 1.6; newB(x, z, 7);
+      add('box', x, Y0, z, w, h, d, 0xFFFFFF, 0, 'bld'); add('box', x, Y0 + h, z, w + 0.2, 0.22, d + 0.2);
+      add('box', x, Y0 + 1.55, z + side * (d / 2 + 0.45), w - 0.3, 0.1, 0.95); add('box', x, Y0 + 1.42, z + side * (d / 2 + 0.88), w - 0.3, 0.16, 0.08);          // 차양
+      add('box', x, Y0 + h + 0.22, z + side * (d / 2 - 0.2), w * 0.6, 0.7, 0.14);                                                                                   // 간판
+      if (R() < 0.5) add('cyl', x + 0.8, Y0 + h + 0.2, z - side * 1.2, 0.7, 0.6, 0.7); else add('box', x - 0.7, Y0 + h + 0.2, z - side * 1.0, 0.8, 0.4, 0.6); }
+    own = -1; lamp(bx - 6, bz + 6.3); lamp(bx + 6, bz - 6.3); },
+  park(bx, bz, R) { own = -1; add('cyl', bx, Y0, bz, 3.4, 0.32, 3.4); add('cyl', bx, Y0, bz, 1.1, 0.9, 1.1); add('ball', bx, Y0 + 0.9, bz, 0.8, 0.8, 0.8); add('ring', bx, Y0 + 0.3, bz, 3.4, 1.2, 3.4);
+    for (let i = 0; i < 16; i++) { const a = R() * 6.28, r = 3.2 + R() * 3.4; tree(bx + Math.cos(a) * r, bz + Math.sin(a) * r, 0.9 + R() * 0.9); }
+    for (let i = 0; i < 4; i++) { const a = i * Math.PI / 2 + 0.78; bench(bx + Math.cos(a) * 2.6, bz + Math.sin(a) * 2.6, -a + Math.PI / 2); } lamp(bx - 5.8, bz - 5.8); lamp(bx + 5.8, bz + 5.8); },
+  ferris(bx, bz, R) { own = -1; for (let i = 0; i < 12; i++) { const a = R() * 6.28, r = 4.6 + R() * 1.8; tree(bx + Math.cos(a) * r, bz + Math.sin(a) * r * 0.9, 0.8 + R() * 0.6); }
+    add('box', bx, Y0, bz, 4.6, 0.3, 2.2); lamp(bx - 5.8, bz + 5.8); lamp(bx + 5.8, bz - 5.8); },
+  plaza(bx, bz, R) { newB(bx, bz, 14); add('box', bx, Y0, bz, 4.6, 1.0, 4.6); body(bx, bz, 3.2, 3.2, Y0 + 1.0, 21); add('box', bx, Y0 + 22.2, bz, 3.9, 2.6, 3.9); add('pyr', bx, Y0 + 24.8, bz, 4.2, 4.4, 4.2); add('cyl', bx, Y0 + 29.2, bz, 0.1, 2.6, 0.1);
+    for (const [a, b] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) add('cyl', bx + a * 1.96, Y0 + 22.7, bz + b * 1.96, a ? 0.1 : 1.6, 1.6, a ? 1.6 : 0.1);     // 시계 판
+    own = -1; for (let i = 0; i < 12; i++) { const a = i * Math.PI / 6; if (i % 3 === 0) bench(bx + Math.cos(a) * 4.4, bz + Math.sin(a) * 4.4, -a + Math.PI / 2); else tree(bx + Math.cos(a) * 5.6, bz + Math.sin(a) * 5.6, 1.0); }
+    for (const [a, b] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) lamp(bx + a * 3.6, bz + b * 3.6); },
+  factory(bx, bz, R) { newB(bx - 1, bz + 2, 15); const w = 9, d = 5.6, hh = 3; add('box', bx - 1, Y0, bz + 2.6, w, hh, d, 0xFFFFFF, 0, 'bld');
+    for (let i = 0; i < 5; i++) add('saw', bx - 1 - w / 2 + (i + 0.5) * w / 5, Y0 + hh, bz + 2.6, w / 5, 1.0, d);
+    add('taper', bx + 4.7, Y0, bz + 4, 1.1, 9, 1.1); add('taper', bx + 4.7, Y0, bz + 1.6, 0.9, 6.5, 0.9);
+    newB(bx - 2, bz - 3.6, 11); for (let i = 0; i < 3; i++) { const tx = bx - 4.4 + i * 3.1, tz = bz - 3.6; add('cyl', tx, Y0, tz, 2.6, 3.6, 2.6); add('dome', tx, Y0 + 3.6, tz, 2.6, 1.4, 2.6); add('cyl', tx, Y0 + 1.8, tz, 2.8, 0.12, 2.8); }
+    newB(bx + 4.6, bz - 3.6, 6); for (const [a, b] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) add('cyl', bx + 4.6 + a * 0.7, Y0, bz - 3.6 + b * 0.7, 0.14, 3.6, 0.14);
+    add('cyl', bx + 4.6, Y0 + 3.6, bz - 3.6, 2.4, 1.7, 2.4); add('cone', bx + 4.6, Y0 + 5.3, bz - 3.6, 2.6, 0.8, 2.6); own = -1; },
+  stadium(bx, bz, R) { newB(bx, bz, 18); add('ring', bx, Y0, bz, 12.2, 14, 9.6); add('ring', bx, Y0 + 1.4, bz, 12.9, 9, 10.3); add('cyl', bx, Y0, bz, 9.2, 0.14, 6.6);
+    for (const [a, b] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) { add('cyl', bx + a * 6.3, Y0, bz + b * 5.3, 0.14, 5.2, 0.14); add('box', bx + a * 6.3, Y0 + 5.2, bz + b * 5.3, 1.1, 0.6, 0.2, 0xFFFFFF, a * b * 0.7); } own = -1; },
+};
+const MAP = [['house', 'mid', 'tower', 'shop', 'house'], ['shop', 'tower', 'tower', 'mid', 'ferris'], ['mid', 'tower', 'plaza', 'tower', 'mid'], ['park', 'mid', 'tower', 'tower', 'shop'], ['house', 'shop', 'stadium', 'house', 'factory']];
+let ferrisAt = null;
+{ const plate = new THREE.Mesh(roundRect(SIZE, SIZE, 6, 1.2, 0.3), plateMat); plate.position.y = -1.5; plate.castShadow = plate.receiveShadow = true; city.add(plate);
+  for (let i = 0; i < NB; i++) for (let j = 0; j < NB; j++) { const bx = (i - HALF) * PITCH, bz = (j - HALF) * PITCH, kind = MAP[j][i]; own = -1;
+    add('block', bx, 0, bz, LOT * 2 + 0.6, 0.3, LOT * 2 + 0.6, SLAB); KIND[kind](bx, bz, seeded(hash(kind + i + ':' + j))); if (kind === 'ferris') ferrisAt = [bx, bz];
+    if (kind === 'tower' || kind === 'mid') { own = -1; lamp(bx - 6.2, bz - 6.2); lamp(bx + 6.2, bz + 6.2); } }
+  own = -1;
+  // 도로 — 가운데 점선 + 횡단보도
+  const ST = [-2.5, -1.5, -0.5, 0.5, 1.5, 2.5].map(k => k * PITCH), E = SIZE / 2 - 2.4;
+  for (const s of ST) for (let t = -E; t <= E; t += 2.4) { if (ST.some(q => Math.abs(q - t) < STREET / 2 + 0.6)) continue; add('box', t, 0.005, s, 1.1, 0.02, 0.13, DASH); add('box', s, 0.005, t, 0.13, 0.02, 1.1, DASH); }
+  for (const a of ST.slice(1, 5)) for (const b of ST.slice(1, 5)) for (const sgn of [-1, 1]) for (let k = -2; k <= 2; k++) {
+    add('box', a + sgn * (STREET / 2 + 0.9), 0.005, b + k * 0.62, 0.9, 0.02, 0.3, DASH); add('box', a + k * 0.62, 0.005, b + sgn * (STREET / 2 + 0.9), 0.3, 0.02, 0.9, DASH); }
+  // 고가 전철 길(위쪽 둘째 길 위)
+  const TZ = -0.5 * PITCH; for (let x = -E + 1; x <= E - 1; x += PITCH / 2) { add('box', x, 0, TZ, 0.6, 4.4, 0.6); add('box', x, 4.2, TZ, 1.9, 0.3, 0.9); }
+  add('box', 0, 4.5, TZ, E * 2, 0.35, 1.7); add('box', 0, 4.85, TZ - 0.8, E * 2, 0.3, 0.1); add('box', 0, 4.85, TZ + 0.8, E * 2, 0.3, 0.1);
+  for (const sx of [-1, 1]) { add('box', sx * (E - 3), 4.85, TZ, 6, 0.2, 3.2); add('box', sx * (E - 3), 6.6, TZ, 6.4, 0.2, 3.6); for (const a of [-1, 1]) add('cyl', sx * (E - 3) + a * 2.8, 4.85, TZ + 1.5, 0.12, 1.8, 0.12); }
+}
+// 인스턴스로 묶기 — 건물 번호를 기억해 두었다가 색만 바꾼다
+const m4 = new THREE.Matrix4(), q4 = new THREE.Quaternion(), UP = new THREE.Vector3(0, 1, 0), v3a = new THREE.Vector3(), v3b = new THREE.Vector3(), col = new THREE.Color();
+const tintMeshes = [];
+for (const k in parts) { const [g, mt] = k.split('|'), arr = parts[k], im = new THREE.InstancedMesh(GEO[g], MAT[mt], arr.length);
+  arr.forEach((p, i) => { q4.setFromAxisAngle(UP, p.ry); m4.compose(v3a.set(p.x, p.y, p.z), q4, v3b.set(p.sx, p.sy, p.sz)); im.setMatrixAt(i, m4); im.setColorAt(i, col.setHex(p.color)); });
+  im.castShadow = im.receiveShadow = true; im.userData.owners = arr.map(p => p.own); if (arr.some(p => p.own >= 0)) tintMeshes.push(im); city.add(im); }
+function radialTex(mid = 0.5) { const c = document.createElement('canvas'); c.width = c.height = 128; const g = c.getContext('2d'), gr = g.createRadialGradient(64, 64, 0, 64, 64, 64);
+  gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(0.45, `rgba(255,255,255,${mid})`); gr.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.fillRect(0, 0, 128, 128); return new THREE.CanvasTexture(c); }
+const flatGeo = new THREE.PlaneGeometry(1, 1).rotateX(-Math.PI / 2);
+const spillIM = new THREE.InstancedMesh(flatGeo, new THREE.MeshBasicMaterial({ map: radialTex(), transparent: true, depthWrite: false, opacity: 0.5 }), spills.length); spillIM.renderOrder = 2; city.add(spillIM);   // 물든 건물 둘레 바닥에 색이 묻어남
+const lampIM = new THREE.InstancedMesh(flatGeo, new THREE.MeshBasicMaterial({ map: radialTex(0.35), color: 0xFFC98A, transparent: true, depthWrite: false, opacity: 0, blending: THREE.AdditiveBlending }), lamps.length); lampIM.renderOrder = 3; city.add(lampIM);
+lamps.forEach((p, i) => { m4.compose(v3a.set(p.x, 0.34, p.z), q4.identity(), v3b.set(9, 1, 9)); lampIM.setMatrixAt(i, m4); });
+
+// 색 — 업종의 등락 분포를 건물들에 흩어서 나눠 준다
+const ORDER = BLD.map((_, i) => i).sort((a, b) => hash('o' + a) - hash('o' + b));
+let tintT = 1;
+function setSector(i, instant = false) { vi = i; const rs = DATA.sectors[vi].rs;
+  ORDER.forEach((b, j) => { BLD[b].tgt.copy(tintOf(rs.length ? rs[Math.min(rs.length - 1, Math.floor((j + 0.5) / ORDER.length * rs.length))] : 0)); });
+  tintT = instant ? 0.999 : 0; $('cName').textContent = DATA.sectors[vi].name;
+  document.querySelectorAll('#chips button').forEach((b, k) => b.setAttribute('aria-pressed', k === vi)); }
+function stepTint(dt) { if (tintT >= 1) return; tintT = Math.min(1, tintT + dt / 1.1); const k = Math.min(1, dt * 5) + (tintT >= 1 ? 1 : 0);
+  BLD.forEach(b => b.cur.lerp(b.tgt, Math.min(1, k)));
+  tintMeshes.forEach(im => { const o = im.userData.owners; for (let i = 0; i < o.length; i++) if (o[i] >= 0) im.setColorAt(i, BLD[o[i]].cur); im.instanceColor.needsUpdate = true; });
+  spills.forEach((p, i) => { const c = BLD[p.own].cur, sat = Math.max(c.r, c.g, c.b) - Math.min(c.r, c.g, c.b), s = sat > 0.02 ? p.s : 0.0001;
+    m4.compose(v3a.set(p.x, 0.33, p.z), q4.identity(), v3b.set(s, 1, s)); spillIM.setMatrixAt(i, m4); spillIM.setColorAt(i, c); }); spillIM.instanceMatrix.needsUpdate = true; spillIM.instanceColor.needsUpdate = true; }
+
+// ── 움직이는 것: 자동차 · 전철 · 관람차 · 비행기 · 열기구 · 구름
+const E2 = SIZE / 2 - 2.6, STS = [-2.5, -1.5, -0.5, 0.5, 1.5, 2.5].map(k => k * PITCH), CARS = [];
+{ const R = seeded(77); for (let i = 0; i < 46; i++) { const bus = i % 9 === 0; CARS.push({ ax: i % 2, s: STS[Math.floor(R() * 6)], dir: R() < 0.5 ? 1 : -1, t: (R() * 2 - 1) * E2, v: 4 + R() * 4, bus }); } }
+const carBody = new THREE.InstancedMesh(GEO.box, MAT.std, CARS.length), carTop = new THREE.InstancedMesh(GEO.box, MAT.std, CARS.length);
+const carLight = new THREE.InstancedMesh(GEO.box, new THREE.MeshBasicMaterial({ color: 0xFFE3A8, transparent: true, opacity: 0 }), CARS.length);
+[carBody, carTop].forEach(m => { m.castShadow = m.receiveShadow = true; for (let i = 0; i < CARS.length; i++) m.setColorAt(i, WHITE); city.add(m); }); city.add(carLight);
+const train = new THREE.InstancedMesh(GEO.box, MAT.bld, 3); train.castShadow = true; for (let i = 0; i < 3; i++) train.setColorAt(i, WHITE); city.add(train);
+function stepTraffic(dt, t) {
+  CARS.forEach((c, i) => { c.t += c.dir * c.v * dt; if (c.t > E2) c.t = -E2; if (c.t < -E2) c.t = E2;
+    const edge = Math.min(1, (E2 - Math.abs(c.t)) / 2.5), lane = c.s - c.dir * (c.ax ? -1 : 1) * 1.05, x = c.ax ? lane : c.t, z = c.ax ? c.t : lane, len = c.bus ? 3.2 : 1.8, hh = c.bus ? 0.95 : 0.42;
+    q4.setFromAxisAngle(UP, c.ax ? Math.PI / 2 : 0);
+    m4.compose(v3a.set(x, 0.1, z), q4, v3b.set(len * edge, hh * edge, 0.85 * edge)); carBody.setMatrixAt(i, m4);
+    m4.compose(v3a.set(x, 0.1 + hh, z), q4, v3b.set((c.bus ? 0.001 : 0.95) * edge, 0.34 * edge, 0.72 * edge)); carTop.setMatrixAt(i, m4);
+    const f = c.dir * (len / 2 + 0.03); m4.compose(v3a.set(c.ax ? x : x + f, 0.26, c.ax ? z + f : z), q4, v3b.set(0.08 * edge, 0.16 * edge, 0.7 * edge)); carLight.setMatrixAt(i, m4); });
+  carBody.instanceMatrix.needsUpdate = carTop.instanceMatrix.needsUpdate = carLight.instanceMatrix.needsUpdate = true;
+  const tx = Math.sin(t * 0.22) * (E2 - 10); for (let i = 0; i < 3; i++) { m4.compose(v3a.set(tx + (i - 1) * 4.3, 5.0, -0.5 * PITCH), q4.identity(), v3b.set(4.0, 1.5, 1.3)); train.setMatrixAt(i, m4); } train.instanceMatrix.needsUpdate = true;
+}
+const wheel = new THREE.Group();
+{ const [fx0, fz0] = ferrisAt; const R0 = 5.2; wheel.position.set(fx0, Y0 + R0 + 1.4, fz0);
+  const mk = (geo, x, y, z, rz = 0) => { const m = new THREE.Mesh(geo, PLAIN); m.position.set(x, y, z); m.rotation.z = rz; m.castShadow = true; wheel.add(m); return m; };
+  for (const dz of [-0.45, 0.45]) mk(new THREE.TorusGeometry(R0, 0.12, 8, 48), 0, 0, dz);
+  for (let i = 0; i < 12; i++) { const a = i * Math.PI / 6; mk(new THREE.CylinderGeometry(0.05, 0.05, R0, 6), Math.cos(a) * R0 / 2, Math.sin(a) * R0 / 2, 0, a - Math.PI / 2); mk(new THREE.SphereGeometry(0.5, 12, 10), Math.cos(a) * R0, Math.sin(a) * R0, 0); }
+  mk(new THREE.CylinderGeometry(0.5, 0.5, 1.3, 16).rotateX(Math.PI / 2), 0, 0, 0); city.add(wheel);
+  for (const dz of [-0.8, 0.8]) for (const dx of [-1, 1]) { const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.16, R0 + 1.7, 8), PLAIN); leg.position.set(fx0 + dx * 1.3, Y0 + (R0 + 1.4) / 2, fz0 + dz); leg.rotation.z = dx * 0.37; leg.castShadow = true; city.add(leg); } }
+const plane = new THREE.Group();
+{ const mk = (geo, x, y, z) => { const m = new THREE.Mesh(geo, PLAIN); m.position.set(x, y, z); m.castShadow = true; plane.add(m); };
+  mk(new THREE.CapsuleGeometry(0.55, 4.2, 6, 12).rotateZ(Math.PI / 2), 0, 0, 0); mk(new THREE.BoxGeometry(1.3, 0.12, 6.4), 0.2, -0.05, 0); mk(new THREE.BoxGeometry(0.8, 0.1, 2.4), -2.3, 0.15, 0); mk(new THREE.BoxGeometry(0.9, 1.1, 0.1), -2.4, 0.6, 0); scene.add(plane); }
+const balloon = new THREE.Group();
+{ const b = new THREE.Mesh(new THREE.SphereGeometry(2.6, 20, 16), PLAIN); b.scale.y = 1.15; b.castShadow = true; const k = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.7, 0.9), PLAIN); k.position.y = -4; k.castShadow = true;
+  const n = new THREE.Mesh(new THREE.ConeGeometry(1.5, 1.6, 16).rotateX(Math.PI), PLAIN); n.position.y = -2.9; balloon.add(b, k, n); scene.add(balloon); }
+const cloudMat = new THREE.MeshStandardMaterial({ color: 0xFFFFFF, roughness: 1 }), CLOUDS = [], camXZ = new THREE.Vector2();
+{ const R = seeded(5), sg = new THREE.SphereGeometry(1, 14, 10); for (let i = 0; i < 9; i++) { const g = new THREE.Group(), n = 4 + Math.floor(R() * 3);
+    const cm = cloudMat.clone(); cm.transparent = true; g.userData.mat = cm;
+    for (let k = 0; k < n; k++) { const m = new THREE.Mesh(sg, cm), s = 2.4 + R() * 2.6; m.scale.set(s * 1.3, s * 0.8, s); m.position.set((k - n / 2) * 3 + R() * 1.5, R() * 1.4, (R() - 0.5) * 3); m.castShadow = true; g.add(m); }
+    Object.assign(g.userData, { a: i / 9 * 6.283 + R() * 0.4, r: 72 + R() * 40, y: 34 + R() * 16, v: 0.6 + R() * 0.8 }); scene.add(g); CLOUDS.push(g); } }
+
+// ── 날씨 장치: 비 · 번개 · 별 · 달 · 물
+const RAIN_N = MOBILE ? 1400 : 3200, rainPos = new Float32Array(RAIN_N * 6), rainP = [];
+for (let i = 0; i < RAIN_N; i++) rainP.push([(Math.random() * 2 - 1) * SIZE * 0.95, Math.random() * 75, (Math.random() * 2 - 1) * SIZE * 0.95, 0.8 + Math.random() * 0.5]);
+const rainGeo = new THREE.BufferGeometry(); rainGeo.setAttribute('position', new THREE.BufferAttribute(rainPos, 3));
+const rain = new THREE.LineSegments(rainGeo, new THREE.LineBasicMaterial({ color: 0xE8EEF6, transparent: true, opacity: 0, depthWrite: false })); rain.frustumCulled = false; scene.add(rain);
+const STAR_N = 900, starPos = new Float32Array(STAR_N * 3); for (let i = 0; i < STAR_N; i++) { const a = Math.random() * 6.283, y = Math.random(), r = Math.sqrt(1 - y * y); starPos.set([Math.cos(a) * r * 900, y * 700 - 60, Math.sin(a) * r * 900], i * 3); }
+const starGeo = new THREE.BufferGeometry(); starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+const stars = new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xFFFFFF, size: 1.7, sizeAttenuation: false, transparent: true, opacity: 0, fog: false, depthWrite: false })); scene.add(stars);
+const moon = new THREE.Mesh(new THREE.SphereGeometry(26, 24, 16), new THREE.MeshBasicMaterial({ color: 0xFFF6DC, transparent: true, opacity: 0, fog: false })); moon.position.set(380, 300, -620); scene.add(moon);
+const boltGeo = new THREE.CylinderGeometry(0.5, 0.5, 1, 6), bolt = new THREE.InstancedMesh(boltGeo, new THREE.MeshBasicMaterial({ color: 0xFFFFFF, fog: false }), 14); bolt.visible = false; bolt.frustumCulled = false; scene.add(bolt);
+const floor = new THREE.Mesh(new THREE.PlaneGeometry(1800, 1800).rotateX(-Math.PI / 2), new THREE.ShadowMaterial({ opacity: 0.16 })); floor.position.y = -1.5; floor.receiveShadow = true; scene.add(floor);
+// 물 — 파란 물이 아니라 은빛 거울(건물 색과 헷갈리지 않게). 휴대폰은 반사를 다시 그리지 않는 가벼운 판
+const waterGeo = new THREE.PlaneGeometry(1800, 1800);
+const water = MOBILE ? new THREE.Mesh(waterGeo, new THREE.MeshStandardMaterial({ color: 0xC4CCD6, roughness: 0.06, metalness: 0.7 }))
+  : new Reflector(waterGeo, { textureWidth: 1024, textureHeight: 1024, color: 0x7D8794, clipBias: 0.003 });
+water.rotation.x = -Math.PI / 2; water.position.y = -3; water.visible = false; scene.add(water);
+const waterTop = new THREE.Mesh(new THREE.CircleGeometry(900, 64), new THREE.MeshStandardMaterial({ color: 0x6E7987, roughness: 0.3, metalness: 0.2, transparent: true, opacity: 0.5, depthWrite: false }));
+waterTop.rotation.x = -Math.PI / 2; waterTop.visible = false; scene.add(waterTop);      // 수면 — 반사 위에 옅은 은회색 막
+
+// 날씨 값 — 지금 값이 목표 값으로 2~3초에 걸쳐 따라간다
+const WX = {
+  sunny: { sun: 3.6, sunC: 0xFFE9C8, hemi: 0.7, env: 0.42, bg: 0xD9E6F3, exp: 0.98, fogN: 3.2, fogF: 7, rain: 0, wind: 0.12, night: 0, flood: 0, wet: 0, cloud: 0xFFFFFF, cloudN: 4, bolt: 0, elev: 0.5 },
+  rain:  { sun: 0.9, sunC: 0xDCE5F1, hemi: 0.9, env: 0.5, bg: 0xB7C1CE, exp: 0.95, fogN: 1.7, fogF: 4.4, rain: 0.75, wind: 0.3, night: 0, flood: 0, wet: 1, cloud: 0xC3CAD4, cloudN: 9, bolt: 0, elev: 0.75 },
+  storm: { sun: 0.35, sunC: 0xC9D6EA, hemi: 0.5, env: 0.3, bg: 0x5E6979, exp: 0.9, fogN: 1.45, fogF: 3.9, rain: 1, wind: 1, night: 0.25, flood: 0, wet: 1, cloud: 0x7C8695, cloudN: 9, bolt: 1, elev: 0.75 },
+  night: { sun: 0.55, sunC: 0x9FB6EA, hemi: 0.16, env: 0.12, bg: 0x0A1124, exp: 1.0, fogN: 2.6, fogF: 6.5, rain: 0, wind: 0.1, night: 1, flood: 0, wet: 0.3, cloud: 0x2A3350, cloudN: 3, bolt: 0, elev: 0.6 },
+  flood: { sun: 2.2, sunC: 0xF6EFE4, hemi: 0.85, env: 0.55, bg: 0xE6EBF1, exp: 1.0, fogN: 3.4, fogF: 8, rain: 0.3, wind: 0.2, night: 0, flood: 1, wet: 1, cloud: 0xDDE2E9, cloudN: 7, bolt: 0, elev: 0.6 },
+};
+let wxName = WX[QS.get('w')] ? QS.get('w') : 'sunny';
+const cur = { ...WX[wxName], sunC: C(WX[wxName].sunC), bg: C(WX[wxName].bg), cloud: C(WX[wxName].cloud) };
+let strikeAt = -9, nextStrike = 1.5;
+function setWeather(n) { wxName = n; nextStrike = 0.9; document.querySelectorAll('#gW button').forEach(b => b.setAttribute('aria-pressed', b.dataset.w === n)); }
+function strike(t) { strikeAt = t; const a = Math.random() * 6.283, r = 20 + Math.random() * 60, ex = Math.cos(a) * r, ez = Math.sin(a) * r; let p = new THREE.Vector3(ex + (Math.random() - 0.5) * 40, 95, ez + (Math.random() - 0.5) * 40);
+  for (let i = 0; i < 14; i++) { const k = (i + 1) / 14, n = new THREE.Vector3(L(p.x, ex, 0.3) + (Math.random() - 0.5) * 9 * (1 - k), 95 * (1 - k), L(p.z, ez, 0.3) + (Math.random() - 0.5) * 9 * (1 - k));
+    const d = n.clone().sub(p), len = d.length(); q4.setFromUnitVectors(UP, d.normalize()); m4.compose(p.clone().add(n).multiplyScalar(0.5), q4, v3b.set(0.5 - k * 0.25, len, 0.5 - k * 0.25)); bolt.setMatrixAt(i, m4); p = n; }
+  bolt.instanceMatrix.needsUpdate = true; flashL.position.set(ex, 80, ez); }
+const tmpC = new THREE.Color();
+function stepWeather(dt, t) {
+  const T = WX[wxName], k = 1 - Math.exp(-dt * 1.3);
+  for (const key of ['sun', 'hemi', 'env', 'exp', 'fogN', 'fogF', 'rain', 'wind', 'night', 'wet', 'cloudN', 'bolt', 'elev']) cur[key] = L(cur[key], T[key], k);
+  cur.flood = L(cur.flood, T.flood, 1 - Math.exp(-dt * (T.flood ? 0.45 : 1.2)));                    // 물은 천천히 차오른다
+  cur.sunC.lerp(tmpC.setHex(T.sunC), k); cur.bg.lerp(tmpC.setHex(T.bg), k); cur.cloud.lerp(tmpC.setHex(T.cloud), k);
+  // 번개
+  let F = 0; if (cur.bolt > 0.5 && wxName === 'storm') { nextStrike -= dt; if (nextStrike <= 0) { strike(t); nextStrike = 2.2 + Math.random() * 3.8; } }
+  const st = t - strikeAt; if (st < 1.2) F = Math.exp(-st * 9) + (st > 0.16 ? 0.8 * Math.exp(-(st - 0.16) * 11) : 0);
+  bolt.visible = st < 0.11 || (st > 0.16 && st < 0.24); flashL.intensity = F * 9;
+  stage.style.transform = st < 0.35 ? `translate(${(Math.random() - 0.5) * 5 * F}px, ${(Math.random() - 0.5) * 5 * F}px)` : '';
+  sun.intensity = cur.sun; sun.color.copy(cur.sunC); hemi.intensity = cur.hemi + F * 1.2; scene.environmentIntensity = cur.env; renderer.toneMappingExposure = cur.exp;
+  const bg = tmpC.copy(cur.bg).lerp(new THREE.Color(0xD8E2F5), Math.min(1, F * 0.75)); scene.background.copy(bg); scene.fog.color.copy(bg); scene.fog.near = SIZE * cur.fogN; scene.fog.far = SIZE * cur.fogF;
+  sun.position.set(-SIZE * 0.9, SIZE * (0.3 + cur.elev * 0.65), SIZE * 0.55);
+  stage.classList.toggle('dark', cur.bg.r + cur.bg.g + cur.bg.b < 1.35);
+  U.uNight.value = cur.night; U.uWind.value = cur.wind; U.uTime.value = t;
+  MAT.lamp.emissiveIntensity = cur.night * 5; lampIM.material.opacity = cur.night * 0.5; carLight.material.opacity = Math.min(1, cur.night * 1.4 + cur.rain * 0.5);
+  stars.material.opacity = Math.max(0, cur.night - 0.4) * 1.6 * (1 - cur.rain); moon.material.opacity = Math.max(0, cur.night - 0.5) * 2 * (1 - cur.rain);
+  plateMat.roughness = L(0.85, 0.14, cur.wet); plateMat.metalness = cur.wet * 0.25; plateMat.envMapIntensity = 1 + cur.wet * 1.5;
+  camXZ.set(camera.position.x, camera.position.z).normalize();
+  CLOUDS.forEach((g, i) => { const u = g.userData; u.a += (0.012 + cur.wind * 0.09) * u.v * dt; g.position.set(Math.cos(u.a) * u.r, u.y, Math.sin(u.a) * u.r); g.rotation.y = -u.a;
+    const front = Math.cos(u.a) * camXZ.x + Math.sin(u.a) * camXZ.y;                     // 1 = 카메라 바로 앞
+    u.mat.color.copy(cur.cloud); u.mat.opacity = 1 - THREE.MathUtils.smoothstep(front, 0.15, 0.6); u.mat.depthWrite = u.mat.opacity > 0.95;
+    const s = THREE.MathUtils.clamp(cur.cloudN - i, 0, 1); g.scale.setScalar(s || 0.0001); g.visible = s > 0.01 && u.mat.opacity > 0.02; });
+  // 비
+  rain.visible = cur.rain > 0.02; rain.material.opacity = cur.rain * 0.5;
+  if (rain.visible) { const sp = 55 + cur.wind * 25, wx = cur.wind * 22, len = 1.6 + cur.wind * 1.2, slant = wx / sp;
+    for (let i = 0; i < RAIN_N; i++) { const p = rainP[i]; p[1] -= sp * p[3] * dt; p[0] += wx * dt; if (p[1] < 0) { p[1] += 75; p[0] = (Math.random() * 2 - 1) * SIZE * 0.95; }
+      rainPos[i * 6] = p[0]; rainPos[i * 6 + 1] = p[1]; rainPos[i * 6 + 2] = p[2]; rainPos[i * 6 + 3] = p[0] - slant * len; rainPos[i * 6 + 4] = p[1] + len; rainPos[i * 6 + 5] = p[2]; }
+    rainGeo.attributes.position.needsUpdate = true; }
+  // 물
+  water.visible = waterTop.visible = cur.flood > 0.01; water.position.y = -1.7 + cur.flood * 4.6 + Math.sin(t * 0.8) * 0.05; waterTop.position.y = water.position.y + 0.03;
+  // 관람차 · 비행기 · 열기구
+  wheel.rotation.z = t * 0.16;
+  const pt = (t % 16) / 9, lap = Math.floor(t / 16), a0 = lap * 2.4 + 0.5; plane.visible = pt < 1 && cur.bolt < 0.5;
+  if (plane.visible) { const s = (pt - 0.5) * 300; plane.position.set(Math.cos(a0) * s + Math.sin(a0) * 12, 36, Math.sin(a0) * s - Math.cos(a0) * 12); plane.rotation.y = -a0; }
+  balloon.position.set(Math.cos(t * 0.05 + 2) * 34, 30 + Math.sin(t * 0.4) * 1.2 + cur.flood * 3, Math.sin(t * 0.05 + 2) * 34); balloon.visible = cur.bolt < 0.5;
+}
+
+// ── 후처리
+const composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples: 4 }));
+composer.addPass(new RenderPass(scene, camera));
+const gtao = new GTAOPass(scene, camera, 1, 1);
+gtao.updateGtaoMaterial({ radius: 3.0, distanceExponent: 1.6, thickness: 2.0, scale: 1.3, samples: 16 });
+gtao.enabled = QS.get('ao') ? QS.get('ao') === '1' : !MOBILE; composer.addPass(gtao);
+const bloom = new UnrealBloomPass(new THREE.Vector2(256, 256), 0, 0.55, 0.82); composer.addPass(bloom);
+composer.addPass(new OutputPass());
+const fx = new ShaderPass({
+  uniforms: { tDiffuse: { value: null }, res: { value: new THREE.Vector2(1, 1) }, time: { value: 0 }, blur: { value: MOBILE ? 3.0 : 5.0 } },
+  vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+  fragmentShader: `uniform sampler2D tDiffuse; uniform vec2 res; uniform float time; uniform float blur; varying vec2 vUv;
+    float hash(vec2 p){ return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
+    void main(){ float b = pow(clamp(abs(vUv.y - 0.5) * 2.0 - 0.28, 0.0, 1.0), 1.6) * blur; vec3 c = texture2D(tDiffuse, vUv).rgb; float n = 1.0;
+      for (int i = 0; i < 12; i++) { float a = float(i) * 2.39996, r = sqrt((float(i) + 0.5) / 12.0) * b; c += texture2D(tDiffuse, vUv + vec2(cos(a), sin(a)) * r / res).rgb; n += 1.0; }
+      c /= n; c *= 1.0 - 0.14 * smoothstep(0.5, 1.0, length(vUv - 0.5) * 1.3); c += (hash(vUv * res + fract(time) * 91.7) - 0.5) * 0.028; gl_FragColor = vec4(c, 1.0); }`,
+});
+composer.addPass(fx);
+
+const sc = SIZE * 1.5; Object.assign(sun.shadow.camera, { left: -sc, right: sc, top: sc, bottom: -sc, near: 1, far: SIZE * 4 }); sun.shadow.camera.updateProjectionMatrix();
+controls.minDistance = SIZE * 0.7; controls.maxDistance = SIZE * 4;
+function fit() { const az = THREE.MathUtils.degToRad(+QS.get('az') || 38), pol = THREE.MathUtils.degToRad(+QS.get('pol') || 58), dist = (+QS.get('zoom') || 2.2) * SIZE * Math.max(1, 0.85 / camera.aspect);
+  controls.target.set(0, 5, 0); camera.position.setFromSphericalCoords(dist, pol, az).add(controls.target); controls.update(); }
+function resize() { const w = stage.clientWidth, h = stage.clientHeight; renderer.setSize(w, h, false); composer.setPixelRatio(renderer.getPixelRatio()); composer.setSize(w, h); fx.uniforms.res.value.set(w, h); camera.aspect = w / h; camera.updateProjectionMatrix(); }
+new ResizeObserver(resize).observe(stage); resize();
+let visible = true; new IntersectionObserver(es => { visible = es[0].isIntersecting; }).observe(stage);
+
+const chips = $('chips'); DATA.sectors.forEach((s, i) => { const b = document.createElement('button'); b.className = 'b'; b.textContent = s.name; b.onclick = () => setSector(i); chips.appendChild(b); });
+document.querySelectorAll('#gW button').forEach(b => b.onclick = () => setWeather(b.dataset.w));
+$('cDate').textContent = DATA.market + ' · ' + DATA.date.replace(/-/g, '.') + ' 장 마감';
+setSector(vi, true); setWeather(wxName); fit();
+
+const clock = new THREE.Clock(); let fpsN = 0, fpsT = 0;
+function frame() {
+  requestAnimationFrame(frame); if (!visible) return;
+  const dt = Math.min(clock.getDelta(), 0.05), t = clock.elapsedTime;
+  controls.update(); stepTint(dt); stepTraffic(dt, t); stepWeather(dt, t);
+  bloom.strength = cur.night * 0.45; bloom.enabled = bloom.strength > 0.02;
+  fx.uniforms.time.value = t; composer.render(dt);
+  fpsN++; if (t - fpsT >= 1) { $('fps').textContent = '초당 ' + Math.round(fpsN / (t - fpsT)) + '장'; fpsN = 0; fpsT = t; }
+}
+frame();
+</script>
+</body>
+</html>

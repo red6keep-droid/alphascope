@@ -51,6 +51,7 @@ button.b[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color
 .note{font-size:13px;color:var(--sub);margin-top:14px}
 .note li{margin:3px 0}
 .err{padding:40px 16px;text-align:center;color:var(--sub)}
+.rotbar{position:absolute;left:0;right:0;bottom:0;height:48px;touch-action:none}   /* 아래 띠 = 한 손가락 좌우 회전, 표시 없음 (2026-11-23 사용자) */
 </style>
 <script type="importmap">
 {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}
@@ -62,18 +63,21 @@ button.b[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color
   <p class="lead">평평한 땅 위의 업종 마을. 성과 붙박이 집은 늘 같은 자리에 있고, 오늘 크게 움직인 종목은 빈터에 천막을 치고 들렀다 갑니다.</p>
   <div class="card">
     <div class="head"><b id="hName">마을</b><span class="st" id="hState"></span><span class="date" id="hDate"></span></div>
-    <div class="stage" id="stage"><div class="labels" id="labels"></div><div class="info" id="info"></div></div>
+    <div class="stage" id="stage"><div class="labels" id="labels"></div><div class="info" id="info"></div><div class="rotbar" id="rotbar"></div></div>
     <div class="ctl">
       <div class="grp"><span>마을</span><select class="b" id="selV"></select></div>
       <div class="grp" id="gN"><span>집 수</span><button class="b" data-n="15">15채</button><button class="b" data-n="20">20채</button><button class="b" data-n="30">30채</button></div>
       <div class="grp" id="gS"><span>계절</span><button class="b" data-s="real">오늘 그대로</button><button class="b" data-s="spring">봄</button><button class="b" data-s="summer">여름</button><button class="b" data-s="autumn">가을</button><button class="b" data-s="winter">겨울</button></div>
       <div class="grp" id="gW"><span>날씨</span><button class="b" data-w="real">오늘 그대로</button><button class="b" data-w="clear">맑음</button><button class="b" data-w="cloud">흐림</button><button class="b" data-w="rain">비 · 눈</button></div>
+      <div class="grp" id="gView"><span>시점</span><button class="b" data-view="top">위에서</button><button class="b" data-view="mid">비스듬히</button><button class="b" data-view="ground">땅에서</button></div>
+      <div class="grp"><span>회전</span><button class="b" id="bRotL" aria-label="왼쪽으로 돌리기">↺</button><button class="b" id="bRotR" aria-label="오른쪽으로 돌리기">↻</button></div>
       <div class="grp"><button class="b" id="bHome">처음 위치</button></div>
     </div>
     <div class="rest" id="rest"></div>
   </div>
   <ul class="note">
-    <li>끌면 옮겨지고, 휠이나 두 손가락으로 확대 · 축소합니다. 기울기는 고정입니다.</li>
+    <li>한 손가락 · 마우스 왼쪽으로 끌면 옮겨지고, 휠이나 두 손가락 벌리기로 확대 · 축소합니다.</li>
+    <li>기울기 · 회전: 두 손가락을 함께 위아래로 끌면 기울고 좌우로 끌면 돕니다. 마우스는 오른쪽 단추나 Shift를 누른 채 끕니다. 시점 · 회전 단추로도 됩니다.</li>
     <li>집을 누르면 이름표와 카드가 나옵니다. 작은 집은 확대해서 누르면 쉽습니다.</li>
     <li>집 수 = 성 1 + 붙박이 + 손님. 15채 = 1 + 10 + 4, 20채 = 1 + 14 + 5, 30채 = 1 + 24 + 5. 종목이 30개보다 적은 마을은 전부 세웁니다.</li>
     <li>붙박이는 시가총액 상위, 손님은 그 밖의 종목 중 오늘 가장 크게 움직인 종목입니다(오른 쪽 · 내린 쪽 번갈아).</li>
@@ -145,15 +149,28 @@ renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadow
 stage.insertBefore(renderer.domElement, stage.firstChild);
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(35, 1, 1, 600);
-const TILT = THREE.MathUtils.degToRad(52);                        // 수직에서 잰 각 — 고정
+const TILT = THREE.MathUtils.degToRad(52);                        // 수직에서 잰 처음 기울기 — 그 뒤로는 독자가 바꿈
 const DIST0 = 84, DIST_MIN = 26, DIST_MAX = 130, PAN_R = 23;
 const camDir = new THREE.Vector3(0, Math.cos(TILT), Math.sin(TILT));
 const controls = new OrbitControls(camera, renderer.domElement);
-controls.enableRotate = false; controls.screenSpacePanning = false; controls.enableDamping = true; controls.dampingFactor = 0.12;
+controls.enableRotate = true; controls.rotateSpeed = 0.6; controls.minPolarAngle = THREE.MathUtils.degToRad(2); controls.maxPolarAngle = THREE.MathUtils.degToRad(86);   // 바로 위 ~ 땅 가까이 (2026-11-23 사용자: 기울기 · 회전 풀기)
+controls.screenSpacePanning = false; controls.enableDamping = true; controls.dampingFactor = 0.12;
 controls.minDistance = DIST_MIN; controls.maxDistance = DIST_MAX; controls.zoomSpeed = 0.9;
-controls.mouseButtons = { LEFT: THREE.MOUSE.PAN, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.PAN };
-controls.touches = { ONE: THREE.TOUCH.PAN, TWO: THREE.TOUCH.DOLLY_PAN };
-function home() { controls.target.set(0, 0, 1.5); camera.position.copy(controls.target).addScaledVector(camDir, Math.min(DIST_MAX, DIST0 * Math.max(1, 1.3 / camera.aspect))); controls.update(); }
+controls.mouseButtons = { LEFT: THREE.MOUSE.PAN, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.ROTATE };   // 왼쪽 + Shift 도 회전
+controls.touches = { ONE: THREE.TOUCH.PAN, TWO: THREE.TOUCH.DOLLY_ROTATE };
+// 시점 단추 — 부드럽게 옮김. phi = 수직에서 잰 기울기, theta = 회전
+const VIEW = { top: 2, mid: 52, ground: 84 };
+let anim = null;
+function goView(phiDeg, thetaAdd = 0, dist = null) {
+  const s = new THREE.Spherical().setFromVector3(camera.position.clone().sub(controls.target));
+  anim = { s0: s.clone(), p1: phiDeg == null ? s.phi : THREE.MathUtils.degToRad(phiDeg), a1: s.theta + thetaAdd, d1: dist ?? s.radius, t: 0 };
+}
+function stepView(dt) {
+  if (!anim) return; anim.t = Math.min(1, anim.t + dt / 0.6); const k = anim.t < 0.5 ? 2 * anim.t * anim.t : 1 - (-2 * anim.t + 2) ** 2 / 2;
+  const s = new THREE.Spherical(THREE.MathUtils.lerp(anim.s0.radius, anim.d1, k), THREE.MathUtils.lerp(anim.s0.phi, anim.p1, k), THREE.MathUtils.lerp(anim.s0.theta, anim.a1, k));
+  camera.position.copy(controls.target).add(new THREE.Vector3().setFromSpherical(s)); if (anim.t >= 1) anim = null;
+}
+function home() { anim = null; controls.target.set(0, 0, 1.5); camera.position.copy(controls.target).addScaledVector(camDir, Math.min(DIST_MAX, DIST0 * Math.max(1, 1.3 / camera.aspect))); controls.update(); }
 controls.addEventListener('change', () => {                        // 마을 밖으로 못 나가게
   const t = controls.target, d = Math.hypot(t.x, t.z);
   if (d > PAN_R) { const k = PAN_R / d, dx = t.x * k - t.x, dz = t.z * k - t.z; t.x += dx; t.z += dz; camera.position.x += dx; camera.position.z += dz; }
@@ -403,6 +420,16 @@ document.querySelectorAll('#gN button').forEach(b => b.onclick = () => { nHouses
 document.querySelectorAll('#gS button').forEach(b => b.onclick = () => { seasonSel = b.dataset.s; build(); });
 document.querySelectorAll('#gW button').forEach(b => b.onclick = () => { weatherSel = b.dataset.w; build(); });
 $('bHome').onclick = home;
+document.querySelectorAll('#gView button').forEach(b => b.onclick = () => goView(VIEW[b.dataset.view], 0, b.dataset.view === 'ground' ? Math.max(DIST_MIN, 34) : null));
+$('bRotL').onclick = () => goView(null, -Math.PI / 4); $('bRotR').onclick = () => goView(null, Math.PI / 4);
+// 아래 띠(표시 없음) = 한 손가락 좌우 회전 — 두 손가락 · 마우스 회전과 함께. 띠에서 시작한 손가락은 지도를 옮기지 않는다, 화면 폭 한 번 밀면 반 바퀴
+{ const bar = $('rotbar'); let rx = null, rid = null;
+  bar.addEventListener('pointerdown', e => { rx = e.clientX; rid = e.pointerId; bar.setPointerCapture(rid); anim = null; e.preventDefault(); e.stopPropagation(); });
+  bar.addEventListener('pointermove', e => { if (rx == null || e.pointerId !== rid) return; const dx = e.clientX - rx; rx = e.clientX;
+    const off = camera.position.clone().sub(controls.target), s = new THREE.Spherical().setFromVector3(off); s.theta -= dx / stage.clientWidth * Math.PI;
+    camera.position.copy(controls.target).add(new THREE.Vector3().setFromSpherical(s)); controls.update(); });
+  const end = e => { if (e.pointerId !== rid) return; rx = null; rid = null; };
+  bar.addEventListener('pointerup', end); bar.addEventListener('pointercancel', end); }
 
 function resize() { const w = stage.clientWidth, h = stage.clientHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); }
 new ResizeObserver(resize).observe(stage); resize();
@@ -410,20 +437,21 @@ let visible = true; new IntersectionObserver(es => { visible = es[0].isIntersect
 
 build(); home(); $('nSrc').textContent = '자료: ' + DATA.src + '.';
 if (QS.get('zoom')) { camera.position.copy(controls.target).addScaledVector(camDir, +QS.get('zoom')); controls.update(); }
+if (QS.get('view') in VIEW || QS.get('rot')) { const v = QS.get('view'); goView(v in VIEW ? VIEW[v] : null, (+QS.get('rot') || 0) * Math.PI / 180, v === 'ground' ? Math.max(DIST_MIN, 34) : null); stepView(1); controls.update(); }
 if (QS.get('pick')) { const h = houses.find(x => x.b.t === QS.get('pick')); if (h) pick(h); }
 
 const clock = new THREE.Clock(), v3 = new THREE.Vector3();
 function frame() {
   requestAnimationFrame(frame); if (!visible) return;
   const dt = Math.min(clock.getDelta(), 0.05), t = clock.elapsedTime;
-  controls.update();
+  stepView(dt); controls.update();
   if (fall.visible) { for (let i = 0; i < FALL_N; i++) { let y = fallPos[i * 3 + 1] - fallSpeed * dt; if (y < 0) y += 40; fallPos[i * 3 + 1] = y; if (fallSpeed < 10) fallPos[i * 3] += Math.sin(t + i) * dt * 0.6; }
     fallGeo.attributes.position.needsUpdate = true; }
   smokes.forEach(s => { const u = s.userData, k = (t * 0.28 + u.ph) % 1; s.position.set(u.x + k * 0.9, u.y + k * 3.2, u.z); s.scale.setScalar(0.7 + k * 1.7); s.material.opacity = 0.6 * (1 - k); });
   glows.forEach((g, i) => { g.material.opacity = 0.55 + Math.sin(t * 2.2 + i) * 0.12; });
   renderer.render(scene, camera);
   if (showLabels) { const w = stage.clientWidth, h = stage.clientHeight;
-    houses.forEach(o => { v3.set(o.x, o.top + 0.4, o.z).project(camera); o.el.style.transform = 'translate(-50%,-100%) translate(' + ((v3.x + 1) / 2 * w).toFixed(1) + 'px,' + ((1 - v3.y) / 2 * h).toFixed(1) + 'px)'; }); }
+    houses.forEach(o => { v3.set(o.x, o.top + 0.4, o.z).project(camera); o.el.style.transform = 'translate(-50%,-100%) translate(' + ((v3.x + 1) / 2 * w).toFixed(1) + 'px,' + ((1 - v3.y) / 2 * h).toFixed(1) + 'px)'; o.el.style.visibility = v3.z < 1 ? '' : 'hidden'; }); }
 }
 frame();
 </script>
