@@ -1,0 +1,68 @@
+name: VPN concurrency test (집 VPN 동시 접속 시험)
+
+# 2026-11-23 사용자: 공유기 VPN 계정을 용도별로 나누면(계정마다 할당 IP 다르게) 동시에 붙을 수 있나.
+# 실행기 두 대가 지금 계정(VPN_USER, 유튜브 수집과 같은 계정)과 새 계정(VPN_USER_NEWFACT)으로 같은 때 붙어
+# 5분 동안 20초마다 집 IP 로 나가는지 센다. 둘 다 끝까지 유지되면 통과. 사람이 손으로만 건다(정기 실행 없음).
+# 유튜브 수집(red9keep/News-sub collect · trial)이 도는 중이면 시험하지 않는다 — 지금 계정이 겹치면 그쪽이 끊긴다.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    outputs:
+      free: ${{ steps.w.outputs.free }}
+    steps:
+      - id: w
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          busy=0
+          for st in in_progress queued; do
+            n=$(curl -s -H "Authorization: Bearer $GH_TOKEN" "https://api.github.com/repos/red9keep/News-sub/actions/runs?status=$st&per_page=20" \
+              | python3 -c "import json,sys; d=json.load(sys.stdin); print(sum(1 for r in d.get('workflow_runs',[]) if r.get('path','').split('@')[0] in ('.github/workflows/collect.yml','.github/workflows/trial.yml')))" 2>/dev/null || echo 0)
+            busy=$((busy + n))
+          done
+          if [ "$busy" = 0 ]; then echo "free=true" >> "$GITHUB_OUTPUT"; echo "유튜브 수집 비어 있음 → 시험"; else echo "::warning::유튜브 수집 도는 중($busy) — 시험 안 함"; fi
+
+  hold:
+    needs: check
+    if: needs.check.outputs.free == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        acct: [old, newfact]
+    steps:
+      - uses: actions/checkout@v5
+      - name: VPN 연결 (${{ matrix.acct }})
+        id: vpn
+        continue-on-error: true
+        run: sudo env VPN_SERVER="$VPN_SERVER" VPN_PSK="$VPN_PSK" VPN_USER="$U" VPN_PASSWORD="$P" GITHUB_OUTPUT="$GITHUB_OUTPUT" bash scripts/vpn/vpn-up.sh
+        env:
+          VPN_SERVER: ${{ secrets.VPN_SERVER }}
+          VPN_PSK: ${{ secrets.VPN_PSK }}
+          U: ${{ matrix.acct == 'old' && secrets.VPN_USER || secrets.VPN_USER_NEWFACT }}
+          P: ${{ matrix.acct == 'old' && secrets.VPN_PASSWORD || secrets.VPN_PASSWORD_NEWFACT }}
+      - name: 5분 유지 확인
+        if: steps.vpn.outputs.ok == 'true'
+        env:
+          IP: ${{ steps.vpn.outputs.ip }}
+        run: |
+          echo "[${{ matrix.acct }}] 할당 IP(공유기가 준 VPN 주소) = $IP · 시작 $(TZ=Asia/Seoul date +%T)"
+          ok=0; n=0
+          for i in $(seq 1 15); do
+            n=$((n+1))
+            if ip -4 -o addr show ppp0 >/dev/null 2>&1 && curl -s --max-time 10 --interface "$IP" https://api.ipify.org >/dev/null; then ok=$((ok+1)); s=유지; else s=끊김; fi
+            echo "  $(TZ=Asia/Seoul date +%T) $s"
+            sleep 20
+          done
+          echo "[${{ matrix.acct }}] 결과 유지 $ok/$n"
+          [ "$ok" = "$n" ] || { echo "::error::[${{ matrix.acct }}] 도중에 끊김 ($ok/$n)"; exit 1; }
+      - name: VPN 끊기
+        if: always() && steps.vpn.outcome != 'skipped'
+        run: sudo bash scripts/vpn/vpn-down.sh
