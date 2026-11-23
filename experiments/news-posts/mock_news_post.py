@@ -20,7 +20,7 @@ import news_render as NR  # noqa: E402
 
 OUT = os.path.join(BASE, "output")
 SAMPLES = os.path.join(BASE, "samples")
-LISTS = os.path.join(BASE, "..", "stock-lists", "output", "lists", "kr", "_lists.json")
+LISTS = {mk: os.path.join(BASE, "..", "stock-lists", "output", "lists", mk, "_lists.json") for mk in ("kr", "us")}   # 한국 + 미국 (2026-11-23 사용자 "미국 종목도")
 
 SAMPLE_POST = {
     "id": "sample-1",
@@ -33,7 +33,7 @@ SAMPLE_POST = {
              "다만 올해 외국인 순매도의 85%가 두 종목에 몰려 있습니다. "
              "==MSCI 지수 비중 상한을 넘을 때마다 매도가 나오는 구조==(하나증권)도 **그대로 남아 있습니다**."),
     "date": "2026-11-18", "cat": "AI_CAPEX", "direction": "up", "stage": "confirmed",
-    "stocks": [{"name": "삼성전자", "code": "005930"}, {"name": "SK하이닉스", "code": "000660"}],
+    "stocks": [{"name": "삼성전자", "code": "005930"}, {"name": "SK하이닉스", "code": "000660"}, {"name": "엔비디아", "code": ""}],   # 미국 종목 = 수집기처럼 코드 빈 값
     "sector": "기술", "slug": "nvidia-earnings-samsung-hynix-rebound", "version": 2,
 }
 
@@ -88,14 +88,18 @@ def closed_through():
 if __name__ == "__main__":
     sys.stdout.reconfigure(encoding="utf-8")
     os.makedirs(OUT, exist_ok=True)
-    lists = {r["t"]: r for r in json.load(open(LISTS, encoding="utf-8"))["rows"]} if os.path.exists(LISTS) else {}
+    lists = {r["t"]: dict(r, mk=mk) for mk, p in LISTS.items() if os.path.exists(p) for r in json.load(open(p, encoding="utf-8"))["rows"]}
     posts, real = load("posts.json", [SAMPLE_POST])
     print("글 재료:", "수집기 실제 글" if real else "예시 글", len(posts), "편")
     upto = closed_through()
-    for i, post in enumerate(sorted(posts, key=lambda p: str(p.get("createdAt") or p["date"]), reverse=True)):
+    jobs = [("mock_news_post.html" if i == 0 else f"mock_news_post_{i + 1}.html", post)
+            for i, post in enumerate(sorted(posts, key=lambda p: str(p.get("createdAt") or p["date"]), reverse=True))]
+    if real:   # 실제 글에 종목이 없을 때도 종목 줄(한국 + 미국)을 볼 수 있게 예시 글도 함께
+        jobs.append(("mock_news_post_example.html", SAMPLE_POST))
+    for name, post in jobs:
         market = NR.same_day(post, lists, closes_of, upto)
         _, html, meta = NR.render(post, market, lists)
-        out = os.path.join(OUT, "mock_news_post.html" if i == 0 else f"mock_news_post_{i + 1}.html")
+        out = os.path.join(OUT, name)
         print(dk.write_mock(html, out, NR.titles(post)[0]) or "index.html 없음", "· 기준", meta["basis"], "· 종목", [s["name"] for s in market["stocks"]])
     docs, real_h = load("headlines.json", SAMPLE_HEADLINES)
     day = max(str(it.get("publishedAt") or it.get("foundAt") or "")[:10] for d in docs for it in d.get("items") or [])

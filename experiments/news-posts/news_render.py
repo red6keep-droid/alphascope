@@ -10,6 +10,7 @@
     from news_render import render
     title, html, meta = render(post, market, lists=…)
 """
+import datetime
 import os
 import re
 import statistics
@@ -31,6 +32,7 @@ DIR_KIND = {"up": "positive", "down": "negative", "neutral": "neutral"}
 STAGE_KO = {"confirmed": "확정", "discussing": "논의 중"}   # 방향 + 단계 두 칸 (논의 중 뉴스도 방향을 붙인다)
 USUAL_N = 60   # 평소 움직임 = 직전 60거래일 하루 등락 폭(절댓값)의 중앙값
 INDEX = [("^KS11", "코스피"), ("^KQ11", "코스닥")]
+US_INDEX = [("^GSPC", "S&P 500"), ("^IXIC", "나스닥")]   # 미국 종목이 있을 때만 — 미국 종목의 비교 대상 = S&P 500 (같은 시장 전체, 2026-11-23 사용자 "미국 종목도 싣게")
 
 
 # ── 같은 날 시장 움직임 숫자 (블로그 데이터 — 지금은 yfinance 일봉) ──
@@ -53,33 +55,69 @@ def kr_symbol(code):
     return sym or f"{code}.KS"
 
 
-def same_day(post, lists, closes_of, closed_through):
-    """→ market = {"basis", "indices": [{name, close, chg_pct, usual}], "stocks": [{ticker, name, chg_pct, usual, vs}]}.
-    closes_of(symbol) → [(날짜, 종가)]. closed_through = 마감이 끝난 마지막 날(장중 값은 쓰지 않는다).
-    종목 = 수집기 stocks 중 블로그 한국 종목 목록(lists)과 코드 · 이름이 모두 맞는 것만 (요청 8절 Q9)."""
-    day = min(post["date"], closed_through)
-    out = {"indices": [], "stocks": []}
-    k = None
-    for sym, name in INDEX:
-        cl = closes_of(sym)
-        m = _move(cl, day) if cl else None
-        if not m:
-            continue
-        out["basis"] = out.get("basis") or m["day"]
-        close = next(v for d, v in cl if d == m["day"])
-        out["indices"].append({"name": name, "close": close, "chg_pct": m["chg"], "usual": m["usual"]})
-        k = k if k is not None else m["chg"]
+def match_stocks(post, lists):
+    """수집기 stocks → [(ticker, name, "kr" | "us")]. 한국 = 코드 · 이름이 블로그 한국 목록과 모두 맞을 때(요청 8절 Q9).
+    미국 = 수집기가 코드를 비워 보내므로(6자리만 받음) 이름이 블로그 미국 목록의 한글 이름과 똑같을 때만(2026-11-23 사용자). 목록에 없는 종목은 싣지 않는다."""
+    by_name = {r["n"]: t for t, r in lists.items() if r.get("mk") == "us"}
+    out, seen = [], set()
     for st in post.get("stocks") or []:
         code, name = str(st.get("code") or ""), (st.get("name") or "").strip()
         row = lists.get(code)
-        if not (re.fullmatch(r"\d{6}", code) and row and row.get("n") == name):
+        if re.fullmatch(r"\d{6}", code) and row and row.get("n") == name:
+            hit = (code, name, "kr")
+        elif name in by_name:
+            hit = (by_name[name], name, "us")
+        else:
             continue
-        cl = closes_of(kr_symbol(code))
+        if hit[0] not in seen:
+            seen.add(hit[0])
+            out.append(hit)
+    return out
+
+
+def us_day(post_date, now_kst):
+    """미국 종목 기준일 = 한국 날짜로 글 날짜까지 마감한 마지막 미국 거래일. 미국 D일 종가는 한국 D+1일 아침(06:30 뒤 확정으로 본다)에 나온다(날짜 = 한국 시간 하나로)."""
+    ready = now_kst.date() if now_kst.hour * 60 + now_kst.minute >= 6 * 60 + 30 else now_kst.date() - datetime.timedelta(days=1)
+    last = min(datetime.date.fromisoformat(post_date), ready)
+    return str(last - datetime.timedelta(days=1))
+
+
+def _close_kst(us_d):
+    return str(datetime.date.fromisoformat(us_d) + datetime.timedelta(days=1))
+
+
+def _indices(pairs, closes_of, day):
+    out = []
+    for sym, name in pairs:
+        cl = closes_of(sym)
         m = _move(cl, day) if cl else None
-        if not m or m["day"] != out.get("basis"):
+        if m:
+            out.append({"name": name, "day": m["day"], "close": next(v for d, v in cl if d == m["day"]), "chg_pct": m["chg"], "usual": m["usual"]})
+    return out
+
+
+def same_day(post, lists, closes_of, closed_through, now_kst=None):
+    """→ market = {"basis", "indices", "us_basis", "us_indices", "stocks": [{ticker, name, mk, chg_pct, usual, base, vs}]}.
+    closes_of(symbol) → [(날짜, 종가)]. closed_through = 한국 마감이 끝난 마지막 날(장중 값은 쓰지 않는다).
+    종목 = match_stocks. 비교 대상(헌법 제1조) = 한국 종목은 코스피, 미국 종목은 S&P 500 — 같은 시장 전체 · 같은 날."""
+    now_kst = now_kst or datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9)))
+    day = min(post["date"], closed_through)
+    out = {"indices": _indices(INDEX, closes_of, day), "us_indices": [], "stocks": []}
+    out["basis"] = out["indices"][0]["day"] if out["indices"] else None
+    k = next((x["chg_pct"] for x in out["indices"] if x["name"] == "코스피"), None)
+    hits = match_stocks(post, lists)
+    if any(h[2] == "us" for h in hits):
+        out["us_indices"] = _indices(US_INDEX, closes_of, us_day(post["date"], now_kst))
+        out["us_basis"] = out["us_indices"][0]["day"] if out["us_indices"] else None
+    spx = next((x["chg_pct"] for x in out["us_indices"] if x["name"] == "S&P 500"), None)
+    for t, name, mk in hits:
+        cl = closes_of(kr_symbol(t) if mk == "kr" else t)
+        basis, base, bchg = (out.get("basis"), "코스피", k) if mk == "kr" else (out.get("us_basis"), "S&P 500", spx)
+        m = _move(cl, basis) if cl and basis else None
+        if not m or m["day"] != basis:
             continue
-        out["stocks"].append({"ticker": code, "name": name, "chg_pct": m["chg"], "usual": m["usual"],
-                              "vs": round(m["chg"] - k, 2) if k is not None else None})
+        out["stocks"].append({"ticker": t, "name": name, "mk": mk, "chg_pct": m["chg"], "usual": m["usual"], "base": base,
+                              "vs": round(m["chg"] - bchg, 2) if bchg is not None else None, "base_chg": bchg})
     return out
 
 
@@ -98,45 +136,51 @@ def _pct(v, unit="%"):
     return f"{abs(v):.2f}{unit}".replace(".00", "") if v is not None else ""
 
 
-def _cmp_line(x, kospi):
-    """종목 줄 아래 회색 한 줄 = 비교 두 개 (헌법 제1조): `코스피보다 0.32%p 더 · 평소 하루 1.6%의 1.4배`. 인과 말은 넣지 않는다 (요청 Q10)."""
+def _cmp_line(x):
+    """종목 줄 아래 회색 한 줄 = 비교 두 개 (헌법 제1조): `코스피보다 0.32%p 더 · 평소 하루 1.6%의 1.4배` (미국 종목은 S&P 500). 인과 말은 넣지 않는다 (요청 Q10)."""
     bits = []
+    b, kospi = x.get("base") or "코스피", x.get("base_chg")
+    wa = b + ("과" if b.endswith("500") else "와")   # S&P 500(오백)과 · 코스피와
     if x.get("vs") is not None and kospi is not None:
         v, c = x["vs"], x["chg_pct"]
         if abs(v) < 0.005:
-            bits.append("코스피와 같은 폭")
+            bits.append(f"{wa} 같은 폭")
         elif c * kospi < 0:   # 방향이 반대인 날
-            bits.append(f'코스피와 반대로 {"오름" if c > 0 else "내림"}')
+            bits.append(f'{wa} 반대로 {"오름" if c > 0 else "내림"}')
         elif c >= 0 and kospi >= 0:
-            bits.append(f'코스피보다 {_pct(v, "%p")} {"더" if v > 0 else "덜"} 오름')
+            bits.append(f'{b}보다 {_pct(v, "%p")} {"더" if v > 0 else "덜"} 오름')
         else:
-            bits.append(f'코스피보다 {_pct(v, "%p")} {"더" if v < 0 else "덜"} 내림')
+            bits.append(f'{b}보다 {_pct(v, "%p")} {"더" if v < 0 else "덜"} 내림')
     if x.get("usual"):
         r = abs(x["chg_pct"]) / x["usual"] if x["usual"] else 0
         bits.append(f'평소 하루 움직임({_pct(x["usual"])})' + (f"의 {r:.1f}배" if r >= 1.5 else "과 비슷" if r >= 0.5 else "보다 작음"))
     return " · ".join(bits)
 
 
+def _md(d):
+    return f"{int(d[5:7])}.{d[8:10]}"
+
+
 def market_section(market, lists, ink):
-    idx = market.get("indices") or []
-    if not idx:
+    idx, us_idx = market.get("indices") or [], market.get("us_indices") or []
+    if not idx and not us_idx:
         return ""
-    kospi = next((x["chg_pct"] for x in idx if x["name"] == "코스피"), None)
-    inner = SR.index_row(idx)
+    inner = SR.index_row(idx) + SR.index_row(us_idx)   # 한국 칸 아래 미국 칸(미국 종목이 있을 때만)
     stocks = market.get("stocks") or []
     if stocks:
         rows = []
         for i, x in enumerate(stocks):
-            r = SR.stock_row(x, lists.get(x["ticker"]), "pm", i == 0)
-            line = _cmp_line(x, kospi)
+            r = SR.stock_row(x, lists.get(x["ticker"]), "am" if x.get("mk") == "us" else "pm", i == 0)   # 미국 = 달러 · 티커 · 업종
+            line = _cmp_line(x)
             if line:
                 r = r.replace(f"padding:{SR.LIST_ROW_PAD}px 12px;", f"padding:{SR.LIST_ROW_PAD}px 12px 6px;", 1)
                 r += (f'<span style="display:block;padding:0 12px {SR.LIST_ROW_PAD}px {12 + SR.LOGO_Z + SR.LOGO_GAP}px;font-size:{dk.TINY};line-height:{dk.LH_TINY};'
                       f'color:#6B7280;word-break:keep-all;">{dk.esc(line)}</span>')
             rows.append(r)
         inner += SR.white_card("".join(rows))
-    b = market.get("basis") or ""
-    note = f"{int(b[5:7])}.{b[8:10]} 종가 기준. 같은 날 움직임을 나란히 적은 것으로, 기사 때문에 움직였다는 뜻은 아닙니다." if b else ""
+    b, ub = market.get("basis") or "", market.get("us_basis") or ""
+    bits = ([f"한국 {_md(b)} 종가"] if b else []) + ([f"미국 {_md(_close_kst(ub))} 아침 마감 종가"] if ub else [])
+    note = (" · ".join(bits) + " 기준. 같은 날 움직임을 나란히 적은 것으로, 기사 때문에 움직였다는 뜻은 아닙니다.") if bits else ""
     inner += dk.excl_note(note, margin="10px 0 0") if note else ""
     sec = dk.section("같은 날 시장 움직임", inner, line=False)
     return SR.tinted(SR.iconed(sec, dk.solid_icon("bars", ink)), ink).replace(f"margin:{SR.H2_TOP}px 0 11px;", f"margin:{SR.BIG_TOP}px 0 11px;", 1)
@@ -148,11 +192,11 @@ def titles(post):
 
 
 def render(post, market, lists=None):
-    """→ (저장 제목, 본문 HTML, meta). summary 가 비면 본문 첫 문장(요청 12절 대체 규칙). 종목이 안 맞으면 지수만."""
+    """lists = 한국 · 미국 목록을 합친 {티커: 행(mk = kr | us)}. → (저장 제목, 본문 HTML, meta). summary 가 비면 본문 첫 문장(요청 12절 대체 규칙). 종목이 안 맞으면 지수만."""
     lists = lists or {}
     th = SR.MOOD_THEME["flat"]   # 글 전체 = 보라 테마 하나 (2026-11-23 사용자 "전체적으로 보라색") — 기사 방향으로 색을 바꾸지 않는다(방향은 라벨이 말한다)
     ink = th["ink"]
-    col = {"tickers": [s.get("code") for s in post.get("stocks") or [] if s.get("code") in lists]}
+    col = {"tickers": [t for t, _, _ in match_stocks(post, lists)]}
     link = SR.Linker(col, {"close": {"movers": [{"name": lists[c]["n"], "ticker": c} for c in col["tickers"]]}}, ink)
 
     def prose(text, strong=True):
