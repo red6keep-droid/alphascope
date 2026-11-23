@@ -1,11 +1,11 @@
 {
-  "updated_at": "2026-11-23 12:46:37 UTC",
+  "updated_at": "2026-11-23 21:58:57 UTC",
   "items": [
     {
-      "title": "Anthropic, Nvidia shares rise in premarket trading after major tech sell-off",
+      "title": "Tech stocks see monster rally after Jensen Huang returns as Nvidia CEO",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/11/23/anthropic-nvidia-shares.html",
-      "published": "2026-11-23 12:19:59",
+      "published": "2026-11-23 21:22:13",
       "title_ko": "대규모 기술주 매도세 이후 장외 거래에서 앤트로픽과 엔비디아 주가 상승",
       "summary_ko": "나스닥은 2020년 코로나 초기 이후 최악의 주간을 기록하며 지난주 10% 하락함",
       "lines": [
@@ -15,102 +15,130 @@
       ]
     },
     {
-      "title": "Tokenized stocks face pushback as NYSE, Nasdaq pivot for a new market",
+      "title": "Jensen Huang reinstated as Nvidia CEO. Stock skyrockets 31%",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/23/tokenized-stocks-face-pushback-as-nyse-nasdaq-pivot-for-a-new-market-.html",
-      "published": "2026-11-23 12:05:06",
-      "title_ko": "뉴욕증권거래소와 나스닥이 새로운 시장으로 전환함에 따라 토큰화된 주식이 반발에 직면",
-      "summary_ko": "초기 상장 대상 기업의 90%가 반대했음에도 불구하고 OKXICE가 월요일에 출시될 예정임",
+      "link": "https://www.cnbc.com/2026/11/23/nvidia-jensen-huang-ceo.html",
+      "published": "2026-11-23 21:08:05",
+      "title_ko": "엔비디아 CEO 진센 황 복귀, 주가 31% 급등",
+      "summary_ko": "주가 31% 급등",
       "lines": [
-        "오케이엑스아이스의 월요일 거래소 플랫폼 출범 예정",
-        "초기 상장 대상 기업의 90%에 달하는 56개사의 반대"
+        "젠슨 황 엔비디아 CEO 즉시 복귀 발표",
+        "엔비디아 주가 31% 급등"
       ]
     },
     {
-      "title": "The biggest money-making energy trade looks over. What to buy instead",
+      "title": "CrowdStrike to buy Zscaler in $44 billion deal as AI supercharges cyberattacks",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/23/refinery-stocks-crack-spreads.html",
-      "published": "2026-11-23 12:00:20",
-      "title_ko": "가장 큰 수익을 내는 에너지 거래가 끝난 것 같습니다. 대신 무엇을 사야 할까요",
-      "summary_ko": "정유 관련 주식의 거대한 호황세가 누그러지고 있음",
+      "link": "https://www.cnbc.com/2026/11/23/crowdstrike-zscaler-aquisition-ai-cyberattacks.html",
+      "published": "2026-11-23 21:04:03",
+      "title_ko": "크라우드스트라이크, AI 사이버 공격 심화 속 440억 달러에 지스케어 인수",
+      "summary_ko": "AI 사이버 공격 대응 위해 수십억 달러 투자",
       "lines": [
-        "정유 관련 주식들의 상승세 둔화",
-        "정유주들의 마진과 현금흐름 증가"
+        "크라우드스트라이크, 439억 달러 규모 즈스케일러 인수 계획",
+        "즈스케일러 주주, 주당 1.135주 크라우드스트라이크 주식 수령 예정"
       ]
     },
     {
-      "title": "Zelenskyy praises ‘exemplary’ drone operation that sank Russian warship in a Libyan port",
+      "title": "Fed's John Williams indicates higher interest rates likely 'over time' to address inflation",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/23/ukraine-russia-warship-libya.html",
-      "published": "2026-11-23 11:30:37",
-      "title_ko": "젤렌스키, 리비아 항구서 러시아 군함 격침한 '모범적' 드론 작전 찬사",
-      "summary_ko": "이번 사건은 주말 동안 발트해에서 러시아 화물선을 상대로 발생한 의심스러운 우크라이나 드론 공격과 함께 발생함",
+      "link": "https://www.cnbc.com/2026/11/23/john-williams-fed-inflation-rate-hikes.html",
+      "published": "2026-11-23 21:02:17",
+      "title_ko": "연준 존 윌리엄스, 인플레이션 대응 위해 금리 인상 시사",
+      "summary_ko": "2027년 연준 2% 목표치 접근 확신",
       "lines": [
-        "우크라이나군의 해상 드론을 이용한 러시아 군함 격침",
-        "발트해의 러시아 화물선에 대한 드론 공격 발생"
+        "뉴욕 연은 총재, 2027년 연준 2% 물가 목표 도달 전망",
+        "존 윌리엄스 총재, 인플레이션 통제 위한 추가 조치 시사"
       ]
     },
     {
-      "title": "Treasury yields jump as stock futures rebound, investors await New York Fed President Williams speech",
+      "title": "Jensen Huang cheered by Nvidia employees after return, pledges to be a better CEO",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/23/treasury-yields-bonds-fed.html",
-      "published": "2026-11-23 10:15:19",
-      "title_ko": "주가 선물 반등 속 국채 금리 상승, 투자자들은 뉴욕 연은 총재 연설 주시",
-      "summary_ko": "월스트리트 주가지수 선물이 강한 반등을 나타내며 지난주 말의 가격 움직임을 일부 되돌림에 따라 월요일 미국 국채 금리가 상승함",
+      "link": "https://www.cnbc.com/2026/11/23/jensen-huang-nvidia-ceo-return.html",
+      "published": "2026-11-23 20:57:41",
+      "title_ko": "복귀 후 엔비디아 직원들의 환호 받은 젠슨 황, 더 나은 CEO 다짐",
+      "summary_ko": "11월 8일 직원들에게 불륜 사실 인정 후 11월 12일 CEO 사임",
       "lines": [
-        "10년물 미국 국채 수익률 4.959%로 상승",
-        "2년물 미국 국채 수익률 4.689% 기록",
-        "30년물 미국 국채 수익률 5.335%로 상승"
+        "11월 8일 직원 서한을 통한 황젠슨의 불륜 사실 인정",
+        "11월 12일 황젠슨의 엔비디아 최고경영자 사임",
+        "월요일의 엔비디아 최고경영자 즉각 복귀 발표"
       ]
     },
     {
-      "title": "Stuck: How a frozen housing market is hitting buyers, sellers and the economy",
+      "title": "Average 401(k), IRA balances fall as more workers raid their accounts, Fidelity says",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/23/housing-market-real-estate-economy.html",
-      "published": "2026-11-23 10:00:01",
-      "title_ko": "정체된 주택 시장이 구매자, 판매자 및 경제에 타격을 주는 방식",
-      "summary_ko": "9월 모기지 금리의 급격한 상승으로 인해 이미 냉각된 부동산 부문이 깊은 침체에 빠짐",
+      "link": "https://www.cnbc.com/2026/11/23/fidelity-401k-ira-balances-q3-2026.html",
+      "published": "2026-11-23 19:54:35",
+      "title_ko": "피델리티, 인출 증가로 평균 401(k) 및 IRA 잔액 감소 발표",
+      "summary_ko": "시장 변동성 속 3분기 계좌 인출 증가",
       "lines": [
-        "9월 주택담보대출 금리 급등에 따른 부동산 시장 침체",
-        "10월 초 30년 고정 주택담보대출 평균금리 7.61% 기록",
-        "7월 대비 3개월간 100 베이시스 포인트 상승"
+        "시장 변동성에 따른 3분기 은퇴 계좌 잔액 감소",
+        "평균 401(k) 잔액 2% 하락한 15만 2500달러",
+        "개인퇴직계좌 평균 잔액 1% 하락한 14만 2261달러"
       ]
     },
     {
-      "title": "French biotech rejects short seller’s cancer-risk claims after shares plunge 17%",
+      "title": "Nvidia surge: What investors should do with the stock and the AI trade now",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/23/abivax-scorpion-capital-obefazimod.html",
-      "published": "2026-11-23 09:45:42",
-      "title_ko": "프랑스 바이오 기업, 주가 17% 급락 후 공스셀러의 암 위험 주장 반박",
-      "summary_ko": "공스셀러 스콜피온 캐피털이 실험 중인 염증성 장질환 치료제와 관련해 아비박스의 심각한 과학적 및 안전성 결함을 비난함",
+      "link": "https://www.cnbc.com/2026/11/23/nvidia-stock-jensen-huang-ai-trade.html",
+      "published": "2026-11-23 19:52:21",
+      "title_ko": "엔비디아 급등: 투자자들과 AI주의 향후 대응 방안",
+      "summary_ko": "젠슨 황 복귀에 시장 환호",
       "lines": [
-        "공매도 세력의 아비박스 실험용 치료제 암 위험 주장",
-        "아비박스 파리 증시 주가 17% 하락",
-        "공매도 보고서 내용 전면 부인"
+        "젠슨 황 엔비디아 CEO 복귀 발표",
+        "엔비디아 주가 개장 직후 30% 이상 급등",
+        "엔비디아 23년 만의 최대 일일 상승폭 기록",
+        "중국 스파이 의혹 조사 및 데이터센터 규제 가능성 언급"
       ]
     },
     {
-      "title": "Forget Anthropic: In Europe, the IPO hype is about a blue lagoon",
+      "title": "Trump administration proposes rule that could curb ESG investing in 401(k)s",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/20/anthropic-ipo-iceland-blue-lagoon.html",
-      "published": "2026-11-23 08:48:36",
-      "title_ko": "앤트로픽은 잊어라 유럽의 IPO 흥행은 블루 라군에 대한 것이다",
-      "summary_ko": "아이슬란드의 지열 스파 블루 라군이 관광 및 웰니스 산업에 대한 투자자 관심을 활용해 IPO를 진행",
+      "link": "https://www.cnbc.com/2026/11/23/labor-department-esg-401k-rule.html",
+      "published": "2026-11-23 19:46:28",
+      "title_ko": "트럼프 행정부, 401(k) ESG 투자 억제 규칙 제안",
+      "summary_ko": "퇴직연금 플랜 내 ESG 펀드 유입 억제 목적",
       "lines": [
-        "블루 라군 1억 1000만 달러 규모 기업공개 진행",
-        "기업공개를 통한 블루 라군 기업가치 7억 8700만 달러 평가"
+        "트럼프 행정부 401(k) ESG 투자 제한 규정 제안",
+        "케이스 손더링 노동장관 재무적 이익 우선 원칙 강조"
       ]
     },
     {
-      "title": "Investors gives a thumbs down to Tata Steel-APL Apollo $1.67 billion deal, plunging shares",
+      "title": "Amazon to acquire AI startup Decart's chip software, hire founders",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/23/tata-steel-acquisition-deal-apl-india.html",
-      "published": "2026-11-23 07:25:24",
-      "title_ko": "투자자들이 타타 스틸과 APL 아폴로의 16억 7천만 달러 규모 거래에 거부감을 표하며 주가 급락",
-      "summary_ko": "타타 스틸이 다운스트림 역량을 강화하기 위해 인도 구조용 강관 및 튜브 제조사의 지분 26.4%를 인수할 예정임",
+      "link": "https://www.cnbc.com/2026/11/23/amazon-decarts-ai-acquisition.html",
+      "published": "2026-11-23 19:34:38",
+      "title_ko": "아마존, AI 스타트업 데카르트 칩 소프트웨어 인수 및 창업자 영입",
+      "summary_ko": "2023년 설립된 데카르트는 AI 모델 동기화 소프트웨어로 유명",
       "lines": [
-        "타타 스틸 APL 아폴로 지분 26.4% 인수 발표",
-        "타타 스틸의 지분 인수 규모 16억 7000만 달러 기록"
+        "아마존 AI 스타트업 데카르트 기술 인수 및 창업자 고용 합의",
+        "데카르트 칩 간 AI 모델 동기화 소프트웨어 기술 확보",
+        "2023년 설립 이스라엘 스타트업 데카르트 인력 흡수"
+      ]
+    },
+    {
+      "title": "DNI Jay Clayton tapped as acting national cyber director",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/23/jay-clayton-cyber-director-kirsten-davies-trump.html",
+      "published": "2026-11-23 19:12:49",
+      "title_ko": "제이 클레이튼, 국가사이버국장 대행에 지명",
+      "summary_ko": "숀 케언크로스 교체",
+      "lines": [
+        "제이 클레이턴 국가정보국장이 국가사이버국장 대행으로 지명",
+        "트럼프 대통령, 시안 케어크로스 국가사이버국장 교체 결정",
+        "키르스텐 데이비스 국방부 CIO, 국가사이버국장 후보로 지명"
+      ]
+    },
+    {
+      "title": "ESPN, NFL to show Super Bowl 61 in Imax theaters",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/23/espn-nfl-super-bowl-imax.html",
+      "published": "2026-11-23 19:08:37",
+      "title_ko": "ESPN, NFL, 슈퍼볼 61 아이맥스 상영",
+      "summary_ko": "디즈니+, 방송 네트워크 ABC 플랫폼 제공",
+      "lines": [
+        "2월 14일 슈퍼볼 61 IMAX 극장 생중계 예정",
+        "IMAX 역사상 최대 규모 라이브 이벤트 기록",
+        "미국 및 호주, 뉴질랜드, 브라질 등 일부 해외 시장 티켓 판매 예정"
       ]
     }
   ]

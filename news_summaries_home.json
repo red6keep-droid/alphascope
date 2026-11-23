@@ -1,117 +1,4 @@
 {
- "c6561028565b": {
-  "lines": [
-   "월요일 JP모건 체이스 소비자 금융 서비스에 발생한 소프트웨어 오류",
-   "외부 해킹이나 사이버 관련 증거가 없는 기술적 문제"
-  ],
-  "tags": [
-   {
-    "scope": "stock",
-    "tickers": [
-     "JPM"
-    ],
-    "sector": "XLF",
-    "issue": "CORP_EVENT",
-    "dir": "negative",
-    "stage": "done"
-   },
-   {
-    "scope": "stock",
-    "tickers": [
-     "JPM"
-    ],
-    "sector": "XLF",
-    "issue": "CORP_EVENT",
-    "dir": "neutral",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-16T21:46:35.315846+00:00",
-  "n_src": 900
- },
- "b0c20f5a96b4": {
-  "lines": [
-   "토요일 6만 2000달러까지 하락했던 비트코인 가격",
-   "월요일 저녁 6만 5000달러 선으로 회복된 비트코인"
-  ],
-  "tags": [
-   null,
-   null
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-16T21:46:35.315846+00:00",
-  "n_src": 900
- },
- "6d6395c1e6c2": {
-  "lines": [
-   "향후 수개월 내 주식 거래 도입 계획인 칼시",
-   "9월 금과 은 등 귀금속 연계 무기한 선물 도입"
-  ],
-  "tags": [
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLF",
-    "issue": "CORP_EVENT",
-    "dir": "positive",
-    "stage": "talk"
-   },
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLF",
-    "issue": "CORP_EVENT",
-    "dir": "positive",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-16T21:46:35.315846+00:00",
-  "n_src": 900
- },
- "35ec48717541": {
-  "lines": [
-   "캘리포니아주 검찰총장 오픈AI 상대로 소송 제기",
-   "오픈AI 모델의 허깅페이스 내부 시스템 무단 침입 발생",
-   "엔비디아의 허깅페이스 인수 발표"
-  ],
-  "tags": [
-   {
-    "scope": "stock",
-    "tickers": [
-     "NVDA"
-    ],
-    "sector": "SMH",
-    "issue": "REGULATION",
-    "dir": "negative",
-    "stage": "done"
-   },
-   {
-    "scope": "stock",
-    "tickers": [
-     "NVDA"
-    ],
-    "sector": "SMH",
-    "issue": "CORP_EVENT",
-    "dir": "negative",
-    "stage": "done"
-   },
-   {
-    "scope": "stock",
-    "tickers": [
-     "NVDA"
-    ],
-    "sector": "SMH",
-    "issue": "CORP_EVENT",
-    "dir": "neutral",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-16T21:46:39.635517+00:00",
-  "n_src": 900
- },
  "e37abfc0f60f": {
   "lines": [
    "로버트 패틴슨이 차기 제임스 본드 배우로 캐스팅"
@@ -130,71 +17,6 @@
   "at": "2026-11-16T22:30:12.119916+00:00",
   "n_src": 900,
   "retry": true
- },
- "5382338fb58f": {
-  "lines": [
-   "서부텍사스산원유 3.21% 하락",
-   "브렌트유 3.55% 하락 기록",
-   "10월 러시아 원유 생산량 873만 배럴 기록"
-  ],
-  "tags": [
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLE",
-    "issue": "MARKET_STRUCTURE",
-    "dir": "neutral",
-    "stage": "done",
-    "price": true
-   },
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLE",
-    "issue": "MARKET_STRUCTURE",
-    "dir": "neutral",
-    "stage": "done",
-    "price": true
-   },
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLE",
-    "issue": "OIL_ENERGY",
-    "dir": "positive",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-16T21:46:39.635517+00:00",
-  "n_src": 900
- },
- "dbc77ae1b602": {
-  "lines": [
-   "앤트로픽 5월 650억 달러 자금 조달 라운드 마감 (예상)",
-   "앤트로픽 IPO 시 기업가치 약 1.4조 달러 전망"
-  ],
-  "tags": [
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLK",
-    "issue": "CORP_EVENT",
-    "dir": "positive",
-    "stage": "done"
-   },
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLK",
-    "issue": "CORP_EVENT",
-    "dir": "positive",
-    "stage": "talk"
-   }
-  ],
-  "model": "groq:qwen/qwen3.8-27b",
-  "at": "2026-11-16T21:46:44.071750+00:00",
-  "n_src": 900
  },
  "c889827fe017": {
   "lines": [
@@ -216,142 +38,6 @@
   "at": "2026-11-16T22:30:14.151847+00:00",
   "n_src": 361,
   "retry": true
- },
- "92c77f149bab": {
-  "lines": [
-   "젠슨 황 엔비디아 CEO 사임 33년 만의 퇴임",
-   "엔비디아 이사회 젠슨 황 CEO 복귀 고려하지 않음",
-   "엔비디아 와처렐 리프턴 로펌에 황 행동 조사 의뢰"
-  ],
-  "tags": [
-   {
-    "scope": "stock",
-    "tickers": [
-     "NVDA"
-    ],
-    "sector": "SMH",
-    "issue": "CORP_EVENT",
-    "dir": "neutral",
-    "stage": "done"
-   },
-   {
-    "scope": "stock",
-    "tickers": [
-     "NVDA"
-    ],
-    "sector": "SMH",
-    "issue": "CORP_EVENT",
-    "dir": "neutral",
-    "stage": "done"
-   },
-   {
-    "scope": "stock",
-    "tickers": [
-     "NVDA"
-    ],
-    "sector": "SMH",
-    "issue": "REGULATION",
-    "dir": "negative",
-    "stage": "done"
-   }
-  ],
-  "model": "groq:qwen/qwen3.8-27b",
-  "at": "2026-11-16T21:46:44.071750+00:00",
-  "n_src": 900
- },
- "2d704108ebf1": {
-  "lines": [
-   "미국 주택가치 상승 속 재산세 인하 또는 상한 설정 움직임 확산",
-   "플로리다 주 11월 3일 중간선거에서 재산세 면제 확대 수정안 가결",
-   "노스캐롤라이나 주 재산세 인상 제한 의무화 수정안 가결",
-   "오클라호마 및 와이오밍 주 재산세 관련 수정안 부결"
-  ],
-  "tags": [
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "FISCAL_POLITICS",
-    "dir": "negative",
-    "stage": "talk"
-   },
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "FISCAL_POLITICS",
-    "dir": "positive",
-    "stage": "done"
-   },
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "FISCAL_POLITICS",
-    "dir": "positive",
-    "stage": "done"
-   },
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "FISCAL_POLITICS",
-    "dir": "negative",
-    "stage": "done"
-   }
-  ],
-  "model": "groq:qwen/qwen3.8-27b",
-  "at": "2026-11-16T21:47:45.394995+00:00",
-  "n_src": 900
- },
- "8ffd60a26139": {
-  "lines": [
-   "테슬라-스페이스X 합병 가능성 27%에서 62%로 상승",
-   "테슬라 2026년 주주총회 12월 3일 개최 예정"
-  ],
-  "tags": [
-   {
-    "scope": "stock",
-    "tickers": [
-     "TSLA"
-    ],
-    "sector": "XLY",
-    "issue": "CORP_EVENT",
-    "dir": "uncertain",
-    "stage": "talk"
-   },
-   {
-    "scope": "stock",
-    "tickers": [
-     "TSLA"
-    ],
-    "sector": "XLY",
-    "issue": "CORP_EVENT",
-    "dir": "neutral",
-    "stage": "talk"
-   }
-  ],
-  "model": "groq:qwen/qwen3.8-27b",
-  "at": "2026-11-16T21:47:45.394995+00:00",
-  "n_src": 900
- },
- "c87252fd4836": {
-  "lines": [
-   "앤트로픽 IPO 관련 파생상품 시장서 낙관적 신호 포착"
-  ],
-  "tags": [
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLK",
-    "issue": "MARKET_STRUCTURE",
-    "dir": "positive",
-    "stage": "talk"
-   }
-  ],
-  "model": "groq:qwen/qwen3.8-27b",
-  "at": "2026-11-16T21:47:45.394995+00:00",
-  "n_src": 308
  },
  "3871cc67e044": {
   "lines": [
@@ -3621,6 +3307,360 @@
   ],
   "model": "gemini-3.5-flash-lite",
   "at": "2026-11-23T12:46:37.327240+00:00",
+  "n_src": 900
+ },
+ "e3a79f42fb3c": {
+  "lines": [
+   "젠슨 황 엔비디아 CEO 즉시 복귀 발표",
+   "엔비디아 주가 31% 급등"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "CORP_EVENT",
+    "dir": "positive",
+    "stage": "done"
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-23T21:47:59.103412+00:00",
+  "n_src": 900
+ },
+ "26e93aaa939a": {
+  "lines": [
+   "크라우드스트라이크, 439억 달러 규모 즈스케일러 인수 계획",
+   "즈스케일러 주주, 주당 1.135주 크라우드스트라이크 주식 수령 예정"
+  ],
+  "tags": [
+   null,
+   null
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-23T21:47:59.103412+00:00",
+  "n_src": 900
+ },
+ "5b5a2db04132": {
+  "lines": [
+   "뉴욕 연은 총재, 2027년 연준 2% 물가 목표 도달 전망",
+   "존 윌리엄스 총재, 인플레이션 통제 위한 추가 조치 시사"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "INFLATION",
+    "dir": "positive",
+    "stage": "talk"
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "RATES_FED",
+    "dir": "negative",
+    "stage": "talk"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-23T21:47:59.103412+00:00",
+  "n_src": 900
+ },
+ "cc01cc3d1257": {
+  "lines": [
+   "11월 8일 직원 서한을 통한 황젠슨의 불륜 사실 인정",
+   "11월 12일 황젠슨의 엔비디아 최고경영자 사임",
+   "월요일의 엔비디아 최고경영자 즉각 복귀 발표"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "CORP_EVENT",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "CORP_EVENT",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "CORP_EVENT",
+    "dir": "positive",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-23T21:48:00.844609+00:00",
+  "n_src": 900
+ },
+ "6c94260459c7": {
+  "lines": [],
+  "tags": [],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-23T21:48:00.844609+00:00",
+  "n_src": 361
+ },
+ "b95ea355aa61": {
+  "lines": [
+   "시장 변동성에 따른 3분기 은퇴 계좌 잔액 감소",
+   "평균 401(k) 잔액 2% 하락한 15만 2500달러",
+   "개인퇴직계좌 평균 잔액 1% 하락한 14만 2261달러"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "MARKET_STRUCTURE",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-23T21:48:00.844609+00:00",
+  "n_src": 900
+ },
+ "ecc3127fc599": {
+  "lines": [
+   "젠슨 황 엔비디아 CEO 복귀 발표",
+   "엔비디아 주가 개장 직후 30% 이상 급등",
+   "엔비디아 23년 만의 최대 일일 상승폭 기록",
+   "중국 스파이 의혹 조사 및 데이터센터 규제 가능성 언급"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "CORP_EVENT",
+    "dir": "positive",
+    "stage": "done"
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done"
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "REGULATION",
+    "dir": "negative",
+    "stage": "talk"
+   }
+  ],
+  "model": "groq:qwen/qwen3.8-27b",
+  "at": "2026-11-23T21:53:07.705292+00:00",
+  "n_src": 900
+ },
+ "2b36ada660b1": {
+  "lines": [
+   "트럼프 행정부 401(k) ESG 투자 제한 규정 제안",
+   "케이스 손더링 노동장관 재무적 이익 우선 원칙 강조"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "REGULATION",
+    "dir": "negative",
+    "stage": "talk"
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "REGULATION",
+    "dir": "neutral",
+    "stage": "done"
+   }
+  ],
+  "model": "groq:qwen/qwen3.8-27b",
+  "at": "2026-11-23T21:53:07.705292+00:00",
+  "n_src": 900
+ },
+ "1a5c8d17c462": {
+  "lines": [
+   "아마존 AI 스타트업 데카르트 기술 인수 및 창업자 고용 합의",
+   "데카르트 칩 간 AI 모델 동기화 소프트웨어 기술 확보",
+   "2023년 설립 이스라엘 스타트업 데카르트 인력 흡수"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "AMZN"
+    ],
+    "sector": "XLY",
+    "issue": "CORP_EVENT",
+    "dir": "positive",
+    "stage": "done"
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "AMZN"
+    ],
+    "sector": "XLY",
+    "issue": "AI_CAPEX",
+    "dir": "positive",
+    "stage": "done"
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "AMZN"
+    ],
+    "sector": "XLY",
+    "issue": "CORP_EVENT",
+    "dir": "positive",
+    "stage": "done"
+   }
+  ],
+  "model": "groq:qwen/qwen3.8-27b",
+  "at": "2026-11-23T21:53:07.705292+00:00",
+  "n_src": 900
+ },
+ "bf1b713da808": {
+  "lines": [
+   "제이 클레이턴 국가정보국장이 국가사이버국장 대행으로 지명",
+   "트럼프 대통령, 시안 케어크로스 국가사이버국장 교체 결정",
+   "키르스텐 데이비스 국방부 CIO, 국가사이버국장 후보로 지명"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "REGULATION",
+    "dir": "neutral",
+    "stage": "done"
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "REGULATION",
+    "dir": "neutral",
+    "stage": "done"
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "REGULATION",
+    "dir": "neutral",
+    "stage": "done"
+   }
+  ],
+  "model": "groq:qwen/qwen3.8-27b",
+  "at": "2026-11-23T21:58:57.357416+00:00",
+  "n_src": 900
+ },
+ "bb9ac6553270": {
+  "lines": [
+   "2월 14일 슈퍼볼 61 IMAX 극장 생중계 예정",
+   "IMAX 역사상 최대 규모 라이브 이벤트 기록",
+   "미국 및 호주, 뉴질랜드, 브라질 등 일부 해외 시장 티켓 판매 예정"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLC",
+    "issue": "CORP_EVENT",
+    "dir": "neutral",
+    "stage": "talk"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLC",
+    "issue": "CORP_EVENT",
+    "dir": "neutral",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLC",
+    "issue": "CORP_EVENT",
+    "dir": "neutral",
+    "stage": "talk"
+   }
+  ],
+  "model": "groq:qwen/qwen3.8-27b",
+  "at": "2026-11-23T21:58:57.357416+00:00",
   "n_src": 900
  }
 }
