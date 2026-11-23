@@ -298,7 +298,7 @@ def price_chart(day, bars):
     if not real:
         print("[kr-report] 코스피 일봉 부족 — 봉차트 없이")
         return ""
-    return real + CDL.GAP + CDL.SCRIPT
+    return real + CDL.kr_live(None, always=MOCK_SAMPLE, url=CDL.NAVER_KOSPI) + CDL.GAP + CDL.SCRIPT   # 장중 네이버 코스피 링크 — 목업은 늘 보임 (2026-11-23 사용자)
 
 
 def head_chart(r):
