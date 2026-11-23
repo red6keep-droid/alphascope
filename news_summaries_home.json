@@ -1,269 +1,4 @@
 {
- "2d11eefeddda": {
-  "lines": [
-   "이란 전쟁 영향의 에너지 가격 상승으로 일본 3분기 경제 연율 0.1% 위축",
-   "LSEG 집계 기준 일본 은행의 12월 25베이시스포인트 금리 인상 확률 75.6% (예상)"
-  ],
-  "tags": [
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "GROWTH_JOBS",
-    "dir": "negative",
-    "stage": "done"
-   },
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "RATES_FED",
-    "dir": "positive",
-    "stage": "talk"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-16T01:23:10.148582+00:00",
-  "n_src": 900
- },
- "a25cede273f9": {
-  "lines": [
-   "엔비디아 CEO 사임 이후 복귀 요구 청원 16만 건 돌파"
-  ],
-  "tags": [
-   {
-    "scope": "stock",
-    "tickers": [
-     "NVDA"
-    ],
-    "sector": "SMH",
-    "issue": "CORP_EVENT",
-    "dir": "positive",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-16T08:12:39.349697+00:00",
-  "n_src": 900
- },
- "9e42e9292b1c": {
-  "lines": [
-   "유럽 은행들의 인공지능 활용 업무 자동화 및 인력 재배치",
-   "바클레이즈의 인공지능 도입 부서 감원 단행"
-  ],
-  "tags": [
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLF",
-    "issue": "AI_CAPEX",
-    "dir": "positive",
-    "stage": "done"
-   },
-   null
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-16T12:46:10.047521+00:00",
-  "n_src": 900,
-  "retry": true
- },
- "fd6ebbed2fe0": {
-  "lines": [
-   "시진핑, 푸틴, 트럼프 목요일 선전 정상회담 개최 예정",
-   "미·중·러 정상회담 사상 최초 성사"
-  ],
-  "tags": [
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "GEOPOLITICS",
-    "dir": "positive",
-    "stage": "talk"
-   },
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "GEOPOLITICS",
-    "dir": "positive",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-16T12:46:11.523758+00:00",
-  "n_src": 900,
-  "retry": true
- },
- "1822d018c565": {
-  "lines": [
-   "10월 중국 소매판매 전년 동기 대비 0.4% 증가 (예상)",
-   "10월 중국 산업생산 전년 동기 대비 4.8% 증가 (예상)"
-  ],
-  "tags": [
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "GROWTH_JOBS",
-    "dir": "positive",
-    "stage": "done"
-   },
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "GROWTH_JOBS",
-    "dir": "positive",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-16T08:12:40.048851+00:00",
-  "n_src": 900
- },
- "8e3e565beb02": {
-  "lines": [],
-  "tags": [],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-16T08:12:40.048851+00:00",
-  "n_src": 316
- },
- "2464beb2d26b": {
-  "lines": [
-   "워런 버핏의 55억 달러 규모 버크셔 해서웨이 주식 기부",
-   "기부 이후 버크셔 해서웨이 클래식 A 주식 18만2140주 보유"
-  ],
-  "tags": [
-   null,
-   null
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-16T12:46:08.195335+00:00",
-  "n_src": 900
- },
- "b987f5a2c424": {
-  "lines": [
-   "마리아 캔트웰 상원의원의 하워드 러트닉 상무장관 앞 대중국 AI 칩 판매 중단 촉구 서한 발송"
-  ],
-  "tags": [
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "SMH",
-    "issue": "REGULATION",
-    "dir": "negative",
-    "stage": "talk"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-16T12:46:08.195335+00:00",
-  "n_src": 900
- },
- "86306f7ca140": {
-  "lines": [
-   "젠슨 황 CEO 사임 여파로 엔비디아 주가 시간외 거래에서 3.7% 하락",
-   "젠슨 황 복귀 촉구 온라인 청원 서명 17만 건 돌파"
-  ],
-  "tags": [
-   {
-    "scope": "stock",
-    "tickers": [
-     "NVDA"
-    ],
-    "sector": "SMH",
-    "issue": "MARKET_STRUCTURE",
-    "dir": "neutral",
-    "stage": "done",
-    "price": true
-   },
-   {
-    "scope": "stock",
-    "tickers": [
-     "NVDA"
-    ],
-    "sector": "SMH",
-    "issue": "CORP_EVENT",
-    "dir": "positive",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-16T12:46:08.195335+00:00",
-  "n_src": 900
- },
- "48d8a47d9a93": {
-  "lines": [
-   "유통업체들의 홀리데이 시즌 재고 비축 신중",
-   "고가 품목 공급 부족 예상"
-  ],
-  "tags": [
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLY",
-    "issue": "GROWTH_JOBS",
-    "dir": "negative",
-    "stage": "done"
-   },
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLY",
-    "issue": "GROWTH_JOBS",
-    "dir": "negative",
-    "stage": "talk"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-16T12:46:10.047521+00:00",
-  "n_src": 900
- },
- "f16b38de07b4": {
-  "lines": [
-   "에스토니아의 12월 1일 러시아 국경 도로 통행 폐쇄 준비",
-   "러시아 군사정보국의 드론 제조업체 방해 공작 시도"
-  ],
-  "tags": [
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "GEOPOLITICS",
-    "dir": "negative",
-    "stage": "talk"
-   },
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "GEOPOLITICS",
-    "dir": "negative",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-16T12:46:10.047521+00:00",
-  "n_src": 900
- },
- "af833fbb8243": {
-  "lines": [
-   "AI 기업 순환 자금 조달 규모 1조 달러 돌파"
-  ],
-  "tags": [
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "SMH",
-    "issue": "AI_CAPEX",
-    "dir": "positive",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-16T12:46:11.523758+00:00",
-  "n_src": 900
- },
  "c6561028565b": {
   "lines": [
    "월요일 JP모건 체이스 소비자 금융 서비스에 발생한 소프트웨어 오류",
@@ -2641,21 +2376,31 @@
  },
  "39c291d4dc46": {
   "lines": [
-   "블루 라군 1억 1천만 달러 규모 기업공개 진행"
+   "블루 라군 1억 1000만 달러 규모 기업공개 진행",
+   "기업공개를 통한 블루 라군 기업가치 7억 8700만 달러 평가"
   ],
   "tags": [
    {
     "scope": "sector",
     "tickers": [],
-    "sector": "XLY",
+    "sector": "XLV",
+    "issue": "CORP_EVENT",
+    "dir": "neutral",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLV",
     "issue": "CORP_EVENT",
     "dir": "neutral",
     "stage": "done"
    }
   ],
   "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-20T12:47:06.390952+00:00",
-  "n_src": 900
+  "at": "2026-11-23T12:46:37.327240+00:00",
+  "n_src": 900,
+  "retry": true
  },
  "c956e5a3c351": {
   "lines": [
@@ -3567,6 +3312,315 @@
   ],
   "model": "gemini-3.5-flash-lite",
   "at": "2026-11-22T21:46:32.026873+00:00",
+  "n_src": 900
+ },
+ "f47b3e7462fa": {
+  "lines": [
+   "오리건주와 버지니아주의 스페이스엑스 대상 그로크 딥페이크 관련 소송 제기"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLK",
+    "issue": "REGULATION",
+    "dir": "negative",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-23T12:46:32.218143+00:00",
+  "n_src": 900
+ },
+ "c54cbd73093d": {
+  "lines": [
+   "지난주 나스닥 지수 10% 하락",
+   "앤트로픽과 엔비디아 주가 시간외 거래 상승",
+   "앤트로픽의 기업공개 당시 역대 최대 935억 달러 조달"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLK",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLK",
+    "issue": "CORP_EVENT",
+    "dir": "positive",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-23T12:46:32.218143+00:00",
+  "n_src": 900
+ },
+ "580ba0c4948d": {
+  "lines": [
+   "오케이엑스아이스의 월요일 거래소 플랫폼 출범 예정",
+   "초기 상장 대상 기업의 90%에 달하는 56개사의 반대"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLF",
+    "issue": "CORP_EVENT",
+    "dir": "positive",
+    "stage": "talk"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLF",
+    "issue": "CORP_EVENT",
+    "dir": "negative",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-23T12:46:32.218143+00:00",
+  "n_src": 900
+ },
+ "86d4b4fc7154": {
+  "lines": [
+   "정유 관련 주식들의 상승세 둔화",
+   "정유주들의 마진과 현금흐름 증가"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLE",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLE",
+    "issue": "EARNINGS",
+    "dir": "positive",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-23T12:46:33.903820+00:00",
+  "n_src": 900
+ },
+ "f89a933dc56d": {
+  "lines": [
+   "우크라이나군의 해상 드론을 이용한 러시아 군함 격침",
+   "발트해의 러시아 화물선에 대한 드론 공격 발생"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLI",
+    "issue": "GEOPOLITICS",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLI",
+    "issue": "GEOPOLITICS",
+    "dir": "negative",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-23T12:46:33.903820+00:00",
+  "n_src": 900
+ },
+ "aab668bd13e8": {
+  "lines": [
+   "10년물 미국 국채 수익률 4.959%로 상승",
+   "2년물 미국 국채 수익률 4.689% 기록",
+   "30년물 미국 국채 수익률 5.335%로 상승"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "RATES_FED",
+    "dir": "neutral",
+    "stage": "done"
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "RATES_FED",
+    "dir": "neutral",
+    "stage": "done"
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "RATES_FED",
+    "dir": "neutral",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-23T12:46:33.903820+00:00",
+  "n_src": 900
+ },
+ "b2fedd61b350": {
+  "lines": [
+   "화석연료 언급 제외로 기후협상 합의 무산"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "GEOPOLITICS",
+    "dir": "negative",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-23T12:46:35.725496+00:00",
+  "n_src": 900
+ },
+ "c8eae1b2443b": {
+  "lines": [
+   "9월 주택담보대출 금리 급등에 따른 부동산 시장 침체",
+   "10월 초 30년 고정 주택담보대출 평균금리 7.61% 기록",
+   "7월 대비 3개월간 100 베이시스 포인트 상승"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLRE",
+    "issue": "REAL_ESTATE",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLRE",
+    "issue": "REAL_ESTATE",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLRE",
+    "issue": "REAL_ESTATE",
+    "dir": "negative",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-23T12:46:35.725496+00:00",
+  "n_src": 900
+ },
+ "4b9fc537804f": {
+  "lines": [
+   "공매도 세력의 아비박스 실험용 치료제 암 위험 주장",
+   "아비박스 파리 증시 주가 17% 하락",
+   "공매도 보고서 내용 전면 부인"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLV",
+    "issue": "CORP_EVENT",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLV",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLV",
+    "issue": "CORP_EVENT",
+    "dir": "positive",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-23T12:46:35.725496+00:00",
+  "n_src": 900
+ },
+ "0d63d1c624d8": {
+  "lines": [
+   "타타 스틸 APL 아폴로 지분 26.4% 인수 발표",
+   "타타 스틸의 지분 인수 규모 16억 7000만 달러 기록"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLB",
+    "issue": "CORP_EVENT",
+    "dir": "neutral",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLB",
+    "issue": "CORP_EVENT",
+    "dir": "neutral",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-23T12:46:37.327240+00:00",
+  "n_src": 900
+ },
+ "8deb736225f2": {
+  "lines": [
+   "한국 금융당국 증권시장 안정화 펀드 즉각 가동 준비"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "MARKET_STRUCTURE",
+    "dir": "positive",
+    "stage": "talk"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-23T12:46:37.327240+00:00",
   "n_src": 900
  }
 }
