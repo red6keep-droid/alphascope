@@ -142,126 +142,76 @@ def _naver_bars(sym, start, end):
     return out
 
 
-KIS_INDEX = {U.BENCH: "0001", U.KOSDAQ: "1001"}
-KIS_BASES = ["https://openapi.koreainvestment.com:9443", "https://openapivts.koreainvestment.com:29443"]   # 실전 → 모의
-_KIS = {}
+KIS_LAST = os.path.join(DATA, "kis_last.json")   # 집 IP 로 받은 한국투자증권 최근 일봉 — 대조에만 (kis_last.py)
 
 
-def _kis_env():
-    k, sec = os.environ.get("KIS_APP_KEY", "").strip(), os.environ.get("KIS_APP_SECRET", "").strip()
-    if not (k and sec):
-        try:
-            from dotenv import load_dotenv
-            load_dotenv(os.path.join(BASE, "..", "..", ".env"))
-            k, sec = os.environ.get("KIS_APP_KEY", "").strip(), os.environ.get("KIS_APP_SECRET", "").strip()
-        except ImportError:
-            pass
-    return k, sec
-
-
-def _kis_token():
-    """한국투자증권 접속 토큰 — 실행마다 한 번(1분 1회 · 24시간 유효). 키가 없거나 실패면 None → 네이버로."""
-    if "tok" in _KIS:
-        return _KIS["tok"]
-    _KIS["tok"] = None
-    k, sec = _kis_env()
-    if not (k and sec):
-        print("[kr] 한국투자증권 키 없음 — 마지막 봉 확인은 네이버로")
-        return None
-    for base in KIS_BASES:
-        try:
-            j = requests.post(base + "/oauth2/tokenP", json={"grant_type": "client_credentials", "appkey": k, "appsecret": sec}, timeout=15).json()
-        except Exception as e:   # noqa: BLE001
-            print(f"[kr] 한국투자증권 토큰 실패 ({base.split('//')[1].split('.')[0]}): {str(e)[:80]}")
-            continue
-        if j.get("access_token"):
-            _KIS["tok"] = (base, j["access_token"], k, sec)
-            return _KIS["tok"]
-        print(f"[kr] 한국투자증권 토큰 거절 ({base.split('//')[1].split('.')[0]}): {j.get('error_description') or j.get('msg1') or ''}"[:160])
-    print("::warning::[kr] 한국투자증권 토큰을 못 받음 — 마지막 봉 확인은 네이버로")
-    return None
-
-
-def _kis_bars(sym, start, end):
-    """한국투자증권 일봉(수정 전 가격, 거래소 기준) — {날짜: 봉}. 못 받으면 빈 dict."""
-    tok = _kis_token()
-    code = KIS_INDEX.get(sym) or _naver_code(sym)
-    if not tok or not code or code in NAVER_INDEX.values():
-        return {}
-    base, token, k, sec = tok
-    idx = sym in KIS_INDEX
-    path, tr = (("/uapi/domestic-stock/v1/quotations/inquire-daily-indexchartprice", "FHKUP03500100") if idx else
-                ("/uapi/domestic-stock/v1/quotations/inquire-daily-itemchartprice", "FHKST03010100"))
-    params = {"FID_COND_MRKT_DIV_CODE": "U" if idx else "J", "FID_INPUT_ISCD": code, "FID_INPUT_DATE_1": start.replace("-", ""),
-              "FID_INPUT_DATE_2": end.replace("-", ""), "FID_PERIOD_DIV_CODE": "D"}
-    if not idx:
-        params["FID_ORG_ADJ_PRC"] = "0"
-    hdr = {"content-type": "application/json; charset=utf-8", "authorization": "Bearer " + token, "appkey": k, "appsecret": sec, "tr_id": tr, "custtype": "P"}
+def _kis_ref(path=None):
+    """오늘 받은 한국투자증권 대조 파일 — 없거나 지난 날짜면 None (그때는 네이버로 대조)."""
     try:
-        j = requests.get(base + path, params=params, headers=hdr, timeout=10).json()
-    except Exception as e:   # noqa: BLE001
-        print(f"[kr] 한국투자증권 {sym} 실패: {str(e)[:80]}")
-        return {}
-    if j.get("rt_cd") != "0":
-        print(f"[kr] 한국투자증권 {sym} 거절: {j.get('msg1', '')[:80]}")
-        return {}
-    pre = "bstp_nmix_" if idx else "stck_"
-    out = {}
-    for r in j.get("output2") or []:
-        d = r.get("stck_bsop_date") or ""
-        try:
-            o, h, lo = float(r[pre + "oprc"]), float(r[pre + "hgpr"]), float(r[pre + "lwpr"])
-            c = float(r[pre + "prpr"] if idx else r["stck_clpr"])
-        except (KeyError, TypeError, ValueError):
-            continue
-        if len(d) == 8 and c > 0:
-            day = f"{d[:4]}-{d[4:6]}-{d[6:]}"
-            out[day] = {"day": day, "open": o, "high": h, "low": lo, "close": c, "adj": c, "volume": float(r.get("acml_vol") or 0)}
-    return out
+        with open(path or KIS_LAST, encoding="utf-8") as f:
+            j = json.load(f)
+    except (OSError, ValueError):
+        return None
+    if j.get("day") != datetime.datetime.now(KST).date().isoformat():
+        return None
+    return j.get("bars") or None
 
 
-def _fix_last(bars):
-    """마지막 봉 = 거래소 값으로 맞추기 (2026-11-23 사용자). 11-23 야후가 ① 전 종목 · 지수 시가를 0.0 으로 주고
+def _fix_last(bars, kis_path=None):
+    """마지막 봉 대조 (2026-11-23 사용자). 11-23 야후가 ① 전 종목 · 지수 시가를 0.0 으로 주고
     ② 삼성전자 177,500 · SK하이닉스 1,085,000 처럼 장 막판 전에서 멈춘 종가를 줬다(거래소 180,600 · 1,101,000).
-    한국 종목 · ETF · 지수마다 마지막 봉을 한국투자증권(없거나 실패면 네이버)으로 받아 다르면 바꾸고, 하루 늦은 봉은 붙인다.
-    과거 봉 · 수정주가는 야후 그대로 — 바꾼 날의 adj 는 야후 adj/종가 비율을 지킨다."""
+    대조 = 한국투자증권(집 IP 로 미리 받은 kis_last.json, 없으면 네이버). 야후와 다른 칸 · 빈 칸 · 하루 늦은 봉은 **네이버 값**으로 바꾼다
+    — 한국투자증권 값은 맞나 틀리나를 가르는 데만 쓰고 싣지 않는다(사용자: 개인 API 시세를 공개 게시하지 않게).
+    네이버도 못 받으면 야후 값 그대로 + 경고. 과거 봉 · 수정주가는 야후 그대로 — 바꾼 날의 adj 는 야후 adj/종가 비율을 지킨다."""
     if not bars:
         return bars
+    kis = _kis_ref(kis_path)
     last_day = max(b[-1]["day"] for b in bars.values() if b)
-    changed, added, failed, src_n = [], [], [], {"한국투자증권": 0, "네이버": 0}
+    changed, added, failed, n_chk = [], [], [], 0
     for s, bs in bars.items():
         if not bs or not _naver_code(s):
             continue
         t = bs[-1]
-        ref, src = _kis_bars(s, t["day"], last_day), "한국투자증권"
-        time.sleep(0.1)
-        if t["day"] not in ref:
-            ref, src = _naver_bars(s, t["day"], last_day), "네이버"
+        keys = ("open", "high", "low", "close")   # 거래량은 대조 안 함 — 한국투자증권은 시간외까지 넣어 늘 조금 다르다(11-23 KODEX 200 29,581,658 vs 네이버 · 야후 28,980,975)
+        ref = (kis or {}).get(s) or {}
+        nav = None
+        if t["day"] not in ref:   # 한국투자증권 대조가 없으면 네이버가 대조 겸 값
+            nav = _naver_bars(s, t["day"], last_day)
             time.sleep(0.3)
+            ref = nav
         if t["day"] not in ref:
             if not t.get("open") or t["day"] < last_day:
                 failed.append(f"{s} {t['day']}")
             continue
-        src_n[src] += 1
-        n = ref[t["day"]]
-        keys = ("open", "high", "low", "close") + (("volume",) if s not in NAVER_INDEX else ())
-        diff = [k for k in keys if n[k] and abs((t.get(k) or 0) - n[k]) > 1e-6 * max(1.0, n[k])]
+        n_chk += 1
+        r = ref[t["day"]]
+        diff = [k for k in keys if r.get(k) and abs((t.get(k) or 0) - r[k]) > 1e-6 * max(1.0, r[k])]
+        late = t["day"] < last_day and any(d > t["day"] for d in ref)
+        if not (diff or late):
+            continue
+        if nav is None:   # 다르다고 나온 종목만 네이버에서 실을 값을 받는다
+            nav = _naver_bars(s, t["day"], last_day)
+            time.sleep(0.3)
         if diff:
-            ratio = (t["adj"] / t["close"]) if t.get("close") and t.get("adj") else 1.0
-            if "close" in diff:
-                changed.append(f"{s} 종가 {t.get('close'):,.2f}→{n['close']:,.2f}")
-            for k in diff:
-                t[k] = n[k]
-            t["adj"] = t["close"] * ratio
-        if t["day"] < last_day:
-            add = [ref[d] for d in sorted(ref) if d > t["day"]]
+            v = nav.get(t["day"])
+            if not v:
+                failed.append(f"{s} {t['day']} 값 다름(네이버 없음)")
+            else:
+                ratio = (t["adj"] / t["close"]) if t.get("close") and t.get("adj") else 1.0
+                if "close" in diff:
+                    changed.append(f"{s} 종가 {t.get('close'):,.2f}→{v['close']:,.2f}")
+                for k in diff:
+                    t[k] = v[k]
+                t["adj"] = t["close"] * ratio
+        if late:
+            add = [nav[d] for d in sorted(nav) if d > t["day"]]
             bs.extend(add)
             (added if add else failed).append(f"{s} {last_day}")
-    print(f"[kr] 마지막 봉 확인 — 한국투자증권 {src_n['한국투자증권']} · 네이버 {src_n['네이버']}, 종가 바꿈 {len(changed)} · 늦은 봉 붙임 {len(added)}")
+    print(f"[kr] 마지막 봉 대조({'한국투자증권' if kis else '네이버'}) {n_chk}종목 — 종가 바꿈 {len(changed)} · 늦은 봉 붙임 {len(added)} (바꾼 값 = 네이버)")
     if changed:
-        print(f"[kr] 야후 종가 다름 → 거래소 값: {', '.join(changed[:15])}{' …' if len(changed) > 15 else ''}")
+        print(f"[kr] 야후 종가 다름 → 네이버 값: {', '.join(changed[:15])}{' …' if len(changed) > 15 else ''}")
     if failed:
-        print(f"::warning::[kr] 마지막 봉 확인 못 함 {len(failed)}건(야후 값 그대로): {', '.join(failed[:10])}")
+        print(f"::warning::[kr] 마지막 봉 대조 · 바꾸기 못 함 {len(failed)}건(야후 값 그대로): {', '.join(failed[:10])}")
     return bars
 
 
@@ -282,7 +232,7 @@ def run_prices():
     syms = [c[0] for c in U.CANDIDATES]
     base = syms + [U.BENCH, U.KOSDAQ] + sorted(U.SECTOR_ETF_LIST)   # 업종 ETF — 업종 자금 카드 (2026-10-31)
     bars = _bars(base + sorted(set(etf_universe.KR_SYMS) - set(base)))   # 회원 `내 종목` ETF (2026-11-12)
-    bars = _fix_last(bars)   # 마지막 봉 = 한국투자증권 → 네이버 — 야후 시가 0 · 장 막판 전 종가 · 늦은 봉 (2026-11-23)
+    bars = _fix_last(bars)   # 마지막 봉 대조 = 한국투자증권(집 IP) · 바꾸는 값 = 네이버 — 야후 시가 0 · 장 막판 전 종가 · 늦은 봉 (2026-11-23)
     got = [s for s in syms if s in bars]
     if len(got) < len(syms) // 2:
         notify.event("수집 실패", f"한국 종목 일봉 {len(got)}/{len(syms)} — yfinance 응답 부족, 이 실행은 자료 지연")

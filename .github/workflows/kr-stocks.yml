@@ -55,7 +55,7 @@ concurrency:
 env:
   ECOS_API_KEY: ${{ secrets.ECOS_API_KEY }}
   DATA_GO_KR_API_KEY: ${{ secrets.DATA_GO_KR_API_KEY }}   # 관세청 품목별 수출 (방산, 2026-10-31)
-  KIS_APP_KEY: ${{ secrets.KIS_APP_KEY }}         # 마지막 봉 = 거래소 값(한국투자증권 실전, collect_kr._fix_last) — 없거나 실패면 네이버 (2026-11-23 사용자)
+  KIS_APP_KEY: ${{ secrets.KIS_APP_KEY }}         # 마지막 봉 대조(한국투자증권 실전, 집 IP 로만 — kis_last.py) · 바꾸는 값은 네이버 (2026-11-23 사용자)
   KIS_APP_SECRET: ${{ secrets.KIS_APP_SECRET }}
   DART_API_KEY: ${{ secrets.DART_API_KEY }}   # `실적과 기대` 분기 매출 (collect_kr_dart.py, 2026-10-25) — 없으면 Yahoo 매출
   # 한국 증시 리포트 뉴스 탭의 같은 뉴스 묶기(news_stories, 사슬 news-alt) — 키가 없어 매번 낱말 규칙으로 떨어졌다 (2026-11-12). 실행당 1~2회 · 하루 약 4회
@@ -202,6 +202,30 @@ jobs:
         run: |
           pip install -q telethon
           python experiments/broker-research/collect_tg.py
+
+      # 마지막 봉 대조용 한국투자증권 일봉 — 집 IP(VPN newfact 계정, 유튜브 수집과 다른 계정이라 기다리지 않음)로만 (2026-11-23 사용자).
+      # 값은 대조에만 쓰고 바꾸는 값은 네이버(collect_kr._fix_last). VPN · 한국투자증권이 안 되면 파일이 없어 네이버로만 대조 — 수집은 멈추지 않는다.
+      # 약 1~2분(VPN 패키지 설치 · 연결 약 1분 + 66종목 0.35초 간격 약 25초)
+      - name: 집 VPN 연결 (newfact)
+        id: vpn
+        continue-on-error: true
+        timeout-minutes: 5
+        run: sudo env VPN_SERVER="$VPN_SERVER" VPN_PSK="$VPN_PSK" VPN_USER="$VPN_USER" VPN_PASSWORD="$VPN_PASSWORD" GITHUB_OUTPUT="$GITHUB_OUTPUT" bash scripts/vpn/vpn-up.sh
+        env:
+          VPN_SERVER: ${{ secrets.VPN_SERVER }}
+          VPN_PSK: ${{ secrets.VPN_PSK }}
+          VPN_USER: ${{ secrets.VPN_USER_NEWFACT }}
+          VPN_PASSWORD: ${{ secrets.VPN_PASSWORD_NEWFACT }}
+      - name: 한국투자증권 최근 일봉 (집 IP · 대조용)
+        if: steps.vpn.outputs.ok == 'true'
+        continue-on-error: true
+        timeout-minutes: 5
+        env:
+          HOME_SOURCE_ADDRESS: ${{ steps.vpn.outputs.ip }}
+        run: python -u "$KR_DIR/kis_last.py"
+      - name: VPN 끊기
+        if: always() && steps.vpn.outcome != 'skipped'
+        run: sudo bash scripts/vpn/vpn-down.sh
 
       - name: Collect · analyze · render
         id: run_kr
