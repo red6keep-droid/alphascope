@@ -4,7 +4,7 @@
     HOME_SOURCE_ADDRESS=<ppp0 주소> python experiments/kr-stocks/kis_last.py --quick --out PATH   # 간단 종목(한국 350)
 
 왜: 11-23 야후가 한국 전 종목 시가 0.0 · 장 막판 전에서 멈춘 종가(삼성전자 177,500 vs 거래소 180,600)를 줬다.
-한국투자증권 값은 **싣지 않는다** — 오늘 거래일이 언제인지 · 야후와 종가가 다른 종목 수를 기록하는 데만 쓴다(collect_kr._fix_last, 2026-11-23 사용자: 출처는 야후, 네이버는 야후가 막힌 칸만).
+한국투자증권 값은 **대조에만** 쓴다 — 야후와 다른 칸은 네이버 값으로 바꾼다(collect_kr._fix_last). 블로그에 싣는 값의 출처는 야후 · 네이버.
 집 IP 로만 부른다(home_ip.session — VPN 주소가 없으면 예외, GitHub 주소로 몰래 나가지 않음). 개인 사용 모양 그대로: 실행마다 토큰 1번, 0.35초 간격(넘기면 1초 쉬고 한 번 더).
 결과 = data/kis_last.json {"day": 오늘(KST), "fetched_at", "base": 실전/모의, "bars": {심볼: {날짜: 봉}}}. 실패하면 파일을 안 쓴다 → 수집기는 네이버로만 대조.
 AI 0 · Blogger · gh-pages 쓰기 0.
