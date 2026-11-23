@@ -45,15 +45,16 @@ def card(name, bars, dec=0, avg=None, title="가격 흐름"):
 MOCK_AVG = 0.97   # 목업에만 보이는 `내 평단` 예시 = 마지막 종가의 97% (실제 페이지엔 없다 — 회원 본인 화면에서만, 회원 기능 때)
 GAP = '<div style="height:20px;"></div>'   # 차트와 탭 사이 20 (2026-11-14 사용자)
 NAVER_KR = "https://m.stock.naver.com/domestic/stock/{code}/total"
+NAVER_KOSPI = "https://m.stock.naver.com/domestic/index/KOSPI/total"
 
 
-def kr_live(code, always=False):
+def kr_live(code, always=False, url=None):
     """한국 종목 봉차트 오른쪽 아래(탭 위) `실시간 가격은 네이버 증권에서 보기 ↗` — 장중(평일 9:00~15:30 한국 시간)에만 보이고 장이 끝나면 사라진다
     (2026-11-23 사용자: 종가 리포트라 실시간은 네이버로 보낸다). 켜고 끄기 = candle_chart.js krLive(1분마다). always = 목업용(시각과 상관없이 보임).
-    새 호출 0 — 링크만."""
-    if not code:
+    url = 종목 페이지가 아닌 곳(한국 증시 리포트 코스피 = NAVER_KOSPI). 새 호출 0 — 링크만."""
+    if not (code or url):
         return ""
-    link = (f'<a href="{html.escape(NAVER_KR.format(code=code), quote=True)}" target="_blank" rel="noopener" data-trhelp="skip" '
+    link = (f'<a href="{html.escape(url or NAVER_KR.format(code=code), quote=True)}" target="_blank" rel="noopener" data-trhelp="skip" '
             f'style="font-size:13px;line-height:19px;color:{dk.SUB};text-decoration:underline;text-underline-offset:3px;">'
             f'실시간 가격은 네이버 증권에서 보기 {dk.LINK_ICON}</a>')
     return (f'<div data-kr-live="{"always" if always else "1"}" style="display:{"flex" if always else "none"};justify-content:flex-end;margin:8px 0 0;">'
