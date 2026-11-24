@@ -90,6 +90,10 @@ SERVICES = [
          wf="commentary.yml", start="08:40", up="us_report"),
     dict(key="quick_us", name="간단 종목 853 (미국)", short="간단 미국", at="09:00", reader=True, why="안내 상자 `아침 9시 무렵` (11.24 고침)",
          since=dt.date(2026, 11, 17), due=_us_day, src=("run", "quick-data.yml", "· us"), wf="quick-data.yml", start="08:20", up="us_pages"),
+    # 새벽 받기 (2026-11-24 사용자) — 한국 간단 종목 DART · 정식 종목 매출 · 수주 읽기. 결과가 화면에 바로 안 보여도 안 돌면 화면이 지난 값으로 나간다.
+    # GitHub 예약이 08~13시에 와 `Too late?` 로 받기를 건너뛰고도 `성공` 이던 날(11-21~24)을 잡는다 — 5분 넘게 돈 실행만 `받음`
+    dict(key="kr_dart", name="한국 DART 새벽 받기", short="새벽 받기", at="06:00", reader=False, why="03:20 Worker 예약 · 02~06시 창 안에서만 받음",
+         since=dt.date(2026, 11, 21), due=_every, src=("run", "quick-dart.yml", ""), wf="quick-dart.yml", start="03:20"),
     dict(key="kr_report", name="한국 증시 리포트", short="한국 리포트", at="16:30", reader=True, why="안내 상자 `오후 4시 30분 무렵`",
          since=START, due=_kr_day, src=("post", lambda e: "한국 증시 리포트" in e["labels"]), wf="kr-stocks.yml", start="15:50"),
     dict(key="kr_pages", name="한국 종목 페이지", short="한국 종목", at="16:30", reader=True, why="안내 상자 `오후 4시 30분 무렵` · 검색 색인 커밋",
@@ -125,6 +129,7 @@ START_BEFORE = {
     "kr_home": [(dt.date(2026, 11, 20), "16:10")], "hypo_pm": [(dt.date(2026, 11, 20), "16:10")],
     "us_report": [(dt.date(2026, 11, 20), "07:00")],   # 11-20 미국 실행 한 줄로 — 07:00 → 06:40
     "quick_kr": [(dt.date(2026, 11, 20), "17:40")],
+    "kr_dart": [(dt.date(2026, 11, 25), "03:25")],   # 11-24 까지 GitHub 예약 03:25 만, 11-25 부터 Worker 03:20
     "us_pages": [(dt.date(2026, 11, 20), "07:30")], "themes": [(dt.date(2026, 11, 20), "07:30")],   # 11-20 리포트 뒤 이어 붙기 — 예약(예비) 07:30 은 그대로, 보통 · 정시는 이날부터
 }
 
@@ -326,7 +331,9 @@ def why(svc, d, st, t, res_by_key, runs):
     gap = round((first["start"] - sched).total_seconds() / 60)
     if gap > 10 and "앞 단계 늦음" not in tags:
         tags.append("늦게 시작")
-        bits.append(f"예약 {st_at} → 시작 {_hm(first['start'])} ({gap}분 늦음)")
+        bits.append(f"예약 {st_at} → 시작 {_hm(first['start'])} ({gap}분 늦음)"
+                    + (" · 실행은 `성공` 이지만 할 일을 건너뜀(5분 안에 끝남)" if svc["src"][0] == "run" and not t
+                       and all((r["end"] - r["start"]).total_seconds() < 300 for r in rs) else ""))
     good = [r for r in rs if r["concl"] == "success" and (not t or r["end"] >= t - dt.timedelta(minutes=5))]
     main = min(good, key=lambda r: r["start"]) if good else None
     if main and not bad:
@@ -487,7 +494,7 @@ def summary(res, now, reasons=None):
 
 
 # 시장 — 탭 나누기 (2026-11-24 사용자 "탭으로 미국 한국 콘텐츠 나눠"). 홈 주요 뉴스(news.json) · Hot Issue · 전망 아침 · 테마 · 인물 발언은 미국 아침 실행이라 미국
-KR_KEYS = {"kr_report", "kr_pages", "kr_home", "hypo_pm", "quick_kr", "kr_brief"}
+KR_KEYS = {"kr_dart", "kr_report", "kr_pages", "kr_home", "hypo_pm", "quick_kr", "kr_brief"}
 
 
 def market(svc):

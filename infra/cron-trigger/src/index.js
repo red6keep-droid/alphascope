@@ -58,6 +58,10 @@ const KST_JOBS = {
   // 간단 종목(853종목) — 미국 = 장 마감 뒤 아침(뉴스 06:40 → 화면 08:20, 정식 07:30 실행이 07:56~59 에 끝난 뒤), 한국 = 장 마감 뒤 17:40 (2026-11-15 사용자).
   // GitHub cron 도 그대로 — 둘 다 도는 날은 워크플로 check 잡이 '최근 6시간 안 같은 실행 성공' 을 보고 뒤 실행을 건너뛴다(뉴스 AI 두 번 X).
   // 미국 종목 뉴스 먼저 분류 (2026-11-20 사용자) — 장 마감 뒤 엔비디아 실행이 남은 기사만 분류하게. 화~토(= 미국 월~금). 늦게 오면 워크플로가 건너뜀
+  // 한국 DART 새벽 받기 · 보고서 매출 · 수주 읽기 (2026-11-24 사용자) — GitHub 예약(03:25)이 11-21~24 나흘 내리 08:29~12:59 에 와
+  // 워크플로 `Too late?`(06시 뒤 건너뜀)에 걸려 아무것도 못 받았다. Worker 가 걸면 workflow_dispatch 라 그 검사를 지난다. GitHub 예약은 예비로 둔다.
+  // 입력 없는 워크플로(inputs: null) · 감시 알림 끔(알림 대신 발행 시간 페이지, 2026-11-24 사용자). 같은 줄(concurrency quick-data)의 간단 종목은 08:20 · 16:40 이라 안 겹침
+  "03:20": [{ workflow: "quick-dart.yml", inputs: null, watch: false }],
   "04:30": [{ workflow: "radar-news-early.yml", inputs: { scheduled: "true" }, when: KST_TUE_SAT }],
   "06:20": [{ workflow: "quick-news.yml", when: KST_TUE_SAT }],   // 옛 06:40 (2026-11-20 사용자 — 미국 실행 한 줄로, 엔비디아 실행과 lite 분당 한도 안 겹치게)
   "08:20": [{ workflow: "quick-data.yml", inputs: { scheduled: "true", market: "us" }, when: KST_TUE_SAT }],
@@ -138,6 +142,7 @@ const NAMES = {
   "radar-news-early.yml": "미국 종목 뉴스 먼저 분류",
   "kr-facts.yml": "한국 기사 공용 저장소",
   "ops-dashboard.yml": "운영 대시보드 · 발행 시간",
+  "quick-dart.yml": "한국 DART 새벽 받기",
 };
 const WATCH_AFTER_MIN = 60;
 const RETRY_AGAIN_MIN = 170;   // 한 번 더 본다(18:40) — 다시 건 실행도 실패했으면 알림, 100분 때 아직 돌다가 그 뒤 끊겼으면 그때 다시 건다
