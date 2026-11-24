@@ -9,7 +9,7 @@
     python experiments/stock-character/look_band.py     # → output/mock_band.html — 목업 목록 http://localhost:8800/ 의 `개성 있는 아이 찾기 게임`
 
 화면 틀 = look_band_page.html (같은 폴더). 자료 = data/store/character/bars_us.pkl · earn_days_us.csv. 미국 S&P 500.
-조각을 자르는 과거 범위 = 최근 SPAN 거래일(지금 3년 — 사용자가 정하지 않은 값).
+과거 범위 = 화면에서 최근 1 · 2 · 3년 중 고름(2026-11-24 사용자 "범위는 안 늘린다. 1년 · 2년 · 3년도 선택하게 해 줘") — 3년치 조각을 담고 화면이 뒤에서부터 잘라 쓴다.
 칸 넷(조각마다 다시 잼, 모든 아이 같은 잣대): 평소 하루 폭(호수) · 예고 없는 돌 수(실적 · 파도 날이 아닌 ±5%) · 방향 크기(조각 처음 → 끝 등락) · 거래량 튄 날 수(평소의 2배).
 """
 
@@ -27,7 +27,7 @@ sys.path.insert(0, HERE)
 import look_stones as LS  # noqa: E402
 
 WINS = [20, 60, 120, 200]
-SPAN = 756          # 조각을 자르는 과거 범위(거래일) — 3년
+SPAN = 756          # 담아 두는 과거(거래일) = 3년. 더 늘리지 않는다(사용자). 화면에서 1 · 2 · 3년을 고른다
 ROSTER = {"COIN": "A", "BE": "A", "SMCI": "A", "BRK-B": "A", "KO": "A", "RSG": "A", "PG": "A", "L": "A", "LIN": "A", "WM": "A", "JNJ": "A",
           "TSLA": "B", "GLW": "B", "MSI": "C", "MSFT": "미정", "SCHW": "미정"}
 
