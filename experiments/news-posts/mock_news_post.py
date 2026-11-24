@@ -166,7 +166,20 @@ if __name__ == "__main__":
             summ = (post.get("summary") or "").strip()
             rows.append(f'<article class="news-item"{" hidden data-news-more=1" if k >= 5 else ""}><a href="{name}">{_h.escape(post["title"])}</a>'
                         + (f'<span class="news-sum nf-one">{_h.escape(summ)}</span>' if summ else "") + '</article>')
-        last = max(post["date"] for _, post in jobs)
+        # 카드 날짜 = 다른 홈 카드와 같은 꼴 `11.24 아침` · `11.24 오후` (테마 genKo — 가장 늦은 글을 만든 시각을 한국 시간으로, 12시 전 아침) (2026-11-24 사용자)
+        def _kst(p):
+            try:
+                t = datetime.datetime.fromisoformat(str(p.get("createdAt") or "").replace("Z", "+00:00"))
+                return (t if t.tzinfo else t.replace(tzinfo=datetime.timezone.utc)).astimezone(datetime.timezone(datetime.timedelta(hours=9)))
+            except ValueError:
+                return None
+        stamps = [t for t in (_kst(p) for _, p in jobs) if t]
+        if stamps:
+            t = max(stamps)
+            card_day = f"{t.month:02d}.{t.day:02d} {'아침' if t.hour < 12 else '오후'}"
+        else:
+            last = max(post["date"] for _, post in jobs)
+            card_day = f"{last[5:7]}.{last[8:10]}"
         card = ('<style>#nf-posts-col .report-title{gap:8px;}'
                 '.nf-home-logo{width:96px;height:22px;flex:none;display:block;}'
                 '#nf-posts-card{gap:0;}#nf-posts-card .news-item:first-child{padding-top:0;}#nf-posts-card .news-item:last-child{padding-bottom:0;}'
@@ -174,7 +187,7 @@ if __name__ == "__main__":
                 '#nf-posts-card .nf-one{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}</style>'
                 '<div class="report-col" id="nf-posts-col">'
                 f'<h3 class="report-title">{svg}'
-                f'<span class="report-card-date">{int(last[5:7])}.{last[8:10]}</span></h3>'
+                f'<span class="report-card-date">{card_day}</span></h3>'
                 f'<div class="report-card" id="nf-posts-card">{"".join(rows)}</div></div>')
         src = open(home, encoding="utf-8").read()
         mark = '<!-- 엔비디아 리포트 카드는 삭제'   # 한국 증시 카드 바로 다음
