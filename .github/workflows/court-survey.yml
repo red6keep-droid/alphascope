@@ -40,7 +40,7 @@ jobs:
 
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.12'   # 3.11 → 3.12 (2026-11-24 — 모든 실행 같은 판)
 
       - name: Install dependencies
         run: pip install requests python-dotenv

@@ -279,6 +279,9 @@ def _steps(run_id):
     return [(j.get("name", ""), s) for j in js.get("jobs") or [] for s in j.get("steps") or []]
 
 
+OPS_RECS = []   # 운영 기록(KV ops:…) — build(…, recs) 가 채운다. 실행이 `성공` 인데 스크립트가 멈춘 것(continue-on-error)을 여기서 본다
+
+
 def why(svc, d, st, t, res_by_key, runs):
     """늦음 · 안 나감 하나의 원인 → (태그 목록, 글). 실행 기록이 없으면 ([`원인 못 찾음`], …)."""
     tags, bits = [], []
@@ -302,6 +305,12 @@ def why(svc, d, st, t, res_by_key, runs):
         return tags, " · ".join(bits)
     # 실패 = 실패 · 시간 초과 · 5분 넘게 돌다 취소(겹친 실행이 곧바로 취소된 것은 빼고)
     bad = [r for r in rs if r["concl"] in ("failure", "timed_out") or (r["concl"] == "cancelled" and (r["end"] - r["start"]).total_seconds() >= 300)]
+    ids = {str(r["id"]) for r in rs}
+    soft = [x for x in OPS_RECS if str(x.get("run_id")) in ids and (x.get("exit") or {}).get("exception")]
+    if soft and not bad:   # 실행은 성공인데 스크립트가 예외로 멈춤 — 11-23 한국 리포트 `abs(None)`
+        x = soft[0]
+        tags.append("실패")
+        bits.append(f"실행은 성공이지만 `{x.get('script', '')}` 가 멈춤 — {str(x['exit']['exception'])[:120]}")
     if bad:
         r = bad[0]
         step = ""
@@ -426,11 +435,22 @@ def _counted(ds):
     return [x for x in ds if x[1] in ("on", "late", "miss")]
 
 
-def summary(res, now):
-    """운영 대시보드 요약 칸 · 할 일 — (값HTML, 보조, 오늘 어긴 것 [(이름, 글)])."""
+def summary(res, now, reasons=None):
+    """운영 대시보드 요약 칸 · 할 일 · Slack — (값HTML, 보조, 오늘 어긴 것 [(이름, 라벨HTML, 알림 key, {line, cause})])."""
+    reasons = reasons or {}
     allc = [x for _, ds in res for x in _counted(ds)]
     bad = sum(x[1] != "on" for x in allc)
-    today = [(svc["name"], _pill(x[1], x[3])) for svc, ds in res for x in ds if x[0] == now.date() and x[1] in ("late", "miss")]
+    today = []
+    for svc, ds in res:
+        for d, st, t, m, url in ds:
+            if d != now.date() or st not in ("late", "miss"):
+                continue
+            k = f"{svc['key']}|{d}"
+            a = at_on(svc["key"], d)
+            what = f"{_hm(t)} 에 {_late_text(m)} 늦게 나감" if t else f"{_hm(now)} 까지 아직 없음"
+            r = reasons.get(k)
+            line = f"{svc['name']} — 기준 {a}" + ("" if svc["reader"] else " (내부)") + f" · {what}"
+            today.append((svc["name"], _pill(st, m), k, {"line": line, "cause": r[1] if r else "원인을 아직 보지 않음"}))
     return (warn(f"늦음 · 안 나감 {bad}번") if bad else ok("모두 정시")), f"서비스 {len(res)}개 · 기준 {len(allc)}번 중 정시 {len(allc) - bad}번", today
 
 
@@ -528,9 +548,10 @@ def page_body(res, reasons, now):
                        "여유 부족(예약 ~ 기준 시간보다 실행이 오래 걸림) · 오래 걸림(20분 넘게, 가장 긴 단계) · 다시 돌림(첫 실행이 아닌 실행에서 나감). Hot Issue 오후 · 방송 줄처럼 바뀐 날만 올리는 자료는 `안 나감`을 가릴 수 없어 넣지 않았습니다."))
 
 
-def build(now, cache=None):
+def build(now, cache=None, recs=None):
     """→ (페이지 본문, 요약, 원인 cache). cache = {"key|날짜": [태그, 글]} — 오늘이 아닌 날 원인은 다시 묻지 않는다."""
     cache = dict(cache or {})
+    OPS_RECS[:] = recs or []
     posts = fetch_posts(START)
     commits = {p: fetch_commits(p, START) for p in sorted({s["src"][1] for s in SERVICES if s["src"][0] == "file"})}
     res = []
@@ -563,7 +584,7 @@ def build(now, cache=None):
             reasons[k] = list(why(svc, d, st, t, res_by_key, {svc["wf"]: rs}))
             if d < now.date() and rs is not None:
                 cache[k] = reasons[k]
-    return page_body(res, reasons, now), summary(res, now), cache
+    return page_body(res, reasons, now), summary(res, now, reasons), cache
 
 
 if __name__ == "__main__":

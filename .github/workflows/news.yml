@@ -52,7 +52,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
-          python-version: '3.10'
+          python-version: '3.12'   # 3.10 → 3.12 (2026-11-24 — 3.10 만 못 읽는 문법으로 미국 리포트가 멈춘 뒤 모든 실행을 3.12 로)
 
       # 방송 요약 날짜 파일 캐시 (experiments/media_feed.py, 2026-11-16 수집기 요청 News-doc/블로그-Firestore-읽기-줄이기.md).
       # 그제 이전 edition 만 들어 있다 — 실행마다 Firestore 는 오늘 · 어제 묶음만 읽는다. 키 = 워크플로 · KST 날짜(하루 한 번 저장, 날짜가 바뀌면 전날 것을 이어 받는다)

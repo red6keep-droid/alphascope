@@ -239,6 +239,7 @@ jobs:
 
       # 한국 증시 리포트 — 방금 받은 자료(data/*.json)로 그리기만. 날짜 붙은 코스피 그래프는 아래 gh-pages 에 남긴다(지난 글이 씀)
       - name: Render KR market report
+        id: kr_render
         continue-on-error: true
         run: python experiments/kr-market-report/main.py --cached
 
@@ -310,6 +311,7 @@ jobs:
           keep_files: true
 
       - name: Publish pages (한국 시총 TOP 10 · 종목 35)
+        id: kr_pages_pub
         if: steps.gate.outputs.go == 'true'
         continue-on-error: true
         run: python "$KR_DIR/publish_pages_kr.py"
@@ -328,12 +330,19 @@ jobs:
 
       # 한국 증시 리포트 글 — 하루 1편, 이미 있으면 건너뜀 (publish_report.py). 그래프가 kr-images 에 올라간 뒤
       - name: Publish KR market report
+        id: kr_report_pub
         if: steps.gate.outputs.go == 'true' && hashFiles('experiments/kr-market-report/output/report_body.html') != ''
         continue-on-error: true
         run: |
           if [ "$DO_REPORT" = "true" ] && [ "$UPDATE_REPORT" = "true" ]; then python experiments/kr-market-report/publish_report.py --update
           elif [ "$DO_REPORT" = "true" ]; then python experiments/kr-market-report/publish_report.py
           else echo "리포트 그림자 모드 (저장소 변수 KR_REPORT_PUBLISH=true 로 켠다)"; python experiments/kr-market-report/publish_report.py --dry; fi
+
+      # 소리 없는 실패 알림 (2026-11-24 사용자) — 위 continue-on-error 단계가 실패해도 실행은 `성공` 이라 알림이 없었다(11-23 한국 리포트 TypeError)
+      - name: Notify soft failures (소리 없는 실패 알림)
+        if: always()
+        continue-on-error: true
+        run: python .github/scripts/soft_fail.py "한국 증시 리포트 그리기=${{ steps.kr_render.outcome }}" "한국 종목 페이지 게시=${{ steps.kr_pages_pub.outcome }}" "한국 증시 리포트 게시=${{ steps.kr_report_pub.outcome }}"
 
       # 홈 한국 탭 데이터 — 발행된 페이지만 링크 (pages_live.json)
       - name: Home kr.json

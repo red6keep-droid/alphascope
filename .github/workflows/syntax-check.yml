@@ -1,0 +1,52 @@
+name: Syntax Check
+
+# 푸시 때 파이썬 문법 검사 (2026-11-24 사용자 "오늘부터 문제를 해결하자") — 11-24 미국 리포트가 3.10 에서 못 읽는 f-string 으로
+# 세 번 멈췄다. 모든 실행이 쓰는 3.12 로 전체 .py 를 컴파일만 한다(실행 X · 비밀값 X · 쓰기 X). 실패하면 Actions 에 빨간불 + Slack.
+# 1분 남짓 · 공개 저장소라 무료.
+
+on:
+  push:
+    branches: [main]
+    paths: ['**.py', '.github/workflows/syntax-check.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: syntax-check
+  cancel-in-progress: true
+
+jobs:
+  compile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Compile all Python files
+        run: |
+          python - <<'PY'
+          import pathlib, py_compile, sys
+          bad = []
+          for p in pathlib.Path(".").rglob("*.py"):
+              if any(part in ("output", "__pycache__", "node_modules", ".git") for part in p.parts):
+                  continue
+              try:
+                  py_compile.compile(str(p), doraise=True)
+              except py_compile.PyCompileError as e:
+                  bad.append(f"{p}: {e.msg.strip().splitlines()[-1]}")
+          print(f"검사 {sum(1 for _ in pathlib.Path('.').rglob('*.py'))}개 · 오류 {len(bad)}개")
+          for b in bad:
+              print(f"::error::{b}")
+          sys.exit(1 if bad else 0)
+          PY
+      - name: Notify failure
+        if: failure()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          [ -z "$SLACK_WEBHOOK_URL" ] && exit 0
+          curl -sS -X POST -H 'Content-type: application/json' --data "{\"text\":\"🚨 문법 검사 실패 — 방금 푸시한 파이썬 파일이 실행에서 멈출 수 있습니다 (${GITHUB_SHA::8})\n🔗 https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}" "$SLACK_WEBHOOK_URL" || true

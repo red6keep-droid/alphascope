@@ -34,7 +34,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
-          python-version: '3.10'
+          python-version: '3.12'   # 3.10 → 3.12 (2026-11-24 — 3.10 만 못 읽는 문법으로 미국 리포트가 멈춘 뒤 모든 실행을 3.12 로)
 
       - name: Install dependencies
         run: pip install -r requirements.txt
