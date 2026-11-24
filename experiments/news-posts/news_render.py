@@ -25,8 +25,9 @@ import story_render as SR  # noqa: E402  시황 해설과 같은 꾸밈(강조 �
 import universe_kr as UKR  # noqa: E402
 
 BLOG = SR.BLOG
-NAME = "Newfact 주요 기사"   # 글 이름 = 제목 줄 · 연재 라벨 (요청 12 · 14절. 4절의 옛 라벨 `Newfact 뉴스` 는 12절에서 이 이름으로)
-LABEL_Q = "Newfact%20%EC%A3%BC%EC%9A%94%20%EA%B8%B0%EC%82%AC"
+NAME = "Newfact 주요 기사"   # 글 이름 = 제목 줄 (요청 12 · 14절)
+LABEL = "Newfact 뉴스"   # 연재 라벨 = 지난 글 목록 (2026-11-24 사용자 결정 — 제목 줄 이름과 따로)
+LABEL_Q = "Newfact%20%EB%89%B4%EC%8A%A4"
 KR_REPORT = f"{BLOG}search/label/%ED%95%9C%EA%B5%AD%20%EC%A6%9D%EC%8B%9C%20%EB%A6%AC%ED%8F%AC%ED%8A%B8"
 DIR_KIND = {"up": "positive", "down": "negative", "neutral": "neutral"}
 STAGE_KO = {"confirmed": "확정", "discussing": "논의 중"}   # 화면에 싣지 않는다 — 단계 라벨 뺌 (2026-11-23 사용자 "확정 라벨은 빼"). 라벨 = 분야 · 방향 둘
@@ -334,10 +335,10 @@ def render(post, market, lists=None, issues=(), forecasts=()):
         body.append(SR.para(prose(p)))
     body.append(market_section(market, lists, th["solid"]))
     rel = follow_links(post, market, lists, issues, forecasts)   # 이어서 보기 칸을 따로 두지 않고 함께 보는 페이지에 합친다 (2026-11-23 사용자)
-    rel += [("한국 증시 리포트", KR_REPORT), (f"지난 {NAME}", f"{BLOG}search/label/{LABEL_Q}")]
+    rel += [("한국 증시 리포트", KR_REPORT), (f"지난 {LABEL}", f"{BLOG}search/label/{LABEL_Q}")]
     body.append(f'<div data-related="1" data-related-all="1" style="margin-top:49px;">{dk.related_title("함께 보는 페이지")}{dk.related_rows(rel)}</div>')   # 이 글만 3줄 상한 없이(테마도 data-related-all 은 안 자름) — 연결되는 서비스 전부
     html = dk.WRAP_OPEN + dk.fix_colons("".join(body)) + dk.WRAP_CLOSE
-    return stored, html, {"labels": [NAME], "slug": post.get("slug"), "basis": market.get("basis"), "linked": sorted(link.seen)}
+    return stored, html, {"labels": [LABEL], "slug": post.get("slug"), "basis": market.get("basis"), "linked": sorted(link.seen)}
 
 
 # ── 한국 기사 제목 묶음 (요청 10 · 11절 headlines) — 미국 뉴스와 같은 묶음 꼴 ──
@@ -436,7 +437,7 @@ def fact_item(e, k, rows_by_event, fact_min=FACTS_MIN_SOURCES):
     return dk.news_pop_wrap(inner, pid) + body
 
 
-def facts_section(fact_docs, head_docs, day, title="한국 주요 뉴스", fact_min=FACTS_MIN_SOURCES):
+def facts_section(fact_docs, head_docs, day, title="한국 주요 뉴스", fact_min=FACTS_MIN_SOURCES, tab=None):
     """위 = 사실로 정리된 사건(보도 2곳 이상, 많이 보도된 순) · 아래 = 그 밖의 기사 제목 묶음(사실 층에 들어간 사건 제목은 원문 보기로 옮겨 빼고).
     둘 다 전부 싣고 5개 + 더 보기."""
     evs = fact_events(fact_docs)
@@ -446,6 +447,6 @@ def facts_section(fact_docs, head_docs, day, title="한국 주요 뉴스", fact_
     items = [x for x in (fact_item(e, k, by_ev, fact_min) for k, e in enumerate(evs)) if x]
     used = {e["event"] for e in evs}
     rest = [b for b in headline_bundles(head_docs, day) if b["event"] not in used]
-    top = dk.section(title, dk.more_list(items, noun="사건") if items else dk.muted("오늘은 아직 2곳 이상이 보도한 사건이 없습니다."))
-    low = dk.section("그 밖의 기사", dk.more_list([headline_item(b, k) for k, b in enumerate(rest)], noun="뉴스")) if rest else ""
+    top = dk.section(title, dk.more_list(items, noun="사건") if items else dk.muted("오늘은 아직 2곳 이상이 보도한 사건이 없습니다."), tab=tab)
+    low = dk.section("그 밖의 기사", dk.more_list([headline_item(b, k) for k, b in enumerate(rest)], noun="뉴스"), tab=tab) if rest else ""
     return top + low

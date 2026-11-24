@@ -425,11 +425,33 @@ def _home_news(media):
         items = [{"title": str(x.get("topic") or "").strip(), "channel": x.get("channel"), "at": str(x.get("published_at") or "")[:19],
                   "dir": x.get("direction"), "kind": "media", "source": x.get("channel"), "link": x.get("url"),
                   "lines": [str(l).strip() for l in (x.get("lines") or []) if str(l).strip()]}   # 홈 팝업 = 방송 요약 줄 · 영상 링크 (2026-11-20 사용자 "다른 뉴스처럼 팝업")
-                 for x in media[:30] if str(x.get("topic") or "").strip()]
+                 for x in media if str(x.get("topic") or "").strip()]   # 전부 — 홈 아래 주요 뉴스가 5줄 + 더 보기로 다 싣는다(옛 30건 상한, 2026-11-24)
         with open(os.path.join(OUT, "kr_news.json"), "w", encoding="utf-8") as f:
             json.dump({"generated": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), "items": items}, f, ensure_ascii=False)
     except Exception as e:  # noqa: BLE001 — 홈 줄은 덤, 리포트를 막지 않는다
         print(f"[kr-report] 홈 뉴스 파일 못 씀: {str(e)[:120]}")
+
+
+KR_FACTS_URL = "https://newfact-news.pages.dev/kr/facts/latest.json"   # 한국 기사 공용 저장소 (kr-facts.yml 09:20 · 18:20, 2026-11-24 사용자)
+
+
+def _facts_sections():
+    """뉴스 탭 맨 위 = 사실로 정리된 한국 사건(보도 2곳 이상) + 그 밖의 기사 제목 묶음 — 뉴스 수집기 자료, 블로그 AI 0 (2026-11-24 사용자).
+    재료 = Pages 공개 파일(그날 가장 늦은 수집기 정기 실행 — 15:50 실행이면 그날 07:00 실행). 사흘보다 오래됐거나 못 받으면 싣지 않는다(방송 뉴스만)."""
+    try:
+        import urllib.request
+        with urllib.request.urlopen(KR_FACTS_URL, timeout=20) as r:
+            d = json.loads(r.read().decode("utf-8"))
+        today = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).date()
+        if (today - datetime.date.fromisoformat(d["day"])).days > 3:
+            print(f"[kr-report] 한국 사건별 사실이 오래됨 ({d['day']}) — 싣지 않음")
+            return ""
+        sys.path.insert(0, os.path.join(_HERE, "..", "news-posts"))
+        import news_render as NR
+        return NR.facts_section(d["facts"], d["headlines"], d["day"], tab=TAB_NEWS)
+    except Exception as e:  # noqa: BLE001 — 뉴스 탭의 덤, 리포트를 막지 않는다
+        print(f"[kr-report] 한국 사건별 사실 못 읽음: {str(e)[:120]}")
+        return ""
 
 
 def news_section():
@@ -437,6 +459,8 @@ def news_section():
     분야 칩 → 방향 막대(오늘 · 최근 7일) → 주요 뉴스 5줄(같은 사건 `n곳`) → 칩별 목록 · 팝업(방송 요약 다섯 줄 · 관련 종목).
     재료 = 한국 증시 내용(media_feed.is_korea) 방송 이슈 48시간. 기사는 아직 없다(한국 기사 수집 없음). AI = 같은 사건 묶기(news_stories, Groq 먼저)만 — 요약은 수집기 lines.
     읽지 못하면 자리만."""
+    facts = _facts_sections()
+    head = "방송 뉴스" if facts else "뉴스"   # 사실 층이 위에 있으면 방송 구획에 이름을 보인다(탭 이름과 같은 제목은 테마가 숨김)
     try:
         RH = _daily_render()
         mf, NP = RH.media_feed, RH.news_pick
@@ -464,11 +488,11 @@ def news_section():
             raise ValueError("뉴스 없음")
         dirs = mf.direction_counts(media)
         week = mf.direction_counts(_kr_content(mf.issues(rows, since7), 10 ** 6))
-        return _dk.keep_tone(_dk.section("뉴스", RH.news_tab(built, dirs, week), tab=TAB_NEWS))   # 헤드라인체 그대로 · 탭 이름과 같은 제목은 테마가 숨긴다
+        return facts + _dk.keep_tone(_dk.section(head, RH.news_tab(built, dirs, week), tab=TAB_NEWS))   # 헤드라인체 그대로 · 탭 이름과 같은 제목은 테마가 숨긴다
     except Exception as e:  # noqa: BLE001
         print(f"[kr-report] 뉴스 못 읽음 (목업은 자리만): {str(e)[:120]}")
     # 독자 화면에 내부 안내(`뉴스 자리 — 발행 때 …`)가 나가던 것 (2026-11-09 사용자) → 독자 말 한 줄
-    return _dk.section("뉴스", _dk.muted("최근 나흘 동안 한국 증시를 다룬 방송 뉴스가 없습니다."), tab=TAB_NEWS)
+    return facts + _dk.section(head, _dk.muted("최근 나흘 동안 한국 증시를 다룬 방송 뉴스가 없습니다."), tab=TAB_NEWS)
 
 
 SORT_BTN = R.SORT_BTN

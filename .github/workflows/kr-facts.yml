@@ -1,0 +1,112 @@
+# 한국 기사 공용 저장소 — 뉴스 수집기(News-text) 블로그 저장소의 사건별 사실 · 기사 제목 → 날짜별 공개 JSON (2026-11-24 사용자)
+#
+# 실행: Cloudflare Worker(infra/cron-trigger) 09:20 · 18:20 KST — 수집기 정기 실행 07:00 · 16:30 이 facts 를 쓴 뒤(07:46 · 17:1x 쯤).
+#       사람은 Run workflow 버튼(scheduled 끄고). 분 :20 = 운영지침 11절 다른 쓰기 시각과 겹치지 않는 자리(:20 = 06:20 · 08:20 · 16:20 만 씀).
+# 읽기: news-text-blog Firestore(facts · headlines) — 블로그 서비스 계정 roles/datastore.viewer, 읽기 하루 약 2회 × 문서 10개 안팎.
+# 쓰기: ① 비공개 상태 저장소 alphascope-state 의 kr-facts 브랜치(날짜 파일 누적 = 기록, 수집기는 30일 뒤 지운다)
+#       ② Cloudflare Pages 프로젝트 newfact-news(https://newfact-news.pages.dev/kr/facts/latest.json) — 한국 홈 · 한국 증시 리포트 뉴스 탭이 읽는다.
+#       Pages 배포는 전체 교체라 ①의 폴더 전부를 올린다. 다른 Pages 프로젝트(alpha-scope · newfact-img)와 섞지 않는다.
+# AI 0 · gh-pages 0 · Blogger 0. 실패해도 다른 실행에 영향 없음 — 화면은 지난 파일을 그대로 읽는다.
+name: 한국 기사 공용 저장소
+
+on:
+  workflow_dispatch:
+    inputs:
+      deploy:
+        description: '상태 저장소 · Pages 에 올리기 (끄면 만들기만, 결과는 artifact)'
+        type: boolean
+        default: true
+      scheduled:
+        description: '외부 cron(Cloudflare Worker)용 — 사람은 끄고 쓴다'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kr-facts
+  cancel-in-progress: false
+
+jobs:
+  kr-facts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      STORE: /tmp/kr-facts-store
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Install
+        run: pip install requests google-auth
+
+      # 지난 날짜 파일을 받아 이어 쓴다. 브랜치가 있는데 못 받으면 멈춘다 — 빈 폴더로 올려 기록을 지우지 않게.
+      - name: Previous store (alphascope-state kr-facts)
+        env:
+          STATE_DEPLOY_KEY: ${{ secrets.STATE_DEPLOY_KEY }}
+        run: |
+          [ -z "$STATE_DEPLOY_KEY" ] && { echo "::error::STATE_DEPLOY_KEY 없음 — 기록을 이어 쓸 수 없어 멈춤"; exit 1; }
+          mkdir -p ~/.ssh && printf '%s\n' "$STATE_DEPLOY_KEY" > ~/.ssh/state_key && chmod 600 ~/.ssh/state_key
+          ssh-keyscan -t ed25519 github.com >> ~/.ssh/known_hosts 2>/dev/null
+          export GIT_SSH_COMMAND="ssh -i ~/.ssh/state_key -o IdentitiesOnly=yes"
+          REPO=git@github.com:red6keep-droid/alphascope-state.git
+          set +e; git ls-remote --exit-code --heads "$REPO" kr-facts >/dev/null; rc=$?; set -e
+          if [ "$rc" = 0 ]; then
+            git clone -q --depth 1 -b kr-facts "$REPO" "$STORE"
+            echo "지난 날짜 파일 $(ls $STORE/kr/facts 2>/dev/null | grep -c '^20') 개"
+          elif [ "$rc" = 2 ]; then
+            echo "kr-facts 브랜치 없음 — 처음 실행"
+            mkdir -p "$STORE" && cd "$STORE" && git init -q && git checkout -q --orphan kr-facts && git remote add origin "$REPO"
+          else
+            echo "::error::상태 저장소 확인 실패 ($rc)"; exit 1
+          fi
+
+      - name: Build
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          PYTHONIOENCODING: utf-8
+        run: python experiments/news-posts/kr_facts_store.py --out "$STORE"
+
+      - name: Save store (alphascope-state kr-facts)
+        if: inputs.deploy || inputs.scheduled
+        run: |
+          cd "$STORE"
+          git config user.name "github-actions[bot]" && git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config core.sshCommand "ssh -i ~/.ssh/state_key -o IdentitiesOnly=yes"
+          git add -A
+          if git diff --cached --quiet; then echo "바뀐 것 없음"; else git commit -q -m "kr facts $(date -u +%FT%H:%MZ) [skip ci]" && git push -q origin HEAD:kr-facts; fi
+          echo "저장소 $(du -sh --exclude=.git . | cut -f1)"
+
+      - name: Publish Cloudflare Pages (newfact-news)
+        if: inputs.deploy || inputs.scheduled
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CF_PAGES_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: a8718df7edc5f8f6ce88e75b6545e5cb
+        run: |
+          [ -z "$CLOUDFLARE_API_TOKEN" ] && { echo "::error::CF_PAGES_API_TOKEN 없음"; exit 1; }
+          rm -rf /tmp/cfp && mkdir -p /tmp/cfp && cp -r "$STORE"/kr "$STORE"/_headers /tmp/cfp/
+          echo "Pages 파일 $(find /tmp/cfp -type f | wc -l)개 · $(du -sh /tmp/cfp | cut -f1)"
+          npx --yes wrangler@4.162.0 pages deploy /tmp/cfp --project-name newfact-news --branch main --commit-dirty=true
+          code=$(curl -s -o /dev/null -w "%{http_code}" "https://newfact-news.pages.dev/kr/facts/latest.json")
+          echo "확인 latest.json → $code"; [ "$code" = 200 ] || echo "::warning::Pages 확인 실패 ($code)"
+
+      - name: Upload result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kr-facts
+          path: /tmp/kr-facts-store/kr
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Notify failure
+        if: failure()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          [ -z "$SLACK_WEBHOOK_URL" ] && exit 0
+          curl -sS -X POST -H 'Content-type: application/json' --data "{\"text\":\"🚨 워크플로 실패 — 한국 기사 공용 저장소 (화면은 지난 파일 그대로)\n🔗 https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}" "$SLACK_WEBHOOK_URL" || true

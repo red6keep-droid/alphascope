@@ -117,8 +117,20 @@ if __name__ == "__main__":
     page = dk.WRAP_OPEN + sec + dk.WRAP_CLOSE
     print(dk.write_mock(page, os.path.join(OUT, "mock_news_headlines.html"), "한국 증시 리포트 · 뉴스 (한국 기사 묶음)"),
           "·", "수집기 실제 제목" if real_h else "예시 제목", "·", day)
+    # 사건별 사실 = 블로그 저장소 facts(수집기 R17 ~ R22, 첫 문서 11-24 07:46) → 운영과 같은 kr_facts_store 꼴로 (2026-11-24).
+    # 표본(samples/facts_blog.json)이 없으면 옛 시안(facts.json = eventsets 변환)으로.
+    fb = os.path.join(BASE, "samples", "facts_blog.json")
+    if os.path.exists(fb):
+        import tempfile
+        import kr_facts_store as KS
+        with tempfile.TemporaryDirectory() as t:
+            KS.write_store(t, json.load(open(fb, encoding="utf-8")), docs)
+            kf = json.load(open(os.path.join(t, "kr", "facts", "latest.json"), encoding="utf-8"))
+        page = dk.WRAP_OPEN + NR.facts_section(kf["facts"], kf["headlines"], kf["day"]) + dk.WRAP_CLOSE
+        print(dk.write_mock(page, os.path.join(OUT, "mock_news_facts.html"), "한국 증시 리포트 · 뉴스 (사건별 사실)"), "·", kf["day"],
+              "· 사건", kf["count"], "· 기사 제목", kf["headlineCount"])
     facts, real_f = load("facts.json", [])
-    if real_f:   # 시안 = 수집기 eventsets 를 facts 모양으로 바꾼 표본(ca7a6b8 전이라 사실마다 보도 수 1 → 사건 기준만)
+    if real_f and not os.path.exists(fb):   # 옛 시안 = 수집기 eventsets 를 facts 모양으로 바꾼 표본(ca7a6b8 전이라 사실마다 보도 수 1 → 사건 기준만)
         fday = max(str(d.get("createdAt"))[:10] for d in facts)
         import difflib
         import re as _re
@@ -176,58 +188,5 @@ if __name__ == "__main__":
         open(out, "w", encoding="utf-8").write(page)
         print(out, "· 홈 카드", len(rows), "편")
 
-    # ── 한국 홈 맨 아래 `주요 뉴스` (2026-11-23 사용자: 미국 홈과 같은 자리 · 이름 `주요 뉴스` 일단) ──
-    # 재료 둘을 시각 순으로 섞는다: ① 유튜브 방송 한국 이슈(media_feed.korea — 한국 증시 리포트 뉴스 탭과 같은 재료, 라벨 `방송` · 채널)
-    # ② 뉴스 수집기 사건(facts, 보도 2곳 이상 — `보도 n곳`). 5건 + 더 보기(버리지 않음). 목업 = 한국 홈 목업의 가짜 뉴스를 덮어쓴다.
-    if os.path.exists(home):
-        import datetime as _dt
-        sys.path.insert(0, os.path.join(BASE, ".."))
-        import media_feed as MF
-        KST = _dt.timezone(_dt.timedelta(hours=9))
-        day = max(post["date"] for _, post in jobs)
-        bc = MF.korea(MF.issues(MF.rows(MF.load(day, days=2))), n=10 ** 6)
-        items = []
-        for r in bc:
-            at = _dt.datetime.fromisoformat(str(r["published_at"]).replace("Z", "+00:00")).astimezone(KST)
-            d = MF.DIRECTION.get(r.get("direction"), "neutral")
-            items.append((at, r.get("topic") or "", r.get("note") or "", r.get("category"), d, "", r.get("url") or "", list(r.get("lines") or []), "media", r.get("channel")))
-        if real_f:
-            last_run = max(facts, key=lambda d: str(d.get("createdAt")))
-            at0 = _dt.datetime.fromisoformat(str(last_run["createdAt"]).replace("Z", "+00:00")).astimezone(KST)
-            for e in NR.fact_events(facts):
-                d = NR.DIR_KIND.get(e.get("direction"), "neutral")
-                first = (e.get("facts") or [{}])[0].get("what", "")
-                lines = [f.get("what", "") for f in e.get("facts") or []]
-                items.append((at0, e["event"], first, e.get("cat"), d, "", "", lines, "fact", f'보도 {e.get("sourceCount")}곳'))
-        # 한 줄짜리(팝업 줄 2개 미만) = 같은 분야끼리 2 ~ 4줄 묶음 한 줄 — 굵은 제목 = 첫 줄 · 요약 = 둘째 줄 · 누르면 묶인 줄 팝업 (news-bundle-rules, 11-15 · 11-17 재확인)
-        one = [x for x in items if len(x[7]) < 2]
-        items = [x for x in items if len(x[7]) >= 2]
-        by_cat = {}
-        for x in one:
-            by_cat.setdefault(x[3], []).append(x)
-        lone = [xs[0] for c, xs in by_cat.items() if len(xs) == 1]   # 이슈에 한 줄뿐이면 `그 밖` 으로 모아 묶음 (news-bundle-rules), 전체 하나뿐이면 싣지 않음
-        by_cat = {c: xs for c, xs in by_cat.items() if len(xs) > 1}
-        if len(lone) >= 2:
-            by_cat["OTHER"] = lone
-        for cat, xs in by_cat.items():
-            xs.sort(key=lambda x: x[0])
-            sizes, k = dk.bundle_sizes(len(xs)) or [1], 0
-            for n in sizes:
-                part, k = xs[k:k + n], k + n
-                heads = [p_[1] for p_ in part]
-                dirs = {p_[4] for p_ in part}   # 방향 = 모두 같으면 그 방향, 섞이면 중립
-                src = part[0][9] + (f" 외 {len(part) - 1}건" if len(part) > 1 else "")
-                items.append((max(p_[0] for p_ in part), heads[0], heads[1], cat, dirs.pop() if len(dirs) == 1 else "neutral", "", "", heads, part[0][8], src))   # 팝업 줄 = 묶인 줄 전부(미국 render_html 묶음 pop_lines 와 같게)
-        items.sort(key=lambda x: x[0], reverse=True)
-        # 미국 홈과 같은 테마 코드로 그린다(news.json 꼴) — 줄을 누르면 팝업(요약 줄), 원문 · 영상은 팝업 안 작은 링크로만 (2026-11-23 사용자 "외부로 바로 보내지 마")
-        feed = []
-        for at, t, sm, cat, d, sub, url, lines, kind, src in items:
-            feed.append({"title": t, "summary_ko": sm, "kind": kind, "tag": dk.ISSUE_KO.get(cat, "그 밖"), "source": src,
-                         "published": at.astimezone(_dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), "link": url, "lines": lines})
-        page = open(out, encoding="utf-8").read()
-        page = _re0.sub(r"<script>window\.addEventListener\('load',function\(\)\{setTimeout\(function\(\)\{var l=document\.getElementById\('news-list'\).*?</script>", "", page, flags=_re0.S)   # 한국 홈 목업의 가짜 뉴스 덮어쓰기 빼기
-        page = page.replace("body = PV_NEWS;", "body = (window.__KR_NEWS || PV_NEWS);", 1)
-        page = page.replace("function newsCategory(item) {", "function newsCategory(item) { if (item.tag) return item.tag;   /* 목업: 한국 줄은 분야 이름 */", 1)
-        page = page.replace("<head>", "<head>\n<script>window.__KR_NEWS = " + json.dumps({"items": feed}, ensure_ascii=False).replace("</", "<\\/") + ";</script>", 1)
-        open(out, "w", encoding="utf-8").write(page)
-        print(out, "· 주요 뉴스 방송", len(bc), "· 수집기 사건", len(items) - len(bc))
+    # ── 한국 홈 맨 아래 `주요 뉴스` — 테마가 직접 그린다(2026-11-24): 방송 이슈(kr-news.json) + 한국 기사 공용 저장소 사건별 사실(Pages newfact-news, kr-facts.yml).
+    # 재료는 홈 나누기 목업(mock_home_split.py)이 실제 파일(없으면 samples 표본)로 넣어 둔다 — 여기서 따로 섞지 않는다(옛 덮어쓰기 11-23 ~ 11-24).

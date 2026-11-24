@@ -73,6 +73,10 @@ const KST_JOBS = {
   // 21:00 실행이 rev 가 올랐으면 같은 주소에 고쳐 쓴다(publish_commentary.py). 한국장 날만. :00 에 다른 gh-pages 푸시 없음(한국 종목 16:28 끝 · 간단 17:40)
   "17:00": [{ workflow: "commentary.yml", inputs: { scheduled: "true", slot: "pm" }, when: WEEKDAY }],
   "14:30": [{ workflow: "home-ip.yml" }], // 낮 갱신 — 종목 페이지만 다시 그린다 (check.mode=refresh, 2026-11-04 P290). GitHub cron 04:00 UTC 는 예비
+  // 한국 기사 공용 저장소 (2026-11-24 사용자) — 뉴스 수집기 정기 실행 07:00 · 16:30 이 facts 를 쓴 뒤(07:46 · 17:1x 쯤). 매일.
+  // gh-pages 에 안 쓴다(상태 저장소 + Pages newfact-news) → push 겹침 없음. 분 :20 은 Worker 가 깨는 분.
+  "09:20": [{ workflow: "kr-facts.yml", inputs: { scheduled: "true" } }],
+  "18:20": [{ workflow: "kr-facts.yml", inputs: { scheduled: "true" } }],
 };
 
 const JOBS = {
@@ -128,6 +132,7 @@ const NAMES = {
   "home-ip.yml": "집 IP 받기 (미래에셋 · 버리)",
   "commentary.yml": "증시 시황 발행 (아침 · 저녁)",
   "radar-news-early.yml": "미국 종목 뉴스 먼저 분류",
+  "kr-facts.yml": "한국 기사 공용 저장소",
 };
 const WATCH_AFTER_MIN = 60;
 const RETRY_AGAIN_MIN = 170;   // 한 번 더 본다(18:40) — 다시 건 실행도 실패했으면 알림, 100분 때 아직 돌다가 그 뒤 끊겼으면 그때 다시 건다

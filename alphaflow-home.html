@@ -411,7 +411,7 @@ body[data-home-mkt="us"] #kr-report-col, body[data-home-mkt="kr"] #us-report-col
 body[data-home-mkt="us"] [data-hook="notable-kr"], body[data-home-mkt="kr"] [data-hook="notable-us"] { display: none; }
 body[data-home-mkt] #notable-col { grid-column: auto; }
 body[data-home-mkt] .nt-grid { grid-template-columns: minmax(0, 1fr); }
-body[data-home-mkt="kr"] .news-section { display: none; }   /* 한국 뉴스 자료가 아직 없다 — 새 수집 없이 시작 */
+/* 한국 홈 주요 뉴스 = 한국 증시 방송 이슈(kr-news.json) — 옛 숨김(자료 없던 때)은 뺌 (2026-11-24 사용자) */
 /* 실적 한 줄 자리 — 일정이 없는 날 주요 뉴스 줄 (2026-11-19 사용자). 같은 한 줄 칸(높이 47) · 같은 바탕색 돌림 · 같은 점 */
 #event-banner .eb-news { gap: 8px; }
 #event-banner .eb-news .eb-tag { flex: none; font-size: 12px; line-height: 19px; padding: 0 6px; border-radius: 4px; background: rgba(255, 255, 255, .2); color: #fff; font-weight: 700; }
@@ -1374,7 +1374,6 @@ a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-p
       <h2 class="section-title" id="news-title">
         <span class="report-icon" style="background:#475569;" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><rect x="2" y="2.5" width="12" height="11" rx="1.5"/><path d="M5 6h6M5 8.5h6M5 11h4"/></svg></span>주요 뉴스
       </h2>
-      <span class="section-note">기사는 원문(영어)으로 열려요</span>
     </div>
     <div class="news-list" id="news-list">
       <article class="news-item load-status">뉴스를 불러오는 중…</article>
@@ -2420,11 +2419,23 @@ function newsStrip(box, track, dotBox) {
     body.scrollTop = 0; homePop.hidden = false; homePop.querySelector('.rt-pop-close').focus();
   }
 
+  var KR_FACTS_URL = 'https://newfact-news.pages.dev/kr/facts/latest.json';   /* 한국 기사 공용 저장소 (kr-facts.yml, 09:20 · 18:20) */
+  function krFactItems(d) {   /* 사건 하나 = 줄 하나: 제목 = 사건 이름 · 요약 = 첫 사실 · 팝업 = 사실 줄 전부 · 출처 자리 = 보도 n곳(비교 대상) */
+    var evs = (d && d.facts && d.facts[0] && d.facts[0].events) || [];
+    return evs.map(function (e) { var fs = e.facts || []; return { title: e.event, summary_ko: (fs[0] && fs[0].what) || '', kind: 'fact', tag: e.tag, source: '보도 ' + e.sourceCount + '곳', published: e.at, lines: fs.map(function (f) { return f.line; }) }; });
+  }
   var NEWS_SHOWN = 5, NEWS_STEP = 10;   /* 홈 주요 뉴스 5건 + 누를 때마다 10건씩 (2026-11-07 사용자 P340, 옛 3건 · 8건까지 한 번에) */
-  fetch(NEWS_URL + '?v=' + Date.now())
-    .then(function (r) { return r.json(); })
+  /* 한국 홈 = 한국 증시 방송 이슈(kr-news.json) + 한국 기사 공용 저장소의 사건별 사실(Pages newfact-news, 보도 2곳 이상) — 시각 순으로 섞음 (2026-11-24 사용자).
+     사실 파일을 못 받으면 방송만, 방송을 못 받으면 사실만 */
+  (HOME_MKT === 'kr' ? Promise.all([
+      fetch(GH + 'kr-news.json?v=' + Date.now()).then(function (r) { return r.json(); }).catch(function () { return { items: [] }; }),
+      fetch(KR_FACTS_URL).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; })
+    ]).then(function (p) { return { items: (p[0].items || []).concat(krFactItems(p[1])) }; })
+    : fetch(NEWS_URL + '?v=' + Date.now()).then(function (r) { return r.json(); }))
     .then(function (json) {
       var items = (json.items || []).filter(function (i) { return i && i.title; });
+            items.forEach(function (i) { if (!i.published && i.at) i.published = /[Z+]/.test(String(i.at).slice(10)) ? i.at : i.at + 'Z'; });   /* kr-news.json 은 시각이 at(UTC) */
+            if (HOME_MKT === 'kr') items.sort(function (a, b) { return String(b.published || '').localeCompare(String(a.published || '')); });   /* 방송 · 사실을 시각 순으로 */
       /* 번역된 제목이 있으면 그것을 쓴다 (fetch_news.py 가 Gemini 로 채운 title_ko). 분류는 영문 원제로 한다. */
       items.forEach(function (i) { i.title_en = i.title; if (i.title_ko) i.title = i.title_ko; });
       if (!items.length) throw new Error('no items');
@@ -2451,10 +2462,10 @@ function newsStrip(box, track, dotBox) {
         if (media) a.setAttribute('data-trhelp', 'skip');
         /* 제목 아래 기사 소개 한 줄 — RSS 요약을 한국어로 옮긴 것 (2026-10-19 사용자: 원문이 영어라 내용을 한국어로 조금). fetch_news.py 가 summary_ko 를 채운다.
            명사형으로 끝낸다 "… 애널리스트가 선정" (2026-10-20 사용자: "전한다" 금지) — 옛 "기사는 … 전한다" 문장은 다음 수집에서 바뀔 때까지 싣지 않는다 */
-        if (it.summary_ko && !/^기사는|전한다\.?$|본다\.?$/.test(it.summary_ko)) card.appendChild(el('span', 'news-sum', it.summary_ko));
+        if (it.summary_ko && (it.kind === 'fact' || !/^기사는|전한다\.?$|본다\.?$/.test(it.summary_ko))) card.appendChild(el('span', 'news-sum', it.summary_ko));
         /* 선정 이유(why_ko)는 홈에 보이지 않는다 (2026-10-24 사용자). 옛: 제목 아래 14px 회색 (2026-10-14) */
         var labs = el('span', 'news-labels');   /* 라벨 줄: 분류 라벨 뒤에 출처 · 시각 (2026-10-14 사용자) */
-        labs.appendChild(el('span', 'news-tag', media ? (it.tag || '시장') : newsCategory(it)));
+        labs.appendChild(el('span', 'news-tag', media ? (it.tag || '시장') : (it.tag || newsCategory(it))));   /* 한국 사실 줄 = 분야 이름(tag) */
         if (media) labs.appendChild(el('span', 'news-tag', '방송'));   /* 기사가 아니라 방송 내용(의견 포함) — 채널이 매체 자리 */
         /* 메타 = `11.07 07:07 · 매체 · 방송 n곳` — 종목 페이지 뉴스와 같은 순서 · 형식 (2026-11-07 사용자: 뉴스 폼 통일, 옛 `CNBC 17:06`) */
         var sub = el('span', 'news-sub', [mdhm(kstTime(it.published)), it.source || 'CNBC'].concat(media && it.n_channels > 1 ? ['방송 ' + it.n_channels + '곳'] : []).filter(Boolean).join(' · '));

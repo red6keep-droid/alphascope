@@ -5,8 +5,8 @@
     python experiments/news-posts/fetch_samples.py --gcloud <계정> --facts --extra            # 시안용 두 가지 더 (아래)
 
 - 시안용 (2026-11-23 사용자 "다른 PC 에서도 같은 목업"), 수집기 원래 저장소(news-text-collector) 읽기만 — 그 저장소를 읽을 수 있는 gcloud 계정이 필요:
-  --facts : 사건 묶기 결과(eventsets) 최근 두 실행 → 수집기 코드(옆 폴더 ../News-text/worker/collect.py 의 blog_event)로 facts 모양 → samples/facts.json
-            (블로그 저장소에 facts 문서가 생기면 그것을 받는 쪽으로 바꾼다)
+  --facts : 옛 시안 — 사건 묶기 결과(eventsets) 최근 두 실행 → 수집기 코드로 facts 모양 → samples/facts.json
+            (블로그 저장소 facts 는 이 옵션 없이도 늘 samples/facts_blog.json 으로 받는다, 2026-11-24)
   --extra : 수집기 posts 중 v2 · 색 강조(==)가 든 글(검사 실패로 블로그에 안 온 글 포함) → samples/posts_extra.json (상세 화면 시안만, 홈 · 목록엔 안 씀)
 
 - 블로그 서비스 계정에 news-text-blog 의 roles/datastore.viewer 가 있다(요청 문서 9절). 쓰기 · 지우기 없음.
@@ -144,6 +144,9 @@ if __name__ == "__main__":
     json.dump(posts, open(os.path.join(OUT, "posts.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
     json.dump(heads, open(os.path.join(OUT, "headlines.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
     print(f"posts {len(posts)}편 · headlines 문서 {len(heads)}개 (제목 {sum(len(d.get('items') or []) for d in heads)}건) → samples/")
+    fb = docs(c, "facts")   # 블로그 저장소 사건별 사실(R17 ~ R22, 첫 문서 11-24) — 운영 kr_facts_store.py 와 같은 재료 (2026-11-24)
+    json.dump(fb, open(os.path.join(OUT, "facts_blog.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+    print(f"facts 문서 {len(fb)}개 → samples/facts_blog.json")
     if a.facts:
         fx = fetch_facts(c)
         json.dump(fx, open(os.path.join(OUT, "facts.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)

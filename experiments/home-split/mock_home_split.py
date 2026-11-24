@@ -32,33 +32,50 @@ def nav(mkt, files=FILES):
     )
 
 
-# 가짜 한국 뉴스(목업 전용) — 테마 JS 가 미국 뉴스를 채운 뒤 덮어쓴다. 5건 + 더 보기 안 3건
-KR_DUMMY_NEWS = [
-    ("반도체 수출 두 달 연속 늘어, 메모리 가격 오름세 이어져", "11월 1~10일 반도체 수출이 1년 전보다 늘었고 D램 고정 거래 가격도 올랐다", "반도체", "11.15 09:12 · 연합뉴스"),
-    ("외국인 사흘째 순매수, 코스피 4,000선 다시 넘봐", "", "시장", "11.15 08:40 · 한국경제"),
-    ("한국은행 기준금리 동결 전망 우세, 환율 부담 여전", "", "금리", "11.15 08:05 · 매일경제"),
-    ("2차전지 소재주 반등, 미국 공장 가동률 회복 기대", "", "2차전지", "11.15 07:31 · 이데일리"),
-    ("조선 3사 수주 잔고 사상 최대, 내년 실적 개선 전망", "", "조선", "11.15 07:02 · 머니투데이"),
-    ("방산 수출 계약 잇따라, 폴란드 2차 협상 막바지", "", "방산", "11.15 06:44 · 연합뉴스"),
-    ("원 · 달러 환율 1,420원대, 수입 물가 부담 커져", "", "환율", "11.15 06:10 · 한국경제"),
-    ("바이오 대형주 임상 결과 발표 앞두고 관망세", "", "바이오", "11.14 22:30 · 매일경제"),
-]
+KR_NEWS_PUBLIC = "https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/kr-news.json"
 
 
-def _kr_news_js():
-    import html as _h
-    items = []
-    for k, (t, sm, tag, sub) in enumerate(KR_DUMMY_NEWS):
-        items.append(f'<article class="news-item"{' hidden="" data-news-more="1"' if k >= 5 else ''}><a href="#">{_h.escape(t)}</a>'
-                     + (f'<span class="news-sum">{_h.escape(sm)}</span>' if sm else '')
-                     + f'<span class="news-labels"><span class="news-tag">{_h.escape(tag)}</span><span class="news-sub">{_h.escape(sub)}</span></span></article>')
-    body = "".join(items).replace("'", "\\'")
-    return ("<style>body[data-home-mkt=\"kr\"] .news-section{display:flex!important}body[data-home-mkt=\"kr\"] .news-section .section-note{display:none}</style>"
-            "<script>window.addEventListener('load',function(){setTimeout(function(){var l=document.getElementById('news-list');if(!l)return;"
-            f"l.innerHTML='{body}';var b=document.getElementById('news-toggle');if(b)b.hidden=false;}},300);}});</script>")
+def kr_news():
+    """한국 홈 주요 뉴스 재료 = 운영과 같은 kr-news.json(한국 증시 방송 이슈, kr-market-report main._home_news) (2026-11-24 사용자 "방송 뉴스라도 나와야").
+    로컬 결과가 있으면 그것, 없으면 운영 gh-pages 공개 파일(읽기만). 못 받으면 None — 테마는 '불러올 수 없습니다'를 그린다. 옛 가짜 한국 뉴스 8건은 뺌"""
+    lp = os.path.join(ROOT, "experiments", "kr-market-report", "output", "kr_news.json")
+    try:
+        if os.path.exists(lp):
+            with open(lp, encoding="utf-8") as f:
+                return json.load(f)
+        import urllib.request
+        with urllib.request.urlopen(KR_NEWS_PUBLIC, timeout=20) as r:
+            return json.loads(r.read().decode("utf-8"))
+    except Exception as e:  # noqa: BLE001
+        print("[home-split] kr-news.json 못 받음:", str(e)[:120])
+        return None
 
 
-KR_NEWS_JS = _kr_news_js()
+KR_FACTS_PUBLIC = "https://newfact-news.pages.dev/kr/facts/latest.json"
+
+
+def kr_facts():
+    """한국 홈 주요 뉴스의 사건별 사실 = 운영과 같은 Pages 파일(kr-facts.yml). 아직 없으면 받은 표본(news-posts/samples, fetch_samples.py)으로 같은 꼴을 만든다 (2026-11-24)."""
+    try:
+        import urllib.request
+        with urllib.request.urlopen(KR_FACTS_PUBLIC, timeout=20) as r:
+            return json.loads(r.read().decode("utf-8"))
+    except Exception:  # noqa: BLE001
+        pass
+    sd = os.path.join(ROOT, "experiments", "news-posts", "samples")
+    fp, hp = os.path.join(sd, "facts_blog.json"), os.path.join(sd, "headlines.json")
+    if not (os.path.exists(fp) and os.path.exists(hp)):
+        print("[home-split] 사건별 사실 없음 — Pages 도 표본도 없음 (fetch_samples.py 로 받기)")
+        return None
+    import tempfile
+    sys.path.insert(0, os.path.join(ROOT, "experiments", "news-posts"))
+    import kr_facts_store as KS
+    with open(fp, encoding="utf-8") as f, open(hp, encoding="utf-8") as g:
+        fd, hd = json.load(f), json.load(g)
+    with tempfile.TemporaryDirectory() as t:
+        KS.write_store(t, fd, hd)
+        with open(os.path.join(t, "kr", "facts", "latest.json"), encoding="utf-8") as f:
+            return json.load(f)
 
 
 _PICKS = []
@@ -133,8 +150,13 @@ def split_html(src, mkt, files=FILES):
     if picks:
         html = html.replace("<head>", "<head>\n<script>window.__PICKS = " + json.dumps(picks, ensure_ascii=False).replace("</", "<\\/") + ";</script>", 1)
         html = html.replace("else if (u.indexOf('stocks.json') >= 0) body = PV_PICKS;", "else if (u.indexOf('stocks.json') >= 0) body = (window.__PICKS || PV_PICKS);", 1)
-    if mkt == "kr":   # 한국 홈 주요 뉴스 — 수집 전이라 테마는 숨김. 목업만 가짜 한국 뉴스로 미국 홈과 같은 꼴을 본다 (2026-11-15 사용자: 한국 홈도 뉴스 넣을 것)
-        html = html.replace("</body>", KR_NEWS_JS + "</body>", 1)
+    if mkt == "kr":   # 한국 홈 주요 뉴스 = 실제 kr-news.json (2026-11-24, 옛 가짜 한국 뉴스 2026-11-15)
+        kn = kr_news()
+        if kn:
+            html = html.replace("<head>", "<head>\n<script>window.PV_KR_NEWS = " + json.dumps(kn, ensure_ascii=False).replace("</", "<\\/") + ";</script>", 1)
+        kf = kr_facts()
+        if kf:
+            html = html.replace("<head>", "<head>\n<script>window.PV_KR_FACTS = " + json.dumps(kf, ensure_ascii=False).replace("</", "<\\/") + ";</script>", 1)
     # 주식 공부 배너 — gh-pages 에 올리기 전에는 로컬 그림을 그대로 넣어 본다 (2026-11-15)
     bp = os.path.join(ROOT, "experiments", "course", "banner", "home_banner.webp")
     if os.path.exists(bp):
