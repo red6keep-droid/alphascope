@@ -651,7 +651,11 @@ def record_tab(now, heads, I):
 def records_status_card(now, st=None):
     """기록 현황 — 기록 대장 줄마다 처음 · 마지막 날짜 · 쌓인 양 (2026-11-24 사용자 "기록 탭에 기록현황").
     재료 = KV dash:records(밤 기록 사본 실행이 experiments/record_status.py 로 센 것). 알림 · `지금 문제` 줄은 넣지 않는다(사용자 "빠진 날 알리지마")."""
-    st = st if st is not None else kv_get_json("dash:records")
+    if st is None:
+        st = kv_get_json("dash:records")
+        p = os.environ.get("RECORDS_LOCAL", "").strip()   # 로컬 목업 확인용 — record_status.py --out 파일 (FEED_LOCAL 과 같은 방식)
+        if st is None and p and os.path.exists(p):
+            st = json.load(open(p, encoding="utf-8"))
     if not st:
         return dk.sub_label("기록 현황") + white_card([("기록 현황", warn("읽지 못함"), "밤 기록 사본 실행(state-backup.yml)이 dash:records 를 아직 안 올림")])
     def _d(s):
