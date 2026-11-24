@@ -27,9 +27,11 @@ OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "samples")
 
 
 def gcloud_token(account):
+    import shutil
     import subprocess
     import types
-    tok = subprocess.check_output(["gcloud", "auth", "print-access-token", f"--account={account}"], text=True).strip()
+    exe = shutil.which("gcloud") or "gcloud"   # 윈도우는 gcloud.cmd 라 이름만으로는 못 찾는다 (2026-11-24)
+    tok = subprocess.check_output([exe, "auth", "print-access-token", f"--account={account}"], text=True).strip()
     return types.SimpleNamespace(token=tok)
 
 
@@ -72,7 +74,11 @@ def docs(c, col, base=BASE):
 
 
 COLLECTOR = "https://firestore.googleapis.com/v1/projects/news-text-collector/databases/(default)/documents"
-COLLECT_PY = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..", "News-text", "worker", "collect.py")
+_ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..")
+# 수집기 저장소 자리 — 맥은 옆 폴더 News-text, 회사 윈도우 PC 는 News-text/News-text (2026-11-24). NEWS_TEXT_DIR 로 바꿀 수 있다.
+_CANDS = [os.environ.get("NEWS_TEXT_DIR", ""), os.path.join(_ROOT, "News-text"), os.path.join(_ROOT, "News-text", "News-text")]
+COLLECT_PY = next((os.path.join(d, "worker", "collect.py") for d in _CANDS if d and os.path.exists(os.path.join(d, "worker", "collect.py"))),
+                  os.path.join(_ROOT, "News-text", "worker", "collect.py"))
 
 
 def _blog_event_fn():
