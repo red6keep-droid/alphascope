@@ -430,6 +430,37 @@ def grid(res, now):
     return f'<div data-cards="1" style="margin:0 0 8px;"><span style="{dk.MULTI}">{tbl}</span></div>'
 
 
+DAYS = {_us_day: "화~토", _us_am_day: "월~토", _kr_day: "평일", _every: "매일"}
+HOW = {"post": "글이 올라간 시각", "file": "화면 자료가 바뀐 시각", "run": "실행이 끝난 시각"}
+
+
+def std_table(res, now):
+    """기준 탭 표 — 기준 · 서비스(독자 약속 / 내부, 무엇으로 재나) · 요일 · 보통(최근 14일 가운데 값) · 정시(최근 14일). 기준 시각 순, 접지 않는다."""
+    cut = now.date() - dt.timedelta(days=13)
+    th = "".join(f'<th style="padding:8px 4px;{al}font-weight:400;font-size:12px;line-height:16px;color:{NOTE_C};">{h}</th>'
+                 for h, al in (("기준", "text-align:left;padding-left:12px;width:44px;"), ("서비스", "text-align:left;"), ("요일", "text-align:center;width:46px;"),
+                               ("보통", "text-align:center;width:44px;"), ("정시", "text-align:center;width:40px;padding-right:12px;")))
+    rows = ""
+    for svc, ds in res:
+        recent = [x for x in _counted(ds) if x[0] >= cut]
+        times = sorted(x[2].hour * 60 + x[2].minute for x in recent if x[2])
+        med = f"{times[len(times) // 2] // 60:02d}:{times[len(times) // 2] % 60:02d}" if times else "—"
+        a = svc["at"]   # 앞으로의 기준 — 바꾼 서비스는 옛 기준을 이름 아래에 (`11.24까지 07:30`)
+        old = "".join(f" · {_md(u - dt.timedelta(days=1))}까지 {o}" for u, o in AT_BEFORE.get(svc["key"], []) if u > cut)
+        lim = int(a[:2]) * 60 + int(a[3:]) + GRACE_MIN
+        mcol = GOOD if times and times[len(times) // 2] <= lim else (BAD if times else NOTE_C)
+        n_on = sum(x[1] == "on" for x in recent)
+        kind = ('<span style="color:#111;">독자 약속</span>' if svc["reader"] else f'<span style="color:{GRAY};">내부</span>')
+        td = f'border-top:1px solid {LINE};padding:8px 4px;font-size:13px;line-height:18px;vertical-align:top;'
+        rows += (f'<tr><td style="{td}padding-left:12px;font-weight:700;color:#111;">{a}</td>'
+                 f'<td style="{td}color:#333;word-break:keep-all;">{esc(svc["name"])}<br><span style="font-size:11px;color:{NOTE_C};">{kind} · {HOW[svc["src"][0]]}{old}</span></td>'
+                 f'<td style="{td}text-align:center;color:#333;white-space:nowrap;">{DAYS.get(svc["due"], "")}</td>'
+                 f'<td style="{td}text-align:center;color:{mcol};">{med}</td>'
+                 f'<td style="{td}text-align:center;padding-right:12px;color:#333;">{f"{n_on}/{len(recent)}" if recent else "—"}</td></tr>')
+    tbl = (f'<table style="display:table;width:100%;border-collapse:collapse;table-layout:fixed;"><tr>{th}</tr>{rows}</table>')
+    return f'<div data-cards="1" style="margin:0 0 8px;"><span style="{dk.MULTI}">{tbl}</span></div>'
+
+
 # ---------------------------------------------------------------- 페이지
 def _counted(ds):
     return [x for x in ds if x[1] in ("on", "late", "miss")]
@@ -526,10 +557,8 @@ def page_body(res, reasons, now):
                                     ("내부 기준", cum(lambda s: not s["reader"]), dk.CHART_SERIES[1], "solid")],
                                    lambda v: f"{v:.0f}", legend_note=f"늦음 + 안 나감 · 기준 {GRACE_MIN}분 뒤까지 정시"), top=0)
 
-    # 기준 — 모든 서비스
-    std = [(s["name"], f"{s['at']}", ("독자 약속 · " if s["reader"] else "내부 기준 · ") + s["why"]
-            + " · " + {"post": "글 게시 시각", "file": f"gh-pages {s['src'][1] if s['src'][0] == 'file' else ''} 커밋", "run": "실행 끝 시각"}[s["src"][0]])
-           for s in sorted(SERVICES, key=lambda s: s["at"])]
+    # 기준 — 모든 서비스 16개를 접지 않고 한 표로 (2026-11-24 사용자 "서비스별 기준 시각 페이지가 이게 맞아?" — 5개만 보이고 요일 · 실제 시각이 없었다)
+    std = std_table(res, now)
 
     legend = (f'<p style="margin:4px 0 12px;padding-left:{dk.ALIGN_PX}px;font-size:13px;line-height:19px;color:{NOTE_C};word-break:keep-all;">'
               f'<span style="color:{GOOD};">초록 = 정시</span> · <span style="color:{BAD};font-weight:700;">주황 = 늦음 · 없음</span> · '
@@ -542,7 +571,7 @@ def page_body(res, reasons, now):
             + dk.sub_label("늦은 날 하나하나") + white_card(ev_rows or [("늦은 날", ok("없음"), "")], fold_at=5, noun="건")
             + dk.h2("누적", tab="누적") + cumc
             + dk.h2("기준", tab="기준")
-            + dk.sub_label("서비스별 기준 시각") + white_card(std, fold_at=5, noun="서비스")
+            + dk.sub_label("서비스별 기준 시각", "기준 = 이 시각 + 10분 안에 나와야 정시. 보통 = 최근 14일 실제 시각의 가운데 값(초록 = 기준 안). 정시 = 최근 14일, 그날의 기준으로 셈.") + std
             + dk.guide("판정", f"기준 시각 {GRACE_MIN}분 뒤까지 정시, 그 뒤는 늦음, 그날 결과가 없으면 안 나감입니다. 오늘 기준 전이면 세지 않습니다. "
                        "원인은 그날 맡은 GitHub 실행 기록으로 봅니다 — 앞 단계 늦음(이어 붙는 서비스) · 실행 없음 · 실패(실패한 단계) · 늦게 시작(예약보다 10분 넘게) · "
                        "여유 부족(예약 ~ 기준 시간보다 실행이 오래 걸림) · 오래 걸림(20분 넘게, 가장 긴 단계) · 다시 돌림(첫 실행이 아닌 실행에서 나감). Hot Issue 오후 · 방송 줄처럼 바뀐 날만 올리는 자료는 `안 나감`을 가릴 수 없어 넣지 않았습니다."))
