@@ -890,6 +890,16 @@ body.item-view .footer-links { margin: 5px 0 -6px; }   /* 상세 = 면책 줄 �
   border-bottom: 1px solid #E5E7EB;
 }
 #us-report-col > .report-title, #kr-report-col > .report-title { border-bottom: 0; padding-bottom: 0; }   /* 미국 · 한국 증시 카드 = 제목 아래 구분선 없이 바로 그래프, 구분선 자리(아래 13)만큼 그래프를 올림 (2026-11-11 사용자) */
+/* 홈 카드 `Newfact 주요 기사` (2026-11-24 사용자) — 머리 = 로고(머리 줄 로고 복제) + 날짜, 머리 아래 구분선만. 기사마다 제목 + 요약 한 줄, 기사 사이 구분선 · 칩 · 날짜 없음 */
+#nf-posts-col[hidden] { display: none; }
+#nf-posts-col .report-title { gap: 8px; }
+.nf-home-logo { width: 96px; height: 22px; flex: none; display: block; }
+#nf-posts-card { gap: 0; }
+#nf-posts-card .news-item { border-top: 0; }
+#nf-posts-card .news-item::before { display: none; }
+#nf-posts-card .news-item:first-child { padding-top: 0; }
+#nf-posts-card .nf-one { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#nf-posts-card .fold-btn { margin-top: 4px; }
 .home-cards .index-card,
 .home-cards .rank-card,
 .home-cards .sector-card { margin: 0 16px; }
@@ -2159,6 +2169,12 @@ html.as-lock, html.as-lock body { overflow: hidden; }
                   </div>
                 </div>
               </a>
+              </div>
+
+              <!-- Newfact 주요 기사 (2026-11-24 사용자) — 한국 홈만, 한국 증시 카드 바로 아래. 자료 = gh-pages news-posts.json(publish_news.py), 글이 없으면 숨김 -->
+              <div class='report-col' id='nf-posts-col' hidden='hidden'>
+              <h3 class='report-title'><span class='report-card-date' data-date='nf-posts-card'></span></h3>
+              <div class='report-card' id='nf-posts-card'></div>
               </div>
 
               <!-- 엔비디아 리포트 카드는 삭제 (2026-10-20 사용자). 2026-11-01 부터 엔비디아도 종목 고정 페이지(nvidia-nvda-stock) -->
@@ -3962,6 +3978,40 @@ html.as-lock, html.as-lock body { overflow: hidden; }
           }
           body.scrollTop = 0; homePop.hidden = false; homePop.querySelector('.rt-pop-close').focus();
         }
+
+        /* 홈 카드 `Newfact 주요 기사` (2026-11-24 사용자) — 한국 홈만. 자료 = gh-pages news-posts.json(publish_news.py 가 발행 때 씀 · 최근 7일 공개 글), 방문자 1명 = jsDelivr 1번(10분 캐시 깨기).
+           기사마다 제목 + 요약 한 줄, 처음 5편 + `기사 n개 더 보기` · 날짜 = 가장 늦은 글 발행 시각(다른 카드와 같은 `11.24 아침` 꼴). 글이 없거나 못 받으면 카드를 숨긴 채 둔다 */
+        (function () {
+          var col = document.getElementById('nf-posts-col'), box = document.getElementById('nf-posts-card');
+          if (!col || !box || HOME_MKT !== 'kr') return;
+          fetch(GH + 'news-posts.json?v=' + Math.floor(Date.now() / 6e5)).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
+            var items = (j && j.items) || [], SHOWN = 5;
+            if (!items.length) return;
+            var head = col.querySelector('.report-title'), lg = document.querySelector('svg.logo-full');
+            if (lg && head && !head.querySelector('.nf-home-logo')) { var c = lg.cloneNode(true); c.setAttribute('class', 'nf-home-logo'); c.removeAttribute('role'); c.setAttribute('aria-label', 'Newfact 주요 기사'); head.insertBefore(c, head.firstChild); }
+            box.textContent = '';
+            items.forEach(function (it, i) {
+              var art = el('article', 'news-item'); if (i >= SHOWN) { art.hidden = true; art.setAttribute('data-nf-more', '1'); }
+              var a = el('a', null, it.title); a.href = it.url; art.appendChild(a);
+              if (it.summary) art.appendChild(el('span', 'news-sum nf-one', it.summary));
+              box.appendChild(art);
+            });
+            if (items.length > SHOWN) {
+              var fb = el('button', 'fold-btn'); fb.type = 'button'; fb.setAttribute('aria-expanded', 'false');
+              var lab = el('span', null, '기사 ' + (items.length - SHOWN) + '개 더 보기'); fb.appendChild(lab);
+              fb.insertAdjacentHTML('beforeend', '<svg class="acc-chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l4 4 4-4"/></svg>');
+              fb.addEventListener('click', function (e) {
+                e.preventDefault(); e.stopPropagation();
+                var open = fb.getAttribute('aria-expanded') !== 'true';
+                [].forEach.call(box.querySelectorAll('[data-nf-more]'), function (x) { x.hidden = !open; });
+                fb.setAttribute('aria-expanded', String(open)); lab.textContent = open ? '접기' : '기사 ' + (items.length - SHOWN) + '개 더 보기';
+              });
+              box.appendChild(fb);
+            }
+            setDate('nf-posts-card', genKo(items[0].published));
+            col.hidden = false;
+          }).catch(function () {});
+        })();
 
         var KR_FACTS_URL = GH + 'kr-facts.json';   /* 한국 기사 공용 저장소 (kr-facts.yml 09:20 · 18:20) — 미국 news.json · 방송 kr-news.json 과 같은 gh-pages */
         function krFactItems(d) {   /* 사건 하나 = 줄 하나: 제목 = 사건 이름 · 요약 = 첫 사실 · 팝업 = 사실 줄 전부 · 출처 자리 = 보도 n곳(비교 대상) */

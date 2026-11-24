@@ -187,6 +187,10 @@ class Blog:
         r.raise_for_status()
         return r.json().get("url") or f"(초안 {r.json().get('id')})"
 
+    def delete(self, post_id):
+        r = self.PB._write("delete", f"{self.PB.BLOGGER_API}/blogs/{self.id}/posts/{post_id}", headers=self._h(), timeout=60)
+        r.raise_for_status()
+
     def update(self, old, html):
         r = self.PB._write("put", f"{self.PB.BLOGGER_API}/blogs/{self.id}/posts/{old['id']}", headers=self._h(),
                            json={"kind": "blogger#post", "id": old["id"], "title": old.get("title"), "content": html, "labels": old.get("labels") or [NR.LABEL]}, timeout=60)
@@ -201,10 +205,15 @@ def stage_publish(a):
     log(f"수집기 글 {len(posts)}편")
     blog = None if a.dry else Blog()
     done = blog.existing(drafts=True) if blog else {}
+    # 공개 발행 때 같은 글의 시험 초안이 있으면 지우고 공개로 다시 낸다(영문 주소 · 홈 카드) — 공개 글이 이미 있으면 건너뜀
+    drafts = {} if a.draft else {s: bp for s, bp in done.items() if str(bp.get("status") or "").upper() == "DRAFT"}
+    done = {s: bp for s, bp in done.items() if s not in drafts}
     oldest = (now.date() - datetime.timedelta(days=MAX_AGE_DAYS)).isoformat()
     todo = sorted((p for p in posts if p["slug"] not in done), key=lambda p: str(p.get("createdAt") or p.get("date")))
     if not todo:
         log("새 글 없음")
+        if blog and not a.draft:
+            write_card(blog)
         return 0
     lists, themes = read_lists()
     issues, forecasts = read_links()
@@ -231,6 +240,9 @@ def stage_publish(a):
             break
         if sent:
             time.sleep(GAP_DRAFT if a.draft else GAP_LIVE)
+        if p["slug"] in drafts:
+            blog.delete(drafts[p["slug"]]["id"])
+            log(f"시험 초안 지움 — {p['slug']}")
         try:
             url = blog.create(title, html, p["slug"], a.draft)
         except Exception as e:  # noqa: BLE001
@@ -242,7 +254,38 @@ def stage_publish(a):
         record("draft" if a.draft else "publish", p, meta, {"url": url})
         log(f"{'초안' if a.draft else '발행'} — {title} · 기준 {meta['basis']} · {url}")
     log(f"끝 — {'초안' if a.draft else '발행'} {sent}편 · 검사 걸림 {blocked}편")
+    if blog and not a.draft:
+        write_card(blog)
     return 1 if blocked else 0
+
+
+CARD_DAYS = 7
+
+
+def _text(html, attr):
+    m = re.search(attr + r'[^>]*>(.*?)</p>', html or "", re.S)
+    return re.sub(r"\s+", " ", re.sub(r"<[^>]+>", "", m.group(1))).strip() if m else ""
+
+
+def write_card(blog):
+    """홈 카드 `Newfact 주요 기사` 자료 = 최근 7일 공개 글 전부(제목 · 요약 한 줄 · 주소 · 발행 시각) → output/publish/news-posts.json.
+    워크플로가 gh-pages news-posts.json 으로 올린다 — 방문자는 이 파일 하나만 읽는다(jsDelivr, 다른 홈 카드와 같은 방식). 자르지 않는다(화면이 5개 + 접기)."""
+    import html as H
+    live = blog.existing(drafts=False)
+    since = (kst_now() - datetime.timedelta(days=CARD_DAYS)).isoformat()
+    items = []
+    for slug, bp in live.items():
+        pub = bp.get("published") or ""
+        if pub < since[:10]:
+            continue
+        title = re.sub(r"^" + re.escape(NR.NAME) + r"\s*:\s*", "", bp.get("title") or "")
+        items.append({"slug": slug, "title": H.unescape(title), "summary": H.unescape(_text(bp.get("content"), "data-seo-lead")),
+                      "url": bp.get("url"), "published": pub})
+    items.sort(key=lambda x: x["published"], reverse=True)
+    os.makedirs(OUT, exist_ok=True)
+    json.dump({"generated": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds"), "items": items},
+              open(os.path.join(OUT, "news-posts.json"), "w", encoding="utf-8"), ensure_ascii=False)
+    log(f"홈 카드 자료 {len(items)}편")
 
 
 def stage_refresh(a):

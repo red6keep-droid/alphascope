@@ -27,7 +27,7 @@ on:
         default: false
 
 permissions:
-  contents: read
+  contents: write   # gh-pages news-posts.json (홈 카드)
 
 concurrency:
   group: news-posts
@@ -61,7 +61,64 @@ jobs:
           python experiments/news-posts/publish_news.py ${{ inputs.stage }} \
             ${{ inputs.draft && '--draft' || '' }} --limit "${{ inputs.limit }}"
 
-      # 발행 · 고치기 기록(records.jsonl — 사건 분류 × 관련 종목 × 그날 움직임, 고치기 전 · 뒤 기준일). 운영 연결 때 상태 저장소로 옮긴다
+      # 기록 = 상태 저장소 alphascope-state news-posts 브랜치 records/YYYY-MM.jsonl 에 이어 붙인다(사건 분류 × 관련 종목 × 그날 움직임, 고치기 전 · 뒤 기준일).
+      # 초안 시험은 남기지 않는다. 키가 없거나 저장소를 못 받으면 기록만 빠지고 글은 이미 나갔다(경고만)
+      - name: Save records (alphascope-state news-posts)
+        if: always() && !inputs.draft && hashFiles('experiments/news-posts/output/publish/records.jsonl') != ''
+        env:
+          STATE_DEPLOY_KEY: ${{ secrets.STATE_DEPLOY_KEY }}
+          STORE: /tmp/news-posts-store
+        run: |
+          [ -z "$STATE_DEPLOY_KEY" ] && { echo "::warning::STATE_DEPLOY_KEY 없음 — 기록 못 남김"; exit 0; }
+          mkdir -p ~/.ssh && printf '%s\n' "$STATE_DEPLOY_KEY" > ~/.ssh/state_key && chmod 600 ~/.ssh/state_key
+          ssh-keyscan -t ed25519 github.com >> ~/.ssh/known_hosts 2>/dev/null
+          export GIT_SSH_COMMAND="ssh -i ~/.ssh/state_key -o IdentitiesOnly=yes"
+          REPO=git@github.com:red6keep-droid/alphascope-state.git
+          set +e; git ls-remote --exit-code --heads "$REPO" news-posts >/dev/null; rc=$?; set -e
+          if [ "$rc" = 0 ]; then git clone -q --depth 1 -b news-posts "$REPO" "$STORE"
+          elif [ "$rc" = 2 ]; then mkdir -p "$STORE" && cd "$STORE" && git init -q && git checkout -q --orphan news-posts && git remote add origin "$REPO" && cd -
+          else echo "::warning::상태 저장소 확인 실패 ($rc) — 기록 못 남김"; exit 0; fi
+          mkdir -p "$STORE/records"
+          cat experiments/news-posts/output/publish/records.jsonl >> "$STORE/records/$(TZ=Asia/Seoul date +%Y-%m).jsonl"
+          cd "$STORE"
+          git config user.name "github-actions[bot]" && git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet || { git commit -q -m "news posts ${{ inputs.stage }} $(date -u +%FT%H:%MZ) [skip ci]" && git push -q origin HEAD:news-posts; }
+          echo "기록 $(wc -l < "$GITHUB_WORKSPACE/experiments/news-posts/output/publish/records.jsonl") 줄 → records/$(TZ=Asia/Seoul date +%Y-%m).jsonl"
+
+      # 홈 카드 자료(최근 7일 공개 글) — keep_files 로 이 파일 하나만 덮는다. 발행 시각 :50 에 다른 gh-pages 푸시 실행 없음. 한 번 거부되면 한 번 더
+      - name: Card file
+        id: card
+        if: inputs.stage == 'publish' && !inputs.draft && hashFiles('experiments/news-posts/output/publish/news-posts.json') != ''
+        run: mkdir -p deploy-home && cp experiments/news-posts/output/publish/news-posts.json deploy-home/news-posts.json && ls -la deploy-home
+
+      - name: Push gh-pages
+        id: push1
+        if: steps.card.outcome == 'success'
+        continue-on-error: true
+        uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453   # v4.1.0 — 커밋 번호로 고정
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./deploy-home
+          publish_branch: gh-pages
+          keep_files: true
+
+      - name: Push gh-pages (retry)
+        if: steps.push1.outcome == 'failure'
+        uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./deploy-home
+          publish_branch: gh-pages
+          keep_files: true
+
+      - name: Purge news-posts.json cache
+        if: steps.card.outcome == 'success'
+        continue-on-error: true
+        run: |
+          sleep 10
+          bash .github/scripts/jsd_purge.sh news-posts.json deploy-home/news-posts.json || true
+
       - name: Records
         if: always()
         uses: actions/upload-artifact@v4

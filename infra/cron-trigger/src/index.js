@@ -81,6 +81,14 @@ const KST_JOBS = {
   // gh-pages kr-facts.json 푸시 하루 2회(+ 상태 저장소) — 09:20 · 18:20 에 다른 gh-pages 푸시 없음. 분 :20 은 Worker 가 깨는 분.
   "09:20": [{ workflow: "kr-facts.yml", inputs: { scheduled: "true" } }],
   "18:20": [{ workflow: "kr-facts.yml", inputs: { scheduled: "true" } }],
+  // Newfact 뉴스 발행 (2026-11-24 사용자 "발행해줘") — 수집기 글을 블로그 공개 글로(새 글 사이 10분) + 홈 카드 자료 gh-pages news-posts.json. 매일.
+  // 수집기 07:00 · 16:30 실행이 글을 쓴 뒤(08시 · 17시 무렵). 분 :50 — 09:20 · 18:20 공용 저장소 gh-pages 푸시와 비킨다(:50 은 Worker 가 깨는 분, 다른 gh-pages 푸시 없음).
+  "09:50": [{ workflow: "news-posts.yml", inputs: { scheduled: "true", stage: "publish", draft: "false" } }],
+  "13:50": [{ workflow: "news-posts.yml", inputs: { scheduled: "true", stage: "publish", draft: "false" } }],
+  "18:50": [{ workflow: "news-posts.yml", inputs: { scheduled: "true", stage: "publish", draft: "false" } }],
+  "22:50": [{ workflow: "news-posts.yml", inputs: { scheduled: "true", stage: "publish", draft: "false" } }],
+  // 아침 글 기준일 고치기 — 한국 장 마감(15:30) 뒤 그날 종가로 관련 종목 표를 고쳐 씀(같은 주소 PUT, gh-pages 안 씀). 평일만(휴장 · 주말은 기준일이 안 바뀌어 건드릴 글이 없다)
+  "16:10": [{ workflow: "news-posts.yml", inputs: { scheduled: "true", stage: "refresh", draft: "false" }, when: WEEKDAY }],
 };
 
 const JOBS = {
@@ -143,6 +151,7 @@ const NAMES = {
   "kr-facts.yml": "한국 기사 공용 저장소",
   "ops-dashboard.yml": "운영 대시보드 · 발행 시간",
   "quick-dart.yml": "한국 DART 새벽 받기",
+  "news-posts.yml": "Newfact 뉴스 발행",
 };
 const WATCH_AFTER_MIN = 60;
 const RETRY_AGAIN_MIN = 170;   // 한 번 더 본다(18:40) — 다시 건 실행도 실패했으면 알림, 100분 때 아직 돌다가 그 뒤 끊겼으면 그때 다시 건다
