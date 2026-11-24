@@ -369,12 +369,6 @@ jobs:
           python experiments/stock-radar/home_feed.py
           mkdir -p deploy-home && cp experiments/stock-radar/output/home/stocks.json deploy-home/stocks.json
 
-      # 소리 없는 실패 알림 (2026-11-24 사용자) — 위 continue-on-error 단계가 실패해도 실행은 `성공` 이라 알림이 없었다(11-23 한국 리포트 TypeError)
-      - name: Notify soft failures (소리 없는 실패 알림)
-        if: always()
-        continue-on-error: true
-        run: python .github/scripts/soft_fail.py "미국 종목 그리기 (stock radar)=${{ steps.run_radar.outcome }}" "미국 종목 페이지 게시=${{ steps.us_pages_pub.outcome }}"
-
       # ETF 고정 페이지 — 미국 상장 18개 (experiments/stock-etf, 2026-11-12 사용자 A안). 위 레이더 snapshot 일봉만 읽는다 · AI 0.
       # 구성 · 기본 정보는 주 1회만 받는다(data/etf_fund.json). 게시는 저장소 변수 ETF_PUBLISH=true 일 때만 — 그 전엔 그림자 모드(--dry)
       - name: ETF pages (미국 상장 18)

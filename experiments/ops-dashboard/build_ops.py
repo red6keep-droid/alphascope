@@ -700,34 +700,6 @@ def shell(body, now, title="운영 현황"):
             f'<script>{js}</script></body></html>')
 
 
-def ontime_alert(items, now):
-    """기준 시각을 넘긴 서비스 → Slack, 같은 서비스 · 같은 날은 한 번 (2026-11-24 사용자 "오늘부터 문제를 해결하자").
-    실행이 `성공` 으로 끝나도 결과가 안 나온 날(11-23 한국 리포트)을 잡는다. 보낸 기록 = KV dash:ontime-alerted (최근 3일만 둔다).
-    SLACK_WEBHOOK_URL · KV 설정이 없으면(로컬) 보내지 않는다."""
-    url = os.environ.get("SLACK_WEBHOOK_URL", "").strip()
-    if not items or not url or not kv_conf():
-        return
-    sent = kv_get_json("dash:ontime-alerted") or {}
-    keep = (now.date() - dt.timedelta(days=3)).isoformat()
-    sent = {k: v for k, v in sent.items() if k.split("|")[-1] >= keep}
-    new = [(k, x) for _, _, k, x in items if k not in sent]
-    groups = {}   # 같은 원인(대개 같은 실행)으로 늦은 서비스는 한 통으로 — 11-20 한국 실행 하나에 4개가 늦었다
-    for k, x in new:
-        groups.setdefault(x["cause"], []).append((k, x))
-    for cause, xs in groups.items():
-        text = ("⏰ 발행 시간 — 기준 시각을 넘김" + "".join(f"\n• {x['line']}" for _, x in xs)
-                + f"\n원인: {cause}\n🔗 https://alphascope-ops-console.red6keep.workers.dev/ontime")
-        try:
-            requests.post(url, json={"text": text, "unfurl_links": False}, timeout=20)
-            for k, _ in xs:
-                sent[k] = now.strftime("%H:%M")
-        except Exception as e:  # noqa: BLE001
-            print(f"[ops] 발행 시간 알림 실패 {type(e).__name__}")
-    if new:
-        kv_put("dash:ontime-alerted", json.dumps(sent))
-        print(f"[ops] 발행 시간 알림 {len(new)}건")
-
-
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--state-heads", help="상태 저장소 브랜치 → 마지막 커밋 ISO 시각 JSON (워크플로가 만든다)")
@@ -755,12 +727,15 @@ def main():
         ontime_body, (ot_val, ot_sub, ot_today), why_cache = got
         I.area["발행 시간"] = (ot_val, ot_sub + " · 운영 현황 아래 `발행 시간`")
         for n, v, _, _ in ot_today:
-            I.add(f"{n} 기준 시각", v, "발행 시간 페이지에서 원인 확인")
-        ontime_alert(ot_today, now)
+            I.add(f"{n} 기준 시각", v, "발행 시간 페이지에서 원인 확인")   # 알림은 보내지 않는다 — 모든 건 페이지에서 (2026-11-24 사용자)
         ontime_page = shell(dk.align_titles(dk.WRAP_OPEN + ontime_body + dk.WRAP_CLOSE), now, title="발행 시간")
     else:
         I.area["발행 시간"] = (warn("읽지 못함"), err[:60])
         print(f"[ops] 발행 시간 만들기 실패 {err}")
+    # 문법 검사(syntax-check.yml) — 마지막 검사가 실패면 할 일에 (알림 대신 이 페이지, 2026-11-24 사용자)
+    sc, _ = safe(lambda: (gh("/actions/workflows/syntax-check.yml/runs", {"per_page": 1}).get("workflow_runs") or [None])[0])
+    if sc and sc.get("conclusion") == "failure":
+        I.add("파이썬 문법 검사 실패", warn("확인필요"), f"{sc.get('head_sha', '')[:8]} 푸시 · 이대로면 그 파일을 쓰는 실행이 멈춤")
     screen = screen_tab(now, I)
     publish = publish_tab(now, runs, recs_today, I)
     feeds, err = safe(kv_feeds)

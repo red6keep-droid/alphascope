@@ -1,7 +1,7 @@
 name: Syntax Check
 
 # 푸시 때 파이썬 문법 검사 (2026-11-24 사용자 "오늘부터 문제를 해결하자") — 11-24 미국 리포트가 3.10 에서 못 읽는 f-string 으로
-# 세 번 멈췄다. 모든 실행이 쓰는 3.12 로 전체 .py 를 컴파일만 한다(실행 X · 비밀값 X · 쓰기 X). 실패하면 Actions 에 빨간불 + Slack.
+# 세 번 멈췄다. 모든 실행이 쓰는 3.12 로 전체 .py 를 컴파일만 한다(실행 X · 비밀값 X · 쓰기 X). 실패하면 Actions 에 빨간불(알림은 보내지 않음 — 2026-11-24 사용자 "모든 건 체크 페이지에서").
 # 1분 남짓 · 공개 저장소라 무료.
 
 on:
@@ -43,10 +43,3 @@ jobs:
               print(f"::error::{b}")
           sys.exit(1 if bad else 0)
           PY
-      - name: Notify failure
-        if: failure()
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-        run: |
-          [ -z "$SLACK_WEBHOOK_URL" ] && exit 0
-          curl -sS -X POST -H 'Content-type: application/json' --data "{\"text\":\"🚨 문법 검사 실패 — 방금 푸시한 파이썬 파일이 실행에서 멈출 수 있습니다 (${GITHUB_SHA::8})\n🔗 https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}" "$SLACK_WEBHOOK_URL" || true

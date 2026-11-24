@@ -60,5 +60,4 @@ jobs:
           OPS_CF_ACCOUNT_ID: ${{ secrets.OPS_CF_ACCOUNT_ID }}
           OPS_CF_KV_NAMESPACE_ID: ${{ secrets.OPS_CF_KV_NAMESPACE_ID }}
           OPS_CF_API_TOKEN: ${{ secrets.OPS_CF_API_TOKEN }}
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}   # 기준 시각을 넘긴 서비스 알림 — 서비스 · 날마다 한 번 (2026-11-24)
         run: python experiments/ops-dashboard/build_ops.py --state-heads state_heads.json --upload
