@@ -1780,8 +1780,9 @@ def report_stamp(day_text, when_text, close="종가", late=False):
     ico = ('<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" '
            'style="flex:none;margin-top:2px;"><circle cx="8" cy="8" r="6.2"/><path d="M8 4.5V8l2.4 1.6"/></svg>')
     if late:   # 늦은 날 = 노랑 상자(바탕 7-5절 #FFF8E1 · 테두리는 7-5절 #F4D37A 를 30% → 다시 20% 연하게 한 #F9E6B5, 2026-11-21 사용자) — 테두리 1 만큼 안쪽을 줄여 상자 높이는 평소와 같게 (2026-11-21 사용자: 빠진 자료는 빼고 나가되 늦은 줄 알게)
+        ico_late = ico.replace("<svg ", '<svg color="#E8710A" ', 1)   # f-string 밖에서 — 3.10(test-daily-report · news · update · comment-reply)은 f-string 안 역슬래시를 못 읽는다 (2026-11-24 미국 증시 리포트 실패)
         return (f'<p data-report-stamp="1" data-stamp-late="1" style="display:flex;gap:6px;align-items:flex-start;margin:0 0 14px;padding:9px 11px;background:#FFF8E1;'
-                f'border:1px solid #F9E6B5;border-radius:8px;font-size:13px;line-height:19px;color:#333;word-break:keep-all;">{ico.replace("<svg ", "<svg color=\"#E8710A\" ", 1)}'
+                f'border:1px solid #F9E6B5;border-radius:8px;font-size:13px;line-height:19px;color:#333;word-break:keep-all;">{ico_late}'
                 f'<span>{day_text} {close} 기준 · {LATE_STAMP}</span></p>')
     return (f'<p data-report-stamp="1" style="display:flex;gap:6px;align-items:flex-start;margin:0 0 14px;padding:10px 12px;background:#F3F4F6;border-radius:8px;'
             f'font-size:13px;line-height:19px;color:#6B7280;word-break:keep-all;">{ico}'

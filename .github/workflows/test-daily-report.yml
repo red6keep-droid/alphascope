@@ -82,7 +82,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
-          python-version: '3.10'
+          python-version: '3.12'   # 3.10 은 f-string 안 역슬래시를 못 읽어 11-24 리포트가 세 번 멈췄다 — 다른 실행(19개)과 같은 3.12 로 (2026-11-24 사용자)
 
       # 방송 요약 날짜 파일 캐시 (experiments/media_feed.py, 2026-11-16 수집기 요청 News-doc/블로그-Firestore-읽기-줄이기.md).
       # 그제 이전 edition 만 들어 있다 — 실행마다 Firestore 는 오늘 · 어제 묶음만 읽는다. 키 = 워크플로 · KST 날짜(하루 한 번 저장, 날짜가 바뀌면 전날 것을 이어 받는다)
