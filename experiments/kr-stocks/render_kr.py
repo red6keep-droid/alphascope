@@ -883,7 +883,7 @@ def _fact_event(e):
     """사건 하나 → 공용 뉴스 카드 한 줄(R._event_html 꼴). 팝업 = 사실 줄(끝에 작은 회색 `- 출처`) + 원문 보기(매체 한 번씩)."""
     facts = e.get("facts") or []
     rows = [{"line": e["event"]}] + [{"line": f.get("line") or f.get("what") or "", "by": f.get("by") or ""} for f in facts]
-    rows += [{"line": "", "source": h.get("outlet"), "url": h["url"]} for h in e.get("_heads") or []]
+    # `원문 보기` 없음 (2026-11-24 사용자) — 이어지는 기사가 일부 언론사뿐이라 그곳이 출처처럼 보였다. 근거 = 카드 메타 `보도 n곳`
     at = str(e.get("at") or "")
     return {"area": "Other", "kind": "news", "title": e["event"], "headline": e["event"], "fact": e["event"],
             "detail": (facts[0].get("what") if facts else "") or "", "url": None, "direction": e.get("dir") or "neutral", "emphasis": False,

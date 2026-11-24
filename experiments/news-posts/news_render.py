@@ -446,7 +446,7 @@ def fact_item(e, k, rows_by_event, fact_min=FACTS_MIN_SOURCES):
     inner = dk.news_item(dk.esc(e["event"]), None, facts[0]["what"], (), labels, meta)
     pid = dk.news_pop_id("kf", f'{e["event"]}:{k}')
     rows = [{"line": e["event"]}] + [dict(zip(("line", "by"), fact_parts(f))) for f in facts]
-    rows += [{"line": "", "source": r.get("outlet"), "url": r["url"]} for r in rows_by_event.get(e["event"], [])]
+    # `원문 보기` 는 달지 않는다 (2026-11-24 사용자) — 사건 이름이 맞는 기사만 이어져 9곳 보도에 1곳만 출처처럼 보였다. 근거 = `보도 n곳` · 줄 끝 발표 주체(- 정부 발표)
     body = dk.bundle_pop_body(pid, e["event"], [r for r in rows if r.get("line") or r.get("url")])
     return dk.news_pop_wrap(inner, pid) + body
 
