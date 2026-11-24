@@ -31,6 +31,7 @@ import mock_ops as M  # noqa: E402
 
 QC = M.QC
 esc, V = dk.esc, dk.violet
+NOTE_C = dk.NOTE
 ok, warn, idle, over, white_card, chart_top = M.ok, M.warn, M.idle, M.over, M.white_card, M.chart_top
 
 BLOG = "https://www.newfact.app"
@@ -124,6 +125,11 @@ def fetch_posts(since):
     return out
 
 
+URLS = {}   # (약속 이름, 날짜) → 글 주소 — 표 칸 · 오늘 카드에서 눌러 바로 확인 (judge 가 채운다)
+SHORT = {"미국 증시 리포트": "미국 리포트", "한국 증시 리포트": "한국 리포트", "미국 증시시황 (아침 편)": "미국 시황", "한국 증시시황 (저녁 편)": "한국 시황"}
+WEEK = "월화수목금토일"
+
+
 def judge(posts, now):
     """→ [(약속, [(날짜, 상태, 게시 시각 | None, 늦은 분)])]. 상태 = on · late · miss · wait · skip(EXCLUDE)."""
     today = now.date()
@@ -135,6 +141,8 @@ def judge(posts, now):
                 d = _date_by_title(p, p["pub"])
                 if d not in first or p["pub"] < first[d]["pub"]:
                     first[d] = p
+        for d, p in first.items():
+            URLS[(name, d)] = p.get("url", "")
         days, d = [], since
         while d <= today:
             if due(d) and (name, d) in EXCLUDE:
@@ -199,20 +207,32 @@ def page_body(res, now):
     head = (f'<div style="display:flex;align-items:center;gap:8px;margin:0 0 12px;padding-left:{dk.ALIGN_PX}px;">'
             f'{dk.solid_icon("clock", M.OPS_COLOR)}'
             f'<span style="font-size:{dk.H2_SIZE};line-height:{dk.LH_H2};font-weight:700;color:#111;">약속한 시각에 나갔나?</span></div>')
+    # 오늘 — 약속 시각 순서로: 약속 → 실제 게시(글 링크) · 아직이면 남은 시간
+    def link(url, text):
+        return f'<a href="{esc(url)}" style="color:inherit;">{esc(text)}</a>' if url else esc(text)
+
     rows = []
-    for (name, at, where, since), ds in res:
+    for (name, at, where, since), ds in sorted(res, key=lambda r: r[0][1]):
         done = [x for x in ds if x[1] in ("on", "late", "miss")]
         n_on = sum(x[1] == "on" for x in done)
         today = next((x for x in ds if x[0] == now.date()), None)
-        if today:
-            st = _pill(today[1], today[3])
-            got = f" · 오늘 {_hm(today[2])}" if today[2] else ""
+        rate = f"지금까지 정시 {n_on}/{len(done)}"
+        if not today:
+            rows.append((name, idle("오늘 없음"), f"약속 {at} · 오늘은 나가지 않는 날 · {rate}"))
+            continue
+        d, st, t, m = today
+        a = at_on(name, at, d)
+        if t:
+            got = f"약속 {a} → 게시 " + link(URLS.get((name, d)), _hm(t)) + (f" ({_late_text(m)} 늦음)" if st == "late" else "")
+        elif st == "wait":
+            left = round((dt.datetime.combine(d, dt.time(*map(int, a.split(":"))), KST) - now).total_seconds() / 60)
+            got = f"약속 {a} · " + (f"{_late_text(left)} 남음" if left > 0 else f"{GRACE_MIN}분 유예 중")
         else:
-            st, got = idle("오늘 없음"), ""
-        lates = [x[3] for x in done if x[1] == "late"]
-        avg = f" · 늦은 날 평균 {_late_text(round(sum(lates) / len(lates)))}" if lates else ""
-        rows.append((name, st, f"약속 {at}{got} · 정시 {n_on}/{len(done)}{avg}"))
-    top = dk.cards(lead + head + white_card(rows))
+            got = f"약속 {a} · 아직 글 없음"
+        if st == "skip":
+            got += " · " + esc(EXCLUDE[(name, d)].split(" — ")[0].split(" · ")[0])
+        rows.append((name, _pill(st, m), got + f" · {rate}"))
+    top = dk.cards(lead + head + dk.sub_label("오늘") + white_card(rows))
 
     # 누적 — 날마다 어긴 횟수(늦음 + 안 나감)를 더한다. 가로축 = START ~ 오늘 모든 날
     days = [START + dt.timedelta(days=i) for i in range((now.date() - START).days + 1)]
@@ -262,10 +282,55 @@ def page_body(res, now):
                 for d, at, name, s, t, m in lst]
     where_rows = [(name, f"{at}", where) for (name, at, where, since), _ in res]
 
+    # 날짜 × 약속 표 — 칸 = 실제 게시 시각(눌러서 글 확인), 색 = 판정. 최신 위, 5일 펼침 + 나머지 접기
+    GOOD, BAD, GRAY, LINE = "#15803D", "#C2410C", "#94A3B8", "#E2E8F0"
+    by = {(name, d): (s_, t, m) for (name, *_), ds in res for d, s_, t, m in ds}
+    dates = sorted({d for (_, d) in by}, reverse=True)
+    th = (f'<th style="width:46px;padding:8px 4px 8px 12px;text-align:left;font-weight:400;font-size:13px;line-height:17px;color:{NOTE_C};">날짜</th>'
+          + "".join(f'<th style="padding:8px 2px;text-align:center;font-weight:400;font-size:13px;line-height:17px;color:{NOTE_C};word-break:keep-all;">'
+                    f'{esc(SHORT.get(name, name)).replace(" ", "<br>")}<br><span style="font-size:12px;">{at}</span></th>' for (name, at, *_), _ in res))
+
+    def cell(name, d):
+        if (name, d) not in by:
+            return f'<span style="color:{LINE};">·</span>'
+        st, t, m = by[(name, d)]
+        url = URLS.get((name, d))
+        if st == "miss":
+            return f'<span style="color:{BAD};font-weight:700;">없음</span>'
+        if st == "wait":
+            return f'<span style="color:{GRAY};">대기</span>'
+        col = GOOD if st == "on" else (BAD if st == "late" else GRAY)
+        txt = link(url, _hm(t)) if t else "제외"
+        sub = (f'<br><span style="font-size:12px;font-weight:400;">+{_late_text(m)}</span>' if st == "late"
+               else '<br><span style="font-size:12px;font-weight:400;">제외</span>' if st == "skip" and t else "")
+        return f'<span style="color:{col};font-weight:{700 if st == "late" else 400};">{txt}{sub}</span>'
+
+    def tr(d, first):
+        bd = "" if first else f"border-top:1px solid {LINE};"
+        wk = WEEK[d.weekday()]
+        return (f'<tr><td style="{bd}padding:8px 4px 8px 12px;font-size:14px;line-height:19px;white-space:nowrap;color:#333;">{_md(d)}<span style="color:{NOTE_C};font-size:12px;"> {wk}</span></td>'
+                + "".join(f'<td style="{bd}padding:8px 2px;text-align:center;font-size:14px;line-height:19px;white-space:nowrap;">{cell(name, d)}</td>'
+                          for (name, *_), _ in res) + "</tr>")
+
+    def tbl(ds_, head):
+        return (f'<table style="display:table;width:100%;border-collapse:collapse;table-layout:fixed;">'
+                + (f'<tr style="border-bottom:1px solid {LINE};">{th}</tr>' if head else "")
+                + "".join(tr(d, i == 0 and not head) for i, d in enumerate(ds_)) + "</table>")
+
+    shown, rest = dates[:5], dates[5:]
+    grid = (dk.fold_card(tbl(shown, True), tbl(rest, False), f"날짜 {len(rest)}개 더 보기") if rest
+            else f'<div data-cards="1" style="margin:0 0 8px;"><span style="{dk.MULTI}">{tbl(shown, True)}</span></div>')
+    legend = (f'<p style="margin:4px 0 12px;padding-left:{dk.ALIGN_PX}px;font-size:13px;line-height:19px;color:{NOTE_C};word-break:keep-all;">'
+              f'<span style="color:{GOOD};">초록 = 정시</span> · <span style="color:{BAD};font-weight:700;">주황 = 늦음 · 없음</span> · '
+              f'회색 = 제외 · 대기 · 점 = 나가지 않는 날. 시각을 누르면 그 글이 열립니다. 약속 시각 {GRACE_MIN}분 뒤까지 정시.'
+              + "".join(f" {esc(SHORT.get(n, n))}는 {_md(until - dt.timedelta(days=1))}까지 {old} 약속으로 셉니다." for n, hist in AT_BEFORE.items() for until, old in hist)
+              + '</p>')
+
     return (top
+            + dk.h2("날짜별", tab="날짜별") + grid + legend
+            + dk.sub_label("날짜별 자세히") + white_card(day_rows, fold_at=5, noun="줄")
             + dk.h2("누적", tab="누적") + cum
             + dk.h2("시각", tab="시각") + (times or white_card([("게시 시각", idle("자료 부족"), "약속마다 2번 넘게 나가야 그립니다")]))
-            + dk.h2("날짜별", tab="날짜별") + white_card(day_rows, fold_at=5, noun="날")
             + dk.h2("약속", tab="약속")
             + dk.sub_label("독자에게 알린 시각") + white_card(where_rows)
             + dk.guide("판정", f"Blogger 공개 피드의 글 게시 시각을 약속 시각과 견줍니다. 약속 시각 {GRACE_MIN}분 뒤까지는 정시(`무렵`), 그 뒤는 늦음, "
