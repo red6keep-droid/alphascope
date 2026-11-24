@@ -20,6 +20,10 @@ REF, BASE = "state/radar-state", "experiments/people-radar/output/state/"
 
 
 def _show(path):
+    if path == "statements.jsonl":   # 2026-11-24 부터 작업 파일 브랜치 radar-work(이력 없음)에 — 없으면 옛 radar-state
+        r = subprocess.run(["git", "show", f"state/radar-work:{BASE}{path}"], capture_output=True, text=True, encoding="utf-8", cwd=HERE)
+        if not r.returncode:
+            return r.stdout
     r = subprocess.run(["git", "show", f"{REF}:{BASE}{path}"], capture_output=True, text=True, encoding="utf-8", cwd=HERE)
     if r.returncode:
         sys.exit(f"상태 저장소를 못 읽었습니다 — 먼저 `git fetch state radar-state` ({r.stderr.strip()[:120]})")

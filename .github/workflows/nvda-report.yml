@@ -187,6 +187,12 @@ jobs:
           else
             echo "이전 상태 없음 (첫 실행)"
           fi
+          # 작업 파일(이력 없음, 2026-11-24 저장소 정리) — 기록 브랜치 위에 덮어 푼다. 없으면(처음) nvda-state 의 옛 작업 파일을 그대로 쓴다
+          if git fetch -q --no-tags state nvda-work:refs/nvda-work 2>/dev/null; then
+            git archive refs/nvda-work "$STATE_DIR" | tar -x && echo "작업 파일 불러옴 (nvda-work)"
+          else
+            echo "nvda-work 없음 — nvda-state 의 작업 파일을 씀"
+          fi
           # 트럼프 반응 통계 — trump_bridge 가 state/trump-state 를 git show 로 읽는다 (2026-11-04: 공개 raw URL 대신)
           git fetch --no-tags state trump-state:refs/remotes/state/trump-state 2>/dev/null || echo "trump-state 없음 — 트럼프 구획 없이"
           # 한국 전망 근거 — kr_why 가 state/kr-state 를 git show 로 읽는다(외국인 수급 · 실적 공시일 · 애널리스트 평균 · 알파스코프 신호, 2026-11-12). 읽기만
@@ -490,8 +496,16 @@ jobs:
           python experiments/record_store.py run-log "$STATE_DIR/radar" radar "${{ steps.run_radar.outcome }}" "mode=${{ needs.check.outputs.mode }}"
           git config user.name "alphascope-bot"
           git config user.email "bot@users.noreply.github.com"
+          # 날마다 통째로 다시 쓰는 큰 작업 파일은 이력 없는 nvda-work 로(덮어씀) — 기록 브랜치 이력이 한 주 수십 MB 씩 불던 것 (2026-11-24 사용자 저장소 정리, 헌법 제4조 6항).
+          # 기록이 아니다: 종목 뉴스 8일 창(분류는 radar/records/issues) · 구글 뉴스 60일 캐시 · 동종 재무 캐시. 작업 브랜치를 먼저 올려 어느 쪽이 실패해도 파일이 사라지지 않게
+          WORK="radar/news.json records/issues/gnews_cache.json radar/peer_fin.json"
+          export GIT_INDEX_FILE="$(mktemp -u)"; n=0
+          for p in $WORK; do [ -f "$STATE_DIR/$p" ] && git add -f "$STATE_DIR/$p" && n=$((n+1)); done
+          WTREE="$(git write-tree)"; unset GIT_INDEX_FILE
+          if [ "$n" -gt 0 ]; then WC="$(git commit-tree "$WTREE" -m "nvda work files (no history) [skip ci]")" && git push -q -f state "$WC:refs/heads/nvda-work" && echo "작업 파일 $n개 → nvda-work"; fi
           export GIT_INDEX_FILE="$(mktemp -u)"
           git add -f "$STATE_DIR"
+          for p in $WORK; do git rm -q --cached --ignore-unmatch "$STATE_DIR/$p"; done
           TREE="$(git write-tree)"
           unset GIT_INDEX_FILE
           if PARENT="$(git rev-parse --verify -q refs/nvda-state)"; then

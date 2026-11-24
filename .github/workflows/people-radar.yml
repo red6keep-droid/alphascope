@@ -141,10 +141,14 @@ jobs:
           if git fetch -q --no-tags state homeip-state:refs/remotes/state/homeip-state 2>/dev/null; then git archive refs/remotes/state/homeip-state experiments/home-ip/data | tar -x && echo "집 IP 자료 불러옴"; else echo "homeip-state 없음 — 버리 RSS 는 이번에 빠짐"; fi
           if git rev-parse --verify -q refs/remotes/state/radar-state > /dev/null; then
             git archive refs/remotes/state/radar-state "$STATE_DIR" | tar -x
-            echo "발언 이력 불러옴: $(wc -l < "$STATE_DIR/statements.jsonl" 2>/dev/null || echo 0)행"
           else
             echo "radar-state 없음 (첫 실행)"
           fi
+          # 작업 파일(이력 없음, 2026-11-24 저장소 정리) — statements.jsonl(30일 창, 기사 본문 포함)은 radar-work 에. 없으면(처음) radar-state 의 것을 씀
+          if git fetch -q --no-tags state radar-work:refs/remotes/state/radar-work 2>/dev/null; then
+            git archive refs/remotes/state/radar-work "$STATE_DIR" | tar -x && echo "작업 파일 불러옴 (radar-work)"
+          fi
+          echo "발언 이력 불러옴: $(wc -l < "$STATE_DIR/statements.jsonl" 2>/dev/null || echo 0)행"
 
       - name: Run pipeline
         id: run_people
@@ -214,8 +218,16 @@ jobs:
           python experiments/record_store.py run-log "$STATE_DIR" people "${{ steps.run_people.outcome }}" "job=${{ job.status }}"   # 실행 한 줄 — records/runs (2026-11-07, A3-3-2 의 1)
           git config user.name "alphascope-bot"
           git config user.email "bot@users.noreply.github.com"
+          # statements.jsonl(30일 창 · 기사 본문 포함, 날마다 통째로 다시 씀)은 이력 없는 radar-work 로 — 발언 · 분류 기록은 records/issues 에 따로 쌓인다
+          # (2026-11-24 사용자 저장소 정리, 헌법 제4조 6항 · 운영지침 4-2 본문은 기록 대상 아님). 작업 브랜치를 먼저 올린다
+          WORK="statements.jsonl"
+          export GIT_INDEX_FILE="$(mktemp -u)"; n=0
+          for p in $WORK; do [ -f "$STATE_DIR/$p" ] && git add -f "$STATE_DIR/$p" && n=$((n+1)); done
+          WTREE="$(git write-tree)"; unset GIT_INDEX_FILE
+          if [ "$n" -gt 0 ]; then WC="$(git commit-tree "$WTREE" -m "people-radar work files (no history) [skip ci]")" && git push -q -f state "$WC:refs/heads/radar-work" && echo "작업 파일 $n개 → radar-work"; fi
           export GIT_INDEX_FILE="$(mktemp -u)"
           git add -f "$STATE_DIR"
+          for p in $WORK; do git rm -q --cached --ignore-unmatch "$STATE_DIR/$p"; done
           TREE="$(git write-tree)"
           unset GIT_INDEX_FILE
           if PARENT="$(git rev-parse --verify -q refs/remotes/state/radar-state)"; then
