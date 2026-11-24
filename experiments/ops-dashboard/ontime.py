@@ -125,6 +125,7 @@ START_BEFORE = {
     "kr_home": [(dt.date(2026, 11, 20), "16:10")], "hypo_pm": [(dt.date(2026, 11, 20), "16:10")],
     "us_report": [(dt.date(2026, 11, 20), "07:00")],   # 11-20 미국 실행 한 줄로 — 07:00 → 06:40
     "quick_kr": [(dt.date(2026, 11, 20), "17:40")],
+    "us_pages": [(dt.date(2026, 11, 20), "07:30")], "themes": [(dt.date(2026, 11, 20), "07:30")],   # 11-20 리포트 뒤 이어 붙기 — 예약(예비) 07:30 은 그대로, 보통 · 정시는 이날부터
 }
 
 
@@ -442,12 +443,13 @@ def std_table(res, now):
                                ("보통", "text-align:center;width:44px;"), ("정시", "text-align:center;width:40px;padding-right:12px;")))
     rows = ""
     for svc, ds in res:
-        recent = [x for x in _counted(ds) if x[0] >= cut]
+        since = max([cut] + [u for u, _ in START_BEFORE.get(svc["key"], [])])   # 예약 시각이 바뀐 서비스는 바뀐 날부터 — 옛 일정 탓 주황이 섞이지 않게 (2026-11-24 사용자)
+        recent = [x for x in _counted(ds) if x[0] >= since]
         times = sorted(x[2].hour * 60 + x[2].minute for x in recent if x[2])
-        med = f"{times[len(times) // 2] // 60:02d}:{times[len(times) // 2] % 60:02d}" if times else "—"
+        med = f"{times[(len(times) - 1) // 2] // 60:02d}:{times[(len(times) - 1) // 2] % 60:02d}" if times else "—"
         a = svc["at"]   # 지금 기준만 — 옛 기준은 보이지 않는다(판정은 그날 기준으로, 2026-11-24 사용자 "옛 기준은 필요없지")
         lim = int(a[:2]) * 60 + int(a[3:]) + GRACE_MIN
-        mcol = GOOD if times and times[len(times) // 2] <= lim else (BAD if times else NOTE_C)
+        mcol = GOOD if times and times[(len(times) - 1) // 2] <= lim else (BAD if times else NOTE_C)
         n_on = sum(x[1] == "on" for x in recent)
         kind = ('<span style="color:#111;">독자 약속</span>' if svc["reader"] else f'<span style="color:{GRAY};">내부</span>')
         td = f'border-top:1px solid {LINE};padding:8px 4px;font-size:13px;line-height:18px;vertical-align:top;'
@@ -554,7 +556,7 @@ def market_tab(name, res, reasons, now, legend):
             + dk.sub_label("오늘") + white_card(tr or [("오늘 나올 것", idle("없음"), "오늘은 쉬는 날")], fold_at=5, noun="서비스")
             + dk.sub_label("7일") + grid(res, now) + legend
             + dk.sub_label("기준") + std_table(res, now)
-            + _note(f"기준 = 이 시각 + {GRACE_MIN}분 안에 나와야 정시. 보통 = 최근 14일 실제 시각의 가운데 값(초록 = 기준 안). 정시 = 최근 14일, 그날의 기준으로 셈.")
+            + _note(f"기준 = 이 시각 + {GRACE_MIN}분 안에 나와야 정시. 보통 = 최근 14일 실제 시각의 가운데 값(초록 = 기준 안). 정시 = 최근 14일, 그날의 기준으로 셈. 실행 일정을 바꾼 서비스(11.20 한국 15:50 · 미국 이어 붙기)는 바꾼 날부터 셉니다.")
             + dk.sub_label("원인") + white_card(tally or [("늦은 일", ok("없음"), "")])
             + _note("원인별 횟수 — 한 번 늦은 데 원인이 둘이면 둘 다 셉니다. 아래는 늦은 날 하나하나(최신 위).")
             + white_card(ev_rows or [("늦은 날", ok("없음"), "")], fold_at=5, noun="건"))
