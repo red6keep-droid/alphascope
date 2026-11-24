@@ -32,7 +32,8 @@ APPEND = re.compile(r"\.jsonl(\.gz)?$|(^|/)kr/raw/|/history/\d{4}-\d{2}-\d{2}\.j
 
 
 def git(mirror, *a):
-    return subprocess.run(["git", "-C", mirror, *a], capture_output=True, check=True).stdout
+    # 줄바꿈 변환 끔 — 윈도우 git(core.autocrlf=true)은 archive 에서 줄마다 CR 을 붙여 원본과 달라진다(11-24 첫 사본이 그랬고, 줄어듦 검사가 잡음)
+    return subprocess.run(["git", "-c", "core.autocrlf=false", "-c", "core.eol=lf", "-C", mirror, *a], capture_output=True, check=True).stdout
 
 
 def write_file(dst_dir, path, data, big):
