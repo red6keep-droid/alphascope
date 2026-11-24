@@ -364,7 +364,7 @@ def page_body(res, now):
     legend = (f'<p style="margin:4px 0 12px;padding-left:{dk.ALIGN_PX}px;font-size:13px;line-height:19px;color:{NOTE_C};word-break:keep-all;">'
               f'<span style="color:{GOOD};">초록 = 정시</span> · <span style="color:{BAD};font-weight:700;">주황 = 늦음 · 없음</span> · '
               f'회색 = 제외 · 대기 · 점 = 나가지 않는 날. 시각을 누르면 그 글이 열립니다. 약속 시각 {GRACE_MIN}분 뒤까지 정시.'
-              + "".join(f" {' · '.join(esc(SHORT.get(n, n)) for n in ns)}는 {_md(until - dt.timedelta(days=1))}까지 {old} 약속으로 셉니다."
+              + "".join(f" {' · '.join(esc(SHORT.get(n, n)) for n in ns)}: {_md(until - dt.timedelta(days=1))}까지 {old} 약속으로 셉니다."
                         for (until, old), ns in _group_before().items())
               + '</p>')
 
