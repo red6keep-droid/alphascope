@@ -259,11 +259,19 @@ def market_section(market, lists, ink):
             inner += dk.fold_card("".join(rows[:STOCKS_SHOWN]), "".join(rows[STOCKS_SHOWN:]), f"관련 종목 {len(rows) - STOCKS_SHOWN}개 더 보기", box=WHITE_BOX)
         else:
             inner += SR.white_card("".join(rows))
+    # 기준일 = 제목 줄 오른쪽 작은 회색 (2026-11-24 사용자 "오전 기사는 우측에 기준일 표시하고 나가, 오후 때 다시 갱신") — 아침 글은 전 거래일, 장 마감 뒤 발행기(publish_news refresh)가 그날 값으로 고친다
     b, ub = market.get("basis") or "", market.get("us_basis") or ""
-    bits = ([f"한국 {_md(b)} 종가"] if b else []) + ([f"미국 {_md(_close_kst(ub))} 아침 마감 종가"] if ub else [])
-    note = (" · ".join(bits) + " 기준") if bits else ""   # 느낌표 아이콘 · 인과 아님 문장 뺌 (2026-11-23 사용자)
-    inner += f'<p style="margin:10px 0 0;font-size:13px;line-height:19px;color:#6B7280;word-break:keep-all;">{dk.esc(note)}</p>' if note else ""
-    sec = dk.section("관련 종목" if stocks else "같은 날 지수", inner, line=False)   # 이름 = 관련 종목 (기획 3-3, 수혜주 X)
+    if b and ub:
+        note = f"한국 {_md(b)} · 미국 {_md(_close_kst(ub))} 아침 종가 기준"
+    elif b:
+        note = f"{_md(b)} 종가 기준"
+    elif ub:
+        note = f"미국 {_md(_close_kst(ub))} 아침 종가 기준"
+    else:
+        note = ""
+    aside = (f'<span data-basis="{dk.esc(b)}" style="margin-left:auto;font-size:13px;line-height:19px;font-weight:400;color:#6B7280;white-space:nowrap;">'
+             f'{dk.esc(note)}</span>') if note else ""
+    sec = dk.section("관련 종목" if stocks else "같은 날 지수", inner, line=False, aside=aside)   # 이름 = 관련 종목 (기획 3-3, 수혜주 X)
     sec = SR.tinted(SR.iconed(sec, dk.solid_icon("bars", ink, size=20)), ink).replace(f"margin:{SR.H2_TOP}px 0 11px;", f"margin:{SR.BIG_TOP}px 0 11px;", 1)
     return sec.replace("font-size:22px;font-weight:700;line-height:28px;", f"font-size:{dk.NAME};font-weight:700;line-height:{dk.LH_CARD};", 1)   # 제목 = 지수 칸 이름(코스피) 크기 16/24 (2026-11-23 사용자 "공간 효율")
 
@@ -322,7 +330,7 @@ def render(post, market, lists=None, issues=(), forecasts=()):
     _, stored = titles(post)
     y, m, d = post["date"].split("-")
     style = ('<style>body:has([data-headline]) .pr-sticky{border-bottom:0;margin-bottom:0;}</style>')
-    body = [style + f'<p data-title-basis="1" data-news-post="{dk.esc(post.get("slug") or "")}" style="margin:0 0 14px;font-size:13px;line-height:19px;color:#6B7280;">{int(m)}.{d} 기사</p>']
+    body = [style + f'<p data-title-basis="1" data-news-post="{dk.esc(post.get("slug") or "")}" data-news-date="{dk.esc(post["date"])}" data-post-id="{dk.esc(post.get("id") or "")}" style="margin:0 0 14px;font-size:13px;line-height:19px;color:#6B7280;">{int(m)}.{d} 기사</p>']
     body.append(f'<h2 data-headline="1" style="margin:0 0 14px;padding:25px 0 0 {dk.ALIGN_PX}px;font-size:26px;line-height:38px;font-weight:700;color:#111;word-break:keep-all;">'
                 f'<span style="display:block;font-size:26px;line-height:38px;">{SR.emph(dk.esc(post["title"]), False)}</span></h2>')   # 폰 테마가 h2 에 20/26 !important — 크기는 안쪽 span 이 갖는다
     pills = [dk.pill(dk.ISSUE_KO.get(post.get("cat"), "그 밖"), "area", bare=True),

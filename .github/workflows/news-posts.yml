@@ -1,0 +1,78 @@
+# Newfact 뉴스 발행 — 뉴스 수집기 글(블로그 저장소 news-text-blog posts)을 블로그 새 글로 (2026-11-24 사용자).
+# 블로그 AI 0. publish = 새 글 → Blogger(초안 또는 공개), refresh = 장 마감 뒤 아침 글의 관련 종목 표를 그날 값으로 고쳐 씀.
+# 지금은 손으로만 건다 — 초안 시험 · 사용자 확인 뒤 Worker 일정(09:20 · 13:20 · 18:20 · 22:20 publish, 16:10 refresh)에 넣는다.
+# 기획 = 비공개 doc/기획/뉴스-글-발행-기획.md
+
+name: Newfact 뉴스 발행
+
+on:
+  workflow_dispatch:
+    inputs:
+      stage:
+        description: 'publish = 새 글 · refresh = 아침 글 기준일 고치기'
+        type: choice
+        options: [publish, refresh]
+        default: publish
+      draft:
+        description: '초안으로 (시험) — 끄면 공개 발행'
+        type: boolean
+        default: true
+      limit:
+        description: '이번 실행 최대 편수 (0 = 전부)'
+        type: string
+        default: '0'
+      scheduled:
+        description: '외부 cron(Cloudflare Worker)용 — 사람은 끄고 쓴다'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: news-posts
+  cancel-in-progress: false
+
+jobs:
+  news-posts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Install
+        run: pip install -r experiments/daily-report/requirements.txt
+
+      # 수집기 글 읽기(블로그 서비스 계정 · 읽기만) · 검사 · 그리기 · Blogger. 검사에 걸린 글이 있으면 exit 1 → Slack (다른 글은 이미 나감)
+      - name: Run
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          BLOGGER_CLIENT_ID: ${{ secrets.BLOGGER_CLIENT_ID }}
+          BLOGGER_CLIENT_SECRET: ${{ secrets.BLOGGER_CLIENT_SECRET }}
+          BLOGGER_REFRESH_TOKEN: ${{ secrets.BLOGGER_REFRESH_TOKEN }}
+          PYTHONIOENCODING: utf-8
+        run: |
+          python experiments/news-posts/publish_news.py ${{ inputs.stage }} \
+            ${{ inputs.draft && '--draft' || '' }} --limit "${{ inputs.limit }}"
+
+      # 발행 · 고치기 기록(records.jsonl — 사건 분류 × 관련 종목 × 그날 움직임, 고치기 전 · 뒤 기준일). 운영 연결 때 상태 저장소로 옮긴다
+      - name: Records
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: news-posts-${{ inputs.stage }}
+          path: experiments/news-posts/output/publish/records.jsonl
+          if-no-files-found: ignore
+          retention-days: 30
+
+      - name: Notify failure
+        if: failure()
+        run: |
+          [ -z "$SLACK_WEBHOOK_URL" ] && exit 0
+          curl -sS -X POST -H 'Content-type: application/json' --data "{\"text\":\"🚨 Newfact 뉴스 ${{ inputs.stage }} 실패 — 검사에 걸린 글이 있거나 발행 오류\n🔗 https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}" "$SLACK_WEBHOOK_URL" || true
