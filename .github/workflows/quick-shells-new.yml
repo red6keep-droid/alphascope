@@ -1,0 +1,100 @@
+name: Quick stock new pages (간단 종목 새 전용 페이지)
+
+# 간단 종목 전용 페이지(/p/<영문이름>-<티커>-stock.html) 새로 만들기만 — 밤 22:30 KST 하루 한 번, 한국 날짜 하루 합계 50쪽까지.
+# 왜 따로: 장 마감 실행(quick-data)이 실행마다 50쪽 · 하루 약 100쪽을 몰아 만든 직후 Blogger 가 4시간 넘게 새 글을 429 로 막아
+#   2026-11-24 저녁 시황(17:00 · 21:00) · 뉴스 글이 빠졌다(2026-11-24 사용자). 시황 마지막 편(21:00) 뒤 · 다음 아침 편(08:40)까지 10시간을 비운다.
+# 고쳐 쓰기(소개가 바뀐 페이지)는 그대로 quick-data 가 한다(--no-new). 남은 새 페이지가 0 이면 Blogger 호출 0.
+# 저장값(quick-state)의 shells.json 을 읽고 · 만든 주소를 더해 되돌린다 — quick-data 와 같은 concurrency 묶음이라 겹쳐 돌지 않는다.
+# 브라우저 주소표(Pages /shells.json)는 다음 quick-data 실행(아침 08:20)이 새 주소까지 올린다.
+
+on:
+  schedule:
+    - cron: '30 13 * * *'   # KST 22:30
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: quick-data
+  cancel-in-progress: false
+
+env:
+  PYTHONIOENCODING: utf-8
+
+jobs:
+  new-pages:
+    if: vars.QUICK_PUBLISH == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      # 늦은 예비 막기 — GitHub cron 이 몇 시간 늦게 와 아침 시황(08:40) 앞에 몰아 만들지 않게. 22:00~06:00 KST 만
+      - name: Time window
+        id: win
+        run: |
+          H=$(TZ=Asia/Seoul date +%H)
+          if [ "${{ github.event_name }}" = schedule ] && [ "$H" -lt 22 ] && [ "$H" -ge 6 ]; then
+            echo "go=false" >> "$GITHUB_OUTPUT"; echo "지금 $H 시(KST) — 22~06시 밖이라 건너뜀"
+          else
+            echo "go=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v5
+        if: steps.win.outputs.go == 'true'
+
+      - name: Set up Python
+        if: steps.win.outputs.go == 'true'
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Install
+        if: steps.win.outputs.go == 'true'
+        run: pip install -r experiments/nvda-report/requirements.txt
+
+      # 저장값을 못 받거나 주소 기록(shells.json)이 비면 멈춘다 — 빈 기록으로 돌면 이미 있는 600여 쪽을 다시 만든다
+      - name: State (quick-state, read)
+        if: steps.win.outputs.go == 'true'
+        env:
+          STATE_DEPLOY_KEY: ${{ secrets.STATE_DEPLOY_KEY }}
+        run: |
+          [ -z "$STATE_DEPLOY_KEY" ] && { echo "::error::STATE_DEPLOY_KEY 없음"; exit 1; }
+          mkdir -p ~/.ssh /tmp/qcache && printf '%s\n' "$STATE_DEPLOY_KEY" > ~/.ssh/state_key && chmod 600 ~/.ssh/state_key
+          ssh-keyscan -t ed25519 github.com >> ~/.ssh/known_hosts 2>/dev/null
+          git config core.sshCommand "ssh -i ~/.ssh/state_key -o IdentitiesOnly=yes"
+          git remote add state git@github.com:red6keep-droid/alphascope-state.git
+          git fetch -q state quick-state && git archive FETCH_HEAD | tar -x -C /tmp/qcache
+          N=$(python -c "import json;print(len(json.load(open('/tmp/qcache/shells.json'))))")
+          echo "주소 기록 ${N}쪽"
+          [ "$N" -ge 100 ] || { echo "::error::주소 기록이 ${N}쪽 — 저장값 이상, 새 페이지를 만들지 않음"; exit 1; }
+
+      - name: New shell pages (Blogger)
+        if: steps.win.outputs.go == 'true'
+        env:
+          BLOGGER_CLIENT_ID: ${{ secrets.BLOGGER_CLIENT_ID }}
+          BLOGGER_CLIENT_SECRET: ${{ secrets.BLOGGER_CLIENT_SECRET }}
+          BLOGGER_REFRESH_TOKEN: ${{ secrets.BLOGGER_REFRESH_TOKEN }}
+        run: python experiments/stock-quick/publish_quick_shells.py --cache /tmp/qcache --publish --new-only --market all
+
+      # 만든 주소를 잃지 않게 — 실패(429 로 중간 멈춤)여도 되돌린다
+      - name: Save quick-state (private, no history)
+        if: always() && steps.win.outputs.go == 'true'
+        env:
+          STATE_DEPLOY_KEY: ${{ secrets.STATE_DEPLOY_KEY }}
+        run: |
+          [ -f /tmp/qcache/shells.json ] || exit 0
+          cd /tmp/qcache
+          git init -q && git checkout -q --orphan quick-state
+          git config user.name "github-actions[bot]" && git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config core.sshCommand "ssh -i ~/.ssh/state_key -o IdentitiesOnly=yes"
+          git add -A && git commit -q -m "quick state $(date -u +%F) new pages [skip ci]"
+          git push -q -f git@github.com:red6keep-droid/alphascope-state.git HEAD:quick-state
+          echo "저장값 $(du -sh . | cut -f1)"
+
+      - name: Notify failure
+        if: failure()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          [ -z "$SLACK_WEBHOOK_URL" ] && exit 0
+          curl -sS -X POST -H 'Content-type: application/json' --data "{\"text\":\"🚨 워크플로 실패 — 간단 종목 새 전용 페이지\n🔗 https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}" "$SLACK_WEBHOOK_URL" || true

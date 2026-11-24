@@ -8,6 +8,9 @@
   - 불러오기 코드: 페이지 스크립트 묶음(js/quick.js = quick_page.js + 봉차트)을 Pages → jsDelivr 순으로 받아 실행.
     스크립트를 고쳐도 768쪽을 다시 쓰지 않는다 — 페이지는 소개가 바뀔 때만 고쳐 쓴다(해시가 같으면 건너뜀).
 쓰기: 새 페이지 하루 NEW_CAP(50) · 고쳐 쓰기 하루 UPDATE_CAP(100), 4초 간격, 429 백오프 후에도 429 면 그 실행 멈춤(publish_pages 와 같은 규칙).
+     새 페이지 = 밤 22:30 따로 실행(quick-shells-new.yml, --new-only)만, 한국 날짜 하루 합계 NEW_CAP(cache/shells_new_day.json).
+     장 마감 실행(quick-data)은 --no-new 로 고쳐 쓰기만 (2026-11-24 사용자: 실행마다 50쪽 · 하루 약 100쪽을 몰아 만든 직후
+     Blogger 가 4시간 넘게 새 글을 막아 17:00 · 21:00 시황이 빠졌다).
      소개가 아직 없는 종목은 만들지 않는다(같은 틀만 있는 페이지를 먼저 내보내지 않게).
 기록: --cache(비공개 quick-state)/shells.json {sym: {"url", "id", "hash"}} — 브라우저용 주소표는 Pages /shells.json {파일 이름: 주소}.
 
@@ -314,12 +317,20 @@ def targets(ref, intros, markets=("us", "kr")):
     return out
 
 
+def _day_kst():
+    return (datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=9)).date().isoformat()
+
+
 def publish(cache, ref, intros, new_cap=NEW_CAP, update_cap=UPDATE_CAP, dry=False, markets=("us", "kr")):
     import requests
     import publish_blogger as PB
     import publish_pages as PP   # _call(429 백오프) · _norm 그대로
     path = os.path.join(cache, "shells.json")
     done = CI._load(path, {})
+    day_path = os.path.join(cache, "shells_new_day.json")   # 새 페이지 하루 합계 — 손 실행 · 늦은 예비가 겹쳐도 하루 NEW_CAP 안
+    day = CI._load(day_path, {})
+    made_today = day.get("made", 0) if day.get("date") == _day_kst() else 0
+    new_cap = max(0, min(new_cap, NEW_CAP - made_today))
     creds = PB._credentials()
     blog_id = PB._blog_id(creds, os.environ.get("BLOG_URL", PB.DEFAULT_BLOG_URL))
     headers = {"Authorization": f"Bearer {creds.token}", "Content-Type": "application/json"}
@@ -364,8 +375,9 @@ def publish(cache, ref, intros, new_cap=NEW_CAP, update_cap=UPDATE_CAP, dry=Fals
         finally:
             if not dry:
                 CI._save(path, done)   # 한 쪽마다 — 중간에 멈춰도 만든 주소를 잃지 않게
+                CI._save(day_path, {"date": _day_kst(), "made": made_today + made})
         time.sleep(4)
-    print(f"[shells] 새로 {made} · 고침 {updated} · 그대로 {same} · 다음으로 미룸 {waiting} · 실패 {failed}"
+    print(f"[shells] 새로 {made}(오늘 합계 {made_today + made}/{NEW_CAP}) · 고침 {updated} · 그대로 {same} · 다음으로 미룸 {waiting} · 실패 {failed}"
           + (" · 429 로 멈춤" if stopped else "") + f" · 전체 {len(done)}쪽")
     return done
 
@@ -406,6 +418,8 @@ def main():
     ap.add_argument("--publish", action="store_true")
     ap.add_argument("--dry", action="store_true")
     ap.add_argument("--map", default="")
+    ap.add_argument("--no-new", action="store_true", help="새 페이지는 만들지 않고 고쳐 쓰기만 (장 마감 실행, 2026-11-24)")
+    ap.add_argument("--new-only", action="store_true", help="새 페이지만 — 고쳐 쓰기 안 함 (밤 22:30 따로 실행, 2026-11-24)")
     ap.add_argument("--market", choices=("all", "us", "kr"), default="all",
                     help="이 실행이 맡는 시장 — 한국 장 마감 실행이 미국 페이지(알파벳 순 10~24분)를 고치느라 늦지 않게 (2026-11-20 사용자)")
     a = ap.parse_args()
@@ -424,7 +438,8 @@ def main():
         texts = {s: server_text(s, e, intros[s], fx, ref) for s, e in targets(ref, intros)}
         print(f"[shells] 서버 글 닮음 평균 — 사실 요약 넣은 뒤 {similarity(texts)}% · 평균 글자 수 {sum(map(len, texts.values())) // max(len(texts), 1)}")
     if a.publish or a.dry:
-        done = publish(a.cache, ref, intros, dry=a.dry, markets=("us", "kr") if a.market == "all" else (a.market,))
+        done = publish(a.cache, ref, intros, dry=a.dry,
+                       new_cap=0 if a.no_new else NEW_CAP, update_cap=0 if a.new_only else UPDATE_CAP, markets=("us", "kr") if a.market == "all" else (a.market,))
         if a.map:
             print(f"[shells] 주소표 {write_map(done, a.map)}쪽 → {a.map}")
 

@@ -54,7 +54,7 @@ env:
 jobs:
   publish:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 350   # 429 다시 시도(30분 간격, 최대 5시간 30분) — 평소엔 1~2분
     steps:
       - uses: actions/checkout@v5
 
@@ -146,7 +146,23 @@ jobs:
           FLAG=""
           [ "${{ steps.banner_cdn.outputs.failed }}" = "true" ] && FLAG="--banner-failed"
           [ "${{ inputs.replace }}" = "true" ] && FLAG="$FLAG --replace"
-          python experiments/market-commentary/publish_commentary.py publish --slot "${{ steps.slot.outputs.slot }}" $FLAG
+          # Blogger 429(종료 코드 75)면 30분 뒤 다시 — 마지막 시도 아침 편 11:30 · 저녁 편 23:30 KST, 한 실행 최대 5시간 30분.
+          # 11-24 저녁 편이 17:00 · 21:00 두 번만 시도하고 빠졌다(종목 페이지 몰아 만들기 뒤 Blogger 가 4시간 넘게 막음). 평소(429 없음)엔 한 번으로 끝
+          LAST=$([ "${{ steps.slot.outputs.slot }}" = am ] && echo 1130 || echo 2330)
+          START=$(date +%s)
+          while :; do
+            set +e
+            python experiments/market-commentary/publish_commentary.py publish --slot "${{ steps.slot.outputs.slot }}" $FLAG
+            RC=$?
+            set -e
+            [ $RC -ne 75 ] && exit $RC
+            NEXT=$(TZ=Asia/Seoul date -d '+30 min' +%H%M)
+            if [ "$NEXT" \> "$LAST" ] || [ "$NEXT" \< "0600" ] || [ $(( $(date +%s) - START )) -gt 18000 ]; then
+              echo "::error::Blogger 429 — 마지막 시도 시각(${LAST:0:2}:${LAST:2} KST)까지 막혀 이번 편은 내지 못함"; exit 1
+            fi
+            echo "Blogger 429 — 30분 뒤($(TZ=Asia/Seoul date -d '+30 min' +%H:%M) KST) 다시"
+            sleep 1800
+          done
 
       - name: Upload artifacts
         if: always()

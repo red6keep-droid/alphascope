@@ -290,7 +290,14 @@ def stage_publish(a):
         r.raise_for_status()
         log(f"{post['key']} 고쳐 씀 — {old.get('url')}")
         return 0
-    url = PB.publish(post["title"], html, labels=post["labels"], blog_url=blog_url)
+    try:
+        url = PB.publish(post["title"], html, labels=post["labels"], blog_url=blog_url)
+    except Exception as ex:  # noqa: BLE001
+        # 429 = Blogger 가 잠시 새 글을 막은 것(11-24 종목 페이지 몰아 만들기 뒤 4시간 넘게) — 워크플로가 30분 뒤 다시 부른다
+        if getattr(getattr(ex, "response", None), "status_code", None) == 429:
+            log("Blogger 429 — 새 글을 잠시 막음, 다시 시도 대기 (종료 코드 75)")
+            return 75
+        raise
     json.dump({**post, "url": url, "published_at": kst_now().isoformat(timespec="seconds")},
               open(os.path.join(OUT, "post_meta.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
     log(f"발행 끝 — {url}")
