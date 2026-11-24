@@ -67,14 +67,14 @@ def react_days(idx, ret, edays, start):
 
 def profile(s, d, edays, waves):
     d = d[(d["open"] > 0) & (d["volume"] > 0)]
-    if len(d) < DAYS + 260:
+    if len(d) < 120:      # 상장 3년이 안 된 아이도 뺀다 X — 있는 만큼 본다 (2026-11-24 사용자 "3년 안 되면 빼지 마")
         return None
     c, idx = d["close"], d.index
     ret = (c.pct_change() * 100).values
     volx = (d["volume"] / d["volume"].rolling(250, min_periods=60).median()).values
     rng = ((d["high"] - d["low"]) / c * 100).values
     sched = sched_days(idx, edays)
-    n0 = len(idx) - DAYS
+    n0 = max(len(idx) - DAYS, 1)
     st = [i for i in range(n0, len(idx)) if abs(ret[i]) >= STONE]
     wv = [i for i in st if idx[i] in waves and i not in sched]
     un = [i for i in st if i not in sched and idx[i] not in waves]
