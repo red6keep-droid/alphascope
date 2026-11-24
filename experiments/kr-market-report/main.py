@@ -1652,6 +1652,37 @@ def body(r):
     return _dk.formal(_dk.fix_colons(_dk.align_titles("\n".join(p for p in parts if p))))
 
 
+MARKET_REC = os.path.join(_HERE, "..", "kr-stocks", "data", "records", "market")   # kr-stocks.yml Save state 가 data/records 를 통째로 올린다
+
+
+def record_day(r):
+    """한국 시장 그날 상태 한 벌 — records/market/{연}/{날짜}.json (2026-11-24 사용자, 헌법 제4조 · 기록 대장 빈 칸 1).
+    미국 report-state history/{날짜}.json 과 같은 자리. 리포트가 이미 계산한 r 에서 일봉 원본(bars · kospi_bars — 다시 받을 수 있는 가격)만 빼고 그대로,
+    그날 AI 한 줄 결론(kr_lead.json 은 30일만 두는 캐시라 여기로)을 같이. 같은 날 다시 돌면 덮어쓴다(그날 마지막 판). AI 0 · 수집 0. 실패해도 리포트는 그대로."""
+    try:
+        line = None
+        try:
+            line = json.load(open(LEAD_CACHE, encoding="utf-8")).get(r["day"])
+        except (OSError, ValueError):
+            pass
+        def strip(o):   # 종목마다 붙은 일봉(_bars, 485일 — 다시 받을 수 있는 가격) · 밑줄로 시작하는 내부 칸은 뺀다 (11-24 실측: 넣으면 하루 1MB, 빼면 수십 KB)
+            if isinstance(o, dict):
+                return {k: strip(v) for k, v in o.items() if not str(k).startswith("_")}
+            if isinstance(o, list):
+                return [strip(v) for v in o]
+            return o
+        rec = {"version": 1, "day": r["day"], "made": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+               "lead_ai": line, **{k: strip(v) for k, v in r.items() if k not in ("bars", "kospi_bars", "day")}}
+        d = os.path.join(MARKET_REC, r["day"][:4])
+        os.makedirs(d, exist_ok=True)
+        p = os.path.join(d, f"{r['day']}.json")
+        with open(p, "w", encoding="utf-8") as f:
+            json.dump(rec, f, ensure_ascii=False, default=str)
+        print(f"[kr-report] 그날 상태 기록 {p} · {os.path.getsize(p) / 1e3:.0f}KB · 한 줄 결론 {'있음' if line else '없음(파이썬 문장)'}")
+    except Exception as e:  # noqa: BLE001
+        print(f"::warning::[kr-report] 그날 상태 기록 못 씀: {str(e)[:120]}")
+
+
 def title(day):
     return "한국 증시 리포트"   # 날짜 · '코스피 마감' 은 뺀다 (2026-10-26 사용자, M1) — 날짜는 맨 앞 요약에
 
@@ -1675,6 +1706,7 @@ if __name__ == "__main__":
         f.write(html)
     with open(os.path.join(OUT, "meta.json"), "w", encoding="utf-8") as f:   # 게시 단계(publish_report.py)가 읽는다
         json.dump({"day": r["day"], "title": title(r["day"])}, f, ensure_ascii=False)
+    record_day(r)   # 한국 시장 그날 상태 기록 — 본문을 만든 뒤(한 줄 결론 캐시가 채워진 뒤) (2026-11-24)
     MOCK_SAMPLE = True   # 목업에만 두 종목 예시 (M85) — 블로그 본문(report_body.html)은 위에서 이미 씀
     mock_html = body(r)
     mock = _dk.write_mock(mock_html, os.path.join(OUT, "kr_report_mock.html"), title(r["day"]))

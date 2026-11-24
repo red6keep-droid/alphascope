@@ -393,6 +393,7 @@ jobs:
           mkdir -p experiments/theme-monitor/data
           [ -f "$STATE_DIR/themes/page_hashes.json" ] && cp "$STATE_DIR/themes/page_hashes.json" experiments/theme-monitor/data/ || true
           python experiments/theme-monitor/main.py
+          python experiments/theme-monitor/theme_records.py --state "$STATE_DIR" || echo "::warning::테마 상태 기록 못 씀"   # 테마마다 그날 상태 · 구성 종목 하루 한 줄 → records/themes (2026-11-24 사용자, 헌법 제4조)
           python experiments/theme-monitor/publish.py
           python experiments/theme-monitor/home_feed.py
           mkdir -p deploy-home "$STATE_DIR/themes"
