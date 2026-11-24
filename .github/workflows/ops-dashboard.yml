@@ -2,7 +2,7 @@ name: Ops Dashboard
 
 # 관리자 전용 운영 대시보드 (2026-11-13 사용자 "시작해") — experiments/ops-dashboard/build_ops.py 가 이미 있는 기록만 읽어
 # 한 페이지를 만들고 Cloudflare KV dash:html 에 올린다. 관리자 Worker(infra/ops-console)가 로그인 확인 뒤 그대로 보낸다.
-# AI 0 · 시세 API 0 · Blogger 쓰기 0 · gh-pages 쓰기 0 · 상태 브랜치 쓰기 0. KV 쓰기 2건/실행(dash:html · dash:hist).
+# AI 0 · 시세 API 0 · Blogger 쓰기 0 · gh-pages 쓰기 0 · 상태 브랜치 쓰기 0. KV 쓰기 3건/실행(dash:html · dash:hist · dash:ontime = 발행 시간 페이지, 2026-11-24).
 # GitHub 예약이 늦거나 빠져도 대시보드가 한두 시간 늦을 뿐이라 Cloudflare 트리거에 넣지 않는다.
 
 on:

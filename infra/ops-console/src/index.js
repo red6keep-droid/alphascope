@@ -458,6 +458,12 @@ export default {
       if (dash) return new Response(dash, { headers: DASH_HEADERS });
       return redirect("/runs");
     }
+    if (url.pathname === "/ontime") {
+      // 발행 시간 — 독자에게 알린 시각에 글이 나갔나 · 어긴 횟수 누적 (2026-11-24 사용자). build_ops.py 가 한 시간마다 KV dash:ontime 에 올린다
+      const page = env.OPS_KV ? await env.OPS_KV.get("dash:ontime") : null;
+      if (page) return new Response(page, { headers: DASH_HEADERS });
+      return new Response(simplePage("발행 시간", "아직 만들어진 페이지가 없습니다. 운영 대시보드 실행(매시 50분)을 기다리세요.", false), { headers: HEADERS });
+    }
     if (url.pathname !== "/runs") return new Response(simplePage("없는 페이지", "주소를 확인하세요.", false), { status: 404, headers: HEADERS });
 
     const today = kstToday();

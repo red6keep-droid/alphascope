@@ -31,6 +31,7 @@ sys.path.insert(0, HERE)
 sys.path.insert(0, os.path.dirname(HERE))
 import design_kit as dk  # noqa: E402
 import mock_ops as M  # noqa: E402  — 같은 도우미(ok · warn · idle · over · white_card · chart_top · head_row)
+import ontime  # noqa: E402  — 발행 시간 페이지 (/ontime)
 
 QC = M.QC
 esc, V = dk.esc, dk.violet
@@ -671,7 +672,7 @@ def forecast_tab(now, I):
 
 
 def summary_tab(now, I):
-    order = ["화면", "수집", "AI 한도", "발행", "기록", "증시 전망"]
+    order = ["발행 시간", "화면", "수집", "AI 한도", "발행", "기록", "증시 전망"]   # 발행 시간 = 독자와의 약속, 맨 위 (2026-11-24 사용자 "최우선")
     lead = (f'<p data-seo-lead="1" style="{dk.SEO_LEAD}">{now.month}월 {now.day}일 {now:%H:%M} 기준으로 손이 필요한 곳 '
             f'{V(f"{I.need}곳")}, 지켜볼 곳 {V(f"{I.watch}곳")}이 있습니다.</p>')
     status = white_card([(a if a != "화면" else "독자 화면", *I.area.get(a, (idle("자료 없음"), ""))) for a in order])
@@ -683,25 +684,26 @@ def summary_tab(now, I):
                        "한 시간마다 새로 만듭니다. 날짜별 실행 상세는 아래 `날짜별 실행`."))
 
 
-def shell(body, now):
-    """블로그 테마 CSS · JS 로 감싼 한 페이지 (dk.write_mock 과 같은 추출, 목업 표시 · 공유 위젯 없음)."""
+def shell(body, now, title="운영 현황"):
+    """블로그 테마 CSS · JS 로 감싼 한 페이지 (dk.write_mock 과 같은 추출, 목업 표시 · 공유 위젯 없음). title = 운영 현황 · 발행 시간(/ontime)."""
     idx = open(os.path.join(ROOT, "index.html"), encoding="utf-8").read()
     css = re.search(r"<b:skin version='1.0'><!\[CDATA\[(.*?)\]\]></b:skin>", idx, re.S).group(1)
     js = re.search(r"//<!\[CDATA\[(.*?)//\]\]>", idx, re.S).group(1)
     foot = (f'<p style="margin:24px 0 0;font-size:14px;line-height:20px;color:#6B7280;">{now.month}.{now.day} {now:%H:%M} 만듦 · '
-            '<a href="/runs">날짜별 실행</a> · <a href="/logout">로그아웃</a></p>')
+            + ('<a href="/">운영 현황</a>' if title != "운영 현황" else '<a href="/ontime">발행 시간</a>')
+            + ' · <a href="/runs">날짜별 실행</a> · <a href="/logout">로그아웃</a></p>')
     return ('<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">'
-            f'<meta name="robots" content="noindex,nofollow"><title>운영 현황</title><style>{css}</style>'
+            f'<meta name="robots" content="noindex,nofollow"><title>{title}</title><style>{css}</style>'
             '<style>.title-share{display:none!important}</style></head>'   # 공유 버튼 없음 — 관리자 화면은 공유할 곳이 아니다 (2026-11-13 사용자)
             '<body class="item-view no-dashboard"><main class="main-content"><div class="post-shell"><article class="post-outer-container"><div class="post">'
-            f'<h3 class="post-title">운영 현황</h3><div class="post-body entry-content">{body}{foot}</div></div></article></div></main>'
+            f'<h3 class="post-title">{title}</h3><div class="post-body entry-content">{body}{foot}</div></div></article></div></main>'
             f'<script>{js}</script></body></html>')
 
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--state-heads", help="상태 저장소 브랜치 → 마지막 커밋 ISO 시각 JSON (워크플로가 만든다)")
-    ap.add_argument("--upload", action="store_true", help="KV dash:html · dash:hist 로 올린다")
+    ap.add_argument("--upload", action="store_true", help="KV dash:html · dash:hist · dash:ontime 으로 올린다")
     a = ap.parse_args()
     now = now_kst()
     I = Issues()
@@ -717,6 +719,18 @@ def main():
     if a.state_heads and os.path.exists(a.state_heads):
         heads = json.load(open(a.state_heads, encoding="utf-8"))
 
+    # 발행 시간(/ontime) — 약속 시각에 글이 나갔나, 어긴 횟수 누적 (2026-11-24 사용자). 요약 탭 맨 위 칸 · 할 일에도
+    ontime_page = None
+    got, err = safe(ontime.build, now)
+    if got:
+        ontime_body, (ot_val, ot_sub, ot_today) = got
+        I.area["발행 시간"] = (ot_val, ot_sub + " · 운영 현황 아래 `발행 시간`")
+        for n, v in ot_today:
+            I.add(f"{n} 약속 시각", v, "발행 시간 페이지에서 확인")
+        ontime_page = shell(dk.align_titles(dk.WRAP_OPEN + ontime_body + dk.WRAP_CLOSE), now, title="발행 시간")
+    else:
+        I.area["발행 시간"] = (warn("읽지 못함"), err[:60])
+        print(f"[ops] 발행 시간 만들기 실패 {err}")
     screen = screen_tab(now, I)
     publish = publish_tab(now, runs, recs_today, I)
     feeds, err = safe(kv_feeds)
@@ -733,12 +747,17 @@ def main():
     os.makedirs(OUT, exist_ok=True)
     with open(os.path.join(OUT, "ops.html"), "w", encoding="utf-8") as f:
         f.write(page)
+    if ontime_page:
+        with open(os.path.join(OUT, "ontime.html"), "w", encoding="utf-8") as f:
+            f.write(ontime_page)
     print(f"[ops] output/ops.html {len(page) // 1024}KB · 손 {I.need} · 지켜볼 {I.watch}")
     if a.upload:
         if not kv_conf():
             sys.exit("[ops] OPS_CF 값이 없어 올리지 못함")
         kv_put("dash:html", page)
         kv_put("dash:hist", json.dumps(hist))
+        if ontime_page:
+            kv_put("dash:ontime", ontime_page)
         print("[ops] KV dash:html 올림")
 
 

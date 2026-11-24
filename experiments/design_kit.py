@@ -1765,10 +1765,10 @@ def kst_close_day(day, market):
 
 def price_stamp(day, market, late=False):
     """가격 페이지(종목 · ETF · 간단 정보 · 목록 · 증시 리포트) 맨 위 안내 상자 — 실시간 가격이 아니라 종가로 만든 리포트라는 것 (2026-11-14 사용자 통일).
-    한국 = `11월 13일 종가 기준 · … (오후 4시 10분 무렵)`, 미국 = `11월 14일 새벽 마감 기준 · … (아침 7시 30분 무렵)` — 날짜 · 시각 모두 한국 시간."""
+    한국 = `11월 13일 종가 기준 · … (오후 4시 30분 무렵)`, 미국 = `11월 14일 새벽 마감 기준 · … (아침 7시 30분 무렵)` — 날짜 · 시각 모두 한국 시간."""
     if market == "US":
         return report_stamp(kst_close_day(day, "US"), "아침 7시 30분 무렵", close="새벽 마감", late=late)
-    return report_stamp(kst_close_day(day, "KR"), "오후 4시 10분 무렵", late=late)
+    return report_stamp(kst_close_day(day, "KR"), "오후 4시 30분 무렵", late=late)   # 옛 4시 10분 — 실제 게시가 16:17~16:29 라 약속을 지킬 수 있는 시각으로 (2026-11-24 사용자)
 
 
 LATE_STAMP = "오늘 자료가 늦어 지난 값을 보여 드립니다. 들어오는 대로 바뀝니다."   # 늦은 날 안내 상자 문구 (2026-11-21 사용자, 가이드라인 2절 3번)

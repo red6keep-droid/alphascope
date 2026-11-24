@@ -22,6 +22,8 @@ ops-dashboard.yml (매시 50분 UTC · 수동)
 이 Worker
   ├ /          = KV dash:html 그대로 (없으면 /runs 로)
   ├ /runs      = 날짜별 실행 화면 (예전 첫 화면)
+  ├ /ontime    = 발행 시간 — 독자에게 알린 시각(미국 07:30 · 한국 16:10 · 시황 08:40 · 21:00)에 글이 나갔나,
+                 어긴 횟수 누적 그래프 (KV dash:ontime, build_ops.py → ontime.py, 2026-11-24)
   └ /fb-login  = 블로그 메뉴 `운영 현황` 이 Firebase ID 토큰을 POST — 구글 공개 키로 서명 · 프로젝트 · 만료 확인,
                  ADMIN_FIREBASE_UIDS 만 통과 → 같은 세션 쿠키(12시간). Origin 이 BLOG_ORIGIN 이 아니면 거부
 ```
