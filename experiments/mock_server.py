@@ -17,6 +17,15 @@
       python experiments/mock_server.py --new "stock-lists/mock_stock-lists-guest-kr.html" "stock-lists/mock_stock-lists-member.html" --note "무엇을 바꿨나 한 줄"
   로 표시한다(파일 패턴 가능, 서버가 꺼져 있어도 됨). 목록 맨 위 `N 새로 바뀐 목업` 에 메모와 함께 모이고, 그 목업을 한 번 열면 표시가 사라진다.
   rebuild_mocks 다시 그리기처럼 내용이 그대로인 갱신은 표시하지 않는다. 기록 = .mock_prefs.json "new".
+- 2026-11-22 사용자: "너무 찾기 힘들다 — 일주일 단위로 끊자". 첫 화면 = 최근 7일 안에 실제로 고친 목업만, 7일 넘게 안 바뀐 것은
+  맨 아래 버튼 `일주일 넘은 목업`(/week) 으로. `쓰지 않는 목업` 은 휴지통(/archive)으로 이름을 바꿨다 — 시안이 확정되면 Claude 가
+      python experiments/mock_server.py --trash "stock-board/mock_board_*" --note "11-22 시안 A 확정"
+  로 지난 시안을 바로 휴지통에 넣는다(파일은 그대로, 휴지통에서 복원).
+  `고친 시각` = --new 기록(열어도 남는 "changed") 과 git 마지막 커밋(`목업 다시 그리기` 커밋 · 합치기 제외) 중 늦은 것.
+  파일 수정 시각은 rebuild_mocks 가 모든 목업을 다시 써서 쓰지 않는다. git 에 없는 파일(.gitignore 폴더)은 만든 시각(birthtime).
+- 2026-11-22 사용자: "발행한 강좌는 일주일 넘은 목업으로". 발행이 끝난 목업은 7일이 안 지나도
+      python experiments/mock_server.py --week "course/mock_study_list.html" "course/mock_착각-*"
+  로 바로 `일주일 넘은 목업` 으로 넘긴다(기록 = .mock_prefs.json "week"). 그 뒤에 다시 고치면(--new · 실제 커밋) 첫 화면으로 돌아온다.
 """
 import html
 import re
@@ -45,10 +54,13 @@ LABELS = {
     "theme-monitor": "테마",
     "media-daily": "미디어 데일리",
     "competitiveness": "국가 경쟁력",
+    "market-map": "시장 지도",   # 네모 칸 지도 + 손가락 확대 · 축소 + 전체 화면 (2026-11-22 사용자 "확대 · 축소 정도 … 로컬 목업 먼저")
+    "today-changes": "오늘 달라진 것",   # 홈 맨 위 카드 · 증시 리포트 첫 구획 (2026-11-22 사용자, 헌법 흐름 맨 앞 자리)
     "home-split": "홈 나누기",   # 미국 화면 · 한국 화면 (2026-11-10 사용자, H35)
     "issue_store": "증시 전망",   # 사건 가설 질문 페이지 · 목록 · 홈 카드 목업 (2026-11-06)
     "site-search": "검색 · 질문하기",   # 헤더 검색 아이콘 · 즉답 카드 · 질문하기 (2026-11-10 사용자)
     "mock-invest": "모의투자",   # 가상의 10억 원 · 종가 체결 · 세금 (2026-11-21 사용자)
+    "comments": "댓글 다듬기",   # 신고 · 가려진 댓글 · 하루 30개 · 자리 댓글 · 별명 (2026-11-21 사용자)
     "post-footer": "글 아래 버튼 줄",   # 💬 댓글 · 홈으로 · TOP 한 줄, 함께 보는 페이지는 그 아래 (2026-11-10 사용자)
     "stock-etf": "ETF",   # ETF 고정 페이지 37개 (2026-11-12 사용자 A안)
     "ops-dashboard": "운영 대시보드",   # 관리자 전용 운영 페이지 목업 (2026-11-13 사용자)
@@ -87,19 +99,16 @@ PLAN = [   # (기능 이름, 남은 일 — 한 줄, 파일 패턴 "폴더/파�
     ("한국 주요 뉴스 · 사건별 사실 (보도 2곳 이상 사건 + 사실 팝업 · 그 밖의 기사 제목 묶음)", "시안: 수집기 사건 묶기 결과를 facts 모양으로 바꾼 표본 → 사용자 디자인 확인 → 첫 facts 문서로 다시 그리기", ["news-posts/mock_news_facts*"]),
     ("한국 홈 — Newfact 주요 기사 카드(한국 증시 카드 아래) · 맨 아래 주요 뉴스(방송 + 뉴스 수집기 사건, 미국 홈과 같은 팝업)", "사용자 목업 확인 → 테마(alphaflow-home) 홈 카드 · 한국 주요 뉴스 켜기 · 자료 파일(Pages)", ["news-posts/mock_news_home_kr*"]),
     ("주식마을 3D (날씨 도시 · 마을 · 행성 시안)", "날씨 도시 판 모델링 · 연출 다듬기(물에 잠김 · 남은 날씨 7가지) → 방향 확정 뒤 휴대폰 발열 줄이기 5가지 · 날씨 기준 정하기 · Blogger 모듈 스크립트 시험 (흰 도시 · 3D 시험 1판은 11-24 사용자 삭제)", ["fantasy-world/mock_city_weather.html", "fantasy-world/mock_village_flat.html", "fantasy-world/mock_village_polish.html", "fantasy-world/mock_village_3d_v2.html"]),
+    ("시장 지도 (업종 · 종목 네모 칸 지도, 손가락 확대 · 축소 · 전체 화면, 미국 · 한국 따로)", "목업 확인(사용자 판단) → 어디에 둘지 · 색 기준 정하기 → 한국 시가총액을 목록 파일에 채우기", ["market-map/mock_market_map_*"]),
+    ("오늘 달라진 것 (홈 맨 위 카드 · 증시 리포트 첫 구획, 미국 · 한국 따로)", "목업 배치 확인(사용자 판단) → 며칠 계산만 돌려 줄 다듬기 → 테마 · 리포트에 붙이기", ["today-changes/mock_today_*"]),
     ("푸터 링크 줄 `소개 · 개인정보처리방침 · 문의`", "테마에 넣음(11-21) → 사용자 테마 붙여넣기 뒤 블로그 확인되면 이 줄 빼기", ["site-pages/mock_footer_links.html"]),
     ("종목 이슈 (종목 페이지 가격 카드 아래 Hot Issue)", "목업 확인 → 뉴스 양으로 자동 열고 닫는 코드 (블로그에 아직 없음)", ["issue_store/mock_stock_issue*"]),
     ("회원 `내 종목`", "목업 3화면 → Firebase 규칙 게시 · 댓글 저장 확인이 먼저 → 고정 페이지 · 10명 열기", ["my-stocks/*"]),
-    ("종목 새 카드 `발표 때 예상을 넘었나?` · `같은 업종 안 주가 순위는?` · `재무 건전성은?` · `이익에 비해 주가 수준은?`", "목업 확인 → 매출 예상 매일 기록 · 업종 비교 묶음 수집 · 정식 렌더러 (블로그에 아직 없음)", ["stock-radar/mock_earnmom_*"]),
+    ("종목 새 카드 `발표 때 예상을 넘었나?` · `같은 업종 안 주가 순위는?` · `재무 건전성은?` · `이익에 비해 주가 수준은?`", "정식 코드 peer_cards.py(11-22) → main 합침 · 첫 정식 실행(재무는 하루 안에 전 종목) 확인 뒤 발행된 화면으로", ["stock-radar/mock_earnmom_*"]),
+    ("댓글 다듬기 (신고 · 가려진 댓글 · 하루 30개 · 날짜를 넘어 이어지는 시황 댓글 · 별명)", "목업 확인 → 댓글 저장 확인 → 테마 JS · Firestore 규칙 · 댓글 봇 가림 (2026-11-21 기획 댓글-토론방-기획.md)", ["comments/mock_comments_*"]),
     ("모의투자 (가상의 10억 원 · 종가 체결 · 세금까지 실전처럼 · 순위는 100명부터)", "목업 확인 → 댓글 저장 확인 · 별명 → Cloudflare D1 · R2 · Worker → 정산 코드 (2026-11-21 기획 모의투자-기획.md, 결정 전부 확정)", ["mock-invest/mock_invest-*"]),
-    ("종목별 토론방 (종목 페이지 맨 끝 탭)", "목업 확인 → newfact.app 구입(11-21) 뒤 하위 주소 · Worker 쓰기 · R2 사본 · 신고 처리 화면", ["stock-board/mock_board_*"]),
+    ("종목별 토론방 (종목 페이지 맨 끝 탭) · 보류", "2026-11-21 사용자: 종목마다 토론방은 미룸 → 댓글 다듬기 먼저. 한 종목에 댓글이 꾸준히 달리면 다시", ["stock-board/mock_board_*"]),
     ("검색 `왜 떨어졌어` · 질문하기", "질문하기 버튼 꺼 둠 — 켤지 사용자 결정", ["site-search/mock_why_demo*"]),
-    ("주식 제대로 알기 4편 `판 값에 다시 사려다 더 비싸게 사는 이유`", "초안 목업 확인 → \"발행해\" 때 발행(주소 · 목록 연결). 발행되면 이 줄을 빼면 아래 `주식 제대로 알기` 묶음으로", ["course/mock_착각-04-되사기.html"]),
-    ("주식 제대로 알기 5편 `분할 매수, 하단을 기다리면 더 싸게 모일까?`", "초안 목업 확인 → \"발행해\" 때 발행(주소 · 목록 연결). 발행되면 이 줄을 빼면 아래 `주식 제대로 알기` 묶음으로", ["course/mock_착각-05-분할매수.html"]),
-    ("주식 제대로 알기 6편 `과열이면 떨어진다고요?`", "초안 목업 확인 → \"발행해\" 때 발행(주소 · 목록 연결). 발행되면 이 줄을 빼면 아래 `주식 제대로 알기` 묶음으로", ["course/mock_착각-06-과열.html"]),
-    ("주식 제대로 알기 7편 `볼린저 하단에서 샀는데 왜 더 떨어질까?`", "초안 목업 확인 → \"발행해\" 때 발행(주소 · 목록 연결). 발행되면 이 줄을 빼면 아래 `주식 제대로 알기` 묶음으로", ["course/mock_착각-07-볼린저.html"]),
-    ("주식 제대로 알기 8편 `골든크로스는 2010년대엔 틀리고 2020년대엔 맞았다?`", "초안 목업 확인 · 제목 끝 ? 승인 → \"발행해\" 때 발행(주소 · 목록 연결). 발행되면 이 줄을 빼면 아래 `주식 제대로 알기` 묶음으로", ["course/mock_착각-08-골든크로스.html"]),
-    ("주식 제대로 알기 9편 `동전 던지기에도 파동은 생긴다`", "초안 목업 확인 · 가짜 주가 파동 길이 재확인 → \"발행해\" 때 발행(주소 · 목록 연결). 발행되면 이 줄을 빼면 아래 `주식 제대로 알기` 묶음으로", ["course/mock_착각-09-파동.html"]),
     ("늦은 날 기준일 상자 (자료가 늦으면 노랑 상자 · `오늘 자료가 늦어 지난 값을 보여 드립니다`)", "목업 확인 → 가이드라인 2절 3번 · 853종목 통 차단 풀기에 연결 (2026-11-21)", ["stock-quick/mock_qpage_late_*"]),
 ]
 PLAN_NOMOCK = [   # 목업 파일이 이 PC 에 없는 발행 예정 기능 — 줄만 보인다
@@ -119,11 +128,12 @@ LIVE = [
     ("Hot Issue", ["issue_store/mock_issue_watch.html"]),
     ("증시 전망", ["issue_store/mock_forecast-list-eh.html", "issue_store/mock_forecast-2.html", "issue_store/mock_forecast-nvda-2026q3.html",
                 "issue_store/mock_real_forecast-nvda-2026q3.html", "issue_store/mock_real_forecast-list.html", "issue_store/mock_real_forecast-2026-007.html", "issue_store/mock_real_forecast-2026-008.html", "issue_store/mock_real_forecast-2.html"]),   # mock_real_ = 상태 저장소 실제 판정 기록으로 그린 것 (2026-11-22 모든 날짜 줄 확인용)
-    ("주식 제대로 알기", ["course/mock_study_list.html", "course/mock_착각-*.html"]),   # 목록 + 나온 편 전부 (2026-11-20 사용자: 모든 편을 목업에서 확인)
+    ("주식 제대로 알기", ["course/mock_study_list.html", "course/mock_입문-*.html", "course/mock_착각-*.html"]),   # 목록 + 나온 편 전부 (2026-11-20 사용자: 모든 편을 목업에서 확인) · 입문 12편 발행 11-22
     ("검색", ["site-search/mock_search.html"]),
     ("디자인 기준표 (그래프 · 팝업 · 아이콘)", ["design-samples/*"]),
     ("운영 현황 (관리자)", ["ops-dashboard/*"]),
 ]
+WEEK_D = 7   # 첫 화면 = 최근 이만큼(일) 안에 고친 목업 (2026-11-22 사용자: "일주일 단위로 끊자")
 STALE_H = 24   # 같은 묶음의 가장 최근 파일보다 이만큼(시간) 먼저 만든 파일 = 지난 버전 → 자동 보관 (2026-11-20 사용자: "만든 날짜로 예전 버전 정리")
 
 
@@ -135,6 +145,62 @@ def stale_keys(items):
         if s:
             top[s] = max(top.get(s, 0), t)
     return {f"{d}/{f}" for d, f, t in items if (s := stage_of(d, f)) and t < top[s] - STALE_H * 3600}
+
+
+_GIT = {"at": 0, "t": {}, "tracked": set()}
+
+
+def git_changes():
+    """{"폴더/파일": 마지막 실제 변경(초)} — git 커밋 중 `목업 다시 그리기`(rebuild_mocks) · 합치기를 뺀 것. 1분 캐시."""
+    import time
+    if time.time() - _GIT["at"] < 60:
+        return _GIT
+    root = os.path.dirname(BASE)
+    try:
+        out = subprocess.run(["git", "-C", root, "log", "--no-merges", "--format=@%ct %s", "--name-only", "--", "experiments/*/output/*.html"],
+                             capture_output=True, text=True, timeout=20).stdout
+        tracked = set(subprocess.run(["git", "-C", root, "ls-files", "experiments/*/output/*.html"], capture_output=True, text=True, timeout=20).stdout.split())
+    except (OSError, subprocess.SubprocessError):
+        return _GIT
+    t, cur, real = {}, 0, False
+    for line in out.splitlines():
+        if line.startswith("@"):
+            ts, _, subj = line[1:].partition(" ")
+            cur, real = int(ts), not subj.startswith("목업 다시 그리기")
+        elif line.strip() and real:
+            sp = line.strip().split("/")   # experiments/<폴더>/output/<파일>
+            if len(sp) == 4:
+                k = f"{sp[1]}/{sp[3]}"
+                t[k] = max(t.get(k, 0), cur)
+    _GIT.update(at=time.time(), t=t, tracked={"/".join((x.split("/")[1], x.split("/")[3])) for x in tracked if x.count("/") == 3})
+    return _GIT
+
+
+def last_change(items, prefs):
+    """{"폴더/파일": (고친 시각, 메모)} — --new 기록(changed · new) · git 실제 커밋 중 늦은 것. git 에 없는 파일은 만든 시각도."""
+    g = git_changes()
+    rec = dict(prefs.get("changed", {}))
+    for k, v in prefs["new"].items():   # 예전 N 기록(changed 생기기 전)도 고친 기록으로
+        if v.get("t", 0) > rec.get(k, {}).get("t", 0):
+            rec[k] = v
+    out = {}
+    for d, f, mt in items:
+        k = f"{d}/{f}"
+        r = rec.get(k, {})
+        t = max(r.get("t", 0), g["t"].get(k, 0))
+        if k not in g["tracked"]:   # git 에 없는 목업(.gitignore 폴더 · 새 파일) = 만든 시각. 수정 시각은 rebuild_mocks 가 매번 바꾼다
+            try:
+                st = os.stat(os.path.join(BASE, d, "output", f))
+                t = max(t, getattr(st, "st_birthtime", 0) or st.st_ctime)
+            except OSError:
+                pass
+        out[k] = (t, r.get("note", "") if r.get("t", 0) >= g["t"].get(k, 0) - 3600 else "")
+    return out
+
+
+def ago(t):
+    d = (datetime.now().date() - datetime.fromtimestamp(t).date()).days   # 달력 날짜로 (어제 저녁 = 어제)
+    return "오늘" if d <= 0 else "어제" if d == 1 else f"{d}일 전"
 
 
 def stage_of(d, f):
@@ -156,7 +222,8 @@ def load_prefs():
             p = json.load(fh)
     except (OSError, ValueError):
         p = {}
-    return {"star": p.get("star", []), "archive": p.get("archive", list(ARCHIVE_SEED)), "new": p.get("new", {})}
+    return {"star": p.get("star", []), "archive": p.get("archive", list(ARCHIVE_SEED)), "new": p.get("new", {}),
+            "changed": p.get("changed", {}), "trash_note": p.get("trash_note", {}), "week": p.get("week", {})}
 
 
 def save_prefs(p):
@@ -291,10 +358,10 @@ OLD_TAG = '<span class="old">옛 버전</span>'
 NEW_TAG = '<span class="nb">N</span>'
 
 
-def row(d, f, t, show_dir=False, stars=(), restore=False, names=None, ref=0, new=None, note=""):
+def row(d, f, t, show_dir=False, stars=(), restore=False, names=None, ref=0, new=None, note="", when_t=None):
     """큰 검은 글씨 = 목업 이름(종목 이름 · 전망 질문 · 페이지 제목), 작은 회색 = 묶음 이름 · 파일 이름 · 수정 시각 (2026-11-13 사용자)"""
     href = f"/{quote(d)}/output/{quote(f)}"
-    when = datetime.fromtimestamp(t).strftime("%m-%d %H:%M")
+    when = (datetime.fromtimestamp(when_t).strftime("%m-%d %H:%M 고침") if when_t else "고친 기록 없음") if when_t is not None else datetime.fromtimestamp(t).strftime("%m-%d %H:%M")
     title = (names or {}).get((d, f)) or f[:-5]
     label = ((names or {}).get(("label", d, f)) or LABELS.get(d, d)) if show_dir else ""
     sub = " · ".join(x for x in (label, f[:-5], when) if x)
@@ -306,15 +373,15 @@ def row(d, f, t, show_dir=False, stars=(), restore=False, names=None, ref=0, new
     if restore:   # 쓰지 않는 목업 화면 — 별 대신 복원
         return (f'<div class="row"><a class="go" href="{href}">'
                 f'<span class="name">{name}</span><span class="sub">{OLD_TAG if t < ref and not restore else ""}{html.escape(sub)}</span></a>'
-                f'<button class="back" data-k="{key}" aria-label="목업 목록으로 복원">복원</button></div>')
+                f'<button class="back" data-k="{key}" aria-label="휴지통에서 꺼내기">복원</button></div>')
     return (f'<div class="row"><a class="go" href="{href}">'
             f'<span class="name">{name}</span><span class="sub">{OLD_TAG if t < ref and not restore else ""}{html.escape(sub)}</span></a>'
             f'<button class="star{" on" if on else ""}" data-k="{key}" aria-label="즐겨찾기">{"★" if on else "☆"}</button>'
-            f'<button class="mv" data-k="{key}" aria-label="쓰지 않는 목업으로 옮기기">쓰지 않음</button></div>')
+            f'<button class="mv" data-k="{key}" aria-label="휴지통으로 옮기기">휴지통</button></div>')
 
 
 RELOAD_BTN = '<button class="edit-btn reload-btn" type="button" aria-label="새로고침 — 목록 다시 읽기" onclick="location.reload()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg></button>'   # 목업 목록 오른쪽 위 연필 왼쪽 — 누르면 목록 새로 읽기 (2026-11-22 사용자)
-EDIT_BTN = '<button class="edit-btn" aria-label="수정 — 쓰지 않음 버튼 보이기" aria-pressed="false"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>'   # 목업 목록 오른쪽 위 연필 — 누르면 줄마다 `쓰지 않음` (2026-11-13 사용자)
+EDIT_BTN = '<button class="edit-btn" aria-label="수정 — 휴지통 버튼 보이기" aria-pressed="false"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>'   # 목업 목록 오른쪽 위 연필 — 누르면 줄마다 `쓰지 않음` (2026-11-13 사용자)
 
 
 JOURNEY_START = "/j/home-split/output/mock_home_kr.html"
@@ -326,60 +393,100 @@ ARCHIVED_LINKS = [   # 파일 목업이 아닌 화면 — 쓰지 않는 목업 �
 ]
 
 
-def index_page(archive=False):
+TRASH_ICON = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>'
+
+
+def index_page(mode="main"):
+    """mode = main(최근 WEEK_D 일 안에 고친 목업) · week(그보다 오래 안 바뀐 목업) · trash(휴지통 = 예전 `쓰지 않는 목업`)."""
+    archive = mode == "trash"
     items = every = mockups()
     with _lock:
         prefs = load_prefs()
     stars = prefs["star"]
     arch = set(prefs["archive"]) | {f"{d}/{f}" for d, f, _ in items if stage_of(d, f) is None} | stale_keys(items)   # 표에 없는 파일 · 지난 버전 = 자동 보관
     old = [x for x in items if f"{x[0]}/{x[1]}" in arch]
-    items = old if archive else [x for x in items if f"{x[0]}/{x[1]}" not in arch]
+    kept = [x for x in items if f"{x[0]}/{x[1]}" not in arch]
+    lc = last_change(every, prefs)
+    from datetime import timedelta
+    cut = datetime.combine(datetime.now().date() - timedelta(days=WEEK_D), datetime.min.time()).timestamp()   # 달력 기준 — `7일 전 고침` 까지 첫 화면
+    newd = prefs["new"]
+    wk = prefs["week"]   # --week 로 넘긴 목업 = 그 뒤에 다시 고치기 전까지 `일주일 넘은 목업` (2026-11-22 사용자: 발행된 강좌)
+    recent = [x for x in kept if (lc[k := f"{x[0]}/{x[1]}"][0] >= cut or k in newd) and not (k in wk and wk[k] >= lc[k][0] and k not in newd)]
+    stale = [x for x in kept if x not in recent]
+    items = old if archive else recent if mode == "main" else stale
+    items = sorted(items, key=lambda x: -lc[f"{x[0]}/{x[1]}"][0])   # 고친 순
     by_key = {f"{d}/{f}": (d, f, t) for d, f, t in items}
     names = display_names(every)
     ref = design_mtime()
     n_old = sum(1 for x in items if x[2] < ref)
-    groups = {}
-    for d, f, t in items:
-        groups.setdefault(d, []).append((d, f, t))
+    W = lambda x: lc[f"{x[0]}/{x[1]}"][0]
     parts = []
+    nav_week = f'<a class="big" href="/week">일주일 넘게 안 바뀐 목업 <span>{len(stale)}개 ›</span></a>'
+    nav_main = f'<a class="big" href="/">← 이번 주 고친 목업 <span>{len(recent)}개</span></a>'
+    nav_trash = f'<a class="big" href="/archive"><b class="ti">{TRASH_ICON}휴지통</b> <span>{len(old) + len(ARCHIVED_LINKS)}개 ›</span></a>'
     if archive:
         parts.append('<a class="big" href="/">← 목업 목록으로</a>')
-        parts += ARCHIVED_LINKS   # 사용자 여정 테스트 · 아이콘 비교 — 쓰지 않는 목업으로 (2026-11-12 사용자)
-        for d in sorted(groups, key=lambda k: -groups[k][0][2]):
-            parts += [f'<section><h2>{html.escape(LABELS.get(d, d))}</h2>', *(row(*x, restore=True, names=names) for x in groups[d]), "</section>"]
+        tn = prefs["trash_note"]
+        groups = {}
+        for d, f, t in items:
+            groups.setdefault(d, []).append((d, f, t))
+        for d in sorted(groups, key=lambda k: -max(W(x) for x in groups[k])):
+            parts += [f'<section><h2>{html.escape(LABELS.get(d, d))}</h2>',
+                      *(row(*x, restore=True, names=names, note=tn.get(f"{x[0]}/{x[1]}", ""), when_t=W(x)) for x in groups[d]), "</section>"]
+        parts += ARCHIVED_LINKS   # 사용자 여정 테스트 · 아이콘 비교 (2026-11-12 사용자)
         if not items and not ARCHIVED_LINKS:
-            parts.append('<div class="meta">쓰지 않는 목업이 없습니다</div>')
+            parts.append('<div class="meta">휴지통이 비었습니다</div>')
     else:
-        newd = prefs["new"]
         every_key = {f"{d}/{f}": (d, f, t) for d, f, t in every}
-        fresh = sorted((k for k in newd if k in by_key), key=lambda k: -newd[k].get("t", 0))
-        if fresh:   # Claude 가 만들거나 고친 목업 — 열면 사라짐 (2026-11-18 사용자)
-            parts += [f'<section><div class="newh"><h2>{NEW_TAG}새로 바뀐 목업 <span class="n">{len(fresh)}</span></h2><button class="clr">모두 확인</button></div>',
-                      *(row(*every_key[k], show_dir=True, stars=stars, names=names, ref=ref, new=newd, note=newd[k].get("note", "")) for k in fresh), "</section>"]
-        fav = [by_key[k] for k in stars if k in by_key]   # 누른 순서대로
-        if fav:
-            parts += ['<section><h2>★ 즐겨찾기</h2>', *(row(*x, show_dir=True, stars=stars, names=names, ref=ref, new=newd) for x in fav), "</section>"]
+        if mode == "main":
+            parts.append(f'<div class="cut">{WEEK_D}일 안에 고친 목업만 보입니다 · 그보다 오래 안 바뀐 목업은 맨 아래 <a href="/week">일주일 넘은 목업</a></div>')
+            fresh = sorted((k for k in newd if k in every_key and k not in arch), key=lambda k: -newd[k].get("t", 0))
+            if fresh:   # Claude 가 만들거나 고친 목업 — 열면 사라짐 (2026-11-18 사용자)
+                parts += [f'<section><div class="newh"><h2>{NEW_TAG}새로 바뀐 목업 <span class="n">{len(fresh)}</span></h2><button class="clr">모두 확인</button></div>',
+                          *(row(*every_key[k], show_dir=True, stars=stars, names=names, ref=ref, new=newd, note=newd[k].get("note", ""), when_t=lc[k][0]) for k in fresh[:5]),
+                          *([f'<details class="more"><summary>N 목업 {len(fresh) - 5}개 더 보기</summary>',
+                             *(row(*every_key[k], show_dir=True, stars=stars, names=names, ref=ref, new=newd, note=newd[k].get("note", ""), when_t=lc[k][0]) for k in fresh[5:]),
+                             "</details>"] if len(fresh) > 5 else []), "</section>"]   # 5개 펼침 + 나머지 접기 (2026-11-22)
+            fav = [every_key[k] for k in stars if k in every_key and k not in arch]   # 즐겨찾기는 날짜와 상관없이 첫 화면에 (누른 순서대로)
+            if fav:
+                parts += ['<section><h2>★ 즐겨찾기</h2>', *(row(*x, show_dir=True, stars=stars, names=names, ref=ref, new=newd, when_t=W(x)) for x in fav), "</section>"]
+        else:
+            parts.append(nav_main)
+            parts.append(f'<div class="cut">{WEEK_D}일 넘게 고치지 않은 목업입니다. 다시 고치면 첫 화면으로 돌아갑니다.</div>')
         plan, live = {}, {}
         for x in items:
-            s = stage_of(x[0], x[1])
-            (plan if s[0] == "plan" else live).setdefault(s[1], []).append(x)
-        parts.append('<h2 class="zone">발행 예정</h2>')
-        for i, (name, todo, _) in enumerate(PLAN):
-            rows = plan.get(i, [])
-            parts.append(f'<details{" open" if i == 0 else ""}><summary>{html.escape(name)} <span class="n">{len(rows)}</span><span class="todo">{html.escape(todo)}</span></summary>')
-            parts += [row(*x, stars=stars, names=names, ref=ref, new=newd) for x in rows]
-            parts.append("</details>")
-        for name, todo in PLAN_NOMOCK:
-            parts.append(f'<div class="nomock"><b>{html.escape(name)}</b><span class="todo">{html.escape(todo)}</span></div>')
-        parts.append('<h2 class="zone">발행된 화면</h2>')
-        for i, (name, _) in enumerate(LIVE):
-            rows = live.get(i, [])
-            if rows:
-                parts.append(f'<details><summary>{html.escape(name)} <span class="n">{len(rows)}</span></summary>')
-                parts += [row(*x, stars=stars, names=names, ref=ref, new=newd) for x in rows]
-                parts.append("</details>")
-        if old or ARCHIVED_LINKS:
-            parts.append(f'<a class="big" href="/archive">쓰지 않는 목업 <span>{len(old) + len(ARCHIVED_LINKS)}개 ›</span></a>')
+            st = stage_of(x[0], x[1])
+            (plan if st[0] == "plan" else live).setdefault(st[1], []).append(x)
+
+        def block(name, todo, rows, opened):
+            last = max(W(x) for x in rows)
+            note = next((lc[f"{x[0]}/{x[1]}"][1] for x in rows if lc[f"{x[0]}/{x[1]}"][1]), "")
+            when = f'{ago(last)} 고침' if last else "고친 기록 없음"
+            out = [f'<details{" open" if opened else ""}><summary>{html.escape(name)} <span class="n">{len(rows)}</span>'
+                   f'<span class="when">{when}{" · " + html.escape(note) if note else ""}</span>'
+                   + (f'<span class="todo">{html.escape(todo)}</span>' if todo else "") + '</summary>']
+            out += [row(*x, stars=stars, names=names, ref=ref, new=newd, when_t=W(x)) for x in rows]
+            out.append("</details>")
+            return out
+
+        order = lambda dct: sorted(dct, key=lambda i: -max(W(x) for x in dct[i]))   # 최근에 고친 기능이 위로
+        if plan or (mode == "main" and PLAN_NOMOCK):
+            parts.append('<h2 class="zone">발행 예정</h2>')
+            for n, i in enumerate(order(plan)):
+                parts += block(PLAN[i][0], PLAN[i][1], plan[i], mode == "main" and n == 0)
+            if mode == "main":
+                for name, todo in PLAN_NOMOCK:
+                    parts.append(f'<div class="nomock"><b>{html.escape(name)}</b><span class="todo">{html.escape(todo)}</span></div>')
+        if live:
+            parts.append('<h2 class="zone">발행된 화면</h2>')
+            for i in order(live):
+                parts += block(LIVE[i][0], "", live[i], False)
+        if not items and mode == "main":
+            parts.append(f'<div class="meta">{WEEK_D}일 안에 고친 목업이 없습니다</div>')
+        parts.append('<div class="foot">')
+        parts.append(nav_week if mode == "main" else nav_main)
+        parts.append(nav_trash)
+        parts.append('</div>')
     now = datetime.now().strftime("%m-%d %H:%M:%S")
     return f"""<!doctype html><html lang="ko"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><title>목업 목록</title>
@@ -405,9 +512,11 @@ body.edit .mv{{display:block}}
 body.edit .edit-btn:not(.reload-btn){{background:#1d2127;border-color:#1d2127;color:#fff}}
 .back{{flex:0 0 auto;border:0;background:none;font-size:13px;color:#5b6370;cursor:pointer;padding:0 14px}}
 .big{{display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:48px;padding:0 14px;margin:0 0 16px;background:#fff;border:1px solid #e3e6eb;border-radius:10px;color:inherit;text-decoration:none;font-weight:600}}
-.big span{{color:#8a919c;font-weight:400;font-size:13px}} .big.dark{{background:#1d2127;border-color:#1d2127;color:#fff}} .big.dark span{{color:#c3c8d0}}
+.big span{{color:#8a919c;font-weight:400;font-size:13px}} .ti{{display:inline-flex;align-items:center;gap:8px}}
+.when{{display:block;margin-top:4px;color:#2563EB;font-size:13px;font-weight:400}} .cut{{color:#5b6370;font-size:13px;margin:-6px 0 16px}} .cut a{{color:#2563EB}}
+.foot{{margin-top:24px}} details.more{{background:none;border:0}} details.more>summary{{padding:10px 14px;color:#2563EB;font-weight:600;font-size:14px}} details.more .row{{border:1px solid #e3e6eb;border-radius:10px;margin-bottom:8px}} .big.dark{{background:#1d2127;border-color:#1d2127;color:#fff}} .big.dark span{{color:#c3c8d0}}
 </style></head><body>
-<div class="top"><h1>{"쓰지 않는 목업" if archive else "목업 목록"}</h1><span class="tbtns">{RELOAD_BTN}{"" if archive else EDIT_BTN}</span></div><div class="meta">{len(items)}개 · 불러온 시각 {now} · 새로고침하면 최신 목록{"" if archive or not n_old else f" · 옛 버전 {n_old}개(공통 디자인보다 먼저 만듦 — rebuild_mocks.py 로 다시 그림)"}</div>
+<div class="top"><h1>{"휴지통" if archive else "목업 목록" if mode == "main" else "일주일 넘은 목업"}</h1><span class="tbtns">{RELOAD_BTN}{"" if archive else EDIT_BTN}</span></div><div class="meta">{len(items)}개 · 불러온 시각 {now} · 새로고침하면 최신 목록{"" if archive or not n_old else f" · 옛 버전 {n_old}개(공통 디자인보다 먼저 만듦 — rebuild_mocks.py 로 다시 그림)"}</div>
 {''.join(parts)}
 <script>
 const ds = [...document.querySelectorAll('details')];
@@ -452,6 +561,27 @@ addEventListener('pagehide', () => {{
 
 # 목업 오른쪽 아래에 떠 있는 작은 '목록' 버튼 — 목업 파일은 건드리지 않고 보낼 때만 붙인다.
 # (2026-11-20 사용자: 맨 끝까지 내려야 목록으로 가던 것 → 보다가 바로 갈 수 있게 플로팅. 높이 44 = 터치 영역 기준)
+def num_font_css():
+    """숫자 = Inter(테마 'AS Num', 11-21 Roboto → Inter) — 테마를 새로 복사하지 않은 옛 목업 · 단독 목업에도 보여 줄 때 넣는다 (2026-11-21 사용자: 목업 페이지 숫자 통일).
+    값은 늘 저장소 index.html 에서 읽는다(테마와 어긋나지 않게)."""
+    try:
+        t = open(os.path.join(os.path.dirname(BASE), "index.html"), encoding="utf-8").read()
+    except OSError:
+        return ""
+    i = t.find("/* 숫자 글꼴 =")
+    if i < 0:
+        return ""
+    face = t[i:t.index("\n", t.index(".post-body svg text", i))]
+    v = {k: re.search(r"--" + k + r":\s*([^;]+);", t).group(1) for k in ("sans", "num", "report-font")}
+    pc = re.search(r":root \{ --sans: ('AS Num', 'AS Barun'[^;]+); --report-font: ([^;]+); \}", t)   # PC 폭(901 이상) 나눔바른고딕 줄
+    css = (face + f"\n:root {{ --sans: {v['sans']}; --num: {v['num']}; --report-font: {v['report-font']}; }}"
+           "\n[style*=\"font-family:-apple-system\"], [style*=\"font-family: -apple-system\"] { font-family: var(--report-font) !important; }"
+           "\nsvg text { font-family: var(--report-font); }")
+    if pc:
+        css += f"\n@media (min-width: 901px) {{ :root {{ --sans: {pc.group(1)}; --report-font: {pc.group(2)}; }} }}"
+    return "<style data-num-font>" + css + "</style>"
+
+
 BACK_BAR = ('<a href="/" aria-label="목업 목록으로" style="position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));'
             'z-index:2147483000;display:flex;align-items:center;gap:6px;height:44px;padding:0 16px;border-radius:22px;'
             'background:rgba(29,33,39,.86);color:#fff;font:600 14px/1 -apple-system,\'Apple SD Gothic Neo\',sans-serif;'
@@ -932,6 +1062,8 @@ class Handler(SimpleHTTPRequestHandler):
                 p["new"] = {} if k == "*" else {x: v for x, v in p["new"].items() if x != k}
             else:
                 p[key] = [x for x in p[key] if x != k] if k in p[key] else p[key] + [k]
+                if key == "archive" and k not in p[key]:   # 휴지통에서 복원하면 이유 메모도 지움
+                    p["trash_note"].pop(k, None)
             save_prefs(p)
         self.send_response(204)
         self.end_headers()
@@ -949,8 +1081,8 @@ class Handler(SimpleHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(body)
             return
-        if path in ("/", "/index.html", "/archive"):
-            body = index_page(archive=path == "/archive").encode()
+        if path in ("/", "/index.html", "/archive", "/week"):
+            body = index_page({"/archive": "trash", "/week": "week"}.get(path, "main")).encode()
             self.send_response(200)
             self.send_header("Content-Type", "text/html; charset=utf-8")
             self.send_header("Content-Length", str(len(body)))
@@ -968,6 +1100,10 @@ class Handler(SimpleHTTPRequestHandler):
                 page = fh.read()
             if journey:
                 page = fresh_theme(page)
+            if "AS Num" not in page:   # 옛 · 단독 목업도 숫자 = Inter
+                h = page.lower().find("</head>")
+                css = num_font_css()
+                page = page[:h] + css + page[h:] if h >= 0 else css + page
             i = page.lower().rfind("</body>")
             extra = journey_bar(seg[0], seg[2]) if journey else BACK_BAR
             page = page[:i] + extra + page[i:] if i >= 0 else page + extra
@@ -1008,8 +1144,40 @@ def mark_new(pats, note):
         p = load_prefs()
         for k in hit:
             p["new"][k] = {"t": time.time(), "note": note}
+            p["changed"][k] = {"t": time.time(), "note": note}   # 열어도 남는 고친 기록 — 첫 화면(최근 7일) 판정 (2026-11-22)
         save_prefs(p)
     print(f"N 표시 {len(hit)}개: " + ", ".join(hit) if hit else f"맞는 목업 없음: {pats}")
+
+
+def mark_trash(pats, note):
+    """--trash 패턴… --note 이유 — 확정돼 안 볼 시안을 휴지통으로 (2026-11-22 사용자). 파일은 그대로, 휴지통에서 복원."""
+    from fnmatch import fnmatch
+    keys = [f"{d}/{f}" for d, f, _ in mockups()]
+    hit = [k for k in keys if any(fnmatch(k, x) for x in pats)]
+    with _lock:
+        p = load_prefs()
+        p["archive"] += [k for k in hit if k not in p["archive"]]
+        for k in hit:
+            if note:
+                p["trash_note"][k] = note
+            p["new"].pop(k, None)
+        save_prefs(p)
+    print(f"휴지통 {len(hit)}개: " + ", ".join(hit) if hit else f"맞는 목업 없음: {pats}")
+
+
+def mark_week(pats):
+    """--week 패턴… — 발행이 끝나 이번 주 목록에 둘 필요 없는 목업을 `일주일 넘은 목업` 으로 (2026-11-22 사용자). 다시 고치면 첫 화면으로 돌아온다."""
+    from fnmatch import fnmatch
+    import time
+    keys = [f"{d}/{f}" for d, f, _ in mockups()]
+    hit = [k for k in keys if any(fnmatch(k, x) for x in pats)]
+    with _lock:
+        p = load_prefs()
+        for k in hit:
+            p["week"][k] = time.time()
+            p["new"].pop(k, None)
+        save_prefs(p)
+    print(f"일주일 넘은 목업으로 {len(hit)}개: " + ", ".join(hit) if hit else f"맞는 목업 없음: {pats}")
 
 
 def lan_ip():
@@ -1026,6 +1194,14 @@ if __name__ == "__main__":
         a = sys.argv[sys.argv.index("--new") + 1:]
         note = a[a.index("--note") + 1] if "--note" in a else ""
         mark_new([x for x in (a[:a.index("--note")] if "--note" in a else a)], note)
+        sys.exit(0)
+    if "--week" in sys.argv:
+        mark_week(sys.argv[sys.argv.index("--week") + 1:])
+        sys.exit(0)
+    if "--trash" in sys.argv:
+        a = sys.argv[sys.argv.index("--trash") + 1:]
+        note = a[a.index("--note") + 1] if "--note" in a else ""
+        mark_trash([x for x in (a[:a.index("--note")] if "--note" in a else a)], note)
         sys.exit(0)
     try:
         host = subprocess.run(["scutil", "--get", "LocalHostName"], capture_output=True, text=True).stdout.strip()

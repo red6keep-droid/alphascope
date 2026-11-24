@@ -1,0 +1,95 @@
+symbol,name,sector,source
+FOSL,Fossil Group,경기 소비재,yahoo 업종 → GICS 이름
+CNX,Consol Energy,에너지,yahoo 업종 → GICS 이름
+THC,Tenet Healthcare,헬스케어,yahoo 업종 → GICS 이름
+GME,GameStop,경기 소비재,yahoo 업종 → GICS 이름
+ADT,ADT,산업재,yahoo 업종 → GICS 이름
+AA,Alcoa,소재,yahoo 업종 → GICS 이름
+OI,Owens-Illinois,소재,GICS 직접
+PBI,Pitney Bowes,산업재,yahoo 업종 → GICS 이름
+URBN,Urban Outfitters,경기 소비재,yahoo 업종 → GICS 이름
+R,Ryder System,산업재,yahoo 업종 → GICS 이름
+TDC,Teradata,기술,yahoo 업종 → GICS 이름
+MUR,Murphy Oil,에너지,yahoo 업종 → GICS 이름
+RIG,Transocean,에너지,yahoo 업종 → GICS 이름
+AN,AutoNation,경기 소비재,yahoo 업종 → GICS 이름
+SIG,Signet Jewelers,경기 소비재,yahoo 업종 → GICS 이름
+NAVI,Navient,금융,yahoo 업종 → GICS 이름
+AYI,Acuity Brands,산업재,yahoo 업종 → GICS 이름
+RRC,Range Resources,에너지,yahoo 업종 → GICS 이름
+GT,The Goodyear Tire & Rubber Company,경기 소비재,yahoo 업종 → GICS 이름
+BHF,Brighthouse Financial,금융,yahoo 업종 → GICS 이름
+FLR,Fluor Corporation,산업재,yahoo 업종 → GICS 이름
+MAT,Mattel,경기 소비재,yahoo 업종 → GICS 이름
+JEF,Jefferies Financial Group,금융,yahoo 업종 → GICS 이름
+NKTR,Nektar Therapeutics,헬스케어,yahoo 업종 → GICS 이름
+MAC,Macerich,부동산,yahoo 업종 → GICS 이름
+TRIP,TripAdvisor,경기 소비재,yahoo 업종 → GICS 이름
+AMG,Affiliated Managers Group,금융,yahoo 업종 → GICS 이름
+M,Macy's,경기 소비재,yahoo 업종 → GICS 이름
+CPRI,Capri Holdings,경기 소비재,yahoo 업종 → GICS 이름
+HP,Helmerich & Payne,에너지,yahoo 업종 → GICS 이름
+HOG,Harley-Davidson,경기 소비재,yahoo 업종 → GICS 이름
+KSS,Kohl's,경기 소비재,yahoo 업종 → GICS 이름
+COTY,Coty,필수 소비재,yahoo 업종 → GICS 이름
+HRB,H&R Block,경기 소비재,yahoo 업종 → GICS 이름
+AIV,Aimco,부동산,yahoo 업종 → GICS 이름
+FTI,TechnipFMC,에너지,yahoo 업종 → GICS 이름
+VNT,Vontier,기술,yahoo 업종 → GICS 이름
+XRX,Xerox,기술,GICS 직접
+SLG,SL Green Realty,부동산,yahoo 업종 → GICS 이름
+FLS,Flowserve,산업재,yahoo 업종 → GICS 이름
+UNM,Unum,금융,yahoo 업종 → GICS 이름
+PRGO,Perrigo,헬스케어,yahoo 업종 → GICS 이름
+NOV,Nov,에너지,yahoo 업종 → GICS 이름
+WU,Western Union,금융,yahoo 업종 → GICS 이름
+IPGP,IPG Photonics,기술,yahoo 업종 → GICS 이름
+UAA,Under Armour (Class A),경기 소비재,yahoo 업종 → GICS 이름
+UA,Under Armour (Class C),경기 소비재,yahoo 업종 → GICS 이름
+PENN,Penn Entertainment,경기 소비재,yahoo 업종 → GICS 이름
+PVH,PVH,경기 소비재,yahoo 업종 → GICS 이름
+MBC,MasterBrand,경기 소비재,yahoo 업종 → GICS 이름
+VNO,Vornado Realty Trust,부동산,yahoo 업종 → GICS 이름
+SBNY,Signature Bank,금융,yahoo 업종 → GICS 이름
+LUMN,Lumen Technologies,커뮤니케이션,yahoo 업종 → GICS 이름
+AAP,Advance Auto Parts,경기 소비재,yahoo 업종 → GICS 이름
+NWL,Newell Brands,경기 소비재,GICS 직접
+LNC,Lincoln National Corporation,금융,yahoo 업종 → GICS 이름
+DXC,DXC Technology,기술,yahoo 업종 → GICS 이름
+OGN,Organon & Co.,헬스케어,yahoo 업종 → GICS 이름
+SEDG,SolarEdge,기술,yahoo 업종 → GICS 이름
+ALK,Alaska Air Group,산업재,yahoo 업종 → GICS 이름
+ZION,Zions Bancorporation,금융,yahoo 업종 → GICS 이름
+WHR,Whirlpool Corporation,경기 소비재,yahoo 업종 → GICS 이름
+VFC,VF Corporation,경기 소비재,yahoo 업종 → GICS 이름
+XRAY,Dentsply Sirona,헬스케어,yahoo 업종 → GICS 이름
+RHI,Robert Half,산업재,yahoo 업종 → GICS 이름
+BIO,Bio-Rad Laboratories,헬스케어,yahoo 업종 → GICS 이름
+ETSY,Etsy,경기 소비재,yahoo 업종 → GICS 이름
+AAL,American Airlines Group,산업재,yahoo 업종 → GICS 이름
+BBWI,"Bath & Body Works, Inc.",경기 소비재,yahoo 업종 → GICS 이름
+QRVO,Qorvo,기술,yahoo 업종 → GICS 이름
+AMTM,Amentum,산업재,yahoo 업종 → GICS 이름
+FMC,FMC Corporation,소재,yahoo 업종 → GICS 이름
+CE,Celanese,소재,yahoo 업종 → GICS 이름
+TFX,Teleflex,헬스케어,yahoo 업종 → GICS 이름
+BWA,BorgWarner,경기 소비재,yahoo 업종 → GICS 이름
+ENPH,Enphase Energy,기술,yahoo 업종 → GICS 이름
+MKTX,MarketAxess,금융,yahoo 업종 → GICS 이름
+CZR,Caesars Entertainment,경기 소비재,yahoo 업종 → GICS 이름
+KMX,CarMax,경기 소비재,yahoo 업종 → GICS 이름
+EMN,Eastman Chemical Co.,소재,yahoo 업종 → GICS 이름
+MHK,Mohawk Industries,경기 소비재,yahoo 업종 → GICS 이름
+SOLS,Solstice Advanced Materials,소재,yahoo 업종 → GICS 이름
+LKQ,LKQ Corporation,경기 소비재,yahoo 업종 → GICS 이름
+MOH,Molina Healthcare,헬스케어,yahoo 업종 → GICS 이름
+MTCH,Match Group,커뮤니케이션,yahoo 업종 → GICS 이름
+PAYC,Paycom,기술,yahoo 업종 → GICS 이름
+LW,Lamb Weston,필수 소비재,yahoo 업종 → GICS 이름
+EPAM,EPAM Systems,기술,yahoo 업종 → GICS 이름
+CPB,Campbell's,필수 소비재,yahoo 업종 → GICS 이름
+POOL,Pool Corporation,경기 소비재,GICS 직접
+CAG,Conagra Brands,필수 소비재,yahoo 업종 → GICS 이름
+BLDR,Builders FirstSource,산업재,yahoo 업종 → GICS 이름
+TTD,The Trade Desk,커뮤니케이션,yahoo 업종 → GICS 이름
+TAP,Molson Coors,필수 소비재,yahoo 업종 → GICS 이름

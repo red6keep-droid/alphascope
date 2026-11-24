@@ -503,12 +503,18 @@ ICON = {
     "rank": "<path d='M8.5 20h7'/><path d='M12 16.5V20'/><path d='M7.5 4h9v5a4.5 4.5 0 0 1-9 0z'/><path d='M7.5 6H5a2.5 2.5 0 0 0 2.7 3.5M16.5 6H19a2.5 2.5 0 0 1-2.7 3.5'/>",
     "me": "<circle cx='12' cy='8.5' r='3.5'/><path d='M5 19.5c.9-3.3 3.6-5 7-5s6.1 1.7 7 5'/>",
 }
+ICON["hot"] = "<path d='M12 21c-3.9 0-6.5-2.6-6.5-6.2 0-3.4 2.4-5.5 3.6-8.3.5 1.7 1.4 2.8 2.6 3.4.3-2.6 1.6-4.9 3.6-6.4-.4 2.6.3 4.4 1.6 6.1 1 1.4 1.6 3 1.6 5.2 0 3.6-2.6 6.2-6.5 6.2z'/>"   # 핫이슈 = 불꽃
+ICON["board"] = "<path d='M4 5.5h11a1.5 1.5 0 0 1 1.5 1.5v6A1.5 1.5 0 0 1 15 14.5H9l-3.5 3v-3H4A1.5 1.5 0 0 1 2.5 13V7A1.5 1.5 0 0 1 4 5.5z'/><path d='M19.5 9.5h.5a1.5 1.5 0 0 1 1.5 1.5v6a1.5 1.5 0 0 1-1.5 1.5h-1v2.5L16 18.5h-4.5'/>"   # 토론 = 말풍선 둘
+TAB_NEW = [("hot", "핫이슈", "../../issue_store/output/mock_issue_watch.html", 2),
+           ("board", "토론", "../../comments/output/mock_board.html", 2)]
 SET_B = [("wallet", "지갑", "mock_invest-wallet.html"), ("bell", "알림", "mock_invest-alerts.html"),
          ("hold", "보유 종목", "../../my-stocks/output/mock_my-stocks.html"), ("rank", "순위", "mock_invest-ranking.html"),
          ("me", "내 정보", "mock_invest-mypage.html")]
 NAV_CSS = """<style>
 @media (max-width:900px){
- .as-tabbar.mi-two{grid-template-columns:repeat(5,1fr) 52px !important;}
+ .as-tabbar{grid-template-columns:repeat(6,1fr) !important;}
+ .as-tabbar.mi-two[data-set=a]{grid-template-columns:repeat(6,1fr) 52px !important;}
+ .as-tabbar.mi-two[data-set=b]{grid-template-columns:repeat(5,1fr) 52px !important;}
  .as-tabbar.mi-two[data-set=a] a[data-set=b],.as-tabbar.mi-two[data-set=b] a[data-set=a]{display:none !important;}
  .as-tabbar a[data-set=b]{position:relative;}
  .mi-dot{position:absolute;top:9px;left:calc(50% + 6px);width:8px;height:8px;border-radius:4px;background:#d93025;box-shadow:0 0 0 2px #fff;}
@@ -531,7 +537,12 @@ def theme_tabbar():
                  ("stock", "../../stock-lists/output/mock_stock-lists-live-kr.html"), ("forecast", "../../issue_store/output/mock_forecast-list-eh.html"),
                  ("people", "../../people-radar/output/radar_mock.html")):
         nav = re.sub(rf"(<a data-tab='{k}' href=')[^']*'", rf"\g<1>{h}'", nav)
-    return nav
+    # 2026-11-22 사용자: 첫 줄 6칸 = 홈 · 리포트 · 종목 · 전망 · 핫이슈 · 토론(인물 발언 뺌 → 전체 메뉴). 6칸 + 토글이면 칸 56(360 폰 51)이라 라벨 줄임
+    nav = nav.replace("<span>증시 리포트</span>", "<span>리포트</span>").replace("<span>증시 전망</span>", "<span>전망</span>")
+    nav = re.sub(r"\s*<a data-tab='people'.*?</a>", "", nav, flags=re.S)
+    extra = "".join(f"<a data-tab='{k}' href='{h}'><svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true' stroke-width='{w}'>{ICON[k]}</svg><span>{t}</span></a>"
+                    for k, t, h, w in TAB_NEW)
+    return nav.replace("</nav>", extra + "</nav>")
 
 
 def nav_html(set_, on, unread=True):

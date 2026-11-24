@@ -1,0 +1,566 @@
+{
+ "market": "us",
+ "day": "2026-11-20",
+ "generated": "2026-11-22T05:00:52Z",
+ "rows": [
+  {
+   "kind": "결과",
+   "what": "엔비디아 실적 뒤 반도체는?",
+   "change": "맞음",
+   "dir": 0,
+   "cmp": "엔비디아 CEO 사임 · 반도체 수출 통제 겹침 · 성적에는 따로",
+   "z": 0,
+   "href": "https://www.newfact.app/p/forecast-nvda-2026q3.html"
+  },
+  {
+   "kind": "상태",
+   "what": "관세",
+   "change": "완화 → 방향미정",
+   "dir": 0,
+   "cmp": "최근 일주일 뉴스 기준",
+   "z": 0,
+   "href": "https://www.newfact.app/p/issue-tariff.html"
+  },
+  {
+   "kind": "상태",
+   "what": "반도체 수출 통제",
+   "change": "방향미정 → 강화",
+   "dir": 0,
+   "cmp": "최근 일주일 뉴스 기준",
+   "z": 0,
+   "href": "https://www.newfact.app/p/issue-export.html"
+  },
+  {
+   "kind": "상태",
+   "what": "엔비디아 CEO 사임",
+   "change": "방향미정 → 수습",
+   "dir": 0,
+   "cmp": "최근 일주일 뉴스 기준",
+   "z": 0,
+   "href": "https://www.newfact.app/p/issue-nvidia-ceo.html"
+  },
+  {
+   "kind": "움직임",
+   "what": "S&P 500",
+   "change": "▼3.7%",
+   "dir": -1,
+   "cmp": "평소의 3.7배",
+   "z": 103.70072691054239,
+   "href": "https://www.newfact.app/search/label/미국%20증시%20리포트"
+  },
+  {
+   "kind": "움직임",
+   "what": "헬스케어 업종",
+   "change": "S&P 500보다 ▲4.3%p",
+   "dir": 1,
+   "cmp": "평소의 3.0배 · 3종목 평균",
+   "z": 2.9803283629319592,
+   "href": "https://www.newfact.app/p/stock-lists.html?m=us",
+   "members": [
+    {
+     "name": "애브비",
+     "change": "▲0.9%",
+     "rel": "S&P 500보다 ▲4.6%p",
+     "times": "평소의 3.2배",
+     "href": "https://www.newfact.app/p/abbvie-abbv-stock.html"
+    },
+    {
+     "name": "존슨앤드존슨",
+     "change": "▲1.2%",
+     "rel": "S&P 500보다 ▲4.9%p",
+     "times": "평소의 3.0배",
+     "href": "https://www.newfact.app/p/johnson-johnson-jnj-stock.html"
+    },
+    {
+     "name": "일라이 릴리",
+     "change": "▼0.3%",
+     "rel": "S&P 500보다 ▲3.4%p",
+     "times": "평소의 1.8배",
+     "href": "https://www.newfact.app/p/eli-lilly-lly-stock.html"
+    }
+   ]
+  },
+  {
+   "kind": "움직임",
+   "what": "필수 소비재 업종",
+   "change": "S&P 500보다 ▲4.3%p",
+   "dir": 1,
+   "cmp": "평소의 2.9배 · 5종목 평균",
+   "z": 2.877615306485954,
+   "href": "https://www.newfact.app/p/stock-lists.html?m=us",
+   "members": [
+    {
+     "name": "코카콜라",
+     "change": "▲0.9%",
+     "rel": "S&P 500보다 ▲4.6%p",
+     "times": "평소의 3.0배",
+     "href": "https://www.newfact.app/p/coca-cola-ko-stock.html"
+    },
+    {
+     "name": "월마트",
+     "change": "▲1.5%",
+     "rel": "S&P 500보다 ▲5.2%p",
+     "times": "평소의 3.0배",
+     "href": "https://www.newfact.app/p/walmart-wmt-stock.html"
+    },
+    {
+     "name": "P&G",
+     "change": "▲0.9%",
+     "rel": "S&P 500보다 ▲4.6%p",
+     "times": "평소의 2.7배",
+     "href": "https://www.newfact.app/p/procter-gamble-pg-stock.html"
+    },
+    {
+     "name": "코스트코",
+     "change": "▲0.8%",
+     "rel": "S&P 500보다 ▲4.5%p",
+     "times": "평소의 2.7배",
+     "href": "https://www.newfact.app/p/costco-cost-stock.html"
+    },
+    {
+     "name": "필립모리스",
+     "change": "▼1.3%",
+     "rel": "S&P 500보다 ▲2.4%p",
+     "times": "평소의 1.3배",
+     "href": "https://www.newfact.app/p/philip-morris-pm-stock.html"
+    }
+   ]
+  },
+  {
+   "kind": "움직임",
+   "what": "버크셔 해서웨이",
+   "change": "▼0.4%",
+   "dir": -1,
+   "cmp": "S&P 500보다 ▲3.3%p · 평소의 2.6배",
+   "z": 2.6363097695973905,
+   "href": "https://www.newfact.app/p/berkshire-hathaway-brk-b-stock.html"
+  },
+  {
+   "kind": "움직임",
+   "what": "결제 업종",
+   "change": "S&P 500보다 ▲3.6%p",
+   "dir": 1,
+   "cmp": "평소의 2.5배 · 2종목 평균",
+   "z": 2.525153279073676,
+   "href": "https://www.newfact.app/p/stock-lists.html?m=us",
+   "members": [
+    {
+     "name": "비자",
+     "change": "▼0.1%",
+     "rel": "S&P 500보다 ▲3.6%p",
+     "times": "평소의 2.6배",
+     "href": "https://www.newfact.app/p/visa-v-stock.html"
+    },
+    {
+     "name": "마스터카드",
+     "change": "▼0.1%",
+     "rel": "S&P 500보다 ▲3.6%p",
+     "times": "평소의 2.4배",
+     "href": "https://www.newfact.app/p/mastercard-ma-stock.html"
+    }
+   ]
+  },
+  {
+   "kind": "움직임",
+   "what": "반도체 업종",
+   "change": "S&P 500보다 ▼7.6%p",
+   "dir": -1,
+   "cmp": "평소의 2.5배 · 16종목 평균",
+   "z": 2.482817695614173,
+   "href": "https://www.newfact.app/p/stock-lists.html?m=us",
+   "members": [
+    {
+     "name": "엔비디아",
+     "change": "▼14.0%",
+     "rel": "S&P 500보다 ▼10.3%p",
+     "times": "평소의 4.4배",
+     "href": "https://www.newfact.app/p/nvidia-nvda-stock.html"
+    },
+    {
+     "name": "브로드컴",
+     "change": "▼12.2%",
+     "rel": "S&P 500보다 ▼8.5%p",
+     "times": "평소의 3.3배",
+     "href": "https://www.newfact.app/p/broadcom-avgo-stock.html"
+    },
+    {
+     "name": "TSMC",
+     "change": "▼9.5%",
+     "rel": "S&P 500보다 ▼5.8%p",
+     "times": "평소의 2.7배",
+     "href": "https://www.newfact.app/p/tsmc-tsm-stock.html"
+    },
+    {
+     "name": "마이크론",
+     "change": "▼13.9%",
+     "rel": "S&P 500보다 ▼10.2%p",
+     "times": "평소의 2.6배",
+     "href": "https://www.newfact.app/p/micron-mu-stock.html"
+    },
+    {
+     "name": "샌디스크",
+     "change": "▼16.1%",
+     "rel": "S&P 500보다 ▼12.4%p",
+     "times": "평소의 2.3배",
+     "href": "https://www.newfact.app/p/sandisk-sndk-stock.html"
+    },
+    {
+     "name": "SK하이닉스 ADR",
+     "change": "▼13.1%",
+     "rel": "S&P 500보다 ▼9.4%p",
+     "times": "평소의 2.2배",
+     "href": "https://www.newfact.app/p/sk-hynix-skhy-stock.html"
+    },
+    {
+     "name": "ARM",
+     "change": "▼14.1%",
+     "rel": "S&P 500보다 ▼10.4%p",
+     "times": "평소의 2.1배",
+     "href": "https://www.newfact.app/p/arm-stock.html"
+    },
+    {
+     "name": "AMD",
+     "change": "▼13.2%",
+     "rel": "S&P 500보다 ▼9.5%p",
+     "times": "평소의 2.1배",
+     "href": "https://www.newfact.app/p/amd-stock.html"
+    },
+    {
+     "name": "어플라이드 머티어리얼즈",
+     "change": "▼10.7%",
+     "rel": "S&P 500보다 ▼7.0%p",
+     "times": "평소의 2.0배",
+     "href": "https://www.newfact.app/p/applied-materials-amat-stock.html"
+    },
+    {
+     "name": "KLA",
+     "change": "▼10.3%",
+     "rel": "S&P 500보다 ▼6.6%p",
+     "times": "평소의 2.0배",
+     "href": "https://www.newfact.app/p/kla-klac-stock.html"
+    },
+    {
+     "name": "마벨 테크놀로지",
+     "change": "▼11.7%",
+     "rel": "S&P 500보다 ▼8.0%p",
+     "times": "평소의 1.7배",
+     "href": "https://www.newfact.app/p/marvell-technology-mrvl-stock.html"
+    },
+    {
+     "name": "램리서치",
+     "change": "▼10.0%",
+     "rel": "S&P 500보다 ▼6.3%p",
+     "times": "평소의 1.6배",
+     "href": "https://www.newfact.app/p/lam-research-lrcx-stock.html"
+    },
+    {
+     "name": "테라다인",
+     "change": "▼10.0%",
+     "rel": "S&P 500보다 ▼6.3%p",
+     "times": "평소의 1.4배",
+     "href": "https://www.newfact.app/p/teradyne-ter-stock.html"
+    },
+    {
+     "name": "퀄컴",
+     "change": "▼7.5%",
+     "rel": "S&P 500보다 ▼3.8%p",
+     "times": "평소의 1.3배",
+     "href": "https://www.newfact.app/p/qualcomm-qcom-stock.html"
+    },
+    {
+     "name": "ASML",
+     "change": "▼6.6%",
+     "rel": "S&P 500보다 ▼2.9%p",
+     "times": "평소의 1.2배",
+     "href": "https://www.newfact.app/p/asml-stock.html"
+    }
+   ]
+  },
+  {
+   "kind": "움직임",
+   "what": "경기 소비재 업종",
+   "change": "S&P 500보다 ▲4.2%p",
+   "dir": 1,
+   "cmp": "평소의 2.4배 · 2종목 평균",
+   "z": 2.3985590853962067,
+   "href": "https://www.newfact.app/p/stock-lists.html?m=us",
+   "members": [
+    {
+     "name": "홈디포",
+     "change": "▲0.7%",
+     "rel": "S&P 500보다 ▲4.4%p",
+     "times": "평소의 2.3배",
+     "href": "https://www.newfact.app/p/home-depot-hd-stock.html"
+    },
+    {
+     "name": "맥도날드",
+     "change": "▲0.3%",
+     "rel": "S&P 500보다 ▲4.0%p",
+     "times": "평소의 2.3배",
+     "href": "https://www.newfact.app/p/mcdonalds-mcd-stock.html"
+    }
+   ]
+  },
+  {
+   "kind": "움직임",
+   "what": "기술 업종",
+   "change": "S&P 500보다 ▼6.8%p",
+   "dir": -1,
+   "cmp": "평소의 2.3배 · 14종목 평균",
+   "z": 2.2993646345569054,
+   "href": "https://www.newfact.app/p/stock-lists.html?m=us",
+   "members": [
+    {
+     "name": "마라 홀딩스",
+     "change": "▼18.6%",
+     "rel": "S&P 500보다 ▼14.9%p",
+     "times": "평소의 3.0배",
+     "href": "https://www.newfact.app/p/marathon-digital-mara-stock.html"
+    },
+    {
+     "name": "아리스타 네트웍스",
+     "change": "▼11.6%",
+     "rel": "S&P 500보다 ▼7.9%p",
+     "times": "평소의 2.5배",
+     "href": "https://www.newfact.app/p/arista-networks-anet-stock.html"
+    },
+    {
+     "name": "시게이트",
+     "change": "▼12.3%",
+     "rel": "S&P 500보다 ▼8.6%p",
+     "times": "평소의 2.0배",
+     "href": "https://www.newfact.app/p/seagate-technology-stx-stock.html"
+    },
+    {
+     "name": "웨스턴 디지털",
+     "change": "▼12.0%",
+     "rel": "S&P 500보다 ▼8.3%p",
+     "times": "평소의 1.9배",
+     "href": "https://www.newfact.app/p/western-digital-wdc-stock.html"
+    },
+    {
+     "name": "퀀텀 컴퓨팅",
+     "change": "▼9.8%",
+     "rel": "S&P 500보다 ▼6.1%p",
+     "times": "평소의 1.6배",
+     "href": "https://www.newfact.app/p/quantum-computing-qubt-stock.html"
+    },
+    {
+     "name": "리게티 컴퓨팅",
+     "change": "▼11.2%",
+     "rel": "S&P 500보다 ▼7.5%p",
+     "times": "평소의 1.6배",
+     "href": "https://www.newfact.app/p/rigetti-computing-rgti-stock.html"
+    },
+    {
+     "name": "디웨이브 퀀텀",
+     "change": "▼10.8%",
+     "rel": "S&P 500보다 ▼7.1%p",
+     "times": "평소의 1.6배",
+     "href": "https://www.newfact.app/p/d-wave-quantum-qbts-stock.html"
+    },
+    {
+     "name": "HPE",
+     "change": "▼10.1%",
+     "rel": "S&P 500보다 ▼6.4%p",
+     "times": "평소의 1.5배",
+     "href": "https://www.newfact.app/p/hewlett-packard-hpe-stock.html"
+    },
+    {
+     "name": "델",
+     "change": "▼11.0%",
+     "rel": "S&P 500보다 ▼7.3%p",
+     "times": "평소의 1.5배",
+     "href": "https://www.newfact.app/p/dell-technologies-dell-stock.html"
+    },
+    {
+     "name": "코어위브",
+     "change": "▼12.0%",
+     "rel": "S&P 500보다 ▼8.3%p",
+     "times": "평소의 1.4배",
+     "href": "https://www.newfact.app/p/coreweave-crwv-stock.html"
+    },
+    {
+     "name": "슈퍼마이크로",
+     "change": "▼9.2%",
+     "rel": "S&P 500보다 ▼5.5%p",
+     "times": "평소의 1.3배",
+     "href": "https://www.newfact.app/p/supermicro-smci-stock.html"
+    },
+    {
+     "name": "스트래티지",
+     "change": "▼9.7%",
+     "rel": "S&P 500보다 ▼6.0%p",
+     "times": "평소의 1.2배",
+     "href": "https://www.newfact.app/p/strategy-mstr-stock.html"
+    }
+   ]
+  },
+  {
+   "kind": "움직임",
+   "what": "IBM",
+   "change": "▲0.2%",
+   "dir": 1,
+   "cmp": "S&P 500보다 ▲3.9%p · 평소의 2.2배",
+   "z": 2.2425613461877276,
+   "href": "https://www.newfact.app/p/ibm-stock.html"
+  },
+  {
+   "kind": "움직임",
+   "what": "서던 컴퍼니",
+   "change": "▼0.2%",
+   "dir": -1,
+   "cmp": "S&P 500보다 ▲3.5%p · 평소의 2.2배",
+   "z": 2.2395227148174097,
+   "href": "https://www.newfact.app/p/southern-company-so-stock.html"
+  },
+  {
+   "kind": "움직임",
+   "what": "넥스트에라 에너지",
+   "change": "▼0.4%",
+   "dir": -1,
+   "cmp": "S&P 500보다 ▲3.3%p · 평소의 2.0배",
+   "z": 2.022646370756276,
+   "href": "https://www.newfact.app/p/nextera-energy-nee-stock.html"
+  },
+  {
+   "kind": "움직임",
+   "what": "산업재 업종",
+   "change": "S&P 500보다 ▼4.4%p",
+   "dir": -1,
+   "cmp": "평소의 1.8배 · 6종목 평균",
+   "z": 1.7664205597778302,
+   "href": "https://www.newfact.app/p/stock-lists.html?m=us",
+   "members": [
+    {
+     "name": "로켓랩",
+     "change": "▼10.9%",
+     "rel": "S&P 500보다 ▼7.2%p",
+     "times": "평소의 1.7배",
+     "href": "https://www.newfact.app/p/rocket-lab-rklb-stock.html"
+    },
+    {
+     "name": "뉴스케일 파워",
+     "change": "▼11.8%",
+     "rel": "S&P 500보다 ▼8.1%p",
+     "times": "평소의 1.5배",
+     "href": "https://www.newfact.app/p/nuscale-power-smr-stock.html"
+    },
+    {
+     "name": "버티브",
+     "change": "▼10.1%",
+     "rel": "S&P 500보다 ▼6.4%p",
+     "times": "평소의 1.4배",
+     "href": "https://www.newfact.app/p/vertiv-vrt-stock.html"
+    },
+    {
+     "name": "스페이스X",
+     "change": "▼7.7%",
+     "rel": "S&P 500보다 ▼4.0%p",
+     "times": "평소의 1.2배",
+     "href": "https://www.newfact.app/p/spacex-spcx-stock.html"
+    }
+   ]
+  },
+  {
+   "kind": "움직임",
+   "what": "에너지 업종",
+   "change": "S&P 500보다 ▲3.2%p",
+   "dir": 1,
+   "cmp": "평소의 1.7배 · 5종목 평균",
+   "z": 1.656782014585594,
+   "href": "https://www.newfact.app/p/stock-lists.html?m=us",
+   "members": [
+    {
+     "name": "셰브론",
+     "change": "▲0.9%",
+     "rel": "S&P 500보다 ▲4.6%p",
+     "times": "평소의 2.3배",
+     "href": "https://www.newfact.app/p/chevron-cvx-stock.html"
+    },
+    {
+     "name": "엑슨모빌",
+     "change": "▲0.7%",
+     "rel": "S&P 500보다 ▲4.4%p",
+     "times": "평소의 2.1배",
+     "href": "https://www.newfact.app/p/exxonmobil-xom-stock.html"
+    },
+    {
+     "name": "코노코필립스",
+     "change": "▲0.8%",
+     "rel": "S&P 500보다 ▲4.5%p",
+     "times": "평소의 1.9배",
+     "href": "https://www.newfact.app/p/conocophillips-cop-stock.html"
+    },
+    {
+     "name": "EOG 리소시스",
+     "change": "▼0.6%",
+     "rel": "S&P 500보다 ▲3.1%p",
+     "times": "평소의 1.4배",
+     "href": "https://www.newfact.app/p/eog-resources-eog-stock.html"
+    }
+   ]
+  },
+  {
+   "kind": "움직임",
+   "what": "소비 · 플랫폼 업종",
+   "change": "S&P 500보다 ▼2.2%p",
+   "dir": -1,
+   "cmp": "평소의 1.5배 · 2종목 평균",
+   "z": 1.5261223326806734,
+   "href": "https://www.newfact.app/p/stock-lists.html?m=us",
+   "members": [
+    {
+     "name": "테슬라",
+     "change": "▼7.6%",
+     "rel": "S&P 500보다 ▼3.9%p",
+     "times": "평소의 1.7배",
+     "href": "https://www.newfact.app/p/tesla-tsla-stock.html"
+    }
+   ]
+  },
+  {
+   "kind": "움직임",
+   "what": "부동산 업종",
+   "change": "S&P 500보다 ▲1.4%p",
+   "dir": 1,
+   "cmp": "평소의 1.5배 · 3종목 평균",
+   "z": 1.5038967595845227,
+   "href": "https://www.newfact.app/p/stock-lists.html?m=us",
+   "members": [
+    {
+     "name": "프롤로지스",
+     "change": "▼0.7%",
+     "rel": "S&P 500보다 ▲3.0%p",
+     "times": "평소의 2.5배",
+     "href": "https://www.newfact.app/p/prologis-pld-stock.html"
+    },
+    {
+     "name": "웰타워",
+     "change": "▼1.2%",
+     "rel": "S&P 500보다 ▲2.5%p",
+     "times": "평소의 1.5배",
+     "href": "https://www.newfact.app/p/welltower-well-stock.html"
+    }
+   ]
+  },
+  {
+   "kind": "일정",
+   "what": "HPE 실적",
+   "change": "11.23 장 마감 뒤",
+   "dir": 0,
+   "cmp": "",
+   "z": 0,
+   "href": "https://www.newfact.app/p/hewlett-packard-hpe-stock.html"
+  },
+  {
+   "kind": "일정",
+   "what": "델 실적",
+   "change": "11.24 장 마감 뒤",
+   "dir": 0,
+   "cmp": "",
+   "z": 0,
+   "href": "https://www.newfact.app/p/dell-technologies-dell-stock.html"
+  }
+ ]
+}

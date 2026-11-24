@@ -74,3 +74,5 @@ experiments/home-ip/data/
 
 # 뉴스 수집기 블로그 저장소에서 받은 목업 재료 — 기사 제목 · 주소가 섞임 (2026-11-23)
 experiments/news-posts/samples/
+# 토론 Worker 로컬 시험 값 (infra/board/test/run.sh 가 만들고 지움)
+infra/board/.dev.vars

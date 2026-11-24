@@ -6,13 +6,20 @@
 <title>Newfact — 미국 증시 AI 데일리 브리핑</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"/>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;900&amp;family=Inter:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;900&amp;family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
 <style>
 /* ==========================================================================
    Newfact — main home
    Figma: alphaflow-main-home (1440 x 2674)
    ========================================================================== */
 
+/* 숫자 글꼴 = Inter 하나 (2026-11-21 사용자: "숫자는 Inter 것으로 통일" — Roboto 는 $ · % 가 어색해 되돌림). 'AS Num' 은 숫자 · 숫자 기호에만 걸리는 Inter(unicode-range) —
+   글꼴 목록 맨 앞에 두면 한글은 뒤 글꼴 그대로, 숫자만 Inter. 리포트 본문 인라인 글꼴(-apple-system …)도 아래 규칙으로 같은 목록을 받는다 */
+@font-face { font-family: 'AS Num'; font-style: normal; font-weight: 100 900; font-display: swap;
+  src: url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw.woff2) format('woff2');
+  unicode-range: U+0030-0039, U+0025, U+002B-002E, U+003A, U+0024, U+2212; }
+.post-body [style*="font-family:-apple-system"] { font-family: var(--report-font) !important; }
+.post-body svg text { font-family: var(--report-font); }
 :root {
   color-scheme: light;
 
@@ -45,9 +52,9 @@
   --badge-teal:  #0F766E;
 
   /* type */
-  --sans: 'Noto Sans KR', 'Noto Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --num:  'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --report-font: -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;   /* 리포트 본문 글꼴 (design_kit.WRAP_OPEN) — 홈 · 목록 구획 제목도 이것 (2026-10-13) */
+  --sans: 'AS Num', 'Noto Sans KR', 'Noto Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --num:  'AS Num', 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --report-font: 'AS Num', -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;   /* 리포트 본문 글꼴 (design_kit.WRAP_OPEN) — 홈 · 목록 구획 제목도 이것 (2026-10-13) */
 
   /* rhythm */
   --gutter:  40px;
