@@ -863,7 +863,7 @@ def _kr_facts_by_code():
             print(f"[kr] 한국 사건별 사실이 오래됨 ({d['day']}) — 종목 페이지에 싣지 않음")
             return _KR_FACTS
         heads = {}
-        for h in d.get("headlines") or []:
+        for h in (it for doc in d.get("headlines") or [] for it in (doc.get("items") or [doc])):   # 문서 → items 두 겹 (news_render.headline_bundles 와 같음)
             if h.get("event") and h.get("url"):
                 heads.setdefault(h["event"], []).append(h)
         n = 0
