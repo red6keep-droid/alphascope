@@ -88,6 +88,24 @@ jobs:
             echo "weekly-$n 올림"
           fi
 
+      # 세 번째 사본 — Cloudflare R2 비공개 버킷 newfact-records(공개 주소 없음, 블로그 계정 red6) 의 daily/{KST 날짜}/ 에 같은 한 벌.
+      # GitHub 과 다른 회사라 GitHub 계정 사고와 따로 간다(헌법 제4조 8항, 2026-11-24 사용자). 버킷 수명 규칙 daily-30 = 30일 지나면 지움 → 약 30 × 28MB.
+      # 키(R2 API 토큰, 이 버킷 읽기 · 쓰기만)가 없으면 경고만 — GitHub 사본은 위에서 이미 올라갔다. 줄어듦으로 멈춘 날은 여기까지 오지 않는다
+      - name: Copy to R2 (newfact-records)
+        if: success()
+        continue-on-error: true
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_RECORDS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_RECORDS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: auto
+        run: |
+          if [ -z "$AWS_ACCESS_KEY_ID" ] || [ -z "$AWS_SECRET_ACCESS_KEY" ]; then echo "::warning::R2 키(R2_RECORDS_ACCESS_KEY_ID · R2_RECORDS_SECRET_ACCESS_KEY) 없음 — R2 사본 건너뜀"; exit 0; fi
+          day=$(TZ=Asia/Seoul date +%F)
+          aws s3 cp /tmp/backup "s3://newfact-records/daily/$day/" --recursive --exclude ".git/*" --only-show-errors \
+            --endpoint-url https://a8718df7edc5f8f6ce88e75b6545e5cb.r2.cloudflarestorage.com
+          n=$(aws s3 ls "s3://newfact-records/daily/$day/" --recursive --endpoint-url https://a8718df7edc5f8f6ce88e75b6545e5cb.r2.cloudflarestorage.com | wc -l)
+          echo "R2 올림 daily/$day/ · 파일 $n개"
+
       # 기록 현황 — 받은 상태 저장소로 기록 대장 줄마다 처음 · 마지막 날짜 · 쌓인 양을 세어 운영 대시보드 기록 탭(KV dash:records)에.
       # 알림은 보내지 않는다(사용자 11-24 "빠진 날 알리지마"). 실패해도 사본에는 영향 없음
       - name: Record status (운영 대시보드 기록 탭)
