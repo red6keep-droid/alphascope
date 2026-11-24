@@ -56,13 +56,39 @@ input[type=range]{width:100%;margin:8px 0 0;accent-color:#111}
 .legend{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:13px;line-height:19px;color:var(--sub);margin:10px 0 0;padding-left:6px}
 .legend span{display:inline-flex;align-items:center;gap:5px}.legend u{display:inline-block;width:10px;height:10px;text-decoration:none}
 .empty{font-size:14px;line-height:20px;color:var(--sub);text-align:center;background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px 12px;margin:0 0 6px}
-.rk{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:14px;line-height:20px;color:var(--sub);margin-top:8px}.rk .strip{margin-top:0}
+.tabsw{position:sticky;top:0;z-index:30;padding-top:12px;margin-bottom:14px;background:#fff}
+.tabs{display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px;border-bottom:2px solid #eee}.tabs::-webkit-scrollbar,.subs::-webkit-scrollbar{display:none}
+.tab{flex:none;padding:8px 13px;font:inherit;font-size:18px;line-height:24px;font-weight:700;color:var(--sub);border:0;background:none;border-bottom:3px solid transparent;margin-bottom:-2px;white-space:nowrap;cursor:pointer}
+.tab[aria-selected="true"]{color:#FF3333;border-bottom-color:#FF3333}
+.subs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--line);margin:0 0 12px}
+.subs.mid{margin:20px 0 22px}
+.sub1{flex:none;padding:6px 11px;font:inherit;font-size:19px;line-height:25px;font-weight:400;color:var(--sub);background:none;border:0;border-bottom:3px solid transparent;margin-bottom:-1px;white-space:nowrap;cursor:pointer}
+.sub1[aria-selected="true"]{color:#111;font-weight:700;border-bottom-color:#FF3333}.sub1 small{font-size:14px;font-weight:400}
+[data-p][hidden]{display:none}
+.rk{font-size:14px;line-height:20px;color:var(--sub);margin-top:10px}.rk .strip{margin-top:4px}
 </style></head><body><main>
 <h1>개성 있는 아이 찾기</h1>
 <div class="stamp">__LASTK__ 종가 기준 · 미국 S&amp;P 500 __N__종목 · 비교 대상 = 같은 구간의 S&amp;P 500 종목</div>
 <p class="lead">과거를 같은 길이의 구간으로 자르고, 구간마다 종목을 값 순서로 줄 세워 가운데 몇 %를 평범으로 볼지 정합니다. 여러 구간에서 되풀이해 평범 밖에 있던 종목이 개성 있는 아이입니다.</p>
 
-<h2>설정</h2>
+<div class="tabsw"><div class="tabs" id="tabs" role="tablist"></div></div>
+<section data-p="개성">
+<div class="subs" id="gsub"></div>
+<div id="answer"></div>
+<div class="guide" id="ansg" style="margin-top:14px"></div>
+</section>
+<section data-p="구간" hidden>
+<div class="emph"><div class="srow"><div class="sname">보는 구간<b class="vio" id="pv"></b></div><div class="smean" id="pd"></div>
+<input id="piece" type="range" min="0" max="0" step="1" value="0"><div class="ticks"><span>옛날</span><span>최근</span></div></div></div>
+<div class="guide" id="sum" style="margin-top:10px"></div>
+<div class="subs mid" id="csub"></div>
+<div id="cards"></div>
+</section>
+<section data-p="명단" hidden>
+<div class="guide">그림을 보고 사람이 적은 첫 명단입니다. `개성` 탭의 답과 다를 수 있습니다. 띠 한 칸은 구간 하나이고 왼쪽이 옛날, 오른쪽이 최근입니다.</div>
+<div id="roster"></div>
+</section>
+<section data-p="설정" hidden>
 <div class="emph">
 <div class="srow"><div class="sname">과거 범위</div><div class="caps" id="yrs"></div></div>
 <div class="srow"><div class="sname">간격</div><div class="smean">구간 하나의 길이입니다. 20거래일은 약 한 달입니다.</div><div class="caps" id="wins"></div></div>
@@ -71,22 +97,11 @@ input[type=range]{width:100%;margin:8px 0 0;accent-color:#111}
 <div class="srow"><div class="sname">개성이 드러난 시기<b><input id="minrun" class="num" type="number" min="1" max="12" value="3"> 구간부터</b></div><div class="smean">평범 밖 구간이 이만큼 이어져야 한 번으로 셉니다. 그보다 짧은 것은 세지 않고 따로 적습니다.</div></div>
 <div class="srow"><div class="sname">볼 칸</div><div class="caps" id="pick"></div></div>
 </div>
-
-<h2>설정으로 나온 답</h2>
-<div class="guide" id="ansg"></div>
-<div id="answer"></div>
-
-<h2>구간마다 평범의 범위</h2>
-<div class="emph"><div class="srow"><div class="sname">보는 구간<b class="vio" id="pv"></b></div><div class="smean" id="pd"></div>
-<input id="piece" type="range" min="0" max="0" step="1" value="0"><div class="ticks"><span>옛날</span><span>최근</span></div></div></div>
-<div class="guide" id="sum" style="margin-top:10px"></div>
-<div id="cards"></div>
-
-<h2>그룹 명단의 종목</h2>
-<div class="guide">그림을 보고 사람이 적은 첫 명단입니다. 위 `설정으로 나온 답`과 다를 수 있습니다. 띠 한 칸은 구간 하나이고 왼쪽이 옛날, 오른쪽이 최근입니다.</div>
-<div id="roster"></div>
+<div class="guide" id="setg" style="margin-top:10px"></div>
+</section>
 </main><script>
 const D=__DATA__, COLS=__COLS__, WINS=__WINS__, LABELS=__LABELS__;let W=20,P=null,Y=3,LB=[];
+const TABS=['개성','구간','명단','설정'];let TAB=TABS.includes(decodeURIComponent(location.hash.slice(1)))?decodeURIComponent(location.hash.slice(1)):'개성',SG='A',SC=0;   // 고른 탭은 URL 해시에 남긴다(가이드라인 12절)
 const $=id=>document.getElementById(id);
 const q=(a,p)=>{const i=(a.length-1)*p,f=Math.floor(i);return a[f]+(a[Math.min(f+1,a.length-1)]-a[f])*(i-f)};
 const fmt=(v,d)=>v.toFixed(d);
@@ -117,7 +132,9 @@ const strip=(a,cur)=>'<span class="strip">'+a.map((v,i)=>`<u class="${v==null?'n
 // 목록 = 전부 싣고 5개 펼침 + 나머지 접기(상한으로 버리지 않는다)
 const fold=(list,one,empty,noun)=>{if(!list.length)return `<div class="empty">${empty}</div>`;const head=list.slice(0,5).map(one).join(''),rest=list.slice(5);
   return rest.length?`<div data-box>${head}<div data-rest hidden>${rest.map(one).join('')}</div><button class="fbtn" data-tg data-c="${noun} ${rest.length}명 더 보기"><span class="lb">${noun} ${rest.length}명 더 보기</span>${CHEV}</button></div>`:head};
-document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-tg]');if(!b)return;const r=b.closest('[data-box]').querySelector(':scope > [data-rest]');
+document.addEventListener('click',e=>{const c=e.target.closest&&e.target.closest('[data-tab],[data-g],[data-c]');
+  if(c){if(c.dataset.tab){TAB=c.dataset.tab;history.replaceState(null,'','#'+encodeURIComponent(TAB));window.scrollTo(0,0)}else if(c.dataset.g)SG=c.dataset.g;else SC=+c.dataset.c;draw();return}
+  const b=e.target.closest&&e.target.closest('[data-tg]');if(!b)return;const r=b.closest('[data-box]').querySelector(':scope > [data-rest]');
   r.hidden=!r.hidden;b.classList.toggle('open',!r.hidden);if(b.dataset.c)b.querySelector('.lb').textContent=r.hidden?b.dataset.c:'접기'});
 function answer(lim){const use=picked(),np=LB.length,band=+$('band').value;
   [...$('pick').querySelectorAll('label')].forEach(l=>l.classList.toggle('on',l.querySelector('input').checked));
@@ -178,14 +195,20 @@ function answer(lim){const use=picked(),np=LB.length,band=+$('band').value;
   const one=x=>{const open=first;first=false;return `<div class="kid" data-box><div class="khead"><span class="kname">${x.k2||x.s}${x.seen?'<span class="pill">그림확인</span>':''}</span>`+
     `<span class="kval">${x.n}구간 중 ${vio(x.k+'구간')}<button class="fb${open?' open':''}" data-tg aria-label="설명 펼치기">${CHEV}</button></span></div>`+
     `${mstrip(x.mix)}<div class="ksub">${sub(x)}</div><div class="ds" data-rest${open?'':' hidden'}>${desc(x)}</div></div>`};
-  const sec=(g,title)=>`<div class="gh"><span class="box">${g}</span><span>${title}</span><span class="cnt vio">${out[g].length}명</span></div>${fold(out[g],one,'없음','종목')}`;
-  $('ansg').innerHTML=`최근 ${Y}년 · ${W}일 간격 ${np}구간 · 평범 = 가운데 ${band}% · 볼 칸 ${use.length}개. 구간 하나에서 볼 칸 중 하나라도 평범 밖이면 그 구간은 평범 밖으로 셉니다. 그 비율이 높은 순으로 종목의 위쪽 ${100-band}%가 개성이고(이번 선 = ${out.cut.toFixed(0)}% 넘게), 나머지가 평범입니다. 이름 오른쪽 버튼을 누르면 설명이 펼쳐집니다.`;
-  $('answer').innerHTML=sec('A','개성이 가장 센 3분의 1')+sec('B','그다음 3분의 1')+sec('C','나머지 3분의 1')+sec('D','단체 그룹 (같은 때 같이 움직인 무리, 사람이 넣음)')+
+  const GT={A:'개성이 가장 센 3분의 1',B:'그다음 3분의 1',C:'나머지 3분의 1',D:'단체 그룹 (같은 때 같이 움직인 무리, 사람이 넣음)'};
+  $('gsub').innerHTML=[...'ABCD'].map(g=>`<button class="sub1" role="tab" data-g="${g}" aria-selected="${g===SG}">${g==='D'?'D 단체':g} <small>(${out[g].length})</small></button>`).join('');
+  const sec=g=>`<div class="gh" style="margin-top:0"><span class="box">${g}</span><span>${GT[g]}</span><span class="cnt vio">${out[g].length}명</span></div>${fold(out[g],one,'없음','종목')}`;
+  $('ansg').innerHTML=`최근 ${Y}년 · ${W}일 간격 ${np}구간 · 평범 = 가운데 ${band}% · 볼 칸 ${use.length}개. 구간 하나에서 볼 칸 중 하나라도 평범 밖이면 그 구간은 평범 밖으로 셉니다. 그 비율이 높은 순으로 종목의 위쪽 ${100-band}%가 개성이고(이번 선 = ${out.cut.toFixed(0)}% 넘게), 나머지가 평범입니다. 값은 설정 탭에서 바꿉니다.`;
+  $('setg').innerHTML=`지금 설정의 답 : A ${out.A.length}명 · B ${out.B.length}명 · C ${out.C.length}명 · D 단체 ${out.D.length}명 · 평범 ${out.plain}명`;
+  $('answer').innerHTML=sec(SG)+
     `<div class="gh"><span>평범</span><span class="cnt vio">${out.plain}명</span></div><div class="guide">평범한 종목은 배경이라 이름을 싣지 않습니다.${out.none?` 이 범위에 구간이 하나도 없는 종목 ${out.none}명.`:''}</div>`+
     `<div class="legend"><span><u style="background:var(--c-up)"></u>평범 위쪽 밖</span><span><u style="background:var(--c-dn)"></u>평범 아래쪽 밖</span><span><u style="background:#A78BFA"></u>한 구간에서 위 · 아래 둘 다 (칸이 다름)</span><span><u style="background:var(--line)"></u>평범 안</span><span><u style="outline:2px solid #111"></u>지금 보는 구간</span></div>`}
 D.forEach(x=>{x.k2=x.k;x.seen=!!x.g&&x.g!=='미정'});
 const tag=x=>x.g?`<span class="box" style="margin-right:5px">${x.g}</span>`:'';
-function draw(){view();const b=+$('band').value,t=(100-b)/2,np=LB.length;
+function draw(){$('tabs').innerHTML=TABS.map(t=>`<button class="tab" role="tab" data-tab="${t}" aria-selected="${t===TAB}">${t}</button>`).join('');
+  document.querySelectorAll('[data-p]').forEach(p=>{p.hidden=p.dataset.p!==TAB});
+  $('csub').innerHTML=COLS.map((c,i)=>`<button class="sub1" role="tab" data-c="${i}" aria-selected="${i===SC}">${CN[i]}</button>`).join('');
+  view();const b=+$('band').value,t=(100-b)/2,np=LB.length;
   if(P==null||P>=np)P=np-1;$('piece').max=np-1;$('piece').value=P;
   $('bv').textContent=b;$('tv').textContent=$('tv2').textContent=(t%1?t.toFixed(1):t);
   [...$('wins').children].forEach(x=>{x.classList.toggle('on',+x.dataset.w===W);x.textContent=`${x.dataset.w}일 (${pieces(+x.dataset.w)}구간)`});
@@ -193,7 +216,7 @@ function draw(){view();const b=+$('band').value,t=(100-b)/2,np=LB.length;
   $('pv').textContent=`${np}구간 중 ${P+1}번째`;$('pd').textContent=lbk(LB[P]);
   const lim=calc(b);answer(lim);let html='';
   const Wd=Math.max(260,Math.min(626,(($('cards').clientWidth||320)-26)|0)),Hh=120;       // 그래프는 실제 px 로 그린다(SVG 를 축소하지 않는다, 가이드라인 6절)
-  COLS.forEach(([c,label,d,unit,why],ci)=>{const [lo,md,hi,vals]=lim[P][ci];
+  COLS.forEach(([c,label,d,unit,why],ci)=>{if(ci!==SC)return;const [lo,md,hi,vals]=lim[P][ci];
     const here=D.filter(x=>x.v[P]),val=x=>x.v[P][c];
     const L=here.filter(x=>x.st[ci][P]<0).sort((x,y)=>val(x)-val(y)),H=here.filter(x=>x.st[ci][P]>0).sort((x,y)=>val(y)-val(x));
     const n=vals.length,max=q(vals,.995),min=vals[0],X=i=>Math.round(i/(n-1)*Wd),Yv=v=>Math.round(Hh-6-(Math.min(v,max)-min)/(max-min||1)*(Hh-16));
@@ -202,7 +225,7 @@ function draw(){view();const b=+$('band').value,t=(100-b)/2,np=LB.length;
     const cnt=(x,dir)=>x.st[ci].filter(v=>v===dir).length,all=x=>x.st[ci].filter(v=>v!=null).length;
     const row=(dir,showVal)=>x=>`<div class="kid"><div class="khead"><span class="kname">${tag(x)}${x.k2||x.s}</span><span class="kval">${showVal?`${fmt(val(x),d)}${unit}`:`${all(x)}구간 중 ${vio(cnt(x,dir)+'구간')}`}</span></div>${strip(x.st[ci],P)}${showVal?`<div class="ksub">${all(x)}구간 중 ${cnt(x,dir)}구간에서 ${dir<0?'아래쪽':'위쪽'} 밖</div>`:''}</div>`;
     const rep=dir=>D.filter(x=>cnt(x,dir)>=2).sort((x,y)=>cnt(y,dir)-cnt(x,dir));
-    html+=`<span class="ct"><i>※</i> ${label.split(' (')[0]} <small>(${unit})</small></span><div class="guide" style="padding-left:6px">${why}. 이 구간의 종목을 작은 값에서 큰 값으로 줄 세운 선이고, 회색 바탕이 평범입니다. 점은 그룹 명단의 종목입니다.</div>
+    html+=`<span class="ct" style="margin-top:0"><i>※</i> ${label.split(' (')[0]} <small>(${unit})</small></span><div class="guide" style="padding-left:6px">${why}. 이 구간의 종목을 작은 값에서 큰 값으로 줄 세운 선이고, 회색 바탕이 평범입니다. 점은 그룹 명단의 종목입니다.</div>
     <div class="white"><svg width="${Wd}" height="${Hh}" role="img" aria-label="${label} 줄 세운 선"><rect x="${x0}" y="0" width="${Math.max(0,x1-x0)}" height="${Hh}" fill="#F1F5F9"/><polyline points="${pts}" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linejoin="round"/>${marks}</svg></div>
     <div class="rows"><div class="rw"><span>이 구간의 가운데 값</span><span>${fmt(md,d)}${unit}</span></div><div class="rw"><span>평범의 범위</span><span>${fmt(lo,d)} ~ ${fmt(hi,d)}${unit}</span></div>
     <div class="rw"><span>평범 아래쪽 밖</span><span>${vio(L.length+'명')}</span></div><div class="rw"><span>평범 위쪽 밖</span><span>${vio(H.length+'명')}</span></div></div>
