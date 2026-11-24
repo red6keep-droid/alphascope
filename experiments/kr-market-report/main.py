@@ -435,6 +435,89 @@ def _home_news(media):
 KR_FACTS_URL = "https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/kr-facts.json"   # 한국 기사 공용 저장소 (kr-facts.yml 09:20 · 18:20, 2026-11-24 사용자) — kr-news.json 과 같은 gh-pages
 
 
+def _facts_doc():
+    """gh-pages kr-facts.json — 사흘보다 오래됐거나 못 받으면 None(방송만)."""
+    try:
+        import urllib.request
+        with urllib.request.urlopen(KR_FACTS_URL, timeout=20) as r:
+            d = json.loads(r.read().decode("utf-8"))
+        today = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).date()
+        if (today - datetime.date.fromisoformat(d["day"])).days > 3:
+            print(f"[kr-report] 한국 사건별 사실이 오래됨 ({d['day']}) — 싣지 않음")
+            return None
+        return d
+    except Exception as e:  # noqa: BLE001
+        print(f"[kr-report] 한국 사건별 사실 못 읽음: {str(e)[:120]}")
+        return None
+
+
+def _utc16(iso):
+    """여러 꼴 시각(KST +09:00 · Z) → 'YYYY-MM-DDTHH:MM' UTC — 방송 줄과 같은 기준으로 시각 순."""
+    try:
+        t = datetime.datetime.fromisoformat(str(iso).replace("Z", "+00:00"))
+        return (t if t.tzinfo else t.replace(tzinfo=datetime.timezone.utc)).astimezone(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M")
+    except ValueError:
+        return str(iso)[:16]
+
+
+def _kr_articles(d):
+    """한국 기사 → news_pick.build extra (2026-11-24 사용자 "미국처럼 합치고 탭도 적용"):
+    사실 기사(보도 2곳 이상) = kind fact — 팝업 = 사실 줄(끝에 작은 회색 출처), 원문 보기 없음, 점수 `보도 n곳` · 방향은 막대에 함께 센다.
+    제목만 있는 기사 = kind head — 같은 사건 2 ~ 4줄 묶음(news_render.headline_bundles), 사실 기사와 같은 사건은 뺀다. AI 0."""
+    if not d:
+        return [], {}
+    import hashlib
+    sys.path.insert(0, os.path.join(_HERE, "..", "news-posts"))
+    import news_render as NR
+    out, codes = [], {}
+    evs = NR.fact_events(d["facts"])
+    for e in evs:
+        facts = [f for f in e.get("facts") or [] if (f.get("sources") or 1) >= NR.FACTS_MIN_SOURCES]
+        if not facts:
+            continue
+        lines = []
+        for f in facts:
+            text, by = (f["line"], f.get("by") or "") if f.get("line") else NR.fact_parts(f)
+            lines.append((text, by) if by else text)
+        rel = [str(s.get("code")) for s in e.get("stocks") or [] if re.fullmatch(r"\d{6}", str(s.get("code") or ""))]
+        for c in rel:
+            codes[c] = 1
+        sc = e.get("sourceCount") or 0
+        out.append({"id": "f" + hashlib.sha1(e["event"].encode()).hexdigest()[:11], "kind": "fact", "text": e["event"], "title": e["event"],
+                    "theme": _dk.ISSUE_KO.get(e.get("cat"), "그 밖"), "published_at": _utc16(e["at"]), "url": None, "source": f"보도 {sc}곳",
+                    "detail": facts[0].get("what") or "", "related": rel[:4], "surprise": e.get("surprise"),
+                    "market_dir": NR.DIR_KIND.get(e.get("direction"), "neutral"), "lines": lines, "n_out": sc})
+    used = {e["event"] for e in evs}
+    bundles = [b for b in NR.headline_bundles(d.get("headlines") or [], d["day"]) if b["event"] not in used]
+    # 제목 1개짜리 = 같은 분야끼리 2 ~ 4개 묶음 (2026-11-24 사용자 — 종목 페이지 `한 줄짜리 묶음` 규칙과 같게). 분야에 1건뿐이면 `그 밖` 으로 모으고,
+    # 그래도 혼자면 한 줄 그대로(버리지 않음). 11-24 아침: 제목 1개짜리 사건 103개가 원문으로 바로 가는 줄이었다
+    multi = [b for b in bundles if len(b["rows"]) > 1]
+    by_cat = {}
+    for b in bundles:
+        if len(b["rows"]) == 1:
+            by_cat.setdefault(b.get("cat") or "OTHER", []).append(b["rows"][0])
+    lone = [r for c, rs in by_cat.items() if len(rs) == 1 for r in rs]
+    by_cat = {c: rs for c, rs in by_cat.items() if len(rs) > 1}
+    if lone:
+        by_cat.setdefault("OTHER", []).extend(lone)
+    for c, rs in by_cat.items():
+        rs.sort(key=lambda r: r["at"], reverse=True)
+        i = 0
+        for n in _dk.bundle_sizes(len(rs)) or [len(rs)]:
+            part, i = rs[i:i + n], i + n
+            multi.append({"event": part[0].get("event") or part[0]["title"], "rows": part, "at": max(r["at"] for r in part), "cat": None if c == "OTHER" else c})
+    for b in multi:
+        rows = b["rows"]
+        outlets = list(dict.fromkeys(r.get("outlet") for r in rows if r.get("outlet")))
+        src = (outlets[0] + (f" 외 {len(outlets) - 1}곳" if len(outlets) > 1 else "")) if outlets else ""
+        out.append({"id": "k" + hashlib.sha1((b["event"] + rows[0]["url"]).encode()).hexdigest()[:11], "kind": "head", "text": rows[0]["title"],
+                    "title": rows[0]["title"], "theme": _dk.ISSUE_KO.get(b.get("cat"), "그 밖"), "published_at": _utc16(b["at"]),
+                    "url": rows[0]["url"], "source": src, "detail": rows[1]["title"] if len(rows) > 1 else "", "related": [], "surprise": 0,
+                    "market_dir": None, "lines": [r["title"] for r in rows],
+                    "rows": [{"line": r["title"], "source": r.get("outlet"), "url": r["url"]} for r in rows]})
+    return out, codes
+
+
 def _facts_sections():
     """뉴스 탭 맨 위 = 사실로 정리된 한국 사건(보도 2곳 이상) + 그 밖의 기사 제목 묶음 — 뉴스 수집기 자료, 블로그 AI 0 (2026-11-24 사용자).
     재료 = gh-pages kr-facts.json(그날 가장 늦은 수집기 정기 실행 — 15:50 실행이면 그날 07:00 실행). 사흘보다 오래됐거나 못 받으면 싣지 않는다(방송 뉴스만)."""
@@ -459,8 +542,11 @@ def news_section():
     분야 칩 → 방향 막대(오늘 · 최근 7일) → 주요 뉴스 5줄(같은 사건 `n곳`) → 칩별 목록 · 팝업(방송 요약 다섯 줄 · 관련 종목).
     재료 = 한국 증시 내용(media_feed.is_korea) 방송 이슈 48시간. 기사는 아직 없다(한국 기사 수집 없음). AI = 같은 사건 묶기(news_stories, Groq 먼저)만 — 요약은 수집기 lines.
     읽지 못하면 자리만."""
-    facts = _facts_sections()
-    head = "방송 뉴스" if facts else "뉴스"   # 사실 층이 위에 있으면 방송 구획에 이름을 보인다(탭 이름과 같은 제목은 테마가 숨김)
+    # 한국 기사(사실 · 제목 묶음)를 방송과 한 목록으로 — 미국 뉴스 탭과 같은 규칙 · 같은 분야 탭 (2026-11-24 사용자 "미국처럼 합치고 탭도 적용").
+    # 옛: 사실 층 · 그 밖의 기사를 방송 목록 위에 따로 얹었다(같은 날 아침, _facts_sections)
+    facts = ""
+    articles, art_codes = _kr_articles(_facts_doc())
+    head = "뉴스"
     try:
         RH = _daily_render()
         mf, NP = RH.media_feed, RH.news_pick
@@ -480,14 +566,21 @@ def news_section():
                 c = mf.kr_code(t)
                 if c and c in KR_PRICES:
                     names[t], series[t] = KR_PRICES[c][0], {"ret_1d": KR_PRICES[c][1]}
+        for c in art_codes:   # 한국 기사 관련 종목 = 종목 코드 그대로
+            if c in KR_PRICES:
+                names[c], series[c] = KR_PRICES[c][0], {"ret_1d": KR_PRICES[c][1]}
         built = NP.build({"news": []}, {"series": series}, media, summarize=False, prev=_prev_run_kst(),
                          all_channels={x["channel"] for x in rows if str(x["published_at"])[:16] >= since},
-                         stories_cache=os.path.join(OUT, "state", "news_stories.json"), label="kr-report-stories")
+                         stories_cache=os.path.join(OUT, "state", "news_stories.json"), label="kr-report-stories", extra=articles)
         built["names"] = names
         if not built["stories"]:
             raise ValueError("뉴스 없음")
         dirs = mf.direction_counts(media)
         week = mf.direction_counts(_kr_content(mf.issues(rows, since7), 10 ** 6))
+        for x in articles:   # 방향 막대 = 방송 + 한국 사실 기사(제목 묶음은 방향이 없어 세지 않는다) — 미국 막대가 기사 + 방송을 세는 것과 같게
+            if x["kind"] == "fact" and x.get("market_dir"):
+                dirs[x["market_dir"]] = dirs.get(x["market_dir"], 0) + 1
+                week[x["market_dir"]] = week.get(x["market_dir"], 0) + 1
         return facts + _dk.keep_tone(_dk.section(head, RH.news_tab(built, dirs, week), tab=TAB_NEWS))   # 헤드라인체 그대로 · 탭 이름과 같은 제목은 테마가 숨긴다
     except Exception as e:  # noqa: BLE001
         print(f"[kr-report] 뉴스 못 읽음 (목업은 자리만): {str(e)[:120]}")

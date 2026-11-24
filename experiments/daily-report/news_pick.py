@@ -127,10 +127,12 @@ def prev_run():
         return {"links": set(), "at": ""}
 
 
-def build(input_data, analysis, media_lines, now=None, summarize=True, all_channels=None, prev=None, stories_cache=None, label="daily-stories"):
+def build(input_data, analysis, media_lines, now=None, summarize=True, all_channels=None, prev=None, stories_cache=None, label="daily-stories", extra=None):
     """재료 → {"stories", "picks", "rest", "chips", "n_channels_all", "channels_all", "prev", "lines", "stocks"}.
     media_lines = media_feed.market_top(issues) (시장 · 업종 이슈, 48시간). analysis 는 없을 수 있다.
-    한국 증시 리포트(M82) = 기사 없이 방송만, prev · stories_cache 를 따로 준다 (미국 데일리 상태를 쓰지 않게)."""
+    한국 증시 리포트(M82) = 방송 + 한국 기사(extra), prev · stories_cache 를 따로 준다 (미국 데일리 상태를 쓰지 않게).
+    extra (2026-11-24 사용자 "미국처럼 합치고 탭도 적용") = 이미 만든 항목 — kind "fact"(뉴스 수집기 사건별 사실: lines = (글, 출처) 줄 · n_out = 보도 곳 수)는
+    방송과 같은 사건 묶기에 넣고, kind "head"(제목만 있는 기사 묶음: rows = 제목 · 매체 · 주소)는 AI 묶기 없이 한 줄씩. 미국 데일리는 extra 없이 지금 그대로."""
     now = now or datetime.datetime.now(datetime.timezone.utc)
     series = (analysis or {}).get("series") or {}
     sx = stocks()
@@ -154,7 +156,15 @@ def build(input_data, analysis, media_lines, now=None, summarize=True, all_chann
               "lines": [str(x) for x in (r.get("lines") or []) if x][:5], "new": _iso(r["published_at"]) > prev["at"] if prev["at"] else False}
         items.append(it)
         src[it["id"]] = it
+    heads = []
+    for it in extra or []:
+        it = dict(it, new=it.get("published_at", "") > prev["at"] if prev["at"] else False)
+        (heads if it["kind"] == "head" else items).append(it)
+        src[it["id"]] = it
     stories = news_stories.group(items, cache_path=stories_cache or os.path.join(STATE_DIR, "news_stories.json"), label=label)
+    for it in heads:   # 제목 묶음 = 이미 같은 사건끼리(수집기 event) — AI 묶기에 넣지 않고 한 줄씩
+        stories.append({"id": "h" + it["id"], "name": it["text"][:16], "short": it["text"][:8], "items": [it], "channels": [], "n_media": 0, "n_articles": 1,
+                        "n_channels": 0, "theme": it.get("theme") or "그 밖", "latest": it.get("published_at") or ""})
     story_of = {it["id"]: g for g in stories for it in g["items"]}
     recent = (now - datetime.timedelta(hours=RECENT_HOURS)).strftime("%Y-%m-%dT%H:%M")
 
@@ -168,8 +178,8 @@ def build(input_data, analysis, media_lines, now=None, summarize=True, all_chann
                 best = max(best, abs(float(v)))
         return min(best, MOVE_CAP)
 
-    for g in stories:   # 대표 = 요약 줄이 있는 최신 기사 → 없으면 최신 기사 → 최신 방송
-        arts = [x for x in g["items"] if x["kind"] == "article"]
+    for g in stories:   # 대표 = 요약 줄이 있는 최신 기사(한국 사실 기사 포함) → 없으면 최신 기사 → 최신 방송
+        arts = [x for x in g["items"] if x["kind"] in ("article", "fact", "head")]
         g["rep"] = next((x for x in arts if x.get("detail")), arts[0] if arts else g["items"][0])
         g["new"] = any(x.get("new") for x in g["items"])
         why = []
@@ -177,6 +187,10 @@ def build(input_data, analysis, media_lines, now=None, summarize=True, all_chann
         if g["n_channels"] >= 2:
             score += min(g["n_channels"], 10) * 2
             why.append(f"방송 {g['n_channels']}곳")
+        n_out = max((x.get("n_out") or 0 for x in g["items"]), default=0)   # 한국 사실 기사 = 보도 곳 수, 방송 곳 수와 같은 무게 (2026-11-24 사용자)
+        if n_out >= 2:
+            score += min(n_out, 10) * 2
+            why.append(f"보도 {n_out}곳")
         mv = max((move(x) for x in g["items"]), default=0.0)
         if mv >= 1:
             score += mv
@@ -210,9 +224,12 @@ def build(input_data, analysis, media_lines, now=None, summarize=True, all_chann
         if x["kind"] == "article" and not checked:
             return ["", ""]
         ln = (lines.get(x["id"]) if x["kind"] == "article" else x.get("lines")) or []
-        return [l for l in ln if l] if x["kind"] == "media" or checked else ln
+        return [l for l in ln if l] if x["kind"] != "article" or checked else ln
     shown, hidden = [], 0
     for g in stories:
+        if g["rep"]["kind"] in ("fact", "head") and pop_of(g["rep"]):   # 한국 사실 기사(2곳 이상 확인된 사실) · 제목 묶음은 한 줄이어도 싣는다 — 버리지 않기
+            shown.append(g)
+            continue
         if len(pop_of(g["rep"])) < 2:
             alt = [x for x in g["items"] if len(pop_of(x)) >= 2]
             if not alt:

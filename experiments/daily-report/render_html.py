@@ -581,9 +581,16 @@ def _pop_lines(g, built):
     return [ln for ln in (lines or []) if ln] or ([rep["detail"]] if rep.get("detail") else [])
 
 
+def _first_text(ln):
+    """팝업 줄 → 목록 보조 글자. 한국 사실 줄은 (글, 출처) 짝 — 글만 (출처는 팝업에서 작은 회색, 2026-11-24)."""
+    return ln[0] if isinstance(ln, (tuple, list)) else ln
+
+
 def _has_pop(g, built):
-    """두 줄 이상 있을 때만 팝업 (batch 9 ④: 한 줄 팝업은 의미 없다 — 목록 보조 글씨로)."""
-    return len(_pop_lines(g, built)) >= 2
+    """두 줄 이상 있을 때만 팝업 (batch 9 ④: 한 줄 팝업은 의미 없다 — 목록 보조 글씨로).
+    한국 사실 기사 · 제목 묶음은 한 줄이어도 팝업 — 원문 주소가 없거나(사실) 여럿이라(묶음) 줄 링크로 보낼 곳이 없다 (2026-11-24)."""
+    n = len(_pop_lines(g, built))
+    return n >= 1 if g["rep"]["kind"] in ("fact", "head") else n >= 2
 
 
 def _story_dir(g):
@@ -606,7 +613,7 @@ def _story_row(g, built, first):
     n_ch = built["n_channels_all"]
     rep = g["rep"]
     lines = _pop_lines(g, built)
-    sub = lines[0] if lines else ""
+    sub = _first_text(lines[0]) if lines else ""
     attrs = (f' data-news-pop="{_esc(g["id"])}"' if _has_pop(g, built) else "") + ' data-trhelp="skip"'
     head = dk.keep_tone(f'<a href="{_esc(rep.get("url") or "#")}" target="_blank" rel="noopener"{attrs} style="color:#111;font-weight:700;text-decoration:none;font-size:{dk.NEWS_TITLE_FS};line-height:{dk.NEWS_TITLE_LH};display:block;">'
                         f'{NEW_LEAD if g.get("new") else ""}{_esc(rep["text"])}</a>')   # 헤드라인은 합니다체로 바꾸지 않는다 (공용 카드와 같게)
@@ -641,8 +648,11 @@ def _news_pop_body(g, built):
             continue
         seen.add(s)
         related.append(((built.get("names") or {}).get(s) or SYMBOL_NAMES.get(s) or (sx.get(s) or {}).get("name") or s, v))   # names = 한국 리포트 종목 이름 (M82)
+    if rep["kind"] == "head":   # 한국 제목 묶음 = 제목 줄 + 매체마다 원문 링크 (한국 리포트 `그 밖의 기사` 와 같은 묶음 팝업)
+        return dk.bundle_pop_body(g["id"], rep["text"], list(rep.get("rows") or []))   # 첫 줄 = 팝업 제목이라 본문에서 반복하지 않는다(bundle_pop_body 가 rows[1:] 만 글머리표로)
     kind = "기사" if rep["kind"] == "article" else "방송"
-    return dk.news_pop_body(g["id"], rep["text"], _pop_lines(g, built), source=rep["source"], kind=kind, url=rep.get("url"), related=related)
+    return dk.news_pop_body(g["id"], rep["text"], _pop_lines(g, built), source=rep["source"], kind=kind,
+                            url=rep.get("url") if rep["kind"] != "fact" else None, related=related)   # 한국 사실 기사 = 원문 보기 없음 (2026-11-24 사용자)
 
 
 def _story_item(g, built, reaction, known, compact=False):
@@ -659,7 +669,7 @@ def _story_item(g, built, reaction, known, compact=False):
     head = (NEW_LEAD if g.get("new") else "") + _esc(rep["text"])
     pop = _has_pop(g, built)
     lines = _pop_lines(g, built)
-    detail = "" if (compact and pop) else (lines[0] if lines else "")   # 팝업 없는 줄은 보조 글씨 한 줄 (④), 주요 뉴스는 늘 보조 줄
+    detail = "" if (compact and pop) else (_first_text(lines[0]) if lines else "")   # 팝업 없는 줄은 보조 글씨 한 줄 (④), 주요 뉴스는 늘 보조 줄
     attrs = (f' data-news-pop="{_esc(g["id"])}"' if pop else "") + ' data-trhelp="skip"'
     return dk.news_item(head, rep.get("url") or "#", detail, subs, labels, meta, attrs, count_html=count)
 
