@@ -703,7 +703,7 @@ def shell(body, now, title="운영 현황"):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--state-heads", help="상태 저장소 브랜치 → 마지막 커밋 ISO 시각 JSON (워크플로가 만든다)")
-    ap.add_argument("--upload", action="store_true", help="KV dash:html · dash:hist · dash:ontime 으로 올린다")
+    ap.add_argument("--upload", action="store_true", help="KV dash:html · dash:hist · dash:ontime(+ ontime-why) 으로 올린다")
     a = ap.parse_args()
     now = now_kst()
     I = Issues()
@@ -721,9 +721,10 @@ def main():
 
     # 발행 시간(/ontime) — 약속 시각에 글이 나갔나, 어긴 횟수 누적 (2026-11-24 사용자). 요약 탭 맨 위 칸 · 할 일에도
     ontime_page = None
-    got, err = safe(ontime.build, now)
+    why_cache = (safe(kv_get_json, "dash:ontime-why")[0] or {}) if kv_conf() else {}   # 지난 날 늦은 원인 — 바뀌지 않으므로 다시 묻지 않는다 (GitHub API 아낌)
+    got, err = safe(ontime.build, now, why_cache)
     if got:
-        ontime_body, (ot_val, ot_sub, ot_today) = got
+        ontime_body, (ot_val, ot_sub, ot_today), why_cache = got
         I.area["발행 시간"] = (ot_val, ot_sub + " · 운영 현황 아래 `발행 시간`")
         for n, v in ot_today:
             I.add(f"{n} 약속 시각", v, "발행 시간 페이지에서 확인")
@@ -758,6 +759,7 @@ def main():
         kv_put("dash:hist", json.dumps(hist))
         if ontime_page:
             kv_put("dash:ontime", ontime_page)
+            kv_put("dash:ontime-why", json.dumps(why_cache, ensure_ascii=False))
         print("[ops] KV dash:html 올림")
 
 
