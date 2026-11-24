@@ -67,5 +67,5 @@ def news_rows(news):
 
 def save(state_dir, verdicts, issues=()):
     record_store.append(state_dir, "verdicts", verdicts)
-    if issues:
-        record_store.append(state_dir, "issues", list(issues))
+    if issues:   # 종목 뉴스 분류는 크고 날마다 는다 → 월별 파일(2026-11-24 사용자 저장소 정리 — 연도 파일 1.3만 줄이 한 주 17MB 씩 git 에 쌓였다)
+        record_store.append(state_dir, "issues", list(issues), monthly=True)

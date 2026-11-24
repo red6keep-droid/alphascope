@@ -98,6 +98,12 @@ def main():
                 if not APPEND.search(path):
                     continue
                 if path not in now:
+                    # 연도 파일을 월별로 옮긴 날(record_store monthly, 2026-11-24) — 같은 폴더의 {연}-MM.jsonl 줄 합이 옛 줄 수 이상이면 정상
+                    mo = re.match(r"(.*/)(\d{4})\.jsonl$", path)
+                    if mo and isinstance(was, dict) and was.get("lines") is not None:
+                        parts = [v for k, v in now.items() if re.match(re.escape(mo.group(1)) + mo.group(2) + r"-\d{2}\.jsonl$", k)]
+                        if parts and sum((v or {}).get("lines") or 0 for v in parts if isinstance(v, dict)) >= was["lines"]:
+                            continue
                     shrunk.append(f"{b}:{path} 없어짐")
                     continue
                 # 줄어듦 = 줄 수가 줄었을 때만(같은 날 · 같은 대상 줄을 고쳐 쓰는 것은 정상 — record_store 규칙, 11-24 NVDA_CEO.jsonl 1434 → 1421 바이트 오탐).

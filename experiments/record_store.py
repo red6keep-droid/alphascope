@@ -26,16 +26,17 @@
 
 import json
 import os
+import re
 
 REQUIRED = ("date", "source", "id")
 
 
-def _path(state_dir, kind, year):
-    return os.path.join(state_dir, "records", kind, f"{year}.jsonl")
+def _path(state_dir, kind, part):
+    """part = 연도 '2026' 또는 달 '2026-11' (월별 기록, 2026-11-24)."""
+    return os.path.join(state_dir, "records", kind, f"{part}.jsonl")
 
 
-def read(state_dir, kind, year):
-    path = _path(state_dir, kind, year)
+def _read_file(path):
     if not os.path.exists(path):
         return []
     rows = []
@@ -51,29 +52,63 @@ def read(state_dir, kind, year):
     return rows
 
 
-def append(state_dir, kind, rows):
-    """rows 를 연도별 파일에 덧붙인다. 같은 (date, id) 는 새 줄로 바꾼다. 쓴 줄 수를 돌려준다. 실패해도 예외를 내지 않는다 — 기록은
-    게시를 막지 않는다 (운영지침 D6-2 와 같은 원칙)."""
+def read(state_dir, kind, year):
+    """그 해 기록 전부 — 연도 파일 + 월별 파일({year}-MM.jsonl)을 이어서. 월별로 바꾼 기록도 부르는 쪽은 그대로."""
+    year = str(year)
+    rows = _read_file(_path(state_dir, kind, year))
+    d = os.path.join(state_dir, "records", kind)
+    if os.path.isdir(d):
+        for name in sorted(os.listdir(d)):
+            if re.match(rf"{re.escape(year)}-\d{{2}}\.jsonl$", name):
+                rows += _read_file(os.path.join(d, name))
+    return rows
+
+
+def _split_year_to_months(state_dir, kind, year):
+    """월별로 바꾸는 첫날 — 연도 파일을 달별 파일로 옮기고 연도 파일을 지운다(줄은 하나도 버리지 않는다). 이미 달 파일이 있으면 덧붙인다."""
+    path = _path(state_dir, kind, year)
+    old = _read_file(path)
+    if not old:
+        return
+    by_month = {}
+    for r in old:
+        by_month.setdefault(str(r.get("date") or "")[:7] or f"{year}-00", []).append(r)
+    for m, rs in by_month.items():
+        with open(_path(state_dir, kind, m), "a", encoding="utf-8") as f:
+            for r in rs:
+                f.write(json.dumps(r, ensure_ascii=False, default=str) + "\n")
+    os.remove(path)
+    print(f"[records] {kind} {year}.jsonl {len(old)}줄 → 월별 {sorted(by_month)} 로 옮김")
+
+
+def append(state_dir, kind, rows, monthly=False):
+    """rows 를 연도별(monthly=True 면 월별) 파일에 덧붙인다. 같은 (date, id) 는 새 줄로 바꾼다. 쓴 줄 수를 돌려준다. 실패해도 예외를 내지 않는다 — 기록은
+    게시를 막지 않는다 (운영지침 D6-2 와 같은 원칙).
+    monthly (2026-11-24 사용자 저장소 정리): 큰 기록은 실행마다 파일 전체를 다시 쓰면 git 이 새 판을 통째로 쌓는다(1.3만 줄 파일이 한 주 17MB).
+    달로 나누면 지난달 파일은 더 바뀌지 않는다. 처음 켤 때 그 해 연도 파일을 달별로 옮긴다."""
     if not state_dir or not rows:
         return 0
     try:
-        by_year = {}
+        by_part = {}
         for r in rows:
             if any(not r.get(k) for k in REQUIRED):
                 continue
-            by_year.setdefault(str(r["date"])[:4], []).append(r)
+            by_part.setdefault(str(r["date"])[:7 if monthly else 4], []).append(r)
+        if monthly:
+            for year in {p[:4] for p in by_part}:
+                _split_year_to_months(state_dir, kind, year)
         n = 0
-        for year, new in by_year.items():
-            old = read(state_dir, kind, year)
+        for part, new in by_part.items():
+            path = _path(state_dir, kind, part)
+            old = _read_file(path)
             keys = {(r["date"], r["id"]) for r in new}
             kept = [r for r in old if (r.get("date"), r.get("id")) not in keys]
-            path = _path(state_dir, kind, year)
             os.makedirs(os.path.dirname(path), exist_ok=True)
             with open(path, "w", encoding="utf-8") as f:
                 for r in kept + new:
                     f.write(json.dumps(r, ensure_ascii=False, default=str) + "\n")
             n += len(new)
-        print(f"[records] {kind} {n}줄 → {os.path.join(state_dir, 'records', kind)}")
+        print(f"[records] {kind} {n}줄 → {os.path.join(state_dir, 'records', kind)}{' (월별)' if monthly else ''}")
         return n
     except Exception as e:  # noqa: BLE001
         print(f"::warning::[records] {kind} 저장 실패 (게시는 계속): {e!r}")
