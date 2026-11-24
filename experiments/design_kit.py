@@ -2166,12 +2166,20 @@ def _link_src(source, kind):
     return f" ({esc(source)}" + (" · 영어" if kind == "기사" else "") + ")"
 
 
+def _pop_line(ln):
+    """팝업 글머리 줄 — 글자면 발언자 접두를 뒤로(speaker_html), (글, 출처) 짝이면 출처를 발언자와 같은 작은 회색 `- 출처` 로 (2026-11-24 사용자: 사실 줄 끝 `(정부 발표)` · `(공시)` 도 이 꼴)."""
+    if isinstance(ln, (tuple, list)):
+        text, by = ln
+        return esc(text) + (f' <span style="color:{SUB};font-size:{TINY};white-space:nowrap;">- {esc(by)}</span>' if by else "")
+    return speaker_html(ln, headline_style=False)
+
+
 def news_pop_body(pid, title, lines, when="", source="", kind="방송", url=None, n_channels=0, related=()):
     """팝업 글 = 요약 줄 → 관련 종목(있으면) → 작은 원문 링크. 머리 줄(시각 · 매체)과 `같은 뉴스` 칸은 없다 (2026-11-07 사용자 P352 · P354).
     when · n_channels 는 옛 호출 호환용 — 쓰지 않는다. related = [(이름, 등락%)]."""
     # 줄 안 행간 35 → 28 (20%), 글머리표 사이 보이는 간격은 그대로 — 줄어든 행간 7px 만큼 항목 여백 4 → 11 (2026-11-07 사용자 P359)
     li = "".join(f'<span style="display:flex;align-items:flex-start;gap:7px;margin:{pop_li_margin(i)};padding-left:{POP_LI_PAD}px;"><span style="flex:none;width:3px;height:3px;margin-top:12px;border-radius:50%;background:#111;"></span>'
-                 f'<span style="min-width:0;font-size:{BODY};line-height:{POP_LH}px;color:#333;word-break:keep-all;">{speaker_html(ln, headline_style=False)}</span></span>' for i, ln in enumerate(lines))
+                 f'<span style="min-width:0;font-size:{BODY};line-height:{POP_LH}px;color:#333;word-break:keep-all;">{_pop_line(ln)}</span></span>' for i, ln in enumerate(lines))
     link = ""
     if url:
         link = (f'<span style="display:block;text-align:right;margin:14px 0 0;"><a href="{esc(url)}" target="_blank" rel="noopener" data-trhelp="skip" '
@@ -2199,10 +2207,17 @@ def bundle_sizes(n, cap=BUNDLE_MAX):
 def bundle_pop_body(pid, title, rows):
     """묶음 팝업 글 = 일반 뉴스 팝업(news_pop_body)과 같은 모양 — 제목 + 글머리표 줄 + 오른쪽 작은 회색 원문 링크 (2026-11-15 사용자: "일반 뉴스 팝업이랑 똑같이").
     rows = [{"line", "source", "url"}] — 첫 줄은 제목이라 본문에서 반복하지 않는다. 원문 링크는 묶인 기사 순서대로 매체 이름을 ` · ` 로 이어 붙인다."""
-    body = news_pop_body(pid, title, [r["line"] for r in rows[1:]])
+    # 글자 없는 줄(원문 링크만 든 줄)은 글머리표를 그리지 않는다 — 빈 점이 기사 수만큼 찍히던 오류 (2026-11-24 사용자)
+    body = news_pop_body(pid, title, [(r["line"], r["by"]) if r.get("by") else r["line"] for r in rows[1:] if r.get("line")])
+    seen, picks = set(), []
+    for r in rows:   # 같은 매체는 이름 한 번 · 첫 기사로 (2026-11-24 사용자 — `핀포인트뉴스` × 8 반복)
+        src = r.get("source") or "원문"
+        if r.get("url") and src not in seen:
+            seen.add(src)
+            picks.append(r)
     links = " · ".join(f'<a href="{esc(r["url"])}" target="_blank" rel="noopener" data-trhelp="skip" '
                        f'style="color:{SUB};text-decoration:underline;text-underline-offset:3px;">{esc(r.get("source") or "원문")}</a>'
-                       for r in rows if r.get("url"))
+                       for r in picks)
     if links:
         link = (f'<span style="display:block;text-align:right;margin:14px 0 0;font-size:13px;line-height:19px;color:{SUB};">'
                 f'원문 보기 ({links}) {LINK_ICON}</span>')   # 일반 팝업의 `원문 보기` 와 같은 13/19 · SUB · 밑줄 — 매체가 여럿이라 이름을 순서대로

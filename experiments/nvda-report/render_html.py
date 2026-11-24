@@ -2687,6 +2687,8 @@ def sec_direction_bars(a):
 def _thin(e):
     """요약 두 줄 못 되는 기사 · 방송 줄 — 독자 목록에서 뺀다 (2026-11-10 사용자: 한 줄짜리 뉴스는 싣지 않는다, 옛 원문 링크 줄 폐지).
     팝업 재료가 있는 줄(pop_key)만 본다 — 공시 · 소송 · 가격 이벤트는 그대로. pop_unchecked = 요약 캐시를 못 읽은 실행(거르지 않음)."""
+    if e.get("bundle"):   # 이미 묶음 팝업을 갖춘 줄(한국 기사 사건 — 사실 줄 팝업, 2026-11-24)은 거르지 않는다
+        return False
     return bool(e.get("pop_key")) and not e.get("pop_unchecked") and len([x for x in (e.get("pop_lines") or []) if x]) < 2
 
 

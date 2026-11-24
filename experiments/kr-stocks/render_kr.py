@@ -834,10 +834,78 @@ DISC = {}           # {종목 코드: [{t, d, u}]} — 최근 7일 DART 공시 (
 MEDIA_WEEK = []     # 최근 7일 방송 이슈 — 뉴스 방향 막대 `최근 7일` (P143)
 
 
+# ── 한국 기사 공용 저장소 → 종목 페이지 (2026-11-24 사용자 "개별 종목에도 분배") ──
+# 뉴스 수집기 사건별 사실(보도 2곳 이상)을 사건의 종목 코드로 그 종목 `오늘` 뉴스에 방송 이슈와 시각 순으로 섞는다.
+# 한 줄 = 공용 뉴스 카드(사건 이름 / 첫 사실 / [분야] [방향]  시각 · 보도 n곳), 누르면 사실 줄 팝업(한국 증시 리포트 뉴스 탭과 같은 bundle 팝업).
+# 재료 = gh-pages kr-facts.json(kr-facts.yml 09:20 · 18:20) 한 번 받기 — 방문자 요청 0, AI 0. 사흘보다 오래됐거나 못 받으면 방송 이슈만(지금과 같음).
+KR_FACTS_URL = "https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/kr-facts.json"
+KR_FACTS_STALE_DAYS = 3
+_KR_FACTS = None    # {종목 코드: [사건]} — 처음 쓸 때 한 번 읽는다. 목업 · 시험은 KR_FACTS_FILE(로컬 latest.json 꼴)로
+
+
+def _kr_facts_by_code():
+    global _KR_FACTS
+    if _KR_FACTS is not None:
+        return _KR_FACTS
+    _KR_FACTS = {}
+    import json
+    try:
+        p = os.environ.get("KR_FACTS_FILE")
+        if p:
+            with open(p, encoding="utf-8") as f:
+                d = json.load(f)
+        else:
+            import urllib.request
+            with urllib.request.urlopen(KR_FACTS_URL, timeout=20) as r:
+                d = json.loads(r.read().decode("utf-8"))
+        now = (NOW or datetime.datetime.now(datetime.timezone.utc)).astimezone(media_feed.KST).date()
+        if not p and (now - datetime.date.fromisoformat(d["day"])).days > KR_FACTS_STALE_DAYS:
+            print(f"[kr] 한국 사건별 사실이 오래됨 ({d['day']}) — 종목 페이지에 싣지 않음")
+            return _KR_FACTS
+        heads = {}
+        for h in d.get("headlines") or []:
+            if h.get("event") and h.get("url"):
+                heads.setdefault(h["event"], []).append(h)
+        n = 0
+        for doc in d.get("facts") or []:
+            for e in doc.get("events") or []:
+                codes = {str(x.get("code") or "") for x in e.get("stocks") or []} - {""}
+                for c in codes:
+                    _KR_FACTS.setdefault(c, []).append(dict(e, _heads=heads.get(e.get("event"), [])))
+                n += 1 if codes else 0
+        print(f"[kr] 한국 사건별 사실 {d['day']} — 종목 붙은 사건 {n} · 종목 {len(_KR_FACTS)}")
+    except Exception as e:  # noqa: BLE001 — 뉴스의 덤, 페이지를 막지 않는다
+        print(f"[kr] 한국 사건별 사실 못 읽음 — 방송 이슈만: {str(e)[:120]}")
+    return _KR_FACTS
+
+
+def _fact_event(e):
+    """사건 하나 → 공용 뉴스 카드 한 줄(R._event_html 꼴). 팝업 = 사실 줄(끝에 작은 회색 `- 출처`) + 원문 보기(매체 한 번씩)."""
+    facts = e.get("facts") or []
+    rows = [{"line": e["event"]}] + [{"line": f.get("line") or f.get("what") or "", "by": f.get("by") or ""} for f in facts]
+    rows += [{"line": "", "source": h.get("outlet"), "url": h["url"]} for h in e.get("_heads") or []]
+    at = str(e.get("at") or "")
+    return {"area": "Other", "kind": "news", "title": e["event"], "headline": e["event"], "fact": e["event"],
+            "detail": (facts[0].get("what") if facts else "") or "", "url": None, "direction": e.get("dir") or "neutral", "emphasis": False,
+            "published_at": at if not at or at.endswith("Z") or "+" in at[10:] else at + "Z",
+            "source": f'보도 {e.get("sourceCount")}곳', "n_all": 0, "speaker": None, "media": False, "has_fact": False, "rel": 0, "prio": False,
+            "issue": e.get("cat"), "related": [], "pop_lines": [], "bundle": rows, "pop_key": "kf:" + e["event"]}
+
+
+def _when_key(r):
+    try:
+        t = datetime.datetime.fromisoformat(str(r.get("published_at") or "").replace("Z", "+00:00"))
+        return (t if t.tzinfo else t.replace(tzinfo=datetime.timezone.utc)).timestamp()
+    except ValueError:
+        return 0.0
+
+
 def sec_today(s):
     """`오늘` 탭 — 방송 뉴스 (2026-10-25 사용자: 한국 종목 뉴스는 방송 자막 뉴스로). 이 종목이 중심인 이슈 + 이 종목 묶음(반도체 · 2차전지 …)의 업종 이슈,
     한국 증시 채널 · 미국 채널 모두. 공용 뉴스 카드(엔비디아 · 미국 종목 페이지와 같은 _event_html): 주제 / 방송 주장 / [영역] [방향] [방송]  시각 · 채널."""
-    ev = [media_feed.event(r, _dk.n_channels_of(MEDIA), KR_PRICES) for r in sorted(media_feed.for_kr_page(MEDIA, s["code"]), key=lambda r: str(r["published_at"]), reverse=True)]
+    ev = [media_feed.event(r, _dk.n_channels_of(MEDIA), KR_PRICES) for r in media_feed.for_kr_page(MEDIA, s["code"])]
+    ev += [_fact_event(e) for e in _kr_facts_by_code().get(str(s["code"]), [])]   # 기사 사건 (2026-11-24 사용자)
+    ev.sort(key=_when_key, reverse=True)   # 방송 · 기사 시각 표기가 달라도(+09:00 · Z) 실제 시각 순
     bars = R.sec_direction_bars({"direction_counts": {"today": media_feed.direction_counts(media_feed.for_kr_page(MEDIA, s["code"])),
                                                       "week": media_feed.direction_counts(media_feed.for_kr_page(MEDIA_WEEK, s["code"]))},
                                  "empty_text": "오늘은 이 종목을 다룬 방송이 없습니다."})   # 엔비디아처럼 오늘 · 최근 7일 방향 막대 (2026-10-31 사용자 P143)

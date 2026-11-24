@@ -411,15 +411,21 @@ def fact_events(fact_docs, min_sources=FACTS_MIN_SOURCES):
     return out
 
 
-def _fact_line(f):
-    """사실 한 줄 = what + (출처 기관 — origin 이 있으면 그것, 아니면 who). 발언은 확인된 것만 따옴표로."""
+def fact_parts(f):
+    """사실 한 줄 = (글, 출처). 글 = what + 확인된 발언(따옴표), 출처 = 말한 사람 직함 · 자리 · 출처 기관(정부 발표 · 공시 …).
+    출처는 괄호로 붙이지 않고 팝업이 작은 회색 `- 출처` 로 그린다(발언자와 같은 꼴, 2026-11-24 사용자). kr_facts_store.fact_parts 와 같은 규칙."""
     line = (f.get("what") or "").strip()
+    by = []
     q = f.get("quote") or {}
     if q.get("verified") and not q.get("anonymous") and q.get("text"):
+        line += f' "{q["text"]}"'
         who = " ".join(x for x in (q.get("speaker"), q.get("title")) if x)
-        line += f' "{q["text"]}"' + (f" ({who}" + (f", {q['venue']}" if q.get("venue") else "") + ")" if who else "")
+        if who:
+            by.append(who + (f", {q['venue']}" if q.get("venue") else ""))
     src = (f.get("origin") or "").strip()
-    return line + (f" ({src})" if src and src not in line else "")
+    if src and src not in line and not any(src in b for b in by):
+        by.append(src)
+    return line, " · ".join(by)
 
 
 def fact_item(e, k, rows_by_event, fact_min=FACTS_MIN_SOURCES):
@@ -428,10 +434,10 @@ def fact_item(e, k, rows_by_event, fact_min=FACTS_MIN_SOURCES):
         return ""
     d = DIR_KIND.get(e.get("direction"), "neutral")
     labels = dk.pill(dk.ISSUE_KO.get(e.get("cat"), "그 밖"), "area") + dk.pill(dk.DIR_KO.get(d), d)
-    meta = [f'보도 {e.get("sourceCount")}곳', f"사실 {len(facts)}개"]
+    meta = [f'보도 {e.get("sourceCount")}곳']   # `사실 n개` 는 뺌 (2026-11-24 사용자)
     inner = dk.news_item(dk.esc(e["event"]), None, facts[0]["what"], (), labels, meta)
     pid = dk.news_pop_id("kf", f'{e["event"]}:{k}')
-    rows = [{"line": e["event"]}] + [{"line": _fact_line(f)} for f in facts]
+    rows = [{"line": e["event"]}] + [dict(zip(("line", "by"), fact_parts(f))) for f in facts]
     rows += [{"line": "", "source": r.get("outlet"), "url": r["url"]} for r in rows_by_event.get(e["event"], [])]
     body = dk.bundle_pop_body(pid, e["event"], [r for r in rows if r.get("line") or r.get("url")])
     return dk.news_pop_wrap(inner, pid) + body

@@ -45,15 +45,21 @@ def _quote(q):
     return None
 
 
-def fact_line(f):
-    """화면 한 줄 = what + 확인된 발언 + (출처 기관). news_render._fact_line 과 같은 글자."""
+def fact_parts(f):
+    """화면 한 줄 = (글, 출처) — 글 = what + 확인된 발언, 출처 = 말한 사람 직함 · 자리 · 출처 기관(정부 발표 · 공시 …).
+    출처는 글 끝 괄호로 붙이지 않고 따로 넘겨 화면이 작은 회색 `- 출처` 로 그린다(다른 팝업 발언자와 같은 꼴, 2026-11-24 사용자). news_render.fact_parts 와 같은 규칙."""
     line = (f.get("what") or "").strip()
+    by = []
     q = f.get("quote")
     if q:
+        line += f' "{q["text"]}"'
         who = " ".join(x for x in (q.get("speaker"), q.get("title")) if x)
-        line += f' "{q["text"]}"' + (f" ({who}" + (f", {q['venue']}" if q.get("venue") else "") + ")" if who else "")
+        if who:
+            by.append(who + (f", {q['venue']}" if q.get("venue") else ""))
     src = (f.get("origin") or "").strip()
-    return line + (f" ({src})" if src and src not in line else "")
+    if src and src not in line and not any(src in b for b in by):
+        by.append(src)
+    return line, " · ".join(by)
 
 
 def clean_event(e, at):
@@ -64,7 +70,7 @@ def clean_event(e, at):
             continue
         g = {k: f.get(k) for k in ("what", "who", "when", "origin", "sources", "numbers", "stocks", "sector", "cat", "direction", "stage")}
         g["quote"] = _quote(f.get("quote"))
-        g["line"] = fact_line(g)
+        g["line"], g["by"] = fact_parts(g)
         facts.append(g)
     if (e.get("sourceCount") or 0) < MIN_SOURCES or not facts:
         return None

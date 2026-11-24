@@ -160,23 +160,20 @@ if __name__ == "__main__":
     home = os.path.join(BASE, "..", "home-split", "output", "mock_home_kr.html")
     if os.path.exists(home):
         svg = _svg.group(0).replace("class='logo-full'", "class='nf-home-logo'") if _svg else ""
+        # 기사마다 제목 + 요약 한 줄만 — 분류 · 방향 칩 · 날짜 · 기사 사이 구분선 없음, 카드 머리는 로고 + 날짜(`주요 기사` 글자 없음) · 머리 아래 구분선만 (2026-11-24 사용자)
         rows = []
         for k, (name, post) in enumerate(jobs):
-            d = NR.DIR_KIND.get(post.get("direction"), "neutral")
-            tags = (f'<span class="news-tag">{_h.escape(dk.ISSUE_KO.get(post.get("cat"), "그 밖"))}</span>'
-                    f'<span class="news-tag issue-tag {d}">{_h.escape(dk.DIR_KO.get(d))}</span>')
-            y, m, dd = post["date"].split("-")
             summ = (post.get("summary") or "").strip()
             rows.append(f'<article class="news-item"{" hidden data-news-more=1" if k >= 5 else ""}><a href="{name}">{_h.escape(post["title"])}</a>'
-                        + (f'<span class="news-sum">{_h.escape(summ)}</span>' if summ else "")
-                        + f'<span class="news-labels">{tags}<span class="news-sub">{int(m)}.{dd}</span></span></article>')
+                        + (f'<span class="news-sum nf-one">{_h.escape(summ)}</span>' if summ else "") + '</article>')
         last = max(post["date"] for _, post in jobs)
         card = ('<style>#nf-posts-col .report-title{gap:8px;}'
                 '.nf-home-logo{width:96px;height:22px;flex:none;display:block;}'
-                '.nf-home-sub{display:inline-flex;align-items:center;gap:8px;font-size:13px;line-height:19px;font-weight:400;letter-spacing:0;color:#6B7280;}.nf-home-sub::before{content:'';width:1px;height:13px;background:#CBD5E1;}'
-                '#nf-posts-card{gap:0;}#nf-posts-card .news-item:first-child{padding-top:0;}#nf-posts-card .news-item:last-child{padding-bottom:0;}</style>'
+                '#nf-posts-card{gap:0;}#nf-posts-card .news-item:first-child{padding-top:0;}#nf-posts-card .news-item:last-child{padding-bottom:0;}'
+                '#nf-posts-card .news-item{border-top:0;}#nf-posts-card .news-item::before{display:none;}'
+                '#nf-posts-card .nf-one{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}</style>'
                 '<div class="report-col" id="nf-posts-col">'
-                f'<h3 class="report-title">{svg}<span class="nf-home-sub">주요 기사</span>'
+                f'<h3 class="report-title">{svg}'
                 f'<span class="report-card-date">{int(last[5:7])}.{last[8:10]}</span></h3>'
                 f'<div class="report-card" id="nf-posts-card">{"".join(rows)}</div></div>')
         src = open(home, encoding="utf-8").read()
