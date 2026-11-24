@@ -1,0 +1,79 @@
+
+/* look_born.py 가 look_band_page.html 의 <style> 앞부분(디자인 가이드라인 값)을 붙이고 이어서 이 파일을 붙인다. */
+.seen{margin:0;padding:0;list-style:none}.seen li{display:flex;gap:8px;align-items:flex-start;margin:8px 0;font-size:17px;line-height:29px;color:var(--body)}
+.seen li>i{flex:none;width:4px;height:4px;border-radius:50%;background:var(--body);margin-top:13px}.seen b{color:var(--ink)}
+.gl{margin:0;padding:0 0 0 6px;list-style:none}.gl li{font-size:14px;line-height:20px;color:var(--sub);margin:6px 0}
+.cmp{background:#fff;border:1px solid var(--line);border-radius:8px;padding:12px;margin:0 0 6px}
+.cmp .nm{font-size:16px;line-height:24px;font-weight:700;color:var(--ink)}.cmp .rw{padding:6px 0}
+.hy{background:#fff;border:1px solid var(--line);border-radius:8px;padding:12px;margin:0 0 12px;font-size:16px;line-height:26px;color:var(--body)}
+.hy b{color:var(--ink)}
+</style></head><body><main>
+<h1 id="h1"></h1>
+<div class="stamp" id="stamp"></div>
+<div class="hy"><b>보려는 가설</b><br>개성은 환경이 만든다. 돈과 관심이 몰린 종목이 개성을 갖고, 돈이 끊기면 급등과 급락이 잦아진다. 전고점 근처에 머무는 민감한 때에는 작은 자극에도 크게 내린다.</div>
+<h2>본 것</h2>
+<div class="emph"><ul class="seen" id="seen"></ul></div>
+<p class="guide">순서와 날짜만 적었습니다. 가설이 맞는지는 이 화면으로 정하지 않습니다.</p>
+<h2>구간마다 대부분의 종목과 견줌</h2>
+<div id="charts"></div>
+<div class="legend"><span><u style="background:#E2E8F0"></u>대부분의 종목(가운데 80%)</span><span><u style="background:#F59E0B;height:3px"></u><span id="lgn"></span></span><span><u style="background:#FDECEA"></u>돌이 잦았던 때</span><span><u style="background:#A78BFA;height:4px"></u>전고점 근처에 머문 때</span></div>
+<h2>돌이 잦았던 때마다</h2>
+<div id="runs"></div>
+<h2>전고점 근처에 머문 때가 어떻게 끝났나</h2>
+<div id="eps"></div>
+<h2>이 자료로 볼 수 없는 것</h2>
+<ul class="gl" id="cant"></ul>
+</main>
+<script>
+const D=__DATA__,$=id=>document.getElementById(id);
+const L=D.labels.map(s=>s.split(' ~ ')),np=L.length,S=D.series;
+const ym=s=>`${s.slice(0,4)}.${s.slice(5,7)}`,dk=s=>s.replace(/-/g,'.'),pm=p=>ym(L[p][0]),pe=p=>ym(L[p][1]);
+const f1=v=>v.toFixed(1),span=r=>`${pm(r.a)} ~ ${r.open?'지금':pe(r.b)}`;
+$('h1').textContent=`${D.ko}(${D.sym}) 개성이 태어난 때`;$('lgn').textContent=D.ko;
+$('stamp').textContent=`기준일 ${dk(D.last)} · 최근 3년을 20거래일씩 ${np}구간 · 대부분의 종목 = 구간마다 S&P 500 ${D.nkids}종목의 가운데 80% · 주가와 거래 주식 수는 첫 1년 가운데 값의 몇 배인지`;
+// 돌이 잦았던 때에 주가가 어떻게 갔나
+const dip=r=>r.pmin<=r.px0*.7&&r.pmin<=r.px1*.7;
+const way=r=>dip(r)?`${f1(r.px0)}배에서 ${f1(r.pmin)}배까지 내렸다가 ${f1(r.px1)}배로 올라온 동안`:r.pmax>=r.px1*1.3&&r.pmax>=r.px0*1.3?`${f1(r.px0)}배에서 ${f1(r.pmax)}배까지 올랐다가 ${f1(r.px1)}배로 내려온 동안`:r.px1>=r.px0*1.1?`${f1(r.px0)}배에서 ${f1(r.px1)}배로 오르는 동안`:r.px1<=r.px0*.9?`${f1(r.px0)}배에서 ${f1(r.px1)}배로 내리는 동안`:`${f1(r.px0)}배 언저리에서 옆으로 가는 동안`;
+const kind=r=>dip(r)?'내렸다 오름':r.pmax>=r.px1*1.3&&r.pmax>=r.px0*1.3?'올랐다 내림':r.px1>=r.px0*1.1?'오름':r.px1<=r.px0*.9?'내림':'옆걸음';
+const fo=Object.entries(D.first).filter(([,p])=>p!=null).sort((a,b)=>a[1]-b[1]);
+const ended=D.eps.filter(e=>e.end),byStone=ended.filter(e=>e.kind==='예고 없는');
+const cnt={};D.runs.forEach(r=>{const k=kind(r);cnt[k]=(cnt[k]||0)+1});
+$('seen').innerHTML=[
+  `처음 넘은 순서는 ${fo.map(([k,p])=>`<b>${k}</b> ${pm(p)}`).join(' → ')}입니다. 두 구간 이어서 넘은 첫 구간입니다.`,
+  `돌이 잦았던 때는 ${D.runs.length}번입니다. `+D.runs.map(r=>`${span(r)}에는 주가가 ${way(r)} 돌이 ${r.st}일 있었고 거래 주식 수는 ${f1(r.vol)}배였습니다(대부분의 종목 위 끝 ${f1(r.volhi)}배).`).join(' '),
+  `주가가 가던 길로 나누면 ${Object.entries(cnt).map(([k,n])=>`${k} ${n}번`).join(' · ')}입니다.`,
+  ended.length?`전고점 근처에 20거래일 넘게 머문 때는 ${D.eps.length}번이고, 끝난 ${ended.length}번 중 <b>${byStone.length}번이 예고 없는 돌</b>로 끝났습니다.`:`전고점 근처에 20거래일 넘게 머문 때는 ${D.eps.length}번입니다.`
+].map(t=>`<li><i></i><span>${t}</span></li>`).join('');
+// 그래프 넷 — 가로 = 구간(왼쪽이 옛날), 회색 띠 = 대부분의 종목, 주황 = 이 종목, 분홍 바탕 = 돌이 잦았던 때, 보라 줄 = 전고점 근처에 머문 때
+const pieceOf=d=>{for(let p=0;p<np;p++)if(d<=L[p][1])return p;return np-1};
+function chart(s,top){const w=Math.min(652,$('charts').clientWidth-26),H=150,pl=30,pr=52,pt=12,pb=24;
+  const ymax=Math.max(...s.pts.map(v=>Math.max(v[0]||0,v[2])))*1.1||1,X=p=>Math.round(pl+p*(w-pl-pr)/(np-1)),Y=v=>Math.round(H-pb-Math.max(0,v)/ymax*(H-pt-pb));
+  const all=[...Array(np).keys()],band=all.map(p=>`${X(p)},${Y(s.pts[p][2])}`).concat(all.slice().reverse().map(p=>`${X(p)},${Y(s.pts[p][1])}`)).join(' ');
+  const have=all.filter(p=>s.pts[p][0]!=null),line=have.map(p=>`${X(p)},${Y(s.pts[p][0])}`).join(' ');
+  const sh=D.runs.map(r=>`<rect x="${X(r.a)-4}" y="${pt}" width="${X(r.b)-X(r.a)+8}" height="${H-pt-pb}" fill="#FDECEA"/>`).join('');
+  const ep=top?D.eps.map(e=>{const a=X(pieceOf(e.start)),b=X(e.end?pieceOf(e.end):np-1);return `<rect x="${a}" y="${pt-6}" width="${Math.max(4,b-a)}" height="4" fill="#A78BFA"/>`}).join(''):'';
+  const ys=[];let last='';all.forEach(p=>{const y=L[p][0].slice(0,4);if(y!==last){ys.push([X(p),y]);last=y}});
+  const yr=ys.map(([px,y],k)=>`<line x1="${px}" y1="${pt}" x2="${px}" y2="${H-pb}" stroke="#ECF0F5"/>`+(k===ys.length-1||ys[k+1][0]-px>=40?`<text x="${px+2}" y="${H-7}" font-size="13" fill="#6B7280">${y}</text>`:'')).join('');
+  const lp=have[have.length-1],lv=s.pts[lp][0],u=s.unit==='일'?'일':s.unit;
+  return `<span class="ct">※ 구간마다 ${s.name} <small>(${s.unit})</small></span><div class="white"><svg width="${w}" height="${H}" role="img" aria-label="구간마다 ${s.name}">${sh}${yr}${ep}`+
+    `<line x1="${pl}" y1="${H-pb}" x2="${w-pr}" y2="${H-pb}" stroke="#CBD5E1"/><text x="${pl-4}" y="${pt+8}" text-anchor="end" font-size="10" fill="#6B7280">${ymax.toFixed(s.dec)}</text><text x="${pl-4}" y="${H-pb}" text-anchor="end" font-size="10" fill="#6B7280">0</text>`+
+    `<polygon points="${band}" fill="#E2E8F0"/><polyline points="${line}" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`+
+    `<circle cx="${X(lp)}" cy="${Y(lv)}" r="3" fill="#F59E0B"/><text x="${X(lp)+7}" y="${Y(lv)+4}" font-size="13" font-weight="700" fill="#111" font-family="Inter,sans-serif">${lv.toFixed(s.dec)}${u}</text></svg></div>`}
+function charts(){$('charts').innerHTML=S.map((s,i)=>chart(s,i===0)).join('')}
+charts();addEventListener('resize',charts);
+$('runs').innerHTML=D.runs.map(r=>`<div class="cmp"><div class="nm">${span(r)} <span class="box">${kind(r)}</span></div><div class="rows">`+
+  `<div class="rw"><span>예고 없는 돌</span><span>${r.st}일</span></div>`+
+  `<div class="rw"><span>주가</span><span>${f1(r.px0)}배 → ${f1(r.px1)}배</span></div>`+
+  `<div class="rw"><span>거래 주식 수</span><span>${f1(r.vol)}배</span></div>`+
+  `<div class="rw"><span>대부분의 종목 위 끝</span><span>${f1(r.volhi)}배</span></div></div>`+
+  `<div class="ksub">${r.b-r.a+1}구간 · 주가는 시작 바로 앞 구간과 마지막 구간 · 가장 높을 때 ${f1(r.pmax)}배 · 가장 낮을 때 ${f1(r.pmin)}배 · 거래 주식 수는 구간들의 가운데 값</div></div>`).join('')||'<div class="empty">없음</div>';
+$('eps').innerHTML=D.eps.map(e=>`<div class="cmp"><div class="nm">${dk(e.start)} ~ ${e.end?dk(e.end):'지금'}</div><div class="rows">`+
+  `<div class="rw"><span>머문 날</span><span>${e.len}거래일</span></div>`+
+  (e.runup!=null?`<div class="rw"><span>들어오기 전 120일</span><span class="${e.runup>=0?'up':'dn'}"><span class="tr">${e.runup>=0?'▲':'▼'}</span>${Math.abs(e.runup)}%</span></div>`:'')+
+  (e.end?`<div class="rw"><span>끝낸 것</span><span>${e.kind==='돌 없이'?'큰 하루 없이':e.kind+' 돌'}</span></div>`+(e.stone!=null?`<div class="rw"><span>그날 등락</span><span class="dn"><span class="tr">▼</span>${Math.abs(e.stone).toFixed(1)}%</span></div>`:''):'')+
+  `</div><div class="ksub">전고점 근처 = 종가가 1년 고점의 10% 안 · 끝 = 고점의 90% 아래로 내려간 첫날${e.fall!=null?` · 마지막 고점에서 끝까지 ${e.fall}거래일`:''}</div></div>`).join('')||'<div class="empty">없음</div>';
+$('cant').innerHTML=['관심: 뉴스 수와 검색량은 3년치 자료가 없어 보지 않았습니다. 그래서 돈과 관심 가운데 돈(거래 주식 수)만 봤습니다.',
+  '누구의 돈인지: 거래 주식 수만으로는 들어오는 돈인지 나가는 돈인지, 기관인지 개인인지 가를 수 없습니다. 주가 방향을 같이 봐야 합니다.',
+  '작은 자극이었는지: 전고점 근처에서 끝낸 날에 어떤 뉴스가 있었는지는 보지 않았습니다.',
+  '3년 앞: 살펴본 기간 전의 모습은 보지 않았습니다.'].map(t=>`<li>${t}</li>`).join('');
+</script></body></html>
