@@ -1121,7 +1121,8 @@ a, button, summary, .tab { -webkit-tap-highlight-color: transparent; }
 a.report-card.is-pressed, .post-card.is-pressed { background-color: #F1F5F9 !important; transform: scale(.985); }
 a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-pressed { opacity: .55; }
 .news-item:not(.load-status), [data-row-link] { transition: background-color .15s ease; }
-.news-item:not(.load-status) { margin-left: -12px; margin-right: -12px; padding-left: 12px; padding-right: 12px; border-radius: 8px; }
+.news-item:not(.load-status) { margin-left: -12px; margin-right: -12px; padding-left: 12px; padding-right: 12px; border-radius: 8px; position: relative; border-top-color: transparent; }
+.news-item:not(.load-status):not(:first-child)::before { content: ''; position: absolute; top: -1px; left: 12px; right: 12px; height: 1px; background: #E2E8F0; }   /* 구분선 = 둥근 모서리(누름 효과)와 떼어 끝까지 곧게 — 테두리 선이면 8px 모서리에 양 끝이 휨 (2026-11-24 사용자) */
 /* 페이지 이동 표시: 맨 위 진행 막대는 바로, 0.4초 넘게 걸리면 가운데 돌기 */
 #nav-progress { position: fixed; top: 0; left: 0; height: 3px; width: 0; background: #E53E3E; z-index: 10000; opacity: 0; pointer-events: none; transition: width 6s cubic-bezier(.08, .7, .2, 1), opacity .2s; }
 #nav-progress.on { opacity: 1; width: 88%; }
@@ -3260,6 +3261,7 @@ function newsStrip(box, track, dotBox) {
       /* 발언자 = 내용 뒤 작은 회색 `- 이름`, 이름 없으면 `- 방송 의견` (P353, design_kit.speaker_split 과 같은 규칙) */
       var m = /^\s*([^:：]{0,30}?)\s*(진행자 발언|기자 보도|발언|진행자|앵커|보도|발표)\s*[:：]\s*(.+)$/.exec(ln), who = '';   /* 접두 꼴 넓힘 (P377) */
       if (m) { ln = m[3]; who = /^(진행자|앵커|방송|패널|출연자|기자)?$/.test(m[1].trim()) ? '방송 의견' : m[1].trim() + (m[2] === '기자 보도' ? ' 기자' : ''); }
+      if (!who && it.bys && it.bys[i]) who = it.bys[i];   /* 사실 줄 출처(정부 발표 · 공시 · 말한 사람) = 발언자와 같은 꼴 (2026-11-24 사용자) */
       var tx = el('span', null, ln); tx.style.cssText = 'min-width:0;font-size:19px;line-height:28px;color:#333;word-break:keep-all;';
       if (who) { var wt = el('span', null, ' - ' + who); wt.style.cssText = 'color:#999;font-size:14px;white-space:nowrap;'; tx.appendChild(wt); }
       row.appendChild(dot); row.appendChild(tx); body.appendChild(row);
@@ -3277,7 +3279,7 @@ function newsStrip(box, track, dotBox) {
   var KR_FACTS_URL = 'https://newfact-news.pages.dev/kr/facts/latest.json';   /* 한국 기사 공용 저장소 (kr-facts.yml, 09:20 · 18:20) */
   function krFactItems(d) {   /* 사건 하나 = 줄 하나: 제목 = 사건 이름 · 요약 = 첫 사실 · 팝업 = 사실 줄 전부 · 출처 자리 = 보도 n곳(비교 대상) */
     var evs = (d && d.facts && d.facts[0] && d.facts[0].events) || [];
-    return evs.map(function (e) { var fs = e.facts || []; return { title: e.event, summary_ko: (fs[0] && fs[0].what) || '', kind: 'fact', tag: e.tag, source: '보도 ' + e.sourceCount + '곳', published: e.at, lines: fs.map(function (f) { return f.line; }) }; });
+    return evs.map(function (e) { var fs = e.facts || []; return { title: e.event, summary_ko: (fs[0] && fs[0].what) || '', kind: 'fact', tag: e.tag, source: '보도 ' + e.sourceCount + '곳', published: e.at, lines: fs.map(function (f) { return f.line; }), bys: fs.map(function (f) { return f.by || ''; }) };   /* by = 출처 · 발언자, 팝업에서 작은 회색 - 출처 (2026-11-24) */ });
   }
   var NEWS_SHOWN = 5, NEWS_STEP = 10;   /* 홈 주요 뉴스 5건 + 누를 때마다 10건씩 (2026-11-07 사용자 P340, 옛 3건 · 8건까지 한 번에) */
   /* 한국 홈 = 한국 증시 방송 이슈(kr-news.json) + 한국 기사 공용 저장소의 사건별 사실(Pages newfact-news, 보도 2곳 이상) — 시각 순으로 섞음 (2026-11-24 사용자).
