@@ -72,6 +72,13 @@ jobs:
           PYTHONIOENCODING: utf-8
         run: python experiments/news-posts/kr_facts_store.py --out "$STORE"
 
+      # 원본 기록 — 실행마다 받은 그대로(gzip), 있는 파일은 다시 안 씀. 날짜 파일은 그날 마지막 실행만 남으므로 아침 실행 · 1곳 보도 사건까지 여기에 (헌법 제4조 4항, 2026-11-24)
+      - name: Raw record (facts · headlines per run)
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          PYTHONIOENCODING: utf-8
+        run: python experiments/news-posts/kr_facts_raw.py --out "$STORE"
+
       - name: Save store (alphascope-state kr-facts)
         if: inputs.deploy || inputs.scheduled
         run: |
