@@ -643,8 +643,38 @@ def record_tab(now, heads, I):
                             [("상태 저장소(비공개) 브랜치의 마지막 저장 시각입니다. 정기 실행이 있는 브랜치는 30시간(주말 +48) 넘게 그대로면 늦음.", "plain")]
                             + [("row", n, v, s) for n, v, s in rows[:3]], opened=True)
     return (dk.h2("기록", tab="기록") + head
+            + records_status_card(now)
             + dk.sub_label("상태 브랜치") + white_card(rows, fold_at=3, noun="브랜치")
             + dk.sub_label("gh-pages") + white_card(size_row) + size_html), hist
+
+
+def records_status_card(now, st=None):
+    """기록 현황 — 기록 대장 줄마다 처음 · 마지막 날짜 · 쌓인 양 (2026-11-24 사용자 "기록 탭에 기록현황").
+    재료 = KV dash:records(밤 기록 사본 실행이 experiments/record_status.py 로 센 것). 알림 · `지금 문제` 줄은 넣지 않는다(사용자 "빠진 날 알리지마")."""
+    st = st if st is not None else kv_get_json("dash:records")
+    if not st:
+        return dk.sub_label("기록 현황") + white_card([("기록 현황", warn("읽지 못함"), "밤 기록 사본 실행(state-backup.yml)이 dash:records 를 아직 안 올림")])
+    def _d(s):
+        return f"{int(s[5:7])}.{s[8:10]}" if s else ""
+    rows = []
+    for it in st.get("items") or []:
+        if it.get("missing"):
+            rows.append((it["name"], idle("브랜치 없음"), it.get("where") or ""))
+            continue
+        if not it.get("files"):
+            rows.append((it["name"], idle("아직 없음"), f"{it.get('asset')} · {it.get('where')}"))
+            continue
+        span = f"{_d(it.get('first'))} ~ {_d(it.get('last'))} · " if it.get("first") else ""
+        rows.append((it["name"], V(_d(it.get("last")) or f"{it['files']}개"),
+                     f"{span}{it['n']:,}줄 · {it['bytes'] / 1e6:.1f}MB · {it.get('asset')} · {it.get('where')}"))
+    made = parse_time(st.get("made"))
+    note = f"기준 {md(made)} {hm(made)} (밤 기록 사본 실행이 셈)" if made else ""
+    bk = st.get("backup") or {}
+    bt = parse_time(bk.get("made"))
+    back = [("기록 사본", V(f"{(bk.get('gz') or 0) / 1e6:.1f}MB") if bk else warn("읽지 못함"),
+             f"{bk.get('where', '')} · {md(bt)} {hm(bt)} · 가장 큰 파일 {((bk.get('biggest') or {}).get('gz') or 0) / 1e6:.1f}MB" if bk and bt else "")]
+    return (dk.sub_label("기록 현황") + (f'<p style="margin:0 0 8px;font-size:13px;line-height:19px;color:#6B7280;">{esc(note)} · 값 = 마지막으로 쌓인 날, 아래 줄 = 처음 ~ 마지막 · 쌓인 양 · 자산 · 브랜치</p>' if note else "")
+            + white_card(rows, fold_at=5, noun="기록") + white_card(back))
 
 
 def forecast_tab(now, I):

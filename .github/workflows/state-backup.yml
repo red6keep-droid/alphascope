@@ -88,6 +88,18 @@ jobs:
             echo "weekly-$n 올림"
           fi
 
+      # 기록 현황 — 받은 상태 저장소로 기록 대장 줄마다 처음 · 마지막 날짜 · 쌓인 양을 세어 운영 대시보드 기록 탭(KV dash:records)에.
+      # 알림은 보내지 않는다(사용자 11-24 "빠진 날 알리지마"). 실패해도 사본에는 영향 없음
+      - name: Record status (운영 대시보드 기록 탭)
+        if: always() && steps.build.outcome != 'skipped'
+        continue-on-error: true
+        env:
+          PYTHONIOENCODING: utf-8
+          OPS_CF_ACCOUNT_ID: ${{ secrets.OPS_CF_ACCOUNT_ID }}
+          OPS_CF_KV_NAMESPACE_ID: ${{ secrets.OPS_CF_KV_NAMESPACE_ID }}
+          OPS_CF_API_TOKEN: ${{ secrets.OPS_CF_API_TOKEN }}
+        run: python experiments/record_status.py --mirror /tmp/state.git --backup-manifest /tmp/backup/manifest.json --kv
+
       - name: Notify split files
         if: steps.build.outputs.rc == '4'
         env:
