@@ -23,6 +23,7 @@ details summary{cursor:pointer;color:var(--mute);font-size:12px;margin:2px 0}
 table{border-collapse:collapse;width:100%;font-size:13px}th,td{border-bottom:1px solid var(--line);padding:5px 6px;text-align:left;vertical-align:middle}
 .tag{display:inline-block;min-width:18px;padding:0 5px;border-radius:9px;background:#1c2330;color:#fff;font-size:11px;text-align:center}
 .note{color:var(--mute);font-size:12px;margin-top:6px}
+.ds{flex-basis:100%;font-size:12px;color:#3a4252;margin:0 0 6px 2px}.ds b{color:var(--ink)}
 </style></head><body><main>
 <h1>평범의 범위 — 과거를 간격으로 잘라, 조각마다 가운데 몇 %를 평범으로 볼까</h1>
 <div class="sub">뉴팩트 개성 있는 아이 찾기 게임 · 미국 S&amp;P 500 __N__명 · 기준일 __LAST__ 에서 거꾸로, 고른 과거 범위(최근 1 · 2 · 3년)를 간격대로 자른 조각 · 평범 = 그 조각 안에서 중간값을 가운데 둔 가운데 N% · 개성 = 여러 조각에서 되풀이해 평범 밖</div>
@@ -67,6 +68,10 @@ function answer(){const use=picked(),np=LB.length,band=+$('band').value;$('pv2')
     for(let p=0;p<np;p++){if(!x.v[p])continue;n++;let u=false,l=false;
       use.forEach((ci,j)=>{const s=x.st[ci][p];if(s>0){u=true;per[j][0]++}else if(s<0){l=true;per[j][1]++}});
       mix[p]=u&&l?2:u?1:l?-1:0;if(u||l)k++;if(u)up++;if(l)dn++}
+    // 드러난 시기 = 평범 밖 조각이 이어진 한 덩어리(이어진 조각은 한 번으로 묶음, 길잡이 0-1). 세기만 하지 않고 언제 · 얼마나 이어졌나를 글로 적는다(2026-11-24 사용자 "이건 이런 애다")
+    const rs=[];let cur=null,tq=0;
+    for(let p=0;p<np;p++){const v=mix[p];if(v==null)continue;if(v!==0){if(!cur){cur={a:p,b:p,n:0,u:false,l:false};rs.push(cur)}cur.b=p;cur.n++;if(v>0||v===2)cur.u=true;if(v<0||v===2)cur.l=true;tq=0}else{cur=null;tq++}}
+    x.runs=rs;x.tq=tq;
     x.mix=mix;x.n=n;x.k=k;x.share=n?k/n*100:0;x.per=per;
     x.side=up&&dn&&Math.min(up,dn)>=0.3*Math.max(up,dn)?'섞임':up>=dn?'위쪽(거친 쪽)':'아래쪽(잔잔한 쪽)';
     x.auto=n?'':null});
@@ -77,13 +82,17 @@ function answer(){const use=picked(),np=LB.length,band=+$('band').value;$('pv2')
   D.forEach(x=>{if(x.g==='D')out.D.push(x);else if(x.auto==null)out.none++;else if(x.auto==='')out.plain++;else out[x.auto].push(x)});
   for(const g of 'ABCD')out[g].sort((a,b)=>b.share-a.share);
   const mstrip=a=>'<span class="strip">'+a.map((v,i)=>`<u class="${v==null?'n':v===2?'m':v<0?'l':v>0?'h':''}${i===P?' c':''}"></u>`).join('')+'</span>';
+  const ym=(p,e)=>LB[p].split(' ~ ')[e].slice(0,7),span=r=>{const a=ym(r.a,0),b=ym(r.b,1);return a===b?a:a+' ~ '+b};
+  const desc=x=>{if(!x.runs||!x.runs.length)return '평범 밖이던 조각 없음';const mk=r=>r.u&&r.l?'↕':r.u?'↑':'↓';
+    if(x.runs.length===1&&x.k===x.n)return `<b>있는 ${x.n}조각 내내</b> 평범 밖 ${mk(x.runs[0])} (${span(x.runs[0])})`;
+    return `<b>드러난 시기 ${x.runs.length}번</b> — `+x.runs.map(r=>`${span(r)} ${mk(r)}${r.n}조각`).join(' · ')+` · 지금은 ${x.tq?`평범 안(${x.tq}조각째)`:'평범 밖'}`};
   const one=x=>`<div class="nm">${x.seen?'<span class="ok" title="그림으로 확인">✓</span>':''}<span>${x.k2||x.s}</span>${mstrip(x.mix)}<i>${x.n}조각 중 ${x.k}조각 (${x.share.toFixed(0)}%) · ${x.side}</i>`+
-    `<i>${use.map((ci,j)=>x.per[j][0]+x.per[j][1]?`<span class="pill">${COLS[ci][1].split(' (')[0]} ${x.per[j][0]?'↑'+x.per[j][0]:''}${x.per[j][1]?'↓'+x.per[j][1]:''}</span>`:'').join(' ')}</i>${x.g==='D'?`<i>설정으로는 ${x.auto||'평범'}</i>`:''}</div>`;
+    `<i>${use.map((ci,j)=>x.per[j][0]+x.per[j][1]?`<span class="pill">${COLS[ci][1].split(' (')[0]} ${x.per[j][0]?'↑'+x.per[j][0]:''}${x.per[j][1]?'↓'+x.per[j][1]:''}</span>`:'').join(' ')}</i>${x.g==='D'?`<i>설정으로는 ${x.auto||'평범'}</i>`:''}<span class="ds">${desc(x)}</span></div>`;
   const sec=(g,title)=>`<div class="grp"><h3><span class="tag">${g}</span> ${title} — ${out[g].length}명</h3>${fold(out[g],one,'없음')}</div>`;
   $('answer').innerHTML=`<h2>설정으로 나온 답</h2><div class="rng">최근 ${Y}년 · ${W}일 간격 ${np}조각 · 평범 = 가운데 ${$('band').value}% · 볼 칸 ${use.length}개. 조각 하나에서 볼 칸 중 하나라도 평범 밖이면 그 조각은 "평범 밖". 그 비율이 높은 순으로 아이의 위쪽 ${100-band}% 가 개성(이번 선 = ${out.cut.toFixed(0)}% 넘게), 나머지가 평범. ✓ = 그림으로 확인한 아이.</div>`+
     sec('A','개성이 가장 센 3분의 1')+sec('B','그다음 3분의 1')+sec('C','나머지 3분의 1')+sec('D','단체 그룹 — 같은 때 같이 움직인 무리(사람이 넣음)')+
     `<div class="grp"><h3>평범 — ${out.plain}명</h3><div class="note">평범한 아이는 배경이라 이름을 싣지 않습니다.${out.none?` 이 범위에 조각이 하나도 없는 아이 ${out.none}명.`:''}</div></div>`+
-    `<div class="note">띠: <span style="color:var(--hi)">■</span> 위쪽 바깥 · <span style="color:var(--lo)">■</span> 아래쪽 바깥 · <span style="color:#8a5fd0">■</span> 한 조각에서 위 · 아래 둘 다(칸이 다름). 굵은 테두리 = 지금 보는 조각.</div>`}
+    `<div class="note">띠: <span style="color:var(--hi)">■</span> 위쪽 바깥 · <span style="color:var(--lo)">■</span> 아래쪽 바깥 · <span style="color:#8a5fd0">■</span> 한 조각에서 위 · 아래 둘 다(칸이 다름). 굵은 테두리 = 지금 보는 조각. 이름 아래 글 = 그 아이의 개성이 드러난 시기 — 평범 밖 조각이 이어진 덩어리를 한 번으로 묶어 언제 · 몇 조각 이어졌나(↑ 위쪽 · ↓ 아래쪽 · ↕ 둘 다).</div>`}
 const strip=(a,cur)=>'<span class="strip">'+a.map((v,i)=>`<u class="${v==null?'n':v<0?'l':v>0?'h':''}${i===cur?' c':''}"></u>`).join('')+'</span>';
 const fold=(list,one,empty)=>{const head=list.slice(0,5).map(one).join(''),rest=list.slice(5);
   return (head+(rest.length?`<details><summary>나머지 ${rest.length}명 펼치기</summary>${rest.map(one).join('')}</details>`:''))||`<i>${empty}</i>`};
