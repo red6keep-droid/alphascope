@@ -37,9 +37,10 @@ ROSTER = {"COIN": "A", "BE": "A", "SMCI": "A", "BRK-B": "A", "KO": "A", "RSG": "
           "MU": "D", "WDC": "D", "STX": "D", "LRCX": "D", "AMAT": "D", "KLAC": "D", "TER": "D", "GLW": "D", "FLEX": "D"}
 
 
-def main():
-    page = open(os.path.join(HERE, "look_band_page.html"), encoding="utf-8").read()
-    bars = pd.read_pickle(os.path.join(STORE, "bars_us.pkl"))
+def compute(bars=None):
+    """화면에 담는 값 전부를 계산한다 — look_why.py(왜 시간표)도 같은 값을 쓰려고 함수로 뗌(2026-11-24, 답은 그대로)."""
+    if bars is None:
+        bars = pd.read_pickle(os.path.join(STORE, "bars_us.pkl"))
     earn = pd.read_csv(os.path.join(STORE, "earn_days_us.csv"), parse_dates=["day"])
     eg = {s: g for s, g in earn.groupby("sym")}
     em = {s: g for s, g in (earn[earn["main"] == 1] if "main" in earn.columns else earn).groupby("sym")}   # 본 발표만 — 실적 반응 날(look_earn 과 같은 기준)
@@ -97,6 +98,12 @@ def main():
             [1, "예고 없는 돌 수", 0, "개", "실적 · 파도 날이 아닌 날에 ±5% 넘게 움직인 횟수"],
             [2, "방향 크기", 0, "%", "구간 처음과 끝의 등락 크기(오름 · 내림 구분 없이)"],
             [3, "거래량 튄 날 수", 0, "일", "거래량이 평소(지난 250일 가운데 값)의 2배를 넘은 날"]]
+    return {"rows": rows, "cols": cols, "days": days, "last": last, "cuts": cuts, "labels": labels, "waves": waves, "bars": bars, "earn": earn}
+
+
+def main():
+    R = compute()
+    rows, cols, days, last, cuts, labels = R["rows"], R["cols"], R["days"], R["last"], R["cuts"], R["labels"]
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     # 원본(look_band_page.html → mock_band.html) + 그래프 시안(look_band_page_b.html → mock_band_b.html, make_band_b.py 가 원본 틀에서 만든다)
     for tpl, out in (("look_band_page.html", OUT), ("look_band_page_b.html", OUT.replace("mock_band.html", "mock_band_b.html"))):

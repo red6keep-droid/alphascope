@@ -38,11 +38,11 @@ def run(*args):
 
 def main():
     refresh = "--refresh" in sys.argv
-    for mod in ("pandas", "numpy", "yfinance", "requests", "matplotlib"):
+    for mod in ("pandas", "numpy", "yfinance", "requests", "matplotlib", "pyarrow"):
         try:
             __import__(mod)
         except ImportError:
-            raise SystemExit(f"파이썬 꾸러미 {mod} 가 없습니다 — pip install pandas numpy yfinance requests matplotlib")
+            raise SystemExit(f"파이썬 꾸러미 {mod} 가 없습니다 — pip install pandas numpy yfinance requests matplotlib pyarrow")
     import pandas as pd
 
     print("1. 일봉")
