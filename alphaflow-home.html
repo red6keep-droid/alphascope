@@ -2419,17 +2419,17 @@ function newsStrip(box, track, dotBox) {
     body.scrollTop = 0; homePop.hidden = false; homePop.querySelector('.rt-pop-close').focus();
   }
 
-  var KR_FACTS_URL = 'https://newfact-news.pages.dev/kr/facts/latest.json';   /* 한국 기사 공용 저장소 (kr-facts.yml, 09:20 · 18:20) */
+  var KR_FACTS_URL = GH + 'kr-facts.json';   /* 한국 기사 공용 저장소 (kr-facts.yml 09:20 · 18:20) — 미국 news.json · 방송 kr-news.json 과 같은 gh-pages */
   function krFactItems(d) {   /* 사건 하나 = 줄 하나: 제목 = 사건 이름 · 요약 = 첫 사실 · 팝업 = 사실 줄 전부 · 출처 자리 = 보도 n곳(비교 대상) */
     var evs = (d && d.facts && d.facts[0] && d.facts[0].events) || [];
     return evs.map(function (e) { var fs = e.facts || []; return { title: e.event, summary_ko: (fs[0] && fs[0].what) || '', kind: 'fact', tag: e.tag, source: '보도 ' + e.sourceCount + '곳', published: e.at, lines: fs.map(function (f) { return f.line; }) }; });
   }
   var NEWS_SHOWN = 5, NEWS_STEP = 10;   /* 홈 주요 뉴스 5건 + 누를 때마다 10건씩 (2026-11-07 사용자 P340, 옛 3건 · 8건까지 한 번에) */
-  /* 한국 홈 = 한국 증시 방송 이슈(kr-news.json) + 한국 기사 공용 저장소의 사건별 사실(Pages newfact-news, 보도 2곳 이상) — 시각 순으로 섞음 (2026-11-24 사용자).
+  /* 한국 홈 = 한국 증시 방송 이슈(kr-news.json) + 한국 기사 공용 저장소의 사건별 사실(kr-facts.json, 보도 2곳 이상) — 시각 순으로 섞음 (2026-11-24 사용자).
      사실 파일을 못 받으면 방송만, 방송을 못 받으면 사실만 */
   (HOME_MKT === 'kr' ? Promise.all([
       fetch(GH + 'kr-news.json?v=' + Date.now()).then(function (r) { return r.json(); }).catch(function () { return { items: [] }; }),
-      fetch(KR_FACTS_URL).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; })
+      fetch(KR_FACTS_URL + '?v=' + Date.now()).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; })
     ]).then(function (p) { return { items: (p[0].items || []).concat(krFactItems(p[1])) }; })
     : fetch(NEWS_URL + '?v=' + Date.now()).then(function (r) { return r.json(); }))
     .then(function (json) {

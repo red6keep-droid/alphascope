@@ -74,7 +74,7 @@ const KST_JOBS = {
   "17:00": [{ workflow: "commentary.yml", inputs: { scheduled: "true", slot: "pm" }, when: WEEKDAY }],
   "14:30": [{ workflow: "home-ip.yml" }], // 낮 갱신 — 종목 페이지만 다시 그린다 (check.mode=refresh, 2026-11-04 P290). GitHub cron 04:00 UTC 는 예비
   // 한국 기사 공용 저장소 (2026-11-24 사용자) — 뉴스 수집기 정기 실행 07:00 · 16:30 이 facts 를 쓴 뒤(07:46 · 17:1x 쯤). 매일.
-  // gh-pages 에 안 쓴다(상태 저장소 + Pages newfact-news) → push 겹침 없음. 분 :20 은 Worker 가 깨는 분.
+  // gh-pages kr-facts.json 푸시 하루 2회(+ 상태 저장소) — 09:20 · 18:20 에 다른 gh-pages 푸시 없음. 분 :20 은 Worker 가 깨는 분.
   "09:20": [{ workflow: "kr-facts.yml", inputs: { scheduled: "true" } }],
   "18:20": [{ workflow: "kr-facts.yml", inputs: { scheduled: "true" } }],
 };

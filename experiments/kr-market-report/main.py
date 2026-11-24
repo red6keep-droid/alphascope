@@ -432,12 +432,12 @@ def _home_news(media):
         print(f"[kr-report] 홈 뉴스 파일 못 씀: {str(e)[:120]}")
 
 
-KR_FACTS_URL = "https://newfact-news.pages.dev/kr/facts/latest.json"   # 한국 기사 공용 저장소 (kr-facts.yml 09:20 · 18:20, 2026-11-24 사용자)
+KR_FACTS_URL = "https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/kr-facts.json"   # 한국 기사 공용 저장소 (kr-facts.yml 09:20 · 18:20, 2026-11-24 사용자) — kr-news.json 과 같은 gh-pages
 
 
 def _facts_sections():
     """뉴스 탭 맨 위 = 사실로 정리된 한국 사건(보도 2곳 이상) + 그 밖의 기사 제목 묶음 — 뉴스 수집기 자료, 블로그 AI 0 (2026-11-24 사용자).
-    재료 = Pages 공개 파일(그날 가장 늦은 수집기 정기 실행 — 15:50 실행이면 그날 07:00 실행). 사흘보다 오래됐거나 못 받으면 싣지 않는다(방송 뉴스만)."""
+    재료 = gh-pages kr-facts.json(그날 가장 늦은 수집기 정기 실행 — 15:50 실행이면 그날 07:00 실행). 사흘보다 오래됐거나 못 받으면 싣지 않는다(방송 뉴스만)."""
     try:
         import urllib.request
         with urllib.request.urlopen(KR_FACTS_URL, timeout=20) as r:

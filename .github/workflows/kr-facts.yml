@@ -4,16 +4,17 @@
 #       사람은 Run workflow 버튼(scheduled 끄고). 분 :20 = 운영지침 11절 다른 쓰기 시각과 겹치지 않는 자리(:20 = 06:20 · 08:20 · 16:20 만 씀).
 # 읽기: news-text-blog Firestore(facts · headlines) — 블로그 서비스 계정 roles/datastore.viewer, 읽기 하루 약 2회 × 문서 10개 안팎.
 # 쓰기: ① 비공개 상태 저장소 alphascope-state 의 kr-facts 브랜치(날짜 파일 누적 = 기록, 수집기는 30일 뒤 지운다)
-#       ② Cloudflare Pages 프로젝트 newfact-news(https://newfact-news.pages.dev/kr/facts/latest.json) — 한국 홈 · 한국 증시 리포트 뉴스 탭이 읽는다.
-#       Pages 배포는 전체 교체라 ①의 폴더 전부를 올린다. 다른 Pages 프로젝트(alpha-scope · newfact-img)와 섞지 않는다.
-# AI 0 · gh-pages 0 · Blogger 0. 실패해도 다른 실행에 영향 없음 — 화면은 지난 파일을 그대로 읽는다.
+#       ② gh-pages kr-facts.json = 가장 최근 날 파일 하나(약 100KB, 같은 이름 덮어씀) — 미국 news.json · 방송 kr-news.json 과 같은 자리 · 같은 jsDelivr 길.
+#          한국 홈 · 한국 증시 리포트 뉴스 탭이 읽는다. 날짜 파일은 gh-pages 에 쌓지 않는다(상자 50MB · 이력) — 기록은 ①.
+#          (11-24 첫 판은 Pages 프로젝트 newfact-news 였다 → 다른 뉴스와 따로 놀아 같은 날 gh-pages 로 옮김, 사용자 "왜 뉴팩트 기사만")
+# AI 0 · Blogger 0 · gh-pages 푸시 하루 2회. 실패해도 다른 실행에 영향 없음 — 화면은 지난 파일을 그대로 읽는다.
 name: 한국 기사 공용 저장소
 
 on:
   workflow_dispatch:
     inputs:
       deploy:
-        description: '상태 저장소 · Pages 에 올리기 (끄면 만들기만, 결과는 artifact)'
+        description: '상태 저장소 · gh-pages 에 올리기 (끄면 만들기만, 결과는 artifact)'
         type: boolean
         default: true
       scheduled:
@@ -22,7 +23,7 @@ on:
         default: false
 
 permissions:
-  contents: read
+  contents: write   # gh-pages kr-facts.json
 
 concurrency:
   group: kr-facts
@@ -81,18 +82,26 @@ jobs:
           if git diff --cached --quiet; then echo "바뀐 것 없음"; else git commit -q -m "kr facts $(date -u +%FT%H:%MZ) [skip ci]" && git push -q origin HEAD:kr-facts; fi
           echo "저장소 $(du -sh --exclude=.git . | cut -f1)"
 
-      - name: Publish Cloudflare Pages (newfact-news)
+      # 다른 홈 파일과 같은 방식(kr-stocks.yml Deploy kr.json) — keep_files 로 이 파일 하나만 덮는다. 09:20 · 18:20 에 다른 gh-pages 푸시 없음
+      - name: Deploy kr-facts.json to gh-pages
         if: inputs.deploy || inputs.scheduled
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CF_PAGES_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: a8718df7edc5f8f6ce88e75b6545e5cb
+        run: mkdir -p deploy-home && cp "$STORE/kr/facts/latest.json" deploy-home/kr-facts.json && ls -la deploy-home
+
+      - name: Push gh-pages
+        if: inputs.deploy || inputs.scheduled
+        uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453   # v4.1.0 — 커밋 번호로 고정
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./deploy-home
+          publish_branch: gh-pages
+          keep_files: true
+
+      - name: Purge kr-facts.json cache
+        if: inputs.deploy || inputs.scheduled
+        continue-on-error: true
         run: |
-          [ -z "$CLOUDFLARE_API_TOKEN" ] && { echo "::error::CF_PAGES_API_TOKEN 없음"; exit 1; }
-          rm -rf /tmp/cfp && mkdir -p /tmp/cfp && cp -r "$STORE"/kr "$STORE"/_headers /tmp/cfp/
-          echo "Pages 파일 $(find /tmp/cfp -type f | wc -l)개 · $(du -sh /tmp/cfp | cut -f1)"
-          npx --yes wrangler@4.162.0 pages deploy /tmp/cfp --project-name newfact-news --branch main --commit-dirty=true
-          code=$(curl -s -o /dev/null -w "%{http_code}" "https://newfact-news.pages.dev/kr/facts/latest.json")
-          echo "확인 latest.json → $code"; [ "$code" = 200 ] || echo "::warning::Pages 확인 실패 ($code)"
+          sleep 10   # 푸시 직후 퍼지는 jsDelivr 가 옛 커밋을 다시 붙잡는다(11-05) — 잠깐 기다린다
+          bash .github/scripts/jsd_purge.sh kr-facts.json deploy-home/kr-facts.json || true
 
       - name: Upload result
         if: always()

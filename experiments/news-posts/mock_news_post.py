@@ -188,5 +188,5 @@ if __name__ == "__main__":
         open(out, "w", encoding="utf-8").write(page)
         print(out, "· 홈 카드", len(rows), "편")
 
-    # ── 한국 홈 맨 아래 `주요 뉴스` — 테마가 직접 그린다(2026-11-24): 방송 이슈(kr-news.json) + 한국 기사 공용 저장소 사건별 사실(Pages newfact-news, kr-facts.yml).
+    # ── 한국 홈 맨 아래 `주요 뉴스` — 테마가 직접 그린다(2026-11-24): 방송 이슈(kr-news.json) + 한국 기사 공용 저장소 사건별 사실(gh-pages kr-facts.json, kr-facts.yml).
     # 재료는 홈 나누기 목업(mock_home_split.py)이 실제 파일(없으면 samples 표본)로 넣어 둔다 — 여기서 따로 섞지 않는다(옛 덮어쓰기 11-23 ~ 11-24).

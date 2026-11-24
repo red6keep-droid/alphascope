@@ -1907,7 +1907,7 @@ def preview_mock_js():
         "    }\n"
         "    else if (u.indexOf('issues.json') >= 0) { body = window.PV_ISSUES; return Promise.resolve({ ok: !!body, status: body ? 200 : 404, json: function () { return Promise.resolve(body); } }); }   /* Hot Issue 카드 — 목업이 window.PV_ISSUES 를 넣을 때만 (2026-11-16) */\n"
         "    else if (u.indexOf('hypo.json') >= 0) { body = window.PV_HYPO; return Promise.resolve({ ok: !!body, status: body ? 200 : 404, json: function () { return Promise.resolve(body); } }); }   /* 증시 전망 카드 — 목업이 window.PV_HYPO 를 넣을 때만 (홈 나누기 목업, 2026-11-12) */\n"
-        "    else if (u.indexOf('newfact-news') >= 0) { body = window.PV_KR_FACTS; return Promise.resolve({ ok: !!body, status: body ? 200 : 404, json: function () { return Promise.resolve(body); } }); }   /* 한국 기사 공용 저장소(사건별 사실) — 목업이 넣을 때만 (2026-11-24) */\n"
+        "    else if (u.indexOf('kr-facts.json') >= 0) { body = window.PV_KR_FACTS; return Promise.resolve({ ok: !!body, status: body ? 200 : 404, json: function () { return Promise.resolve(body); } }); }   /* 한국 기사 공용 저장소(사건별 사실) — 목업이 넣을 때만 (2026-11-24) */\n"
         "    else if (u.indexOf('kr-news.json') >= 0) body = (window.PV_KR_NEWS || { items: [] });   /* 한국 홈 주요 뉴스 · 한 줄 롤링 — 목업이 넣을 때만 (2026-11-24) */\n"
         "    else if (u.indexOf('news.json') >= 0) body = PV_NEWS;\n"
         "    else if (u.indexOf('stocks.json') >= 0) body = PV_PICKS;\n"

@@ -51,11 +51,11 @@ def kr_news():
         return None
 
 
-KR_FACTS_PUBLIC = "https://newfact-news.pages.dev/kr/facts/latest.json"
+KR_FACTS_PUBLIC = "https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/kr-facts.json"
 
 
 def kr_facts():
-    """한국 홈 주요 뉴스의 사건별 사실 = 운영과 같은 Pages 파일(kr-facts.yml). 아직 없으면 받은 표본(news-posts/samples, fetch_samples.py)으로 같은 꼴을 만든다 (2026-11-24)."""
+    """한국 홈 주요 뉴스의 사건별 사실 = 운영과 같은 gh-pages kr-facts.json(kr-facts.yml). 아직 없으면 받은 표본(news-posts/samples, fetch_samples.py)으로 같은 꼴을 만든다 (2026-11-24)."""
     try:
         import urllib.request
         with urllib.request.urlopen(KR_FACTS_PUBLIC, timeout=20) as r:
