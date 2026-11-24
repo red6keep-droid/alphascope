@@ -2,7 +2,9 @@
 #
 # 어디에: red9keep/News-doc(비공개) 의 브랜치 state-backup/daily(날마다 덮어씀) · state-backup/weekly-1 ~ 4(월요일마다 하나씩 돌려 씀).
 #         문서 브랜치 main 은 건드리지 않는다.
-# 크기: 한 벌 압축 27.5MB(11-24 실측) → 다섯 세대 약 140MB. 이력째 복사(91MB + 한 주 55MB 씩)는 하지 않는다 — 기록은 덧붙이기만 해서 최신 한 벌에 과거가 다 있다.
+# 크기: 한 벌 압축 약 27MB(11-24 실측) — 파일마다 따로 압축(안 바뀐 파일은 다시 안 올라감), 40MB 넘는 파일은 조각(GitHub 파일 한도 50 · 100MB).
+#       이력째 복사(91MB + 한 주 55MB 씩)는 하지 않는다 — 기록은 덧붙이기만 해서 최신 한 벌에 과거가 다 있다.
+#       지난 사본을 받아 그 위에 고쳐 쓰고(amend) 덮어 올린다 → 하루에 올라가는 양 = 바뀐 파일만. 덮인 옛 커밋은 GitHub 정리 때 지워진다.
 # 막는 장치: 지난 사본보다 기록 파일이 없어졌거나 작아졌으면 덮어쓰지 않고 실패 → Slack (원본이 지워진 날 사본까지 따라 지워지지 않게).
 # 언제: 하루 한 번 KST 23:40(GitHub cron — 급하지 않아 늦게 돌아도 됨, Worker 자리 안 씀). 사람은 Run workflow.
 # 키: STATE_DEPLOY_KEY(상태 저장소 읽기 · 이미 있음) · STATE_BACKUP_KEY(News-doc 배포 키, 쓰기). AI 0 · 수집 0 · gh-pages 0 · Blogger 0.
@@ -43,38 +45,56 @@ jobs:
           printf '%s\n' "$STATE_BACKUP_KEY" > ~/.ssh/backup_key && chmod 600 ~/.ssh/backup_key
           ssh-keyscan -t ed25519 github.com >> ~/.ssh/known_hosts 2>/dev/null
 
-      - name: Fetch state (mirror) · previous manifest
+      - name: Fetch state (mirror) · previous backup
         run: |
           GIT_SSH_COMMAND="ssh -i ~/.ssh/state_key -o IdentitiesOnly=yes" git clone -q --mirror git@github.com:red6keep-droid/alphascope-state.git /tmp/state.git
           echo "상태 저장소 $(du -sh /tmp/state.git | cut -f1) · 브랜치 $(git -C /tmp/state.git for-each-ref refs/heads | wc -l)"
           export GIT_SSH_COMMAND="ssh -i ~/.ssh/backup_key -o IdentitiesOnly=yes"
           set +e; git ls-remote --exit-code --heads git@github.com:red9keep/News-doc.git state-backup/daily >/dev/null; rc=$?; set -e
           if [ "$rc" = 0 ]; then
-            git clone -q --depth 1 -b state-backup/daily git@github.com:red9keep/News-doc.git /tmp/prev && cp /tmp/prev/manifest.json /tmp/prev_manifest.json && echo "지난 사본 $(python -c "import json;print(json.load(open('/tmp/prev_manifest.json'))['made'])")"
-          elif [ "$rc" = 2 ]; then echo "지난 사본 없음 — 처음"
+            git clone -q --depth 1 -b state-backup/daily git@github.com:red9keep/News-doc.git /tmp/backup
+            cp /tmp/backup/manifest.json /tmp/prev_manifest.json
+            echo "지난 사본 $(python -c "import json;print(json.load(open('/tmp/prev_manifest.json'))['made'])")"
+          elif [ "$rc" = 2 ]; then
+            echo "지난 사본 없음 — 처음"; mkdir -p /tmp/backup && git -C /tmp/backup init -q && git -C /tmp/backup checkout -q --orphan state-backup/daily
           else echo "::error::사본 저장소 확인 실패 ($rc)"; exit 1; fi
 
+      # 줄어듦(종료 3) = 멈춤 · 덮어쓰지 않음. 조각(종료 4) = 사본은 올리고 아래에서 알림만
       - name: Build snapshot (줄어듦 검사)
+        id: build
         env:
           PYTHONIOENCODING: utf-8
         run: |
+          rm -rf /tmp/backup/alphascope-state
+          set +e
           python experiments/state_backup.py --mirror /tmp/state.git --out /tmp/backup $([ -f /tmp/prev_manifest.json ] && echo "--prev /tmp/prev_manifest.json")
-          [ -f /tmp/prev/README.md ] && cp /tmp/prev/README.md /tmp/backup/README.md || true
+          rc=$?; set -e
+          echo "rc=$rc" >> "$GITHUB_OUTPUT"
+          [ "$rc" = 0 ] || [ "$rc" = 4 ] || exit "$rc"
 
       - name: Push (daily · 월요일은 weekly 도)
         run: |
           export GIT_SSH_COMMAND="ssh -i ~/.ssh/backup_key -o IdentitiesOnly=yes"
           cd /tmp/backup
-          git init -q && git checkout -q --orphan snap
           git config user.name "github-actions[bot]" && git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A && git commit -q -m "기록 사본 $(TZ=Asia/Seoul date +%F) — alphascope-state 한 벌"
+          git add -A
+          msg="기록 사본 $(TZ=Asia/Seoul date +%F) — alphascope-state 한 벌"
+          if git rev-parse -q --verify HEAD >/dev/null; then git commit -q --amend -m "$msg"; else git commit -q -m "$msg"; fi
           git push -q -f git@github.com:red9keep/News-doc.git HEAD:refs/heads/state-backup/daily
-          echo "daily 올림 $(du -sh --exclude=.git . | cut -f1)"
+          echo "daily 올림 · 사본 $(du -sh --exclude=.git . | cut -f1) · $(python -c "import json;m=json.load(open('manifest.json'));print('가장 큰 파일', m['biggest']['path'], round(m['biggest']['gz']/1e6,1), 'MB')")"
           if [ "$(TZ=Asia/Seoul date +%u)" = 1 ]; then
             n=$(( 10#$(TZ=Asia/Seoul date +%V) % 4 + 1 ))
             git push -q -f git@github.com:red9keep/News-doc.git HEAD:refs/heads/state-backup/weekly-$n
             echo "weekly-$n 올림"
           fi
+
+      - name: Notify split files
+        if: steps.build.outputs.rc == '4'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          [ -z "$SLACK_WEBHOOK_URL" ] && exit 0
+          curl -sS -X POST -H 'Content-type: application/json' --data "{\"text\":\"ℹ️ 기록 사본 — 압축 40MB 넘는 기록 파일이 있어 조각으로 나눠 올렸습니다(사본은 정상). 기록을 연도 · 월별로 나눌 때입니다\n🔗 https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}" "$SLACK_WEBHOOK_URL" || true
 
       - name: Notify failure
         if: failure()
