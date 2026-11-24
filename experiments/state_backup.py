@@ -9,7 +9,7 @@
 - 만드는 것: --out/alphascope-state/{브랜치}/{원래 경로}.gz (이미 .gz 인 파일은 그대로) · --out/manifest.json
     압축이 SPLIT_MB 를 넘으면 `.gz.000` · `.gz.001` … 조각으로 나눈다(되살리기 = 이어 붙인 뒤 gunzip). 넘은 파일은 manifest `big` 에.
     manifest = 브랜치마다 커밋 · 커밋 시각 · 파일 수 · 크기, 기록 파일(records/ · history/ · raw/ · 날짜 파일)마다 크기.
-- 줄어듦 검사(--prev): 지난 사본보다 **기록 파일이 사라졌거나 작아졌으면** 종료 코드 3 — 부르는 쪽이 사본을 덮어쓰지 않고 알린다.
+- 줄어듦 검사(--prev): 지난 사본보다 **기록 파일이 사라졌거나 줄 수가 줄었으면** 종료 코드 3 — 부르는 쪽이 사본을 덮어쓰지 않고 알린다.
   (원본이 지워진 날 사본까지 따라 지워지지 않게. 작업 파일 · 통째로 덮어쓰는 브랜치는 검사하지 않는다.)
 - 조각으로 나눈 파일이 있으면 종료 코드 4 — 사본은 만들어졌고(올려도 됨), 부르는 쪽이 알림만 보낸다(기록 구조를 손볼 때).
 - 올리는 곳 · 세대(날마다 1 + 주마다 4)는 워크플로(state-backup.yml)가 맡는다. AI 0 · 수집 0.
@@ -74,8 +74,8 @@ def main():
                     continue
                 data = t.extractfile(m).read()
                 files, size = files + 1, size + len(data)
-                if RECORD.search(m.name):
-                    recs[m.name] = len(data)
+                if RECORD.search(m.name):   # 줄로 쌓는 파일은 줄 수도 — 같은 날 줄을 고쳐 쓰면 바이트는 줄 수 있어도 줄 수는 안 준다
+                    recs[m.name] = {"bytes": len(data), "lines": data.count(b"\n")} if re.search(r"\.jsonl$|seen\.txt$", m.name) else {"bytes": len(data)}
                 n = write_file(os.path.join(dst, b), m.name, data, man["big"])
                 gz_sum += n
                 if n > biggest[0]:
@@ -94,13 +94,18 @@ def main():
                 if pb.get("records"):
                     shrunk.append(f"{b}: 브랜치가 없어짐")
                 continue
-            for path, n in (pb.get("records") or {}).items():
+            for path, was in (pb.get("records") or {}).items():
                 if not APPEND.search(path):
                     continue
                 if path not in now:
                     shrunk.append(f"{b}:{path} 없어짐")
-                elif now[path] < n and not path.endswith(".gz"):   # gzip 은 다시 묶으면 조금 달라질 수 있어 크기 비교 안 함(없어짐만 본다)
-                    shrunk.append(f"{b}:{path} {n} → {now[path]} 바이트")
+                    continue
+                # 줄어듦 = 줄 수가 줄었을 때만(같은 날 · 같은 대상 줄을 고쳐 쓰는 것은 정상 — record_store 규칙, 11-24 NVDA_CEO.jsonl 1434 → 1421 바이트 오탐).
+                # 날짜 파일 · 원본 gzip 은 같은 날 다시 쓰거나 다시 묶을 수 있어 없어짐만 본다. 옛 manifest(숫자 하나)는 없어짐만.
+                w_lines = was.get("lines") if isinstance(was, dict) else None
+                n_lines = (now[path] or {}).get("lines") if isinstance(now[path], dict) else None
+                if w_lines is not None and n_lines is not None and n_lines < w_lines:
+                    shrunk.append(f"{b}:{path} {w_lines} → {n_lines}줄")
     with open(os.path.join(a.out, "manifest.json"), "w", encoding="utf-8") as f:
         json.dump(man, f, ensure_ascii=False, indent=1)
     print(f"한 벌 {len(man['branches'])} 브랜치 · 압축 합계 {total / 1e6:.1f}MB · 가장 큰 파일 {biggest[1]} {biggest[0] / 1e6:.1f}MB")
