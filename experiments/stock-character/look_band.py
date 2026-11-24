@@ -97,11 +97,17 @@ def main():
             [1, "예고 없는 돌 수", 0, "개", "실적 · 파도 날이 아닌 날에 ±5% 넘게 움직인 횟수"],
             [2, "방향 크기", 0, "%", "구간 처음과 끝의 등락 크기(오름 · 내림 구분 없이)"],
             [3, "거래량 튄 날 수", 0, "일", "거래량이 평소(지난 250일 가운데 값)의 2배를 넘은 날"]]
-    html = (page.replace("__DATA__", json.dumps(rows, ensure_ascii=False, separators=(",", ":"))).replace("__COLS__", json.dumps(cols, ensure_ascii=False))
-            .replace("__N__", str(len(rows))).replace("__LAST__", str(last.date())).replace("__LASTK__", f"{last.year}.{last.month}.{last.day}").replace("__FIRST__", str(days[0].date()))
-            .replace("__WINS__", json.dumps(WINS)).replace("__LABELS__", json.dumps(labels)))
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
-    open(OUT, "w", encoding="utf-8").write(html)
+    # 원본(look_band_page.html → mock_band.html) + 그래프 시안(look_band_page_b.html → mock_band_b.html, make_band_b.py 가 원본 틀에서 만든다)
+    for tpl, out in (("look_band_page.html", OUT), ("look_band_page_b.html", OUT.replace("mock_band.html", "mock_band_b.html"))):
+        path = os.path.join(HERE, tpl)
+        if not os.path.exists(path):
+            continue
+        page = open(path, encoding="utf-8").read()
+        html = (page.replace("__DATA__", json.dumps(rows, ensure_ascii=False, separators=(",", ":"))).replace("__COLS__", json.dumps(cols, ensure_ascii=False))
+                .replace("__N__", str(len(rows))).replace("__LAST__", str(last.date())).replace("__LASTK__", f"{last.year}.{last.month}.{last.day}").replace("__FIRST__", str(days[0].date()))
+                .replace("__WINS__", json.dumps(WINS)).replace("__LABELS__", json.dumps(labels)))
+        open(out, "w", encoding="utf-8").write(html)
     print(f"화면 → {OUT} · 아이 {len(rows)}명 · {days[0].date()} ~ {last.date()} · 조각 수 "
           + " · ".join(f"{W}일 {len(cuts[W])}" for W in WINS) + f" · {os.path.getsize(OUT) // 1024}KB")
 

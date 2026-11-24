@@ -1,0 +1,332 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>개성 있는 아이 찾기 (그래프 시안)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;900&amp;family=Inter:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+/* 디자인 가이드라인(저장소 맨 위 `디자인-가이드라인.md`) 값 — 글자 세 톤 #111 · #333 · #6B7280(4절), 증감 #D93025 · #1A73E8, 중립 강조 보라 #6D28D9(5절),
+   카드 테두리 #E2E8F0 · 흰 카드 모서리 8 · 강조 카드 모서리 10(7절), 그래프 색 dk.CHART_*(4절), 라벨(8절), 정수 px · 글자와 줄 높이 홀짝 맞춤(3 · 6절), 폰 먼저(1절). */
+:root{--ink:#111;--body:#333;--sub:#6B7280;--faint:#9CA3AF;--line:#E2E8F0;--up:#D93025;--dn:#1A73E8;--vio:#6D28D9;--c-up:#ED8E87;--c-dn:#82B1F0;--c-main:#F59E0B;--c-cmp:#CBD5E1}
+*{box-sizing:border-box}
+body{margin:0;background:#fff;color:var(--body);font-family:'Noto Sans KR',-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:19px;line-height:35px;word-break:keep-all;font-variant-numeric:tabular-nums}
+main{max-width:680px;margin:0 auto;padding:26px 14px 60px}
+h1{font-size:22px;line-height:28px;font-weight:700;color:var(--ink);margin:0 0 12px;padding-left:6px}
+@media(max-width:680px){h1{font-size:20px;line-height:26px}}
+.stamp{background:#F3F4F6;border-radius:8px;padding:10px 12px;margin:0 0 14px;font-size:13px;line-height:19px;color:var(--sub)}
+.lead{font-size:19px;line-height:35px;color:var(--body);margin:0 0 12px;padding-left:6px}
+h2{font-size:19px;line-height:29px;font-weight:700;color:var(--ink);margin:24px 0 10px;padding-left:6px}
+.guide{font-size:14px;line-height:20px;color:var(--sub);margin:0 0 10px;padding-left:12px}
+.ct{display:block;font-weight:700;color:var(--ink);font-size:16px;line-height:24px;margin:16px 0 4px;padding-left:6px}
+.ct i{font-style:normal;font-weight:400;font-size:14px;position:relative;top:-2px}
+.ct small{font-size:14px;font-weight:400;color:var(--sub)}
+.emph{background:#F8FAFC;border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+.srow{padding:14px 0;border-top:1px solid #EAEDF2}.srow:first-child{border-top:0}
+.sname{font-size:18px;line-height:30px;font-weight:500;color:var(--ink);display:flex;justify-content:space-between;align-items:center;gap:12px}
+.sname b{font-weight:600}.smean{font-size:14px;line-height:20px;color:var(--sub);margin:0 0 6px}
+.caps{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.cap{font:inherit;font-size:14px;line-height:20px;font-weight:400;color:var(--sub);background:#fff;border:1px solid var(--line);border-radius:999px;padding:5px 12px;cursor:pointer}
+.cap.on{color:var(--ink);font-weight:700;background:#F1F5F9;border-color:var(--c-cmp)}
+label.cap{display:inline-flex;align-items:center;gap:6px}label.cap input{margin:0;width:14px;height:14px;accent-color:#111}
+input[type=range]{width:100%;margin:8px 0 0;accent-color:#111}
+.ticks{display:flex;justify-content:space-between;font-size:13px;line-height:19px;color:var(--sub)}
+.num{width:56px;font:inherit;font-size:16px;line-height:24px;font-weight:700;color:var(--ink);padding:3px 6px;border:1px solid var(--line);border-radius:8px;text-align:right;background:#fff}
+.vio{color:var(--vio);font-weight:700}
+.up{color:var(--up);font-weight:700;white-space:nowrap}.dn{color:var(--dn);font-weight:700;white-space:nowrap}.tr{position:relative;top:-1px;margin-right:2px}
+.box{display:inline-block;vertical-align:middle;font-size:14px;line-height:18px;font-weight:700;padding:3px 7px 2px;border-radius:4px;background:#E8EDF3;border:1px solid #D6DEE8;color:#475569;white-space:nowrap}
+.pill{display:inline-block;vertical-align:middle;position:relative;top:-1px;font-size:14px;line-height:1;font-weight:400;padding:3px 5px 2px;border-radius:4px;border:1px solid #86EFAC;color:#15803D;background:#F0FDF4;white-space:nowrap;margin-left:5px}
+.gh{display:flex;align-items:center;gap:8px;font-size:16px;line-height:24px;font-weight:700;color:var(--ink);margin:18px 0 8px;padding-left:6px}
+.gh span.cnt{margin-left:auto;font-size:17px;line-height:25px}
+.kid{background:#fff;border:1px solid var(--line);border-radius:8px;padding:12px;margin:0 0 6px}
+.khead{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.kname{font-size:16px;line-height:24px;font-weight:700;color:var(--ink);min-width:0}
+.kval{flex:none;display:flex;align-items:center;gap:4px;font-size:17px;line-height:25px;font-weight:700;color:var(--body);white-space:nowrap}
+.ksub{font-size:14px;line-height:20px;color:var(--sub);margin-top:6px}
+.fb{flex:none;width:31px;height:31px;border-radius:7px;border:1px solid var(--line);background:#fff;color:#111;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;margin-left:4px}
+.fb svg,.fbtn svg{transition:transform .15s}.fb.open svg,.fbtn.open svg{transform:rotate(180deg)}
+.fbtn{width:100%;font:inherit;cursor:pointer;display:flex;justify-content:center;align-items:center;gap:6px;padding:8px 12px;background:#fff;border:1px solid var(--line);border-radius:8px;color:#111;font-size:14px;line-height:20px;font-weight:700;margin:2px 0 8px}
+.strip{display:flex;gap:1px;margin-top:8px}.strip u{display:block;flex:none;width:6px;height:12px;background:var(--line);text-decoration:none}
+.strip u.l{background:var(--c-dn)}.strip u.h{background:var(--c-up)}.strip u.m{background:#A78BFA}.strip u.n{background:#fff;box-shadow:inset 0 0 0 1px #EEF2F7}.strip u.c{outline:2px solid #111;outline-offset:0}
+.ds{border-top:1px solid var(--line);margin-top:12px;padding-top:2px;font-size:16px;line-height:26px;color:var(--body)}
+.ds p{margin:12px 0 0}.ds .ph{font-weight:700;color:var(--ink);font-size:16px;line-height:24px;margin-top:16px}
+.ds ul{list-style:none;margin:4px 0 0;padding:0}.ds li{display:flex;align-items:flex-start;gap:7px;margin:9px 0}
+.ds li>i{flex:none;width:3px;height:3px;border-radius:50%;background:var(--body);margin-top:12px}
+.ds .tn{font-size:14px;line-height:20px;color:var(--sub)}.ds b{color:var(--ink)}
+.white{background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px 12px;overflow-x:auto}
+.white svg{display:block}
+.rows{margin:6px 0 0;padding:0 6px}.rw{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line);font-size:16px;line-height:24px}
+.rw:first-child{border-top:0}.rw>span:first-child{font-weight:700;color:var(--ink)}.rw>span:last-child{font-size:17px;line-height:25px;font-weight:700;color:var(--body);text-align:right;white-space:nowrap}
+.legend{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:13px;line-height:19px;color:var(--sub);margin:10px 0 0;padding-left:6px}
+.legend span{display:inline-flex;align-items:center;gap:5px}.legend u{display:inline-block;width:10px;height:10px;text-decoration:none}
+.empty{font-size:14px;line-height:20px;color:var(--sub);text-align:center;background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px 12px;margin:0 0 6px}
+.tabsw{position:sticky;top:0;z-index:30;padding-top:12px;margin-bottom:14px;background:#fff}
+.tabs{display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px;border-bottom:2px solid #eee}.tabs::-webkit-scrollbar,.subs::-webkit-scrollbar{display:none}
+.tab{flex:none;padding:8px 13px;font:inherit;font-size:18px;line-height:24px;font-weight:700;color:var(--sub);border:0;background:none;border-bottom:3px solid transparent;margin-bottom:-2px;white-space:nowrap;cursor:pointer}
+.tab[aria-selected="true"]{color:#FF3333;border-bottom-color:#FF3333}
+.subs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--line);margin:0 0 12px}
+.subs.mid{margin:20px 0 22px}
+.sub1{flex:none;padding:6px 11px;font:inherit;font-size:19px;line-height:25px;font-weight:400;color:var(--sub);background:none;border:0;border-bottom:3px solid transparent;margin-bottom:-1px;white-space:nowrap;cursor:pointer}
+.sub1[aria-selected="true"]{color:#111;font-weight:700;border-bottom-color:#FF3333}.sub1 small{font-size:14px;font-weight:400}
+[data-p][hidden]{display:none}
+.tip{display:inline-flex;vertical-align:middle;margin:0 3px;padding:0;border:0;background:none;color:var(--sub);cursor:pointer;line-height:0}
+.tips{display:flex;justify-content:flex-end;align-items:center;gap:6px;font-size:14px;line-height:20px;color:var(--sub);margin:10px 0 0;white-space:nowrap}
+.tips>i{font-style:normal;color:#CBD5E1}.tips>span{display:inline-flex;align-items:center}
+.pop{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:16px}.pop[hidden]{display:none}
+.pop::before{content:"";position:fixed;top:-100px;right:0;bottom:-100px;left:0;z-index:-1;background:rgba(15,23,42,.45)}
+.popbox{position:relative;display:flex;flex-direction:column;width:100%;max-width:520px;max-height:80vh;overflow:hidden;background:#fff;border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,.25)}
+.pophead{position:relative;flex:none;padding:20px 60px 12px 20px}.pophead::after{content:"";position:absolute;left:20px;right:12px;bottom:0;border-bottom:1px solid var(--line)}
+.poptitle{margin:0;font-size:19px;line-height:25px;font-weight:700;color:#111}
+.popx{position:absolute;top:14px;right:12px;width:32px;height:32px;border:1px solid var(--line);border-radius:8px;background:#fff;color:#111;font-size:20px;line-height:30px;padding:0;cursor:pointer}
+.popbody{flex:1 1 auto;min-height:0;overflow-y:auto;padding:12px 20px 22px;font-size:19px;line-height:28px;color:var(--body)}
+.popbody p{margin:14px 0 0}.popli{display:flex;align-items:flex-start;gap:7px;margin:21px 0 11px;padding-left:7px}
+.popli>i{flex:none;width:3px;height:3px;margin-top:12px;border-radius:50%;background:#111}.popli b{color:#111}
+.rk{font-size:14px;line-height:20px;color:var(--sub);margin-top:10px}.rk .strip{margin-top:4px}
+
+.rr{padding:12px 0 6px;border-top:1px solid var(--line)}.rr:first-of-type{border-top:0}
+.rrh{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.rrn{font-size:16px;line-height:24px;font-weight:700;color:var(--ink)}.rrv{font-size:16px;line-height:24px;font-weight:700;color:var(--body);white-space:nowrap}
+.rrs{font-size:14px;line-height:20px;color:var(--sub)}
+.ds svg{display:block}.ds .ct{padding-left:0;margin-top:20px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 8px}
+.chip{font:inherit;font-size:13px;line-height:19px;color:var(--sub);background:#fff;border:1px solid var(--line);border-radius:999px;padding:3px 9px;cursor:pointer}
+.chip.on{color:var(--ink);font-weight:700;background:#F1F5F9;border-color:var(--c-cmp)}
+.lg2{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:13px;line-height:19px;color:var(--sub);margin:6px 0 0}
+.lg2 span{display:inline-flex;align-items:center;gap:5px}.lg2 u{display:inline-block;width:12px;height:8px;text-decoration:none;border-radius:2px}
+.hs{overflow-x:auto}.hint{font-size:13px;line-height:19px;color:var(--faint);text-align:right}
+.yt{position:relative;height:16px;margin-top:2px;font-size:12px;line-height:16px;color:var(--sub)}.yt span{position:absolute;top:0}
+</style></head><body><main>
+<h1>개성 있는 아이 찾기 (그래프 시안)</h1>
+<div class="stamp">__LASTK__ 종가 기준 · 미국 S&amp;P 500 __N__종목 · 비교 대상 = 같은 구간의 S&amp;P 500 종목</div>
+<p class="lead">과거를 같은 길이의 구간으로 자르고, 구간마다 종목을 값 순서로 줄 세워 가운데 몇 %를 평범으로 볼지 정합니다. 여러 구간에서 되풀이해 평범 밖에 있던 종목이 개성 있는 아이입니다.</p>
+
+<div class="tabsw"><div class="tabs" id="tabs" role="tablist"></div></div>
+<section data-p="개성">
+<div class="subs" id="gsub"></div>
+<div id="answer"></div>
+<div class="guide" id="ansg" style="margin-top:14px"></div>
+</section>
+<section data-p="구간" hidden>
+<div class="emph"><div class="srow"><div class="sname">보는 구간<b class="vio" id="pv"></b></div><div class="smean" id="pd"></div>
+<input id="piece" type="range" min="0" max="0" step="1" value="0"><div class="ticks"><span>옛날</span><span>최근</span></div></div></div>
+<div class="guide" id="sum" style="margin-top:10px"></div>
+<div class="subs mid" id="csub"></div>
+<div id="cards"></div>
+</section>
+<section data-p="명단" hidden>
+<div class="guide">그림을 보고 사람이 적은 첫 명단입니다. `개성` 탭의 답과 다를 수 있습니다. 띠 한 칸은 구간 하나이고 왼쪽이 옛날, 오른쪽이 최근입니다.</div>
+<div id="roster"></div>
+</section>
+<section data-p="설정" hidden>
+<div class="emph">
+<div class="srow"><div class="sname">과거 범위</div><div class="caps" id="yrs"></div></div>
+<div class="srow"><div class="sname">간격</div><div class="smean">구간 하나의 길이입니다. 20거래일은 약 한 달입니다.</div><div class="caps" id="wins"></div></div>
+<div class="srow"><div class="sname">평범의 범위<b>가운데 <span class="vio"><span id="bv">80</span>%</span></b></div><div class="smean">아래쪽 <span id="tv">10</span>% · 위쪽 <span id="tv2">10</span>% 가 평범 밖입니다.</div>
+<input id="band" type="range" min="70" max="90" step="1" value="80"><div class="ticks"><span>70% (좁게)</span><span>80%</span><span>90% (넓게)</span></div></div>
+<div class="srow"><div class="sname">개성이 드러난 시기<b><input id="minrun" class="num" type="number" min="1" max="12" value="3"> 구간부터</b></div><div class="smean">평범 밖 구간이 이만큼 이어져야 한 번으로 셉니다. 그보다 짧은 것은 세지 않고 따로 적습니다.</div></div>
+<div class="srow"><div class="sname">볼 칸</div><div class="caps" id="pick"></div></div>
+</div>
+<div class="guide" id="setg" style="margin-top:10px"></div>
+</section>
+</main>
+<div class="pop" id="pop" hidden role="dialog" aria-modal="true"><div class="popbox"><div class="pophead"><h3 class="poptitle" id="popt"></h3><button class="popx" id="popx" aria-label="닫기">×</button></div><div class="popbody" id="popb"></div></div></div>
+<script>
+const D=__DATA__, COLS=__COLS__, WINS=__WINS__, LABELS=__LABELS__;let W=20,P=null,Y=3,LB=[];
+const TABS=['개성','구간','명단','설정'];let TAB=TABS.includes(decodeURIComponent(location.hash.slice(1)))?decodeURIComponent(location.hash.slice(1)):'개성',SG='A',SC=0;   // 고른 탭은 URL 해시에 남긴다(가이드라인 12절)
+const $=id=>document.getElementById(id);
+const q=(a,p)=>{const i=(a.length-1)*p,f=Math.floor(i);return a[f]+(a[Math.min(f+1,a.length-1)]-a[f])*(i-f)};
+const fmt=(v,d)=>v.toFixed(d);
+const CHEV='<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l4 4 4-4"/></svg>';
+const CN=COLS.map(c=>c[1].split(' (')[0]);                               // 칸 이름(괄호 뺀 것)
+const dot=d=>{const [y,m,dd]=d.split('-');return `${y}.${+m}.${+dd}`};      // 날짜는 점으로, 앞자리 0 없이(가이드라인 5절)
+const lbk=s=>s.split(' ~ ').map(dot).join(' ~ ');
+const tri=(v,dec,unit,px)=>v===0?`0${unit}`:`<span class="${v>0?'up':'dn'}"><span class="tr" style="font-size:${px}px">${v>0?'▲':'▼'}</span>${Math.abs(v).toFixed(dec)}${unit}</span>`;   // 증감 = 삼각형 + 절댓값 + 증감 색, 삼각형은 글자의 80%
+const vio=t=>`<span class="vio">${t}</span>`;
+// 툴팁 — 되풀이되는 설명글은 ? 아이콘 뒤 팝업으로(가이드라인 11절: 뜻 한 문장 + `· 라벨 : 풀이` 줄). 글은 data-tip 에 줄바꿈으로 담는다
+const QICON='<svg viewBox="0 0 16 16" width="20" height="20" aria-hidden="true" style="display:block" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.2"/><text x="8" y="11.6" text-anchor="middle" fill="currentColor" stroke="none" font-family="Arial, Helvetica, sans-serif" font-size="11" font-weight="700">?</text></svg>';
+const att=t=>String(t).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/\n/g,'&#10;');
+const tip=(title,text)=>`<button class="tip" data-tip-title="${att(title)}" data-tip="${att(text)}" aria-label="${att(title)} 설명">${QICON}</button>`;
+const tipL=(label,text)=>`<span>${label}${tip(label,text)}</span>`;
+function openTip(b){$('popt').textContent=b.dataset.tipTitle;
+  $('popb').innerHTML=b.dataset.tip.split('\n').map(l=>{const e=l.replace(/&/g,'&amp;').replace(/</g,'&lt;');if(!l.startsWith('· '))return `<p>${e}</p>`;
+    const t=e.slice(2),k=t.indexOf(' : ');return `<div class="popli"><i></i><span>${k>0&&k<=14?`<b>${t.slice(0,k)}</b>${t.slice(k)}`:t}</span></div>`}).join('');$('pop').hidden=false}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')$('pop').hidden=true});
+$('wins').innerHTML=WINS.map(w=>`<button class="cap" data-w="${w}"></button>`).join('');
+$('yrs').innerHTML=[1,2,3].map(y=>`<button class="cap" data-y="${y}">최근 ${y}년</button>`).join('');
+$('yrs').addEventListener('click',e=>{if(e.target.dataset.y){Y=+e.target.dataset.y;P=null;draw()}});
+const pieces=w=>Math.min(LABELS[w].length,Math.floor(252*Y/w));   // 고른 범위 안에 들어가는 구간 수(뒤에서부터)
+function view(){const n=pieces(W);LB=LABELS[W].slice(-n);D.forEach(x=>{x.v=x.w[W].slice(-n)})}
+$('wins').addEventListener('click',e=>{if(e.target.dataset.w){W=+e.target.dataset.w;P=null;draw()}});
+function calc(b){const t=(100-b)/200,np=LB.length,lim=[];
+  D.forEach(x=>{x.st=COLS.map(()=>new Array(np).fill(null))});
+  for(let p=0;p<np;p++){lim.push([]);COLS.forEach(([c],ci)=>{
+    const vals=D.map(x=>x.v[p]?x.v[p][c]:null).filter(v=>v!=null).sort((x,y)=>x-y);
+    const lo=q(vals,t),hi=q(vals,1-t),md=q(vals,.5);lim[p].push([lo,md,hi,vals]);
+    D.forEach(x=>{const r=x.v[p];if(r)x.st[ci][p]=r[c]<lo?-1:r[c]>hi?1:0})})}
+  return lim}
+$('pick').innerHTML=COLS.map((c,i)=>`<label class="cap on"><input type="checkbox" data-i="${i}" checked>${CN[i]}</label>`).join('');
+$('pick').addEventListener('change',()=>draw());
+const picked=()=>[...$('pick').querySelectorAll('input')].filter(x=>x.checked).map(x=>+x.dataset.i);
+const mstrip=a=>'<span class="strip">'+a.map((v,i)=>`<u class="${v==null?'n':v===2?'m':v<0?'l':v>0?'h':''}${i===P?' c':''}"></u>`).join('')+'</span>';
+const strip=(a,cur)=>'<span class="strip">'+a.map((v,i)=>`<u class="${v==null?'n':v<0?'l':v>0?'h':''}${i===cur?' c':''}"></u>`).join('')+'</span>';
+// 목록 = 전부 싣고 5개 펼침 + 나머지 접기(상한으로 버리지 않는다)
+const fold=(list,one,empty,noun)=>{if(!list.length)return `<div class="empty">${empty}</div>`;const head=list.slice(0,5).map(one).join(''),rest=list.slice(5);
+  return rest.length?`<div data-box>${head}<div data-rest hidden>${rest.map(one).join('')}</div><button class="fbtn" data-tg data-c="${noun} ${rest.length}명 더 보기"><span class="lb">${noun} ${rest.length}명 더 보기</span>${CHEV}</button></div>`:head};
+document.addEventListener('click',e=>{const tb=e.target.closest&&e.target.closest('[data-tip]');if(tb){openTip(tb);return}
+  if(e.target.id==='pop'||e.target.id==='popx'){$('pop').hidden=true;return}
+  const ch=e.target.closest&&e.target.closest('[data-cc]');if(ch){CC[ch.dataset.s]=+ch.dataset.cc;const x=D.find(d=>d.s===ch.dataset.s);ch.closest('[data-tc]').innerHTML=timeBlock(x);return}
+  const c=e.target.closest&&e.target.closest('[data-tab],[data-g],[data-c]');
+  if(c){if(c.dataset.tab){TAB=c.dataset.tab;history.replaceState(null,'','#'+encodeURIComponent(TAB));window.scrollTo(0,0)}else if(c.dataset.g)SG=c.dataset.g;else SC=+c.dataset.c;draw();return}
+  const b=e.target.closest&&e.target.closest('[data-tg]');if(!b)return;const r=b.closest('[data-box]').querySelector(':scope > [data-rest]');
+  r.hidden=!r.hidden;b.classList.toggle('open',!r.hidden);if(b.dataset.c)b.querySelector('.lb').textContent=r.hidden?b.dataset.c:'접기'});
+
+let LIM=null,USE=[];const CC={};
+const cw=()=>Math.max(240,Math.min(626,(($('answer').clientWidth||320)-26)|0));
+// 범위 막대 한 줄 — 회색 막대 = 대부분의 종목 범위, 주황 점 = 이 종목. 점이 막대 밖이면 범위 밖
+function rangeRow(name,val,lo,hi,unit,dec,right,sub,max0){const W=cw(),H=48,pl=8,pr=8,max=max0||Math.max(hi,val)*1.15||1;
+  const X=v=>Math.round(pl+Math.max(0,Math.min(v,max))/max*(W-pl-pr)),cx=X(val),x0=X(lo),x1=Math.max(x0+2,X(hi)),mid=Math.max(44,Math.min(W-44,Math.round((x0+x1)/2)));
+  const anc=cx<34?'start':cx>W-34?'end':'middle',tx=anc==='start'?pl:anc==='end'?W-pr:cx;
+  return `<div class="rr"><div class="rrh"><span class="rrn">${name}</span><span class="rrv">${right}</span></div>${sub?`<div class="rrs">${sub}</div>`:''}`+
+    `<svg width="${W}" height="${H}" role="img" aria-label="${name} 이 종목 ${val.toFixed(dec)}${unit}, 대부분의 종목 ${lo.toFixed(dec)} ~ ${hi.toFixed(dec)}${unit}">`+
+    `<line x1="${pl}" y1="26" x2="${W-pr}" y2="26" stroke="#EEF2F7" stroke-width="2"/><rect x="${x0}" y="22" width="${x1-x0}" height="8" rx="4" fill="#CBD5E1"/>`+
+    `<circle cx="${cx}" cy="26" r="6" fill="#F59E0B" stroke="#fff" stroke-width="2"/>`+
+    `<text x="${tx}" y="13" text-anchor="${anc}" font-size="13" font-weight="700" fill="#D97706">${val.toFixed(dec)}${unit}</text>`+
+    `<text x="${mid}" y="45" text-anchor="middle" font-size="12" fill="#6B7280">${lo.toFixed(dec)} ~ ${hi.toFixed(dec)}${unit}</text></svg></div>`}
+// 구간마다 시간 그래프 — 회색 띠 = 대부분의 종목 범위, 주황 선 = 이 종목, 점 = 범위 밖이던 구간
+function timeChart(x,ci){const c=COLS[ci][0],np=LB.length,W=cw(),H=150,pl=30,pr=8,pt=8,pb=24,ps=[];
+  for(let p=0;p<np;p++)if(x.v[p])ps.push(p);if(!ps.length)return '';
+  const ymax=Math.max(...ps.map(p=>Math.max(x.v[p][c],LIM[p][ci][2])))*1.08||1,X=p=>Math.round(np>1?pl+p*(W-pl-pr)/(np-1):(pl+W-pr)/2),Y=v=>Math.round(H-pb-Math.max(0,v)/ymax*(H-pt-pb));
+  const all=[...Array(np).keys()],band=all.map(p=>`${X(p)},${Y(LIM[p][ci][2])}`).concat(all.slice().reverse().map(p=>`${X(p)},${Y(LIM[p][ci][0])}`)).join(' ');
+  const segs=[];let cur=[];for(let p=0;p<np;p++){if(x.v[p])cur.push(`${X(p)},${Y(x.v[p][c])}`);else if(cur.length){segs.push(cur);cur=[]}}if(cur.length)segs.push(cur);
+  const dots=ps.filter(p=>x.st[ci][p]).map(p=>`<circle cx="${X(p)}" cy="${Y(x.v[p][c])}" r="3" fill="${x.st[ci][p]>0?'#ED8E87':'#82B1F0'}" stroke="#fff" stroke-width="1"/>`).join('');
+  const ys=[];let last='';for(let p=0;p<np;p++){const y=LB[p].slice(0,4);if(y!==last){ys.push([X(p),y]);last=y}}   // 해가 바뀌는 구간에 세로선 + 연도. 다음 연도와 40px 안이면 앞의 것은 글자를 뺀다
+  const yr=ys.map(([px,y],k)=>`<line x1="${px}" y1="${pt}" x2="${px}" y2="${H-pb}" stroke="#ECF0F5"/>`+(px<W-30&&(k===ys.length-1||ys[k+1][0]-px>=40)?`<text x="${px+2}" y="${H-7}" font-size="13" fill="#6B7280">${y}</text>`:'')).join('');
+  const d=COLS[ci][2];
+  return `<svg width="${W}" height="${H}" role="img" aria-label="구간마다 ${CN[ci]}">${yr}<line x1="${pl}" y1="${H-pb}" x2="${W-pr}" y2="${H-pb}" stroke="#CBD5E1"/>`+
+    `<text x="${pl-4}" y="${pt+8}" text-anchor="end" font-size="10" fill="#6B7280">${ymax.toFixed(d)}</text><text x="${pl-4}" y="${H-pb}" text-anchor="end" font-size="10" fill="#6B7280">0</text>`+
+    `<polygon points="${band}" fill="#E2E8F0"/>`+segs.map(s=>`<polyline points="${s.join(' ')}" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`).join('')+dots+`</svg>`}
+function timeBlock(x){const ci=USE.includes(CC[x.s])?CC[x.s]:USE[0];if(ci==null)return '';const u0=COLS[ci][3],unit=u0==='개'?'일':u0;
+  return `<span class="ct"><i>※</i> 구간마다 ${CN[ci]} <small>(${unit})</small></span>`+
+    (USE.length>1?`<div class="chips">${USE.map(i=>`<button class="chip${i===ci?' on':''}" data-cc="${i}" data-s="${x.s}">${CN[i]}</button>`).join('')}</div>`:'')+timeChart(x,ci)+
+    `<div class="lg2"><span><u style="background:#F59E0B"></u>이 종목</span><span><u style="background:#E2E8F0"></u>대부분의 종목 범위</span><span><u style="background:#ED8E87;width:8px;border-radius:50%"></u>범위 위쪽 밖</span><span><u style="background:#82B1F0;width:8px;border-radius:50%"></u>범위 아래쪽 밖</span></div>`}
+// 발표마다 첫 거래일 등락 — 세로 막대(오름 #ED8E87 · 내림 #82B1F0), 숫자는 부호 + 증감 색. 넓으면 가로로 넘겨 본다
+function earnBars(ev){const slot=38,pl=6,W=Math.max(cw(),pl*2+ev.length*slot),H=170,pt=20,pb=38,mp=Math.max(0,...ev.map(r=>r[1])),mn=Math.max(0,...ev.map(r=>-r[1])),k=(H-pt-pb-32)/((mp+mn)||1),y0=Math.round(pt+16+mp*k);
+  let s='',last='';ev.forEach((r,i)=>{const cx=Math.round(pl+slot*i+slot/2),h=Math.max(1,Math.round(Math.abs(r[1])*k)),up=r[1]>=0,[y,m]=r[0].split('-');
+    s+=`<rect x="${cx-7}" y="${up?y0-h:y0}" width="14" height="${h}" fill="${up?'#ED8E87':'#82B1F0'}"/>`+
+      `<text x="${cx}" y="${up?y0-h-5:y0+h+14}" text-anchor="middle" font-size="13" font-weight="700" fill="${up?'#D93025':'#1A73E8'}">${up?'+':'−'}${Math.abs(r[1]).toFixed(1)}</text>`+
+      `<text x="${cx}" y="${H-20}" text-anchor="middle" font-size="13" fill="#6B7280">${+m}월</text>`+(y!==last?`<text x="${cx}" y="${H-5}" text-anchor="middle" font-size="12" fill="#6B7280">${y}</text>`:'');last=y});
+  return `${W>cw()?'<div class="hint">‹ 넘겨 보기</div>':''}<div class="hs"><svg width="${W}" height="${H}" role="img" aria-label="발표마다 첫 거래일 등락"><line x1="0" y1="${y0}" x2="${W}" y2="${y0}" stroke="#CBD5E1"/>${s}</svg></div>`}
+function answer(lim){LIM=lim;const use=picked(),np=LB.length,band=+$('band').value;USE=use;
+  [...$('pick').querySelectorAll('label')].forEach(l=>l.classList.toggle('on',l.querySelector('input').checked));
+  const out={A:[],B:[],C:[],D:[],plain:0,none:0};
+  D.forEach(x=>{let n=0,k=0,up=0,dn=0;const mix=new Array(np).fill(null),per=use.map(()=>[0,0]);
+    for(let p=0;p<np;p++){if(!x.v[p])continue;n++;let u=false,l=false;
+      use.forEach((ci,j)=>{const s=x.st[ci][p];if(s>0){u=true;per[j][0]++}else if(s<0){l=true;per[j][1]++}});
+      mix[p]=u&&l?2:u?1:l?-1:0;if(u||l)k++;if(u)up++;if(l)dn++}
+    // 드러난 시기 = 평범 밖 구간이 이어진 한 덩어리(이어진 것은 한 번으로 묶음, 길잡이 0-1)
+    const rs=[];let cur=null,tq=0;
+    for(let p=0;p<np;p++){const v=mix[p];if(v==null)continue;if(v!==0){if(!cur){cur={a:p,b:p,n:0,u:false,l:false};rs.push(cur)}cur.b=p;cur.n++;if(v>0||v===2)cur.u=true;if(v<0||v===2)cur.l=true;tq=0}else{cur=null;tq++}}
+    x.runs=rs;x.tq=tq;
+    x.mix=mix;x.n=n;x.k=k;x.share=n?k/n*100:0;x.per=per;
+    x.side=up&&dn&&Math.min(up,dn)>=0.3*Math.max(up,dn)?'위 · 아래 섞임':up>=dn?'위쪽 (거친 쪽)':'아래쪽 (잔잔한 쪽)';
+    x.auto=n?'':null});
+  // 평범 = 아이의 band% — 평범 밖 구간 비율로 줄 세워 위쪽 (100 − band)% 만 개성. 볼 칸을 몇 개 고르든 평범의 몫은 그대로.
+  const have=D.filter(x=>x.auto==='').sort((a,b)=>b.share-a.share),nTop=Math.round(have.length*(100-band)/100);
+  let top=have.slice(0,nTop).filter(x=>x.share>0);const cut=top.length?top[top.length-1].share:0;
+  top.forEach((x,i)=>{x.auto=i<top.length/3?'A':i<top.length*2/3?'B':'C'});out.cut=cut;
+  D.forEach(x=>{if(x.g==='D')out.D.push(x);else if(x.auto==null)out.none++;else if(x.auto==='')out.plain++;else out[x.auto].push(x)});
+  for(const g of 'ABCD')out[g].sort((a,b)=>b.share-a.share);
+  // 독자가 읽을 설명 — 우리끼리 말 없이 기간 · 견준 대상 · 값을 풀어 적는다(2026-11-24 사용자 "아주 자세히 적어 독자가 알 수 있게")
+  const UW={20:'약 한 달',60:'약 석 달',120:'약 반년',200:'약 열 달'},U=UW[W],N=Math.max(1,+$('minrun').value||3);
+  const ymk=(p,e)=>{const d=LB[p].split(' ~ ')[e];return `${d.slice(0,4)}년 ${+d.slice(5,7)}월`},spanK=r=>{const a=ymk(r.a,0),b=ymk(r.b,1);return a===b?a:`${a} ~ ${b}`};
+  const dur=n=>{const m=Math.max(1,Math.round(n*W/21)),y=Math.floor(m/12),o=m%12;return '약 '+(y?y+'년'+(o?' '+o+'개월':''):o+'개월')};
+  const med=a=>q(a.slice().sort((x,y)=>x-y),.5),li=t=>`<li><i></i><span>${t}</span></li>`;
+  const CW=[['컸습니다','작았습니다'],['많았습니다','적었습니다'],['컸습니다','작았습니다'],['많았습니다','적었습니다']];
+  const TIP_READ=`과거를 같은 길이의 구간으로 나누고, 구간마다 종목을 값 순서로 줄 세워 가운데에 있는 종목들을 대부분의 종목으로 봅니다.\n· 지금 설정 : 최근 ${Y}년을 ${U}(${W}거래일)씩 ${np}구간, 가운데 ${band}%\n· 견준 대상 : 같은 구간의 S&P 500 ${D.length}종목\n· 개성이 드러난 시기 : 그 범위 밖에 ${N}구간 이상 이어서 머문 때입니다. 그보다 짧으면 세지 않고 따로 적습니다\n· 띠 : 한 칸이 구간 하나이고 왼쪽이 옛날입니다`;
+  const TIP_TERM=`네 가지를 구간마다 다시 잽니다.\n· 평소 하루 폭 : 하루 동안 오르내린 폭, 그날 고가와 저가의 차이\n· 예고 없는 돌 수 : 실적 발표일도 시장 전체가 흔들린 날도 아닌데 하루에 5% 넘게 움직인 날 수\n· 방향 크기 : 구간 처음과 끝 사이의 등락 크기, 오름과 내림을 가리지 않습니다\n· 거래량 튄 날 수 : 거래량이 평소의 2배를 넘은 날 수`;
+  const TIP_EARN=`실적 발표 뒤 첫 거래일에 주가가 얼마나 움직였는지를 다른 종목과 견줍니다.\n· 견준 대상 : 같은 기간 S&P 500 종목의 가운데 ${band}%\n· 평소 하루 등락 : 발표 전 60거래일의 가운데 값\n· 머문 횟수 : 발표 뒤 20거래일 동안 발표 전 가격으로 한 번도 돌아오지 않은 횟수`;
+  const TIP_GROUP=`구간 하나에서 볼 칸 중 하나라도 평범 밖이면 그 구간을 평범 밖으로 셉니다.\n· 개성 : 그 비율이 높은 순으로 종목의 위쪽 ${100-band}%\n· A · B · C : 개성 안에서 센 순서대로 3분의 1씩\n· D 단체 : 같은 때 같이 움직인 무리, 사람이 넣었습니다\n· 평범 : 나머지이고 이름을 싣지 않습니다`;
+  const colLine=(x,r,ci)=>{const [c,,d,u0]=COLS[ci],unit=u0==='개'?'일':u0,ps=[];for(let p=r.a;p<=r.b;p++)if(x.v[p])ps.push(p);
+    const part=dir=>{const hit=ps.filter(p=>x.st[ci][p]===dir);if(!hit.length)return '';
+      return `${hit.length===ps.length?`${ps.length}구간 모두에서`:`${ps.length}구간 중 ${vio(hit.length+'구간')}에서`} 대부분의 종목보다 ${CW[ci][dir>0?0:1]}. 그때 이 종목은 대체로 <b>${fmt(med(hit.map(p=>x.v[p][c])),d)}${unit}</b>, 대부분의 종목은 ${fmt(med(hit.map(p=>lim[p][ci][0])),d)} ~ ${fmt(med(hit.map(p=>lim[p][ci][2])),d)}${unit}.`};
+    const u=part(1),l=part(-1);return li(`<b>${CN[ci]}</b> : ${u||l?[u,l].filter(Boolean).join(' '):'대부분의 종목과 같은 범위 안이었습니다.'}`)};
+  // 실적 발표 뒤 첫 거래일의 반응 — 설명에만 붙인다. 견줄 대상 = 같은 기간 모든 종목의 가운데 band%
+  const t0=(100-band)/200,d0=LB[0].slice(0,10);
+  D.forEach(x=>{const ev=(x.e||[]).filter(r=>r[0]>=d0);if(ev.length<3){x.es=null;return}
+    const ab=ev.map(r=>Math.abs(r[1])),st=ev.filter(r=>r[3]!=null),big=ab.filter(v=>v>=5).length,sk=st.filter(r=>r[3]).length;
+    x.es={n:ev.length,ev,react:med(ab),times:med(ev.filter(r=>r[2]>0).map(r=>Math.abs(r[1])/r[2])),big,bigS:big/ev.length*100,stN:st.length,stK:sk,stay:st.length?sk/st.length*100:null}});
+  const eb=k=>{const a=D.map(x=>x.es?x.es[k]:null).filter(v=>v!=null&&!isNaN(v)).sort((m,n)=>m-n);return [q(a,t0),q(a,1-t0)]};
+  const EB={react:eb('react'),times:eb('times'),bigS:eb('bigS'),stay:eb('stay')};
+  const vd=(v,b,up,dn)=>v>b[1]?`대부분의 종목보다 ${up}`:v<b[0]?`대부분의 종목보다 ${dn}`:'대부분의 종목과 같은 범위 안입니다';
+  const eh=`<p class="ph">실적 발표 뒤 첫 거래일의 반응${tip('실적 발표 뒤 첫 거래일의 반응',TIP_EARN)}</p>`;
+  const earnP=x=>{const s=x.es;if(!s)return eh+`<p class="tn">이 기간에는 견줄 만큼의 실적 발표(3번 이상)가 없습니다.</p>`;
+    return eh+`<p class="tn">최근 ${Y}년의 실적 발표 ${s.n}번</p><ul>`+
+      li(`<b>첫 거래일의 등락 크기</b> : 대체로 <b>${s.react.toFixed(1)}%</b>, 대부분의 종목은 ${EB.react[0].toFixed(1)} ~ ${EB.react[1].toFixed(1)}%. ${vd(s.react,EB.react,'컸습니다','작았습니다')}.`)+
+      li(`<b>평소 하루 등락의 몇 배</b> : 대체로 <b>${s.times.toFixed(1)}배</b>, 대부분의 종목은 ${EB.times[0].toFixed(1)} ~ ${EB.times[1].toFixed(1)}배. ${vd(s.times,EB.times,'컸습니다','작았습니다')}.`)+
+      li(`<b>그날 5% 넘게 움직인 횟수</b> : ${s.n}번 중 ${vio(s.big+'번')} (${s.bigS.toFixed(0)}%), 대부분의 종목은 ${EB.bigS[0].toFixed(0)} ~ ${EB.bigS[1].toFixed(0)}%. ${vd(s.bigS,EB.bigS,'많았습니다','적었습니다')}.`)+
+      (s.stay!=null?li(`<b>움직인 자리에 머문 횟수</b> : ${s.stN}번 중 ${vio(s.stK+'번')} (${s.stay.toFixed(0)}%), 대부분의 종목은 ${EB.stay[0].toFixed(0)} ~ ${EB.stay[1].toFixed(0)}%. ${vd(s.stay,EB.stay,'많았습니다','적었습니다')}.`):'')+
+      `</ul><p class="tn">발표마다 첫 거래일 등락 : ${s.ev.map(r=>`<span style="white-space:nowrap">${dot(r[0])} ${tri(r[1],1,'%',11)}</span>`).join(' · ')}</p>`};
+  const desc=x=>{const head=`<div class="tips">${tipL('읽는 법',TIP_READ+'\n· 범위 막대 : 회색 막대가 대부분의 종목 범위이고 주황 점이 이 종목입니다. 점이 막대 밖이면 범위 밖입니다')}<i>·</i>${tipL('용어',TIP_TERM)}</div><p>${x.n<np?`이 종목은 자료가 있는 ${x.n}구간(${dur(x.n)})만 봤습니다. `:''}`;
+    const lg=(x.runs||[]).filter(r=>r.n>=N),sh=(x.runs||[]).filter(r=>r.n<N),ls=x.runs&&x.runs[x.runs.length-1],whole=x.runs&&x.runs.length===1&&x.k===x.n&&x.n>=N;
+    const ps=[];for(let p=0;p<np;p++)if(x.v[p])ps.push(p);
+    // ② 칸마다 범위 막대 — 살펴본 구간 전체의 가운데 값끼리 견준다(시기별 차이는 ③ 시간 그래프가 보여 준다)
+    const rows=use.map((ci,j)=>{const [c,,d,u0]=COLS[ci],unit=u0==='개'?'일':u0,[u,l]=x.per[j];
+      return rangeRow(CN[ci],med(ps.map(p=>x.v[p][c])),med(ps.map(p=>LIM[p][ci][0])),med(ps.map(p=>LIM[p][ci][2])),unit,d,`${x.n}구간 중 ${vio((u+l)+'구간')}`,u&&l?`범위 위쪽 밖 ${u}구간 · 아래쪽 밖 ${l}구간`:u?'범위 위쪽 밖':l?'범위 아래쪽 밖':'범위 밖이던 구간 없음')}).join('');
+    const s=x.es;
+    const earn=`<span class="ct">실적 발표 뒤 첫 거래일의 반응${tip('실적 발표 뒤 첫 거래일의 반응',TIP_EARN)}</span>`+(!s?`<p class="tn">이 기간에는 견줄 만큼의 실적 발표(3번 이상)가 없습니다.</p>`:
+      `<p class="tn" style="margin-top:0">최근 ${Y}년의 실적 발표 ${s.n}번</p>`+
+      rangeRow('첫 거래일의 등락 크기',s.react,EB.react[0],EB.react[1],'%',1,'대체로 '+vio(s.react.toFixed(1)+'%'))+
+      rangeRow('평소 하루 등락의 몇 배',s.times,EB.times[0],EB.times[1],'배',1,'대체로 '+vio(s.times.toFixed(1)+'배'))+
+      rangeRow('그날 5% 넘게 움직인 비율',s.bigS,EB.bigS[0],EB.bigS[1],'%',0,`${s.n}번 중 ${vio(s.big+'번')}`,'',100)+
+      (s.stay!=null?rangeRow('움직인 자리에 머문 비율',s.stay,EB.stay[0],EB.stay[1],'%',0,`${s.stN}번 중 ${vio(s.stK+'번')}`,'',100):'')+
+      `<span class="ct"><i>※</i> 발표마다 첫 거래일 등락 <small>(%)</small></span>${earnBars(s.ev)}`);
+    return head+`${!x.runs||!x.runs.length?'이 종목은 대부분의 종목 범위를 벗어난 구간이 없었습니다.':whole?`이 종목은 <b>살펴본 ${x.n}구간(${dur(x.n)}) 내내</b> 대부분의 종목 범위 밖에 있었습니다.`:lg.length?`이 종목의 개성이 드러난 시기는 ${vio(lg.length+'번')}입니다 (${lg.map(r=>`${spanK(r)}, ${dur(r.n)}`).join(' / ')}).`:'이 종목은 개성이 드러난 시기가 없었습니다.'}`+
+      `${sh.length?` 이 밖에 ${N}구간보다 짧게 범위를 벗어났다가 돌아온 때가 ${vio(sh.length+'번')} 있었습니다.`:''} 가장 최근 구간(${lbk(LB[np-1])})에서는 ${!ls||x.tq?'대부분의 종목과 같은 범위 안입니다.':ls.n>=N?'여전히 범위 밖입니다.':`범위 밖입니다 (${ls.n}구간째).`}</p>`+
+      `<span class="ct">대부분의 종목과 견준 값</span>${rows}<div data-tc="${x.s}">${timeBlock(x)}</div>`+earn};
+  const sub=x=>{const a=use.map((ci,j)=>{const [u,l]=x.per[j];return u+l?`${CN[ci]} ${[u?'위쪽 '+u:'',l?'아래쪽 '+l:''].filter(Boolean).join(', ')}`:''}).filter(Boolean);
+    return `${x.side}${a.length?' · '+a.join(' · '):''}${x.g==='D'?` · 설정으로는 ${x.auto||'평범'}`:''}`};
+  let first=true;
+  const one=x=>{const open=first;first=false;return `<div class="kid" data-box><div class="khead"><span class="kname">${x.k2||x.s}${x.seen?'<span class="pill">그림확인</span>':''}</span>`+
+    `<span class="kval">${x.n}구간 중 ${vio(x.k+'구간')}<button class="fb${open?' open':''}" data-tg aria-label="설명 펼치기">${CHEV}</button></span></div>`+
+    `${mstrip(x.mix)}<div class="ksub">${sub(x)}</div><div class="ds" data-rest${open?'':' hidden'}>${desc(x)}</div></div>`};
+  const GT={A:'개성이 가장 센 3분의 1',B:'그다음 3분의 1',C:'나머지 3분의 1',D:'단체 그룹'};
+  $('gsub').innerHTML=[...'ABCD'].map(g=>`<button class="sub1" role="tab" data-g="${g}" aria-selected="${g===SG}">${g==='D'?'D 단체':g} <small>(${out[g].length})</small></button>`).join('');
+  const sec=g=>`<div class="gh" style="margin-top:0"><span class="box">${g}</span><span>${GT[g]}${tip('나누는 법',TIP_GROUP)}</span><span class="cnt vio">${out[g].length}명</span></div>${fold(out[g],one,'없음','종목')}`;
+  $('ansg').innerHTML=`지금 설정 : 최근 ${Y}년 · ${W}일 간격 ${np}구간 · 평범 = 가운데 ${band}% · 볼 칸 ${use.length}개 · 드러난 시기 ${N}구간부터. 값은 설정 탭에서 바꿉니다.`;
+  $('setg').innerHTML=`지금 설정의 답 : A ${out.A.length}명 · B ${out.B.length}명 · C ${out.C.length}명 · D 단체 ${out.D.length}명 · 평범 ${out.plain}명`;
+  $('answer').innerHTML=sec(SG)+
+    `<div class="gh"><span>평범</span><span class="cnt vio">${out.plain}명</span></div><div class="guide">평범한 종목은 배경이라 이름을 싣지 않습니다.${out.none?` 이 범위에 구간이 하나도 없는 종목 ${out.none}명.`:''}</div>`+
+    `<div class="legend"><span><u style="background:var(--c-up)"></u>평범 위쪽 밖</span><span><u style="background:var(--c-dn)"></u>평범 아래쪽 밖</span><span><u style="background:#A78BFA"></u>한 구간에서 위 · 아래 둘 다 (칸이 다름)</span><span><u style="background:var(--line)"></u>평범 안</span><span><u style="outline:2px solid #111"></u>지금 보는 구간</span></div>`}
+D.forEach(x=>{x.k2=x.k;x.seen=!!x.g&&x.g!=='미정'});
+const tag=x=>x.g?`<span class="box" style="margin-right:5px">${x.g}</span>`:'';
+function draw(){$('tabs').innerHTML=TABS.map(t=>`<button class="tab" role="tab" data-tab="${t}" aria-selected="${t===TAB}">${t}</button>`).join('');
+  document.querySelectorAll('[data-p]').forEach(p=>{p.hidden=p.dataset.p!==TAB});
+  $('csub').innerHTML=COLS.map((c,i)=>`<button class="sub1" role="tab" data-c="${i}" aria-selected="${i===SC}">${CN[i]}</button>`).join('');
+  view();const b=+$('band').value,t=(100-b)/2,np=LB.length;
+  if(P==null||P>=np)P=np-1;$('piece').max=np-1;$('piece').value=P;
+  $('bv').textContent=b;$('tv').textContent=$('tv2').textContent=(t%1?t.toFixed(1):t);
+  [...$('wins').children].forEach(x=>{x.classList.toggle('on',+x.dataset.w===W);x.textContent=`${x.dataset.w}일 (${pieces(+x.dataset.w)}구간)`});
+  [...$('yrs').children].forEach(x=>x.classList.toggle('on',+x.dataset.y===Y));
+  $('pv').textContent=`${np}구간 중 ${P+1}번째`;$('pd').textContent=lbk(LB[P]);
+  const lim=calc(b);answer(lim);let html='';
+  const Wd=Math.max(260,Math.min(626,(($('cards').clientWidth||320)-26)|0)),Hh=120;       // 그래프는 실제 px 로 그린다(SVG 를 축소하지 않는다, 가이드라인 6절)
+  COLS.forEach(([c,label,d,unit,why],ci)=>{if(ci!==SC)return;const [lo,md,hi,vals]=lim[P][ci];
+    const here=D.filter(x=>x.v[P]),val=x=>x.v[P][c];
+    const L=here.filter(x=>x.st[ci][P]<0).sort((x,y)=>val(x)-val(y)),H=here.filter(x=>x.st[ci][P]>0).sort((x,y)=>val(y)-val(x));
+    const n=vals.length,max=q(vals,.995),min=vals[0],X=i=>Math.round(i/(n-1)*Wd),Yv=v=>Math.round(Hh-6-(Math.min(v,max)-min)/(max-min||1)*(Hh-16));
+    const pts=vals.map((v,i)=>`${X(i)},${Yv(v)}`).join(' '),x0=X(L.length),x1=X(n-H.length-1);
+    const marks=here.filter(x=>x.g).map(x=>{const v=val(x),i=vals.indexOf(v),s=x.st[ci][P];return `<circle cx="${X(i)}" cy="${Yv(v)}" r="4" fill="${s<0?'#82B1F0':s>0?'#ED8E87':'#CBD5E1'}" stroke="#fff" stroke-width="1"><title>${x.k2||x.s} ${fmt(v,d)}${unit}</title></circle>`}).join('');
+    const cnt=(x,dir)=>x.st[ci].filter(v=>v===dir).length,all=x=>x.st[ci].filter(v=>v!=null).length;
+    const row=(dir,showVal)=>x=>`<div class="kid"><div class="khead"><span class="kname">${tag(x)}${x.k2||x.s}</span><span class="kval">${showVal?`${fmt(val(x),d)}${unit}`:`${all(x)}구간 중 ${vio(cnt(x,dir)+'구간')}`}</span></div>${strip(x.st[ci],P)}${showVal?`<div class="ksub">${all(x)}구간 중 ${cnt(x,dir)}구간에서 ${dir<0?'아래쪽':'위쪽'} 밖</div>`:''}</div>`;
+    const rep=dir=>D.filter(x=>cnt(x,dir)>=2).sort((x,y)=>cnt(y,dir)-cnt(x,dir));
+    html+=`<span class="ct" style="margin-top:0"><i>※</i> ${label.split(' (')[0]} <small>(${unit})</small>${tip(label.split(' (')[0],`${why}.\n· 선 : 이 구간의 종목을 작은 값에서 큰 값으로 줄 세운 것\n· 회색 바탕 : 평범의 범위\n· 점 : 그룹 명단의 종목`)}</span>
+    <div class="white"><svg width="${Wd}" height="${Hh}" role="img" aria-label="${label} 줄 세운 선"><rect x="${x0}" y="0" width="${Math.max(0,x1-x0)}" height="${Hh}" fill="#F1F5F9"/><polyline points="${pts}" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linejoin="round"/>${marks}</svg></div>
+    <div class="rows"><div class="rw"><span>이 구간의 가운데 값</span><span>${fmt(md,d)}${unit}</span></div><div class="rw"><span>평범의 범위</span><span>${fmt(lo,d)} ~ ${fmt(hi,d)}${unit}</span></div>
+    <div class="rw"><span>평범 아래쪽 밖</span><span>${vio(L.length+'명')}</span></div><div class="rw"><span>평범 위쪽 밖</span><span>${vio(H.length+'명')}</span></div></div>
+    <div class="gh"><span>이 구간에서 아래쪽 밖</span><span class="cnt vio">${L.length}명</span></div>${fold(L,row(-1,true),'없음','종목')}
+    <div class="gh"><span>이 구간에서 위쪽 밖</span><span class="cnt vio">${H.length}명</span></div>${fold(H,row(1,true),'없음','종목')}
+    <div class="gh"><span>되풀이 : 아래쪽 밖이던 구간이 많은 종목</span></div>${fold(rep(-1),row(-1,false),'두 구간 넘게 밖이던 종목이 없습니다','종목')}
+    <div class="gh"><span>되풀이 : 위쪽 밖이던 구간이 많은 종목</span></div>${fold(rep(1),row(1,false),'두 구간 넘게 밖이던 종목이 없습니다','종목')}`});
+  $('cards').innerHTML=html;
+  const here=D.filter(x=>x.v[P]),k=here.map(x=>COLS.filter((_,ci)=>x.st[ci][P]).length),cn=m=>k.filter(v=>m(v)).length;
+  $('sum').innerHTML=`이 구간에서 네 칸 모두 평범 안 ${cn(v=>v===0)}명 · 한 칸에서만 밖 ${cn(v=>v===1)}명 · 두 칸 ${cn(v=>v===2)}명 · 세 칸 넘게 ${cn(v=>v>=3)}명`;
+  $('roster').innerHTML=D.filter(x=>x.g).sort((a,b)=>a.g.localeCompare(b.g)).map(x=>`<div class="kid"><div class="khead"><span class="kname">${tag(x)}${x.k2||x.s}${x.seen?'<span class="pill">그림확인</span>':''}</span></div>`+
+    COLS.map((_,ci)=>`<div class="rk"><span>${CN[ci]}</span>${strip(x.st[ci],P)}</div>`).join('')+'</div>').join('')}
+$('band').addEventListener('input',draw);$('minrun').addEventListener('input',draw);$('piece').addEventListener('input',()=>{P=+$('piece').value;draw()});draw();
+</script></body></html>
