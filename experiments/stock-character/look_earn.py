@@ -38,6 +38,8 @@ plt.rcParams["axes.unicode_minus"] = False
 def main():
     bars = pd.read_pickle(os.path.join(STORE, "bars_us.pkl"))
     earn = pd.read_csv(os.path.join(STORE, "earn_days_us.csv"), parse_dates=["day"])
+    if "main" in earn.columns:
+        earn = earn[earn["main"] == 1]          # 본 발표만(붙어 나온 예비 · 다시 낸 공시는 뺌)
     rows, each = [], []
     for s, d in bars.items():
         if s.startswith("^") or len(d) < 400:

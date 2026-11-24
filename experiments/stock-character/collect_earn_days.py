@@ -13,7 +13,7 @@
     python experiments/stock-character/collect_earn_days.py --market us --only AAPL,KO   # 시험
 
 원본(회사별 공시 목록) = data/store/character/earn_raw/{us,kr}/종목.json — 있으면 다시 받지 않는다(--refresh 로 다시).
-결과 = data/store/character/earn_days_{us,kr}.csv (깃 밖): sym, day(공시일), kind, after_close, period, accepted
+결과 = data/store/character/earn_days_{us,kr}.csv (깃 밖): sym, day(공시일), kind, after_close, period, accepted, main(1 = 그 분기 본 발표 · 0 = 붙어 나온 다른 실적 항목 공시)
 AI 0 · 로컬 한 번. 부르는 횟수: EDGAR 회사당 1 + 옛 목록 파일 수(초당 5회로 늦춤) · DART 회사당 공시 유형 둘 × 쪽수(키당 하루 2만 회).
 EDGAR 는 연락처가 든 User-Agent 가 필요하다(없으면 403) — 환경 변수 또는 .env 의 EDGAR_USER_AGENT(이름 + 블로그 문의 메일).
 """
@@ -146,14 +146,35 @@ def us_events(raw):
             ev.append({**e, "kind": "8k202"})
         elif r["form"] in ("10-Q", "10-K"):
             ev.append({**e, "kind": r["form"].lower().replace("-", "")})
-    rel = first_only([e for e in ev if e["kind"] == "8k202"])
+    # 2.02 공시가 40일 안에 붙어 나오면(예비 숫자 → 진짜 실적, 다시 낸 숫자 …) 그 분기 보고서(10-Q · 10-K) 제출일에 가장 가까운(그날까지의 마지막) 것을 본 발표로.
+    # 옛 규칙(앞선 것만 남김)은 페덱스 2024-09-03 → 09-19, 애브비 분기마다 초순 예비 공시를 본 발표로 잘못 골랐다(2026-11-24 발견 — 3년 132종목 307쌍).
+    # 나머지 2.02 공시는 main = 0 으로 남긴다 — 그날 돌은 "예고 없는 돌"이 아니라 공시가 있던 날.
+    k8 = sorted([e for e in ev if e["kind"] == "8k202"], key=lambda x: (x["day"], x["accepted"]))
+    reps = sorted([e for e in ev if e["kind"] != "8k202"], key=lambda x: x["day"])
+    clusters = []
+    for e in k8:
+        if clusters and (_day(e["day"]) - _day(clusters[-1][-1]["day"])).days < GAP_DAYS:
+            clusters[-1].append(e)
+        else:
+            clusters.append([e])
+    rel, side = [], []
+    for cl in clusters:
+        pick = cl[-1]
+        if len(cl) > 1:
+            lim = (_day(cl[-1]["day"]) + datetime.timedelta(days=75)).isoformat()
+            rp = next((r for r in reps if cl[0]["day"] <= r["day"] <= lim), None)
+            if rp:
+                upto = [e for e in cl if e["day"] <= rp["day"]]
+                pick = upto[-1] if upto else cl[0]
+        rel.append({**pick, "main": 1})
+        side += [{**e, "main": 0} for e in cl if e is not pick]
     out = list(rel)
-    for rep in [e for e in ev if e["kind"] != "8k202"]:
+    for rep in reps:
         # 그 분기 끝(period) 뒤 ~ 보고서 제출일 사이에 실적 발표 공시가 있으면 그것이 첫 공개 — 없을 때만 보고서 날을 쓴다
         lo = rep["period"] or (_day(rep["day"]) - datetime.timedelta(days=100)).isoformat()
         if not any(lo < x["day"] <= rep["day"] for x in rel):
-            out.append(rep)
-    return first_only(out)
+            out.append({**rep, "main": 1})
+    return first_only(out) + side
 
 
 # ─── 한국: DART ─────────────────────────────────────────────────────────
@@ -294,7 +315,7 @@ def main():
     os.makedirs(STORE, exist_ok=True)
     out = os.path.join(STORE, f"earn_days_{a.market}.csv")
     with open(out, "w", newline="", encoding="utf-8") as f:
-        w = csv.DictWriter(f, fieldnames=["sym", "day", "kind", "after_close", "period", "accepted"])
+        w = csv.DictWriter(f, fieldnames=["sym", "day", "kind", "after_close", "period", "accepted", "main"], restval=1)
         w.writeheader()
         w.writerows(sorted(rows, key=lambda r: (r["sym"], r["day"])))
     print(f"저장 {out} ({len(rows)}줄)")
