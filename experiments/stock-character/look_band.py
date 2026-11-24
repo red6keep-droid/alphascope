@@ -4,7 +4,7 @@
 사용자: "중간값이 평범이지, 여기를 대략 80% 잡아 줘." · "기간을 20 · 60 · 120일로 나눈 것처럼 평범의 범위도 조절하게 해 줘. 90% 최고 · 70% 최소. 변화되는 것도 보고 싶다."
 → 평범 = 중간값을 가운데 둔 가운데 N%(기본 80, 70 ~ 90). 그 바깥(아래쪽 · 위쪽)이 개성 후보.
 
-    python experiments/stock-character/look_band.py     # → output/band.html (자료를 안에 담은 한 파일, 더블클릭으로 열림)
+    python experiments/stock-character/look_band.py     # → output/mock_band.html (자료를 안에 담은 한 파일) — 목업 목록 http://localhost:8800/ 의 `개성 있는 아이 찾기 게임`
 
 먼저 돌려 둘 것: look_stones.py(stones_us.csv) · look_earn.py(earn_react_us.csv). 미국 S&P 500 · 최근 3년.
 칸 넷: 평소 하루 폭(호수) · 예고 없는 돌 수 · 실적 날 등락 · 실적 때 평소의 몇 배.
@@ -18,7 +18,7 @@ import pandas as pd
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HERE, "..", ".."))
 STORE = os.path.join(ROOT, "data", "store", "character")
-OUT = os.path.join(HERE, "output", "band.html")
+OUT = os.path.join(HERE, "output", "mock_band.html")   # 목업 목록(http://localhost:8800/)에 뜨게 mock_ 이름
 ROSTER = {"COIN": "A", "BE": "A", "SMCI": "A", "BRK-B": "A", "KO": "A", "RSG": "A", "PG": "A", "L": "A", "LIN": "A", "WM": "A", "JNJ": "A",
           "TSLA": "B", "GLW": "B", "MSI": "C", "MSFT": "미정", "SCHW": "미정"}
 
