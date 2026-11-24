@@ -1,11 +1,63 @@
 {
-  "updated_at": "2026-11-24 12:50:00 UTC",
+  "updated_at": "2026-11-24 21:48:42 UTC",
   "items": [
+    {
+      "title": "AI debt markets shudder as Nvidia's top \"banker\" returns",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/24/nvidia-jensen-huang-ai-credit-markets.html",
+      "published": "2026-11-24 21:39:24",
+      "title_ko": "엔비디아의 최고 은행가 복귀 속 AI 부채 시장 동요",
+      "summary_ko": "젠슨 황의 엔비디아 CEO 복귀 하루 만인 화요일 일부 기업의 AI 부채 우려 증대",
+      "lines": [
+        "젠슨 황 엔비디아 CEO 복귀로 AI 채무 우려 확대",
+        "코어웨이브 주가 13% 급락",
+        "코어웨이브 2031년 만기 채권 수익률 17% 돌파"
+      ]
+    },
+    {
+      "title": "Dell earnings beat on AI strength, company authorizes $25 billion buyback",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/24/dell-earnings-report-q3-2027.html",
+      "published": "2026-11-24 21:29:03",
+      "title_ko": "델, AI 성장으로 실적 호조·250억 달러 자사주 매입 승인",
+      "summary_ko": "",
+      "lines": [
+        "델 테크놀로지스 3분기 실적 월가 예상 상회",
+        "델 250억 달러 자사주 매입 승인",
+        "델 4분기 매출 563억 달러, 주당 8.40달러 가이던스",
+        "델 AI 서버 매출 220억 달러, 전년 대비 291% 증가"
+      ]
+    },
+    {
+      "title": "Nvidia shares fall more than 5% as Huang comeback rally cools",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/24/nvidia-stock-jensen-huang-return.html",
+      "published": "2026-11-24 21:15:23",
+      "title_ko": "엔비디아 주가 5% 이상 하락, 황 복귀 랠리 식음",
+      "summary_ko": "",
+      "lines": [
+        "엔비디아 주가 5.86% 하락",
+        "마이크론 주가 10.97% 하락",
+        "코어웨이브 주가 11.84% 하락"
+      ]
+    },
+    {
+      "title": "Trump wanted Jensen Huang back. Now, the president is all alone in Washington",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/24/trump-jensen-huang-nvidia.html",
+      "published": "2026-11-24 21:13:39",
+      "title_ko": "트럼프, 젠슨 황 복귀 원했지만, 공화당은 국가 안보 위험 우려",
+      "summary_ko": "",
+      "lines": [
+        "엔비디아 이사회의 젠슨 황 CEO 복직 결정",
+        "중국 첩보원 연루 의혹 관련 의회 조사 지속 방침"
+      ]
+    },
     {
       "title": "Drugmaker Insmed shares rally 14% after Sanofi agrees to buy it in pharma’s biggest deal in three years",
       "source": "CNBC",
       "link": "https://www.cnbc.com/2026/11/24/insmed-sanofi-deal-stock-pharma.html",
-      "published": "2026-11-24 12:33:41",
+      "published": "2026-11-24 21:07:19",
       "title_ko": "제약사 인스메드 주가 14% 급등, 사노피가 3년 만의 최대 제약 인수합병으로 인수 합의",
       "summary_ko": "사노피, 최고 판매 의약품 독점권 상실로 세기말 매출 감소 직면",
       "lines": [
@@ -14,141 +66,102 @@
       ]
     },
     {
-      "title": "Russia accuses NATO member Estonia of hostile actions ‘on the verge of unleashing open war’",
+      "title": "Anthropic closes below $83 IPO price, but analysts are still largely positive",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/24/russia-estonia-ukraine-war-nato-finland.html",
-      "published": "2026-11-24 12:32:24",
-      "title_ko": "러시아, 나토 회원국 에스토니아가 '공공연한 전쟁 촉발 직전의' 적대적 행동을 하고 있다고 비난",
-      "summary_ko": "탈린, 12월 1일부터 도로 국경 폐쇄 준비",
+      "link": "https://www.cnbc.com/2026/11/24/anthropic-stock-ipo-price.html",
+      "published": "2026-11-24 21:04:03",
+      "title_ko": "Anthropic, IPO 가격 이하 마감… 애널리스트는 여전히 긍정적",
+      "summary_ko": "",
       "lines": [
-        "러시아의 에스토니아 국경 폐쇄 조치 비난",
-        "에스토니아의 12월 1일 도로 국경 통행 폐쇄 예정"
+        "앤스로픽 주가 6.5% 하락 마감",
+        "공모가 83달러 하회",
+        "나스닥 상장 후 주가 하락세 지속"
       ]
     },
     {
-      "title": "Best Buy reports comparable sales growth of 6.1%, highest in five years",
+      "title": "Utah drops criminal charges against Kalshi founders after company suspended operations in state",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/24/best-buy-bby-q3-2027-earnings.html",
-      "published": "2026-11-24 12:06:04",
-      "title_ko": "베스트바이, 동일점포 매출 6.1% 증가… 5년 내 최고치",
-      "summary_ko": "베스트바이는 화요일 회계 3분기 실적에서 분기 예상치를 상회하며 연간 가이던스를 상향 조정",
+      "link": "https://www.cnbc.com/2026/11/24/utah-drops-charges-against-kalshi-after-it-halted-operations-in-state.html",
+      "published": "2026-11-24 20:45:57",
+      "title_ko": "유타, 칼시 창업자들에 대한 형사 기소 취소",
+      "summary_ko": "",
       "lines": [
-        "베스트바이의 3분기 동일점포 매출 6.1% 증가",
-        "베스트바이의 연간 매출 가이던스 상향 조정"
+        "유타주의 칼시 및 공동 창업자 형사 기소 기각",
+        "칼시의 유타주 내 영업 중단 결정"
       ]
     },
     {
-      "title": "Jensen Huang is ‘too big to fire,’ putting Nvidia’s governance in focus: analysts",
+      "title": "Jensen Huang tells staff that Nvidia doesn't need a succession plan",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/24/nvidia-jensen-huang-governance.html",
-      "published": "2026-11-24 10:56:56",
-      "title_ko": "젠슨 황은 '해고하기에는 너무 큰' 인물, 엔비디아 거버넌스 주목: 애널리스트들",
-      "summary_ko": "젠슨 황의 복귀로 인해 엔비디아의 창업자에 대한 깊은 의존도가 부각되며 이사회 감독과 기업 거버넌스가 심사 대상에 오름",
+      "link": "https://www.cnbc.com/2026/11/24/jensen-huang-nvidia-employee-meeting.html",
+      "published": "2026-11-24 20:42:07",
+      "title_ko": "엔비디아 CEO 젠슨 황, 외도 의혹으로 사임",
+      "summary_ko": "스파이 의혹 제기된 중국인 사업가와 연루",
       "lines": [
-        "젠슨 황 엔비디아 CEO 복귀로 이사회 감독 및 거버넌스 집중 점검",
-        "황의 갑작스러운 사임 및 재임명으로 엔비디아 승계 계획 취약점 노출"
+        "엔비디아 CEO 젠슨 황 사임 후 복귀",
+        "화요일 첫 직원회의 진행",
+        "승계 계획 불필요 언급"
       ]
     },
     {
-      "title": "Asian tech stocks recover from ‘collateral damage’ of Jensen Huang’s departure",
+      "title": "How Meta is using Instagram to get an ad boost from its Muse personal AI agent",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/24/nvidia-jensen-huang-asia-chip-stocks.html",
-      "published": "2026-11-24 09:46:01",
-      "title_ko": "아시아 테크주, 젠슨 황 퇴임의 '부수적 피해'에서 회복",
-      "summary_ko": "엔비디아 이사회의 젠슨 황 CEO 복직 결정 이후 투자자들이 테크 시장에 재유입",
+      "link": "https://www.cnbc.com/2026/11/24/meta-instagram-muse-ad-revenue.html",
+      "published": "2026-11-24 20:37:40",
+      "title_ko": "메타, 인스타그램에 AI 에이전트 ‘Muse’ 도입해 광고 매출 상승",
+      "summary_ko": "고위 임원, 광고 비즈니스 부스트 언급",
       "lines": [
-        "젠슨 황 엔비디아 CEO 복귀로 아시아 기술주 투자자 자금 유입",
-        "TSMC 주가 9.85% 급등, 폭스콘 9.95% 및 미디어텍 9.91% 상승"
+        "인스타그램 이용자 일일 약 20% 게시물 저장",
+        "뮤즈 개인 에이전트 광고 사업 성장 지원"
       ]
     },
     {
-      "title": "미국 청문회 및 규제 리스크",
-      "title_ko": "미국 청문회 및 규제 리스크",
-      "summary_ko": "중국 우회 수출 규제와 12월 초 예정된 의회 청문회 등 잠재적 노이즈가 여전히 해소되지 않음",
-      "source": "SBS Biz 증시인사이트",
-      "link": "https://www.youtube.com/watch?v=_D4g4QMkReQ",
-      "published": "2026-11-24 09:00:23",
+      "title": "AI 데이터센터 수요 둔화 우려",
+      "title_ko": "AI 데이터센터 수요 둔화 우려",
+      "summary_ko": "HPE의 실적 가이던스가 시장 기대치를 하회하며 AI 인프라 수요의 정점 통과 가능성이 제기 중",
+      "source": "블룸버그",
+      "link": "https://www.youtube.com/watch?v=5IiHzLvLqMI",
+      "published": "2026-11-24 17:25:52",
       "kind": "media",
-      "tag": "규제 · 산업정책",
+      "tag": "AI 투자 · 반도체 수요",
       "direction": "negative",
-      "n_channels": 3,
+      "n_channels": 2,
       "lines": [
-        "이주현 대표 발언 : 중국 우회 수출 규제 및 실적 타격 우려 상존",
-        "이주현 대표 발언 : 12월 초 비공개 및 공개 청문회 예정",
-        "길건우 대표 발언 : 청문회 질의응답 과정에서 변동성 확대 가능성"
+        "진행자 발언 : HPE의 매출 가이던스가 시장 기대치를 하회하며 AI 수요 정점 논란 발생",
+        "우 진호 발언 : HPE의 매출 부진은 AI 인프라 수요의 가격 민감도와 마진 압박을 시사함",
+        "마틴 슈로터 발언 : 고객사들은 AI 도입을 추진 중이나 인프라 현대화와 인력 준비가 여전히 큰 과제"
       ]
     },
     {
-      "title": "한미 추가 금리 인상",
-      "title_ko": "한미 추가 금리 인상",
-      "summary_ko": "미국과 한국 모두 인플레이션 압력으로 인해 추가 금리 인상이 불가피한 상황",
-      "source": "매경TV 뉴스",
-      "link": "https://www.youtube.com/watch?v=BjSiiH49EW0",
-      "published": "2026-11-24 07:48:18",
+      "title": "연준 금리 인상 기조",
+      "title_ko": "연준 금리 인상 기조",
+      "summary_ko": "연준은 시장 변동성에도 불구하고 인플레이션 억제를 위해 금리 인상을 지속할 것으로 보인",
+      "source": "블룸버그",
+      "link": "https://www.youtube.com/watch?v=aykZ7BIjQmc",
+      "published": "2026-11-24 16:33:54",
       "kind": "media",
       "tag": "금리 · 연준",
       "direction": "negative",
       "n_channels": 4,
       "lines": [
-        "장재철 대표 발언 : 미국과 한국 중앙은행 각각 25bp 인상 예상",
-        "장재철 대표 발언 : 금융 시장 불안 지속 시 향후 금리 인상 횟수와 폭에 영향 가능",
-        "장재철 대표 발언 : 시장에서는 12월 25bp 인상 확률 약 95%로 예상",
-        "장재철 대표 발언 : 한국은행 11월 금통위 25bp 인상 예상"
+        "존 윌리엄스 뉴욕 연은 총재 발언 : 인플레이션 2% 목표 달성을 위해 추가 금리 인상 필요",
+        "린지 로스너 발언 : 연준은 시장 변동성보다 경제 데이터를 우선시하며 긴축 기조 유지 예상"
       ]
     },
     {
-      "title": "Signal joins United Airlines, banks in limiting AI agents over customer risks",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/24/signal-airlines-banks-ai-limit.html",
-      "published": "2026-11-24 07:25:41",
-      "title_ko": "시그널, 고객 위험 우려로 AI 에이전트 제한 조치에 유나이티드 항공 및 은행들과 합류",
-      "summary_ko": "개인정보 보호 중심의 메시징 앱 시그널이 인공지능 에이전트 제한 조치에 동참",
-      "lines": [
-        "시그널, AI 에이전트 화면 정보 접근 차단 기능 도입",
-        "iOS 스크린샷 차단 및 안드로이드 AI 어시스턴트 화면 보안 활성화"
-      ]
-    },
-    {
-      "title": "Six key questions raised by Jensen Huang's return to Nvidia",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/24/nvidia-jensen-huang-politics-market.html",
-      "published": "2026-11-24 07:12:33",
-      "title_ko": "젠슨 황의 엔비디아 복귀가 제기하는 6가지 주요 질문",
-      "summary_ko": "젠슨 황이 엔비디아로 복귀하면서 이사회 결정 번복과 기술 거인의 미래를 둘러싼 질문 제기",
-      "lines": [
-        "젠슨 황 엔비디아 CEO 복귀 이사회 만장일치 승인",
-        "엔비디아 주가 125.53달러 마감",
-        "나스닥 6.5% 상승 2025년 4월 이후 최고 기록",
-        "S&P 500 4.7% 상승 2025년 4월 이후 최고 기록",
-        "젠슨 황 복귀 청원 20만 명 이상 서명"
-      ]
-    },
-    {
-      "title": "Iran says three tankers hit mines in Hormuz despite U.S. escort, as Treasury widens sanctions",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/24/iran-trump-hormuz-crude-.html",
-      "published": "2026-11-24 05:05:08",
-      "title_ko": "미국의 제재 확대 속 호르무즈 해협에서 기뢰 피격된 유조선 3척",
-      "summary_ko": "이란은 호르무즈 해협에서 해군 기뢰에 부딪힌 유조선 3척이 화재에 휩싸였다고 발표",
-      "lines": [
-        "호르무즈 해협 3척 유조선 지뢰 피격 화재",
-        "미국 테헤란 금융 차단 제재 강화"
-      ]
-    },
-    {
-      "title": "WTI 유가 공급과잉 전망 하락",
-      "title_ko": "WTI 유가 공급과잉 전망 하락",
-      "summary_ko": "공급과잉 전망이 재차 확산되며 WTI 유가가 하락함",
-      "source": "삼성증권",
-      "link": "https://www.youtube.com/watch?v=SFnkignsR3g",
-      "published": "2026-11-23 23:01:57",
+      "title": "엔비디아 주가 변동성",
+      "title_ko": "엔비디아 주가 변동성",
+      "summary_ko": "엔비디아 주가 급등은 옵션 거래에 의한 일시적 현상이며 근본적인 기업 가치 회복은 아니",
+      "source": "블룸버그",
+      "link": "https://www.youtube.com/watch?v=5Dkk-1J716g",
+      "published": "2026-11-24 16:08:43",
       "kind": "media",
-      "tag": "유가 · 에너지 · 원자재",
+      "tag": "수급 · 시장 구조",
       "direction": "negative",
-      "n_channels": 4,
+      "n_channels": 3,
       "lines": [
-        "진행자 발언 : 공급과잉 전망 재차 확산",
-        "진행자 발언 : WTI 유가 3.88% 하락"
+        "사라 쿤스트 발언 : 최근 주가 급등은 옵션 거래에 따른 일시적 현상",
+        "사라 쿤스트 발언 : 엔비디아는 이미 경영상 동력을 잃어가고 있었음"
       ]
     }
   ]

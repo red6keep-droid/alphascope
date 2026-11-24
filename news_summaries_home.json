@@ -1,369 +1,4 @@
 {
- "d97ed0c1bbfd": {
-  "lines": [
-   "도널드 트럼프 미국 대통령의 아시아 순방 시작",
-   "필리핀 마닐라 도착 및 기자회견 진행"
-  ],
-  "tags": [
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "GEOPOLITICS",
-    "dir": "neutral",
-    "stage": "done"
-   },
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "GEOPOLITICS",
-    "dir": "neutral",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-17T21:46:35.186379+00:00",
-  "n_src": 900,
-  "retry": true
- },
- "54df06262303": {
-  "lines": [
-   "미 의회, AI 칩 수출 통제 법안 국방수권법 포함 추진",
-   "젠슨 황 스파이 연루 의혹, 대중국 칩 수출 제한 여론 강화",
-   "국방수권법 12월 의회 심의 예정"
-  ],
-  "tags": [
-   {
-    "scope": "stock",
-    "tickers": [
-     "NVDA"
-    ],
-    "sector": "SMH",
-    "issue": "REGULATION",
-    "dir": "negative",
-    "stage": "talk"
-   },
-   {
-    "scope": "stock",
-    "tickers": [
-     "NVDA"
-    ],
-    "sector": "SMH",
-    "issue": "GEOPOLITICS",
-    "dir": "negative",
-    "stage": "done"
-   },
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "REGULATION",
-    "dir": "neutral",
-    "stage": "talk"
-   }
-  ],
-  "model": "groq:qwen/qwen3.8-27b",
-  "at": "2026-11-17T21:46:25.002608+00:00",
-  "n_src": 900
- },
- "32c2628ba7ee": {
-  "lines": [
-   "NSA, 애플, 마이크로소프트 등 주요 기관 및 기업 광범위 장애 발생",
-   "국가정보국장, 이번 장애 사이버 공격 또는 국가 주도 음모 아님 확인"
-  ],
-  "tags": [
-   {
-    "scope": "stock",
-    "tickers": [
-     "AAPL"
-    ],
-    "sector": "XLK",
-    "issue": "OTHER",
-    "dir": "negative",
-    "stage": "done"
-   },
-   {
-    "scope": "stock",
-    "tickers": [
-     "AAPL"
-    ],
-    "sector": "XLK",
-    "issue": "GEOPOLITICS",
-    "dir": "neutral",
-    "stage": "done"
-   }
-  ],
-  "model": "groq:qwen/qwen3.8-27b",
-  "at": "2026-11-17T21:46:25.002608+00:00",
-  "n_src": 900
- },
- "1e87f45bb066": {
-  "lines": [],
-  "tags": [],
-  "model": "groq:qwen/qwen3.8-27b",
-  "at": "2026-11-17T21:46:25.002608+00:00",
-  "n_src": 900
- },
- "6d0c63fb754b": {
-  "lines": [
-   "젠슨 황 전 엔비디아 CEO의 사임 후 첫 공개 입장 발표",
-   "이사회의 행동 조사 협조 및 CEO 복귀 의사 표명",
-   "실적 발표를 앞두고 화요일 엔비디아 주가 하락 마감"
-  ],
-  "tags": [
-   {
-    "scope": "stock",
-    "tickers": [
-     "NVDA"
-    ],
-    "sector": "SMH",
-    "issue": "CORP_EVENT",
-    "dir": "neutral",
-    "stage": "done"
-   },
-   {
-    "scope": "stock",
-    "tickers": [
-     "NVDA"
-    ],
-    "sector": "SMH",
-    "issue": "CORP_EVENT",
-    "dir": "positive",
-    "stage": "talk"
-   },
-   {
-    "scope": "stock",
-    "tickers": [
-     "NVDA"
-    ],
-    "sector": "SMH",
-    "issue": "MARKET_STRUCTURE",
-    "dir": "neutral",
-    "stage": "done",
-    "price": true
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-17T21:46:31.515480+00:00",
-  "n_src": 900
- },
- "a12e13fe5b6b": {
-  "lines": [
-   "연방항공청의 신규 라우터 설치 중단 발표",
-   "금요일 기술적 문제로 발생한 전국 항공기 운항 중단",
-   "남아크 Arkansas에 설치된 과부하 라우터가 시스템 마비 원인으로 지목"
-  ],
-  "tags": [
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLI",
-    "issue": "REGULATION",
-    "dir": "negative",
-    "stage": "done"
-   },
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLI",
-    "issue": "MARKET_STRUCTURE",
-    "dir": "negative",
-    "stage": "done"
-   },
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLI",
-    "issue": "CORP_EVENT",
-    "dir": "negative",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-17T21:46:31.515480+00:00",
-  "n_src": 900
- },
- "258fb4d0be96": {
-  "lines": [
-   "기술주에서 방어주로의 자금 이동 현상 발생"
-  ],
-  "tags": [
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "MARKET_STRUCTURE",
-    "dir": "neutral",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-17T21:46:31.515480+00:00",
-  "n_src": 323
- },
- "444fca867a9a": {
-  "lines": [
-   "변동성 지수 4거래일 연속 상승"
-  ],
-  "tags": [
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "MARKET_STRUCTURE",
-    "dir": "neutral",
-    "stage": "done",
-    "price": true
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-17T21:46:33.335480+00:00",
-  "n_src": 301
- },
- "437b927dac9f": {
-  "lines": [
-   "홈디포 최고재무책임자 리처드 맥페일 신임 최고경영자 선임",
-   "앤마리 캠벨 미국 점포·운영 총괄 수석부사장 사장 겸 최고운영책임자 승진",
-   "조던 브로기 최고재무책임자 내정",
-   "테드 데커 최고경영자 사임 및 이사회 의장 유지"
-  ],
-  "tags": [
-   {
-    "scope": "stock",
-    "tickers": [
-     "HD"
-    ],
-    "sector": "XLY",
-    "issue": "CORP_EVENT",
-    "dir": "positive",
-    "stage": "done"
-   },
-   {
-    "scope": "stock",
-    "tickers": [
-     "HD"
-    ],
-    "sector": "XLY",
-    "issue": "CORP_EVENT",
-    "dir": "positive",
-    "stage": "done"
-   },
-   {
-    "scope": "stock",
-    "tickers": [
-     "HD"
-    ],
-    "sector": "XLY",
-    "issue": "CORP_EVENT",
-    "dir": "neutral",
-    "stage": "done"
-   },
-   {
-    "scope": "stock",
-    "tickers": [
-     "HD"
-    ],
-    "sector": "XLY",
-    "issue": "CORP_EVENT",
-    "dir": "neutral",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-17T21:46:33.335480+00:00",
-  "n_src": 900
- },
- "9bcfcc1b3fd6": {
-  "lines": [
-   "칼시 상품선물거래위원회 요청에 따라 트럼프 관련 일부 언급 계약 거래 중단"
-  ],
-  "tags": [
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLF",
-    "issue": "REGULATION",
-    "dir": "negative",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-17T21:46:33.335480+00:00",
-  "n_src": 900
- },
- "5e39bb37b737": {
-  "lines": [
-   "미국의 홍역 퇴치 공식 지위 상실",
-   "범미주보건기구의 홍역 풍토병화 최종 결정",
-   "12개월 연속 바이러스 전파 확인"
-  ],
-  "tags": [
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLV",
-    "issue": "REGULATION",
-    "dir": "negative",
-    "stage": "done"
-   },
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLV",
-    "issue": "REGULATION",
-    "dir": "negative",
-    "stage": "done"
-   },
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLV",
-    "issue": "REGULATION",
-    "dir": "negative",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-17T21:46:35.186379+00:00",
-  "n_src": 900
- },
- "d26a7d48dbc9": {
-  "lines": [
-   "30년 고정 주택담보대출 평균 금리 7.5% 기록 (예상)",
-   "전년 대비 전체 모기지 수요 39% 감소",
-   "체이스 홈 랜딩의 시장 점유율 확대 계획 발표"
-  ],
-  "tags": [
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLF",
-    "issue": "RATES_FED",
-    "dir": "negative",
-    "stage": "done"
-   },
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLF",
-    "issue": "GROWTH_JOBS",
-    "dir": "negative",
-    "stage": "done"
-   },
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLF",
-    "issue": "CORP_EVENT",
-    "dir": "positive",
-    "stage": "talk"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-17T21:46:35.186379+00:00",
-  "n_src": 900
- },
  "b6b70931238e": {
   "lines": [
    "12월 연방공개시장위원회 회의 예정"
@@ -3544,6 +3179,375 @@
   ],
   "model": "groq:qwen/qwen3.8-27b",
   "at": "2026-11-24T12:50:00.386150+00:00",
+  "n_src": 900
+ },
+ "a82888cd3f01": {
+  "lines": [
+   "젠슨 황 엔비디아 CEO 복귀로 AI 채무 우려 확대",
+   "코어웨이브 주가 13% 급락",
+   "코어웨이브 2031년 만기 채권 수익률 17% 돌파"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "AI_CAPEX",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "CRWV"
+    ],
+    "sector": "XLK",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "CRWV"
+    ],
+    "sector": "XLK",
+    "issue": "CREDIT_BANKS",
+    "dir": "negative",
+    "stage": "done"
+   }
+  ],
+  "model": "groq:qwen/qwen3.8-27b",
+  "at": "2026-11-24T21:48:22.352772+00:00",
+  "n_src": 900
+ },
+ "5b0ad5da71df": {
+  "lines": [
+   "델 테크놀로지스 3분기 실적 월가 예상 상회",
+   "델 250억 달러 자사주 매입 승인",
+   "델 4분기 매출 563억 달러, 주당 8.40달러 가이던스",
+   "델 AI 서버 매출 220억 달러, 전년 대비 291% 증가"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "DELL"
+    ],
+    "sector": "XLK",
+    "issue": "EARNINGS",
+    "dir": "positive",
+    "stage": "done"
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "DELL"
+    ],
+    "sector": "XLK",
+    "issue": "CORP_EVENT",
+    "dir": "positive",
+    "stage": "done"
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "DELL"
+    ],
+    "sector": "XLK",
+    "issue": "EARNINGS",
+    "dir": "positive",
+    "stage": "done"
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "DELL"
+    ],
+    "sector": "XLK",
+    "issue": "AI_CAPEX",
+    "dir": "positive",
+    "stage": "done"
+   }
+  ],
+  "model": "groq:qwen/qwen3.8-27b",
+  "at": "2026-11-24T21:48:22.352772+00:00",
+  "n_src": 900
+ },
+ "7b37625c1dc9": {
+  "lines": [
+   "엔비디아 주가 5.86% 하락",
+   "마이크론 주가 10.97% 하락",
+   "코어웨이브 주가 11.84% 하락"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "MU"
+    ],
+    "sector": "SMH",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "CRWV"
+    ],
+    "sector": "XLK",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
+   }
+  ],
+  "model": "groq:qwen/qwen3.8-27b",
+  "at": "2026-11-24T21:48:22.352772+00:00",
+  "n_src": 900
+ },
+ "fd9d6acc316c": {
+  "lines": [
+   "엔비디아 이사회의 젠슨 황 CEO 복직 결정",
+   "중국 첩보원 연루 의혹 관련 의회 조사 지속 방침"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "CORP_EVENT",
+    "dir": "positive",
+    "stage": "done"
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "REGULATION",
+    "dir": "negative",
+    "stage": "talk"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-24T21:48:36.384003+00:00",
+  "n_src": 900
+ },
+ "2116f73a7761": {
+  "lines": [
+   "앤스로픽 주가 6.5% 하락 마감",
+   "공모가 83달러 하회",
+   "나스닥 상장 후 주가 하락세 지속"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLK",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLK",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLK",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-24T21:48:36.384003+00:00",
+  "n_src": 900
+ },
+ "527af39fbba6": {
+  "lines": [
+   "유타주의 칼시 및 공동 창업자 형사 기소 기각",
+   "칼시의 유타주 내 영업 중단 결정"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLF",
+    "issue": "REGULATION",
+    "dir": "positive",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLF",
+    "issue": "REGULATION",
+    "dir": "negative",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-24T21:48:36.384003+00:00",
+  "n_src": 900
+ },
+ "0e1dbd847d3b": {
+  "lines": [
+   "엔비디아 CEO 젠슨 황 사임 후 복귀",
+   "화요일 첫 직원회의 진행",
+   "승계 계획 불필요 언급"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "CORP_EVENT",
+    "dir": "neutral",
+    "stage": "done"
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "CORP_EVENT",
+    "dir": "neutral",
+    "stage": "done"
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "CORP_EVENT",
+    "dir": "neutral",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-24T21:48:41.898149+00:00",
+  "n_src": 900
+ },
+ "80a5acb9a177": {
+  "lines": [
+   "인스타그램 이용자 일일 약 20% 게시물 저장",
+   "뮤즈 개인 에이전트 광고 사업 성장 지원"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "META"
+    ],
+    "sector": "XLC",
+    "issue": "AI_CAPEX",
+    "dir": "neutral",
+    "stage": "done"
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "META"
+    ],
+    "sector": "XLC",
+    "issue": "AI_CAPEX",
+    "dir": "positive",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-24T21:48:41.898149+00:00",
+  "n_src": 900
+ },
+ "eae788f2bd68": {
+  "lines": [
+   "트럼프 대통령 젠슨 황 복귀 개입",
+   "월요일 월스트리트 시장 반등 기록"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "GEOPOLITICS",
+    "dir": "neutral",
+    "stage": "done"
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "MARKET_STRUCTURE",
+    "dir": "positive",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-24T21:48:41.898149+00:00",
+  "n_src": 900
+ },
+ "54b19165a141": {
+  "lines": [
+   "앤트로픽 주가 83달러의 공모가 하회",
+   "화요일 13% 및 월요일 1.5% 하락 기록",
+   "장중 최고가 115달러 대비 34% 하락",
+   "옵션 거래량 증가와 함께 내재 변동성 96 기록"
+  ],
+  "tags": [
+   null,
+   null,
+   null,
+   null
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-24T21:48:42.984683+00:00",
+  "n_src": 900
+ },
+ "c39ea0fc9e3f": {
+  "lines": [
+   "콜스 10월 31일 마감 기간 동일점포 매출 성장률 1.2% 기록",
+   "콜스 연간 실적 전망 상향 조정"
+  ],
+  "tags": [
+   null,
+   null
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-24T21:48:42.984683+00:00",
   "n_src": 900
  }
 }
