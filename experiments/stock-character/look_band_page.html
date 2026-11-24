@@ -8,6 +8,9 @@ h1{font-size:20px;margin:0 0 4px}.sub{color:var(--mute);font-size:13px;margin-bo
 .bar b{font-size:20px}.bar input{width:100%;margin:4px 0 2px}.ticks{display:flex;justify-content:space-between;color:var(--mute);font-size:12px}
 .row{margin-bottom:8px;font-size:14px}.row button{font:inherit;margin:0 0 4px 6px;padding:4px 12px;border:1px solid var(--line);border-radius:16px;background:#fff;cursor:pointer}
 .row button.on{background:#1c2330;color:#fff;border-color:#1c2330}.sum{margin-top:6px;font-size:14px}
+.num{width:54px;font:inherit;padding:2px 4px;border:1px solid var(--line);border-radius:6px;text-align:right}
+.row label{margin-left:8px;white-space:nowrap}.strip u.m{background:#8a5fd0}.grp{margin-top:10px}.grp h3{font-size:14px;margin:0 0 4px}
+.ok{color:#1f9d6b;font-weight:700}.pill{display:inline-block;padding:0 6px;border-radius:9px;background:#eef0f4;font-size:11px}
 .card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:12px}
 .card h2{font-size:16px;margin:0 0 2px}.rng{color:var(--mute);font-size:13px;margin-bottom:6px}
 svg{width:100%;height:110px;display:block}
@@ -30,10 +33,16 @@ table{border-collapse:collapse;width:100%;font-size:13px}th,td{border-bottom:1px
 <input id="band" type="range" min="70" max="90" step="1" value="80"><div class="ticks"><span>70% (평범 좁게)</span><span>80%</span><span>90% (평범 넓게)</span></div>
 <div style="margin-top:8px">보는 조각 <b id="pv"></b> <span id="pd" style="color:var(--mute);font-size:13px"></span></div>
 <input id="piece" type="range" min="0" max="0" step="1" value="0"><div class="ticks"><span>옛날</span><span>최근</span></div>
+<div class="row" style="margin-top:10px">볼 칸 <span id="pick"></span></div>
+<div class="row">그룹 선 — 평범 밖이던 조각의 비율이
+ A <input class="num" id="ga" type="number" min="1" max="100" value="75">% 넘게 ·
+ B <input class="num" id="gb" type="number" min="1" max="100" value="50">% 넘게 ·
+ C <input class="num" id="gc" type="number" min="1" max="100" value="25">% 넘게</div>
 <div class="sum" id="sum"></div></div>
+<div class="card" id="answer"></div>
 <div id="cards"></div>
-<div class="card"><h2>지금 그룹 명단 아이들 — 조각마다 어디에 있었나</h2><div class="rng">띠 한 칸 = 조각 하나(왼쪽 옛날 → 오른쪽 최근). <span style="color:var(--lo)">■</span> 평범 아래쪽 바깥 · <span style="color:var(--hi)">■</span> 위쪽 바깥 · 옅은 칸 = 평범 안 · 굵은 테두리 = 지금 보는 조각.</div><div id="roster"></div>
-<div class="note">그룹 A · B · C 는 3년 그림을 보고 만든 첫 판입니다 — 이 화면 기준으로 다시 볼 대상입니다.</div></div>
+<div class="card"><h2>지금 그룹 명단 아이들 — 조각마다 어디에 있었나</h2><div class="rng">✓ = 그림으로 확인한 아이 · D = 단체 그룹(같은 때 같이 움직인 무리). 띠 한 칸 = 조각 하나(왼쪽 옛날 → 오른쪽 최근). <span style="color:var(--lo)">■</span> 평범 아래쪽 바깥 · <span style="color:var(--hi)">■</span> 위쪽 바깥 · 옅은 칸 = 평범 안 · 굵은 테두리 = 지금 보는 조각.</div><div id="roster"></div>
+<div class="note">이 표의 그룹은 3년 그림을 보고 사람이 적은 첫 판입니다. 위 "설정으로 나온 답"과 다를 수 있습니다.</div></div>
 </main><script>
 const D=__DATA__, COLS=__COLS__, WINS=__WINS__, LABELS=__LABELS__;let W=20,P=null,Y=3,LB=[];
 const $=id=>document.getElementById(id);
@@ -52,9 +61,33 @@ function calc(b){const t=(100-b)/200,np=LB.length,lim=[];
     const lo=q(vals,t),hi=q(vals,1-t),md=q(vals,.5);lim[p].push([lo,md,hi,vals]);
     D.forEach(x=>{const r=x.v[p];if(r)x.st[ci][p]=r[c]<lo?-1:r[c]>hi?1:0})})}
   return lim}
+$('pick').innerHTML=COLS.map(([c,l],i)=>`<label><input type="checkbox" data-i="${i}" checked> ${l.split(' (')[0]}</label>`).join('');
+$('pick').addEventListener('change',()=>draw());
+['ga','gb','gc'].forEach(id=>$(id).addEventListener('input',()=>draw()));
+const picked=()=>[...$('pick').querySelectorAll('input')].filter(x=>x.checked).map(x=>+x.dataset.i);
+function answer(){const use=picked(),np=LB.length,ga=+$('ga').value,gb=+$('gb').value,gc=+$('gc').value;
+  const out={A:[],B:[],C:[],D:[],plain:0,none:0};
+  D.forEach(x=>{let n=0,k=0,up=0,dn=0;const mix=new Array(np).fill(null),per=use.map(()=>[0,0]);
+    for(let p=0;p<np;p++){if(!x.v[p])continue;n++;let u=false,l=false;
+      use.forEach((ci,j)=>{const s=x.st[ci][p];if(s>0){u=true;per[j][0]++}else if(s<0){l=true;per[j][1]++}});
+      mix[p]=u&&l?2:u?1:l?-1:0;if(u||l)k++;if(u)up++;if(l)dn++}
+    x.mix=mix;x.n=n;x.k=k;x.share=n?k/n*100:0;x.per=per;
+    x.side=up&&dn&&Math.min(up,dn)>=0.3*Math.max(up,dn)?'섞임':up>=dn?'위쪽(거친 쪽)':'아래쪽(잔잔한 쪽)';
+    x.auto=n<3?null:x.share>ga?'A':x.share>gb?'B':x.share>gc?'C':'';
+    if(x.g==='D')out.D.push(x);else if(x.auto==null)out.none++;else if(x.auto==='')out.plain++;else out[x.auto].push(x)});
+  for(const g of 'ABCD')out[g].sort((a,b)=>b.share-a.share);
+  const mstrip=a=>'<span class="strip">'+a.map((v,i)=>`<u class="${v==null?'n':v===2?'m':v<0?'l':v>0?'h':''}${i===P?' c':''}"></u>`).join('')+'</span>';
+  const one=x=>`<div class="nm">${x.seen?'<span class="ok" title="그림으로 확인">✓</span>':''}<span>${x.k2||x.s}</span>${mstrip(x.mix)}<i>${x.n}조각 중 ${x.k}조각 (${x.share.toFixed(0)}%) · ${x.side}</i>`+
+    `<i>${use.map((ci,j)=>x.per[j][0]+x.per[j][1]?`<span class="pill">${COLS[ci][1].split(' (')[0]} ${x.per[j][0]?'↑'+x.per[j][0]:''}${x.per[j][1]?'↓'+x.per[j][1]:''}</span>`:'').join(' ')}</i>${x.g==='D'&&x.auto?`<i>설정으로는 ${x.auto}</i>`:''}</div>`;
+  const sec=(g,title)=>`<div class="grp"><h3><span class="tag">${g}</span> ${title} — ${out[g].length}명</h3>${fold(out[g],one,'없음')}</div>`;
+  $('answer').innerHTML=`<h2>설정으로 나온 답</h2><div class="rng">최근 ${Y}년 · ${W}일 간격 ${np}조각 · 평범 = 가운데 ${$('band').value}% · 볼 칸 ${use.length}개. 조각 하나에서 볼 칸 중 하나라도 평범 밖이면 그 조각은 "평범 밖". 그 조각의 비율로 그룹을 나눕니다. ✓ = 그림으로 확인한 아이.</div>`+
+    sec('A',`평범 밖이던 조각이 ${ga}% 넘게`)+sec('B',`${gb}% 넘게`)+sec('C',`${gc}% 넘게`)+sec('D','단체 그룹 — 같은 때 같이 움직인 무리(사람이 넣음)')+
+    `<div class="grp"><h3>평범 — ${out.plain}명</h3><div class="note">평범한 아이는 배경이라 이름을 싣지 않습니다.${out.none?` 조각이 3개 미만이라 가를 수 없는 아이 ${out.none}명.`:''}</div></div>`+
+    `<div class="note">띠: <span style="color:var(--hi)">■</span> 위쪽 바깥 · <span style="color:var(--lo)">■</span> 아래쪽 바깥 · <span style="color:#8a5fd0">■</span> 한 조각에서 위 · 아래 둘 다(칸이 다름). 굵은 테두리 = 지금 보는 조각.</div>`}
 const strip=(a,cur)=>'<span class="strip">'+a.map((v,i)=>`<u class="${v==null?'n':v<0?'l':v>0?'h':''}${i===cur?' c':''}"></u>`).join('')+'</span>';
 const fold=(list,one,empty)=>{const head=list.slice(0,5).map(one).join(''),rest=list.slice(5);
   return (head+(rest.length?`<details><summary>나머지 ${rest.length}명 펼치기</summary>${rest.map(one).join('')}</details>`:''))||`<i>${empty}</i>`};
+D.forEach(x=>{x.k2=x.k;x.seen=!!x.g&&x.g!=='미정'});
 const tag=x=>x.g?`<span class="tag">${x.g}</span>`:'';
 function draw(){view();const b=+$('band').value,t=(100-b)/2,np=LB.length;
   if(P==null||P>=np)P=np-1;$('piece').max=np-1;$('piece').value=P;
@@ -62,17 +95,17 @@ function draw(){view();const b=+$('band').value,t=(100-b)/2,np=LB.length;
   [...$('wins').children].forEach(x=>{x.classList.toggle('on',+x.dataset.w===W);x.textContent=`${x.dataset.w}일 간격 (${pieces(+x.dataset.w)}조각)`});
   [...$('yrs').children].forEach(x=>x.classList.toggle('on',+x.dataset.y===Y));
   $('pv').textContent=`${P+1} / ${np}`;$('pd').textContent=LB[P];
-  const lim=calc(b);let html='';
+  const lim=calc(b);answer();let html='';
   COLS.forEach(([c,label,d,unit,why],ci)=>{const [lo,md,hi,vals]=lim[P][ci];
     const here=D.filter(x=>x.v[P]),val=x=>x.v[P][c];
     const L=here.filter(x=>x.st[ci][P]<0).sort((x,y)=>val(x)-val(y)),H=here.filter(x=>x.st[ci][P]>0).sort((x,y)=>val(y)-val(x));
     const n=vals.length,Wd=1000,Hh=110,max=q(vals,.995),min=vals[0],X=i=>i/(n-1)*Wd,Y=v=>Hh-6-(Math.min(v,max)-min)/(max-min||1)*(Hh-16);
     const pts=vals.map((v,i)=>`${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join(' '),x0=X(L.length-.5),x1=X(n-H.length-.5);
-    const marks=here.filter(x=>x.g).map(x=>{const v=val(x),i=vals.indexOf(v),s=x.st[ci][P];return `<circle cx="${X(i)}" cy="${Y(v)}" r="4" fill="${s<0?'#2f6fdb':s>0?'#d0342c':'#6b7485'}"><title>${x.k||x.s} ${fmt(v,d)}</title></circle>`}).join('');
+    const marks=here.filter(x=>x.g).map(x=>{const v=val(x),i=vals.indexOf(v),s=x.st[ci][P];return `<circle cx="${X(i)}" cy="${Y(v)}" r="4" fill="${s<0?'#2f6fdb':s>0?'#d0342c':'#6b7485'}"><title>${x.k2||x.s} ${fmt(v,d)}</title></circle>`}).join('');
     const cnt=(x,dir)=>x.st[ci].filter(v=>v===dir).length,all=x=>x.st[ci].filter(v=>v!=null).length;
-    const now=dir=>x=>`<div class="nm">${tag(x)}<span>${x.k||x.s}</span><i>${fmt(val(x),d)}${unit}</i>${strip(x.st[ci],P)}<i>${all(x)}조각 중 ${cnt(x,dir)}조각</i></div>`;
+    const now=dir=>x=>`<div class="nm">${tag(x)}<span>${x.k2||x.s}</span><i>${fmt(val(x),d)}${unit}</i>${strip(x.st[ci],P)}<i>${all(x)}조각 중 ${cnt(x,dir)}조각</i></div>`;
     const rep=dir=>D.filter(x=>cnt(x,dir)>=2).sort((x,y)=>cnt(y,dir)-cnt(x,dir));
-    const repOne=dir=>x=>`<div class="nm">${tag(x)}<span>${x.k||x.s}</span>${strip(x.st[ci],P)}<i>${all(x)}조각 중 ${cnt(x,dir)}조각</i></div>`;
+    const repOne=dir=>x=>`<div class="nm">${tag(x)}<span>${x.k2||x.s}</span>${strip(x.st[ci],P)}<i>${all(x)}조각 중 ${cnt(x,dir)}조각</i></div>`;
     html+=`<div class="card"><h2>${label}</h2><div class="rng">${why} · 이 조각의 중간값 ${fmt(md,d)}${unit} · <b>평범 = ${fmt(lo,d)} ~ ${fmt(hi,d)}${unit}</b> · 아래쪽 ${L.length}명 · 위쪽 ${H.length}명</div>
     <svg viewBox="0 0 ${Wd} ${Hh}" preserveAspectRatio="none"><rect x="${x0}" y="0" width="${x1-x0}" height="${Hh}" fill="#eef4ff"/><polyline points="${pts}" fill="none" stroke="#1c2330" stroke-width="1.6" vector-effect="non-scaling-stroke"/>${marks}</svg>
     <div class="note">이 조각에서 아이들을 작은 값 → 큰 값으로 줄 세운 선. 파란 바탕 = 평범. 점 = 그룹 명단 아이. 이름 옆 띠 = 그 아이의 조각마다 자리.</div>
@@ -84,6 +117,6 @@ function draw(){view();const b=+$('band').value,t=(100-b)/2,np=LB.length;
   const here=D.filter(x=>x.v[P]),k=here.map(x=>COLS.filter((_,ci)=>x.st[ci][P]).length),cn=m=>k.filter(v=>m(v)).length;
   $('sum').innerHTML=`이 조각에서 — 네 칸 모두 평범 안 ${cn(v=>v===0)}명 · 한 칸에서만 바깥 ${cn(v=>v===1)}명 · 두 칸 ${cn(v=>v===2)}명 · 세 칸 넘게 ${cn(v=>v>=3)}명`;
   $('roster').innerHTML='<table><tr><th>아이</th><th>그룹</th>'+COLS.map(([c,l])=>`<th>${l.split(' (')[0]}</th>`).join('')+'</tr>'+
-   D.filter(x=>x.g).sort((a,b)=>a.g.localeCompare(b.g)).map(x=>`<tr><td>${x.k||x.s}</td><td>${x.g}</td>`+COLS.map((_,ci)=>`<td>${strip(x.st[ci],P)}</td>`).join('')+'</tr>').join('')+'</table>'}
+   D.filter(x=>x.g).sort((a,b)=>a.g.localeCompare(b.g)).map(x=>`<tr><td>${x.k2||x.s}</td><td>${x.g}</td>`+COLS.map((_,ci)=>`<td>${strip(x.st[ci],P)}</td>`).join('')+'</tr>').join('')+'</table>'}
 $('band').addEventListener('input',draw);$('piece').addEventListener('input',()=>{P=+$('piece').value;draw()});draw();
 </script></body></html>

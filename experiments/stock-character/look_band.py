@@ -29,7 +29,9 @@ import look_stones as LS  # noqa: E402
 WINS = [20, 60, 120, 200]
 SPAN = 756          # 담아 두는 과거(거래일) = 3년. 더 늘리지 않는다(사용자). 화면에서 1 · 2 · 3년을 고른다
 ROSTER = {"COIN": "A", "BE": "A", "SMCI": "A", "BRK-B": "A", "KO": "A", "RSG": "A", "PG": "A", "L": "A", "LIN": "A", "WM": "A", "JNJ": "A",
-          "TSLA": "B", "GLW": "B", "MSI": "C", "MSFT": "미정", "SCHW": "미정"}
+          "TSLA": "B", "MSI": "C", "MSFT": "미정", "SCHW": "미정",
+          # D = 단체 그룹 — 같은 때 같이 움직인 무리(2026-11-24 사용자 "그룹으로 일단 해놔 D 단체 그룹"). 메모리 · 저장장치 · 반도체 장비 · 전자부품 아홉(길잡이 7-19). 코닝은 B 에서 여기로.
+          "MU": "D", "WDC": "D", "STX": "D", "LRCX": "D", "AMAT": "D", "KLAC": "D", "TER": "D", "GLW": "D", "FLEX": "D"}
 
 
 def main():
