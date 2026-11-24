@@ -1,0 +1,32 @@
+{
+ "id": "EH-2026-011",
+ "slug": "forecast-2026-011",
+ "title": "브로드컴 급락, 반등할까 더 빠질까?",
+ "kind": "after",
+ "registered": "2026-11-24",
+ "event": "11.23 브로드컴 급락",
+ "event_day": null,
+ "ruler": "브로드컴 vs 업종",
+ "line": 7.0,
+ "unit": "%p",
+ "gap": -11.0,
+ "pick": null,
+ "pick_prob": null,
+ "market_prob": null,
+ "rules": "EH-2026-11-10",
+ "scenarios": [
+  {
+   "cond": "반등한다",
+   "name": "브로드컴 반등",
+   "dir": 1,
+   "win": "브로드컴이 급락 폭(11.0%p)의 절반을 회복한다"
+  },
+  {
+   "cond": "지속한다",
+   "name": "브로드컴 하락 지속",
+   "dir": -1,
+   "win": "브로드컴이 급락 뒤 7%p 더 빠진다"
+  }
+ ],
+ "sha256": "c9c8af5656862392a5a087941eb47c980558be7373014070d299d7e24424ee98"
+}

@@ -1,0 +1,32 @@
+{
+ "id": "EH-2026-013",
+ "slug": "forecast-2026-013",
+ "title": "기술 업종 급등, 조정 올까 더 오를까?",
+ "kind": "after",
+ "registered": "2026-11-24",
+ "event": "11.23 기술 업종 급등",
+ "event_day": null,
+ "ruler": "기술 업종 vs 시장",
+ "line": 3.0,
+ "unit": "%p",
+ "gap": 4.2,
+ "pick": 1,
+ "pick_prob": 0.5,
+ "market_prob": null,
+ "rules": "EH-2026-11-10",
+ "scenarios": [
+  {
+   "cond": "조정한다",
+   "name": "기술 업종 조정",
+   "dir": -1,
+   "win": "기술 업종이 급등 폭(4.2%p)의 절반을 반납한다"
+  },
+  {
+   "cond": "지속한다",
+   "name": "기술 업종 상승 지속",
+   "dir": 1,
+   "win": "기술 업종이 급등 뒤 3%p 더 오른다"
+  }
+ ],
+ "sha256": "008ab2b8e5105bec079e6cd351388e4d2af4a086587309a60dfd55634ed02756"
+}

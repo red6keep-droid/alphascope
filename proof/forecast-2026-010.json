@@ -1,0 +1,32 @@
+{
+ "id": "EH-2026-010",
+ "slug": "forecast-2026-010",
+ "title": "엔비디아 급등, 조정 올까 더 오를까?",
+ "kind": "after",
+ "registered": "2026-11-24",
+ "event": "11.23 엔비디아 급등",
+ "event_day": null,
+ "ruler": "엔비디아 vs 업종",
+ "line": 9.0,
+ "unit": "%p",
+ "gap": 17.5,
+ "pick": null,
+ "pick_prob": null,
+ "market_prob": null,
+ "rules": "EH-2026-11-10",
+ "scenarios": [
+  {
+   "cond": "조정한다",
+   "name": "엔비디아 조정",
+   "dir": -1,
+   "win": "엔비디아가 급등 폭(17.5%p)의 절반을 반납한다"
+  },
+  {
+   "cond": "지속한다",
+   "name": "엔비디아 상승 지속",
+   "dir": 1,
+   "win": "엔비디아가 급등 뒤 9%p 더 오른다"
+  }
+ ],
+ "sha256": "64ed95ff524a29a543a0c04ea1e6af4201b102929ce325810636f1dadeafac78"
+}

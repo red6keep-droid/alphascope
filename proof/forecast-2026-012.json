@@ -1,0 +1,32 @@
+{
+ "id": "EH-2026-012",
+ "slug": "forecast-2026-012",
+ "title": "반도체 급등, 조정 올까 더 오를까?",
+ "kind": "after",
+ "registered": "2026-11-24",
+ "event": "11.23 반도체 급등",
+ "event_day": null,
+ "ruler": "반도체 vs 시장",
+ "line": 6.0,
+ "unit": "%p",
+ "gap": 9.3,
+ "pick": 1,
+ "pick_prob": 0.6206896551724138,
+ "market_prob": null,
+ "rules": "EH-2026-11-10",
+ "scenarios": [
+  {
+   "cond": "조정한다",
+   "name": "반도체 조정",
+   "dir": -1,
+   "win": "반도체가 급등 폭(9.3%p)의 절반을 반납한다"
+  },
+  {
+   "cond": "지속한다",
+   "name": "반도체 상승 지속",
+   "dir": 1,
+   "win": "반도체가 급등 뒤 6%p 더 오른다"
+  }
+ ],
+ "sha256": "877a1c0f1d48a6f3f9699633975f5a36067ccb158f8ed3ff6ae0c7968e52d858"
+}
