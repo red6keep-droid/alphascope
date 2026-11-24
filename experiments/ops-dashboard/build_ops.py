@@ -758,13 +758,14 @@ def main():
     why_cache = (safe(kv_get_json, "dash:ontime-why")[0] or {}) if kv_conf() else {}   # 지난 날 늦은 원인 — 바뀌지 않으므로 다시 묻지 않는다 (GitHub API 아낌)
     got, err = safe(ontime.build, now, why_cache, recs2)   # 운영 기록 = 소리 없이 멈춘 스크립트 원인
     if got:
-        ontime_body, (ot_val, ot_sub, ot_today), why_cache = got
-        I.area["발행 시간"] = (ot_val, ot_sub + " · 운영 현황 아래 `발행 시간`")
+        ontime_body, ontime_tab, (ot_val, ot_sub, ot_today), why_cache = got   # 탭 = 운영 현황 안 `발행 시간`(요약 다음), 단독 페이지 /ontime 도 그대로 (2026-11-24 사용자)
+        I.area["발행 시간"] = (ot_val, ot_sub + " · `발행 시간` 탭")
         for n, v, _, _ in ot_today:
-            I.add(f"{n} 기준 시각", v, "발행 시간 페이지에서 원인 확인")   # 알림은 보내지 않는다 — 모든 건 페이지에서 (2026-11-24 사용자)
+            I.add(f"{n} 기준 시각", v, "`발행 시간` 탭에서 원인 확인")   # 알림은 보내지 않는다 — 모든 건 페이지에서 (2026-11-24 사용자)
         ontime_page = shell(dk.align_titles(dk.WRAP_OPEN + ontime_body + dk.WRAP_CLOSE), now, title="발행 시간")
     else:
         I.area["발행 시간"] = (warn("읽지 못함"), err[:60])
+        ontime_tab = dk.h2("발행 시간", tab="발행 시간") + white_card([("발행 시간", warn("읽지 못함"), err[:60])])
         print(f"[ops] 발행 시간 만들기 실패 {err}")
     # 문법 검사(syntax-check.yml) — 마지막 검사가 실패면 할 일에 (알림 대신 이 페이지, 2026-11-24 사용자)
     sc, _ = safe(lambda: (gh("/actions/workflows/syntax-check.yml/runs", {"per_page": 1}).get("workflow_runs") or [None])[0])
@@ -779,7 +780,7 @@ def main():
     ai = ai_tab(now, recs2, I)
     record, hist = record_tab(now, heads, I)
     forecast = forecast_tab(now, I)
-    body = summary_tab(now, I) + screen + publish + collect + ai + record + forecast
+    body = summary_tab(now, I) + ontime_tab + screen + publish + collect + ai + record + forecast
     body = dk.align_titles(dk.WRAP_OPEN + body + dk.WRAP_CLOSE)
     html = dk.fix_colons(body) if hasattr(dk, "fix_colons") else body
     page = shell(html, now)

@@ -555,21 +555,29 @@ def _note(text):
     return (f'<p style="margin:4px 0 12px;padding-left:{dk.ALIGN_PX}px;font-size:13px;line-height:19px;color:{NOTE_C};word-break:keep-all;">{text}</p>')
 
 
-def market_tab(name, res, reasons, now, legend):
-    """시장 탭 — 서브탭 4개(오늘 · 7일 · 기준 · 원인). 탭 안 sub_label 은 테마가 서브탭으로 만든다 — 툴팁을 달면 이름에 붙어 나와 안내는 아래 줄로."""
+def _inner_title(t):
+    """운영 현황 `발행 시간` 탭 안, 시장 서브탭 안의 작은 제목 — data-sub 를 달지 않아 서브탭이 되지 않는다(탭이 세 겹이 되지 않게, 2026-11-24 사용자)."""
+    return f'<div style="font-size:17px;line-height:25px;color:#111;font-weight:700;margin:20px 0 8px;">{esc(t)}</div>'
+
+
+def market_tab(name, res, reasons, now, legend, in_tab=False):
+    """시장 탭 — 서브탭 4개(오늘 · 7일 · 기준 · 원인). 탭 안 sub_label 은 테마가 서브탭으로 만든다 — 툴팁을 달면 이름에 붙어 나와 안내는 아래 줄로.
+    in_tab=True = 운영 현황의 `발행 시간` 탭 안: 시장이 서브탭, 오늘 · 7일 · 기준 · 원인은 서브탭 안의 작은 제목으로 펼친다."""
     tally, ev_rows = cause_parts(res, reasons, now)
     tr = today_rows(res, reasons, now)
-    return (dk.h2(name, tab=name)
-            + dk.sub_label("오늘") + white_card(tr or [("오늘 나올 것", idle("없음"), "오늘은 쉬는 날")], fold_at=5, noun="서비스")
-            + dk.sub_label("7일") + grid(res, now) + legend
-            + dk.sub_label("기준") + std_table(res, now)
+    head, T = (dk.sub_label(name), _inner_title) if in_tab else (dk.h2(name, tab=name), dk.sub_label)
+    return (head
+            + T("오늘") + white_card(tr or [("오늘 나올 것", idle("없음"), "오늘은 쉬는 날")], fold_at=5, noun="서비스")
+            + T("7일") + grid(res, now) + legend
+            + T("기준") + std_table(res, now)
             + _note(f"기준 = 이 시각 + {GRACE_MIN}분 안에 나와야 정시. 보통 = 최근 14일 실제 시각의 가운데 값(초록 = 기준 안). 정시 = 최근 14일, 그날의 기준으로 셈. 실행 일정을 바꾼 서비스(11.20 한국 15:50 · 미국 이어 붙기)는 바꾼 날부터 셉니다.")
-            + dk.sub_label("원인") + white_card(tally or [("늦은 일", ok("없음"), "")])
+            + T("원인") + white_card(tally or [("늦은 일", ok("없음"), "")])
             + _note("원인별 횟수 — 한 번 늦은 데 원인이 둘이면 둘 다 셉니다. 아래는 늦은 날 하나하나(최신 위).")
             + white_card(ev_rows or [("늦은 날", ok("없음"), "")], fold_at=5, noun="건"))
 
 
-def page_body(res, reasons, now):
+def page_body(res, reasons, now, in_tab=False):
+    """in_tab=False = 단독 페이지 /ontime (탭 미국 · 한국 · 누적). in_tab=True = 운영 현황 안 `발행 시간` 탭 하나(서브탭 미국 · 한국 · 누적)."""
     allc = [x for _, ds in res for x in _counted(ds)]
     late = sum(x[1] == "late" for x in allc)
     miss = sum(x[1] == "miss" for x in allc)
@@ -604,10 +612,15 @@ def page_body(res, reasons, now):
     legend = (f'<p style="margin:4px 0 12px;padding-left:{dk.ALIGN_PX}px;font-size:13px;line-height:19px;color:{NOTE_C};word-break:keep-all;">'
               f'<span style="color:{GOOD};">초록 = 정시</span> · <span style="color:{BAD};font-weight:700;">주황 = 늦음 · 없음</span> · '
               f'회색 = 제외 · 대기 · 점 = 나오지 않는 날. 시각을 누르면 그 글 · 커밋 · 실행이 열립니다. `내부` = 독자에게 알리지 않은 기준.</p>')
+    if in_tab:   # 운영 현황 머리 카드가 따로 있으므로 이 탭은 질문 줄 + 시장별 오늘 상태부터
+        top = dk.h2("발행 시간", tab="발행 시간") + head + white_card(mk_rows)
+        cum_head = dk.sub_label("누적")
+    else:
+        cum_head = dk.h2("누적", tab="누적")
     return (top
-            + market_tab("미국", by_mk["미국"], reasons, now, legend)
-            + market_tab("한국", by_mk["한국"], reasons, now, legend)
-            + dk.h2("누적", tab="누적") + cumc
+            + market_tab("미국", by_mk["미국"], reasons, now, legend, in_tab)
+            + market_tab("한국", by_mk["한국"], reasons, now, legend, in_tab)
+            + cum_head + cumc
             + dk.guide("판정", f"기준 시각 {GRACE_MIN}분 뒤까지 정시, 그 뒤는 늦음, 그날 결과가 없으면 안 나감입니다. 오늘 기준 전이면 세지 않습니다. "
                        "원인은 그날 맡은 GitHub 실행 기록으로 봅니다 — 앞 단계 늦음(이어 붙는 서비스) · 실행 없음 · 실패(실패한 단계) · 늦게 시작(예약보다 10분 넘게) · "
                        "여유 부족(예약 ~ 기준 시간보다 실행이 오래 걸림) · 오래 걸림(20분 넘게, 가장 긴 단계) · 다시 돌림(첫 실행이 아닌 실행에서 나감). "
@@ -616,7 +629,7 @@ def page_body(res, reasons, now):
 
 
 def build(now, cache=None, recs=None):
-    """→ (페이지 본문, 요약, 원인 cache). cache = {"key|날짜": [태그, 글]} — 오늘이 아닌 날 원인은 다시 묻지 않는다."""
+    """→ (단독 페이지 본문, 운영 현황 탭 본문, 요약, 원인 cache). cache = {"key|날짜": [태그, 글]} — 오늘이 아닌 날 원인은 다시 묻지 않는다."""
     cache = dict(cache or {})
     OPS_RECS[:] = recs or []
     posts = fetch_posts(START)
@@ -651,14 +664,14 @@ def build(now, cache=None, recs=None):
             reasons[k] = list(why(svc, d, st, t, res_by_key, {svc["wf"]: rs}))
             if d < now.date() and rs is not None:
                 cache[k] = reasons[k]
-    return page_body(res, reasons, now), summary(res, now, reasons), cache
+    return page_body(res, reasons, now), page_body(res, reasons, now, in_tab=True), summary(res, now, reasons), cache
 
 
 if __name__ == "__main__":
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     import build_ops as B
     now = dt.datetime.now(KST)
-    body, (val, sub, today), cache = build(now)
+    body, _, (val, sub, today), cache = build(now)
     page = B.shell(dk.align_titles(dk.WRAP_OPEN + body + dk.WRAP_CLOSE), now, title="발행 시간")
     os.makedirs(B.OUT, exist_ok=True)
     with open(os.path.join(B.OUT, "ontime.html"), "w", encoding="utf-8") as f:
