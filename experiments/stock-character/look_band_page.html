@@ -1,0 +1,83 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>평범의 범위</title><style>
+:root{--ink:#1c2330;--mute:#6b7485;--line:#e3e6ec;--lo:#2f6fdb;--hi:#d0342c}
+body{margin:0;background:#f6f7f9;color:var(--ink);font:15px/1.6 "Malgun Gothic","Apple SD Gothic Neo",sans-serif}
+main{max-width:1060px;margin:0 auto;padding:20px 16px 60px}
+h1{font-size:20px;margin:0 0 4px}.sub{color:var(--mute);font-size:13px;margin-bottom:14px}
+.bar{position:sticky;top:0;background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:14px;z-index:5}
+.bar b{font-size:20px}.bar input{width:100%;margin:4px 0 2px}.ticks{display:flex;justify-content:space-between;color:var(--mute);font-size:12px}
+.row{margin-bottom:8px;font-size:14px}.row button{font:inherit;margin:0 0 4px 6px;padding:4px 12px;border:1px solid var(--line);border-radius:16px;background:#fff;cursor:pointer}
+.row button.on{background:#1c2330;color:#fff;border-color:#1c2330}.sum{margin-top:6px;font-size:14px}
+.card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:12px}
+.card h2{font-size:16px;margin:0 0 2px}.rng{color:var(--mute);font-size:13px;margin-bottom:6px}
+svg{width:100%;height:110px;display:block}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px}@media(max-width:640px){.cols{grid-template-columns:1fr}}
+.side h3{font-size:13px;margin:0 0 4px}.lo h3{color:var(--lo)}.hi h3{color:var(--hi)}
+.nm{font-size:13px;display:flex;align-items:center;gap:6px;margin-bottom:3px;flex-wrap:wrap}.nm i{color:var(--mute);font-style:normal}
+.strip{display:inline-flex;gap:1px;vertical-align:middle}.strip u{display:inline-block;width:6px;height:12px;background:#e9ecf1;text-decoration:none}
+.strip u.l{background:var(--lo)}.strip u.h{background:var(--hi)}.strip u.n{background:#fff;outline:1px dotted #d5d9e0}.strip u.c{outline:2px solid #1c2330}
+details summary{cursor:pointer;color:var(--mute);font-size:12px;margin:2px 0}
+table{border-collapse:collapse;width:100%;font-size:13px}th,td{border-bottom:1px solid var(--line);padding:5px 6px;text-align:left;vertical-align:middle}
+.tag{display:inline-block;min-width:18px;padding:0 5px;border-radius:9px;background:#1c2330;color:#fff;font-size:11px;text-align:center}
+.note{color:var(--mute);font-size:12px;margin-top:6px}
+</style></head><body><main>
+<h1>평범의 범위 — 과거를 간격으로 잘라, 조각마다 가운데 몇 %를 평범으로 볼까</h1>
+<div class="sub">뉴팩트 개성 있는 아이 찾기 게임 · 미국 S&amp;P 500 __N__명 · __FIRST__ ~ __LAST__ 을 간격대로 자른 조각 · 평범 = 그 조각 안에서 중간값을 가운데 둔 가운데 N% · 개성 = 여러 조각에서 되풀이해 평범 밖</div>
+<div class="bar">
+<div class="row">간격 <span id="wins"></span></div>
+<div>평범 = 가운데 <b id="bv">80</b>% <span style="color:var(--mute);font-size:13px">(아래쪽 <span id="tv">10</span>% · 위쪽 <span id="tv2">10</span>% 가 바깥)</span></div>
+<input id="band" type="range" min="70" max="90" step="1" value="80"><div class="ticks"><span>70% (평범 좁게)</span><span>80%</span><span>90% (평범 넓게)</span></div>
+<div style="margin-top:8px">보는 조각 <b id="pv"></b> <span id="pd" style="color:var(--mute);font-size:13px"></span></div>
+<input id="piece" type="range" min="0" max="0" step="1" value="0"><div class="ticks"><span>옛날</span><span>최근</span></div>
+<div class="sum" id="sum"></div></div>
+<div id="cards"></div>
+<div class="card"><h2>지금 그룹 명단 아이들 — 조각마다 어디에 있었나</h2><div class="rng">띠 한 칸 = 조각 하나(왼쪽 옛날 → 오른쪽 최근). <span style="color:var(--lo)">■</span> 평범 아래쪽 바깥 · <span style="color:var(--hi)">■</span> 위쪽 바깥 · 옅은 칸 = 평범 안 · 굵은 테두리 = 지금 보는 조각.</div><div id="roster"></div>
+<div class="note">그룹 A · B · C 는 3년 그림을 보고 만든 첫 판입니다 — 이 화면 기준으로 다시 볼 대상입니다.</div></div>
+</main><script>
+const D=__DATA__, COLS=__COLS__, WINS=__WINS__, LABELS=__LABELS__;let W=20,P=null;
+const $=id=>document.getElementById(id);
+const q=(a,p)=>{const i=(a.length-1)*p,f=Math.floor(i);return a[f]+(a[Math.min(f+1,a.length-1)]-a[f])*(i-f)};
+const fmt=(v,d)=>v.toFixed(d);
+$('wins').innerHTML=WINS.map(w=>`<button data-w="${w}">${w}일 간격 (${LABELS[w].length}조각)</button>`).join('');
+$('wins').addEventListener('click',e=>{if(e.target.dataset.w){W=+e.target.dataset.w;P=null;draw()}});
+function calc(b){const t=(100-b)/200,np=LABELS[W].length,lim=[];
+  D.forEach(x=>{x.st=COLS.map(()=>new Array(np).fill(null))});
+  for(let p=0;p<np;p++){lim.push([]);COLS.forEach(([c],ci)=>{
+    const vals=D.map(x=>x.w[W][p]?x.w[W][p][c]:null).filter(v=>v!=null).sort((x,y)=>x-y);
+    const lo=q(vals,t),hi=q(vals,1-t),md=q(vals,.5);lim[p].push([lo,md,hi,vals]);
+    D.forEach(x=>{const r=x.w[W][p];if(r)x.st[ci][p]=r[c]<lo?-1:r[c]>hi?1:0})})}
+  return lim}
+const strip=(a,cur)=>'<span class="strip">'+a.map((v,i)=>`<u class="${v==null?'n':v<0?'l':v>0?'h':''}${i===cur?' c':''}"></u>`).join('')+'</span>';
+const fold=(list,one,empty)=>{const head=list.slice(0,5).map(one).join(''),rest=list.slice(5);
+  return (head+(rest.length?`<details><summary>나머지 ${rest.length}명 펼치기</summary>${rest.map(one).join('')}</details>`:''))||`<i>${empty}</i>`};
+const tag=x=>x.g?`<span class="tag">${x.g}</span>`:'';
+function draw(){const b=+$('band').value,t=(100-b)/2,np=LABELS[W].length;
+  if(P==null||P>=np)P=np-1;$('piece').max=np-1;$('piece').value=P;
+  $('bv').textContent=b;$('tv').textContent=$('tv2').textContent=(t%1?t.toFixed(1):t);
+  [...$('wins').children].forEach(x=>x.classList.toggle('on',+x.dataset.w===W));
+  $('pv').textContent=`${P+1} / ${np}`;$('pd').textContent=LABELS[W][P];
+  const lim=calc(b);let html='';
+  COLS.forEach(([c,label,d,unit,why],ci)=>{const [lo,md,hi,vals]=lim[P][ci];
+    const here=D.filter(x=>x.w[W][P]),val=x=>x.w[W][P][c];
+    const L=here.filter(x=>x.st[ci][P]<0).sort((x,y)=>val(x)-val(y)),H=here.filter(x=>x.st[ci][P]>0).sort((x,y)=>val(y)-val(x));
+    const n=vals.length,Wd=1000,Hh=110,max=q(vals,.995),min=vals[0],X=i=>i/(n-1)*Wd,Y=v=>Hh-6-(Math.min(v,max)-min)/(max-min||1)*(Hh-16);
+    const pts=vals.map((v,i)=>`${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join(' '),x0=X(L.length-.5),x1=X(n-H.length-.5);
+    const marks=here.filter(x=>x.g).map(x=>{const v=val(x),i=vals.indexOf(v),s=x.st[ci][P];return `<circle cx="${X(i)}" cy="${Y(v)}" r="4" fill="${s<0?'#2f6fdb':s>0?'#d0342c':'#6b7485'}"><title>${x.k||x.s} ${fmt(v,d)}</title></circle>`}).join('');
+    const cnt=(x,dir)=>x.st[ci].filter(v=>v===dir).length,all=x=>x.st[ci].filter(v=>v!=null).length;
+    const now=dir=>x=>`<div class="nm">${tag(x)}<span>${x.k||x.s}</span><i>${fmt(val(x),d)}${unit}</i>${strip(x.st[ci],P)}<i>${all(x)}조각 중 ${cnt(x,dir)}조각</i></div>`;
+    const rep=dir=>D.filter(x=>cnt(x,dir)>=2).sort((x,y)=>cnt(y,dir)-cnt(x,dir));
+    const repOne=dir=>x=>`<div class="nm">${tag(x)}<span>${x.k||x.s}</span>${strip(x.st[ci],P)}<i>${all(x)}조각 중 ${cnt(x,dir)}조각</i></div>`;
+    html+=`<div class="card"><h2>${label}</h2><div class="rng">${why} · 이 조각의 중간값 ${fmt(md,d)}${unit} · <b>평범 = ${fmt(lo,d)} ~ ${fmt(hi,d)}${unit}</b> · 아래쪽 ${L.length}명 · 위쪽 ${H.length}명</div>
+    <svg viewBox="0 0 ${Wd} ${Hh}" preserveAspectRatio="none"><rect x="${x0}" y="0" width="${x1-x0}" height="${Hh}" fill="#eef4ff"/><polyline points="${pts}" fill="none" stroke="#1c2330" stroke-width="1.6" vector-effect="non-scaling-stroke"/>${marks}</svg>
+    <div class="note">이 조각에서 아이들을 작은 값 → 큰 값으로 줄 세운 선. 파란 바탕 = 평범. 점 = 그룹 명단 아이. 이름 옆 띠 = 그 아이의 조각마다 자리.</div>
+    <div class="cols"><div class="side lo"><h3>이 조각에서 아래쪽 바깥 ${L.length}명</h3>${fold(L,now(-1),'없음')}</div>
+    <div class="side hi"><h3>이 조각에서 위쪽 바깥 ${H.length}명</h3>${fold(H,now(1),'없음')}</div></div>
+    <div class="cols" style="border-top:1px solid var(--line);padding-top:8px"><div class="side lo"><h3>되풀이 — 아래쪽 바깥이던 조각이 많은 아이</h3>${fold(rep(-1),repOne(-1),'두 조각 넘게 바깥이던 아이 없음')}</div>
+    <div class="side hi"><h3>되풀이 — 위쪽 바깥이던 조각이 많은 아이</h3>${fold(rep(1),repOne(1),'두 조각 넘게 바깥이던 아이 없음')}</div></div></div>`});
+  $('cards').innerHTML=html;
+  const here=D.filter(x=>x.w[W][P]),k=here.map(x=>COLS.filter((_,ci)=>x.st[ci][P]).length),cn=m=>k.filter(v=>m(v)).length;
+  $('sum').innerHTML=`이 조각에서 — 네 칸 모두 평범 안 ${cn(v=>v===0)}명 · 한 칸에서만 바깥 ${cn(v=>v===1)}명 · 두 칸 ${cn(v=>v===2)}명 · 세 칸 넘게 ${cn(v=>v>=3)}명`;
+  $('roster').innerHTML='<table><tr><th>아이</th><th>그룹</th>'+COLS.map(([c,l])=>`<th>${l.split(' (')[0]}</th>`).join('')+'</tr>'+
+   D.filter(x=>x.g).sort((a,b)=>a.g.localeCompare(b.g)).map(x=>`<tr><td>${x.k||x.s}</td><td>${x.g}</td>`+COLS.map((_,ci)=>`<td>${strip(x.st[ci],P)}</td>`).join('')+'</tr>').join('')+'</table>'}
+$('band').addEventListener('input',draw);$('piece').addEventListener('input',()=>{P=+$('piece').value;draw()});draw();
+</script></body></html>
