@@ -115,7 +115,25 @@ def _write(method, url, **kw):
         r = getattr(requests, method)(url, **kw)
         if r.status_code != 429:
             return r
+        print(f"[게시] 429 사유 — {_reason_429(r)}")
     return r
+
+
+def _reason_429(r):
+    """429 응답에 Google 이 적어 보내는 사유(메시지 · reason · 할당량 이름)를 한 줄로 (2026-11-24 사용자:
+    '새 글 한도' 는 추측이었다 — 무엇에 걸렸는지 로그로 확인). 본문 형식이 달라도 앞 500자는 남긴다."""
+    try:
+        err = r.json().get("error", {})
+        parts = [str(err.get("message", ""))]
+        parts += [e.get("reason", "") for e in err.get("errors", []) if isinstance(e, dict)]
+        for d in err.get("details", []):
+            if isinstance(d, dict):
+                parts.append(str(d.get("reason", "")))
+                parts += [f"{k}={v}" for k, v in (d.get("metadata") or {}).items()]
+        line = " · ".join(p for p in parts if p)
+        return line or r.text[:500]
+    except Exception:
+        return (r.text or "")[:500]
 
 
 def publish(title, content, labels=None, blog_url=None, dry_run=False, slug_title=None):
