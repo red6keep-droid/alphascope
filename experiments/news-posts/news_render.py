@@ -354,17 +354,28 @@ def _hm(iso):
     return f"{int(iso[5:7])}.{iso[8:10]} {iso[11:16]}" if iso and len(iso) >= 16 else ""
 
 
+def _title_key(t):
+    return re.sub(r"[^가-힣A-Za-z0-9]", "", re.sub(r"\[[^\]]*\]|\([^)]*\)", "", str(t or "")))
+
+
 def headline_bundles(docs, day):
     """headlines 문서들(그날 실행 여럿) → 묶음 목록. url 로 겹친 것을 빼고(가벼운 회차 · 16:30 회차 겹침, Q12), 같은 event 끼리 2 ~ 4줄 묶음.
     한 줄뿐인 사건은 기사 한 줄(원문 링크). 최근 시각부터. 버리는 것 없음 — 화면은 5개 + 더 보기."""
-    seen, ev = set(), {}
+    import difflib
+    seen, ev, titles = set(), {}, []
     for doc in docs:
-        for it in doc.get("items") or []:
+        for it in sorted(doc.get("items") or [], key=lambda x: str(x.get("publishedAt") or x.get("foundAt") or "")):
             u = it.get("url")
             at = it.get("publishedAt") or it.get("foundAt") or ""
             if not u or u in seen or not at.startswith(day):
                 continue
             seen.add(u)
+            # 같은 제목은 하나만 (2026-11-24 사용자 "같은 제목의 기사는 하나만 — 상식") — 괄호 머리말 · 띄어쓰기 · 문장부호를 빼고 85% 이상 같으면 먼저 나온 것만.
+            # 수집기 sourceCount 의 `제목 85% 이상 같은 기사는 한 곳`(요청 16절)과 같은 기준. 주소만 다른 같은 기사(YTN 두 번)가 두 줄로 나오던 것
+            t = _title_key(it.get("title"))
+            if t and any(t == x or difflib.SequenceMatcher(None, t, x).ratio() >= 0.85 for x in titles):
+                continue
+            titles.append(t)
             ev.setdefault(it.get("event") or it.get("title"), []).append(dict(it, at=at))
     out = []
     for name, rows in ev.items():
