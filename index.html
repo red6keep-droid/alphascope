@@ -3979,13 +3979,16 @@ html.as-lock, html.as-lock body { overflow: hidden; }
           body.scrollTop = 0; homePop.hidden = false; homePop.querySelector('.rt-pop-close').focus();
         }
 
-        /* 홈 카드 `Newfact 주요 기사` (2026-11-24 사용자) — 한국 홈만. 자료 = gh-pages news-posts.json(publish_news.py 가 발행 때 씀 · 최근 7일 공개 글), 방문자 1명 = jsDelivr 1번(10분 캐시 깨기).
+        /* 홈 카드 `Newfact 주요 기사` (2026-11-24 사용자) — 한국 홈만. 자료 = gh-pages news-posts.json(publish_news.py 가 발행 때 씀 · 오늘 공개 글만), 방문자 1명 = jsDelivr 1번(10분 캐시 깨기).
            기사마다 제목 + 요약 한 줄, 처음 5편 + `기사 n개 더 보기` · 날짜 = 가장 늦은 글 발행 시각(다른 카드와 같은 `11.24 아침` 꼴). 글이 없거나 못 받으면 카드를 숨긴 채 둔다 */
         (function () {
           var col = document.getElementById('nf-posts-col'), box = document.getElementById('nf-posts-card');
           if (!col || !box || HOME_MKT !== 'kr') return;
           fetch(GH + 'news-posts.json?v=' + Math.floor(Date.now() / 6e5)).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
-            var items = (j && j.items) || [], SHOWN = 5;
+            // 오늘(한국 시간) 공개 글만 — 자료는 발행 때만 새로 써서 자정 뒤엔 어제 글이 남아 있다 (2026-11-24 사용자 "홈 카드는 무조건 오늘 날짜 기사")
+            var kday = function (t) { var d = new Date(t); return isNaN(d) ? '' : new Date(d.getTime() + 9 * 36e5).toISOString().slice(0, 10); };
+            var today = kday(Date.now());
+            var items = ((j && j.items) || []).filter(function (it) { return kday(it.published) === today; }), SHOWN = 5;
             if (!items.length) return;
             var head = col.querySelector('.report-title'), lg = document.querySelector('svg.logo-full');
             if (lg && head && !head.querySelector('.nf-home-logo')) { var c = lg.cloneNode(true); c.setAttribute('class', 'nf-home-logo'); c.removeAttribute('role'); c.setAttribute('aria-label', 'Newfact 주요 기사'); head.insertBefore(c, head.firstChild); }

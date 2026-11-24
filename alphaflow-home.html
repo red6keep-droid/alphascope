@@ -2443,7 +2443,10 @@ function newsStrip(box, track, dotBox) {
           var col = document.getElementById('nf-posts-col'), box = document.getElementById('nf-posts-card');
           if (!col || !box || HOME_MKT !== 'kr') return;
           fetch(GH + 'news-posts.json?v=' + Math.floor(Date.now() / 6e5)).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
-            var items = (j && j.items) || [], SHOWN = 5;
+            // 오늘(한국 시간) 공개 글만 — 자료는 발행 때만 새로 써서 자정 뒤엔 어제 글이 남아 있다 (2026-11-24 사용자 "홈 카드는 무조건 오늘 날짜 기사")
+            var kday = function (t) { var d = new Date(t); return isNaN(d) ? '' : new Date(d.getTime() + 9 * 36e5).toISOString().slice(0, 10); };
+            var today = kday(Date.now());
+            var items = ((j && j.items) || []).filter(function (it) { return kday(it.published) === today; }), SHOWN = 5;
             if (!items.length) return;
             var head = col.querySelector('.report-title'), lg = document.querySelector('svg.logo-full');
             if (lg && head && !head.querySelector('.nf-home-logo')) { var c = lg.cloneNode(true); c.setAttribute('class', 'nf-home-logo'); c.removeAttribute('role'); c.setAttribute('aria-label', 'Newfact 주요 기사'); head.insertBefore(c, head.firstChild); }

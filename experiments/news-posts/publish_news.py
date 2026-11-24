@@ -38,7 +38,7 @@ import news_render as NR  # noqa: E402
 KST = datetime.timezone(datetime.timedelta(hours=9))
 OUT = os.path.join(BASE, "output", "publish")
 RAW = "https://raw.githubusercontent.com/red6keep-droid/alphascope/gh-pages"
-MAX_AGE_DAYS = 3
+MAX_AGE_DAYS = 0   # 오늘 날짜(한국 시간) 기사만 발행 · 고쳐 씀 — 어제 이전 기사는 내지 않는다 (2026-11-24 사용자 "Newfact 에는 오늘 날짜 기사만")
 GAP_LIVE, GAP_DRAFT = 600, 3   # 새 글 사이 — 공개는 10분(기획 3절, 11-20 새 글 거절 1회 사례), 초안은 짧게
 ADVICE = re.compile(r"(?:매수|매도|사|팔|담으)세요|(?:매수|매도|투자|손절)하(?:세요|십시오|라)|비중을? ?(?:늘리|줄이)(?:세요|십시오)|추천합니다|권합니다|권유합니다|지금이 기회")
 BAD_TITLE = re.compile(r"(폭망|대폭락 임박|무조건|100% 확실|확정적 상승|떡상|떡락)")   # 시황 해설 발행기와 같은 낱말
@@ -262,24 +262,25 @@ def stage_publish(a):
     return 1 if blocked else 0
 
 
-CARD_DAYS = 7
-
-
 def _text(html, attr):
     m = re.search(attr + r'[^>]*>(.*?)</p>', html or "", re.S)
     return re.sub(r"\s+", " ", re.sub(r"<[^>]+>", "", m.group(1))).strip() if m else ""
 
 
 def write_card(blog):
-    """홈 카드 `Newfact 주요 기사` 자료 = 최근 7일 공개 글 전부(제목 · 요약 한 줄 · 주소 · 발행 시각) → output/publish/news-posts.json.
+    """홈 카드 `Newfact 주요 기사` 자료 = 오늘(한국 시간) 공개 글 전부 (2026-11-24 사용자 "홈 카드는 무조건 오늘 날짜 기사" — 7일 → 오늘)(제목 · 요약 한 줄 · 주소 · 발행 시각) → output/publish/news-posts.json.
     워크플로가 gh-pages news-posts.json 으로 올린다 — 방문자는 이 파일 하나만 읽는다(jsDelivr, 다른 홈 카드와 같은 방식). 자르지 않는다(화면이 5개 + 접기)."""
     import html as H
     live = blog.existing(drafts=False)
-    since = (kst_now() - datetime.timedelta(days=CARD_DAYS)).isoformat()
+    today = kst_now().date().isoformat()
     items = []
     for slug, bp in live.items():
         pub = bp.get("published") or ""
-        if pub < since[:10]:
+        try:
+            pday = datetime.datetime.fromisoformat(pub.replace("Z", "+00:00")).astimezone(KST).date().isoformat()
+        except ValueError:
+            continue
+        if pday != today:
             continue
         title = re.sub(r"^" + re.escape(NR.NAME) + r"\s*:\s*", "", bp.get("title") or "")
         items.append({"slug": slug, "title": H.unescape(title), "summary": H.unescape(_text(bp.get("content"), "data-seo-lead")),

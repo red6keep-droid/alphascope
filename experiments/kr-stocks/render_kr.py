@@ -840,6 +840,7 @@ MEDIA_WEEK = []     # 최근 7일 방송 이슈 — 뉴스 방향 막대 `최근
 # 재료 = gh-pages kr-facts.json(kr-facts.yml 09:20 · 18:20) 한 번 받기 — 방문자 요청 0, AI 0. 사흘보다 오래됐거나 못 받으면 방송 이슈만(지금과 같음).
 KR_FACTS_URL = "https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/kr-facts.json"
 KR_FACTS_STALE_DAYS = 3
+KR_FACTS_HOURS = 48   # 종목 상세 페이지엔 48시간 안 사건만 (2026-11-24 사용자 "종목은 48시간 정도" — 홈은 오늘만)
 _KR_FACTS = None    # {종목 코드: [사건]} — 처음 쓸 때 한 번 읽는다. 목업 · 시험은 KR_FACTS_FILE(로컬 latest.json 꼴)로
 
 
@@ -867,8 +868,16 @@ def _kr_facts_by_code():
             if h.get("event") and h.get("url"):
                 heads.setdefault(h["event"], []).append(h)
         n = 0
+        cut = (NOW or datetime.datetime.now(datetime.timezone.utc)) - datetime.timedelta(hours=KR_FACTS_HOURS)
         for doc in d.get("facts") or []:
             for e in doc.get("events") or []:
+                try:
+                    at = datetime.datetime.fromisoformat(str(e.get("at") or "").replace("Z", "+00:00"))
+                    at = at if at.tzinfo else at.replace(tzinfo=datetime.timezone.utc)
+                except ValueError:
+                    at = None
+                if not p and at and at < cut:
+                    continue
                 codes = {str(x.get("code") or "") for x in e.get("stocks") or []} - {""}
                 for c in codes:
                     _KR_FACTS.setdefault(c, []).append(dict(e, _heads=heads.get(e.get("event"), [])))
