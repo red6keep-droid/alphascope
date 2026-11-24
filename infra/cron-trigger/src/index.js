@@ -111,6 +111,10 @@ const REPEAT = [
   // 한국 간단 종목 뉴스 매체 시험(RSS 제목) — 2시간마다 UTC 짝수 시 :10. GitHub cron 이 24시간에 2번만 돌았다 (2026-11-17 사용자 "Worker로 옮기고").
   // 시험 끝(11-21 KST) 뒤엔 걸지 않는다. gh-pages 에 안 써서 다른 실행과 push 겹침 없음.
   { workflow: "kr-rss-probe.yml", inputs: { scheduled: "true" }, when: (u) => u.m === 10 && u.h % 2 === 0 && u.day <= "2026-11-21" },
+  // 운영 대시보드 · 발행 시간(/ontime) — 매시 :50 UTC. GitHub cron 이 11-22~24 이틀 동안 3번만 돌았다 (2026-11-24 사용자 "진행해").
+  // 입력 없는 워크플로(inputs: null). 감시 알림은 끈다 — 한 시간 늦어도 다음 시각에 다시 만들고, 매시 실패 알림은 소음. gh-pages 에 안 써서 push 겹침 없음.
+  // GitHub cron(같은 :50)은 예비로 그대로 — 겹치면 워크플로 concurrency 가 앞 실행을 취소한다.
+  { workflow: "ops-dashboard.yml", inputs: null, watch: false, when: (u) => u.m === 50 },
 ];
 
 // 알림 (2026-11-12 사용자: "실패됐을 때 나한테 알림이 와야") — 11-12 GitHub 토큰 만료로 13:00 · 16:10 · 21:45 실행이
@@ -133,6 +137,7 @@ const NAMES = {
   "commentary.yml": "증시 시황 발행 (아침 · 저녁)",
   "radar-news-early.yml": "미국 종목 뉴스 먼저 분류",
   "kr-facts.yml": "한국 기사 공용 저장소",
+  "ops-dashboard.yml": "운영 대시보드 · 발행 시간",
 };
 const WATCH_AFTER_MIN = 60;
 const RETRY_AGAIN_MIN = 170;   // 한 번 더 본다(18:40) — 다시 건 실행도 실패했으면 알림, 100분 때 아직 돌다가 그 뒤 끊겼으면 그때 다시 건다
