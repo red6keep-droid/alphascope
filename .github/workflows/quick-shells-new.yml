@@ -1,15 +1,15 @@
 name: Quick stock new pages (간단 종목 새 전용 페이지)
 
-# 간단 종목 전용 페이지(/p/<영문이름>-<티커>-stock.html) 새로 만들기만 — 밤 22:30 KST 하루 한 번, 한국 날짜 하루 합계 50쪽까지.
+# 간단 종목 전용 페이지(/p/<영문이름>-<티커>-stock.html) 새로 만들기만 — 밤 23:40 KST 하루 한 번, 한국 날짜 하루 합계 50쪽까지.
 # 왜 따로: 장 마감 실행(quick-data)이 실행마다 50쪽 · 하루 약 100쪽을 몰아 만든 직후 Blogger 가 4시간 넘게 새 글을 429 로 막아
-#   2026-11-24 저녁 시황(17:00 · 21:00) · 뉴스 글이 빠졌다(2026-11-24 사용자). 시황 마지막 편(21:00) 뒤 · 다음 아침 편(08:40)까지 10시간을 비운다.
+#   2026-11-24 저녁 시황(17:00 · 21:00) · 뉴스 글이 빠졌다(2026-11-24 사용자). 시황 저녁 편 마지막 다시 시도(23:30) 뒤 · 다음 아침 편(08:40)까지 9시간을 비운다.
 # 고쳐 쓰기(소개가 바뀐 페이지)는 그대로 quick-data 가 한다(--no-new). 남은 새 페이지가 0 이면 Blogger 호출 0.
 # 저장값(quick-state)의 shells.json 을 읽고 · 만든 주소를 더해 되돌린다 — quick-data 와 같은 concurrency 묶음이라 겹쳐 돌지 않는다.
 # 브라우저 주소표(Pages /shells.json)는 다음 quick-data 실행(아침 08:20)이 새 주소까지 올린다.
 
 on:
   schedule:
-    - cron: '30 13 * * *'   # KST 22:30
+    - cron: '40 14 * * *'   # KST 23:40 — 시황 저녁 편 마지막 다시 시도(23:30) 뒤
   workflow_dispatch:
 
 permissions:
@@ -28,13 +28,13 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      # 늦은 예비 막기 — GitHub cron 이 몇 시간 늦게 와 아침 시황(08:40) 앞에 몰아 만들지 않게. 22:00~06:00 KST 만
+      # 늦은 예비 막기 — GitHub cron 이 몇 시간 늦게 와 아침 시황(08:40) 앞에 몰아 만들지 않게. 23:00~06:00 KST 만
       - name: Time window
         id: win
         run: |
           H=$(TZ=Asia/Seoul date +%H)
-          if [ "${{ github.event_name }}" = schedule ] && [ "$H" -lt 22 ] && [ "$H" -ge 6 ]; then
-            echo "go=false" >> "$GITHUB_OUTPUT"; echo "지금 $H 시(KST) — 22~06시 밖이라 건너뜀"
+          if [ "${{ github.event_name }}" = schedule ] && [ "$H" -lt 23 ] && [ "$H" -ge 6 ]; then
+            echo "go=false" >> "$GITHUB_OUTPUT"; echo "지금 $H 시(KST) — 23~06시 밖이라 건너뜀"
           else
             echo "go=true" >> "$GITHUB_OUTPUT"
           fi

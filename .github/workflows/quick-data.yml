@@ -335,7 +335,7 @@ jobs:
           BLOGGER_CLIENT_ID: ${{ secrets.BLOGGER_CLIENT_ID }}
           BLOGGER_CLIENT_SECRET: ${{ secrets.BLOGGER_CLIENT_SECRET }}
           BLOGGER_REFRESH_TOKEN: ${{ secrets.BLOGGER_REFRESH_TOKEN }}
-        # --no-new: 새 페이지는 밤 22:30 quick-shells-new.yml 만 만든다 — 장 마감 직후 몰아 만들면 Blogger 가 몇 시간 새 글을 막아 시황(08:40 · 17:00 · 21:00)이 빠진다 (2026-11-24 사용자)
+        # --no-new: 새 페이지는 밤 23:40 quick-shells-new.yml 만 만든다 — 장 마감 직후 몰아 만들면 Blogger 가 몇 시간 새 글을 막아 시황(08:40 · 17:00 · 21:00)이 빠진다 (2026-11-24 사용자)
         run: python experiments/stock-quick/publish_quick_shells.py --cache /tmp/qcache --publish --no-new --map /tmp/qd/shells.json --market "$MARKET"   # 이 실행의 시장만 (2026-11-20)
 
       # 페이지 정리로 주소표가 바뀌었으면(새 전용 페이지) Pages 에 다시 — 바뀐 파일(shells.json · names.json)만 올라간다

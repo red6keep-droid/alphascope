@@ -8,7 +8,7 @@
   - 불러오기 코드: 페이지 스크립트 묶음(js/quick.js = quick_page.js + 봉차트)을 Pages → jsDelivr 순으로 받아 실행.
     스크립트를 고쳐도 768쪽을 다시 쓰지 않는다 — 페이지는 소개가 바뀔 때만 고쳐 쓴다(해시가 같으면 건너뜀).
 쓰기: 새 페이지 하루 NEW_CAP(50) · 고쳐 쓰기 하루 UPDATE_CAP(100), 4초 간격, 429 백오프 후에도 429 면 그 실행 멈춤(publish_pages 와 같은 규칙).
-     새 페이지 = 밤 22:30 따로 실행(quick-shells-new.yml, --new-only)만, 한국 날짜 하루 합계 NEW_CAP(cache/shells_new_day.json).
+     새 페이지 = 밤 23:40 따로 실행(quick-shells-new.yml, --new-only)만, 한국 날짜 하루 합계 NEW_CAP(cache/shells_new_day.json).
      장 마감 실행(quick-data)은 --no-new 로 고쳐 쓰기만 (2026-11-24 사용자: 실행마다 50쪽 · 하루 약 100쪽을 몰아 만든 직후
      Blogger 가 4시간 넘게 새 글을 막아 17:00 · 21:00 시황이 빠졌다).
      소개가 아직 없는 종목은 만들지 않는다(같은 틀만 있는 페이지를 먼저 내보내지 않게).
@@ -419,7 +419,7 @@ def main():
     ap.add_argument("--dry", action="store_true")
     ap.add_argument("--map", default="")
     ap.add_argument("--no-new", action="store_true", help="새 페이지는 만들지 않고 고쳐 쓰기만 (장 마감 실행, 2026-11-24)")
-    ap.add_argument("--new-only", action="store_true", help="새 페이지만 — 고쳐 쓰기 안 함 (밤 22:30 따로 실행, 2026-11-24)")
+    ap.add_argument("--new-only", action="store_true", help="새 페이지만 — 고쳐 쓰기 안 함 (밤 23:40 따로 실행, 2026-11-24)")
     ap.add_argument("--market", choices=("all", "us", "kr"), default="all",
                     help="이 실행이 맡는 시장 — 한국 장 마감 실행이 미국 페이지(알파벳 순 10~24분)를 고치느라 늦지 않게 (2026-11-20 사용자)")
     a = ap.parse_args()
