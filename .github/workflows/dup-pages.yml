@@ -1,0 +1,30 @@
+name: Duplicate pages (숫자 붙은 중복 고정 페이지)
+
+# 손으로만 — 11-21 도메인 연결 직후 생긴 `_숫자` 중복 페이지 찾기 · 지우기 (experiments/stock-radar/dup_pages.py, 2026-11-24 사용자)
+on:
+  workflow_dispatch:
+    inputs:
+      delete:
+        description: '찾은 중복을 지운다 (끄면 찾기만)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - run: pip install -r experiments/daily-report/requirements.txt
+      - env:
+          BLOGGER_CLIENT_ID: ${{ secrets.BLOGGER_CLIENT_ID }}
+          BLOGGER_CLIENT_SECRET: ${{ secrets.BLOGGER_CLIENT_SECRET }}
+          BLOGGER_REFRESH_TOKEN: ${{ secrets.BLOGGER_REFRESH_TOKEN }}
+          PYTHONIOENCODING: utf-8
+        run: python experiments/stock-radar/dup_pages.py ${{ inputs.delete && '--delete' || '' }}
