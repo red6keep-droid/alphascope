@@ -42,6 +42,7 @@ def main():
     bars = pd.read_pickle(os.path.join(STORE, "bars_us.pkl"))
     earn = pd.read_csv(os.path.join(STORE, "earn_days_us.csv"), parse_dates=["day"])
     eg = {s: g for s, g in earn.groupby("sym")}
+    em = {s: g for s, g in (earn[earn["main"] == 1] if "main" in earn.columns else earn).groupby("sym")}   # 본 발표만 — 실적 반응 날(look_earn 과 같은 기준)
     ref = json.load(open(os.path.join(ROOT, "experiments", "ref", "quick_ref.json"), encoding="utf-8"))["us"]
     C = pd.DataFrame({s: d["close"] for s, d in bars.items() if not s.startswith("^")})
     hit = C.pct_change().abs() * 100 >= LS.STONE
@@ -77,7 +78,21 @@ def main():
                 ps.append([round(float(g["rng"].median()), 2), int(g["un"].sum()),
                            round(abs(float(g["c"].dropna().iloc[-1] / prev.iloc[a] - 1)) * 100, 1), int(g["vs"].sum())])
             w[W] = ps
-        rows.append({"s": s, "k": (ref.get(s.replace("-", ".")) or ref.get(s) or {}).get("ko"), "g": ROSTER.get(s), "w": w})
+        # 실적 발표 뒤 첫 거래일의 반응 — 개성으로 나온 아이의 설명에만 쓴다(누가 개성인지는 안 바꿈. 2026-11-24 사용자 "개성을 찾은 범위에서 실적 날 반응을 추가하자")
+        ev = []
+        if s in em:
+            pos, _ = LS.react_days(idx, ret, em[s], days[0])
+            eset, cl = set(pos), d["close"].values
+            for q in pos:
+                if idx[q] < days[0] or q < 61 or ret[q] != ret[q]:
+                    continue
+                base = float(pd.Series([abs(ret[k]) for k in range(q - 60, q) if k not in eset]).median())
+                stay = None
+                if q + 20 < len(idx):
+                    after = cl[q + 1:q + 21]
+                    stay = int(not ((after >= cl[q - 1]).any() if ret[q] < 0 else (after <= cl[q - 1]).any()))
+                ev.append([str(idx[q].date()), round(float(ret[q]), 2), round(base, 2), stay])
+        rows.append({"e": ev, "s": s, "k": (ref.get(s.replace("-", ".")) or ref.get(s) or {}).get("ko"), "g": ROSTER.get(s), "w": w})
     cols = [[0, "평소 하루 폭 (호수)", 1, "%", "그 조각에서 하루 동안 얼마나 오르내렸나(가운데 값)"],
             [1, "예고 없는 돌 수", 0, "개", "실적 · 파도 날이 아닌 날에 ±5% 넘게 움직인 횟수"],
             [2, "방향 크기", 0, "%", "조각 처음과 끝의 등락 크기(오름 · 내림 구분 없이)"],

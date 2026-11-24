@@ -94,13 +94,28 @@ function answer(lim){const use=picked(),np=LB.length,band=+$('band').value;$('pv
     const part=dir=>{const hit=ps.filter(p=>x.st[ci][p]===dir);if(!hit.length)return '';
       return `${hit.length===ps.length?`${ps.length}구간 모두에서`:`${ps.length}구간 중 ${hit.length}구간에서`} 대부분의 종목보다 ${CW[ci][dir>0?1:2]} — 그때 이 종목은 대체로 ${fmt(med(hit.map(p=>x.v[p][c])),d)}${unit}, 대부분의 종목은 ${fmt(med(hit.map(p=>lim[p][ci][0])),d)} ~ ${fmt(med(hit.map(p=>lim[p][ci][2])),d)}${unit}`};
     const u=part(1),l=part(-1);return `<li>${CW[ci][0]}: ${u||l?[u,l].filter(Boolean).join(' / ')+'.':'대부분의 종목과 같은 범위 안이었습니다.'}</li>`};
+  // 실적 발표 뒤 첫 거래일의 반응 — 설명에만 붙인다. 견줄 대상 = 같은 기간 모든 종목의 가운데 band%
+  const t0=(100-band)/200,d0=LB[0].slice(0,10);
+  D.forEach(x=>{const ev=(x.e||[]).filter(r=>r[0]>=d0);if(ev.length<3){x.es=null;return}
+    const ab=ev.map(r=>Math.abs(r[1])),st=ev.filter(r=>r[3]!=null),big=ab.filter(v=>v>=5).length,sk=st.filter(r=>r[3]).length;
+    x.es={n:ev.length,ev,react:med(ab),times:med(ev.filter(r=>r[2]>0).map(r=>Math.abs(r[1])/r[2])),big,bigS:big/ev.length*100,stN:st.length,stK:sk,stay:st.length?sk/st.length*100:null}});
+  const eb=k=>{const a=D.map(x=>x.es?x.es[k]:null).filter(v=>v!=null&&!isNaN(v)).sort((m,n)=>m-n);return [q(a,t0),q(a,1-t0)]};
+  const EB={react:eb('react'),times:eb('times'),bigS:eb('bigS'),stay:eb('stay')};
+  const vd=(v,b,up,dn)=>v>b[1]?`대부분의 종목보다 ${up}`:v<b[0]?`대부분의 종목보다 ${dn}`:'대부분의 종목과 같은 범위 안입니다';
+  const earnP=x=>{const s=x.es;if(!s)return `<p><b>실적 발표 뒤의 반응</b> — 이 기간에는 견줄 만큼의 실적 발표(3번 이상)가 없습니다.</p>`;
+    return `<p><b>실적 발표 뒤 첫 거래일의 반응</b> — 최근 ${Y}년의 실적 발표 ${s.n}번. 견준 대상은 같은 기간 S&amp;P 500 종목의 가운데 ${band}%("대부분의 종목")입니다.</p><ul>`+
+      `<li>발표 뒤 첫 거래일의 등락 크기: 대체로 ${s.react.toFixed(1)}% — 대부분의 종목은 ${EB.react[0].toFixed(1)} ~ ${EB.react[1].toFixed(1)}%. ${vd(s.react,EB.react,'컸습니다','작았습니다')}.</li>`+
+      `<li>그 등락이 이 종목의 평소 하루 등락(발표 전 60거래일의 가운데 값)의 몇 배였나: 대체로 ${s.times.toFixed(1)}배 — 대부분의 종목은 ${EB.times[0].toFixed(1)} ~ ${EB.times[1].toFixed(1)}배. ${vd(s.times,EB.times,'컸습니다','작았습니다')}.</li>`+
+      `<li>그날 5% 넘게 움직인 횟수: ${s.n}번 중 ${s.big}번(${s.bigS.toFixed(0)}%) — 대부분의 종목은 ${EB.bigS[0].toFixed(0)} ~ ${EB.bigS[1].toFixed(0)}%. ${vd(s.bigS,EB.bigS,'많았습니다','적었습니다')}.</li>`+
+      (s.stay!=null?`<li>발표 뒤 20거래일 동안 발표 전 가격으로 한 번도 돌아오지 않은 횟수(움직인 자리에 머묾): ${s.stN}번 중 ${s.stK}번(${s.stay.toFixed(0)}%) — 대부분의 종목은 ${EB.stay[0].toFixed(0)} ~ ${EB.stay[1].toFixed(0)}%. ${vd(s.stay,EB.stay,'많았습니다','적었습니다')}.</li>`:'')+
+      `</ul><p>발표마다(첫 거래일 등락): ${s.ev.map(r=>`${r[0]} ${r[1]>0?'+':''}${r[1].toFixed(1)}%`).join(' · ')}</p>`};
   const desc=x=>{const head=`최근 ${Y}년을 ${U}(${W}거래일)씩 ${np}구간으로 나누고, 구간마다 S&amp;P 500 ${D.length}종목을 값 순서로 줄 세워 가운데 ${band}%를 "대부분의 종목"으로 봤습니다.${x.n<np?` 이 종목은 자료가 있는 ${x.n}구간(${dur(x.n)})만 봤습니다.`:''} `;
-    if(!x.runs||!x.runs.length)return `<p>${head}이 종목은 그 범위를 벗어난 구간이 없었습니다.</p>`;
+    if(!x.runs||!x.runs.length)return `<p>${head}이 종목은 그 범위를 벗어난 구간이 없었습니다.</p>`+earnP(x);
     const lg=x.runs.filter(r=>r.n>=N),sh=x.runs.filter(r=>r.n<N),ls=x.runs[x.runs.length-1],whole=x.runs.length===1&&x.k===x.n&&x.n>=N;
     return `<p>${head}${whole?`이 종목은 <b>살펴본 ${x.n}구간(${dur(x.n)}) 내내</b> 그 범위 밖에 있었습니다.`:lg.length?`이 종목이 그 범위 밖에 ${N}구간 이상 이어서 머문 시기(개성이 드러난 시기)는 <b>${lg.length}번</b>입니다.`:`이 종목이 그 범위 밖에 ${N}구간 이상 이어서 머문 시기는 없었습니다.`}</p>`+
       lg.map(r=>`<p><b>${spanK(r)}</b> — ${dur(r.n)} 동안(${r.n}구간 연속)</p><ul>${use.map(ci=>colLine(x,r,ci)).join('')}</ul>`).join('')+
       (sh.length?`<p>이 밖에 ${N}구간보다 짧게 범위를 벗어났다가 돌아온 때가 ${sh.length}번 있었습니다(${sh.map(r=>`${spanK(r)} ${r.n}구간`).join(', ')}). 짧아서 개성이 드러난 시기로 세지 않았습니다.</p>`:'')+
-      `<p>가장 최근 구간(${LB[np-1]})에서는 ${x.tq?`대부분의 종목과 같은 범위 안입니다(${x.tq}구간째).`:ls.n>=N?`여전히 범위 밖입니다 — 드러난 시기가 ${dur(ls.n)}째 이어지고 있습니다.`:`범위 밖입니다(${ls.n}구간째 — 아직 짧아 드러난 시기로 세지 않았습니다).`}</p>`};
+      `<p>가장 최근 구간(${LB[np-1]})에서는 ${x.tq?`대부분의 종목과 같은 범위 안입니다(${x.tq}구간째).`:ls.n>=N?`여전히 범위 밖입니다 — 드러난 시기가 ${dur(ls.n)}째 이어지고 있습니다.`:`범위 밖입니다(${ls.n}구간째 — 아직 짧아 드러난 시기로 세지 않았습니다).`}</p>`+earnP(x)};
   const one=x=>`<div class="nm">${x.seen?'<span class="ok" title="그림으로 확인">✓</span>':''}<span>${x.k2||x.s}</span>${mstrip(x.mix)}<i>${x.n}조각 중 ${x.k}조각 (${x.share.toFixed(0)}%) · ${x.side}</i>`+
     `<i>${use.map((ci,j)=>x.per[j][0]+x.per[j][1]?`<span class="pill">${COLS[ci][1].split(' (')[0]} ${x.per[j][0]?'↑'+x.per[j][0]:''}${x.per[j][1]?'↓'+x.per[j][1]:''}</span>`:'').join(' ')}</i>${x.g==='D'?`<i>설정으로는 ${x.auto||'평범'}</i>`:''}<div class="ds">${desc(x)}</div></div>`;
   const sec=(g,title)=>`<div class="grp"><h3><span class="tag">${g}</span> ${title} — ${out[g].length}명</h3>${fold(out[g],one,'없음')}</div>`;
