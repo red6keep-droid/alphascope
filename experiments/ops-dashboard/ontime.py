@@ -73,13 +73,13 @@ def _every(d):
 SERVICES = [
     dict(key="news_am", name="홈 주요 뉴스 (아침)", short="뉴스 아침", at="07:00", reader=False, why="예약 06:45 · 보통 06:46 끝",
          since=dt.date(2026, 11, 14), due=_every, src=("file", "news.json", "05:00"), wf="news.yml", start="06:45"),
-    dict(key="us_report", name="미국 증시 리포트", short="미국 리포트", at="08:00", reader=True, why="안내 상자 `아침 8시 무렵` (11.24까지 7시 30분)",
+    dict(key="us_report", name="미국 증시 리포트", short="미국 리포트", at="08:00", reader=True, why="안내 상자 `아침 8시 무렵`",
          since=START, due=_us_day, src=("post", lambda e: "데일리 브리핑" in e["labels"]), wf="test-daily-report.yml", start="06:40"),
     dict(key="issue_am", name="Hot Issue (아침)", short="Hot Issue", at="08:00", reader=False, why="미국 종목 실행 안 · 보통 07:34~07:40",
          since=dt.date(2026, 11, 14), due=_every, src=("file", "issues.json", "05:00"), wf="nvda-report.yml", start="07:30", up="us_report"),
     dict(key="hypo_am", name="증시 전망 (아침 판정)", short="전망 아침", at="08:00", reader=False, why="미국 종목 실행 안 · 보통 07:34~07:40",
          since=dt.date(2026, 11, 14), due=_every, src=("file", "hypo.json", "05:00"), wf="nvda-report.yml", start="07:30", up="us_report"),
-    dict(key="us_pages", name="미국 종목 페이지", short="미국 종목", at="08:00", reader=True, why="안내 상자 `아침 8시 무렵` (11.24까지 7시 30분) · 검색 색인 커밋",
+    dict(key="us_pages", name="미국 종목 페이지", short="미국 종목", at="08:00", reader=True, why="안내 상자 `아침 8시 무렵` · 검색 색인 커밋",
          since=dt.date(2026, 11, 14), due=_us_day, src=("file", "search/us.json", "05:00"), wf="nvda-report.yml", start="07:30", up="us_report"),
     dict(key="themes", name="테마 페이지", short="테마", at="08:10", reader=False, why="미국 종목 실행 끝 무렵 · 보통 08:05~08:13 · 바뀐 날만 올려 화~토만 셈",
          since=dt.date(2026, 11, 14), due=_us_day, src=("file", "themes.json", "05:00"), wf="nvda-report.yml", start="07:30", up="us_report"),
@@ -90,9 +90,9 @@ SERVICES = [
          wf="commentary.yml", start="08:40", up="us_report"),
     dict(key="quick_us", name="간단 종목 853 (미국)", short="간단 미국", at="09:00", reader=True, why="안내 상자 `아침 9시 무렵` (11.24 고침)",
          since=dt.date(2026, 11, 17), due=_us_day, src=("run", "quick-data.yml", "· us"), wf="quick-data.yml", start="08:20", up="us_pages"),
-    dict(key="kr_report", name="한국 증시 리포트", short="한국 리포트", at="16:30", reader=True, why="안내 상자 `오후 4시 30분 무렵` (11.23까지 4시 10분)",
+    dict(key="kr_report", name="한국 증시 리포트", short="한국 리포트", at="16:30", reader=True, why="안내 상자 `오후 4시 30분 무렵`",
          since=START, due=_kr_day, src=("post", lambda e: "한국 증시 리포트" in e["labels"]), wf="kr-stocks.yml", start="15:50"),
-    dict(key="kr_pages", name="한국 종목 페이지", short="한국 종목", at="16:30", reader=True, why="안내 상자 `오후 4시 30분 무렵` (11.23까지 4시 10분) · 검색 색인 커밋",
+    dict(key="kr_pages", name="한국 종목 페이지", short="한국 종목", at="16:30", reader=True, why="안내 상자 `오후 4시 30분 무렵` · 검색 색인 커밋",
          since=dt.date(2026, 11, 14), due=_kr_day, src=("file", "search/kr.json", "15:00"), wf="kr-stocks.yml", start="15:50"),
     dict(key="kr_home", name="한국 홈 시세", short="한국 홈", at="16:30", reader=False, why="한국 종목 실행 안 · kr.json",
          since=dt.date(2026, 11, 14), due=_kr_day, src=("file", "kr.json", "15:00"), wf="kr-stocks.yml", start="15:50"),
@@ -422,7 +422,7 @@ def grid(res, now):
         by = {x[0]: x for x in ds}
         mark = "" if svc["reader"] else f'<span style="color:{GRAY};"> 내부</span>'
         rows += (f'<tr><td style="border-top:1px solid {LINE};padding:7px 2px 7px 12px;font-size:13px;line-height:17px;color:#333;word-break:keep-all;">'
-                 f'{esc(svc["short"])}<br><span style="font-size:11px;color:{NOTE_C};">{at_on(svc["key"], now.date())}{mark}</span></td>'
+                 f'{esc(svc["short"])}<br><span style="font-size:11px;color:{NOTE_C};">{svc["at"]}{mark}</span></td>'
                  + "".join(f'<td style="border-top:1px solid {LINE};padding:7px 1px;text-align:center;font-size:12px;line-height:16px;white-space:nowrap;">{_cell(by.get(d))}</td>'
                            for d in days) + "</tr>")
     tbl = (f'<table style="display:table;width:100%;border-collapse:collapse;table-layout:fixed;">'
@@ -445,15 +445,14 @@ def std_table(res, now):
         recent = [x for x in _counted(ds) if x[0] >= cut]
         times = sorted(x[2].hour * 60 + x[2].minute for x in recent if x[2])
         med = f"{times[len(times) // 2] // 60:02d}:{times[len(times) // 2] % 60:02d}" if times else "—"
-        a = svc["at"]   # 앞으로의 기준 — 바꾼 서비스는 옛 기준을 이름 아래에 (`11.24까지 07:30`)
-        old = "".join(f" · {_md(u - dt.timedelta(days=1))}까지 {o}" for u, o in AT_BEFORE.get(svc["key"], []) if u > cut)
+        a = svc["at"]   # 지금 기준만 — 옛 기준은 보이지 않는다(판정은 그날 기준으로, 2026-11-24 사용자 "옛 기준은 필요없지")
         lim = int(a[:2]) * 60 + int(a[3:]) + GRACE_MIN
         mcol = GOOD if times and times[len(times) // 2] <= lim else (BAD if times else NOTE_C)
         n_on = sum(x[1] == "on" for x in recent)
         kind = ('<span style="color:#111;">독자 약속</span>' if svc["reader"] else f'<span style="color:{GRAY};">내부</span>')
         td = f'border-top:1px solid {LINE};padding:8px 4px;font-size:13px;line-height:18px;vertical-align:top;'
         rows += (f'<tr><td style="{td}padding-left:12px;font-weight:700;color:#111;">{a}</td>'
-                 f'<td style="{td}color:#333;word-break:keep-all;">{esc(svc["name"])}<br><span style="font-size:11px;color:{NOTE_C};">{kind} · {HOW[svc["src"][0]]}{old}</span></td>'
+                 f'<td style="{td}color:#333;word-break:keep-all;">{esc(svc["name"])}<br><span style="font-size:11px;color:{NOTE_C};">{kind} · {HOW[svc["src"][0]]}</span></td>'
                  f'<td style="{td}text-align:center;color:#333;white-space:nowrap;">{DAYS.get(svc["due"], "")}</td>'
                  f'<td style="{td}text-align:center;color:{mcol};">{med}</td>'
                  f'<td style="{td}text-align:center;padding-right:12px;color:#333;">{f"{n_on}/{len(recent)}" if recent else "—"}</td></tr>')
@@ -485,21 +484,20 @@ def summary(res, now, reasons=None):
     return (warn(f"늦음 · 안 나감 {bad}번") if bad else ok("모두 정시")), f"서비스 {len(res)}개 · 기준 {len(allc)}번 중 정시 {len(allc) - bad}번", today
 
 
-def page_body(res, reasons, now):
-    allc = [x for _, ds in res for x in _counted(ds)]
-    rd = [x for svc, ds in res if svc["reader"] for x in _counted(ds)]
-    late = sum(x[1] == "late" for x in allc)
-    miss = sum(x[1] == "miss" for x in allc)
-    lead = (f'<p data-seo-lead="1" style="{dk.SEO_LEAD}">{now.month}월 {now.day}일 {now:%H:%M} 기준, 서비스 {len(res)}개의 기준 시각 '
-            f'{V(f"{len(allc)}번")} 가운데 정시 {V(f"{len(allc) - late - miss}번")}, 늦음 {V(f"{late}번")}, 안 나감 {V(f"{miss}번")}입니다. '
-            f'독자에게 알린 약속만 보면 {len(rd)}번 중 정시 {sum(x[1] == "on" for x in rd)}번입니다.</p>')
-    head = (f'<div style="display:flex;align-items:center;gap:8px;margin:0 0 12px;padding-left:{dk.ALIGN_PX}px;">'
-            f'{dk.solid_icon("clock", M.OPS_COLOR)}'
-            f'<span style="font-size:{dk.H2_SIZE};line-height:{dk.LH_H2};font-weight:700;color:#111;">기준 시각에 나갔나?</span></div>')
+# 시장 — 탭 나누기 (2026-11-24 사용자 "탭으로 미국 한국 콘텐츠 나눠"). 홈 주요 뉴스(news.json) · Hot Issue · 전망 아침 · 테마 · 인물 발언은 미국 아침 실행이라 미국
+KR_KEYS = {"kr_report", "kr_pages", "kr_home", "hypo_pm", "quick_kr", "kr_brief"}
 
-    # 오늘 — 문제(늦음 · 안 나감) 먼저, 그다음 기다림 · 정시 · 제외. 5개 펼침 + 접기
-    order = {"miss": 0, "late": 1, "wait": 2, "on": 3, "skip": 4}
-    trows = []
+
+def market(svc):
+    return "한국" if svc["key"] in KR_KEYS else "미국"
+
+
+ORDER = {"miss": 0, "late": 1, "wait": 2, "on": 3, "skip": 4}
+
+
+def today_rows(res, reasons, now):
+    """오늘 — 문제(늦음 · 안 나감) 먼저, 그다음 기다림 · 정시 · 제외."""
+    rows = []
     for svc, ds in res:
         x = next((x for x in ds if x[0] == now.date()), None)
         if not x:
@@ -518,11 +516,13 @@ def page_body(res, reasons, now):
             txt += " · " + esc(r[1])
         elif st == "skip":
             txt += " · " + esc(EXCLUDE[(svc["key"], d)])
-        trows.append((order[st], a, svc["name"] + ("" if svc["reader"] else " (내부 기준)"), _pill(st, m), txt))
-    trows.sort(key=lambda r: (r[0], r[1]))
-    top = dk.cards(lead + head + dk.sub_label("오늘") + white_card([r[2:] for r in trows], fold_at=5, noun="서비스"))
+        rows.append((ORDER[st], a, svc["name"] + ("" if svc["reader"] else " (내부 기준)"), _pill(st, m), txt))
+    rows.sort(key=lambda r: (r[0], r[1]))
+    return [r[2:] for r in rows]
 
-    # 원인 — 지난 날까지 모든 늦음 · 안 나감, 최신 위. 원인별 횟수(최근 14일 · 전체)
+
+def cause_parts(res, reasons, now):
+    """원인별 횟수 · 늦은 날 하나하나 (최신 위)."""
     evs = []
     for svc, ds in res:
         for d, st, t, m, url in ds:
@@ -537,12 +537,48 @@ def page_body(res, reasons, now):
         nall = sum(tg in e[6] for e in evs)
         if nall:
             tally.append((tg, V(f"{n14}번"), f"최근 14일 · 11.1부터 {nall}번"))
-    by_svc = sorted(((svc, sum(x[1] != "on" for x in _counted(ds)), len(_counted(ds))) for svc, ds in res), key=lambda x: -x[1])
-    svc_rows = [(s["name"], warn(f"{b}번") if b else ok("0번"), f"기준 {s['at']} · 정시 {n - b}/{n}") for s, b, n in by_svc if n]
-    ev_rows = [(f"{_md(d)} {svc['short']}", _pill(st, m),
-                f"기준 {a} → " + (_hm(t) if t else "없음") + " · " + esc(text)) for d, a, svc, st, t, m, tags, text in evs]
+    ev_rows = [(f"{_md(d)} {svc['short']}", _pill(st, m), f"기준 {a} → " + (_hm(t) if t else "없음") + " · " + esc(text))
+               for d, a, svc, st, t, m, tags, text in evs]
+    return tally, ev_rows
 
-    # 누적 — 모두 · 독자 약속 · 내부 기준
+
+def _note(text):
+    return (f'<p style="margin:4px 0 12px;padding-left:{dk.ALIGN_PX}px;font-size:13px;line-height:19px;color:{NOTE_C};word-break:keep-all;">{text}</p>')
+
+
+def market_tab(name, res, reasons, now, legend):
+    """시장 탭 — 서브탭 4개(오늘 · 7일 · 기준 · 원인). 탭 안 sub_label 은 테마가 서브탭으로 만든다 — 툴팁을 달면 이름에 붙어 나와 안내는 아래 줄로."""
+    tally, ev_rows = cause_parts(res, reasons, now)
+    tr = today_rows(res, reasons, now)
+    return (dk.h2(name, tab=name)
+            + dk.sub_label("오늘") + white_card(tr or [("오늘 나올 것", idle("없음"), "오늘은 쉬는 날")], fold_at=5, noun="서비스")
+            + dk.sub_label("7일") + grid(res, now) + legend
+            + dk.sub_label("기준") + std_table(res, now)
+            + _note(f"기준 = 이 시각 + {GRACE_MIN}분 안에 나와야 정시. 보통 = 최근 14일 실제 시각의 가운데 값(초록 = 기준 안). 정시 = 최근 14일, 그날의 기준으로 셈.")
+            + dk.sub_label("원인") + white_card(tally or [("늦은 일", ok("없음"), "")])
+            + _note("원인별 횟수 — 한 번 늦은 데 원인이 둘이면 둘 다 셉니다. 아래는 늦은 날 하나하나(최신 위).")
+            + white_card(ev_rows or [("늦은 날", ok("없음"), "")], fold_at=5, noun="건"))
+
+
+def page_body(res, reasons, now):
+    allc = [x for _, ds in res for x in _counted(ds)]
+    late = sum(x[1] == "late" for x in allc)
+    miss = sum(x[1] == "miss" for x in allc)
+    lead = (f'<p data-seo-lead="1" style="{dk.SEO_LEAD}">{now.month}월 {now.day}일 {now:%H:%M} 기준, 서비스 {len(res)}개의 기준 시각 '
+            f'{V(f"{len(allc)}번")} 가운데 정시 {V(f"{len(allc) - late - miss}번")}, 늦음 {V(f"{late}번")}, 안 나감 {V(f"{miss}번")}입니다.</p>')
+    head = (f'<div style="display:flex;align-items:center;gap:8px;margin:0 0 12px;padding-left:{dk.ALIGN_PX}px;">'
+            f'{dk.solid_icon("clock", M.OPS_COLOR)}'
+            f'<span style="font-size:{dk.H2_SIZE};line-height:{dk.LH_H2};font-weight:700;color:#111;">기준 시각에 나갔나?</span></div>')
+    by_mk = {mk: [(svc, ds) for svc, ds in res if market(svc) == mk] for mk in ("미국", "한국")}
+    mk_rows = []
+    for mk, sub in by_mk.items():
+        c = [x for _, ds in sub for x in _counted(ds)]
+        bad_today = sum(1 for _, ds in sub for x in ds if x[0] == now.date() and x[1] in ("late", "miss"))
+        wait = sum(1 for _, ds in sub for x in ds if x[0] == now.date() and x[1] == "wait")
+        val = warn(f"오늘 {bad_today}개 늦음") if bad_today else (idle(f"{wait}개 기다림") if wait else ok("오늘 정시"))
+        mk_rows.append((f"{mk} ({len(sub)}개)", val, f"11.1부터 정시 {sum(x[1] == 'on' for x in c)}/{len(c)}"))
+    top = dk.cards(lead + head + white_card(mk_rows))
+
     days = [START + dt.timedelta(days=i) for i in range((now.date() - START).days + 1)]
 
     def cum(pred):
@@ -553,28 +589,21 @@ def page_body(res, reasons, now):
         return xs
 
     cumc = chart_top(dk.trend_card("기준 시각을 넘긴 횟수 (누적, 번)", [_md(d) for d in days],
-                                   [("모두", cum(lambda s: True), "#111827", "solid"), ("독자 약속", cum(lambda s: s["reader"]), dk.CHART_SERIES[0], "solid"),
-                                    ("내부 기준", cum(lambda s: not s["reader"]), dk.CHART_SERIES[1], "solid")],
+                                   [("모두", cum(lambda s: True), "#111827", "solid"), ("미국", cum(lambda s: market(s) == "미국"), dk.CHART_SERIES[0], "solid"),
+                                    ("한국", cum(lambda s: market(s) == "한국"), dk.CHART_SERIES[1], "solid")],
                                    lambda v: f"{v:.0f}", legend_note=f"늦음 + 안 나감 · 기준 {GRACE_MIN}분 뒤까지 정시"), top=0)
-
-    # 기준 — 모든 서비스 16개를 접지 않고 한 표로 (2026-11-24 사용자 "서비스별 기준 시각 페이지가 이게 맞아?" — 5개만 보이고 요일 · 실제 시각이 없었다)
-    std = std_table(res, now)
-
     legend = (f'<p style="margin:4px 0 12px;padding-left:{dk.ALIGN_PX}px;font-size:13px;line-height:19px;color:{NOTE_C};word-break:keep-all;">'
               f'<span style="color:{GOOD};">초록 = 정시</span> · <span style="color:{BAD};font-weight:700;">주황 = 늦음 · 없음</span> · '
               f'회색 = 제외 · 대기 · 점 = 나오지 않는 날. 시각을 누르면 그 글 · 커밋 · 실행이 열립니다. `내부` = 독자에게 알리지 않은 기준.</p>')
     return (top
-            + dk.h2("최근", tab="최근") + grid(res, now) + legend
-            + dk.h2("원인", tab="원인")
-            + dk.sub_label("원인별 횟수", "한 번 늦은 데 원인이 둘이면 둘 다 셉니다.") + white_card(tally or [("늦은 일", ok("없음"), "")])
-            + dk.sub_label("서비스별 늦음 · 안 나감") + white_card(svc_rows, fold_at=5, noun="서비스")
-            + dk.sub_label("늦은 날 하나하나") + white_card(ev_rows or [("늦은 날", ok("없음"), "")], fold_at=5, noun="건")
+            + market_tab("미국", by_mk["미국"], reasons, now, legend)
+            + market_tab("한국", by_mk["한국"], reasons, now, legend)
             + dk.h2("누적", tab="누적") + cumc
-            + dk.h2("기준", tab="기준")
-            + dk.sub_label("서비스별 기준 시각", "기준 = 이 시각 + 10분 안에 나와야 정시. 보통 = 최근 14일 실제 시각의 가운데 값(초록 = 기준 안). 정시 = 최근 14일, 그날의 기준으로 셈.") + std
             + dk.guide("판정", f"기준 시각 {GRACE_MIN}분 뒤까지 정시, 그 뒤는 늦음, 그날 결과가 없으면 안 나감입니다. 오늘 기준 전이면 세지 않습니다. "
                        "원인은 그날 맡은 GitHub 실행 기록으로 봅니다 — 앞 단계 늦음(이어 붙는 서비스) · 실행 없음 · 실패(실패한 단계) · 늦게 시작(예약보다 10분 넘게) · "
-                       "여유 부족(예약 ~ 기준 시간보다 실행이 오래 걸림) · 오래 걸림(20분 넘게, 가장 긴 단계) · 다시 돌림(첫 실행이 아닌 실행에서 나감). Hot Issue 오후 · 방송 줄처럼 바뀐 날만 올리는 자료는 `안 나감`을 가릴 수 없어 넣지 않았습니다."))
+                       "여유 부족(예약 ~ 기준 시간보다 실행이 오래 걸림) · 오래 걸림(20분 넘게, 가장 긴 단계) · 다시 돌림(첫 실행이 아닌 실행에서 나감). "
+                       "Hot Issue 오후 · 방송 줄처럼 바뀐 날만 올리는 자료는 `안 나감`을 가릴 수 없어 넣지 않았습니다. "
+                       "미국 탭 = 미국 장 마감 뒤 아침 실행(홈 뉴스 포함), 한국 탭 = 한국 장 마감 뒤."))
 
 
 def build(now, cache=None, recs=None):
