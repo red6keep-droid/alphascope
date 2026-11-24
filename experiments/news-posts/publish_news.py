@@ -240,9 +240,6 @@ def stage_publish(a):
             break
         if sent:
             time.sleep(GAP_DRAFT if a.draft else GAP_LIVE)
-        if p["slug"] in drafts:
-            blog.delete(drafts[p["slug"]]["id"])
-            log(f"시험 초안 지움 — {p['slug']}")
         try:
             url = blog.create(title, html, p["slug"], a.draft)
         except Exception as e:  # noqa: BLE001
@@ -250,6 +247,12 @@ def stage_publish(a):
                 log("Blogger 새 글 거절(429) — 멈추고 다음 실행에")
                 break
             raise
+        if p["slug"] in drafts:   # 공개 글이 올라간 뒤에만 시험 초안을 지운다 (11-24 첫 공개 실행: 먼저 지우고 429 로 초안만 사라졌다)
+            try:
+                blog.delete(drafts[p["slug"]]["id"])
+                log(f"시험 초안 지움 — {p['slug']}")
+            except Exception as e:  # noqa: BLE001 — 초안이 남아도 공개 글은 나갔다
+                log(f"시험 초안 못 지움 {p['slug']}: {str(e)[:80]}")
         sent += 1
         record("draft" if a.draft else "publish", p, meta, {"url": url})
         log(f"{'초안' if a.draft else '발행'} — {title} · 기준 {meta['basis']} · {url}")
