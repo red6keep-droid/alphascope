@@ -93,12 +93,12 @@ def main():
                     stay = int(not ((after >= cl[q - 1]).any() if ret[q] < 0 else (after <= cl[q - 1]).any()))
                 ev.append([str(idx[q].date()), round(float(ret[q]), 2), round(base, 2), stay])
         rows.append({"e": ev, "s": s, "k": (ref.get(s.replace("-", ".")) or ref.get(s) or {}).get("ko"), "g": ROSTER.get(s), "w": w})
-    cols = [[0, "평소 하루 폭 (호수)", 1, "%", "그 조각에서 하루 동안 얼마나 오르내렸나(가운데 값)"],
+    cols = [[0, "평소 하루 폭 (호수)", 1, "%", "그 구간에서 하루 동안 얼마나 오르내렸나(가운데 값)"],
             [1, "예고 없는 돌 수", 0, "개", "실적 · 파도 날이 아닌 날에 ±5% 넘게 움직인 횟수"],
-            [2, "방향 크기", 0, "%", "조각 처음과 끝의 등락 크기(오름 · 내림 구분 없이)"],
+            [2, "방향 크기", 0, "%", "구간 처음과 끝의 등락 크기(오름 · 내림 구분 없이)"],
             [3, "거래량 튄 날 수", 0, "일", "거래량이 평소(지난 250일 가운데 값)의 2배를 넘은 날"]]
     html = (page.replace("__DATA__", json.dumps(rows, ensure_ascii=False, separators=(",", ":"))).replace("__COLS__", json.dumps(cols, ensure_ascii=False))
-            .replace("__N__", str(len(rows))).replace("__LAST__", str(last.date())).replace("__FIRST__", str(days[0].date()))
+            .replace("__N__", str(len(rows))).replace("__LAST__", str(last.date())).replace("__LASTK__", f"{last.year}.{last.month}.{last.day}").replace("__FIRST__", str(days[0].date()))
             .replace("__WINS__", json.dumps(WINS)).replace("__LABELS__", json.dumps(labels)))
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     open(OUT, "w", encoding="utf-8").write(html)
