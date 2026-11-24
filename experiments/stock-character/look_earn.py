@@ -7,7 +7,7 @@
     python experiments/stock-character/look_earn.py
 
 자료 = data/store/character/bars_us.pkl (check_stage1.py) · earn_days_us.csv (collect_earn_days.py --market us). 최근 3년.
-반응 날 = 발표가 장 마감 뒤면 다음 거래일, 아니면 그날.
+반응 날 = 발표가 장 마감 뒤면 다음 거래일, 아니면 그날. 단 16시 뒤 접수인데 접수 당일이 늘 더 크게 움직인 회사(아침 발표 · 오후 접수, 예: 찰스 슈왑)는 당일 — look_stones.react_days.
 재는 것(종목마다, 실적 돌 약 12개):
   반응 크기      반응 날 등락 크기(%)의 중앙값 — 모든 종목 같은 잣대
   평소의 몇 배    반응 날 등락 크기 ÷ 그 앞 60거래일(실적 날 빼고) 등락 크기 중앙값, 의 중앙값
@@ -26,6 +26,8 @@ import numpy as np
 import pandas as pd
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, HERE)
+import look_stones as LS  # noqa: E402 — react_days
 ROOT = os.path.abspath(os.path.join(HERE, "..", ".."))
 STORE = os.path.join(ROOT, "data", "store", "character")
 OUT = os.path.join(HERE, "output", "graphs")
@@ -40,7 +42,7 @@ def main():
     earn = pd.read_csv(os.path.join(STORE, "earn_days_us.csv"), parse_dates=["day"])
     if "main" in earn.columns:
         earn = earn[earn["main"] == 1]          # 본 발표만(붙어 나온 예비 · 다시 낸 공시는 뺌)
-    rows, each = [], []
+    rows, each, early = [], [], []
     for s, d in bars.items():
         if s.startswith("^") or len(d) < 400:
             continue
@@ -49,13 +51,9 @@ def main():
         ret = c.pct_change() * 100
         idx = c.index
         start = idx[-DAYS] if len(idx) > DAYS else idx[0]
-        pos_e = []
-        for _, e in earn[earn.sym == s].iterrows():
-            p = idx.searchsorted(e["day"])
-            if p < len(idx) and idx[p] == e["day"] and e["after_close"] == 1:
-                p += 1
-            if p < len(idx):
-                pos_e.append(p)
+        pos_e, is_early = LS.react_days(idx, ret.values, earn[earn.sym == s], start)
+        if is_early:
+            early.append(s)
         eset = set(pos_e)
         got = []
         for p in pos_e:
@@ -78,6 +76,7 @@ def main():
                      "big": int((a >= 5).sum()), "big_share": (a >= 5).mean(), "stay": np.mean(stays) if stays else np.nan,
                      "lake": ret.iloc[-DAYS:].abs().median()})
     R = pd.DataFrame(rows).set_index("sym")
+    print(f"아침 발표 · 오후 접수로 본 회사 {len(early)}개(접수 당일을 반응 날로): " + ", ".join(sorted(early)))
     print(f"종목 {len(R)}개 · 실적 돌 종목당 중앙 {int(R.n.median())}개 · 최근 3년")
     print(f"무리 한가운데: 반응 크기 {R.react.median():.1f}% · 평소의 {R.times.median():.1f}배 · 12번 중 ±5% 넘은 횟수 {R.big.median():.0f} · 머문 비율 {R.stay.median() * 100:.0f}%")
 

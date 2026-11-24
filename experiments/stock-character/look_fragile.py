@@ -46,12 +46,7 @@ def episodes(s, d, edays, waves):
     ret = (c.pct_change() * 100).values
     hi = c.rolling(250, min_periods=120).max()
     near = (c >= hi * (1 - NEAR)).values
-    sched = set()
-    for _, e in edays.iterrows():
-        p = idx.searchsorted(e["day"])
-        if p < len(idx) and idx[p] == e["day"] and e["after_close"] == 1:
-            p += 1
-        sched.update((p, p + 1))
+    sched = LS.sched_days(idx, edays)
     out, n0, i, n = [], len(idx) - LS.DAYS, 0, len(idx)
     while i < n:
         if not near[i]:

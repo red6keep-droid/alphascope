@@ -34,6 +34,37 @@ plt.rcParams["font.family"] = "Malgun Gothic"
 plt.rcParams["axes.unicode_minus"] = False
 
 
+def sched_days(idx, edays):
+    """정해진 돌로 치는 날(위치) — 공시 접수일 당일 · 다음 거래일, 16시 뒤 접수면 그다음 날까지.
+    2026-11-24: 접수일 당일을 넣음 — 찰스 슈왑처럼 아침에 발표하고 공시는 16시 넘어 접수하는 회사의 진짜 반응 날이 예고 없는 돌로 잡혔다."""
+    out = set()
+    for _, e in edays.iterrows():
+        p = idx.searchsorted(e["day"])
+        out.update((p, p + 1))
+        if p < len(idx) and idx[p] == e["day"] and e["after_close"] == 1:
+            out.add(p + 2)
+    return out
+
+
+def react_days(idx, ret, edays, start):
+    """실적 반응 날(위치) 목록 + 이 회사가 `아침 발표 · 오후 접수`로 보이는지.
+    16시 뒤 접수한 발표들에서 접수 당일 등락 크기 가운데 값이 다음 날의 1.5배 이상이면(4번 넘게 있을 때) 당일을 반응 날로 본다. 아니면 다음 거래일."""
+    rows = []
+    for _, e in edays.iterrows():
+        p = idx.searchsorted(e["day"])
+        if p >= len(idx):
+            continue
+        rows.append((p, bool(idx[p] == e["day"] and e["after_close"] == 1)))
+    late = [p for p, ac in rows if ac and idx[p] >= start and p + 1 < len(idx)]
+    early = False
+    if len(late) >= 4:
+        a0 = np.nanmedian([abs(ret[p]) for p in late])
+        a1 = np.nanmedian([abs(ret[p + 1]) for p in late])
+        early = bool(a0 >= 1.5 * a1)
+    pos = [p if (not ac or early) else p + 1 for p, ac in rows]
+    return [p for p in pos if p < len(idx)], early
+
+
 def profile(s, d, edays, waves):
     d = d[(d["open"] > 0) & (d["volume"] > 0)]
     if len(d) < DAYS + 260:
@@ -42,12 +73,7 @@ def profile(s, d, edays, waves):
     ret = (c.pct_change() * 100).values
     volx = (d["volume"] / d["volume"].rolling(250, min_periods=60).median()).values
     rng = ((d["high"] - d["low"]) / c * 100).values
-    sched = set()
-    for _, e in edays.iterrows():
-        p = idx.searchsorted(e["day"])
-        if p < len(idx) and idx[p] == e["day"] and e["after_close"] == 1:
-            p += 1
-        sched.update((p, p + 1))
+    sched = sched_days(idx, edays)
     n0 = len(idx) - DAYS
     st = [i for i in range(n0, len(idx)) if abs(ret[i]) >= STONE]
     wv = [i for i in st if idx[i] in waves and i not in sched]
