@@ -1,146 +1,4 @@
 {
- "e37abfc0f60f": {
-  "lines": [
-   "로버트 패틴슨이 차기 제임스 본드 배우로 캐스팅"
-  ],
-  "tags": [
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLC",
-    "issue": "CORP_EVENT",
-    "dir": "positive",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-16T22:30:12.119916+00:00",
-  "n_src": 900,
-  "retry": true
- },
- "c889827fe017": {
-  "lines": [
-   "일라이릴리의 비만치료제 외 분야 신규 계약 체결"
-  ],
-  "tags": [
-   {
-    "scope": "stock",
-    "tickers": [
-     "LLY"
-    ],
-    "sector": "XLV",
-    "issue": "CORP_EVENT",
-    "dir": "positive",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-16T22:30:14.151847+00:00",
-  "n_src": 361,
-  "retry": true
- },
- "3871cc67e044": {
-  "lines": [
-   "유나이티드항공 월요일 출발 항공편 시스템 장애 발생"
-  ],
-  "tags": [
-   null
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-16T22:30:10.508946+00:00",
-  "n_src": 900
- },
- "6757fc86f70b": {
-  "lines": [
-   "버크셔 해서웨이 3분기 델타항공 지분 12% 확대",
-   "3분기 말 델타항공 지분 가치 53억 7000만 달러 기록"
-  ],
-  "tags": [
-   null,
-   null
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-16T22:30:10.508946+00:00",
-  "n_src": 900
- },
- "81e420a7570a": {
-  "lines": [
-   "오픈에이아이 안전성 평가 위해 독립 평가사 4곳과 계약 체결"
-  ],
-  "tags": [
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLK",
-    "issue": "CORP_EVENT",
-    "dir": "positive",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-16T22:30:10.508946+00:00",
-  "n_src": 900
- },
- "f5b40b49f970": {
-  "lines": [
-   "도널드 트럼프의 투자 계좌가 지난해 엔비디아 주식을 최대 58백만 달러 보유",
-   "백악관 재입성 이후 트럼프 계좌의 엔비디아 관련 거래 규모가 최대 9750만 달러 기록"
-  ],
-  "tags": [
-   {
-    "scope": "stock",
-    "tickers": [
-     "NVDA"
-    ],
-    "sector": "SMH",
-    "issue": "MARKET_STRUCTURE",
-    "dir": "neutral",
-    "stage": "done"
-   },
-   {
-    "scope": "stock",
-    "tickers": [
-     "NVDA"
-    ],
-    "sector": "SMH",
-    "issue": "MARKET_STRUCTURE",
-    "dir": "neutral",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-16T22:30:12.119916+00:00",
-  "n_src": 900
- },
- "e23b92262f9e": {
-  "lines": [
-   "미 상무부가 중국 기업의 엔비디아 첨단 컴퓨팅 파워 우회 임대를 차단하는 규정 발표",
-   "젠슨 황 엔비디아 CEO의 사임"
-  ],
-  "tags": [
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "SMH",
-    "issue": "REGULATION",
-    "dir": "negative",
-    "stage": "done"
-   },
-   {
-    "scope": "stock",
-    "tickers": [
-     "NVDA"
-    ],
-    "sector": "SMH",
-    "issue": "CORP_EVENT",
-    "dir": "negative",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-16T22:30:12.119916+00:00",
-  "n_src": 900
- },
  "d97ed0c1bbfd": {
   "lines": [
    "도널드 트럼프 미국 대통령의 아시아 순방 시작",
@@ -168,279 +26,6 @@
   "at": "2026-11-17T21:46:35.186379+00:00",
   "n_src": 900,
   "retry": true
- },
- "9a6087f7ddac": {
-  "lines": [
-   "우크라이나의 러시아 크림반도 크로치 다리 공격과 부분 파괴"
-  ],
-  "tags": [
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLE",
-    "issue": "GEOPOLITICS",
-    "dir": "negative",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-17T12:46:21.343388+00:00",
-  "n_src": 900
- },
- "8c1ef7e8c246": {
-  "lines": [
-   "디즈니의 4분기 실적과 매출의 예상치 상회",
-   "2029 회계연도까지 30억 달러 비용 절감 목표 설정"
-  ],
-  "tags": [
-   {
-    "scope": "stock",
-    "tickers": [
-     "DIS"
-    ],
-    "sector": "XLC",
-    "issue": "EARNINGS",
-    "dir": "positive",
-    "stage": "done"
-   },
-   {
-    "scope": "stock",
-    "tickers": [
-     "DIS"
-    ],
-    "sector": "XLC",
-    "issue": "CORP_EVENT",
-    "dir": "positive",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-17T12:46:21.343388+00:00",
-  "n_src": 900
- },
- "65047d2bef1b": {
-  "lines": [
-   "나이키 9년 만의 첫 투자자의 날 개최",
-   "나이키 회계연도 1분기 순이익 및 매출 감소",
-   "나이키 회계연도 2027년 매출 한 자릿수 후반 감소 전망"
-  ],
-  "tags": [
-   null,
-   null,
-   null
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-17T12:46:22.796606+00:00",
-  "n_src": 900
- },
- "266faa9385b8": {
-  "lines": [
-   "엔비디아 옵션 시장 변동성 4월 이후 최고치 기록",
-   "엔비디아 실적 발표 앞두고 옵션 거래자 7% 주가 반응 예상",
-   "엔비디아 내재 변동성 68 도달"
-  ],
-  "tags": [
-   {
-    "scope": "stock",
-    "tickers": [
-     "NVDA"
-    ],
-    "sector": "SMH",
-    "issue": "MARKET_STRUCTURE",
-    "dir": "neutral",
-    "stage": "done"
-   },
-   {
-    "scope": "stock",
-    "tickers": [
-     "NVDA"
-    ],
-    "sector": "SMH",
-    "issue": "EARNINGS",
-    "dir": "uncertain",
-    "stage": "talk"
-   },
-   {
-    "scope": "stock",
-    "tickers": [
-     "NVDA"
-    ],
-    "sector": "SMH",
-    "issue": "MARKET_STRUCTURE",
-    "dir": "neutral",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-17T12:46:22.796606+00:00",
-  "n_src": 900
- },
- "7909b6a88d9c": {
-  "lines": [
-   "미국 세 번째 항공모함 중동 걸프 지역 도착",
-   "이란 혁명수비대 해군 호르무즈 해협 폐쇄 경고"
-  ],
-  "tags": [
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "GEOPOLITICS",
-    "dir": "neutral",
-    "stage": "done"
-   },
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "GEOPOLITICS",
-    "dir": "negative",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-17T12:46:22.796606+00:00",
-  "n_src": 900
- },
- "51e78b9adda1": {
-  "lines": [
-   "대학 수학능력시험 영어 듣기 평가 시간 동안 전국 항공기 이스착륙 35분간 금지",
-   "국토교통부 발표에 따른 영향 항공기 총 130편",
-   "시험 시간 중 공중 비행 항공기는 상온 3킬로미터 이상 고도 유지 의무"
-  ],
-  "tags": [
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLI",
-    "issue": "OTHER",
-    "dir": "neutral",
-    "stage": "done"
-   },
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLI",
-    "issue": "OTHER",
-    "dir": "neutral",
-    "stage": "done"
-   },
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLI",
-    "issue": "OTHER",
-    "dir": "neutral",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-17T12:46:24.391072+00:00",
-  "n_src": 900
- },
- "4e8f7775bd56": {
-  "lines": [
-   "미국 부통령 제이디 밴스의 2028년 대선 출마 여부 내년 결정 예정"
-  ],
-  "tags": [
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "FISCAL_POLITICS",
-    "dir": "uncertain",
-    "stage": "talk"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-17T12:46:24.391072+00:00",
-  "n_src": 900
- },
- "f4ca3a19032b": {
-  "lines": [
-   "스페인 정부의 데이터 센터 규제 강화 추진",
-   "아마존과 마이크로소프트 및 블랙스톤 산하 큐티에스 투자 영향권 포함"
-  ],
-  "tags": [
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLK",
-    "issue": "REGULATION",
-    "dir": "negative",
-    "stage": "talk"
-   },
-   {
-    "scope": "stock",
-    "tickers": [
-     "AMZN",
-     "MSFT"
-    ],
-    "sector": null,
-    "issue": "REGULATION",
-    "dir": "negative",
-    "stage": "talk"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-17T12:46:24.391072+00:00",
-  "n_src": 900
- },
- "e12cc7917ed3": {
-  "lines": [
-   "도이체방크 내부 고발 약 1500만 건 유출",
-   "제프리 엡스타인 연계 의심 거래 5억 8200만 달러 처리"
-  ],
-  "tags": [
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLF",
-    "issue": "REGULATION",
-    "dir": "negative",
-    "stage": "done"
-   },
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLF",
-    "issue": "REGULATION",
-    "dir": "negative",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-17T12:46:25.401373+00:00",
-  "n_src": 900
- },
- "7d91861a30f2": {
-  "lines": [
-   "젠슨 황 엔비디아 CEO 사임",
-   "트럼프 행정부 중국 기업 첨단 칩 원격 접근 규제 강화"
-  ],
-  "tags": [
-   {
-    "scope": "stock",
-    "tickers": [
-     "NVDA"
-    ],
-    "sector": "SMH",
-    "issue": "CORP_EVENT",
-    "dir": "negative",
-    "stage": "done"
-   },
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "SMH",
-    "issue": "TARIFF_TRADE",
-    "dir": "negative",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-17T12:46:25.401373+00:00",
-  "n_src": 900
  },
  "54df06262303": {
   "lines": [
@@ -3661,6 +3246,304 @@
   ],
   "model": "groq:qwen/qwen3.8-27b",
   "at": "2026-11-23T21:58:57.357416+00:00",
+  "n_src": 900
+ },
+ "460ecfec9c50": {
+  "lines": [
+   "사노피의 인스메드 410억 달러 인수 합의",
+   "인스메드 주가 14% 급등"
+  ],
+  "tags": [
+   null,
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLV",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-24T12:47:14.366068+00:00",
+  "n_src": 900
+ },
+ "c16d81286e68": {
+  "lines": [
+   "러시아의 에스토니아 국경 폐쇄 조치 비난",
+   "에스토니아의 12월 1일 도로 국경 통행 폐쇄 예정"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "GEOPOLITICS",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "GEOPOLITICS",
+    "dir": "negative",
+    "stage": "talk"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-24T12:47:14.366068+00:00",
+  "n_src": 900
+ },
+ "d36e529bf39c": {
+  "lines": [
+   "베스트바이의 3분기 동일점포 매출 6.1% 증가",
+   "베스트바이의 연간 매출 가이던스 상향 조정"
+  ],
+  "tags": [
+   null,
+   null
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-24T12:47:14.366068+00:00",
+  "n_src": 900
+ },
+ "58861b464a1d": {
+  "lines": [
+   "일부 미국 푸드뱅크의 지원 수요가 팬데믹 당시 수준을 상회"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLP",
+    "issue": "GROWTH_JOBS",
+    "dir": "negative",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-24T12:48:01.268592+00:00",
+  "n_src": 900
+ },
+ "11b430ff93ab": {
+  "lines": [
+   "미 연방 항소법원의 아이오와 탄약 시설 폭발물 처리 허용"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLI",
+    "issue": "REGULATION",
+    "dir": "positive",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-24T12:48:01.268592+00:00",
+  "n_src": 900
+ },
+ "0498093f95b4": {
+  "lines": [
+   "11월 프랑스 비즈니스 활동의 6개월 내 최저치 기록"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "MARKET_STRUCTURE",
+    "dir": "negative",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-24T12:48:01.268592+00:00",
+  "n_src": 900
+ },
+ "43a3af0872fb": {
+  "lines": [
+   "젠슨 황 엔비디아 CEO 복귀로 이사회 감독 및 거버넌스 집중 점검",
+   "황의 갑작스러운 사임 및 재임명으로 엔비디아 승계 계획 취약점 노출"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "CORP_EVENT",
+    "dir": "neutral",
+    "stage": "done"
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "CORP_EVENT",
+    "dir": "negative",
+    "stage": "done"
+   }
+  ],
+  "model": "groq:qwen/qwen3.8-27b",
+  "at": "2026-11-24T12:48:51.105100+00:00",
+  "n_src": 900
+ },
+ "e3c164de68be": {
+  "lines": [
+   "젠슨 황 엔비디아 CEO 복귀로 아시아 기술주 투자자 자금 유입",
+   "TSMC 주가 9.85% 급등, 폭스콘 9.95% 및 미디어텍 9.91% 상승"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "SMH",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "positive",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "SMH",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
+   }
+  ],
+  "model": "groq:qwen/qwen3.8-27b",
+  "at": "2026-11-24T12:48:51.105100+00:00",
+  "n_src": 900
+ },
+ "5707f4f4d41e": {
+  "lines": [
+   "시그널, AI 에이전트 화면 정보 접근 차단 기능 도입",
+   "iOS 스크린샷 차단 및 안드로이드 AI 어시스턴트 화면 보안 활성화"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLK",
+    "issue": "REGULATION",
+    "dir": "neutral",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLK",
+    "issue": "REGULATION",
+    "dir": "neutral",
+    "stage": "done"
+   }
+  ],
+  "model": "groq:qwen/qwen3.8-27b",
+  "at": "2026-11-24T12:48:51.105100+00:00",
+  "n_src": 900
+ },
+ "fdbead87f74d": {
+  "lines": [
+   "젠슨 황 엔비디아 CEO 복귀 이사회 만장일치 승인",
+   "엔비디아 주가 125.53달러 마감",
+   "나스닥 6.5% 상승 2025년 4월 이후 최고 기록",
+   "S&P 500 4.7% 상승 2025년 4월 이후 최고 기록",
+   "젠슨 황 복귀 청원 20만 명 이상 서명"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "CORP_EVENT",
+    "dir": "positive",
+    "stage": "done"
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "CORP_EVENT",
+    "dir": "neutral",
+    "stage": "done"
+   }
+  ],
+  "model": "groq:qwen/qwen3.8-27b",
+  "at": "2026-11-24T12:50:00.386150+00:00",
+  "n_src": 900
+ },
+ "8d9fe0b4ba80": {
+  "lines": [],
+  "tags": [],
+  "model": "groq:qwen/qwen3.8-27b",
+  "at": "2026-11-24T12:50:00.386150+00:00",
+  "n_src": 900
+ },
+ "e4ce6dcd2ebf": {
+  "lines": [
+   "호르무즈 해협 3척 유조선 지뢰 피격 화재",
+   "미국 테헤란 금융 차단 제재 강화"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLE",
+    "issue": "GEOPOLITICS",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLE",
+    "issue": "GEOPOLITICS",
+    "dir": "negative",
+    "stage": "done"
+   }
+  ],
+  "model": "groq:qwen/qwen3.8-27b",
+  "at": "2026-11-24T12:50:00.386150+00:00",
   "n_src": 900
  }
 }
