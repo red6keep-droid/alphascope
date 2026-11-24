@@ -65,6 +65,18 @@ input[type=range]{width:100%;margin:8px 0 0;accent-color:#111}
 .sub1{flex:none;padding:6px 11px;font:inherit;font-size:19px;line-height:25px;font-weight:400;color:var(--sub);background:none;border:0;border-bottom:3px solid transparent;margin-bottom:-1px;white-space:nowrap;cursor:pointer}
 .sub1[aria-selected="true"]{color:#111;font-weight:700;border-bottom-color:#FF3333}.sub1 small{font-size:14px;font-weight:400}
 [data-p][hidden]{display:none}
+.tip{display:inline-flex;vertical-align:middle;margin:0 3px;padding:0;border:0;background:none;color:var(--sub);cursor:pointer;line-height:0}
+.tips{display:flex;justify-content:flex-end;align-items:center;gap:6px;font-size:14px;line-height:20px;color:var(--sub);margin:10px 0 0;white-space:nowrap}
+.tips>i{font-style:normal;color:#CBD5E1}.tips>span{display:inline-flex;align-items:center}
+.pop{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:16px}.pop[hidden]{display:none}
+.pop::before{content:"";position:fixed;top:-100px;right:0;bottom:-100px;left:0;z-index:-1;background:rgba(15,23,42,.45)}
+.popbox{position:relative;display:flex;flex-direction:column;width:100%;max-width:520px;max-height:80vh;overflow:hidden;background:#fff;border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,.25)}
+.pophead{position:relative;flex:none;padding:20px 60px 12px 20px}.pophead::after{content:"";position:absolute;left:20px;right:12px;bottom:0;border-bottom:1px solid var(--line)}
+.poptitle{margin:0;font-size:19px;line-height:25px;font-weight:700;color:#111}
+.popx{position:absolute;top:14px;right:12px;width:32px;height:32px;border:1px solid var(--line);border-radius:8px;background:#fff;color:#111;font-size:20px;line-height:30px;padding:0;cursor:pointer}
+.popbody{flex:1 1 auto;min-height:0;overflow-y:auto;padding:12px 20px 22px;font-size:19px;line-height:28px;color:var(--body)}
+.popbody p{margin:14px 0 0}.popli{display:flex;align-items:flex-start;gap:7px;margin:21px 0 11px;padding-left:7px}
+.popli>i{flex:none;width:3px;height:3px;margin-top:12px;border-radius:50%;background:#111}.popli b{color:#111}
 .rk{font-size:14px;line-height:20px;color:var(--sub);margin-top:10px}.rk .strip{margin-top:4px}
 </style></head><body><main>
 <h1>개성 있는 아이 찾기</h1>
@@ -99,7 +111,9 @@ input[type=range]{width:100%;margin:8px 0 0;accent-color:#111}
 </div>
 <div class="guide" id="setg" style="margin-top:10px"></div>
 </section>
-</main><script>
+</main>
+<div class="pop" id="pop" hidden role="dialog" aria-modal="true"><div class="popbox"><div class="pophead"><h3 class="poptitle" id="popt"></h3><button class="popx" id="popx" aria-label="닫기">×</button></div><div class="popbody" id="popb"></div></div></div>
+<script>
 const D=__DATA__, COLS=__COLS__, WINS=__WINS__, LABELS=__LABELS__;let W=20,P=null,Y=3,LB=[];
 const TABS=['개성','구간','명단','설정'];let TAB=TABS.includes(decodeURIComponent(location.hash.slice(1)))?decodeURIComponent(location.hash.slice(1)):'개성',SG='A',SC=0;   // 고른 탭은 URL 해시에 남긴다(가이드라인 12절)
 const $=id=>document.getElementById(id);
@@ -111,6 +125,15 @@ const dot=d=>{const [y,m,dd]=d.split('-');return `${y}.${+m}.${+dd}`};      // �
 const lbk=s=>s.split(' ~ ').map(dot).join(' ~ ');
 const tri=(v,dec,unit,px)=>v===0?`0${unit}`:`<span class="${v>0?'up':'dn'}"><span class="tr" style="font-size:${px}px">${v>0?'▲':'▼'}</span>${Math.abs(v).toFixed(dec)}${unit}</span>`;   // 증감 = 삼각형 + 절댓값 + 증감 색, 삼각형은 글자의 80%
 const vio=t=>`<span class="vio">${t}</span>`;
+// 툴팁 — 되풀이되는 설명글은 ? 아이콘 뒤 팝업으로(가이드라인 11절: 뜻 한 문장 + `· 라벨 : 풀이` 줄). 글은 data-tip 에 줄바꿈으로 담는다
+const QICON='<svg viewBox="0 0 16 16" width="20" height="20" aria-hidden="true" style="display:block" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.2"/><text x="8" y="11.6" text-anchor="middle" fill="currentColor" stroke="none" font-family="Arial, Helvetica, sans-serif" font-size="11" font-weight="700">?</text></svg>';
+const att=t=>String(t).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/\n/g,'&#10;');
+const tip=(title,text)=>`<button class="tip" data-tip-title="${att(title)}" data-tip="${att(text)}" aria-label="${att(title)} 설명">${QICON}</button>`;
+const tipL=(label,text)=>`<span>${label}${tip(label,text)}</span>`;
+function openTip(b){$('popt').textContent=b.dataset.tipTitle;
+  $('popb').innerHTML=b.dataset.tip.split('\n').map(l=>{const e=l.replace(/&/g,'&amp;').replace(/</g,'&lt;');if(!l.startsWith('· '))return `<p>${e}</p>`;
+    const t=e.slice(2),k=t.indexOf(' : ');return `<div class="popli"><i></i><span>${k>0&&k<=14?`<b>${t.slice(0,k)}</b>${t.slice(k)}`:t}</span></div>`}).join('');$('pop').hidden=false}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')$('pop').hidden=true});
 $('wins').innerHTML=WINS.map(w=>`<button class="cap" data-w="${w}"></button>`).join('');
 $('yrs').innerHTML=[1,2,3].map(y=>`<button class="cap" data-y="${y}">최근 ${y}년</button>`).join('');
 $('yrs').addEventListener('click',e=>{if(e.target.dataset.y){Y=+e.target.dataset.y;P=null;draw()}});
@@ -132,7 +155,9 @@ const strip=(a,cur)=>'<span class="strip">'+a.map((v,i)=>`<u class="${v==null?'n
 // 목록 = 전부 싣고 5개 펼침 + 나머지 접기(상한으로 버리지 않는다)
 const fold=(list,one,empty,noun)=>{if(!list.length)return `<div class="empty">${empty}</div>`;const head=list.slice(0,5).map(one).join(''),rest=list.slice(5);
   return rest.length?`<div data-box>${head}<div data-rest hidden>${rest.map(one).join('')}</div><button class="fbtn" data-tg data-c="${noun} ${rest.length}명 더 보기"><span class="lb">${noun} ${rest.length}명 더 보기</span>${CHEV}</button></div>`:head};
-document.addEventListener('click',e=>{const c=e.target.closest&&e.target.closest('[data-tab],[data-g],[data-c]');
+document.addEventListener('click',e=>{const tb=e.target.closest&&e.target.closest('[data-tip]');if(tb){openTip(tb);return}
+  if(e.target.id==='pop'||e.target.id==='popx'){$('pop').hidden=true;return}
+  const c=e.target.closest&&e.target.closest('[data-tab],[data-g],[data-c]');
   if(c){if(c.dataset.tab){TAB=c.dataset.tab;history.replaceState(null,'','#'+encodeURIComponent(TAB));window.scrollTo(0,0)}else if(c.dataset.g)SG=c.dataset.g;else SC=+c.dataset.c;draw();return}
   const b=e.target.closest&&e.target.closest('[data-tg]');if(!b)return;const r=b.closest('[data-box]').querySelector(':scope > [data-rest]');
   r.hidden=!r.hidden;b.classList.toggle('open',!r.hidden);if(b.dataset.c)b.querySelector('.lb').textContent=r.hidden?b.dataset.c:'접기'});
@@ -161,12 +186,15 @@ function answer(lim){const use=picked(),np=LB.length,band=+$('band').value;
   const ymk=(p,e)=>{const d=LB[p].split(' ~ ')[e];return `${d.slice(0,4)}년 ${+d.slice(5,7)}월`},spanK=r=>{const a=ymk(r.a,0),b=ymk(r.b,1);return a===b?a:`${a} ~ ${b}`};
   const dur=n=>{const m=Math.max(1,Math.round(n*W/21)),y=Math.floor(m/12),o=m%12;return '약 '+(y?y+'년'+(o?' '+o+'개월':''):o+'개월')};
   const med=a=>q(a.slice().sort((x,y)=>x-y),.5),li=t=>`<li><i></i><span>${t}</span></li>`;
-  const CW=[['하루 동안 오르내린 폭 (그날 고가와 저가의 차이)','컸습니다','작았습니다'],['실적 발표일도 시장 전체가 흔들린 날도 아닌데 하루에 5% 넘게 움직인 날 수','많았습니다','적었습니다'],
-    ['구간 처음과 끝 사이의 등락 크기 (오름 · 내림 구분 없이)','컸습니다','작았습니다'],['거래량이 평소의 2배를 넘은 날 수','많았습니다','적었습니다']];
+  const CW=[['컸습니다','작았습니다'],['많았습니다','적었습니다'],['컸습니다','작았습니다'],['많았습니다','적었습니다']];
+  const TIP_READ=`과거를 같은 길이의 구간으로 나누고, 구간마다 종목을 값 순서로 줄 세워 가운데에 있는 종목들을 대부분의 종목으로 봅니다.\n· 지금 설정 : 최근 ${Y}년을 ${U}(${W}거래일)씩 ${np}구간, 가운데 ${band}%\n· 견준 대상 : 같은 구간의 S&P 500 ${D.length}종목\n· 개성이 드러난 시기 : 그 범위 밖에 ${N}구간 이상 이어서 머문 때입니다. 그보다 짧으면 세지 않고 따로 적습니다\n· 띠 : 한 칸이 구간 하나이고 왼쪽이 옛날입니다`;
+  const TIP_TERM=`네 가지를 구간마다 다시 잽니다.\n· 평소 하루 폭 : 하루 동안 오르내린 폭, 그날 고가와 저가의 차이\n· 예고 없는 돌 수 : 실적 발표일도 시장 전체가 흔들린 날도 아닌데 하루에 5% 넘게 움직인 날 수\n· 방향 크기 : 구간 처음과 끝 사이의 등락 크기, 오름과 내림을 가리지 않습니다\n· 거래량 튄 날 수 : 거래량이 평소의 2배를 넘은 날 수`;
+  const TIP_EARN=`실적 발표 뒤 첫 거래일에 주가가 얼마나 움직였는지를 다른 종목과 견줍니다.\n· 견준 대상 : 같은 기간 S&P 500 종목의 가운데 ${band}%\n· 평소 하루 등락 : 발표 전 60거래일의 가운데 값\n· 머문 횟수 : 발표 뒤 20거래일 동안 발표 전 가격으로 한 번도 돌아오지 않은 횟수`;
+  const TIP_GROUP=`구간 하나에서 볼 칸 중 하나라도 평범 밖이면 그 구간을 평범 밖으로 셉니다.\n· 개성 : 그 비율이 높은 순으로 종목의 위쪽 ${100-band}%\n· A · B · C : 개성 안에서 센 순서대로 3분의 1씩\n· D 단체 : 같은 때 같이 움직인 무리, 사람이 넣었습니다\n· 평범 : 나머지이고 이름을 싣지 않습니다`;
   const colLine=(x,r,ci)=>{const [c,,d,u0]=COLS[ci],unit=u0==='개'?'일':u0,ps=[];for(let p=r.a;p<=r.b;p++)if(x.v[p])ps.push(p);
     const part=dir=>{const hit=ps.filter(p=>x.st[ci][p]===dir);if(!hit.length)return '';
-      return `${hit.length===ps.length?`${ps.length}구간 모두에서`:`${ps.length}구간 중 ${vio(hit.length+'구간')}에서`} 대부분의 종목보다 ${CW[ci][dir>0?1:2]}. 그때 이 종목은 대체로 <b>${fmt(med(hit.map(p=>x.v[p][c])),d)}${unit}</b>, 대부분의 종목은 ${fmt(med(hit.map(p=>lim[p][ci][0])),d)} ~ ${fmt(med(hit.map(p=>lim[p][ci][2])),d)}${unit}.`};
-    const u=part(1),l=part(-1);return li(`<b>${CW[ci][0]}</b> : ${u||l?[u,l].filter(Boolean).join(' '):'대부분의 종목과 같은 범위 안이었습니다.'}`)};
+      return `${hit.length===ps.length?`${ps.length}구간 모두에서`:`${ps.length}구간 중 ${vio(hit.length+'구간')}에서`} 대부분의 종목보다 ${CW[ci][dir>0?0:1]}. 그때 이 종목은 대체로 <b>${fmt(med(hit.map(p=>x.v[p][c])),d)}${unit}</b>, 대부분의 종목은 ${fmt(med(hit.map(p=>lim[p][ci][0])),d)} ~ ${fmt(med(hit.map(p=>lim[p][ci][2])),d)}${unit}.`};
+    const u=part(1),l=part(-1);return li(`<b>${CN[ci]}</b> : ${u||l?[u,l].filter(Boolean).join(' '):'대부분의 종목과 같은 범위 안이었습니다.'}`)};
   // 실적 발표 뒤 첫 거래일의 반응 — 설명에만 붙인다. 견줄 대상 = 같은 기간 모든 종목의 가운데 band%
   const t0=(100-band)/200,d0=LB[0].slice(0,10);
   D.forEach(x=>{const ev=(x.e||[]).filter(r=>r[0]>=d0);if(ev.length<3){x.es=null;return}
@@ -175,30 +203,31 @@ function answer(lim){const use=picked(),np=LB.length,band=+$('band').value;
   const eb=k=>{const a=D.map(x=>x.es?x.es[k]:null).filter(v=>v!=null&&!isNaN(v)).sort((m,n)=>m-n);return [q(a,t0),q(a,1-t0)]};
   const EB={react:eb('react'),times:eb('times'),bigS:eb('bigS'),stay:eb('stay')};
   const vd=(v,b,up,dn)=>v>b[1]?`대부분의 종목보다 ${up}`:v<b[0]?`대부분의 종목보다 ${dn}`:'대부분의 종목과 같은 범위 안입니다';
-  const earnP=x=>{const s=x.es;if(!s)return `<p class="ph">실적 발표 뒤 첫 거래일의 반응</p><p class="tn">이 기간에는 견줄 만큼의 실적 발표(3번 이상)가 없습니다.</p>`;
-    return `<p class="ph">실적 발표 뒤 첫 거래일의 반응</p><p class="tn">최근 ${Y}년의 실적 발표 ${s.n}번 · 비교 대상 = 같은 기간 S&amp;P 500 종목의 가운데 ${band}% (대부분의 종목)</p><ul>`+
-      li(`<b>발표 뒤 첫 거래일의 등락 크기</b> : 대체로 <b>${s.react.toFixed(1)}%</b>, 대부분의 종목은 ${EB.react[0].toFixed(1)} ~ ${EB.react[1].toFixed(1)}%. ${vd(s.react,EB.react,'컸습니다','작았습니다')}.`)+
-      li(`<b>평소 하루 등락의 몇 배였나</b> (평소 = 발표 전 60거래일의 가운데 값) : 대체로 <b>${s.times.toFixed(1)}배</b>, 대부분의 종목은 ${EB.times[0].toFixed(1)} ~ ${EB.times[1].toFixed(1)}배. ${vd(s.times,EB.times,'컸습니다','작았습니다')}.`)+
+  const eh=`<p class="ph">실적 발표 뒤 첫 거래일의 반응${tip('실적 발표 뒤 첫 거래일의 반응',TIP_EARN)}</p>`;
+  const earnP=x=>{const s=x.es;if(!s)return eh+`<p class="tn">이 기간에는 견줄 만큼의 실적 발표(3번 이상)가 없습니다.</p>`;
+    return eh+`<p class="tn">최근 ${Y}년의 실적 발표 ${s.n}번</p><ul>`+
+      li(`<b>첫 거래일의 등락 크기</b> : 대체로 <b>${s.react.toFixed(1)}%</b>, 대부분의 종목은 ${EB.react[0].toFixed(1)} ~ ${EB.react[1].toFixed(1)}%. ${vd(s.react,EB.react,'컸습니다','작았습니다')}.`)+
+      li(`<b>평소 하루 등락의 몇 배</b> : 대체로 <b>${s.times.toFixed(1)}배</b>, 대부분의 종목은 ${EB.times[0].toFixed(1)} ~ ${EB.times[1].toFixed(1)}배. ${vd(s.times,EB.times,'컸습니다','작았습니다')}.`)+
       li(`<b>그날 5% 넘게 움직인 횟수</b> : ${s.n}번 중 ${vio(s.big+'번')} (${s.bigS.toFixed(0)}%), 대부분의 종목은 ${EB.bigS[0].toFixed(0)} ~ ${EB.bigS[1].toFixed(0)}%. ${vd(s.bigS,EB.bigS,'많았습니다','적었습니다')}.`)+
-      (s.stay!=null?li(`<b>움직인 자리에 머문 횟수</b> (발표 뒤 20거래일 동안 발표 전 가격으로 한 번도 돌아오지 않음) : ${s.stN}번 중 ${vio(s.stK+'번')} (${s.stay.toFixed(0)}%), 대부분의 종목은 ${EB.stay[0].toFixed(0)} ~ ${EB.stay[1].toFixed(0)}%. ${vd(s.stay,EB.stay,'많았습니다','적었습니다')}.`):'')+
+      (s.stay!=null?li(`<b>움직인 자리에 머문 횟수</b> : ${s.stN}번 중 ${vio(s.stK+'번')} (${s.stay.toFixed(0)}%), 대부분의 종목은 ${EB.stay[0].toFixed(0)} ~ ${EB.stay[1].toFixed(0)}%. ${vd(s.stay,EB.stay,'많았습니다','적었습니다')}.`):'')+
       `</ul><p class="tn">발표마다 첫 거래일 등락 : ${s.ev.map(r=>`<span style="white-space:nowrap">${dot(r[0])} ${tri(r[1],1,'%',11)}</span>`).join(' · ')}</p>`};
-  const desc=x=>{const head=`최근 ${Y}년을 ${U}(${W}거래일)씩 ${np}구간으로 나누고, 구간마다 S&amp;P 500 ${D.length}종목을 값 순서로 줄 세워 가운데 ${band}%를 대부분의 종목으로 봤습니다.${x.n<np?` 이 종목은 자료가 있는 ${x.n}구간(${dur(x.n)})만 봤습니다.`:''} `;
-    if(!x.runs||!x.runs.length)return `<p>${head}이 종목은 그 범위를 벗어난 구간이 없었습니다.</p>`+earnP(x);
+  const desc=x=>{const head=`<div class="tips">${tipL('읽는 법',TIP_READ)}<i>·</i>${tipL('용어',TIP_TERM)}</div><p>${x.n<np?`이 종목은 자료가 있는 ${x.n}구간(${dur(x.n)})만 봤습니다. `:''}`;
+    if(!x.runs||!x.runs.length)return head+`이 종목은 대부분의 종목 범위를 벗어난 구간이 없었습니다.</p>`+earnP(x);
     const lg=x.runs.filter(r=>r.n>=N),sh=x.runs.filter(r=>r.n<N),ls=x.runs[x.runs.length-1],whole=x.runs.length===1&&x.k===x.n&&x.n>=N;
-    return `<p>${head}${whole?`이 종목은 <b>살펴본 ${x.n}구간(${dur(x.n)}) 내내</b> 그 범위 밖에 있었습니다.`:lg.length?`이 종목이 그 범위 밖에 ${N}구간 이상 이어서 머문 시기(개성이 드러난 시기)는 ${vio(lg.length+'번')}입니다.`:`이 종목이 그 범위 밖에 ${N}구간 이상 이어서 머문 시기는 없었습니다.`}</p>`+
+    return head+`${whole?`이 종목은 <b>살펴본 ${x.n}구간(${dur(x.n)}) 내내</b> 대부분의 종목 범위 밖에 있었습니다.`:lg.length?`이 종목의 개성이 드러난 시기는 ${vio(lg.length+'번')}입니다.`:`이 종목은 개성이 드러난 시기가 없었습니다.`}</p>`+
       lg.map(r=>`<p class="ph">${spanK(r)} <span class="tn" style="font-weight:400">(${dur(r.n)}, ${r.n}구간 연속)</span></p><ul>${use.map(ci=>colLine(x,r,ci)).join('')}</ul>`).join('')+
-      (sh.length?`<p>이 밖에 ${N}구간보다 짧게 범위를 벗어났다가 돌아온 때가 ${vio(sh.length+'번')} 있었습니다 (${sh.map(r=>`${spanK(r)} ${r.n}구간`).join(', ')}). 짧아서 개성이 드러난 시기로 세지 않았습니다.</p>`:'')+
-      `<p>가장 최근 구간(${lbk(LB[np-1])})에서는 ${x.tq?`대부분의 종목과 같은 범위 안입니다 (${x.tq}구간째).`:ls.n>=N?`여전히 범위 밖입니다. 드러난 시기가 ${dur(ls.n)}째 이어지고 있습니다.`:`범위 밖입니다 (${ls.n}구간째, 아직 짧아 드러난 시기로 세지 않았습니다).`}</p>`+earnP(x)};
+      (sh.length?`<p>이 밖에 ${N}구간보다 짧게 범위를 벗어났다가 돌아온 때가 ${vio(sh.length+'번')} 있었습니다 (${sh.map(r=>`${spanK(r)} ${r.n}구간`).join(', ')}).</p>`:'')+
+      `<p>가장 최근 구간(${lbk(LB[np-1])})에서는 ${x.tq?`대부분의 종목과 같은 범위 안입니다 (${x.tq}구간째).`:ls.n>=N?`여전히 범위 밖입니다. 드러난 시기가 ${dur(ls.n)}째 이어지고 있습니다.`:`범위 밖입니다 (${ls.n}구간째).`}</p>`+earnP(x)};
   const sub=x=>{const a=use.map((ci,j)=>{const [u,l]=x.per[j];return u+l?`${CN[ci]} ${[u?'위쪽 '+u:'',l?'아래쪽 '+l:''].filter(Boolean).join(', ')}`:''}).filter(Boolean);
     return `${x.side}${a.length?' · '+a.join(' · '):''}${x.g==='D'?` · 설정으로는 ${x.auto||'평범'}`:''}`};
   let first=true;
   const one=x=>{const open=first;first=false;return `<div class="kid" data-box><div class="khead"><span class="kname">${x.k2||x.s}${x.seen?'<span class="pill">그림확인</span>':''}</span>`+
     `<span class="kval">${x.n}구간 중 ${vio(x.k+'구간')}<button class="fb${open?' open':''}" data-tg aria-label="설명 펼치기">${CHEV}</button></span></div>`+
     `${mstrip(x.mix)}<div class="ksub">${sub(x)}</div><div class="ds" data-rest${open?'':' hidden'}>${desc(x)}</div></div>`};
-  const GT={A:'개성이 가장 센 3분의 1',B:'그다음 3분의 1',C:'나머지 3분의 1',D:'단체 그룹 (같은 때 같이 움직인 무리, 사람이 넣음)'};
+  const GT={A:'개성이 가장 센 3분의 1',B:'그다음 3분의 1',C:'나머지 3분의 1',D:'단체 그룹'};
   $('gsub').innerHTML=[...'ABCD'].map(g=>`<button class="sub1" role="tab" data-g="${g}" aria-selected="${g===SG}">${g==='D'?'D 단체':g} <small>(${out[g].length})</small></button>`).join('');
-  const sec=g=>`<div class="gh" style="margin-top:0"><span class="box">${g}</span><span>${GT[g]}</span><span class="cnt vio">${out[g].length}명</span></div>${fold(out[g],one,'없음','종목')}`;
-  $('ansg').innerHTML=`최근 ${Y}년 · ${W}일 간격 ${np}구간 · 평범 = 가운데 ${band}% · 볼 칸 ${use.length}개. 구간 하나에서 볼 칸 중 하나라도 평범 밖이면 그 구간은 평범 밖으로 셉니다. 그 비율이 높은 순으로 종목의 위쪽 ${100-band}%가 개성이고(이번 선 = ${out.cut.toFixed(0)}% 넘게), 나머지가 평범입니다. 값은 설정 탭에서 바꿉니다.`;
+  const sec=g=>`<div class="gh" style="margin-top:0"><span class="box">${g}</span><span>${GT[g]}${tip('나누는 법',TIP_GROUP)}</span><span class="cnt vio">${out[g].length}명</span></div>${fold(out[g],one,'없음','종목')}`;
+  $('ansg').innerHTML=`지금 설정 : 최근 ${Y}년 · ${W}일 간격 ${np}구간 · 평범 = 가운데 ${band}% · 볼 칸 ${use.length}개 · 드러난 시기 ${N}구간부터. 값은 설정 탭에서 바꿉니다.`;
   $('setg').innerHTML=`지금 설정의 답 : A ${out.A.length}명 · B ${out.B.length}명 · C ${out.C.length}명 · D 단체 ${out.D.length}명 · 평범 ${out.plain}명`;
   $('answer').innerHTML=sec(SG)+
     `<div class="gh"><span>평범</span><span class="cnt vio">${out.plain}명</span></div><div class="guide">평범한 종목은 배경이라 이름을 싣지 않습니다.${out.none?` 이 범위에 구간이 하나도 없는 종목 ${out.none}명.`:''}</div>`+
@@ -225,7 +254,7 @@ function draw(){$('tabs').innerHTML=TABS.map(t=>`<button class="tab" role="tab" 
     const cnt=(x,dir)=>x.st[ci].filter(v=>v===dir).length,all=x=>x.st[ci].filter(v=>v!=null).length;
     const row=(dir,showVal)=>x=>`<div class="kid"><div class="khead"><span class="kname">${tag(x)}${x.k2||x.s}</span><span class="kval">${showVal?`${fmt(val(x),d)}${unit}`:`${all(x)}구간 중 ${vio(cnt(x,dir)+'구간')}`}</span></div>${strip(x.st[ci],P)}${showVal?`<div class="ksub">${all(x)}구간 중 ${cnt(x,dir)}구간에서 ${dir<0?'아래쪽':'위쪽'} 밖</div>`:''}</div>`;
     const rep=dir=>D.filter(x=>cnt(x,dir)>=2).sort((x,y)=>cnt(y,dir)-cnt(x,dir));
-    html+=`<span class="ct" style="margin-top:0"><i>※</i> ${label.split(' (')[0]} <small>(${unit})</small></span><div class="guide" style="padding-left:6px">${why}. 이 구간의 종목을 작은 값에서 큰 값으로 줄 세운 선이고, 회색 바탕이 평범입니다. 점은 그룹 명단의 종목입니다.</div>
+    html+=`<span class="ct" style="margin-top:0"><i>※</i> ${label.split(' (')[0]} <small>(${unit})</small>${tip(label.split(' (')[0],`${why}.\n· 선 : 이 구간의 종목을 작은 값에서 큰 값으로 줄 세운 것\n· 회색 바탕 : 평범의 범위\n· 점 : 그룹 명단의 종목`)}</span>
     <div class="white"><svg width="${Wd}" height="${Hh}" role="img" aria-label="${label} 줄 세운 선"><rect x="${x0}" y="0" width="${Math.max(0,x1-x0)}" height="${Hh}" fill="#F1F5F9"/><polyline points="${pts}" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linejoin="round"/>${marks}</svg></div>
     <div class="rows"><div class="rw"><span>이 구간의 가운데 값</span><span>${fmt(md,d)}${unit}</span></div><div class="rw"><span>평범의 범위</span><span>${fmt(lo,d)} ~ ${fmt(hi,d)}${unit}</span></div>
     <div class="rw"><span>평범 아래쪽 밖</span><span>${vio(L.length+'명')}</span></div><div class="rw"><span>평범 위쪽 밖</span><span>${vio(H.length+'명')}</span></div></div>
