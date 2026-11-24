@@ -95,7 +95,7 @@ jobs:
           NEWS_MAX_MINUTES: '20'
         run: python experiments/stock-quick/quick_news.py --state /tmp/qn --limit ${{ inputs.limit || '0' }}
 
-      # 기록 없이 덮어쓴다 — 다시 모을 수 있는 캐시(분류 결과)라 저장소가 커지지 않게. 실패해도 그때까지 분류한 것은 남긴다
+      # 작업용 저장값은 기록 없이 덮어쓴다(8일 창). 분류 기록은 아래 news-records 단계가 날짜별로 쌓는다(2026-11-24 — 옛 설명 "다시 모을 수 있는 캐시"는 틀림: 그날의 분류는 다시 못 만든다)
       - name: Save quick-news-state (private, no history)
         if: always() && steps.run.outcome != 'skipped'
         env:
@@ -109,6 +109,15 @@ jobs:
           git add -A && git commit -q -m "quick news $(date -u +%F) [skip ci]"
           git push -q -f git@github.com:red6keep-droid/alphascope-state.git HEAD:quick-news-state
           echo "저장 $(du -sh . | cut -f1)"
+
+      # 분류 기록 — 위 저장값은 8일 창으로 덮어쓰므로, 처음 보는 기사 분류를 날짜별로 news-records 브랜치에 쌓는다(일반 푸시, 이력 유지).
+      # 그날의 뉴스 분류는 다시 못 만든다(헌법 제4조 4항, 2026-11-24 사용자 기록 점검). 실패해도 위 결과에는 영향 없음
+      - name: Record news classification (news-records)
+        if: always() && steps.run.outcome != 'skipped'
+        continue-on-error: true
+        env:
+          STATE_DEPLOY_KEY: ${{ secrets.STATE_DEPLOY_KEY }}
+        run: bash .github/scripts/news_records_push.sh quick /tmp/qn/news.json
 
       - name: Notify failure
         if: failure()

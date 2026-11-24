@@ -100,6 +100,14 @@ jobs:
         continue-on-error: true
         run: bash .github/scripts/jsd_purge.sh news.json deploy/news.json   # 기다렸다 비우기 + 새 파일 확인 (2026-11-17 — 푸시 직후 바로 비우면 옛 커밋을 다시 붙잡는다). 5번 안에 안 되면 경고만
 
+      # 분류 기록 — news_store_home.json 은 8일 창으로 덮어쓰므로, 처음 보는 기사 분류를 날짜별로 비공개 news-records 브랜치에 쌓는다(일반 푸시).
+      # 그날의 뉴스 분류는 다시 못 만든다(헌법 제4조 4항, 2026-11-24 사용자 기록 점검). 실패해도 홈 뉴스에는 영향 없음
+      - name: Record news classification (news-records)
+        continue-on-error: true
+        env:
+          STATE_DEPLOY_KEY: ${{ secrets.STATE_DEPLOY_KEY }}
+        run: bash .github/scripts/news_records_push.sh home news_store_home.json
+
       - name: Notify failure
         if: failure()
         run: |
