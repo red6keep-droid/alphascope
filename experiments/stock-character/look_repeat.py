@@ -11,7 +11,10 @@
   거래량 실린 돌   ±5% 이면서 거래량 2배 넘은 날 수
   거래량만 튐     거래량 2배 넘었는데 등락 2% 미만인 날 수
   방향 크기     W일 등락의 크기
-켜짐 = 그날 그 값이 무리(S&P 500, 같은 날 같은 주기)에서 위쪽 5% 안(자기보다 작은 종목이 95% 이상).
+켜짐 = **무리에서 떨어진 거리** (2026-11-24 사용자 "그렇게 해" — 비율을 미리 정하지 않는다, 옛 기준 = 위쪽 5%).
+  무리 폭 = 그날 무리(S&P 500, 같은 주기) 값들이 중앙값에서 흔히 벗어나는 크기(중앙값 절대 편차 × 1.4826). 날 수 칸은 폭이 0 이 되지 않게 최소 1개.
+  꽤 떨어짐 = 중앙값보다 3폭 넘게 위 · 아주 멀리 = 5폭 넘게 위.
+잔잔한 개성(호수만) = 무리가 거칠어져도 아래쪽에 계속 머묾 — 호수가 무리 아래쪽 10% 안이던 날 비율(지속).
 한 번 = 켜진 날이 이어진 덩어리(5일 이상). 덩어리 사이가 W일 넘게 꺼져 있어야 따로 센다. 지속 = 켜져 있던 날 비율.
 돌 뒤(둘 다) = 돌 하나하나에 대해 ① 물결 평온까지 ② 가격이 돌 전 자리까지 — look_numbers 의 함수 그대로.
 
@@ -38,7 +41,9 @@ import look_numbers as LN  # noqa: E402 — calm_back · price_back · earn_days
 
 WINS = [20, 60, 120, 200]
 YEARS_DAYS = 756
-TOP = 0.95
+FAR, VERY = 3.0, 5.0      # 무리 폭의 몇 배 — 꽤 떨어짐 · 아주 멀리
+CALM = 0.10               # 잔잔 = 무리 아래쪽 10% 안
+COUNT_BOXES = {"stone", "vstone", "vonly"}
 BOXES = [("lake", "호수"), ("stone", "돌"), ("vstone", "거래량 실린 돌"), ("vonly", "거래량만 튐"), ("dir", "방향 크기")]
 NAMES = {"JPM": "JP모건", "TSLA": "테슬라", "MSFT": "마이크로소프트", "CRCL": "서클"}
 plt.rcParams["font.family"] = "Malgun Gothic"
@@ -100,7 +105,18 @@ def main():
             extra[s] = d[d.index <= last]
     crowd = measures(H, L, C, V)
     days = C.index[-YEARS_DAYS:]
-    print(f"무리 {C.shape[1]}종목 · 기간 {days[0].date()} ~ {days[-1].date()} · 켜짐 = 무리 위쪽 {round((1 - TOP) * 100)}% 안")
+    print(f"무리 {C.shape[1]}종목 · 기간 {days[0].date()} ~ {days[-1].date()} · 켜짐 = 무리 중앙값보다 {FAR:.0f}폭 넘게 위(꽤) · {VERY:.0f}폭 넘게 위(아주)")
+    stat = {}
+    for k, cw in crowd.items():
+        cw = cw.reindex(days)
+        med = cw.median(axis=1)
+        mad = cw.sub(med, axis=0).abs().median(axis=1) * 1.4826
+        stat[k] = (med, mad.clip(lower=1.0 if k[0] in COUNT_BOXES else 1e-9))
+    # 잔잔한 개성 — 무리 전체에서 "아래쪽 10% 안이던 날 비율"을 미리 재 둔다(60일 호수)
+    lk = crowd[("lake", 60)].reindex(days)
+    calm_share = lk.lt(lk.quantile(CALM, axis=1), axis=0).sum() / lk.notna().sum()
+    steady = calm_share[calm_share >= 0.8].sort_values(ascending=False)
+    print(f"잔잔 지속(3년 중 80% 넘는 날을 무리 아래쪽 10% 안에서 보낸 종목) {len(steady)}개: " + ", ".join(f"{s} {v * 100:.0f}%" for s, v in steady.items()))
     os.makedirs(OUT, exist_ok=True)
 
     for s in syms:
@@ -116,19 +132,22 @@ def main():
         px = px.reindex(days).dropna()
         on_all = {}
         print(f"\n=== {NAMES.get(s, s)} ({s}) · 자료 {px.index[0].date()} ~ {px.index[-1].date()} ({len(px)}일)")
-        print(f"{'칸':12} " + " ".join(f"{str(w) + '일':>16}" for w in WINS) + "    (켜진 횟수 · 켜져 있던 날 비율)")
+        print(f"{'칸':12} " + " ".join(f"{str(w) + '일':>22}" for w in WINS) + "    (꽤 떨어진 횟수 · 날 비율 / 아주 멀리 날 비율)")
         for box, label in BOXES:
             cells = []
             for w in WINS:
                 v = own[(box, w)][s].reindex(px.index)
-                cw = crowd[(box, w)].reindex(px.index)
-                below = cw.lt(v, axis=0).sum(axis=1) / cw.notna().sum(axis=1)
-                on = (below >= TOP) & v.notna()
+                med, mad = stat[(box, w)]
+                z = (v - med.reindex(px.index)) / mad.reindex(px.index)
+                on = (z > FAR) & v.notna()
+                very = (z > VERY) & v.notna()
                 ep = episodes(on, w)
-                on_all[(box, w)] = (on, ep)
-                share = on.sum() / max(1, v.notna().sum()) * 100
-                cells.append(f"{len(ep):>3}번 · {share:3.0f}%")
-            print(f"{label:12} " + " ".join(f"{c:>16}" for c in cells))
+                on_all[(box, w)] = (on, ep, very)
+                n = max(1, v.notna().sum())
+                cells.append(f"{len(ep):>2}번 · {on.sum() / n * 100:3.0f}% / {very.sum() / n * 100:3.0f}%")
+            print(f"{label:12} " + " ".join(f"{c:>22}" for c in cells))
+        if s in calm_share.index:
+            print(f"잔잔(호수 60일이 무리 아래쪽 10% 안이던 날) {calm_share[s] * 100:.0f}%")
 
         # 돌 하나하나 — 돌 뒤 둘 다
         d = one[(one["open"] > 0) & (one["volume"] > 0)].copy()
@@ -153,14 +172,16 @@ def main():
         fig, (a, b) = plt.subplots(2, 1, figsize=(15, 8), gridspec_kw={"height_ratios": [2.2, 3]}, sharex=True)
         a.plot(px.index, px.values, color="#1c2330", lw=1.1)
         a.set_yscale("log")
-        a.set_title(f"{NAMES.get(s, s)} ({s}) — 가격(위) · 개성이 켜진 때(아래, 무리 위쪽 5% 안) · 숫자 = 켜진 횟수", loc="left", fontsize=11)
+        a.set_title(f"{NAMES.get(s, s)} ({s}) — 가격(위) · 개성이 켜진 때(아래 — 옅음 = 무리에서 꽤 떨어짐, 진함 = 아주 멀리) · 숫자 = 켜진 횟수", loc="left", fontsize=11)
         colors = {"lake": "#2f6fdb", "stone": "#d0342c", "vstone": "#e08a00", "vonly": "#8a5fd0", "dir": "#1f9d6b"}
         rows = [(box, w) for box, _ in BOXES for w in WINS]
         for r, (box, w) in enumerate(rows):
-            on, ep = on_all[(box, w)]
+            on, ep, very = on_all[(box, w)]
             y = len(rows) - 1 - r
             xs = px.index[on.values]
-            b.scatter(xs, [y] * len(xs), marker="|", s=90, color=colors[box], linewidths=1.2)
+            b.scatter(xs, [y] * len(xs), marker="|", s=90, color=colors[box], linewidths=1.2, alpha=0.35)
+            xv = px.index[very.values]
+            b.scatter(xv, [y] * len(xv), marker="|", s=90, color=colors[box], linewidths=1.2)
             b.text(px.index[-1] + pd.Timedelta(days=8), y, f"{len(ep)}번", va="center", fontsize=8, color=colors[box])
         b.set_yticks(range(len(rows)))
         b.set_yticklabels([f"{dict(BOXES)[box]} {w}일" for box, w in rows][::-1], fontsize=8)
