@@ -45,13 +45,19 @@ def attn(sym, query, wiki, d0, d1):
     os.makedirs(ATTN, exist_ok=True)
     gp, wp = os.path.join(ATTN, f"{sym}_gdelt.csv"), os.path.join(ATTN, f"{sym}_wiki.json")
     if query and not os.path.exists(gp):
-        r = requests.get("https://api.gdeltproject.org/api/v2/doc/doc", headers=UA, timeout=90, params={
-            "query": f'"{query}"', "mode": "timelinevolraw", "format": "csv", "startdatetime": d0.replace("-", "") + "000000", "enddatetime": d1.replace("-", "") + "235959"})
-        if r.ok and r.text.lstrip("\ufeff").startswith("Date,"):
-            open(gp, "w", encoding="utf-8").write(r.text.lstrip("\ufeff"))
+        # GDELT 는 첫 부름에도 "5초에 한 번" 안내문을 돌려줄 때가 있다(2026-11-24 두 번 겪음) — 8초 쉬고 네 번까지 다시 부른다
+        for k in range(4):
+            r = requests.get("https://api.gdeltproject.org/api/v2/doc/doc", headers=UA, timeout=90, params={
+                "query": f'"{query}"', "mode": "timelinevolraw", "format": "csv", "startdatetime": d0.replace("-", "") + "000000", "enddatetime": d1.replace("-", "") + "235959"})
+            text = r.text.lstrip("\ufeff")
+            if r.ok and text.startswith("Date,"):
+                open(gp, "w", encoding="utf-8").write(text)
+                print(f"  GDELT 받음({k + 1}번째 부름) → {os.path.relpath(gp, LB.ROOT)}")
+                break
+            print(f"  GDELT {k + 1}번째 부름 못 받음: {r.text[:60]!r} — 8초 뒤 다시")
+            time.sleep(8)
         else:
-            print("  GDELT 못 받음:", r.text[:80])
-        time.sleep(6)
+            print("  GDELT 끝내 못 받음 — 기사 수 줄 없이 화면을 만든다. 잠시 뒤 같은 명령을 다시 돌리면 된다")
     if wiki and not os.path.exists(wp):
         r = requests.get(f"https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/en.wikipedia/all-access/all-agents/{wiki}/monthly/{d0.replace('-', '')}/{d1.replace('-', '')}", headers=UA, timeout=30)
         if r.ok:

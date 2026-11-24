@@ -10,7 +10,8 @@
      check_stage1.py 를 그대로 돌리면 비공개 문서의 1단계 검증 글을 덮어쓰므로, 여기서는 그 스크립트의 받기 함수만 부른다.
   2. 실적일 data/store/character/earn_days_us.csv — 없거나 옛 판(main 열 없음)이면 collect_earn_days.py --market us 로 다시 만든다.
      받아 둔 원본(earn_raw/us)이 있으면 부름 0, 없으면 SEC 에서 받는다(약 20분, .env 의 EDGAR_USER_AGENT 필요 — 값은 길잡이 문서 8절).
-  3. 화면 — make_band_b.py(시안 틀) → look_band.py → output/mock_band.html(원본) · mock_band_b.html(그래프 시안).
+  3. 화면 — make_band_b.py(시안 틀) → look_band.py → output/mock_band.html(원본) · mock_band_b.html(그래프 시안)
+     + look_born.py LITE news=Lumentum wiki=Lumentum → output/mock_born_LITE.html("왜" 화면, 2026-11-24 밤 집 PC 에서 더함. 관심 자료가 없으면 GDELT · 위키백과를 두세 번 부른다).
   4. 끝에 기준일 · 아이 수를 찍는다. 회사 PC 에서 마지막으로 만든 값(2026-11-24): 기준일 2026-11-20 · 아이 499명 · 20일 간격 37구간.
      기준일이 다르면 구간 경계가 달라져 "설정으로 나온 답"의 명수 · 이름이 조금 달라진다(틀린 것이 아니다).
 
@@ -74,7 +75,9 @@ def main():
     print("3. 화면")
     run(os.path.join(HERE, "make_band_b.py"))
     run(os.path.join(HERE, "look_band.py"))
-    for name in ("mock_band.html", "mock_band_b.html"):
+    # 5단계 "왜" 화면(길잡이 7-22 · 7-23) — 루멘텀 한 명. 관심 자료(GDELT 기사 수 · 위키백과 조회수)가 없으면 두세 번 불러 받고 data/store/character/attn 에 둔다(있으면 부름 0)
+    run(os.path.join(HERE, "look_born.py"), "LITE", "news=Lumentum", "wiki=Lumentum")
+    for name in ("mock_band.html", "mock_band_b.html", "mock_born_LITE.html"):
         p = os.path.join(HERE, "output", name)
         print(f"  {'만듦' if os.path.exists(p) else '없음 !!'}  {os.path.relpath(p, ROOT)}")
 
@@ -84,7 +87,7 @@ def main():
     if str(last.date()) != REF["last"]:
         print("  기준일이 달라 '설정으로 나온 답'의 명수 · 이름이 조금 다를 수 있습니다 — 틀린 것이 아닙니다.")
     print("\n다음: python experiments/mock_server.py  →  http://localhost:8800/ 의 `개성 있는 아이 찾기 게임`")
-    print(f"길잡이 문서(0-0 · 0-4 먼저): {DOC}{'' if os.path.exists(DOC) else '  ← 없음! 비공개 저장소 alphascope-docs 를 이 저장소 옆 폴더에 받으세요'}")
+    print(f"길잡이 문서(처음부터 끝까지 — 0-0 · 0-4 와 사용자 가설 7-11 ~ 7-14 · 최근 걸음 7-21 ~ 7-23 은 꼭): {DOC}{'' if os.path.exists(DOC) else '  ← 없음! 비공개 저장소 alphascope-docs 를 이 저장소 옆 폴더에 받으세요'}")
 
 
 if __name__ == "__main__":
