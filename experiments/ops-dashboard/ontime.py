@@ -85,18 +85,36 @@ PROMISES = [
      lambda e: "증시 시황" in e["labels"] and "미국 증시" in e["labels"]),
     ("한국 증시시황 (저녁 편)", "21:00", "홈 시황 카드 `21:00`", dt.date(2026, 11, 20), _kr_day,
      lambda e: "증시 시황" in e["labels"] and "한국 증시" in e["labels"]),
+    # 종목 페이지 (2026-11-24 사용자 "순서대로") — 고정 페이지라 피드에 없다. 종목 페이지 실행이 끝날 때 gh-pages 검색 색인(search/us · kr.json)을 올리므로
+    # 그 커밋 시각 = 그날 종목 페이지가 바뀐 시각으로 본다(공개 기록, GitHub API). 미국 = 05시 뒤 첫 커밋, 한국 = 15시 뒤 첫 커밋. 안내 상자를 단 11-14 부터
+    ("미국 종목 페이지", "07:30", "종목 · ETF 페이지 안내 상자 `아침 7시 30분 무렵`", dt.date(2026, 11, 14), _us_day,
+     lambda e: e.get("src") == "search/us.json" and e["pub"].hour >= 5),
+    ("한국 종목 페이지", "16:30", "한국 종목 페이지 안내 상자 `오후 4시 30분 무렵` (11.23까지 4시 10분)", dt.date(2026, 11, 14), _kr_day,
+     lambda e: e.get("src") == "search/kr.json" and e["pub"].hour >= 15),
 ]
+COMMIT_FILES = ["search/us.json", "search/kr.json"]
+REPO = "red6keep-droid/alphascope"
 
 # 약속 시각을 바꾼 이력 — 그 날짜 전은 옛 시각으로 판정 (기록을 고쳐 쓰지 않는다)
 AT_BEFORE = {
     "한국 증시 리포트": [(dt.date(2026, 11, 24), "16:10")],   # 2026-11-24 사용자: 실제 게시 16:17~16:29 → 안내 문구를 4시 30분으로
+    "한국 종목 페이지": [(dt.date(2026, 11, 24), "16:10")],   # 같은 안내 상자
 }
 
 # 세지 않는 날 — (이름, 날짜): 까닭. 화면 `날짜별` 에는 `제외` 로 남긴다
 EXCLUDE = {
     ("미국 증시 리포트", dt.date(2026, 11, 24)): "코드 오류(Python 3.10 SyntaxError)로 세 번 멈춤 · 09:58 수동 게시 — 사용자 제외",
     ("미국 증시시황 (아침 편)", dt.date(2026, 11, 24)): "같은 오류 — 리포트가 멈춰 아침 해설 재료가 없었음 · 사용자 제외",
+    ("미국 종목 페이지", dt.date(2026, 11, 24)): "같은 오류 — 리포트 뒤 이어 붙이기가 안 붙어 07:30 예비 실행이 함 · 사용자 제외",
 }
+
+
+def _group_before():
+    g = {}
+    for n, hist in AT_BEFORE.items():
+        for h in hist:
+            g.setdefault(h, []).append(n)
+    return g
 
 
 def at_on(name, at, d):
@@ -125,8 +143,29 @@ def fetch_posts(since):
     return out
 
 
+def fetch_commits(since):
+    """gh-pages 의 COMMIT_FILES 커밋 시각 — [{src, pub(KST), url, title:""}]. GITHUB_TOKEN 이 있으면 쓴다(없으면 공개 한도 시간당 60)."""
+    h = {"Accept": "application/vnd.github+json", **UA}
+    if os.environ.get("GITHUB_TOKEN"):
+        h["Authorization"] = f"Bearer {os.environ['GITHUB_TOKEN']}"
+    out = []
+    for path in COMMIT_FILES:
+        for page in range(1, 6):
+            r = requests.get(f"https://api.github.com/repos/{REPO}/commits", headers=h, timeout=30,
+                             params={"sha": "gh-pages", "path": path, "since": f"{since - dt.timedelta(days=1)}T00:00:00Z", "per_page": 100, "page": page})
+            r.raise_for_status()
+            js = r.json()
+            for c in js:
+                t = dt.datetime.fromisoformat(c["commit"]["committer"]["date"].replace("Z", "+00:00")).astimezone(KST)
+                out.append({"src": path, "pub": t, "url": c.get("html_url", ""), "title": "", "labels": set()})
+            if len(js) < 100:
+                break
+    return out
+
+
 URLS = {}   # (약속 이름, 날짜) → 글 주소 — 표 칸 · 오늘 카드에서 눌러 바로 확인 (judge 가 채운다)
-SHORT = {"미국 증시 리포트": "미국 리포트", "한국 증시 리포트": "한국 리포트", "미국 증시시황 (아침 편)": "미국 시황", "한국 증시시황 (저녁 편)": "한국 시황"}
+SHORT = {"미국 증시 리포트": "미국 리포트", "한국 증시 리포트": "한국 리포트", "미국 증시시황 (아침 편)": "미국 시황", "한국 증시시황 (저녁 편)": "한국 시황",
+         "미국 종목 페이지": "미국 종목", "한국 종목 페이지": "한국 종목"}
 WEEK = "월화수목금토일"
 
 
@@ -301,7 +340,7 @@ def page_body(res, now):
             return f'<span style="color:{GRAY};">대기</span>'
         col = GOOD if st == "on" else (BAD if st == "late" else GRAY)
         txt = link(url, _hm(t)) if t else "제외"
-        sub = (f'<br><span style="font-size:12px;font-weight:400;">+{_late_text(m)}</span>' if st == "late"
+        sub = (f'<br><span style="font-size:12px;font-weight:400;">+{f"{m // 60}:{m % 60:02d}" if m >= 60 else f"{m}분"}</span>' if st == "late"
                else '<br><span style="font-size:12px;font-weight:400;">제외</span>' if st == "skip" and t else "")
         return f'<span style="color:{col};font-weight:{700 if st == "late" else 400};">{txt}{sub}</span>'
 
@@ -323,7 +362,8 @@ def page_body(res, now):
     legend = (f'<p style="margin:4px 0 12px;padding-left:{dk.ALIGN_PX}px;font-size:13px;line-height:19px;color:{NOTE_C};word-break:keep-all;">'
               f'<span style="color:{GOOD};">초록 = 정시</span> · <span style="color:{BAD};font-weight:700;">주황 = 늦음 · 없음</span> · '
               f'회색 = 제외 · 대기 · 점 = 나가지 않는 날. 시각을 누르면 그 글이 열립니다. 약속 시각 {GRACE_MIN}분 뒤까지 정시.'
-              + "".join(f" {esc(SHORT.get(n, n))}는 {_md(until - dt.timedelta(days=1))}까지 {old} 약속으로 셉니다." for n, hist in AT_BEFORE.items() for until, old in hist)
+              + "".join(f" {' · '.join(esc(SHORT.get(n, n)) for n in ns)}는 {_md(until - dt.timedelta(days=1))}까지 {old} 약속으로 셉니다."
+                        for (until, old), ns in _group_before().items())
               + '</p>')
 
     return (top
@@ -340,7 +380,8 @@ def page_body(res, now):
 
 def build(now):
     """→ (페이지 본문 HTML, 요약 (값, 보조, 오늘 어긴 것)) — 피드를 못 읽으면 예외."""
-    res = judge(fetch_posts(START), now)
+    res = judge(fetch_posts(START) + fetch_commits(START), now)
+    res.sort(key=lambda r: (r[0][1], "종목" in r[0][0]))   # 표 · 오늘 카드 순서 = 약속 시각 → 글 먼저 (미국 리포트 · 미국 종목 · 미국 시황 · 한국 …)
     return page_body(res, now), summary(res, now)
 
 

@@ -37,7 +37,7 @@ import collect_kr_fin as FIN  # noqa: E402
 import full_us  # noqa: E402
 
 R = render_kr.R
-WHEN = full_us.WHEN
+WHEN = full_us.WHEN_KR   # 시장마다 따로 (2026-11-24 — 옛 미국 · 한국 모두 `오후 5시 40분`)
 LATE_DAY = None   # full_us.LATE_DAY 와 같은 뜻 — 한국 종목 날짜 (collect_quick 이 넣는다)
 BUDGET = {"detail": 60, "dart": int(os.environ.get("QUICK_DART_BUDGET") or 40), "company": 60, "hist": 100}
 DART_MINUTES = int(os.environ.get("QUICK_DART_MINUTES") or 20)   # 매출 · 손익 받기 시간 상한 — DART 가 느린 날에도 실행이 끝나 저장값을 남기게 (2026-11-16)

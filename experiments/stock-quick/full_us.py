@@ -46,7 +46,8 @@ import render_pages as RP  # noqa: E402
 
 R = RP.R
 LATE_DAY = None   # 그날 다른 종목의 마지막 일봉 날짜 — collect_quick 이 넣는다. 이보다 이른 종목 = 늦음 상자 (2026-11-21 사용자)
-WHEN = "오후 5시 40분 무렵"            # 간단 정보 실행 시각 (quick-data.yml 17:40 KST) — 정식 미국 페이지는 아침 7시 30분
+WHEN = "아침 9시 무렵"            # 간단 정보 미국 = quick-data 08:20 KST(이어 붙이기) · 끝 08:48 쯤 (2026-11-24 사용자 — 옛 `오후 5시 40분` 은 11-15 · 11-20 시각 변경 뒤 그대로였다). 정식 미국 페이지는 아침 7시 30분
+WHEN_KR = "오후 5시 무렵"         # 간단 정보 한국 = 한국 종목(15:50) 뒤 이어 붙이기 · 끝 16:36 쯤. 정식 한국 페이지는 오후 4시 30분
 MARKET = sorted({U.BENCH, "^VIX", "SMH", "^GSPC", *__import__("collect").SECTOR_ETFS})
 BUDGET = {"detail": 90, "sec": 100, "hist": 100}   # 한 번 실행에 새로 받는 종목 수 상한 — 첫 주에 나눠 채우고, 그 뒤는 주기만큼만 (기획 6-6 `요일 나눔`)
 DETAIL_FIELDS = ("analysts", "eps", "short", "company")   # 옵션(시장 예상 흔들림)은 매일이어야 뜻이 있어 뺀다 (6-6)
