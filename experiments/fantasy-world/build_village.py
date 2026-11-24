@@ -94,9 +94,7 @@ def main():
     open(os.path.join(OUTD, "mock_village_flat.html"), "w", encoding="utf-8").write(html)
     html = open(os.path.join(BASE, "village_polish.html"), encoding="utf-8").read()       # 다듬은 판 (2026-11-23)
     open(os.path.join(OUTD, "mock_village_polish.html"), "w", encoding="utf-8").write(html)
-    html = open(os.path.join(BASE, "city_white.html"), encoding="utf-8").read()            # 흰 도시 판 — 포스터 (2026-11-23)
-    open(os.path.join(OUTD, "mock_city_white.html"), "w", encoding="utf-8").write(html)
-    html = open(os.path.join(BASE, "city_weather.html"), encoding="utf-8").read()          # 날씨 도시 판 (2026-11-23)
+    html = open(os.path.join(BASE, "city_weather.html"), encoding="utf-8").read()          # 날씨 도시 판 — 지금 중심 시안 (2026-11-23)
     open(os.path.join(OUTD, "mock_city_weather.html"), "w", encoding="utf-8").write(html)
     kb = lambda f: os.path.getsize(os.path.join(VD, f)) / 1024
     print(f"[village] {d['d']} sectors {len(secs)} stocks {len(q)} layout v{v} {kb(lname):.1f}KB"

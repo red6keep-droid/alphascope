@@ -84,7 +84,7 @@ PLAN = [   # (기능 이름, 남은 일 — 한 줄, 파일 패턴 "폴더/파�
     ("Newfact 주요 기사 (뉴스 수집기 글 → 블로그 새 글) · 한국 기사 제목 묶음", "목업 확인 → 실제 글로 다시 그리기(fetch_samples) → 발행기(하루 4번, 시험은 Blogger 초안) · 제목 묶음을 한국 기사 공용 저장소에 연결", ["news-posts/mock_news_*"]),
     ("한국 주요 뉴스 · 사건별 사실 (보도 2곳 이상 사건 + 사실 팝업 · 그 밖의 기사 제목 묶음)", "시안: 수집기 사건 묶기 결과를 facts 모양으로 바꾼 표본 → 사용자 디자인 확인 → 첫 facts 문서로 다시 그리기", ["news-posts/mock_news_facts*"]),
     ("한국 홈 — Newfact 주요 기사 카드(한국 증시 카드 아래) · 맨 아래 주요 뉴스(방송 + 뉴스 수집기 사건, 미국 홈과 같은 팝업)", "사용자 목업 확인 → 테마(alphaflow-home) 홈 카드 · 한국 주요 뉴스 켜기 · 자료 파일(Pages)", ["news-posts/mock_news_home_kr*"]),
-    ("주식마을 3D (마을 · 흰 도시 · 날씨 도시 시안)", "날씨 도시 판 모델링 · 연출 다듬기(물에 잠김 · 남은 날씨 7가지) → 방향 확정 뒤 휴대폰 발열 줄이기 5가지 · 날씨 기준 정하기 · Blogger 모듈 스크립트 시험", ["fantasy-world/mock_village_flat.html", "fantasy-world/mock_village_polish.html", "fantasy-world/mock_city_weather.html", "fantasy-world/mock_city_white.html", "fantasy-world/mock_village_3d_v2.html"]),
+    ("주식마을 3D (날씨 도시 · 마을 · 행성 시안)", "날씨 도시 판 모델링 · 연출 다듬기(물에 잠김 · 남은 날씨 7가지) → 방향 확정 뒤 휴대폰 발열 줄이기 5가지 · 날씨 기준 정하기 · Blogger 모듈 스크립트 시험 (흰 도시 · 3D 시험 1판은 11-24 사용자 삭제)", ["fantasy-world/mock_city_weather.html", "fantasy-world/mock_village_flat.html", "fantasy-world/mock_village_polish.html", "fantasy-world/mock_village_3d_v2.html"]),
     ("푸터 링크 줄 `소개 · 개인정보처리방침 · 문의`", "테마에 넣음(11-21) → 사용자 테마 붙여넣기 뒤 블로그 확인되면 이 줄 빼기", ["site-pages/mock_footer_links.html"]),
     ("종목 이슈 (종목 페이지 가격 카드 아래 Hot Issue)", "목업 확인 → 뉴스 양으로 자동 열고 닫는 코드 (블로그에 아직 없음)", ["issue_store/mock_stock_issue*"]),
     ("회원 `내 종목`", "목업 3화면 → Firebase 규칙 게시 · 댓글 저장 확인이 먼저 → 고정 페이지 · 10명 열기", ["my-stocks/*"]),
