@@ -23,7 +23,7 @@ details summary{cursor:pointer;color:var(--mute);font-size:12px;margin:2px 0}
 table{border-collapse:collapse;width:100%;font-size:13px}th,td{border-bottom:1px solid var(--line);padding:5px 6px;text-align:left;vertical-align:middle}
 .tag{display:inline-block;min-width:18px;padding:0 5px;border-radius:9px;background:#1c2330;color:#fff;font-size:11px;text-align:center}
 .note{color:var(--mute);font-size:12px;margin-top:6px}
-.ds{flex-basis:100%;font-size:12px;color:#3a4252;margin:0 0 6px 2px}.ds b{color:var(--ink)}
+.ds{flex-basis:100%;font-size:13px;color:#3a4252;margin:2px 0 12px 2px;padding:8px 12px;background:#fafbfc;border-left:3px solid var(--line)}.ds b{color:var(--ink)}.ds p{margin:3px 0}.ds ul{margin:2px 0 8px 18px;padding:0}
 </style></head><body><main>
 <h1>평범의 범위 — 과거를 간격으로 잘라, 조각마다 가운데 몇 %를 평범으로 볼까</h1>
 <div class="sub">뉴팩트 개성 있는 아이 찾기 게임 · 미국 S&amp;P 500 __N__명 · 기준일 __LAST__ 에서 거꾸로, 고른 과거 범위(최근 1 · 2 · 3년)를 간격대로 자른 조각 · 평범 = 그 조각 안에서 중간값을 가운데 둔 가운데 N% · 개성 = 여러 조각에서 되풀이해 평범 밖</div>
@@ -63,7 +63,7 @@ function calc(b){const t=(100-b)/200,np=LB.length,lim=[];
 $('pick').innerHTML=COLS.map(([c,l],i)=>`<label><input type="checkbox" data-i="${i}" checked> ${l.split(' (')[0]}</label>`).join('');
 $('pick').addEventListener('change',()=>draw());
 const picked=()=>[...$('pick').querySelectorAll('input')].filter(x=>x.checked).map(x=>+x.dataset.i);
-function answer(){const use=picked(),np=LB.length,band=+$('band').value;$('pv2').textContent=100-band;
+function answer(lim){const use=picked(),np=LB.length,band=+$('band').value;$('pv2').textContent=100-band;
   const out={A:[],B:[],C:[],D:[],plain:0,none:0};
   D.forEach(x=>{let n=0,k=0,up=0,dn=0;const mix=new Array(np).fill(null),per=use.map(()=>[0,0]);
     for(let p=0;p<np;p++){if(!x.v[p])continue;n++;let u=false,l=false;
@@ -83,20 +83,31 @@ function answer(){const use=picked(),np=LB.length,band=+$('band').value;$('pv2')
   D.forEach(x=>{if(x.g==='D')out.D.push(x);else if(x.auto==null)out.none++;else if(x.auto==='')out.plain++;else out[x.auto].push(x)});
   for(const g of 'ABCD')out[g].sort((a,b)=>b.share-a.share);
   const mstrip=a=>'<span class="strip">'+a.map((v,i)=>`<u class="${v==null?'n':v===2?'m':v<0?'l':v>0?'h':''}${i===P?' c':''}"></u>`).join('')+'</span>';
-  const ym=(p,e)=>LB[p].split(' ~ ')[e].slice(0,7),span=r=>{const a=ym(r.a,0),b=ym(r.b,1);return a===b?a:a+' ~ '+b};
-  const desc=x=>{if(!x.runs||!x.runs.length)return '평범 밖이던 조각 없음';const mk=r=>r.u&&r.l?'↕':r.u?'↑':'↓';
-    const N=Math.max(1,+$('minrun').value||3),lg=x.runs.filter(r=>r.n>=N),sh=x.runs.filter(r=>r.n<N),ls=x.runs[x.runs.length-1],li=r=>`${span(r)} ${mk(r)}${r.n}조각`;
-    if(x.runs.length===1&&x.k===x.n&&x.n>=N)return `<b>있는 ${x.n}조각 내내</b> 평범 밖 ${mk(x.runs[0])} (${span(x.runs[0])})`;
-    return (lg.length?`<b>드러난 시기 ${lg.length}번</b> — `+lg.map(li).join(' · '):'<b>드러난 시기 없음</b>')+
-      (sh.length?` · <span style="color:var(--mute)">짧게 스친 것 ${sh.length}번(세지 않음): ${sh.map(li).join(' · ')}</span>`:'')+
-      ` · 지금은 ${x.tq?`평범 안(${x.tq}조각째)`:ls.n>=N?`드러나 있음(${ls.n}조각째)`:`평범 밖(${ls.n}조각째 — 아직 짧음)`}`};
+  // 독자가 읽을 설명 — "조각" 같은 우리끼리 말 없이 기간 · 견준 대상 · 값을 풀어 적는다(2026-11-24 사용자 "조각이 독자는 뭔지 모르잖아. 아주 자세히 적어 독자가 알 수 있게")
+  const UW={20:'약 한 달',60:'약 석 달',120:'약 반년',200:'약 열 달'},U=UW[W],N=Math.max(1,+$('minrun').value||3);
+  const ymk=(p,e)=>{const d=LB[p].split(' ~ ')[e];return `${d.slice(0,4)}년 ${+d.slice(5,7)}월`},spanK=r=>{const a=ymk(r.a,0),b=ymk(r.b,1);return a===b?a:`${a} ~ ${b}`};
+  const dur=n=>{const m=Math.max(1,Math.round(n*W/21)),y=Math.floor(m/12),o=m%12;return '약 '+(y?y+'년'+(o?' '+o+'개월':''):o+'개월')};
+  const med=a=>q(a.slice().sort((x,y)=>x-y),.5);
+  const CW=[['하루 동안 오르내린 폭(그날 고가와 저가의 차이)','컸습니다','작았습니다'],['실적 발표일도 시장 전체가 흔들린 날도 아닌데 하루에 5% 넘게 움직인 날 수','많았습니다','적었습니다'],
+    ['구간 처음과 끝 사이의 등락 크기(오름 · 내림 구분 없이)','컸습니다','작았습니다'],['거래량이 평소의 2배를 넘은 날 수','많았습니다','적었습니다']];
+  const colLine=(x,r,ci)=>{const [c,,d,u0]=COLS[ci],unit=u0==='개'?'일':u0,ps=[];for(let p=r.a;p<=r.b;p++)if(x.v[p])ps.push(p);
+    const part=dir=>{const hit=ps.filter(p=>x.st[ci][p]===dir);if(!hit.length)return '';
+      return `${hit.length===ps.length?`${ps.length}구간 모두에서`:`${ps.length}구간 중 ${hit.length}구간에서`} 대부분의 종목보다 ${CW[ci][dir>0?1:2]} — 그때 이 종목은 대체로 ${fmt(med(hit.map(p=>x.v[p][c])),d)}${unit}, 대부분의 종목은 ${fmt(med(hit.map(p=>lim[p][ci][0])),d)} ~ ${fmt(med(hit.map(p=>lim[p][ci][2])),d)}${unit}`};
+    const u=part(1),l=part(-1);return `<li>${CW[ci][0]}: ${u||l?[u,l].filter(Boolean).join(' / ')+'.':'대부분의 종목과 같은 범위 안이었습니다.'}</li>`};
+  const desc=x=>{const head=`최근 ${Y}년을 ${U}(${W}거래일)씩 ${np}구간으로 나누고, 구간마다 S&amp;P 500 ${D.length}종목을 값 순서로 줄 세워 가운데 ${band}%를 "대부분의 종목"으로 봤습니다.${x.n<np?` 이 종목은 자료가 있는 ${x.n}구간(${dur(x.n)})만 봤습니다.`:''} `;
+    if(!x.runs||!x.runs.length)return `<p>${head}이 종목은 그 범위를 벗어난 구간이 없었습니다.</p>`;
+    const lg=x.runs.filter(r=>r.n>=N),sh=x.runs.filter(r=>r.n<N),ls=x.runs[x.runs.length-1],whole=x.runs.length===1&&x.k===x.n&&x.n>=N;
+    return `<p>${head}${whole?`이 종목은 <b>살펴본 ${x.n}구간(${dur(x.n)}) 내내</b> 그 범위 밖에 있었습니다.`:lg.length?`이 종목이 그 범위 밖에 ${N}구간 이상 이어서 머문 시기(개성이 드러난 시기)는 <b>${lg.length}번</b>입니다.`:`이 종목이 그 범위 밖에 ${N}구간 이상 이어서 머문 시기는 없었습니다.`}</p>`+
+      lg.map(r=>`<p><b>${spanK(r)}</b> — ${dur(r.n)} 동안(${r.n}구간 연속)</p><ul>${use.map(ci=>colLine(x,r,ci)).join('')}</ul>`).join('')+
+      (sh.length?`<p>이 밖에 ${N}구간보다 짧게 범위를 벗어났다가 돌아온 때가 ${sh.length}번 있었습니다(${sh.map(r=>`${spanK(r)} ${r.n}구간`).join(', ')}). 짧아서 개성이 드러난 시기로 세지 않았습니다.</p>`:'')+
+      `<p>가장 최근 구간(${LB[np-1]})에서는 ${x.tq?`대부분의 종목과 같은 범위 안입니다(${x.tq}구간째).`:ls.n>=N?`여전히 범위 밖입니다 — 드러난 시기가 ${dur(ls.n)}째 이어지고 있습니다.`:`범위 밖입니다(${ls.n}구간째 — 아직 짧아 드러난 시기로 세지 않았습니다).`}</p>`};
   const one=x=>`<div class="nm">${x.seen?'<span class="ok" title="그림으로 확인">✓</span>':''}<span>${x.k2||x.s}</span>${mstrip(x.mix)}<i>${x.n}조각 중 ${x.k}조각 (${x.share.toFixed(0)}%) · ${x.side}</i>`+
-    `<i>${use.map((ci,j)=>x.per[j][0]+x.per[j][1]?`<span class="pill">${COLS[ci][1].split(' (')[0]} ${x.per[j][0]?'↑'+x.per[j][0]:''}${x.per[j][1]?'↓'+x.per[j][1]:''}</span>`:'').join(' ')}</i>${x.g==='D'?`<i>설정으로는 ${x.auto||'평범'}</i>`:''}<span class="ds">${desc(x)}</span></div>`;
+    `<i>${use.map((ci,j)=>x.per[j][0]+x.per[j][1]?`<span class="pill">${COLS[ci][1].split(' (')[0]} ${x.per[j][0]?'↑'+x.per[j][0]:''}${x.per[j][1]?'↓'+x.per[j][1]:''}</span>`:'').join(' ')}</i>${x.g==='D'?`<i>설정으로는 ${x.auto||'평범'}</i>`:''}<div class="ds">${desc(x)}</div></div>`;
   const sec=(g,title)=>`<div class="grp"><h3><span class="tag">${g}</span> ${title} — ${out[g].length}명</h3>${fold(out[g],one,'없음')}</div>`;
   $('answer').innerHTML=`<h2>설정으로 나온 답</h2><div class="rng">최근 ${Y}년 · ${W}일 간격 ${np}조각 · 평범 = 가운데 ${$('band').value}% · 볼 칸 ${use.length}개. 조각 하나에서 볼 칸 중 하나라도 평범 밖이면 그 조각은 "평범 밖". 그 비율이 높은 순으로 아이의 위쪽 ${100-band}% 가 개성(이번 선 = ${out.cut.toFixed(0)}% 넘게), 나머지가 평범. ✓ = 그림으로 확인한 아이.</div>`+
     sec('A','개성이 가장 센 3분의 1')+sec('B','그다음 3분의 1')+sec('C','나머지 3분의 1')+sec('D','단체 그룹 — 같은 때 같이 움직인 무리(사람이 넣음)')+
     `<div class="grp"><h3>평범 — ${out.plain}명</h3><div class="note">평범한 아이는 배경이라 이름을 싣지 않습니다.${out.none?` 이 범위에 조각이 하나도 없는 아이 ${out.none}명.`:''}</div></div>`+
-    `<div class="note">띠: <span style="color:var(--hi)">■</span> 위쪽 바깥 · <span style="color:var(--lo)">■</span> 아래쪽 바깥 · <span style="color:#8a5fd0">■</span> 한 조각에서 위 · 아래 둘 다(칸이 다름). 굵은 테두리 = 지금 보는 조각. 이름 아래 글 = 그 아이의 개성이 드러난 시기 — 평범 밖 조각이 위에서 고른 수만큼 이어져야 드러난 시기 한 번, 그보다 짧은 것은 '짧게 스친 것'으로 따로(↑ 위쪽 · ↓ 아래쪽 · ↕ 둘 다).</div>`}
+    `<div class="note">띠: <span style="color:var(--hi)">■</span> 위쪽 바깥 · <span style="color:var(--lo)">■</span> 아래쪽 바깥 · <span style="color:#8a5fd0">■</span> 한 조각에서 위 · 아래 둘 다(칸이 다름). 굵은 테두리 = 지금 보는 조각. 이름 아래 글 = 독자가 읽을 설명(조각 = 구간, 평범 = 대부분의 종목으로 풀어 적음). 견준 대상 = 같은 구간의 S&amp;P 500 종목.</div>`}
 const strip=(a,cur)=>'<span class="strip">'+a.map((v,i)=>`<u class="${v==null?'n':v<0?'l':v>0?'h':''}${i===cur?' c':''}"></u>`).join('')+'</span>';
 const fold=(list,one,empty)=>{const head=list.slice(0,5).map(one).join(''),rest=list.slice(5);
   return (head+(rest.length?`<details><summary>나머지 ${rest.length}명 펼치기</summary>${rest.map(one).join('')}</details>`:''))||`<i>${empty}</i>`};
@@ -108,7 +119,7 @@ function draw(){view();const b=+$('band').value,t=(100-b)/2,np=LB.length;
   [...$('wins').children].forEach(x=>{x.classList.toggle('on',+x.dataset.w===W);x.textContent=`${x.dataset.w}일 간격 (${pieces(+x.dataset.w)}조각)`});
   [...$('yrs').children].forEach(x=>x.classList.toggle('on',+x.dataset.y===Y));
   $('pv').textContent=`${P+1} / ${np}`;$('pd').textContent=LB[P];
-  const lim=calc(b);answer();let html='';
+  const lim=calc(b);answer(lim);let html='';
   COLS.forEach(([c,label,d,unit,why],ci)=>{const [lo,md,hi,vals]=lim[P][ci];
     const here=D.filter(x=>x.v[P]),val=x=>x.v[P][c];
     const L=here.filter(x=>x.st[ci][P]<0).sort((x,y)=>val(x)-val(y)),H=here.filter(x=>x.st[ci][P]>0).sort((x,y)=>val(y)-val(x));
