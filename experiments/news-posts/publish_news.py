@@ -280,11 +280,12 @@ def write_card(blog):
             pday = datetime.datetime.fromisoformat(pub.replace("Z", "+00:00")).astimezone(KST).date().isoformat()
         except ValueError:
             continue
-        if pday != today:
+        nd = re.search(r'data-news-date="([\d-]+)"', bp.get("content") or "")
+        if pday != today or not nd or nd.group(1) != today:   # 기사 날짜도 오늘 — 11-23 기사를 11-24 에 공개해도 홈 카드엔 안 싣는다 (2026-11-24 사용자)
             continue
         title = re.sub(r"^" + re.escape(NR.NAME) + r"\s*:\s*", "", bp.get("title") or "")
         items.append({"slug": slug, "title": H.unescape(title), "summary": H.unescape(_text(bp.get("content"), "data-seo-lead")),
-                      "url": bp.get("url"), "published": pub})
+                      "url": bp.get("url"), "published": pub, "date": nd.group(1)})
     items.sort(key=lambda x: x["published"], reverse=True)
     os.makedirs(OUT, exist_ok=True)
     json.dump({"generated": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds"), "items": items},
