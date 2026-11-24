@@ -892,6 +892,12 @@ def _fact_event(e):
             "issue": e.get("cat"), "related": [], "pop_lines": [], "bundle": rows, "pop_key": "kf:" + e["event"]}
 
 
+def sec_facts_only(s):
+    """방송 자료를 못 읽은 실행(간단 종목 MEDIA_OK 거짓)용 — 기사 사건만, 방송 방향 막대 · `방송이 없습니다` 안내 없이. 사건이 없으면 "" (구획 숨김)."""
+    ev = sorted((_fact_event(e) for e in _kr_facts_by_code().get(str(s["code"]), [])), key=_when_key, reverse=True)
+    return R.sec_events({"events": ev[:MAX_NEWS], "events_overflow": ev[MAX_NEWS:MAX_NEWS + 12]}) if ev else ""
+
+
 def _when_key(r):
     try:
         t = datetime.datetime.fromisoformat(str(r.get("published_at") or "").replace("Z", "+00:00"))
