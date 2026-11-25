@@ -77,6 +77,13 @@ SUB_BIZ = {
 }
 
 
+# 종목별 업계 카드 배정표 (2026-11-25 사용자 "미국도 한국처럼") — build_us_industry_fix.py 가 503종목을 점검해 만든 ref/us_industry_fix.json. 한국 kr_industry_fix.json 과 같은 꼴
+try:
+    US_FIX = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "ref", "us_industry_fix.json"), encoding="utf-8"))
+except (OSError, ValueError):
+    US_FIX = {"card": {}, "card_off": {}}
+
+
 def sector_key(e):
     """간단 종목 업종(분류 세 층의 업종) → 정식 명단의 업종 칸(universe.SECTOR_ETF 키). 반도체만 따로(SMH)."""
     if e.get("sub_en") in ("Semiconductors", "Semiconductor Materials & Equipment"):
@@ -491,8 +498,9 @@ def build(ref_us, bars_all, earn, det, sec, hist, fred_data, macro=None, only=No
         U.CANDIDATES.append((s, e["ko"], s.lower(), k))
         U.BY_SYM[s] = U.CANDIDATES[-1]
         groups.setdefault(k, []).append(s)
-        if SUB_BIZ.get(e.get("sub_en")):
-            industry_us.SYM_BIZ[s] = SUB_BIZ[e["sub_en"]]
+        g = (US_FIX["card"].get(s) or {}).get("group") if s in US_FIX["card"] or s in US_FIX["card_off"] else SUB_BIZ.get(e.get("sub_en"))   # 배정표가 먼저, 표에 없는 새 종목만 세부 업종 기본값
+        if g:
+            industry_us.SYM_BIZ[s] = tuple(g) if isinstance(g, list) else g
     peers = corr_peers(bars_all, {k: [s for s in v if s in quick or s in U.BY_SYM] for k, v in groups.items()})
     for s in quick:
         U.PEERS[s] = peers.get(s) or {}

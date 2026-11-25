@@ -1,0 +1,2031 @@
+{
+ "_note": "미국 간단 종목 업계 카드 배정 — build_us_industry_fix.py 가 만든다. 손으로 고치지 말고 그 스크립트의 SYM · OFF 를 고친 뒤 다시 만들 것",
+ "card": {
+  "AAPL": {
+   "name": "애플",
+   "group": "electronics"
+  },
+  "ABBV": {
+   "name": "애브비",
+   "group": "pharma"
+  },
+  "ABNB": {
+   "name": "에어비앤비",
+   "group": "travel"
+  },
+  "ABT": {
+   "name": "애벗 래버러토리스",
+   "group": "medtech"
+  },
+  "ACGL": {
+   "name": "아치 캐피탈 그룹",
+   "group": "pc_ins"
+  },
+  "ACN": {
+   "name": "액센츄어",
+   "group": "itsvc"
+  },
+  "ADBE": {
+   "name": "어도비",
+   "group": "software"
+  },
+  "ADI": {
+   "name": "아날로그 디바이스",
+   "group": "semi"
+  },
+  "ADM": {
+   "name": "아처 대니얼스 미들랜드",
+   "group": "grain"
+  },
+  "ADP": {
+   "name": "ADP",
+   "group": "payroll"
+  },
+  "ADSK": {
+   "name": "오토데스크",
+   "group": "software"
+  },
+  "AEE": {
+   "name": "아메렌",
+   "group": "power"
+  },
+  "AEP": {
+   "name": "아메리칸 일렉트릭 파워",
+   "group": "power"
+  },
+  "AES": {
+   "name": "AES",
+   "group": "power"
+  },
+  "AIG": {
+   "name": "아메리칸 인터내셔널 그룹",
+   "group": "pc_ins"
+  },
+  "AIZ": {
+   "name": "어슈어런트",
+   "group": "pc_ins"
+  },
+  "AJG": {
+   "name": "아서 J. 갤러거",
+   "group": "pc_ins"
+  },
+  "AKAM": {
+   "name": "아카마이",
+   "group": "cloud"
+  },
+  "ALB": {
+   "name": "앨버말",
+   "group": "chem"
+  },
+  "ALGN": {
+   "name": "얼라인 테크놀로지",
+   "group": "medtech"
+  },
+  "ALL": {
+   "name": "올스테이트",
+   "group": "pc_ins"
+  },
+  "ALLE": {
+   "name": "알레기온",
+   "group": "bldg"
+  },
+  "AMAT": {
+   "name": "어플라이드 머티어리얼즈",
+   "group": "semi"
+  },
+  "AMCR": {
+   "name": "앰코어",
+   "group": "paper"
+  },
+  "AMD": {
+   "name": "AMD",
+   "group": "semi"
+  },
+  "AME": {
+   "name": "아메텍",
+   "group": "capgoods"
+  },
+  "AMGN": {
+   "name": "암젠",
+   "group": "pharma"
+  },
+  "AMP": {
+   "name": "아메리프라이즈 파이낸셜",
+   "group": "broker"
+  },
+  "AMZN": {
+   "name": "아마존",
+   "group": "online"
+  },
+  "ANET": {
+   "name": "아리스타 네트웍스",
+   "group": "netgear"
+  },
+  "AON": {
+   "name": "에이온",
+   "group": "pc_ins"
+  },
+  "AOS": {
+   "name": "A. O. 스미스",
+   "group": "bldg"
+  },
+  "APA": {
+   "name": "APA",
+   "group": "oil"
+  },
+  "APD": {
+   "name": "에어 프로덕츠",
+   "group": "chem"
+  },
+  "APH": {
+   "name": "앰페놀",
+   "group": "components"
+  },
+  "APO": {
+   "name": "아폴로 글로벌 매니지먼트",
+   "group": "broker"
+  },
+  "APP": {
+   "name": "앱러빈",
+   "group": "ad"
+  },
+  "APTV": {
+   "name": "앱티브",
+   "group": "auto"
+  },
+  "ARES": {
+   "name": "아레스 매니지먼트",
+   "group": "broker"
+  },
+  "ATO": {
+   "name": "애트모스 에너지",
+   "group": "gasutil"
+  },
+  "AVGO": {
+   "name": "브로드컴",
+   "group": "semi"
+  },
+  "AVY": {
+   "name": "에이버리 데니슨",
+   "group": "paper"
+  },
+  "AXP": {
+   "name": "아메리칸 엑스프레스",
+   "group": "payments"
+  },
+  "AZO": {
+   "name": "오토존",
+   "group": "autoparts"
+  },
+  "BA": {
+   "name": "보잉",
+   "group": "aero"
+  },
+  "BAC": {
+   "name": "뱅크 오브 아메리카",
+   "group": "bank"
+  },
+  "BAX": {
+   "name": "백스터",
+   "group": "medtech"
+  },
+  "BBY": {
+   "name": "베스트 바이",
+   "group": "electronics"
+  },
+  "BDX": {
+   "name": "벡톤 디킨슨",
+   "group": "medtech"
+  },
+  "BE": {
+   "name": "블룸 에너지",
+   "group": "elec_equip"
+  },
+  "BEN": {
+   "name": "프랭클린 템플턴 인베스트먼츠",
+   "group": "broker"
+  },
+  "BF-B": {
+   "name": "브라운 포만",
+   "group": "alcohol"
+  },
+  "BG": {
+   "name": "번지",
+   "group": "grain"
+  },
+  "BIIB": {
+   "name": "바이오젠",
+   "group": "pharma"
+  },
+  "BKNG": {
+   "name": "부킹 홀딩스",
+   "group": "travel"
+  },
+  "BKR": {
+   "name": "베이커 휴즈",
+   "group": "oilsvc"
+  },
+  "BLK": {
+   "name": "블랙록",
+   "group": "broker"
+  },
+  "BMY": {
+   "name": "브리스톨 마이어스 스퀴브",
+   "group": "pharma"
+  },
+  "BNY": {
+   "name": "BNY",
+   "group": "broker"
+  },
+  "BRO": {
+   "name": "브라운 앤 브라운",
+   "group": "pc_ins"
+  },
+  "BSX": {
+   "name": "보스톤사이언티픽",
+   "group": "medtech"
+  },
+  "BX": {
+   "name": "블랙스톤",
+   "group": "broker"
+  },
+  "C": {
+   "name": "씨티그룹",
+   "group": "bank"
+  },
+  "CAH": {
+   "name": "카디널 헬스",
+   "group": "drugstore"
+  },
+  "CARR": {
+   "name": "캐리어",
+   "group": "bldg"
+  },
+  "CASY": {
+   "name": "케이시스",
+   "group": "staples"
+  },
+  "CAT": {
+   "name": "캐터필러",
+   "group": "machine"
+  },
+  "CB": {
+   "name": "처브",
+   "group": "pc_ins"
+  },
+  "CBOE": {
+   "name": "Cboe 글로벌 마켓",
+   "group": "broker"
+  },
+  "CCL": {
+   "name": "카니발",
+   "group": "travel"
+  },
+  "CDNS": {
+   "name": "케이던스 디자인 시스템즈",
+   "group": "software"
+  },
+  "CDW": {
+   "name": "CDW",
+   "group": "hardware"
+  },
+  "CEG": {
+   "name": "컨스텔레이션 에너지",
+   "group": "power"
+  },
+  "CF": {
+   "name": "CF 인더스트리스",
+   "group": "chem"
+  },
+  "CFG": {
+   "name": "시티즌스 파이낸셜 그룹",
+   "group": "bank"
+  },
+  "CHD": {
+   "name": "처치 앤드 드와이트",
+   "group": "staples"
+  },
+  "CHRW": {
+   "name": "C.H. 로빈슨",
+   "group": "freight"
+  },
+  "CHTR": {
+   "name": "차터 커뮤니케이션스",
+   "group": "media"
+  },
+  "CI": {
+   "name": "시그나",
+   "group": "managed"
+  },
+  "CIEN": {
+   "name": "시에나",
+   "group": "netgear"
+  },
+  "CINF": {
+   "name": "신시내티 파이낸셜",
+   "group": "pc_ins"
+  },
+  "CL": {
+   "name": "콜게이트 파몰리브",
+   "group": "staples"
+  },
+  "CLX": {
+   "name": "크로락스",
+   "group": "staples"
+  },
+  "CMCSA": {
+   "name": "컴캐스트",
+   "group": "media"
+  },
+  "CME": {
+   "name": "CME 그룹",
+   "group": "broker"
+  },
+  "CMG": {
+   "name": "치포틀레 멕시칸 그릴",
+   "group": "food"
+  },
+  "CMI": {
+   "name": "커민스",
+   "group": "truck"
+  },
+  "CMS": {
+   "name": "CMS 에너지",
+   "group": "power"
+  },
+  "CNC": {
+   "name": "센테네",
+   "group": "managed"
+  },
+  "CNP": {
+   "name": "센터포인트 에너지",
+   "group": "power"
+  },
+  "COF": {
+   "name": "캐피털 원",
+   "group": "payments"
+  },
+  "COHR": {
+   "name": "코히런트",
+   "group": "components"
+  },
+  "COO": {
+   "name": "쿠퍼컴퍼니",
+   "group": "medtech"
+  },
+  "COP": {
+   "name": "코노코필립스",
+   "group": "oil"
+  },
+  "COR": {
+   "name": "센코라",
+   "group": "drugstore"
+  },
+  "COST": {
+   "name": "코스트코",
+   "group": "mart"
+  },
+  "CPAY": {
+   "name": "코페이",
+   "group": "payments"
+  },
+  "CPT": {
+   "name": "캠든 프로퍼티 트러스트",
+   "group": "apartment"
+  },
+  "CRH": {
+   "name": "CRH",
+   "group": "aggregates"
+  },
+  "CRM": {
+   "name": "세일즈포스",
+   "group": "software"
+  },
+  "CRWD": {
+   "name": "크라우드스트라이크",
+   "group": "software"
+  },
+  "CSCO": {
+   "name": "시스코 시스템즈",
+   "group": "netgear"
+  },
+  "CSX": {
+   "name": "CSX",
+   "group": "rail"
+  },
+  "CTSH": {
+   "name": "카그너전트",
+   "group": "itsvc"
+  },
+  "CVNA": {
+   "name": "카바나",
+   "group": "usedcar"
+  },
+  "CVS": {
+   "name": "CVS 헬스",
+   "group": "drugstore"
+  },
+  "CVX": {
+   "name": "셰브론",
+   "group": "oil"
+  },
+  "D": {
+   "name": "도미니언에너지",
+   "group": "power"
+  },
+  "DAL": {
+   "name": "델타 항공",
+   "group": "airline"
+  },
+  "DASH": {
+   "name": "도어대시",
+   "group": "food"
+  },
+  "DD": {
+   "name": "듀폰",
+   "group": "chem"
+  },
+  "DDOG": {
+   "name": "데이터도그",
+   "group": "software"
+  },
+  "DE": {
+   "name": "디어 앤 컴퍼니",
+   "group": "capgoods"
+  },
+  "DECK": {
+   "name": "데커스브랜드",
+   "group": "apparel"
+  },
+  "DELL": {
+   "name": "델",
+   "group": "hardware"
+  },
+  "DG": {
+   "name": "달러 제너럴",
+   "group": "mart"
+  },
+  "DHI": {
+   "name": "D.R. 호튼",
+   "group": "homebuild"
+  },
+  "DIS": {
+   "name": "디즈니",
+   "group": "media"
+  },
+  "DLR": {
+   "name": "디지털 리얼티",
+   "group": "cloud"
+  },
+  "DLTR": {
+   "name": "달러트리",
+   "group": "mart"
+  },
+  "DOV": {
+   "name": "도버",
+   "group": "capgoods"
+  },
+  "DOW": {
+   "name": "다우 케미컬",
+   "group": "chem"
+  },
+  "DPZ": {
+   "name": "도미노피자",
+   "group": "food"
+  },
+  "DRI": {
+   "name": "다든레스토랑",
+   "group": "food"
+  },
+  "DTE": {
+   "name": "DTE에너지",
+   "group": "power"
+  },
+  "DUK": {
+   "name": "듀크에너지",
+   "group": "power"
+  },
+  "DVN": {
+   "name": "데본에너지",
+   "group": "oil"
+  },
+  "DXCM": {
+   "name": "덱스콤",
+   "group": "medtech"
+  },
+  "EBAY": {
+   "name": "이베이",
+   "group": "online"
+  },
+  "ECHO": {
+   "name": "에코스타",
+   "group": "telecom"
+  },
+  "ECL": {
+   "name": "에코랩",
+   "group": "chem"
+  },
+  "ED": {
+   "name": "컨솔리데이티드에디슨",
+   "group": "power"
+  },
+  "EG": {
+   "name": "에버레스트그룹",
+   "group": "pc_ins"
+  },
+  "EIX": {
+   "name": "에디슨인터내셔널",
+   "group": "power"
+  },
+  "EL": {
+   "name": "에스티 로더",
+   "group": "staples"
+  },
+  "ELV": {
+   "name": "엘리번스 헬스",
+   "group": "managed"
+  },
+  "EME": {
+   "name": "엠코",
+   "group": "machine"
+  },
+  "EMR": {
+   "name": "에머슨 일렉트릭",
+   "group": "capgoods"
+  },
+  "EOG": {
+   "name": "EOG 리소시스",
+   "group": "oil"
+  },
+  "EQIX": {
+   "name": "에퀴닉스",
+   "group": "cloud"
+  },
+  "EQT": {
+   "name": "EQT",
+   "group": "natgas"
+  },
+  "ERIE": {
+   "name": "에리인덴미티",
+   "group": "pc_ins"
+  },
+  "ES": {
+   "name": "에버소스 에너지",
+   "group": "power"
+  },
+  "ESS": {
+   "name": "에섹스프로퍼티트러스트",
+   "group": "apartment"
+  },
+  "ETN": {
+   "name": "이튼",
+   "group": "elec_equip"
+  },
+  "ETR": {
+   "name": "엔터지",
+   "group": "power"
+  },
+  "EVRG": {
+   "name": "에버지",
+   "group": "power"
+  },
+  "EW": {
+   "name": "에드워즈라이프사이언스",
+   "group": "medtech"
+  },
+  "EXC": {
+   "name": "엑셀론",
+   "group": "power"
+  },
+  "EXE": {
+   "name": "익스팬드에너지",
+   "group": "natgas"
+  },
+  "EXPD": {
+   "name": "익스페디터스인터내셔널",
+   "group": "freight"
+  },
+  "EXPE": {
+   "name": "익스피디아 그룹",
+   "group": "travel"
+  },
+  "F": {
+   "name": "포드",
+   "group": "auto"
+  },
+  "FANG": {
+   "name": "다이아몬드백에너지",
+   "group": "oil"
+  },
+  "FAST": {
+   "name": "패스널",
+   "group": "capgoods"
+  },
+  "FCX": {
+   "name": "프리포트 맥모란",
+   "group": "copper"
+  },
+  "FDX": {
+   "name": "페덱스",
+   "group": "freight"
+  },
+  "FDXF": {
+   "name": "페덱스프레이트",
+   "group": "freight"
+  },
+  "FE": {
+   "name": "퍼스트에너지",
+   "group": "power"
+  },
+  "FERG": {
+   "name": "퍼거슨엔터프라이즈",
+   "group": "bldg"
+  },
+  "FFIV": {
+   "name": "F5",
+   "group": "netgear"
+  },
+  "FICO": {
+   "name": "페어아이작",
+   "group": "software"
+  },
+  "FIS": {
+   "name": "피델리티내셔널인포메이션서비스",
+   "group": "payments"
+  },
+  "FISV": {
+   "name": "파이서브",
+   "group": "payments"
+  },
+  "FITB": {
+   "name": "피프스서드뱅코프",
+   "group": "bank"
+  },
+  "FIX": {
+   "name": "컴포트시스템즈",
+   "group": "machine"
+  },
+  "FLEX": {
+   "name": "플렉스",
+   "group": "components"
+  },
+  "FOX": {
+   "name": "폭스 (B주)",
+   "group": "media"
+  },
+  "FOXA": {
+   "name": "폭스 (A주)",
+   "group": "media"
+  },
+  "FTNT": {
+   "name": "포티넷",
+   "group": "software"
+  },
+  "FTV": {
+   "name": "포티브",
+   "group": "capgoods"
+  },
+  "GD": {
+   "name": "제너럴 다이내믹스",
+   "group": "defense"
+  },
+  "GDDY": {
+   "name": "고대디",
+   "group": "cloud"
+  },
+  "GE": {
+   "name": "GE 에어로스페이스",
+   "group": "aero"
+  },
+  "GEHC": {
+   "name": "GE 헬스케어",
+   "group": "medtech"
+  },
+  "GEN": {
+   "name": "젠 디지털",
+   "group": "software"
+  },
+  "GEV": {
+   "name": "GE버노바",
+   "group": "elec_equip"
+  },
+  "GILD": {
+   "name": "길리어드 사이언스",
+   "group": "pharma"
+  },
+  "GIS": {
+   "name": "제너럴 밀스",
+   "group": "grocery"
+  },
+  "GLW": {
+   "name": "코닝",
+   "group": "components"
+  },
+  "GM": {
+   "name": "제너럴 모터스",
+   "group": "auto"
+  },
+  "GNRC": {
+   "name": "제너랙",
+   "group": "elec_equip"
+  },
+  "GOOG": {
+   "name": "알파벳 (C주)",
+   "group": "ad"
+  },
+  "GOOGL": {
+   "name": "알파벳(구글)",
+   "group": [
+    "ad",
+    "cloud"
+   ]
+  },
+  "GPC": {
+   "name": "제뉴인 파츠",
+   "group": "autoparts"
+  },
+  "GPN": {
+   "name": "글로벌페이먼츠",
+   "group": "payments"
+  },
+  "GRMN": {
+   "name": "가르민",
+   "group": "electronics"
+  },
+  "GS": {
+   "name": "골드만삭스",
+   "group": "broker"
+  },
+  "GWW": {
+   "name": "W.W. 그레인저",
+   "group": "capgoods"
+  },
+  "HAL": {
+   "name": "할리버튼",
+   "group": "oilsvc"
+  },
+  "HAS": {
+   "name": "해즈브로",
+   "group": "hobby"
+  },
+  "HBAN": {
+   "name": "헌팅턴 뱅크셰어스",
+   "group": "bank"
+  },
+  "HCA": {
+   "name": "HCA헬스케어",
+   "group": "hospital"
+  },
+  "HD": {
+   "name": "홈디포",
+   "group": "home"
+  },
+  "HIG": {
+   "name": "하트퍼드",
+   "group": "pc_ins"
+  },
+  "HII": {
+   "name": "헌팅턴 잉걸스 인더스트리",
+   "group": "defense"
+  },
+  "HLT": {
+   "name": "힐튼 월드와이드",
+   "group": "travel"
+  },
+  "HON": {
+   "name": "허니웰",
+   "group": "capgoods"
+  },
+  "HONA": {
+   "name": "허니웰에어로스페이스",
+   "group": "aero"
+  },
+  "HOOD": {
+   "name": "로빈후드",
+   "group": "broker"
+  },
+  "HPE": {
+   "name": "HPE",
+   "group": "hardware"
+  },
+  "HPQ": {
+   "name": "HP",
+   "group": "hardware"
+  },
+  "HRL": {
+   "name": "호멜",
+   "group": "grocery"
+  },
+  "HST": {
+   "name": "호스트호텔앤드리조트",
+   "group": "travel"
+  },
+  "HSY": {
+   "name": "허쉬",
+   "group": "grocery"
+  },
+  "HUBB": {
+   "name": "허벨",
+   "group": "elec_equip"
+  },
+  "HUM": {
+   "name": "휴매나",
+   "group": "managed"
+  },
+  "HWM": {
+   "name": "하우멧 에어로스페이스",
+   "group": "aero"
+  },
+  "IBKR": {
+   "name": "인터랙티브 브로커스",
+   "group": "broker"
+  },
+  "IBM": {
+   "name": "IBM",
+   "group": "itsvc"
+  },
+  "ICE": {
+   "name": "인터컨티넨탈 익스체인지",
+   "group": "broker"
+  },
+  "IDXX": {
+   "name": "아이덱스 래버러토리스",
+   "group": "medtech"
+  },
+  "IEX": {
+   "name": "아이덱스 코퍼레이션",
+   "group": "capgoods"
+  },
+  "IFF": {
+   "name": "인터내셔널 플레버스 앤 프래그런스",
+   "group": "chem"
+  },
+  "INCY": {
+   "name": "인사이트",
+   "group": "pharma"
+  },
+  "INTC": {
+   "name": "인텔",
+   "group": "semi"
+  },
+  "INTU": {
+   "name": "인튜이트",
+   "group": "software"
+  },
+  "INVH": {
+   "name": "인비테이션 홈즈",
+   "group": "apartment"
+  },
+  "IP": {
+   "name": "인터내셔널페이퍼",
+   "group": "paper"
+  },
+  "IR": {
+   "name": "잉거솔 랜트",
+   "group": "capgoods"
+  },
+  "ISRG": {
+   "name": "인튜이티브 서지컬",
+   "group": "medtech"
+  },
+  "ITW": {
+   "name": "일리노이스 툴 웍스",
+   "group": "capgoods"
+  },
+  "IVZ": {
+   "name": "인베스코",
+   "group": "broker"
+  },
+  "J": {
+   "name": "제이콥스 솔루션스",
+   "group": "machine"
+  },
+  "JBHT": {
+   "name": "제이비헌트",
+   "group": "freight"
+  },
+  "JBL": {
+   "name": "자빌",
+   "group": "components"
+  },
+  "JCI": {
+   "name": "존슨 컨트롤스",
+   "group": "bldg"
+  },
+  "JNJ": {
+   "name": "존슨앤드존슨",
+   "group": "pharma"
+  },
+  "JPM": {
+   "name": "JP모건",
+   "group": "bank"
+  },
+  "KDP": {
+   "name": "큐리그 닥터페퍼",
+   "group": "staples"
+  },
+  "KEY": {
+   "name": "키코프",
+   "group": "bank"
+  },
+  "KEYS": {
+   "name": "키사이트",
+   "group": "components"
+  },
+  "KHC": {
+   "name": "크래프트 하인즈",
+   "group": "grocery"
+  },
+  "KKR": {
+   "name": "KKR",
+   "group": "broker"
+  },
+  "KLAC": {
+   "name": "KLA",
+   "group": "semi"
+  },
+  "KMB": {
+   "name": "킴벌리-클라크",
+   "group": "staples"
+  },
+  "KMI": {
+   "name": "킨더 모건",
+   "group": "midstream"
+  },
+  "KO": {
+   "name": "코카콜라",
+   "group": "staples"
+  },
+  "KR": {
+   "name": "크로거",
+   "group": "grocery"
+  },
+  "L": {
+   "name": "로우스 코퍼레이션",
+   "group": "pc_ins"
+  },
+  "LDOS": {
+   "name": "라이도스",
+   "group": "defense"
+  },
+  "LEN": {
+   "name": "레너",
+   "group": "homebuild"
+  },
+  "LHX": {
+   "name": "L3해리스",
+   "group": "defense"
+  },
+  "LII": {
+   "name": "레녹스 인터내셔널",
+   "group": "bldg"
+  },
+  "LIN": {
+   "name": "린데",
+   "group": "chem"
+  },
+  "LITE": {
+   "name": "루멘텀",
+   "group": "netgear"
+  },
+  "LLY": {
+   "name": "일라이 릴리",
+   "group": "pharma"
+  },
+  "LMT": {
+   "name": "록히드 마틴",
+   "group": "defense"
+  },
+  "LNT": {
+   "name": "얼라이언트 에너지",
+   "group": "power"
+  },
+  "LOW": {
+   "name": "로우스",
+   "group": "home"
+  },
+  "LRCX": {
+   "name": "램리서치",
+   "group": "semi"
+  },
+  "LULU": {
+   "name": "룰루레몬",
+   "group": "apparel"
+  },
+  "LUV": {
+   "name": "사우스웨스트 항공",
+   "group": "airline"
+  },
+  "LYB": {
+   "name": "라이온델 바셀",
+   "group": "chem"
+  },
+  "LYV": {
+   "name": "라이브 네이션",
+   "group": "live"
+  },
+  "MA": {
+   "name": "마스터카드",
+   "group": "payments"
+  },
+  "MAA": {
+   "name": "미드아메리카 아파트 커뮤니티",
+   "group": "apartment"
+  },
+  "MAR": {
+   "name": "매리엇 인터내셔널",
+   "group": "travel"
+  },
+  "MAS": {
+   "name": "마스코",
+   "group": "bldg"
+  },
+  "MCD": {
+   "name": "맥도날드",
+   "group": "food"
+  },
+  "MCHP": {
+   "name": "마이크로칩 테크놀로지",
+   "group": "semi"
+  },
+  "MCK": {
+   "name": "맥케슨",
+   "group": "drugstore"
+  },
+  "MDLZ": {
+   "name": "몬덜리즈 인터내셔널",
+   "group": "grocery"
+  },
+  "MDT": {
+   "name": "메드트로닉",
+   "group": "medtech"
+  },
+  "META": {
+   "name": "메타",
+   "group": "ad"
+  },
+  "MGM": {
+   "name": "MGM 리조트 인터내셔널",
+   "group": "travel"
+  },
+  "MKC": {
+   "name": "맥코믹",
+   "group": "grocery"
+  },
+  "MLM": {
+   "name": "마틴 메리타",
+   "group": "aggregates"
+  },
+  "MMM": {
+   "name": "3M",
+   "group": "capgoods"
+  },
+  "MNST": {
+   "name": "몬스터 베버리지",
+   "group": "staples"
+  },
+  "MO": {
+   "name": "알트리아",
+   "group": "tobacco"
+  },
+  "MOS": {
+   "name": "모자이크",
+   "group": "chem"
+  },
+  "MPC": {
+   "name": "마라톤 페트롤리엄",
+   "group": "refine"
+  },
+  "MPWR": {
+   "name": "모놀리식 파워 시스템스",
+   "group": "semi"
+  },
+  "MRK": {
+   "name": "머크",
+   "group": "pharma"
+  },
+  "MRNA": {
+   "name": "모더나",
+   "group": "pharma"
+  },
+  "MRSH": {
+   "name": "마시 맥클레넌",
+   "group": "pc_ins"
+  },
+  "MRVL": {
+   "name": "마벨 테크놀로지",
+   "group": "semi"
+  },
+  "MS": {
+   "name": "모건 스탠리",
+   "group": "broker"
+  },
+  "MSFT": {
+   "name": "마이크로소프트",
+   "group": [
+    "software",
+    "cloud"
+   ]
+  },
+  "MSI": {
+   "name": "모토로라 솔루션스",
+   "group": "netgear"
+  },
+  "MTB": {
+   "name": "M&T 뱅크",
+   "group": "bank"
+  },
+  "MU": {
+   "name": "마이크론",
+   "group": "semi"
+  },
+  "NCLH": {
+   "name": "노르웨이지안 크루즈 라인",
+   "group": "travel"
+  },
+  "NDAQ": {
+   "name": "나스닥",
+   "group": "broker"
+  },
+  "NDSN": {
+   "name": "노드슨",
+   "group": "capgoods"
+  },
+  "NEE": {
+   "name": "넥스트에라 에너지",
+   "group": "power"
+  },
+  "NEM": {
+   "name": "뉴몬트",
+   "group": "gold"
+  },
+  "NFLX": {
+   "name": "넷플릭스",
+   "group": "media"
+  },
+  "NI": {
+   "name": "니소스",
+   "group": "power"
+  },
+  "NKE": {
+   "name": "나이키",
+   "group": "apparel"
+  },
+  "NOC": {
+   "name": "노스럽 그러먼",
+   "group": "defense"
+  },
+  "NOW": {
+   "name": "서비스나우",
+   "group": "software"
+  },
+  "NRG": {
+   "name": "NRG 에너지",
+   "group": "power"
+  },
+  "NSC": {
+   "name": "노퍽 서던 철도",
+   "group": "rail"
+  },
+  "NTAP": {
+   "name": "넷앱",
+   "group": "hardware"
+  },
+  "NTRS": {
+   "name": "노던 트러스트",
+   "group": "broker"
+  },
+  "NUE": {
+   "name": "누코",
+   "group": "steel"
+  },
+  "NVDA": {
+   "name": "엔비디아",
+   "group": "semi"
+  },
+  "NVR": {
+   "name": "NVR",
+   "group": "homebuild"
+  },
+  "NXPI": {
+   "name": "NXP 반도체",
+   "group": "semi"
+  },
+  "ODFL": {
+   "name": "올드 도미니언",
+   "group": "freight"
+  },
+  "OKE": {
+   "name": "원오크",
+   "group": "midstream"
+  },
+  "OKTA": {
+   "name": "옥타",
+   "group": "software"
+  },
+  "OMC": {
+   "name": "옴니콤 그룹",
+   "group": "ad"
+  },
+  "ON": {
+   "name": "온세미",
+   "group": "semi"
+  },
+  "ORCL": {
+   "name": "오라클",
+   "group": [
+    "sw_invest",
+    "cloud"
+   ]
+  },
+  "ORLY": {
+   "name": "오릴리 오토모티브",
+   "group": "autoparts"
+  },
+  "OTIS": {
+   "name": "오티스",
+   "group": "capgoods"
+  },
+  "OXY": {
+   "name": "옥시덴탈 페트롤리엄",
+   "group": "oil"
+  },
+  "P": {
+   "name": "에버퓨어",
+   "group": "hardware"
+  },
+  "PANW": {
+   "name": "팰러앨토 네트웍스",
+   "group": "software"
+  },
+  "PAYX": {
+   "name": "페이체크스",
+   "group": "payroll"
+  },
+  "PCAR": {
+   "name": "파카 그룹",
+   "group": "truck"
+  },
+  "PCG": {
+   "name": "PG&E",
+   "group": "power"
+  },
+  "PEG": {
+   "name": "퍼블릭 서비스 엔터프라이즈",
+   "group": "power"
+  },
+  "PEP": {
+   "name": "펩시코",
+   "group": "staples"
+  },
+  "PFE": {
+   "name": "화이자",
+   "group": "pharma"
+  },
+  "PG": {
+   "name": "P&G",
+   "group": "staples"
+  },
+  "PGR": {
+   "name": "프로그레시브",
+   "group": "pc_ins"
+  },
+  "PH": {
+   "name": "파커 하니핀",
+   "group": "capgoods"
+  },
+  "PHM": {
+   "name": "펄트그룹",
+   "group": "homebuild"
+  },
+  "PKG": {
+   "name": "패키징 코퍼레이션 오브 아메리카",
+   "group": "paper"
+  },
+  "PLTR": {
+   "name": "팔란티어 테크놀로지스",
+   "group": "software"
+  },
+  "PM": {
+   "name": "필립모리스",
+   "group": "tobacco"
+  },
+  "PNC": {
+   "name": "PNC 파이낸셜 서비시즈",
+   "group": "bank"
+  },
+  "PNR": {
+   "name": "펜테어",
+   "group": "capgoods"
+  },
+  "PNW": {
+   "name": "피나클 웨스트",
+   "group": "power"
+  },
+  "PODD": {
+   "name": "인슐렛",
+   "group": "medtech"
+  },
+  "PPG": {
+   "name": "PPG 인더스트리",
+   "group": "chem"
+  },
+  "PPL": {
+   "name": "PPL",
+   "group": "power"
+  },
+  "PSX": {
+   "name": "필립스 66",
+   "group": "refine"
+  },
+  "PTC": {
+   "name": "PTC",
+   "group": "software"
+  },
+  "PWR": {
+   "name": "퀀타 서비스",
+   "group": "machine"
+  },
+  "PYPL": {
+   "name": "페이팔",
+   "group": "payments"
+  },
+  "Q": {
+   "name": "큐니티",
+   "group": "semi"
+  },
+  "QCOM": {
+   "name": "퀄컴",
+   "group": "semi"
+  },
+  "RCL": {
+   "name": "로열 캐리비안",
+   "group": "travel"
+  },
+  "RDDT": {
+   "name": "레딧",
+   "group": "ad"
+  },
+  "REGN": {
+   "name": "리제네론 파마슈티컬스",
+   "group": "pharma"
+  },
+  "RF": {
+   "name": "리전스 파이낸셜",
+   "group": "bank"
+  },
+  "RJF": {
+   "name": "레이몬드 제임스",
+   "group": "broker"
+  },
+  "RL": {
+   "name": "랠프 로런",
+   "group": "apparel"
+  },
+  "RMD": {
+   "name": "레즈메드",
+   "group": "medtech"
+  },
+  "ROK": {
+   "name": "로크웰 오토메이션",
+   "group": "capgoods"
+  },
+  "ROST": {
+   "name": "로스 스토어스",
+   "group": "apparel"
+  },
+  "RTX": {
+   "name": "RTX",
+   "group": [
+    "aero",
+    "defense"
+   ]
+  },
+  "RVTY": {
+   "name": "레비티",
+   "group": "medtech"
+  },
+  "SBUX": {
+   "name": "스타벅스",
+   "group": "food"
+  },
+  "SCHW": {
+   "name": "찰스 슈왑",
+   "group": "broker"
+  },
+  "SHW": {
+   "name": "셔윈윌리암스",
+   "group": "chem"
+  },
+  "SJM": {
+   "name": "J.M. 스무커",
+   "group": "grocery"
+  },
+  "SKYD": {
+   "name": "스카이댄스",
+   "group": "media"
+  },
+  "SLB": {
+   "name": "SLB",
+   "group": "oilsvc"
+  },
+  "SMCI": {
+   "name": "슈퍼마이크로",
+   "group": "hardware"
+  },
+  "SNA": {
+   "name": "스냅온",
+   "group": "capgoods"
+  },
+  "SNDK": {
+   "name": "샌디스크",
+   "group": "hardware"
+  },
+  "SNPS": {
+   "name": "시놉시스",
+   "group": "software"
+  },
+  "SO": {
+   "name": "서던 컴퍼니",
+   "group": "power"
+  },
+  "SOLV": {
+   "name": "솔벤툼",
+   "group": "medtech"
+  },
+  "SRE": {
+   "name": "셈프라",
+   "group": "power"
+  },
+  "STE": {
+   "name": "스테리스",
+   "group": "medtech"
+  },
+  "STLD": {
+   "name": "스틸 다이내믹스",
+   "group": "steel"
+  },
+  "STT": {
+   "name": "스테이트 스트리트",
+   "group": "broker"
+  },
+  "STX": {
+   "name": "시게이트",
+   "group": "hardware"
+  },
+  "STZ": {
+   "name": "컨스텔레이션브랜드",
+   "group": "alcohol"
+  },
+  "SW": {
+   "name": "스머핏 웨스트록",
+   "group": "paper"
+  },
+  "SWK": {
+   "name": "스탠리 블랙앤데커",
+   "group": "capgoods"
+  },
+  "SWKS": {
+   "name": "스카이웍스 솔루션스",
+   "group": "semi"
+  },
+  "SYF": {
+   "name": "싱크로니 파이낸셜",
+   "group": "payments"
+  },
+  "SYK": {
+   "name": "스트라이커",
+   "group": "medtech"
+  },
+  "SYY": {
+   "name": "시스코(Sysco)",
+   "group": "food"
+  },
+  "T": {
+   "name": "AT&T",
+   "group": "telecom"
+  },
+  "TDG": {
+   "name": "트랜스디그",
+   "group": "aero"
+  },
+  "TDY": {
+   "name": "텔레다인 테크놀로지스",
+   "group": "components"
+  },
+  "TEL": {
+   "name": "TE 커넥티비티",
+   "group": "components"
+  },
+  "TER": {
+   "name": "테라다인",
+   "group": "semi"
+  },
+  "TFC": {
+   "name": "트루이스트 파이낸셜",
+   "group": "bank"
+  },
+  "TGT": {
+   "name": "타깃",
+   "group": "mart"
+  },
+  "TJX": {
+   "name": "TJX",
+   "group": "apparel"
+  },
+  "TKO": {
+   "name": "TKO 그룹",
+   "group": "live"
+  },
+  "TMUS": {
+   "name": "T-모바일 US",
+   "group": "telecom"
+  },
+  "TPL": {
+   "name": "텍사스 퍼시픽 랜드",
+   "group": "oil"
+  },
+  "TPR": {
+   "name": "테이프스트리",
+   "group": "apparel"
+  },
+  "TRGP": {
+   "name": "타르가 리소시스",
+   "group": "midstream"
+  },
+  "TRMB": {
+   "name": "트림블",
+   "group": "software"
+  },
+  "TROW": {
+   "name": "티. 로우 프라이스",
+   "group": "broker"
+  },
+  "TRV": {
+   "name": "트래블러스",
+   "group": "pc_ins"
+  },
+  "TSCO": {
+   "name": "트랙터 서플라이",
+   "group": "home"
+  },
+  "TSLA": {
+   "name": "테슬라",
+   "group": "auto"
+  },
+  "TSN": {
+   "name": "타이슨 푸드",
+   "group": "grocery"
+  },
+  "TT": {
+   "name": "트레인 테크놀로지스",
+   "group": "bldg"
+  },
+  "TWLO": {
+   "name": "트윌리오",
+   "group": "software"
+  },
+  "TXN": {
+   "name": "텍사스 인스트루먼트",
+   "group": "semi"
+  },
+  "TXT": {
+   "name": "텍스트론",
+   "group": "aero"
+  },
+  "TYL": {
+   "name": "타일러 테크놀로지스",
+   "group": "software"
+  },
+  "UAL": {
+   "name": "유나이티드 항공",
+   "group": "airline"
+  },
+  "UDR": {
+   "name": "UDR",
+   "group": "apartment"
+  },
+  "UHS": {
+   "name": "유니버설 헬스 서비스",
+   "group": "hospital"
+  },
+  "UNH": {
+   "name": "유나이티드헬스 그룹",
+   "group": "managed"
+  },
+  "UNP": {
+   "name": "유니온 퍼시픽",
+   "group": "rail"
+  },
+  "UPS": {
+   "name": "UPS",
+   "group": "freight"
+  },
+  "URI": {
+   "name": "유나이티드 렌탈스",
+   "group": "aggregates"
+  },
+  "USB": {
+   "name": "U.S. 뱅코프",
+   "group": "bank"
+  },
+  "V": {
+   "name": "비자",
+   "group": "payments"
+  },
+  "VEEV": {
+   "name": "비바 시스템스",
+   "group": "software"
+  },
+  "VLO": {
+   "name": "발레로 에너지",
+   "group": "refine"
+  },
+  "VMC": {
+   "name": "벌컨 머티리얼스",
+   "group": "aggregates"
+  },
+  "VMRK": {
+   "name": "비브마크 레지덴셜",
+   "group": "apartment"
+  },
+  "VRSN": {
+   "name": "베리사인",
+   "group": "cloud"
+  },
+  "VRT": {
+   "name": "버티브",
+   "group": "elec_equip"
+  },
+  "VRTX": {
+   "name": "버텍스 파마슈티컬",
+   "group": "pharma"
+  },
+  "VST": {
+   "name": "비스트라",
+   "group": "power"
+  },
+  "VTRS": {
+   "name": "비아트리스",
+   "group": "pharma"
+  },
+  "VYLR": {
+   "name": "바이러",
+   "group": "grain"
+  },
+  "VZ": {
+   "name": "버라이즌 커뮤니케이션스",
+   "group": "telecom"
+  },
+  "WAB": {
+   "name": "웹텍",
+   "group": "rail"
+  },
+  "WDAY": {
+   "name": "워크데이",
+   "group": "software"
+  },
+  "WDC": {
+   "name": "웨스턴 디지털",
+   "group": "hardware"
+  },
+  "WEC": {
+   "name": "WEC 에너지 그룹",
+   "group": "power"
+  },
+  "WFC": {
+   "name": "웰스 파고",
+   "group": "bank"
+  },
+  "WMB": {
+   "name": "윌리엄스 컴퍼니",
+   "group": "midstream"
+  },
+  "WMT": {
+   "name": "월마트",
+   "group": "mart"
+  },
+  "WRB": {
+   "name": "W. R. 버클레이",
+   "group": "pc_ins"
+  },
+  "WSM": {
+   "name": "윌리엄스-소노마",
+   "group": "furniture"
+  },
+  "WST": {
+   "name": "웨스트 파마슈티컬 서비스",
+   "group": "medtech"
+  },
+  "WTW": {
+   "name": "윌리스 타워스 왓슨",
+   "group": "pc_ins"
+  },
+  "XEL": {
+   "name": "엑셀 에너지",
+   "group": "power"
+  },
+  "XOM": {
+   "name": "엑슨모빌",
+   "group": "oil"
+  },
+  "XYL": {
+   "name": "자일럼",
+   "group": "capgoods"
+  },
+  "XYZ": {
+   "name": "블록",
+   "group": "payments"
+  },
+  "YUM": {
+   "name": "얌! 브랜드",
+   "group": "food"
+  },
+  "ZBH": {
+   "name": "짐머 바이오메트",
+   "group": "medtech"
+  },
+  "ZBRA": {
+   "name": "지브라 테크놀로지스",
+   "group": "components"
+  },
+  "ZTS": {
+   "name": "조에티스",
+   "group": "pharma"
+  }
+ },
+ "card_off": {
+  "A": {
+   "name": "애질런트 테크놀로지스",
+   "why": "연구 장비 · 시약 — 따로 보는 월 통계 없음(제약 생산은 함께 볼 지표로)"
+  },
+  "AFL": {
+   "name": "아플락",
+   "why": "생명보험 — 보험료 월 통계 없음(금리는 함께 볼 지표로)"
+  },
+  "AMT": {
+   "name": "아메리칸 타워",
+   "why": "통신 타워 리츠 — 타워 임대 월 통계 없음(통신사 매출 · 금리는 함께 볼 지표로)"
+  },
+  "ARE": {
+   "name": "알렉산드리아 리얼 에스테이트 이퀴티스",
+   "why": "오피스 리츠 — 맞는 월 통계 없음"
+  },
+  "AWK": {
+   "name": "아메리칸 워터 웍스",
+   "why": "수도 — 수도 요금 월 통계를 FRED 에서 찾지 못함"
+  },
+  "AXON": {
+   "name": "액손",
+   "why": "경찰 장비 · 소프트웨어 — 항공 · 방산 통계가 설명하지 못함"
+  },
+  "BALL": {
+   "name": "볼",
+   "why": "음료 캔 — 맞는 월 통계 없음"
+  },
+  "BR": {
+   "name": "브로드리지 파이낸셜 솔루션스",
+   "why": "금융 문서 처리 — 맞는 월 통계 없음"
+  },
+  "BRK-B": {
+   "name": "버크셔 해서웨이",
+   "why": "여러 사업 지주 — 한 업계 통계로 설명되지 않음"
+  },
+  "BXP": {
+   "name": "BXP",
+   "why": "오피스 리츠 — 맞는 월 통계 없음"
+  },
+  "CBRE": {
+   "name": "CBRE 그룹",
+   "why": "부동산 서비스 — 맞는 월 통계 없음"
+  },
+  "CCI": {
+   "name": "크라운캐슬",
+   "why": "통신 타워 리츠 — 타워 임대 월 통계 없음(통신사 매출 · 금리는 함께 볼 지표로)"
+  },
+  "COIN": {
+   "name": "코인베이스",
+   "why": "가상자산 거래소 — 증권 업종 통계가 설명하지 못함"
+  },
+  "CPRT": {
+   "name": "코파트",
+   "why": "사고 차량 경매 — 맞는 월 통계 없음"
+  },
+  "CRL": {
+   "name": "찰스 리버 랩",
+   "why": "연구 장비 · 시약 — 따로 보는 월 통계 없음(제약 생산은 함께 볼 지표로)"
+  },
+  "CSGP": {
+   "name": "코스타그룹",
+   "why": "부동산 서비스 — 맞는 월 통계 없음"
+  },
+  "CTAS": {
+   "name": "신타스",
+   "why": "작업복 대여 — 맞는 월 통계 없음"
+  },
+  "DGX": {
+   "name": "퀘스트 진단",
+   "why": "검사 · 투석 서비스 — 맞는 월 통계 없음"
+  },
+  "DHR": {
+   "name": "다나허",
+   "why": "연구 장비 · 시약 — 따로 보는 월 통계 없음(제약 생산은 함께 볼 지표로)"
+  },
+  "DOC": {
+   "name": "헬스피크프로퍼티",
+   "why": "의료 리츠 — 맞는 월 통계 없음"
+  },
+  "DVA": {
+   "name": "다비타",
+   "why": "검사 · 투석 서비스 — 맞는 월 통계 없음"
+  },
+  "EFX": {
+   "name": "에퀴팩스",
+   "why": "신용 정보 — 맞는 월 통계 없음"
+  },
+  "EXR": {
+   "name": "엑스트라스페이스스토리지",
+   "why": "자주식 부동산 — 맞는 월 통계 없음"
+  },
+  "FDS": {
+   "name": "팩트셋 리서치 시스템즈",
+   "why": "신용평가 · 지수 · 금융 데이터 — 증권 거래 통계가 설명하지 못함(금리는 함께 볼 지표로)"
+  },
+  "FRT": {
+   "name": "페더럴리얼티인베스트먼트트러스트",
+   "why": "상가 리츠 — 임대료 월 통계 없음(입점 매장 매출 · 금리는 함께 볼 지표로)"
+  },
+  "FSLR": {
+   "name": "퍼스트 솔라",
+   "why": "태양광 패널 — 반도체 통계가 설명하지 못함(전력 수요 · 금리는 함께 볼 지표로)"
+  },
+  "GL": {
+   "name": "글로브라이프",
+   "why": "생명보험 — 보험료 월 통계 없음(금리는 함께 볼 지표로)"
+  },
+  "HSIC": {
+   "name": "헨리 샤인",
+   "why": "치과 · 동물병원 용품 유통 — 약국 판매 통계가 설명하지 못함"
+  },
+  "ILMN": {
+   "name": "일루미나",
+   "why": "연구 장비 · 시약 — 따로 보는 월 통계 없음(제약 생산은 함께 볼 지표로)"
+  },
+  "IQV": {
+   "name": "아이큐비아",
+   "why": "연구 장비 · 시약 — 따로 보는 월 통계 없음(제약 생산은 함께 볼 지표로)"
+  },
+  "IRM": {
+   "name": "아이언 마운틴",
+   "why": "기타 전문 리츠 — 맞는 월 통계 없음"
+  },
+  "IT": {
+   "name": "가트너",
+   "why": "리서치 구독 — IT 서비스 매출 통계가 설명하지 못함"
+  },
+  "JKHY": {
+   "name": "잭 헨리",
+   "why": "은행용 소프트웨어 — 결제 통계가 설명하지 못함"
+  },
+  "KIM": {
+   "name": "킴코 리얼티",
+   "why": "상가 리츠 — 임대료 월 통계 없음(입점 매장 매출 · 금리는 함께 볼 지표로)"
+  },
+  "LH": {
+   "name": "랩코프",
+   "why": "검사 · 투석 서비스 — 맞는 월 통계 없음"
+  },
+  "LVS": {
+   "name": "라스베이거스 샌즈",
+   "why": "카지노 — 마카오 · 라스베이거스 방문객 통계가 정부 월 통계에 없음"
+  },
+  "MCO": {
+   "name": "무디스",
+   "why": "신용평가 · 지수 · 금융 데이터 — 증권 거래 통계가 설명하지 못함(금리는 함께 볼 지표로)"
+  },
+  "MET": {
+   "name": "메트라이프",
+   "why": "생명보험 — 보험료 월 통계 없음(금리는 함께 볼 지표로)"
+  },
+  "MSCI": {
+   "name": "MSCI",
+   "why": "신용평가 · 지수 · 금융 데이터 — 증권 거래 통계가 설명하지 못함(금리는 함께 볼 지표로)"
+  },
+  "MTD": {
+   "name": "메틀러 톨레도",
+   "why": "연구 장비 · 시약 — 따로 보는 월 통계 없음(제약 생산은 함께 볼 지표로)"
+  },
+  "NWS": {
+   "name": "뉴스 코프 (B주)",
+   "why": "신문 · 출판 — 따로 보는 월 통계 없음"
+  },
+  "NWSA": {
+   "name": "뉴스 코프 (A주)",
+   "why": "신문 · 출판 — 따로 보는 월 통계 없음"
+  },
+  "O": {
+   "name": "리얼티 인컴",
+   "why": "상가 리츠 — 임대료 월 통계 없음(입점 매장 매출 · 금리는 함께 볼 지표로)"
+  },
+  "PFG": {
+   "name": "프린시펄 파이낸셜",
+   "why": "생명보험 — 보험료 월 통계 없음(금리는 함께 볼 지표로)"
+  },
+  "PLD": {
+   "name": "프롤로지스",
+   "why": "산업 리츠 — 맞는 월 통계 없음"
+  },
+  "PRU": {
+   "name": "푸르덴셜 파이낸셜",
+   "why": "생명보험 — 보험료 월 통계 없음(금리는 함께 볼 지표로)"
+  },
+  "PSA": {
+   "name": "퍼블릭 스토리지",
+   "why": "자주식 부동산 — 맞는 월 통계 없음"
+  },
+  "REG": {
+   "name": "레전시 센터스",
+   "why": "상가 리츠 — 임대료 월 통계 없음(입점 매장 매출 · 금리는 함께 볼 지표로)"
+  },
+  "ROL": {
+   "name": "롤린스",
+   "why": "쓰레기 · 시설 관리 — 요금 월 통계를 FRED 에서 찾지 못함"
+  },
+  "ROP": {
+   "name": "로퍼 테크놀로지스",
+   "why": "소프트웨어 여러 사업 — 전자 장비 통계가 설명하지 못함"
+  },
+  "RSG": {
+   "name": "리퍼블릭 서비스",
+   "why": "쓰레기 · 시설 관리 — 요금 월 통계를 FRED 에서 찾지 못함"
+  },
+  "SBAC": {
+   "name": "SBA 커뮤니케이션스",
+   "why": "통신 타워 리츠 — 타워 임대 월 통계 없음(통신사 매출 · 금리는 함께 볼 지표로)"
+  },
+  "SPG": {
+   "name": "시몬 프로퍼티",
+   "why": "상가 리츠 — 임대료 월 통계 없음(입점 매장 매출 · 금리는 함께 볼 지표로)"
+  },
+  "SPGI": {
+   "name": "S&P 글로벌",
+   "why": "신용평가 · 지수 · 금융 데이터 — 증권 거래 통계가 설명하지 못함(금리는 함께 볼 지표로)"
+  },
+  "TECH": {
+   "name": "바이오테크니",
+   "why": "연구 장비 · 시약 — 따로 보는 월 통계 없음(제약 생산은 함께 볼 지표로)"
+  },
+  "TMO": {
+   "name": "써모 피셔 사이언티픽",
+   "why": "연구 장비 · 시약 — 따로 보는 월 통계 없음(제약 생산은 함께 볼 지표로)"
+  },
+  "TTWO": {
+   "name": "테이크투 인터랙티브",
+   "why": "게임 — 게임만 따로 보는 미국 월 통계 없음"
+  },
+  "UBER": {
+   "name": "우버",
+   "why": "차량 호출 — 맞는 월 통계 없음"
+  },
+  "ULTA": {
+   "name": "울타 뷰티",
+   "why": "화장품 전문점 — 화장품만 따로 보는 매장 판매 통계 없음"
+  },
+  "VICI": {
+   "name": "비시 프로퍼티스",
+   "why": "카지노 부동산 리츠 — 임대료 월 통계 없음"
+  },
+  "VLTO": {
+   "name": "베랄토",
+   "why": "쓰레기 · 시설 관리 — 요금 월 통계를 FRED 에서 찾지 못함"
+  },
+  "VRSK": {
+   "name": "베리스크 애널리틱스",
+   "why": "보험 데이터 분석 — 맞는 월 통계 없음"
+  },
+  "VTR": {
+   "name": "벤타스",
+   "why": "의료 리츠 — 맞는 월 통계 없음"
+  },
+  "WAT": {
+   "name": "워터스",
+   "why": "연구 장비 · 시약 — 따로 보는 월 통계 없음(제약 생산은 함께 볼 지표로)"
+  },
+  "WELL": {
+   "name": "웰타워",
+   "why": "의료 리츠 — 맞는 월 통계 없음"
+  },
+  "WM": {
+   "name": "웨이스트 매니지먼트",
+   "why": "쓰레기 · 시설 관리 — 요금 월 통계를 FRED 에서 찾지 못함"
+  },
+  "WY": {
+   "name": "와이어하우저",
+   "why": "목재 부동산 — 맞는 월 통계 없음"
+  },
+  "WYNN": {
+   "name": "윈 리조트",
+   "why": "카지노 — 마카오 · 라스베이거스 방문객 통계가 정부 월 통계에 없음"
+  }
+ }
+}

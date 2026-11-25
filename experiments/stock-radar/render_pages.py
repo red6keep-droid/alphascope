@@ -27,6 +27,7 @@ import signal_groups as SG  # noqa: E402 — 판정 묶음 분류표 (함께 보
 import universe as U  # noqa: E402
 import court  # noqa: E402 — 소송 일정 (P270)
 import crash_watch as CW  # noqa: E402 — 급락장에서 어땠나? (오늘 탭, 2026-11-04)
+import industry_us as IU  # noqa: E402 — 지표 단위 (UNITS)
 import peer_cards as PC  # noqa: E402 — 같은 업종 S&P 500 과 견주는 카드 넷 (2026-11-22 사용자 "전부 발행")
 
 UP, DOWN, NOTE, TINY = _dk.UP, _dk.DOWN, _dk.NOTE, _dk.TINY
@@ -563,6 +564,9 @@ def sec_momentum(s):
 
 def _fred_value(sid, v):
     """FRED 값 → 읽기 쉬운 글. 소매 · 주문 · 건설 = 백만 달러, 은행 대출 = 십억 달러, 신차 = 백만 대(연율), 기업이익 = 십억 달러(연율)."""
+    t = IU.fmt(sid, v)   # 새 지표는 industry_us.UNITS 가 단위를 정한다 (2026-11-25)
+    if t:
+        return t
     if sid.startswith(("RS", "NEWORDER", "PNRES", "A34")):
         return f"{v / 100:,.0f}억 달러"
     if sid == "TOTLL":
@@ -580,6 +584,8 @@ def _fred_value(sid, v):
 
 def _fred_scale(sid):
     """그래프 숫자 나누기 · 단위 — 단위는 그래프 오른쪽 위."""
+    if sid in IU.UNITS:
+        return IU.UNITS[sid][0], IU.UNITS[sid][1]
     if sid.startswith(("RS", "NEWORDER", "PNRES", "A34")):
         return 100, "억 달러"
     if sid == "TOTLL":
@@ -645,6 +651,19 @@ def industry_cards(s):
     return out
 
 
+def card_related(s):
+    """함께 볼 지표 (2026-11-25 사용자, 한국 render_kr.card_related 와 같은 카드) — 업계 통계는 아니지만 회사의 원가 · 손님 수와 이어지는 지표. 판정 없이 참고, 업계 카드 아래."""
+    rows = (s.get("industry_us") or {}).get("related") or []
+    if not rows:
+        return ""
+    lines = [("업계 통계는 아니지만 이 회사의 원가나 손님 수와 이어지는 지표입니다."
+              + R.small_note("모두 1년 전 같은 달(분기 자료는 같은 분기)과 견줍니다. 주가를 설명한다고 확인한 지표는 아니고, 참고로만 봅니다."), "plain")]
+    for r in rows:
+        chg = "" if r.get("chg") is None else f" · 1년 전보다 {_sgn(r['chg'])}{'%p' if r.get('pct') else '%'}"
+        lines.append(("row", r["name"], _fred_value(r["fred"], r["v"]), f"{_when(r['month'], r.get('quarterly', False))}{chg} · {r['why']}"))
+    return R._state_card("함께 볼 지표", "참고", "neutral", R.MUTED, lines, "", fold=True)
+
+
 def sec_industry_tab(s):
     """`업계상황` 탭 (2026-10-31 사용자: 한국처럼 업종 이야기는 따로) — 업종 자금 카드(펼침) + 업계 카드(FRED, 2026-11-01 P268)."""
     sf = s.get("sector_flow")
@@ -653,7 +672,7 @@ def sec_industry_tab(s):
         th, col = R.FLOW_THEME.get(sf["state"], ("neutral", R.MUTED))
         title = f"{sf['name']} 업계 자금 흐름은?"   # 옛 `○○ 업계 자금 흐름은?` — 앞날이 아니라 지난 20거래일, 회사 매출이 아니라 주식 쪽 돈 (2026-11-01 사용자 P198)
         card = R._state_card(title, sf["state"], th, col, sector_lines(sf), "", fold=True, opened=True)   # 툴팁 없음 — 근거 줄에 유입 · 유출 기준 · 순위가 있다 (2026-11-08 사용자: 카드와 겹치는 툴팁 생략, 가이드라인 11절)   # 탭 첫 강조 카드는 펼침 (P216)
-    card += industry_cards(s)
+    card += industry_cards(s) + card_related(s)
     if not card:
         return _dk.muted("이 종목은 업계 자료를 아직 연결하지 않았습니다.")
     return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{card}</div>'
