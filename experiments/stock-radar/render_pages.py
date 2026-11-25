@@ -76,7 +76,6 @@ def home_marker():
 
 # ---------------------------------------------------------------- 상세 (간단형)
 
-INFO_ICON_12 = _dk.INFO_ICON.replace('width="14" height="14"', 'width="12" height="12"')   # 12px 안내 줄용 ⓘ — 글씨 크기에 맞춤 (2026-11-10)
 
 
 def lead(s):
@@ -190,13 +189,14 @@ def fact_streak(s, closes):
 
 
 def lead_note(about):
-    """요약 아래 12px 안내 줄 — 회사 소개 첫 문장 (2026-11-10 사용자: 독자는 다 아는 말 · 매일 반복 — 줄바꿈 + 안내 기호 + 블로그 문장 최소 글씨 12px).
+    """요약 아래 10/15 안내 줄 — 회사 소개 첫 문장, 앞 ※ (2026-11-10 사용자: 독자는 다 아는 말 · 매일 반복 — 줄바꿈 + 안내 기호.
+    2026-11-25 사용자: 12px · ⓘ → 10px · ※ — 가이드라인 최소 글씨 13 의 예외).
     숨기지 않는다 — 페이지마다 다른 문장이라 검색엔진이 읽어야 한다. 한국 종목도 같은 줄."""
     first = (about or "").split(". ")[0].rstrip(".")
     if not first:
         return ""
-    return (f'<p style="margin:-4px 0 12px;padding-left:{_dk.ALIGN_PX}px;font-size:12px;line-height:18px;color:{_dk.NOTE};word-break:keep-all;">'
-            f'{INFO_ICON_12}{_esc(first)}.</p>')
+    return (f'<p style="margin:-4px 0 12px;padding-left:{_dk.ALIGN_PX}px;font-size:10px;line-height:15px;color:{_dk.NOTE};word-break:keep-all;">'
+            f'※ {_esc(first)}.</p>')
 
 
 def range_tip(s):

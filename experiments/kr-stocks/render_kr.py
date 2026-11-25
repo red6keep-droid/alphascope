@@ -158,7 +158,7 @@ def lead(s):
     fact, _ = lead_fact(s)   # 둘째 문장 — 그날 이 종목에서 가장 눈에 띄는 사실 하나 (2026-11-10 사용자: 색인 안 된 페이지가 한국 종목, AI 없이 — 미국과 같은 규칙)
     if fact:
         text += " " + fact
-    return f'<p data-seo-lead="1" style="{_dk.SEO_LEAD}">{_dk.tint(_esc(text))}</p>' + RP.lead_note(U.ABOUT.get(s["code"]))   # 요약 아래 12px 회사 소개 줄 (미국과 같게)
+    return f'<p data-seo-lead="1" style="{_dk.SEO_LEAD}">{_dk.tint(_esc(text))}</p>' + RP.lead_note(U.ABOUT.get(s["code"]))   # 요약 아래 10px ※ 회사 소개 줄 (미국과 같게)
 
 
 def lead_fact(s):

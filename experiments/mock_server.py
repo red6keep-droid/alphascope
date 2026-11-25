@@ -94,6 +94,7 @@ ARCHIVE_SEED = [
 # 발행 예정 = 아직 블로그에 없는 기능(남은 일 한 줄) · 발행된 화면 = 블로그에 있는 기능의 목업(접어 둠) · 어느 표에도 없는 파일 = 자동으로 `쓰지 않는 목업`.
 # 기능이 발행되면 Claude 가 PLAN → LIVE 로 옮긴다(사용자 몫 아님). 새 목업 묶음을 만들면 같은 커밋에서 PLAN 에 한 줄.
 PLAN = [   # (기능 이름, 남은 일 — 한 줄, 파일 패턴 "폴더/파일")
+    ("종목 페이지 회사 소개 안내 줄 10/15 · ※ (옛 12px · 느낌표 아이콘)", "목업 확인 → render_pages.lead_note 12 → 10/15 · ※ 로 바꾸고 가이드라인 한 줄 (2026-11-25 사용자)", ["stock-lists/mock_stock-star-kr-note13.html"]),
     ("개성 있는 아이 찾기 게임 — 평범의 범위 · 설정으로 나온 답 · 그림 확인", "기준 설정(80% · 20일 간격)에서 나온 그룹 후보를 여덟 명씩 그림으로 확인 · 길잡이 = 비공개 doc/기획/종목-그래프-패턴-분류-목적.md", ["stock-character/mock_*.html"]),
     ("Newfact 주요 기사 (뉴스 수집기 글 → 블로그 새 글) · 한국 기사 제목 묶음", "목업 확인 → 실제 글로 다시 그리기(fetch_samples) → 발행기(하루 4번, 시험은 Blogger 초안) · 제목 묶음을 한국 기사 공용 저장소에 연결", ["news-posts/mock_news_*"]),
     ("한국 주요 뉴스 · 사건별 사실 (보도 2곳 이상 사건 + 사실 팝업 · 그 밖의 기사 제목 묶음)", "시안: 수집기 사건 묶기 결과를 facts 모양으로 바꾼 표본 → 사용자 디자인 확인 → 첫 facts 문서로 다시 그리기", ["news-posts/mock_news_facts*"]),
@@ -158,8 +159,8 @@ def git_changes():
     root = os.path.dirname(BASE)
     try:
         out = subprocess.run(["git", "-C", root, "log", "--no-merges", "--format=@%ct %s", "--name-only", "--", "experiments/*/output/*.html"],
-                             capture_output=True, text=True, timeout=20).stdout
-        tracked = set(subprocess.run(["git", "-C", root, "ls-files", "experiments/*/output/*.html"], capture_output=True, text=True, timeout=20).stdout.split())
+                             capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=20).stdout
+        tracked = set(subprocess.run(["git", "-C", root, "ls-files", "experiments/*/output/*.html"], capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=20).stdout.split())
     except (OSError, subprocess.SubprocessError):
         return _GIT
     t, cur, real = {}, 0, False
