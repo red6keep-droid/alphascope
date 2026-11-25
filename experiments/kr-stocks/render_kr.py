@@ -278,6 +278,10 @@ def _ind_value(r):
         return f"{v / 1e8:,.1f}억 달러" if abs(v) >= 1e8 else f"{v / 1e4:,.0f}만 달러"   # 관세청 수출금액 (방산, 2026-10-31) · 1억 달러 아래는 만 달러 (로봇, 2026-11-25)
     if kind == "won_b":
         return f"{v / 1e3:,.0f}조 원"
+    if kind == "won_k":   # 천원 (증시 거래대금, 2026-11-25)
+        return f"{v / 1e9:,.1f}조 원" if abs(v) >= 1e9 else f"{v / 1e5:,.0f}억 원"
+    if kind == "won":   # 원 (투자자 예탁금 · 신용융자, 2026-11-25)
+        return f"{v / 1e12:,.1f}조 원" if abs(v) >= 1e12 else f"{v / 1e8:,.0f}억 원"
     if kind == "pct":
         return f"{v:.2f}%"
     if kind == "mwh":
@@ -415,7 +419,7 @@ def _mo(m):
 
 def _chart_unit(kind):
     """그래프 숫자는 짧게 — 단위는 그래프 제목에."""
-    return {"won_m": (1e6, "조 원"), "won_b": (1e3, "조 원"), "mwh": (1e4, "만 MWh"), "kbbl": (1e3, "백만 배럴"), "ktoe": (1e3, "백만 TOE"), "ton": (1e4, "만 톤"),
+    return {"won_m": (1e6, "조 원"), "won_b": (1e3, "조 원"), "won_k": (1e9, "조 원"), "won": (1e12, "조 원"), "mwh": (1e4, "만 MWh"), "kbbl": (1e3, "백만 배럴"), "ktoe": (1e3, "백만 TOE"), "ton": (1e4, "만 톤"),
             "cnt": (1, "호"), "pct": (1, "%"), "idx": (1, ""), "usd": (1e8, "억 달러")}.get(kind, (1, ""))
 
 
