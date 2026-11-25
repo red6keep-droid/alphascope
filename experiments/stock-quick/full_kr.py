@@ -507,8 +507,11 @@ def build(ref_kr, bars_all, flows, hist_full, det, dart_data, hist_quick, only=N
         K.BY_SYM[s] = K.CANDIDATES[-1]
         if code_of(s) in CARD_OFF:
             K.SECTOR_FALLBACK_OFF.add(s)
-        if not rep and CARD.get(code_of(s)) in K.BIZ:   # 대표 종목이 없는 새 묶음 — 업계 일감 카드만 (업계 경기 · 자금 흐름은 빌릴 곳이 없다)
+        if not rep and CARD.get(code_of(s)) in K.BIZ:   # 대표 종목이 없는 새 묶음 — 업계 일감 지표는 BIZ, 업계 경기 · 수익성은 아래 업종 통계. 업계 자금 흐름(업종 ETF)은 없다
             K.BIZ_OF[code_of(s)] = CARD[code_of(s)]
+            for tbl, ind in zip((K.BSI_INDUSTRY, K.FIN_INDUSTRY, K.LOAN_INDUSTRY), K.BIZ_STATS.get(CARD[code_of(s)]) or ()):   # 업계 경기 · 수익성 = 그 묶음이 속한 업종 통계(안내 줄 = K.BIZ_MIX_NOTE)
+                if s not in tbl[ind][1]:
+                    tbl[ind][1].append(s)
         if rep:
             alias(rep, s)
         groups.setdefault(e.get("sector") or "기타", []).append(s)
