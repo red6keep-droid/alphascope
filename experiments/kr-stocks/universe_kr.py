@@ -350,6 +350,8 @@ def loan_industry(sym):
 
 # 산업재 테마 종목(2차전지 · 방산)은 건설 지표가 어울리지 않는다 — 테마가 있으면 테마 지표만, 없으면 업종 지표
 SECTOR_SKIP_IF_THEMED = {"산업재"}
+# 큰 업종 지표로 대체하지 않는 종목 — full_kr.py 가 채운다 (2026-11-25 사용자: 하림지주에 `산업재` 대체 = 건설 수주 카드)
+SECTOR_FALLBACK_OFF = set()
 
 
 # 사업 묶음 16개 (2026-10-31 사용자 · doc/검증/한국-업종지표-재선정.md) — 지표 · 질문을 회사 사업마다. 테마 · 큰 업종에 기대지 않는다.
@@ -409,6 +411,8 @@ def indicators_for(sym):
     for g in groups(sym):
         out += THEME_INDICATORS.get(g, [])
     sec = sector(sym)
+    if sym in SECTOR_FALLBACK_OFF:   # 간단 종목 중 큰 업종 지표가 실제 사업과 맞지 않는 종목 (ref/kr_industry_fix.json card_off, 2026-11-25)
+        return out[:MAX_INDICATORS]
     if not (groups(sym) and sec in SECTOR_SKIP_IF_THEMED):
         out += SECTOR_INDICATORS.get(sec, [])
     seen, uniq = set(), []

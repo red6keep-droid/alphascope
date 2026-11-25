@@ -138,6 +138,10 @@ def run(cache_dir, ref, only=None, fetch_cap=FETCH_CAP, call_cap=CALL_CAP, dry=F
     if only:
         entries = {s: e for s, e in entries.items() if s in only}
     todo = [s for s in sorted(entries) if s not in intro]
+    # 업종 문장은 업종을 고치면 다시 쓴다 — AI 0 (2026-11-25: 네이처셀 `무알코올 음료 기업` · 케어젠 `종합 화학 기업`, ref/kr_industry_fix.json)
+    for s in sorted(entries):
+        if (intro.get(s) or {}).get("src") == "sector" and intro[s]["ko"] != (new := sector_sentence(entries[s])):
+            intro[s] = {"ko": new, "src": "sector", "at": _now(), "model": ""}
 
     need_src = [s for s in todo if s not in src]
     if need_src and fetch_cap:

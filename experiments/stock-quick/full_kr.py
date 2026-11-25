@@ -85,12 +85,22 @@ KR_FIX = {
 }
 
 
+# 업계 카드가 실제 사업과 맞지 않는 종목 — 대표 종목도 큰 업종 대체도 쓰지 않는다 (2026-11-25 사용자 `하림지주가 왜 건설` → 316개 점검).
+# 업종 고침(큰 업종 · 세부 업종)은 build_ref.py 가 같은 파일로 quick_ref.json 에 넣는다
+try:
+    CARD_OFF = set(json.load(open(os.path.join(EXP, "ref", "kr_industry_fix.json"), encoding="utf-8")).get("card_off") or {})
+except (OSError, ValueError):
+    CARD_OFF = set()
+
+
 def code_of(sym):
     return sym.split(".")[0]
 
 
 def rep_of(sym, e):
     c = code_of(sym)
+    if c in CARD_OFF:
+        return None
     if c in KR_FIX:
         return KR_FIX[c]
     return IND_REP.get(e.get("industry_en"))
@@ -486,6 +496,8 @@ def build(ref_kr, bars_all, flows, hist_full, det, dart_data, hist_quick, only=N
         rep = rep_of(s, e)
         K.CANDIDATES.append((s, e["ko"], f"quick-{code_of(s)}", e.get("sector") or "기타", list(K.groups(rep)) if rep else []))
         K.BY_SYM[s] = K.CANDIDATES[-1]
+        if code_of(s) in CARD_OFF:
+            K.SECTOR_FALLBACK_OFF.add(s)
         if rep:
             alias(rep, s)
         groups.setdefault(e.get("sector") or "기타", []).append(s)

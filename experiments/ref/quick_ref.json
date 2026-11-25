@@ -15,29 +15,32 @@
   "000120.KS": {
    "corp": "00113410",
    "en": "CJ Logistics Corp",
+   "fix": true,
    "industry_en": "Marine Shipping",
    "ko": "CJ대한통운",
    "market": "KOSPI",
    "sector": "산업재",
-   "sub": "해운"
+   "sub": "택배 · 물류"
   },
   "000150.KS": {
    "corp": "00117212",
    "en": "Doosan Corporation",
+   "fix": true,
    "industry_en": "Trucks/Construction/Farm Machinery",
    "ko": "두산",
    "market": "KOSPI",
    "sector": "산업재",
-   "sub": "건설 기계"
+   "sub": "지주회사 (발전설비 · 건설장비)"
   },
   "000240.KS": {
    "corp": "00160047",
    "en": "HANKOOK & COMPANY CO., LTD.",
+   "fix": true,
    "industry_en": "Electrical Products",
    "ko": "한국앤컴퍼니",
    "market": "KOSPI",
-   "sector": "산업재",
-   "sub": "전기 제품"
+   "sector": "경기 소비재",
+   "sub": "지주회사 (타이어)"
   },
   "000250.KQ": {
    "corp": "00128546",
@@ -102,11 +105,12 @@
   "000880.KS": {
    "corp": "00160588",
    "en": "Hanwha Corp",
+   "fix": true,
    "industry_en": "Industrial Specialties",
    "ko": "한화",
    "market": "KOSPI",
    "sector": "산업재",
-   "sub": "산업 특화"
+   "sub": "지주회사 (방산 · 화학 · 금융)"
   },
   "000990.KS": {
    "corp": "00160843",
@@ -120,11 +124,12 @@
   "001040.KS": {
    "corp": "00148540",
    "en": "CJ Corporation",
+   "fix": true,
    "industry_en": "Food: Specialty/Candy",
    "ko": "CJ",
    "market": "KOSPI",
    "sector": "필수 소비재",
-   "sub": "식품 · 특화 · 사탕"
+   "sub": "지주회사 (식품 · 물류 · 엔터)"
   },
   "001120.KS": {
    "corp": "00120076",
@@ -147,11 +152,12 @@
   "001440.KS": {
    "corp": "00113207",
    "en": "Taihan Cable & Solution Co., Ltd.",
+   "fix": true,
    "industry_en": "Metal Fabrication",
    "ko": "대한전선",
    "market": "KOSPI",
    "sector": "산업재",
-   "sub": "금속 가공"
+   "sub": "전선"
   },
   "001450.KS": {
    "corp": "00164973",
@@ -165,20 +171,22 @@
   "001740.KS": {
    "corp": "00131780",
    "en": "SK Networks Co., Ltd.",
+   "fix": true,
    "industry_en": "Wholesale Distributors",
    "ko": "SK네트웍스",
    "market": "KOSPI",
    "sector": "산업재",
-   "sub": "도매 유통"
+   "sub": "렌터카 · 정보통신 유통"
   },
   "001800.KS": {
    "corp": "00117577",
    "en": "ORION Holdings Corporation",
+   "fix": true,
    "industry_en": "Food: Specialty/Candy",
    "ko": "오리온홀딩스",
    "market": "KOSPI",
    "sector": "필수 소비재",
-   "sub": "식품 · 특화 · 사탕"
+   "sub": "지주회사 (제과)"
   },
   "001820.KS": {
    "corp": "00129350",
@@ -192,20 +200,22 @@
   "002380.KS": {
    "corp": "00105271",
    "en": "KCC Corporation",
+   "fix": true,
    "industry_en": "Industrial Specialties",
    "ko": "케이씨씨",
    "market": "KOSPI",
-   "sector": "산업재",
-   "sub": "산업 특화"
+   "sector": "소재",
+   "sub": "도료 · 건자재 · 실리콘"
   },
   "002790.KS": {
    "corp": "00154462",
    "en": "AMOREPACIFIC Holdings Corp.",
+   "fix": true,
    "industry_en": "Household/Personal Care",
    "ko": "아모레퍼시픽홀딩스",
    "market": "KOSPI",
    "sector": "필수 소비재",
-   "sub": "가정 · 개인용품"
+   "sub": "지주회사 (화장품)"
   },
   "003230.KS": {
    "corp": "00126955",
@@ -219,11 +229,12 @@
   "003380.KQ": {
    "corp": "00148364",
    "en": "Harim Holdings Co., Ltd.",
+   "fix": true,
    "industry_en": "Wholesale Distributors",
    "ko": "하림지주",
    "market": "KOSDAQ",
-   "sector": "산업재",
-   "sub": "도매 유통"
+   "sector": "필수 소비재",
+   "sub": "지주회사 (축산 · 사료)"
   },
   "003490.KS": {
    "corp": "00113526",
@@ -246,11 +257,12 @@
   "003550.KS": {
    "corp": "00120021",
    "en": "LG Corp",
+   "fix": true,
    "industry_en": "Electronics/Appliances",
    "ko": "LG",
    "market": "KOSPI",
    "sector": "기술",
-   "sub": "전자 · 가전"
+   "sub": "지주회사 (전자 · 화학 · 통신)"
   },
   "003670.KS": {
    "corp": "00155276",
@@ -302,38 +314,42 @@
   "004800.KS": {
    "corp": "00117188",
    "en": "Hyosung Corporation",
+   "fix": true,
    "industry_en": "Financial Conglomerates",
    "ko": "효성",
    "market": "KOSPI",
-   "sector": "금융",
-   "sub": "금융 지주"
+   "sector": "산업재",
+   "sub": "지주회사 (섬유 · 산업자재 · 중공업)"
   },
   "004990.KS": {
    "corp": "00120562",
    "en": "Lotte Corp",
+   "fix": true,
    "industry_en": "Food: Specialty/Candy",
    "ko": "롯데지주",
    "market": "KOSPI",
    "sector": "필수 소비재",
-   "sub": "식품 · 특화 · 사탕"
+   "sub": "지주회사 (식품 · 유통 · 화학)"
   },
   "005070.KS": {
    "corp": "00129989",
    "en": "Cosmo AM&T Co., Ltd.",
+   "fix": true,
    "industry_en": "Electronic Equipment/Instruments",
    "ko": "코스모신소재",
    "market": "KOSPI",
-   "sector": "기술",
-   "sub": "전자 장비 · 계측기"
+   "sector": "소재",
+   "sub": "2차전지 양극재"
   },
   "005290.KQ": {
    "corp": "00118804",
    "en": "Dongjin Semichem Co., Ltd",
+   "fix": true,
    "industry_en": "Electronic Production Equipment",
    "ko": "동진쎄미켐",
    "market": "KOSDAQ",
-   "sector": "기술",
-   "sub": "전자 생산 장비"
+   "sector": "소재",
+   "sub": "반도체 · 디스플레이 소재"
   },
   "005380.KS": {
    "corp": "00164742",
@@ -349,11 +365,12 @@
   "005440.KS": {
    "corp": "00105280",
    "en": "HYUNDAI G.F. HOLDINGS CO. LTD.",
+   "fix": true,
    "industry_en": "Home Furnishings",
    "ko": "현대지에프홀딩스",
    "market": "KOSPI",
-   "sector": "경기 소비재",
-   "sub": "가구 · 인테리어"
+   "sector": "필수 소비재",
+   "sub": "지주회사 (급식 · 가구)"
   },
   "005490.KS": {
    "corp": "00155319",
@@ -407,29 +424,32 @@
   "006040.KS": {
    "corp": "00118026",
    "en": "Dongwon Industries Co., Ltd",
+   "fix": true,
    "industry_en": "Air Freight/Couriers",
    "ko": "동원산업",
    "market": "KOSPI",
-   "sector": "산업재",
-   "sub": "항공 화물 · 택배"
+   "sector": "필수 소비재",
+   "sub": "지주회사 (수산 · 식품 · 물류)"
   },
   "006120.KS": {
    "corp": "00131832",
    "en": "SK Discovery Co. Ltd.",
+   "fix": true,
    "industry_en": "Pharmaceuticals: Major",
    "ko": "SK디스커버리",
    "market": "KOSPI",
    "sector": "헬스케어",
-   "sub": "대형 제약"
+   "sub": "지주회사 (화학 · 백신 · 가스)"
   },
   "006260.KS": {
    "corp": "00105952",
    "en": "LS Corp.",
+   "fix": true,
    "industry_en": "Electrical Products",
    "ko": "LS",
    "market": "KOSPI",
    "sector": "산업재",
-   "sub": "전기 제품"
+   "sub": "지주회사 (전선 · 전력기기)"
   },
   "006280.KS": {
    "corp": "00129679",
@@ -463,11 +483,12 @@
   "006730.KQ": {
    "corp": "00130383",
    "en": "Seobu T&D Co., Ltd.",
+   "fix": true,
    "industry_en": "Oil Refining/Marketing",
    "ko": "서부T&D",
    "market": "KOSDAQ",
-   "sector": "에너지",
-   "sub": "석유 정제 · 마케팅"
+   "sector": "부동산",
+   "sub": "부동산 임대 · 유통"
   },
   "006800.KS": {
    "corp": "00111722",
@@ -508,11 +529,12 @@
   "007390.KQ": {
    "corp": "00117276",
    "en": "NATURECELL Co., Ltd.",
+   "fix": true,
    "industry_en": "Beverages: Non-Alcoholic",
    "ko": "네이처셀",
    "market": "KOSDAQ",
-   "sector": "필수 소비재",
-   "sub": "무알코올 음료"
+   "sector": "헬스케어",
+   "sub": "줄기세포 바이오"
   },
   "007660.KS": {
    "corp": "00107613",
@@ -544,20 +566,22 @@
   "008930.KS": {
    "corp": "00161426",
    "en": "Hanmi Science Co., Ltd",
+   "fix": true,
    "industry_en": "Medical Distributors",
    "ko": "한미사이언스",
    "market": "KOSPI",
    "sector": "헬스케어",
-   "sub": "의료 유통"
+   "sub": "지주회사 (제약)"
   },
   "009150.KS": {
    "corp": "00126371",
    "en": "Samsung Electro-Mechanics Co., Ltd",
+   "fix": true,
    "industry_en": "Semiconductors",
    "ko": "삼성전기",
    "market": "KOSPI",
    "sector": "기술",
-   "sub": "반도체"
+   "sub": "전자부품 (콘덴서 · 기판)"
   },
   "009420.KS": {
    "corp": "00162586",
@@ -582,29 +606,32 @@
   "009830.KS": {
    "corp": "00162461",
    "en": "HANWHA SOLUTIONS CORPORATION",
+   "fix": true,
    "industry_en": "Semiconductors",
    "ko": "한화솔루션",
    "market": "KOSPI",
-   "sector": "기술",
-   "sub": "반도체"
+   "sector": "소재",
+   "sub": "화학 · 태양광"
   },
   "009970.KS": {
    "corp": "00140964",
    "en": "Youngone Holdings Co., Ltd.",
+   "fix": true,
    "industry_en": "Apparel/Footwear",
    "ko": "영원무역홀딩스",
    "market": "KOSPI",
    "sector": "경기 소비재",
-   "sub": "의류 · 신발"
+   "sub": "지주회사 (의류 위탁생산)"
   },
   "010060.KS": {
    "corp": "00148896",
    "en": "OCI Holdings Company Ltd.",
+   "fix": true,
    "industry_en": "Chemicals: Specialty",
    "ko": "OCI홀딩스",
    "market": "KOSPI",
    "sector": "소재",
-   "sub": "특수 화학"
+   "sub": "지주회사 (폴리실리콘 · 화학)"
   },
   "010120.KS": {
    "corp": "00105855",
@@ -629,11 +656,12 @@
   "010140.KS": {
    "corp": "00126478",
    "en": "Samsung Heavy Industries Co., Ltd",
+   "fix": true,
    "industry_en": "Trucks/Construction/Farm Machinery",
    "ko": "삼성중공업",
    "market": "KOSPI",
    "sector": "산업재",
-   "sub": "건설 기계"
+   "sub": "조선"
   },
   "010170.KQ": {
    "corp": "00113261",
@@ -656,11 +684,12 @@
   "011070.KS": {
    "corp": "00105961",
    "en": "LG Innotek Co., Ltd",
+   "fix": true,
    "industry_en": "Electronic Production Equipment",
    "ko": "LG이노텍",
    "market": "KOSPI",
    "sector": "기술",
-   "sub": "전자 생산 장비"
+   "sub": "카메라모듈 · 기판"
   },
   "011170.KS": {
    "corp": "00165413",
@@ -701,11 +730,12 @@
   "011790.KS": {
    "corp": "00139889",
    "en": "SKC Co., Ltd.",
+   "fix": true,
    "industry_en": "Chemicals: Specialty",
    "ko": "SKC",
    "market": "KOSPI",
    "sector": "소재",
-   "sub": "특수 화학"
+   "sub": "2차전지 동박 · 화학"
   },
   "012330.KS": {
    "corp": "00164788",
@@ -813,11 +843,12 @@
   "020150.KS": {
    "corp": "00113997",
    "en": "LOTTE ENERGY MATERIALS CORPORATION",
+   "fix": true,
    "industry_en": "Electrical Products",
    "ko": "롯데에너지머티리얼즈",
    "market": "KOSPI",
-   "sector": "산업재",
-   "sub": "전기 제품"
+   "sector": "소재",
+   "sub": "2차전지 동박"
   },
   "020560.KS": {
    "corp": "00138792",
@@ -867,11 +898,12 @@
   "023590.KS": {
    "corp": "00176914",
    "en": "DAOU TECHNOLOGY Inc.",
+   "fix": true,
    "industry_en": "Investment Banks/Brokers",
    "ko": "다우기술",
    "market": "KOSPI",
    "sector": "금융",
-   "sub": "투자은행 · 증권"
+   "sub": "지주회사 (증권) · IT"
   },
   "024110.KS": {
    "corp": "00149646",
@@ -959,11 +991,12 @@
   "030530.KQ": {
    "corp": "00216647",
    "en": "WONIK HOLDINGS CO., LTD.",
+   "fix": true,
    "industry_en": "Semiconductors",
    "ko": "원익홀딩스",
    "market": "KOSDAQ",
    "sector": "기술",
-   "sub": "반도체"
+   "sub": "지주회사 (반도체 장비)"
   },
   "031210.KS": {
    "corp": "00112998",
@@ -995,20 +1028,22 @@
   "032190.KQ": {
    "corp": "00238782",
    "en": "Daou Data Corp",
+   "fix": true,
    "industry_en": "Electronics Distributors",
    "ko": "다우데이타",
    "market": "KOSDAQ",
-   "sector": "기술",
-   "sub": "전자 유통"
+   "sector": "금융",
+   "sub": "지주회사 (증권) · IT"
   },
   "032500.KQ": {
    "corp": "00226352",
    "en": "KMW, Inc.",
+   "fix": true,
    "industry_en": "Electronic Production Equipment",
    "ko": "케이엠더블유",
    "market": "KOSDAQ",
    "sector": "기술",
-   "sub": "전자 생산 장비"
+   "sub": "통신장비"
   },
   "032640.KS": {
    "corp": "00231363",
@@ -1022,11 +1057,12 @@
   "032820.KQ": {
    "corp": "00231044",
    "en": "Woori Technology Inc.",
+   "fix": true,
    "industry_en": "Electronics/Appliances",
    "ko": "우리기술",
    "market": "KOSDAQ",
-   "sector": "기술",
-   "sub": "전자 · 가전"
+   "sector": "산업재",
+   "sub": "원전 제어계측 · 풍력"
   },
   "032830.KS": {
    "corp": "00126256",
@@ -1051,11 +1087,12 @@
   "033640.KQ": {
    "corp": "00227333",
    "en": "Nepes Corporation",
+   "fix": true,
    "industry_en": "Electronic Components",
    "ko": "네패스",
    "market": "KOSDAQ",
    "sector": "기술",
-   "sub": "전자 부품"
+   "sub": "반도체 후공정"
   },
   "033780.KS": {
    "corp": "00244455",
@@ -1089,20 +1126,22 @@
   "034220.KS": {
    "corp": "00105873",
    "en": "LG Display Co., Ltd",
+   "fix": true,
    "industry_en": "Electronic Production Equipment",
    "ko": "LG디스플레이",
    "market": "KOSPI",
    "sector": "기술",
-   "sub": "전자 생산 장비"
+   "sub": "디스플레이 패널"
   },
   "034730.KS": {
    "corp": "00181712",
    "en": "SK Inc.",
+   "fix": true,
    "industry_en": "Financial Conglomerates",
    "ko": "SK",
    "market": "KOSPI",
-   "sector": "금융",
-   "sub": "금융 지주"
+   "sector": "산업재",
+   "sub": "지주회사 (반도체 · 정유 · 통신)"
   },
   "035250.KS": {
    "corp": "00255619",
@@ -1183,29 +1222,32 @@
   "036810.KQ": {
    "corp": "00223434",
    "en": "Fine Semitech Corp",
+   "fix": true,
    "industry_en": "Industrial Machinery",
    "ko": "에프에스티",
    "market": "KOSDAQ",
-   "sector": "산업재",
-   "sub": "산업 기계"
+   "sector": "기술",
+   "sub": "반도체 장비 · 소재"
   },
   "036830.KQ": {
    "corp": "00247975",
    "en": "Soulbrain Holdings Co., Ltd.",
+   "fix": true,
    "industry_en": "Chemicals: Specialty",
    "ko": "솔브레인홀딩스",
    "market": "KOSDAQ",
    "sector": "소재",
-   "sub": "특수 화학"
+   "sub": "지주회사 (반도체 소재)"
   },
   "036930.KQ": {
    "corp": "00252135",
    "en": "Jusung Engineering Co., Ltd",
+   "fix": true,
    "industry_en": "Industrial Machinery",
    "ko": "주성엔지니어링",
    "market": "KOSDAQ",
-   "sector": "산업재",
-   "sub": "산업 기계"
+   "sector": "기술",
+   "sub": "반도체 장비"
   },
   "038500.KQ": {
    "corp": "00239639",
@@ -1219,11 +1261,12 @@
   "039030.KQ": {
    "corp": "00246417",
    "en": "EO Technics Co., Ltd",
+   "fix": true,
    "industry_en": "Industrial Machinery",
    "ko": "이오테크닉스",
    "market": "KOSDAQ",
-   "sector": "산업재",
-   "sub": "산업 기계"
+   "sector": "기술",
+   "sub": "반도체 장비"
   },
   "039200.KQ": {
    "corp": "00263654",
@@ -1322,11 +1365,12 @@
   "047050.KS": {
    "corp": "00124504",
    "en": "POSCO INTERNATIONAL Corporation",
+   "fix": true,
    "industry_en": "Industrial Conglomerates",
    "ko": "포스코인터내셔널",
    "market": "KOSPI",
    "sector": "산업재",
-   "sub": "산업 지주"
+   "sub": "종합상사 · 에너지"
   },
   "048410.KQ": {
    "corp": "00313649",
@@ -1349,11 +1393,12 @@
   "051600.KS": {
    "corp": "00159218",
    "en": "KEPCO Plant Service & Engineering Co., Ltd",
+   "fix": true,
    "industry_en": "Engineering & Construction",
    "ko": "한전KPS",
    "market": "KOSPI",
    "sector": "산업재",
-   "sub": "엔지니어링 · 건설"
+   "sub": "발전설비 정비"
   },
   "051900.KS": {
    "corp": "00356370",
@@ -1378,20 +1423,22 @@
   "052690.KS": {
    "corp": "00159209",
    "en": "KEPCO Engineering & Construction Co., Inc.",
+   "fix": true,
    "industry_en": "Engineering & Construction",
    "ko": "한전기술",
    "market": "KOSPI",
    "sector": "산업재",
-   "sub": "엔지니어링 · 건설"
+   "sub": "원전 · 발전소 설계"
   },
   "053610.KQ": {
    "corp": "00325112",
    "en": "Protec Co., Ltd.",
+   "fix": true,
    "industry_en": "Industrial Machinery",
    "ko": "프로텍",
    "market": "KOSDAQ",
-   "sector": "산업재",
-   "sub": "산업 기계"
+   "sector": "기술",
+   "sub": "반도체 장비"
   },
   "053800.KQ": {
    "corp": "00298270",
@@ -1508,11 +1555,12 @@
   "064760.KQ": {
    "corp": "00245472",
    "en": "Tokai Carbon Korea Co., Ltd.",
+   "fix": true,
    "industry_en": "Electrical Products",
    "ko": "티씨케이",
    "market": "KOSDAQ",
-   "sector": "산업재",
-   "sub": "전기 제품"
+   "sector": "기술",
+   "sub": "반도체 장비 부품"
   },
   "065350.KQ": {
    "corp": "00136226",
@@ -1537,11 +1585,12 @@
   "066970.KS": {
    "corp": "00398701",
    "en": "L & F Co., Ltd.",
+   "fix": true,
    "industry_en": "Electronic Production Equipment",
    "ko": "엘앤에프",
    "market": "KOSPI",
-   "sector": "기술",
-   "sub": "전자 생산 장비"
+   "sector": "소재",
+   "sub": "2차전지 양극재"
   },
   "067310.KQ": {
    "corp": "00445054",
@@ -1620,38 +1669,42 @@
   "074600.KQ": {
    "corp": "00468374",
    "en": "WONIK QnC Corporation",
+   "fix": true,
    "industry_en": "Industrial Machinery",
    "ko": "원익QnC",
    "market": "KOSDAQ",
-   "sector": "산업재",
-   "sub": "산업 기계"
+   "sector": "기술",
+   "sub": "반도체 장비 부품"
   },
   "077360.KQ": {
    "corp": "00471068",
    "en": "Duksan Hi-Metal Co., Ltd.",
+   "fix": true,
    "industry_en": "Industrial Machinery",
    "ko": "덕산하이메탈",
    "market": "KOSDAQ",
-   "sector": "산업재",
-   "sub": "산업 기계"
+   "sector": "기술",
+   "sub": "반도체 소재"
   },
   "078600.KQ": {
    "corp": "00177816",
    "en": "Daejoo Electronic Materials Co., Ltd.",
+   "fix": true,
    "industry_en": "Electrical Products",
    "ko": "대주전자재료",
    "market": "KOSDAQ",
-   "sector": "산업재",
-   "sub": "전기 제품"
+   "sector": "소재",
+   "sub": "2차전지 음극재 · 전자재료"
   },
   "078930.KS": {
    "corp": "00500254",
    "en": "GS Holdings Corp.",
+   "fix": true,
    "industry_en": "Food Retail",
    "ko": "GS",
    "market": "KOSPI",
-   "sector": "필수 소비재",
-   "sub": "식품 소매"
+   "sector": "에너지",
+   "sub": "지주회사 (정유 · 발전 · 유통)"
   },
   "080220.KQ": {
    "corp": "00447487",
@@ -1683,20 +1736,22 @@
   "082920.KQ": {
    "corp": "00154718",
    "en": "VITZROCELL Co., Ltd.",
+   "fix": true,
    "industry_en": "Electrical Products",
    "ko": "비츠로셀",
    "market": "KOSDAQ",
    "sector": "산업재",
-   "sub": "전기 제품"
+   "sub": "1차전지"
   },
   "083450.KQ": {
    "corp": "00540863",
    "en": "Global Standard Technology Co., Ltd.",
+   "fix": true,
    "industry_en": "Industrial Machinery",
    "ko": "GST",
    "market": "KOSDAQ",
-   "sector": "산업재",
-   "sub": "산업 기계"
+   "sector": "기술",
+   "sub": "반도체 장비"
   },
   "083650.KQ": {
    "corp": "00409788",
@@ -1710,11 +1765,12 @@
   "084370.KQ": {
    "corp": "00531014",
    "en": "Eugene Technology Co., Ltd.",
+   "fix": true,
    "industry_en": "Industrial Machinery",
    "ko": "유진테크",
    "market": "KOSDAQ",
-   "sector": "산업재",
-   "sub": "산업 기계"
+   "sector": "기술",
+   "sub": "반도체 장비"
   },
   "085620.KS": {
    "corp": "00112332",
@@ -1728,11 +1784,12 @@
   "085660.KQ": {
    "corp": "00525679",
    "en": "CHA Biotech Co., Ltd.",
+   "fix": true,
    "industry_en": "Electronic Components",
    "ko": "차바이오텍",
    "market": "KOSDAQ",
-   "sector": "기술",
-   "sub": "전자 부품"
+   "sector": "헬스케어",
+   "sub": "바이오 · 병원"
   },
   "086280.KS": {
    "corp": "00360595",
@@ -1795,11 +1852,12 @@
   "089030.KQ": {
    "corp": "00535676",
    "en": "Techwing, Inc.",
+   "fix": true,
    "industry_en": "Industrial Machinery",
    "ko": "테크윙",
    "market": "KOSDAQ",
-   "sector": "산업재",
-   "sub": "산업 기계"
+   "sector": "기술",
+   "sub": "반도체 장비"
   },
   "089860.KS": {
    "corp": "00545716",
@@ -1813,11 +1871,12 @@
   "089970.KQ": {
    "corp": "00544577",
    "en": "VM Inc.",
+   "fix": true,
    "industry_en": "Industrial Machinery",
    "ko": "브이엠",
    "market": "KOSDAQ",
-   "sector": "산업재",
-   "sub": "산업 기계"
+   "sector": "기술",
+   "sub": "반도체 장비"
   },
   "090360.KQ": {
    "corp": "00536523",
@@ -1894,47 +1953,52 @@
   "096770.KS": {
    "corp": "00631518",
    "en": "SK Innovation Co., Ltd",
+   "fix": true,
    "industry_en": "Oil Refining/Marketing",
    "ko": "SK이노베이션",
    "market": "KOSPI",
    "sector": "에너지",
-   "sub": "석유 정제 · 마케팅"
+   "sub": "정유 · 배터리 · 화학"
   },
   "097230.KS": {
    "corp": "00633835",
    "en": "HJ SHIPBUILDING & CONSTRUCTION CO. LTD",
+   "fix": true,
    "industry_en": "Engineering & Construction",
    "ko": "HJ중공업",
    "market": "KOSPI",
    "sector": "산업재",
-   "sub": "엔지니어링 · 건설"
+   "sub": "조선 · 건설"
   },
   "097950.KS": {
    "corp": "00635134",
    "en": "CJ CheilJedang Corporation",
+   "fix": true,
    "industry_en": "Air Freight/Couriers",
    "ko": "CJ제일제당",
    "market": "KOSPI",
-   "sector": "산업재",
-   "sub": "항공 화물 · 택배"
+   "sector": "필수 소비재",
+   "sub": "식품 · 바이오 소재"
   },
   "098460.KQ": {
    "corp": "00579999",
    "en": "Koh Young Technology Inc.",
+   "fix": true,
    "industry_en": "Semiconductors",
    "ko": "고영",
    "market": "KOSDAQ",
    "sector": "기술",
-   "sub": "반도체"
+   "sub": "검사 장비 · 의료 로봇"
   },
   "099320.KQ": {
    "corp": "00449254",
    "en": "Satrec Initiative Co., Ltd.",
+   "fix": true,
    "industry_en": "Telecommunications Equipment",
    "ko": "쎄트렉아이",
    "market": "KOSDAQ",
-   "sector": "기술",
-   "sub": "통신 장비"
+   "sector": "산업재",
+   "sub": "인공위성"
   },
   "100790.KQ": {
    "corp": "00340096",
@@ -1966,11 +2030,12 @@
   "103140.KS": {
    "corp": "00684714",
    "en": "Poongsan Corporation",
+   "fix": true,
    "industry_en": "Other Metals/Minerals",
    "ko": "풍산",
    "market": "KOSPI",
    "sector": "소재",
-   "sub": "기타 금속 · 광물"
+   "sub": "구리 가공 · 탄약"
   },
   "103590.KS": {
    "corp": "00683469",
@@ -2013,11 +2078,12 @@
   "112610.KS": {
    "corp": "00670340",
    "en": "CS Wind Corp.",
+   "fix": true,
    "industry_en": "Electrical Products",
    "ko": "씨에스윈드",
    "market": "KOSPI",
    "sector": "산업재",
-   "sub": "전기 제품"
+   "sub": "풍력 타워"
   },
   "115180.KQ": {
    "corp": "01042650",
@@ -2040,11 +2106,12 @@
   "120110.KS": {
    "corp": "00795135",
    "en": "Kolon Industries, Inc.",
+   "fix": true,
    "industry_en": "Textiles",
    "ko": "코오롱인더",
    "market": "KOSPI",
    "sector": "소재",
-   "sub": "섬유"
+   "sub": "산업자재 · 화학 · 패션"
   },
   "121600.KQ": {
    "corp": "00439965",
@@ -2058,11 +2125,12 @@
   "122640.KQ": {
    "corp": "00530556",
    "en": "YEST Co.,Ltd.",
+   "fix": true,
    "industry_en": "Food: Specialty/Candy",
    "ko": "예스티",
    "market": "KOSDAQ",
-   "sector": "필수 소비재",
-   "sub": "식품 · 특화 · 사탕"
+   "sector": "기술",
+   "sub": "반도체 장비"
   },
   "122870.KQ": {
    "corp": "00613318",
@@ -2076,11 +2144,12 @@
   "124500.KQ": {
    "corp": "00620868",
    "en": "ITCENGLOBAL CO. LTD.",
+   "fix": true,
    "industry_en": "Metal Fabrication",
    "ko": "아이티센글로벌",
    "market": "KOSDAQ",
-   "sector": "산업재",
-   "sub": "금속 가공"
+   "sector": "기술",
+   "sub": "IT 서비스 · 금 거래"
   },
   "126340.KQ": {
    "corp": "00563518",
@@ -2121,29 +2190,32 @@
   "131970.KQ": {
    "corp": "00563545",
    "en": "DOOSAN TESNA Inc.",
+   "fix": true,
    "industry_en": "Miscellaneous Commercial Services",
    "ko": "두산테스나",
    "market": "KOSDAQ",
-   "sector": "산업재",
-   "sub": "기타 상업 서비스"
+   "sector": "기술",
+   "sub": "반도체 테스트"
   },
   "137400.KQ": {
    "corp": "00612294",
    "en": "People & Technology, Inc.",
+   "fix": true,
    "industry_en": "Other Metals/Minerals",
    "ko": "피엔티",
    "market": "KOSDAQ",
-   "sector": "소재",
-   "sub": "기타 금속 · 광물"
+   "sector": "산업재",
+   "sub": "2차전지 장비"
   },
   "138040.KS": {
    "corp": "00860332",
    "en": "Meritz Financial Group Inc.",
+   "fix": true,
    "industry_en": "Investment Banks/Brokers",
    "ko": "메리츠금융지주",
    "market": "KOSPI",
    "sector": "금융",
-   "sub": "투자은행 · 증권"
+   "sub": "금융 지주 (보험 · 증권)"
   },
   "138930.KS": {
    "corp": "00858364",
@@ -2274,20 +2346,22 @@
   "178320.KQ": {
    "corp": "00838005",
    "en": "SEOJIN SYSTEM CO.,LTD",
+   "fix": true,
    "industry_en": "Computer Communications",
    "ko": "서진시스템",
    "market": "KOSDAQ",
-   "sector": "기술",
-   "sub": "컴퓨터 통신"
+   "sector": "산업재",
+   "sub": "ESS 함체 · 장비 부품"
   },
   "180640.KS": {
    "corp": "00983040",
    "en": "HANJIN KAL Corp.",
+   "fix": true,
    "industry_en": "Hotels/Resorts/Cruise lines",
    "ko": "한진칼",
    "market": "KOSPI",
-   "sector": "경기 소비재",
-   "sub": "호텔 · 리조트 · 크루즈"
+   "sector": "산업재",
+   "sub": "지주회사 (항공)"
   },
   "181710.KS": {
    "corp": "00983271",
@@ -2328,11 +2402,12 @@
   "195940.KQ": {
    "corp": "01012066",
    "en": "HK inno.N Corporation",
+   "fix": true,
    "industry_en": "Medical/Nursing Services",
    "ko": "HK이노엔",
    "market": "KOSDAQ",
    "sector": "헬스케어",
-   "sub": "의료 · 간호 서비스"
+   "sub": "제약"
   },
   "196170.KQ": {
    "corp": "00989619",
@@ -2348,11 +2423,12 @@
   "204270.KQ": {
    "corp": "00447575",
    "en": "JNTC Co., Ltd.",
+   "fix": true,
    "industry_en": "Electronic Production Equipment",
    "ko": "제이앤티씨",
    "market": "KOSDAQ",
    "sector": "기술",
-   "sub": "전자 생산 장비"
+   "sub": "전자부품 (커넥터 · 강화유리)"
   },
   "204320.KS": {
    "corp": "01042775",
@@ -2377,11 +2453,12 @@
   "213420.KQ": {
    "corp": "01061558",
    "en": "DUK SAN NEOLUX CO.LTD",
+   "fix": true,
    "industry_en": "Electrical Products",
    "ko": "덕산네오룩스",
    "market": "KOSDAQ",
-   "sector": "산업재",
-   "sub": "전기 제품"
+   "sector": "소재",
+   "sub": "OLED 소재"
   },
   "214150.KQ": {
    "corp": "01061327",
@@ -2395,11 +2472,12 @@
   "214370.KQ": {
    "corp": "00549891",
    "en": "Caregen Co., Ltd.",
+   "fix": true,
    "industry_en": "Chemicals: Major Diversified",
    "ko": "케어젠",
    "market": "KOSDAQ",
-   "sector": "소재",
-   "sub": "종합 화학"
+   "sector": "헬스케어",
+   "sub": "펩타이드 바이오"
   },
   "214450.KQ": {
    "corp": "00970453",
@@ -2485,11 +2563,12 @@
   "240810.KQ": {
    "corp": "01135941",
    "en": "Wonik IPS Co., Ltd.",
+   "fix": true,
    "industry_en": "Industrial Machinery",
    "ko": "원익IPS",
    "market": "KOSDAQ",
-   "sector": "산업재",
-   "sub": "산업 기계"
+   "sector": "기술",
+   "sub": "반도체 장비"
   },
   "241560.KS": {
    "corp": "01032486",
@@ -2541,11 +2620,12 @@
   "252990.KQ": {
    "corp": "01199727",
    "en": "SEMCNS Co., Ltd.",
+   "fix": true,
    "industry_en": "Electrical Products",
    "ko": "샘씨엔에스",
    "market": "KOSDAQ",
-   "sector": "산업재",
-   "sub": "전기 제품"
+   "sector": "기술",
+   "sub": "반도체 부품 (세라믹 기판)"
   },
   "253590.KQ": {
    "corp": "01170865",
@@ -2586,11 +2666,12 @@
   "267250.KS": {
    "corp": "01205709",
    "en": "HD HYUNDAI CO.,LTD.",
+   "fix": true,
    "industry_en": "Trucks/Construction/Farm Machinery",
    "ko": "HD현대",
    "market": "KOSPI",
    "sector": "산업재",
-   "sub": "건설 기계"
+   "sub": "지주회사 (조선 · 정유 · 기계)"
   },
   "267260.KS": {
    "corp": "01205851",
@@ -2784,20 +2865,22 @@
   "319660.KQ": {
    "corp": "01365825",
    "en": "PSK INC",
+   "fix": true,
    "industry_en": "Industrial Machinery",
    "ko": "피에스케이",
    "market": "KOSDAQ",
-   "sector": "산업재",
-   "sub": "산업 기계"
+   "sector": "기술",
+   "sub": "반도체 장비"
   },
   "322000.KS": {
    "corp": "01199550",
    "en": "HD HYUNDAI ENERGY SOLUTIONS CO. LTD.",
+   "fix": true,
    "industry_en": "Semiconductors",
    "ko": "HD현대에너지솔루션",
    "market": "KOSPI",
-   "sector": "기술",
-   "sub": "반도체"
+   "sector": "유틸리티",
+   "sub": "태양광 모듈"
   },
   "323280.KQ": {
    "corp": "01366000",
@@ -2831,20 +2914,22 @@
   "327260.KQ": {
    "corp": "01343665",
    "en": "RF Materials Co., Ltd.",
+   "fix": true,
    "industry_en": "Industrial Conglomerates",
    "ko": "RF머트리얼즈",
    "market": "KOSDAQ",
-   "sector": "산업재",
-   "sub": "산업 지주"
+   "sector": "기술",
+   "sub": "광통신 · RF 부품"
   },
   "328130.KQ": {
    "corp": "01397620",
    "en": "Lunit Inc.",
+   "fix": true,
    "industry_en": "Packaged Software",
    "ko": "루닛",
    "market": "KOSDAQ",
-   "sector": "기술",
-   "sub": "패키지 소프트웨어"
+   "sector": "헬스케어",
+   "sub": "의료 AI"
   },
   "329180.KS": {
    "corp": "01390344",
@@ -2860,20 +2945,22 @@
   "336260.KS": {
    "corp": "01412725",
    "en": "Doosan Fuel Cell Co., Ltd.",
+   "fix": true,
    "industry_en": "Electronic Production Equipment",
    "ko": "두산퓨얼셀",
    "market": "KOSPI",
-   "sector": "기술",
-   "sub": "전자 생산 장비"
+   "sector": "산업재",
+   "sub": "연료전지"
   },
   "347700.KQ": {
    "corp": "01336762",
    "en": "Sphere Corp.",
+   "fix": true,
    "industry_en": "Packaged Software",
    "ko": "스피어",
    "market": "KOSDAQ",
-   "sector": "기술",
-   "sub": "패키지 소프트웨어"
+   "sector": "산업재",
+   "sub": "우주항공 소재 공급"
   },
   "347850.KQ": {
    "corp": "01376715",
@@ -2887,11 +2974,12 @@
   "352820.KS": {
    "corp": "01204056",
    "en": "HYBE Co., Ltd.",
+   "fix": true,
    "industry_en": "Miscellaneous Commercial Services",
    "ko": "하이브",
    "market": "KOSPI",
-   "sector": "산업재",
-   "sub": "기타 상업 서비스"
+   "sector": "커뮤니케이션",
+   "sub": "엔터 (음반 · 공연)"
   },
   "353200.KS": {
    "corp": "01478712",
@@ -2923,11 +3011,12 @@
   "361610.KS": {
    "corp": "01386916",
    "en": "Sk Ie Technology Co., Ltd.",
+   "fix": true,
    "industry_en": "Chemicals: Major Diversified",
    "ko": "SK아이이테크놀로지",
    "market": "KOSPI",
    "sector": "소재",
-   "sub": "종합 화학"
+   "sub": "2차전지 분리막"
   },
   "373220.KS": {
    "corp": "01515323",
@@ -2952,11 +3041,12 @@
   "377300.KS": {
    "corp": "01244601",
    "en": "kakaopay Corp.",
+   "fix": true,
    "industry_en": "Miscellaneous Commercial Services",
    "ko": "카카오페이",
    "market": "KOSPI",
-   "sector": "산업재",
-   "sub": "기타 상업 서비스"
+   "sector": "금융",
+   "sub": "간편결제 · 금융 플랫폼"
   },
   "383220.KS": {
    "corp": "01568413",
@@ -3008,11 +3098,12 @@
   "415640.KS": {
    "corp": "01880801",
    "en": "KB Balhae Infrastructure Fund",
+   "fix": true,
    "industry_en": "Financial Conglomerates",
    "ko": "KB발해인프라",
    "market": "KOSPI",
    "sector": "금융",
-   "sub": "금융 지주"
+   "sub": "인프라 펀드"
   },
   "417200.KQ": {
    "corp": "01528141",
@@ -3044,20 +3135,22 @@
   "437730.KQ": {
    "corp": "00262266",
    "en": "Samhyun Co., Ltd.",
+   "fix": true,
    "industry_en": "Building Products",
    "ko": "삼현",
    "market": "KOSDAQ",
    "sector": "산업재",
-   "sub": "건자재"
+   "sub": "모터 · 구동기"
   },
   "439260.KS": {
    "corp": "00182696",
    "en": "DAEHAN SHIPBUILDING Co., Ltd.",
+   "fix": true,
    "industry_en": "Trucks/Construction/Farm Machinery",
    "ko": "대한조선",
    "market": "KOSPI",
    "sector": "산업재",
-   "sub": "건설 기계"
+   "sub": "조선"
   },
   "440110.KQ": {
    "corp": "01292291",
@@ -3071,29 +3164,32 @@
   "443060.KS": {
    "corp": "01194689",
    "en": "HD Hyundai Marine Solution Co., Ltd.",
+   "fix": true,
    "industry_en": "Wholesale Distributors",
    "ko": "HD현대마린솔루션",
    "market": "KOSPI",
    "sector": "산업재",
-   "sub": "도매 유통"
+   "sub": "선박 서비스"
   },
   "445680.KQ": {
    "corp": "01498974",
    "en": "Curiox Biosystems Co., Ltd.",
+   "fix": true,
    "industry_en": "Packaged Software",
    "ko": "큐리옥스바이오시스템즈",
    "market": "KOSDAQ",
-   "sector": "기술",
-   "sub": "패키지 소프트웨어"
+   "sector": "헬스케어",
+   "sub": "바이오 실험 장비"
   },
   "450080.KS": {
    "corp": "01311408",
    "en": "Ecopro Materials Co Ltd.",
+   "fix": true,
    "industry_en": "Chemicals: Specialty",
    "ko": "에코프로머티",
    "market": "KOSPI",
    "sector": "소재",
-   "sub": "특수 화학"
+   "sub": "2차전지 전구체"
   },
   "454910.KS": {
    "corp": "01105153",
@@ -3188,20 +3284,22 @@
   "489790.KS": {
    "corp": "01867758",
    "en": "Hanwha Vision Co., Ltd.",
+   "fix": true,
    "industry_en": "Telecommunications Equipment",
    "ko": "한화비전",
    "market": "KOSPI",
    "sector": "기술",
-   "sub": "통신 장비"
+   "sub": "보안 카메라 · 반도체 장비"
   },
   "490470.KQ": {
    "corp": "01627363",
    "en": "SemiFive Inc.",
+   "fix": true,
    "industry_en": "Packaged Software",
    "ko": "세미파이브",
    "market": "KOSDAQ",
    "sector": "기술",
-   "sub": "패키지 소프트웨어"
+   "sub": "반도체 설계 서비스"
   },
   "491000.KQ": {
    "corp": "01385005",

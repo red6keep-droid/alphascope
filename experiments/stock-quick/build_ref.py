@@ -113,6 +113,25 @@ def ai_map(pool, items, prompt_head, check):
     return got
 
 
+KR_FIX_PATH = os.path.join(EXP, "ref", "kr_industry_fix.json")
+
+
+def apply_kr_fix(kr):
+    """한국 업종 고침표(ref/kr_industry_fix.json stocks) — 원자료 업종이 틀렸거나 지주인 종목의 큰 업종 · 세부 업종을 덮어 쓴다.
+    AI 가 옮긴 업종보다 우선 (2026-11-25 사용자: 하림지주 `도매 유통 → 산업재` 라 업계 카드가 건설). 바뀐 수를 돌려준다."""
+    try:
+        fix = json.load(open(KR_FIX_PATH, encoding="utf-8")).get("stocks") or {}
+    except (OSError, ValueError):
+        return 0
+    n = 0
+    for s, e in kr.items():
+        f = fix.get(s.split(".")[0])
+        if f and not e.get("full") and (e.get("sector"), e.get("sub")) != (f["sector"], f["sub"]):
+            e["sector"], e["sub"], e["fix"] = f["sector"], f["sub"], True
+            n += 1
+    return n
+
+
 def main():
     uni = json.load(open(os.path.join(EXP, "ref", "universe_all.json"), encoding="utf-8"))
     ref = json.load(open(OUT, encoding="utf-8")) if os.path.exists(OUT) else {}
@@ -191,6 +210,7 @@ def main():
         e["sub"] = sub_ko.get(e.get("industry_en", ""))
         if full and full[3]:
             e["sub_ours"] = full[3]   # 정식 종목은 한국 종목 페이지의 업종 이름도 같이
+    apply_kr_fix(kr)
     for s, e in us.items():
         e["sub"] = sub_ko.get(e["sub_en"])
         if e.get("ko_src"):   # 위키데이터 · AI 이름의 법인 꼬리(타깃 코퍼레이션 → 타깃) — 정식 종목 이름은 손대지 않는다
