@@ -1,163 +1,114 @@
 {
-  "updated_at": "2026-11-25 12:49:12 UTC",
+  "updated_at": "2026-11-25 21:46:30 UTC",
   "items": [
     {
-      "title": "Liesman: Nvidia whiplash tests Kevin Warsh’s push to read market signals",
+      "title": "Macy's postpones Thanksgiving Day Parade due to severe weather",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/25/nvidia-kevin-warsh-fed-market-signals.html",
-      "published": "2026-11-25 12:26:41",
-      "title_ko": "리스만: 엔비디아의 급등락은 시장 신호를 읽으려는 케빈 워시의 추진력을 시험한다",
-      "summary_ko": "엔비디아를 둘러싼 극심한 시장 급등락과 드라마가 연방준비제도 의장 케빈 워시가 직면한 딜레마를 부각",
+      "link": "https://www.cnbc.com/2026/11/25/macys-thanksgiving-day-parade-postponed.html",
+      "published": "2026-11-25 21:26:36",
+      "title_ko": "메이시스, 악천후로 인해 추수감사절 퍼레이드 연기",
+      "summary_ko": "악천후로 인해 토요일로 연기",
       "lines": [
-        "금요일 주가 하락에 따른 연준의 금리 인상 확률 감소",
-        "월요일 엔비디아 CEO 복귀와 함께 발생한 증시 반등"
+        "메이시스 악천후로 추수감사절 퍼레이드 토요일 연기 발표",
+        "연기된 퍼레이드 토요일 오전 8시 30분 개최 예정"
       ]
     },
     {
-      "title": "Secondhand shopping is going mainstream this holiday season as consumers seek value",
+      "title": "10-year Treasury yield slides despite sticky inflation data as investors buy bonds for protection",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/25/secondhand-holiday-shopping-grows-as-shoppers-seek-value.html",
-      "published": "2026-11-25 12:00:01",
-      "title_ko": "소비자들 가치 추구 속 이번 홀리데이 시즌 중고 쇼핑 주류로 부상",
-      "summary_ko": "소비자들이 구매에서 가치와 독창성을 강조함에 따라 더 많은 소비자가 중고 쇼핑을 이용하고 있음",
+      "link": "https://www.cnbc.com/2026/11/25/treasury-yields-bonds-inflation.html",
+      "published": "2026-11-25 21:02:05",
+      "title_ko": "끈질긴 인플레이션 데이터에도 불구하고 투자자들이 보호를 위해 채권 매수에 나서면서 10년물 국채 금리가 하락",
+      "summary_ko": "인플레이션 데이터 지속 속 투자자들의 채권 매수",
       "lines": [
-        "2025년 13% 성장률을 기록한 미국 중고 의류 시장",
-        "2030년까지 연평균 7% 이상 성장하여 800억 달러 규모 도달 예정인 중고 시장"
+        "10년물 미 국채 금리 4.866%로 3bp 이상 하락",
+        "2년물 미 국채 금리 4.65%로 2bp 이상 하락",
+        "30년물 미 국채 금리 5.254%로 3bp 이상 하락"
       ]
     },
     {
-      "title": "미국 대 EU·중국 등 신규 관세 부과 준비",
-      "title_ko": "미국 대 EU·중국 등 신규 관세 부과 준비",
-      "summary_ko": "트럼프 행정부가 대법원에서 무효화된 관세 체제를 대체하기 위해 EU와 중국 등 16개 경제권을 겨냥한 신규 관세 조치를 준비 중",
+      "title": "트럼프 행정부 관세 부활",
+      "title_ko": "트럼프 행정부 관세 부활",
+      "summary_ko": "트럼프 행정부가 관세를 이전 수준으로 인상하며 시장에 단기적인 충격을 주었",
       "source": "블룸버그",
-      "link": "https://www.youtube.com/watch?v=ZDZ3k7h55Lo",
-      "published": "2026-11-25 11:16:37",
+      "link": "https://www.youtube.com/watch?v=Nw2ibHMUmbk",
+      "published": "2026-11-25 20:45:40",
       "kind": "media",
       "tag": "관세 · 무역",
       "direction": "negative",
-      "n_channels": 5,
+      "n_channels": 3,
       "lines": [
-        "질 디시스 발언 : 트럼프 행정부의 초과 생산 조사 및 16개 경제권 대상 신규 관세 준비",
-        "진행자 발언 : 트럼프 행정부의 대중국 및 대유럽 무역 압박 재개 예상",
-        "질 디시스 발언 : 중국의 희토류 규제 유예 및 보잉 항공기 구매 등 관계 개선 제스처 공존"
+        "중국 대상 관세율 20% 적용 및 내년 두 배 인상 가능성",
+        "택스페이어스 포 커먼 센스 대표 발언 : 관세 비용은 외국이 아닌 미국 소비자가 부담"
       ]
     },
     {
-      "title": "엔비디아 반등 소멸 및 AI 섹터 변동성",
-      "title_ko": "엔비디아 반등 소멸 및 AI 섹터 변동성",
-      "summary_ko": "엔비디아 반등세가 소멸하면서 나스닥을 중심으로 기술주 매도 압력이 다시 고조 중",
-      "source": "블룸버그",
-      "link": "https://www.youtube.com/watch?v=ZDZ3k7h55Lo",
-      "published": "2026-11-25 11:16:37",
+      "title": "Nvidia's billion-dollar board bet: Who's protected as lawsuits mount?",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/25/nvidias-billion-dollar-board-bet-whos-protected-as-lawsuits-mount.html",
+      "published": "2026-11-25 19:16:24",
+      "title_ko": "엔비디아의 수십억 달러 이사회 도박: 소송이 쏟아지는 가운데 누가 보호받는가?",
+      "summary_ko": "이사들이 회사의 적절한 감독 소홀 혐의로 주주 소송 피고인 상태",
+      "lines": [
+        "엔비디아 이사진 대상 주주 소송 및 당국 조사 진행",
+        "캘리포니아주 법무부의 엔비디아 투자자 오인 정보 제공 여부 조사 착수"
+      ]
+    },
+    {
+      "title": "연준 12월 금리 인상 예상",
+      "title_ko": "연준 12월 금리 인상 예상",
+      "summary_ko": "모하메드 엘에리언은 인플레이션 수치와 시장 가격 반영으로 인해 연준이 12월에 금리 인상을 단행할 것으로 봄",
+      "source": "CNBC",
+      "link": "https://www.youtube.com/watch?v=1Dh6fw_zSpw",
+      "published": "2026-11-25 17:57:08",
       "kind": "media",
-      "tag": "AI 투자 · 반도체 수요",
-      "direction": "negative",
-      "n_channels": 2,
-      "lines": [
-        "진행자 발언 : 글로벌 기술주 심리 악화 및 엔비디아 반등 소멸",
-        "진행자 발언 : 나스닥 선물 시장에서 엔비디아 반등분 거의 반납",
-        "닐 캠플링 발언 : 아시아 지역 AI 반도체 밸류체인 및 실적 추정치 하향 조정"
-      ]
-    },
-    {
-      "title": "Budget carrier Norse Atlantic falls 77% after warning its finances are ‘critical’ amid soaring fuel costs",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/25/norse-atlantic-financial-warning-fuel-costs.html",
-      "published": "2026-11-25 11:10:28",
-      "title_ko": "노스 아틀랜틱 항공, 치솟는 연료비 속 재무 상태 '위기' 경고에 77% 폭락",
-      "summary_ko": "노르웨이 저가 항공사는 단기 유동성 수요를 위한 자금 조달 확보에 상황이 달려 있다고 밝힘",
-      "lines": [
-        "노르스 아틀란틱 주가 77% 폭락",
-        "항공유 가격 약 72% 급등"
-      ]
-    },
-    {
-      "title": "Ukraine tells Putin to ‘stop complaining’ over oil refinery attacks as Russia promises retaliation",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/25/ukraine-putin-russia-oil-refinery-attacks.html",
-      "published": "2026-11-25 09:18:37",
-      "title_ko": "우크라이나, 러시아의 보복 경고 속 푸틴에게 정유시설 공격 불평 중단 촉구",
-      "summary_ko": "우크라이나 외무장관은 푸틴이 러시아 정유시설 공격 중단을 원한다면 전쟁을 끝내야 한다고 밝힘",
-      "lines": [
-        "우크라이나의 러시아 정유시설 공격 지속",
-        "러시아의 보복 조치 예고"
-      ]
-    },
-    {
-      "title": "Crypto talent will return ‘when AI implodes,’ Arthur Hayes says",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/25/talents-crypto-ai-investment.html",
-      "published": "2026-11-25 06:09:44",
-      "title_ko": "아서 헤이즈 \"AI 붕괴하면 암호화폐 인재 돌아올 것\"",
-      "summary_ko": "마엘스트롬 CIO 아서 헤이즈는 AI 거래가 역풍을 맞으며 스타트업 인재가 암호화폐로 복귀할 것으로 전망함",
-      "lines": [
-        "아서 헤이스의 2027년 하반기 AI 관련주 역풍 전망",
-        "AI 분야 인재의 암호화폐 업계 복귀 전망"
-      ]
-    },
-    {
-      "title": "‘Ready for any storm’: UAE minister optimistic on economy as IMF lifts forecast",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/25/uae-iran-war-economy-oil.html",
-      "published": "2026-11-25 04:06:01",
-      "title_ko": "IMF 전망 상향 속 아랍에미리트 장관 경제에 대해 '어떤 폭풍에도 대비되어 있다'며 낙관",
-      "summary_ko": "",
-      "lines": [
-        "IMF의 2026년 아랍에미리트 실질 GDP 성장률 전망치 수정",
-        "아랍에미리트 경제관광부 장관의 내년 경제 성장률 목표치 발표"
-      ]
-    },
-    {
-      "title": "China’s Xiamen Airlines to buy 50 Boeing jets in $7.4 billion deal",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/25/china-xiamen-boeing-deal.html",
-      "published": "2026-11-25 03:58:32",
-      "title_ko": "중국 샤먼항공, 74억 달러 규모에 보잉 제트기 50대 구매",
-      "summary_ko": "샤먼항공은 총 카탈로그 가격 약 74억 달러 상당의 보잉 737-8 항공기 50대를 구매하기로 합의함",
-      "lines": [
-        "샤먼항공의 보잉 737-8 항공기 50대 구매 계약 체결",
-        "보잉 항공기 구매 계약 규모 74억 달러 기록"
-      ]
-    },
-    {
-      "title": "U.S. jury convicts Huawei in a criminal trial over fraud and trade secrets",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/25/huawei-fraud-trade-trial.html",
-      "published": "2026-11-25 02:43:33",
-      "title_ko": "미국 배심원단, 형사 재판에서 화웨이에 사기 및 영업비밀 침해 유죄 평결",
-      "summary_ko": "화웨이는 미국 재판에서 은행 사기, 자금 세탁, 영업비밀 절도 공모 혐의로 유죄 판결을 받음",
-      "lines": [
-        "미국 연방 배심원단의 화웨이 형사재판 유죄 평결",
-        "화웨이의 은행 사기 및 영업비밀 탈취 공모 혐의 유죄 판결"
-      ]
-    },
-    {
-      "title": "Trump open to pardoning Jensen Huang if needed: NY Post",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/25/trump-huang-pardon-politics.html",
-      "published": "2026-11-25 02:09:45",
-      "title_ko": "트럼프, 필요시 젠슨 황 사면 용의 표명",
-      "summary_ko": "",
-      "lines": [
-        "트럼프의 엔비디아 이사회 개입으로 젠슨 황 CEO 복귀",
-        "복귀 당일 엔비디아 주가 31% 급등",
-        "이후 시장 조정 속에서 엔비디아 주가 5.9% 하락"
-      ]
-    },
-    {
-      "title": "달러트리 실적 호조 및 주가 급등",
-      "title_ko": "달러트리 실적 호조 및 주가 급등",
-      "summary_ko": "달러트리는 인플레이션 환경 속에서 쇼핑객들이 몰리며 동일점포 매출이 예상보다 빠르게 증가해 연간 실적 전망을 상향",
-      "source": "블룸버그",
-      "link": "https://www.youtube.com/watch?v=ueTR7ruHgEs",
-      "published": "2026-11-24 21:20:40",
-      "kind": "media",
-      "tag": "실적 · 가이던스",
+      "tag": "금리 · 연준",
       "direction": "positive",
-      "n_channels": 2,
+      "n_channels": 4,
       "lines": [
-        "진행자 발언 : 3분기 동일점포 매출 4.6% 증가",
-        "진행자 발언 : 3년 만의 최고가 기록하며 주가 11% 이상 급등"
+        "시장 12월 금리 인상 기대치 약 100% 육박",
+        "알리안츠 수석 경제 자문 발언 : 인플레이션 수치와 시장 가격 반영으로 12월 25bp 금리 인상 불가피"
+      ]
+    },
+    {
+      "title": "중국 및 EU 등 14개국 대상 신규 관세 제안",
+      "title_ko": "중국 및 EU 등 14개국 대상 신규 관세 제안",
+      "summary_ko": "미국 무역대표부는 초과 설비 문제에 대응하기 위해 중국과 EU 등 14개 교역 상대를 대상으로 한 신규 타겟 관세 제안을 발표",
+      "source": "CNBC",
+      "link": "https://www.youtube.com/watch?v=RZJfbY21fCk",
+      "published": "2026-11-25 17:55:05",
+      "kind": "media",
+      "tag": "관세 · 무역",
+      "direction": "negative",
+      "n_channels": 3,
+      "lines": [
+        "미국 무역대표부 발표 : 중국 및 EU 등 14개 교역 상대국 대상 신규 관세 제안",
+        "신규 관세는 기존 조치와 무역 협정 세율을 반영하여 조정될 예정",
+        "미국 무역대표부 대표 발언 : 중국의 20% 관세는 기존 조치에 추가되며 일부 소비재는 면제될 것"
+      ]
+    },
+    {
+      "title": "Kalshi traders say state data center moratoriums are more likely than not",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/25/kalshi-traders-say-the-odds-of-states-imposing-data-center-moratoriums-is-more-likely-than-not.html",
+      "published": "2026-11-25 17:36:54",
+      "title_ko": "칼시 트레이더들, 주 정부의 데이터센터 일시 중단 가능성 높다고 전망",
+      "summary_ko": "민주당의 의회 및 주요 주지사 선거 승리 이후 데이터센터 구축 일시 중단 가능성 변화",
+      "lines": [
+        "칼시 거래자들의 4개 이상 주 데이터센터 건설 유예 확률 57% 기록",
+        "7월 14일 뉴욕주 하이퍼스케일 데이터센터 관련 1년 허가 중단 첫 시행"
+      ]
+    },
+    {
+      "title": "Prediction markets push OpenAI IPO expectations later into 2027",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/25/openai-ipo-odds-2027-prediction-markets.html",
+      "published": "2026-11-25 17:08:03",
+      "title_ko": "예측 시장, 오픈AI 기업공개(IPO) 예상 시점을 2027년 후반으로 연기",
+      "summary_ko": "AI 주식과 관련 시장 약세로 기업공개 예상 시점 연기",
+      "lines": [
+        "칼시 거래자들의 2027년 6월 이전 오픈에이아이 기업공개 확률 28% 산정 (예상)",
+        "최근 펀딩 라운드 기준 오픈에이아이 기업가치 1조 2500억 달러 기록"
       ]
     }
   ]

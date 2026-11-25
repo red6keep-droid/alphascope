@@ -3572,5 +3572,284 @@
   "model": "gemini-3.5-flash-lite",
   "at": "2026-11-25T12:49:12.713734+00:00",
   "n_src": 900
+ },
+ "627e6aa7826c": {
+  "lines": [
+   "VIX 옵션 거래량 85만 건 중 풋옵션 51만 건 상회 (예상)"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-25T21:46:25.194470+00:00",
+  "n_src": 900
+ },
+ "322d59d2ece8": {
+  "lines": [
+   "메이시스 악천후로 추수감사절 퍼레이드 토요일 연기 발표",
+   "연기된 퍼레이드 토요일 오전 8시 30분 개최 예정"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLY",
+    "issue": "CORP_EVENT",
+    "dir": "uncertain",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLY",
+    "issue": "CORP_EVENT",
+    "dir": "neutral",
+    "stage": "talk"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-25T21:46:25.194470+00:00",
+  "n_src": 900
+ },
+ "a1cb4567b16b": {
+  "lines": [
+   "10년물 미 국채 금리 4.866%로 3bp 이상 하락",
+   "2년물 미 국채 금리 4.65%로 2bp 이상 하락",
+   "30년물 미 국채 금리 5.254%로 3bp 이상 하락"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "RATES_FED",
+    "dir": "positive",
+    "stage": "done"
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "RATES_FED",
+    "dir": "positive",
+    "stage": "done"
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "RATES_FED",
+    "dir": "positive",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-25T21:46:25.194470+00:00",
+  "n_src": 900
+ },
+ "a26b51ba227a": {
+  "lines": [
+   "법무부와 국가안보 기관의 젠슨 황 엔비디아 CEO 조사 부재 확인"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "REGULATION",
+    "dir": "positive",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-25T21:46:26.398034+00:00",
+  "n_src": 900
+ },
+ "3e29399724fb": {
+  "lines": [
+   "미국 증시의 과매도 국면 지속"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "MARKET_STRUCTURE",
+    "dir": "negative",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-25T21:46:26.398034+00:00",
+  "n_src": 302
+ },
+ "b8e65de04b89": {
+  "lines": [
+   "스페이스엑스의 100만 개 인공지능 위성 궤도 배치 연방통신위원회 승인 획득"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "AMZN"
+    ],
+    "sector": "XLY",
+    "issue": "REGULATION",
+    "dir": "positive",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-25T21:46:26.398034+00:00",
+  "n_src": 900
+ },
+ "c2150c757e97": {
+  "lines": [
+   "엔비디아 이사진 대상 주주 소송 및 당국 조사 진행",
+   "캘리포니아주 법무부의 엔비디아 투자자 오인 정보 제공 여부 조사 착수"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "CORP_EVENT",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "REGULATION",
+    "dir": "negative",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-25T21:46:27.984196+00:00",
+  "n_src": 900
+ },
+ "35ce48e126bd": {
+  "lines": [
+   "오픈에이아이 회의실 도청 혐의 전직 엔지니어 보석 석방"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLK",
+    "issue": "CORP_EVENT",
+    "dir": "negative",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-25T21:46:27.984196+00:00",
+  "n_src": 900
+ },
+ "a22a89f54110": {
+  "lines": [
+   "앤트로픽 기업공개로 임직원 5100명 백만장자 등극"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLK",
+    "issue": "CORP_EVENT",
+    "dir": "positive",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-25T21:46:27.984196+00:00",
+  "n_src": 900
+ },
+ "abfc667cb28b": {
+  "lines": [
+   "칼시 거래자들의 4개 이상 주 데이터센터 건설 유예 확률 57% 기록",
+   "7월 14일 뉴욕주 하이퍼스케일 데이터센터 관련 1년 허가 중단 첫 시행"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLRE",
+    "issue": "REGULATION",
+    "dir": "uncertain",
+    "stage": "talk"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLRE",
+    "issue": "REGULATION",
+    "dir": "negative",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-25T21:46:30.306812+00:00",
+  "n_src": 900
+ },
+ "092caf82715c": {
+  "lines": [
+   "칼시 거래자들의 2027년 6월 이전 오픈에이아이 기업공개 확률 28% 산정 (예상)",
+   "최근 펀딩 라운드 기준 오픈에이아이 기업가치 1조 2500억 달러 기록"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLK",
+    "issue": "CORP_EVENT",
+    "dir": "negative",
+    "stage": "talk"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLK",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-25T21:46:30.306812+00:00",
+  "n_src": 900
+ },
+ "35460b7c3efe": {
+  "lines": [
+   "2026년 미국 소비자들의 식료품 및 선물 비용 증가"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-25T21:46:30.306812+00:00",
+  "n_src": 900
  }
 }
