@@ -446,6 +446,49 @@ def openverse(per_topic=4, only=None):
     return stat
 
 
+def rebuild_topics():
+    """출처.csv 에 줄이 없는 주제 그림(위키미디어 쪽)의 출처를 되살린다 — 같은 검색을 다시 해 그림 내용이 똑같은 파일에만 붙인다.
+    받기가 중간에 강제로 멈추면 출처.csv 를 못 써서 생긴다(11-25). 새 파일은 만들지 않는다."""
+    have = set()
+    if os.path.exists(os.path.join(OUT, "출처.csv")):
+        have = {r["file"] for r in csv.DictReader(open(os.path.join(OUT, "출처.csv"), encoding="utf-8-sig"))}
+    fixed = 0
+    for folder, items in TOPICS.items():
+        for topic, queries in items.items():
+            d = os.path.join(OUT, folder, safe(topic))
+            if not os.path.isdir(d):
+                continue
+            miss = {f: open(os.path.join(d, f), "rb").read() for f in os.listdir(d)
+                    if "flickr" not in f and f"{folder}/{safe(topic)}/{f}" not in have and not f.startswith(".")}
+            if not miss:
+                continue
+            for q in queries:
+                if not miss:
+                    break
+                r = api(action="query", generator="search", gsrnamespace=6, gsrlimit=15, gsrsearch=f"{q} filetype:bitmap",
+                        prop="imageinfo", iiprop="url|size|mime|extmetadata", iiurlwidth=WIDTH)
+                for p in r.get("query", {}).get("pages", []):
+                    ii = (p.get("imageinfo") or [None])[0]
+                    if not ii or not miss or not OK_LICENSE.search(license_of(ii)[0]):
+                        continue
+                    try:
+                        data = get(ii.get("thumburl") or ii["url"])
+                    except Exception:
+                        continue
+                    time.sleep(1.5)
+                    for f, b in list(miss.items()):
+                        if b == data:
+                            lic, artist, restr = license_of(ii)
+                            ROWS.append({"file": f"{folder}/{safe(topic)}/{f}", "title": p["title"], "license": lic, "artist": artist,
+                                         "restrictions": restr, "source": ii.get("descriptionurl", ""), "width": ii.get("width"),
+                                         "height": ii.get("height"), "note": q})
+                            del miss[f]
+                            fixed += 1
+                time.sleep(0.5)
+            print(f"  [출처 복구] {folder}/{topic}: 남은 {len(miss)} " + " ".join(miss), flush=True)
+    return {"출처 되살림": fixed}
+
+
 def write_sheet():
     rows_path = os.path.join(OUT, "출처.csv")
     old = []
@@ -482,7 +525,7 @@ def write_sheet():
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--only", choices=["companies", "topics", "openverse"])
+    ap.add_argument("--only", choices=["companies", "topics", "openverse", "rebuild"])
     ap.add_argument("--limit", type=int)
     ap.add_argument("--topics", help="쉼표로 주제 이름 — 그 주제만 다시 받아 후보를 더한다")
     a = ap.parse_args()
@@ -491,6 +534,8 @@ def main():
     try:
         if a.only in (None, "topics"):
             stats["주제"] = topics(only=set(a.topics.split(",")) if a.topics else None)
+        if a.only == "rebuild":
+            stats["복구"] = rebuild_topics()
         if a.only == "openverse":
             stats["플리커"] = openverse(only=set(a.topics.split(",")) if a.topics else None)
         if a.only in (None, "companies"):
