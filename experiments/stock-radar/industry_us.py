@@ -226,7 +226,7 @@ def related(sym, data):
             continue
         if sid in PCT:
             chg = last["v"] - ser[-1 - (4 if q else 12)]["v"]
-        out.append({"fred": sid, "name": name, "why": why, "month": last["month"], "v": last["v"], "chg": chg, "pct": sid in PCT, "quarterly": q})
+        out.append({"fred": sid, "name": name, "why": why, "month": last["month"], "v": last["v"], "chg": chg, "pct": sid in PCT, "quarterly": q, "next": next_release(sid, data)})
     return out[:3]
 
 
@@ -234,7 +234,7 @@ def fetch():
     """FRED 최근 4년 — 하루 한 번(캐시가 오늘이면 그대로). 실패한 지표는 지난 캐시 값을 둔다. 키가 없으면 캐시만."""
     old = json.load(open(CACHE, encoding="utf-8")) if os.path.exists(CACHE) else {}
     today = datetime.date.today().isoformat()
-    if old.get("fetched") == today:
+    if old.get("fetched") == today and "_dates" in old:
         return old
     key = _key()
     if not key:
@@ -252,9 +252,46 @@ def fetch():
             if old.get(sid):
                 out[sid] = old[sid]
         time.sleep(0.25)   # 94번 연달아 — FRED 1분 120번 한도에 다른 실행과 겹쳐 걸리지 않게 (2026-11-25)
+    _releases(out, old, key, today)
     os.makedirs(os.path.dirname(CACHE), exist_ok=True)
     json.dump(out, open(CACHE, "w", encoding="utf-8"))
     return out
+
+
+def _releases(out, old, key, today):
+    """다음 발표일 재료 (2026-11-26 사용자 "미국에도 다음 발표일") — FRED 발표 일정. `_release` = 번호 → 발표 묶음(한 번 알아 두면 다시 안 부른다),
+    `_dates` = 발표 묶음 → 오늘부터의 발표일 셋(날마다). 매일 · 매주 나오는 자료(PARTIAL)는 뺀다. 실패하면 지난 값."""
+    def get(path, **q):
+        u = f"https://api.stlouisfed.org/fred/{path}?" + urllib.parse.urlencode({**q, "api_key": key, "file_type": "json"})
+        return json.load(urllib.request.urlopen(u, timeout=60))
+
+    rel = dict(old.get("_release") or {})
+    for sid in _ids():
+        if sid in PARTIAL or sid in rel:
+            continue
+        try:
+            rel[sid] = get("series/release", series_id=sid)["releases"][0]["id"]
+        except Exception as e:  # noqa: BLE001
+            print(f"[industry_us] 발표 묶음 {sid} 실패: {str(e)[:80]}")
+        time.sleep(0.25)
+    dates = {}
+    for rid in sorted({str(r) for s_, r in rel.items() if s_ not in PARTIAL}):
+        try:
+            got = get("release/dates", release_id=rid, realtime_start=today, realtime_end="9999-12-31", include_release_dates_with_no_data="true", sort_order="asc", limit=3)
+            dates[rid] = [x["date"] for x in got.get("release_dates") or []]
+        except Exception as e:  # noqa: BLE001
+            print(f"[industry_us] 발표일 {rid} 실패: {str(e)[:80]}")
+            if (old.get("_dates") or {}).get(rid):
+                dates[rid] = old["_dates"][rid]
+        time.sleep(0.25)
+    out["_release"], out["_dates"] = rel, dates
+
+
+def next_release(sid, data):
+    """번호의 다음 발표일(YYYY-MM-DD) — 오늘(한국 날짜) 이후 첫 날. 없으면 None. 미국 아침 발표는 한국 날짜로 같은 날 밤이다."""
+    rid = (data.get("_release") or {}).get(sid)
+    today = (datetime.datetime.utcnow() + datetime.timedelta(hours=9)).strftime("%Y-%m-%d")
+    return next((d for d in (data.get("_dates") or {}).get(str(rid)) or [] if d >= today), None) if rid and sid not in PARTIAL else None
 
 
 def load():
@@ -306,12 +343,12 @@ def build(sym, data):
         up, dn = ("늘고 있음", "줄고 있음") if mode == "qty" else ("오르는 중", "내리는 중")
         state = "판단 유보" if chg is None else up if chg >= LIM_WORK else dn if chg <= -LIM_WORK else "비슷함"
         out["works"].append({"biz": biz, "q": q, "fred": sid, "name": label, "mode": mode, "src": src, "vkey": vkey, "month": last["month"], "v": last["v"], "chg": chg,
-                             "state": state, "series": ser[-9:] if quarterly else ser[-25:], "quarterly": quarterly})
+                             "state": state, "series": ser[-9:] if quarterly else ser[-25:], "quarterly": quarterly, "next": next_release(sid, data)})
     if money:
         sid, label, vkey = money
         ser = _monthly(data.get(sid) or [])
         last, chg = _yoy(ser, 4)
         if last:
             state = "판단 유보" if chg is None else "나아짐" if chg >= LIM_MONEY else "나빠짐" if chg <= -LIM_MONEY else "비슷함"
-            out["money"] = {"fred": sid, "name": label, "src": BEA, "vkey": vkey, "month": last["month"], "v": last["v"], "chg": chg, "state": state, "series": ser[-9:]}
+            out["money"] = {"fred": sid, "name": label, "src": BEA, "vkey": vkey, "month": last["month"], "v": last["v"], "chg": chg, "state": state, "series": ser[-9:], "next": next_release(sid, data)}
     return out if out["works"] or out["money"] or rel else None

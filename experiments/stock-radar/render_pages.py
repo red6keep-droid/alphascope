@@ -623,6 +623,12 @@ def _fred_chart(x, title, q=False):
     return [(f'{_dk.CHART_TITLE_M}{_esc(title)}</span>{chart}', "html")]
 
 
+def _next_txt(x):
+    """줄 끝 ` · 다음 발표 12월 16일` — FRED 발표 일정에 있는 지표만 (2026-11-26, 한국 render_kr._release_txt 와 같은 글)."""
+    n = x.get("next")
+    return f" · 다음 발표 {int(n[5:7])}월 {int(n[8:])}일" if n else ""
+
+
 def industry_cards(s):
     """미국 업계 카드 — `○○ 업계 생산은?` · `제품 값은?` · `수익성은?` (2026-11-01 사용자 P268: 한국처럼 방향까지). 재료 = industry_us.build."""
     d = s.get("industry_us")
@@ -638,7 +644,7 @@ def industry_cards(s):
         note = ("분기 자료라 2~3달 늦게 나옵니다." if q else "월별 자료라 1~2달 늦게 나옵니다.") + " 1년 전보다 5% 넘게 바뀌면 방향을 적습니다."   # 옛 툴팁 기준을 문장 작은 글씨로 (2026-11-08)
         lines = [(head + R.small_note(note), "plain")]
         lines += _fred_chart(x, f"{x['name']}, 올해와 작년 같은 {unit}", q=q)
-        lines.append(("row", x["name"], _fred_value(x["fred"], x["v"]), f"{_when(x['month'], q)} · 1년 전보다 {_sgn(x['chg'])}%"))
+        lines.append(("row", x["name"], _fred_value(x["fred"], x["v"]), f"{_when(x['month'], q)} · 1년 전보다 {_sgn(x['chg'])}%" + _next_txt(x)))
         out += R._state_card(f"{x.get('biz', d['biz'])} 업계 {x['q']}", x["state"], theme, col, lines, "", fold=True)   # 툴팁 없음 (2026-11-08 사용자: 카드와 겹치는 툴팁 생략, 가이드라인 11절)
     m = d.get("money")
     if m:
@@ -646,7 +652,7 @@ def industry_cards(s):
         head = f"{_dk.josa(m['name'], '은')} {_when(m['month'], True)} {_dk.josa(_fred_value(m['fred'], m['v']), '로')} 1년 전 같은 분기보다 {_sgn(m['chg'])}%였다."
         lines = [(head + R.small_note("분기 자료라 2~3달 늦게 나오고, 1년치로 환산한 금액입니다. 1년 전보다 10% 넘게 바뀌면 방향을 적습니다."), "plain")]
         lines += _fred_chart(m, f"{m['name']}, 올해와 작년 같은 분기", q=True)
-        lines.append(("row", "업종 기업이익", _fred_value(m["fred"], m["v"]), f"{_when(m['month'], True)} · 1년 전보다 {_sgn(m['chg'])}%"))
+        lines.append(("row", "업종 기업이익", _fred_value(m["fred"], m["v"]), f"{_when(m['month'], True)} · 1년 전보다 {_sgn(m['chg'])}%" + _next_txt(m)))
         out += R._state_card(f"{d['biz']} 업계 수익성은?", m["state"], theme, col, lines, "", fold=True)
     return out
 
@@ -660,7 +666,7 @@ def card_related(s):
               + R.small_note("모두 1년 전 같은 달(분기 자료는 같은 분기)과 견줍니다. 주가를 설명한다고 확인한 지표는 아니고, 참고로만 봅니다."), "plain")]
     for r in rows:
         chg = "" if r.get("chg") is None else f" · 1년 전보다 {_sgn(r['chg'])}{'%p' if r.get('pct') else '%'}"
-        lines.append(("row", r["name"], _fred_value(r["fred"], r["v"]), f"{_when(r['month'], r.get('quarterly', False))}{chg} · {r['why']}"))
+        lines.append(("row", r["name"], _fred_value(r["fred"], r["v"]), f"{_when(r['month'], r.get('quarterly', False))}{chg} · {r['why']}" + _next_txt(r)))
     return R._state_card("함께 볼 지표", "참고", "neutral", R.MUTED, lines, "", fold=True)
 
 
