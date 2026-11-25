@@ -18,6 +18,11 @@ on:
         type: choice
         options: [am, pm]
         default: am
+      date:
+        description: 'KST 날짜 YYYY-MM-DD (비우면 오늘) — 429 등으로 빠진 지난 편을 늦게 낼 때'
+        type: string
+        required: false
+        default: ''
       publish:
         description: 'Blogger 에 실제 발행 (끄면 준비 · 배너만, 결과는 artifact)'
         type: boolean
@@ -86,7 +91,10 @@ jobs:
           PY
           else
             echo "slot=${{ inputs.slot }}" >> "$GITHUB_OUTPUT"
-            echo "date=$(TZ=Asia/Seoul date +%F)" >> "$GITHUB_OUTPUT"
+            D="${{ inputs.date }}"
+            [ -z "$D" ] && D=$(TZ=Asia/Seoul date +%F)
+            echo "$D" | grep -qE '^[0-9]{4}-[0-9]{2}-[0-9]{2}$' || { echo "::error::date 형식 = YYYY-MM-DD"; exit 1; }
+            echo "date=$D" >> "$GITHUB_OUTPUT"
           fi
           cat "$GITHUB_OUTPUT"
 
