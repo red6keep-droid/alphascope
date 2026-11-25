@@ -46,6 +46,7 @@ on:
 
 permissions:
   contents: write
+  actions: write   # 빠진 편 자동 다시 발행(Catch up 단계가 이 워크플로를 다시 부름)
 
 concurrency:
   group: commentary
@@ -171,6 +172,26 @@ jobs:
             echo "Blogger 429 — 30분 뒤($(TZ=Asia/Seoul date -d '+30 min' +%H:%M) KST) 다시"
             sleep 1800
           done
+
+      # 빠진 편 자동 메우기 — 정시 · 예비 실행만(다시 부른 실행은 또 부르지 않음). 이번 편 성공 · 실패와 상관없이 직전 두 편을 본다.
+      # 수집기 글이 ready 인데 Blogger 에 없으면 그 편을 date 지정 손 실행으로 다시 부른다(마감 시각 검사 없음, 429 면 30분마다 다시).
+      # 11-24 저녁 편이 Blogger 429 로 빠지고 다음 날 사람이 손으로 낸 것을 자동으로 (2026-11-25 사용자). 읽기만: Firestore 2건 · Blogger 목록 2번
+      - name: Catch up missed editions
+        if: always() && env.IS_SCHEDULED == 'true'
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          YTB_FIRESTORE_KEY: ${{ secrets.YTB_FIRESTORE_KEY }}
+          BLOGGER_CLIENT_ID: ${{ secrets.BLOGGER_CLIENT_ID }}
+          BLOGGER_CLIENT_SECRET: ${{ secrets.BLOGGER_CLIENT_SECRET }}
+          BLOGGER_REFRESH_TOKEN: ${{ secrets.BLOGGER_REFRESH_TOKEN }}
+        run: |
+          python experiments/market-commentary/publish_commentary.py missing --slot "${{ steps.slot.outputs.slot }}" --date "${{ steps.slot.outputs.date }}" | tee /tmp/missing.txt
+          M=$(grep '^MISSING ' /tmp/missing.txt | head -1 || true)
+          [ -z "$M" ] && exit 0
+          set -- $M
+          echo "::warning::빠진 편 $3 $2 — 다시 발행을 부름"
+          gh workflow run commentary.yml --ref main -f slot="$2" -f date="$3" -f publish=true
 
       - name: Upload artifacts
         if: always()

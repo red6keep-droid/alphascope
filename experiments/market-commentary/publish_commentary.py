@@ -304,10 +304,52 @@ def stage_publish(a):
     return 0
 
 
+def previous_editions(day, slot, n=2):
+    """(day, slot) 바로 앞 n 편 — 최근 것부터. am 앞 = 전날 pm, pm 앞 = 그날 am."""
+    d = datetime.date.fromisoformat(day)
+    out = []
+    for _ in range(n):
+        d, slot = (d - datetime.timedelta(days=1), "pm") if slot == "am" else (d, "am")
+        out.append((d.isoformat(), slot))
+    return out
+
+
+def stage_missing(a):
+    """빠진 편 찾기 — 정시 실행 끝에 직전 두 편을 본다. 수집기 글이 ready 인데 Blogger 에 없으면 '슬롯 날짜' 한 줄(가장 오래된 것 하나만).
+    워크플로가 그 편을 손 실행처럼(마감 시각 검사 없이) 다시 부른다 — 11-24 저녁 편이 Blogger 429 로 빠지고 사람이 다음 날 손으로 낸 것을 자동으로 (2026-11-25 사용자).
+    한 실행에 하나만: concurrency 묶음에서 기다리는 실행은 하나만 남아 둘을 부르면 앞의 것이 취소된다. 남은 편은 다음 실행이 메운다."""
+    import publish_blogger as PB
+    creds = PB._credentials()
+    blog_id = PB._blog_id(creds, os.environ.get("BLOG_URL", PB.DEFAULT_BLOG_URL))
+    found = None
+    for day, slot in previous_editions(a.date, a.slot):
+        key = f"{day}-{slot}"
+        col = read_column(key)
+        if not col or col.get("status") != "ready":
+            log(f"{key} — 수집기 글 없음 · ready 아님, 메울 것 없음")
+            continue
+        if slot == "pm":   # 정시 실행과 같은 조건 — 16:30 전에 쓴 글(한국장 마감 재료 없음)은 일부러 안 낸 것이라 메우지 않는다
+            w = col.get("createdAt")
+            if isinstance(w, datetime.datetime) and w.tzinfo is None:
+                w = w.replace(tzinfo=datetime.timezone.utc)
+            h, mi = PM_MIN_WRITTEN
+            if not isinstance(w, datetime.datetime) or w < datetime.datetime.fromisoformat(day).replace(hour=h, minute=mi, tzinfo=KST):
+                log(f"{key} — {h:02d}:{mi:02d} KST 전에 저장된 글이라 메우지 않음")
+                continue
+        if already(creds, blog_id, key):
+            log(f"{key} — 발행돼 있음")
+            continue
+        log(f"{key} — 수집기 글은 ready 인데 Blogger 에 없음 → 다시 발행")
+        found = (slot, day)   # 오래된 것이 뒤에 오므로 마지막 것 = 가장 오래된 빠진 편
+    if found:
+        print(f"MISSING {found[0]} {found[1]}")
+    return 0
+
+
 def main():
     sys.stdout.reconfigure(encoding="utf-8")
     ap = argparse.ArgumentParser()
-    ap.add_argument("stage", choices=["prepare", "publish"])
+    ap.add_argument("stage", choices=["prepare", "publish", "missing"])
     ap.add_argument("--slot", choices=["am", "pm"], required=True)
     ap.add_argument("--date", help="KST 날짜 YYYY-MM-DD (기본 오늘)")
     ap.add_argument("--column-json", help="시험: 수집기 글 JSON 파일 (Firestore 대신)")
@@ -318,7 +360,7 @@ def main():
     ap.add_argument("--replace", action="store_true", help="publish: 같은 편이 이미 나갔으면 그 글을 고쳐 쓴다(사람이 손으로 부를 때만)")
     a = ap.parse_args()
     a.date = a.date or kst_now().date().isoformat()
-    sys.exit(stage_prepare(a) if a.stage == "prepare" else stage_publish(a))
+    sys.exit({"prepare": stage_prepare, "publish": stage_publish, "missing": stage_missing}[a.stage](a))
 
 
 if __name__ == "__main__":
