@@ -1,0 +1,903 @@
+{
+ "made": "2026-11-25T08:39:46+00:00",
+ "status": [
+  {
+   "q": "\"S&P 500\" target 2027 strategist when:30d",
+   "status": 200
+  },
+  {
+   "q": "\"S&P 500\" year-end 2027 target when:30d",
+   "status": 200
+  },
+  {
+   "q": "\"S&P 500\" target 2026 strategist when:30d",
+   "status": 200
+  },
+  {
+   "q": "\"S&P 500\" year-end 2026 target when:30d",
+   "status": 200
+  },
+  {
+   "q": "\"S&P 500\" target raises OR cuts strategist when:14d",
+   "status": 200
+  }
+ ],
+ "spx": {
+  "day": "2026-11-24",
+  "close": 7201.09
+ },
+ "items": [
+  {
+   "firm": "Citi",
+   "target": "S&P 500",
+   "horizon": "2026-12",
+   "value": 8100,
+   "low": null,
+   "high": null,
+   "sources": [
+    {
+     "title": "Citi raises year-end target for S&P 500 to 8,100 points; recommends balanced allocation in Q4",
+     "source": "富途牛牛",
+     "link": "https://news.google.com/rss/articles/CBMijgFBVV95cUxOUW9ILTUwMkRrUE4tbC13eDFaSXJONXRBM2JYQ3ljbGFMSW5leEpYempHb1p0OVh2MWtlMTQ2RHJOd2Vlak45WnFjaGNTdlB5NTZxLWtZQXdaSG0tZnpfZlVkRE04NUZnbmh4aDBDTm9SbkN0WEFianZScXZsQmtqMFZja3h0cjhEVFVpbC1R?oc=5",
+     "published": "2026-11-14"
+    }
+   ],
+   "published": "2026-11-14"
+  },
+  {
+   "firm": "Yardeni Research",
+   "target": "S&P 500",
+   "horizon": "2026-12",
+   "value": 7900,
+   "low": null,
+   "high": null,
+   "sources": [
+    {
+     "title": "Ed Yardeni on his 7,900 S&P 500 year-end target: 'Santa is coming'",
+     "source": "CNBC",
+     "link": "https://news.google.com/rss/articles/CBMipwFBVV95cUxNQXRvOGFTZzhOM3dQNGRsMDRCcmRCaGl3bXFfek1VdHNISWdpT1YwU2hPY0F0eTNDZzlNRUJhVkFtcGFKNkpPZG1ZN2hUaUJkOVdyT294dGltaWliYXBkdlRUV3FpQXpNaEJBTm9DZTdZQUplUFdfbHhiWldlcGdfTUpTNU5tOU84LTRUYVhQT1pabnU2NlBsUzlHOE8yTzEwamcxUE02NA?oc=5",
+     "published": "2026-11-05"
+    }
+   ],
+   "published": "2026-11-05"
+  },
+  {
+   "firm": "Yardeni Research",
+   "target": "S&P 500",
+   "horizon": "2026-12",
+   "value": 7500,
+   "low": null,
+   "high": null,
+   "sources": [
+    {
+     "title": "Even Wall Street's Biggest Bull Balks: Yardeni Cuts S&P 500 Year-End Target to 7,500, His Second Cut in Two Months",
+     "source": "BigGo Finance",
+     "link": "https://news.google.com/rss/articles/CBMidkFVX3lxTE9iVnV4V2l2a2Z4YlJjSXRROHVOelFmN0lyV01Vd3hqVEtKN0VUbFdkN3cwUktaWkNVNllyM2ZkOEg1NmdBSjdzQ0tNNW0xMmJCQjAzVnh3WlA4WHVHNHF3Q1p2ejNzSm5JS3VTdzRZOWpjZWl2VEE?oc=5",
+     "published": "2026-11-23"
+    },
+    {
+     "title": "S&P 500 Falls as Yardeni Cuts Year-End Target to 7,500",
+     "source": "JournalArta",
+     "link": "https://news.google.com/rss/articles/CBMijgFBVV95cUxQTFhJUVdsMkxPWmVRU1lYaXZTcHB1ZEY3S2tqbk1FVm92alFTQmNVQUI5b0FsbUFELUNPbVhEa3lPZWx3RkhKc2pnX0o3czY2VHdJR0JMZmlPTjVHaVJKeVR5V2lQdkwxTGJzaFhuUWpQNjM3ZEJYZ3VsUVhDUmsxazhfSXlYVXc5WlhZdVhB?oc=5",
+     "published": "2026-11-22"
+    }
+   ],
+   "published": "2026-11-22"
+  },
+  {
+   "firm": "Deutsche Bank",
+   "target": "S&P 500",
+   "horizon": "2027-12",
+   "value": 9000,
+   "low": null,
+   "high": null,
+   "sources": [
+    {
+     "title": "Deutsche Bank sees S&P 500 hitting 9K by end of 2027 (SP500:)",
+     "source": "Seeking Alpha",
+     "link": "https://news.google.com/rss/articles/CBMimgFBVV95cUxNZ1NBODlrWXJrOEVKQzlWWnB4bkZoeUFqN3ZnVDM1a1ZSVmxzdXZjcHp5VUFBNW9rNzd5UUlZZklNT212dW1PWGtVWFRxc3JRMk10THdncE5VaU9DQTRIUFVGTlRqS1VHQU5teEZPYTNVYVMzUlRMN2lrLTF0SXZJNEZVOWFoeW5fSVZmYWZpRGFvYXpibnJ1cmNn?oc=5",
+     "published": "2026-11-23"
+    },
+    {
+     "title": "Deutsche Bank Says S&P 500 Will Hit 9,000 in Two Years, Most Bullish Call on Wall Street",
+     "source": "BigGo Finance",
+     "link": "https://news.google.com/rss/articles/CBMidkFVX3lxTE1oZmRZcmhELXpoNjNKR21vUTRjaWRrajFTVlFaUi1VNnFuTHhncDZkOTRYdWJkLVNkellaRDNJREVOTXZLcjJmVHdPSnVvcUtueFlLS3E0Q05lNlJsQmE0bnFncVR1bW9kMTl4cEM4eEpWVjZnemc?oc=5",
+     "published": "2026-11-24"
+    },
+    {
+     "title": "Deutsche Bank Sets S&P 500 End-2027 Target at 9,000, Forecasting Roughly 30% Upside",
+     "source": "BigGo Finance",
+     "link": "https://news.google.com/rss/articles/CBMidkFVX3lxTE9aTDVVNlhBZlg0LW9GZ0ZjUUhHVG01dl9pN2dicVkybnJXMzBXcTRzUHRtaVpvQWFxZmhIUFlSMlZpRnhoXzVLN1dTbUc1ejg4emNWNnRxamdvdEs4N0JaUEJBMEQxQTh5WkY4eGlJQWtVNmxqWEE?oc=5",
+     "published": "2026-11-23"
+    },
+    {
+     "title": "Deutsche Bank sees S&P 500 hitting 9K by end of 2027",
+     "source": "TradingView",
+     "link": "https://news.google.com/rss/articles/CBMitgFBVV95cUxQcVdwUWo0LThrUnVaTnhfSVdQclExZVVkVy1WTHBldzVNTTdpeWlFMzVYSy1iaXhZOGtsdHoycURJVTFtbERTejF0X3diY09iaHFJeWROYzJ2b2lackhXZmItQU1lSUtaU3JqUm1BN19NMVJQVWlYRkNYcVNpNVVBT2V2cl9SamlJZTFhSHExb2RNdDlPMXhrWDE2angteG1rN2Y3YlNWN3VQM2xGTF9rTXFfR05hQQ?oc=5",
+     "published": "2026-11-23"
+    }
+   ],
+   "published": "2026-11-23"
+  },
+  {
+   "firm": "UBS",
+   "target": "S&P 500",
+   "horizon": "2027-12",
+   "value": 8900,
+   "low": null,
+   "high": null,
+   "sources": [
+    {
+     "title": "UBS keeps S&P 500 end-2027 target at 8,900, says derating sets up strong returns",
+     "source": "Investing.com",
+     "link": "https://news.google.com/rss/articles/CBMizgFBVV95cUxOMFR6MGg4Y0lWYzlHaXNLZXhmMWNzUnVBRnh3dW1MTUdmZDdxTG1oMkpoNkRBdXp6ZWpWSjRvUVZLNUJqZkU4bm5hSTJqanBCM05TcEFTWUdsUU9Ma01CRUtrbEhnNE9SZVRlUlM5cUlsOFR4NGNjU0VMYS1wTFFPc0VNSFF6c2NKNjFQcjZKakF2eWk2akV3SkZ3cVRIQ2NrUVlWSGdtM3lXdWlmR3BILUkwd1lOVHFiMVBteGRYVlVscGQtb2l0YktUcnZjZw?oc=5",
+     "published": "2026-11-10"
+    },
+    {
+     "title": "UBS reaffirms its 2027 S&P 500 year-end call of 8,900",
+     "source": "TradingView",
+     "link": "https://news.google.com/rss/articles/CBMitwFBVV95cUxPVWdnZVRxZ3pEV3dNMThLRDN3VkFrdDhtTGpLcHFISWptQW1fT3FmZ0stU1gtSFA0NTJhTkFnNkN4NzB4dEJJcXlVZW1kSmdjaUdKYWN6S0k0TGJ0Z0dYNzZCYlhuNFh5ZW1KV0NZRzZjcU13aG96UnJ0VHBxeTBiOWhDb2d3MFNZU3E4ZnhoM2VoRDB2NlBneUdjSEI5SmJKa0FUMkFRRDhyb1gtdDFMNFJscHozb1k?oc=5",
+     "published": "2026-11-10"
+    }
+   ],
+   "published": "2026-11-10"
+  },
+  {
+   "firm": "Goldman Sachs",
+   "target": "S&P 500",
+   "horizon": "2027-12",
+   "value": 8700,
+   "low": null,
+   "high": null,
+   "sources": [
+    {
+     "title": "Goldman Sachs Sets 8,700 S&P 500 Target for 2027, Sees 14% Upside as AI Capex Peaks",
+     "source": "BigGo Finance",
+     "link": "https://news.google.com/rss/articles/CBMidkFVX3lxTE1PZ0FJMzBPWkF5UjNaT0U1dVRxaUxFQk5QZjAtd3J5S21JcWVscHpkRzlEVWl5WGNuUjRnd3h3bUdDWVh6aldGSFlOdUdYWno4SENublFLaFJlbFUxcUdkVG02bHY2YmQ4NHZhemdlV2RWZzg2VXc?oc=5",
+     "published": "2026-11-15"
+    },
+    {
+     "title": "Goldman Sachs Sees S&P 500 Hitting 8,700 by End of Next Year; Japan Stocks Also Overweight, TOPIX Target 4,500",
+     "source": "BigGo Finance",
+     "link": "https://news.google.com/rss/articles/CBMidkFVX3lxTE1acTdWMUtlNF9qaTduYnlzQk5CcjlsVU5aTm9zTzRDT3hkVXMtcjl0Tno5dUxBcjFPVTljRjUyZm9DTnl0dzI3MVpzRWd0ZWhRbDlKTy1sYlphQlJXUHA2OHg5QU84ZFVaV3JjMURlUzc2RWpfQmc?oc=5",
+     "published": "2026-11-13"
+    },
+    {
+     "title": "Goldman Sachs sees the S&P 500 at 8,700 by the end of 2027 as earnings growth slows",
+     "source": "MLQ.ai",
+     "link": "https://news.google.com/rss/articles/CBMipAFBVV95cUxOVGhTNzZKNUwta3hWN2Vlem1mUVY3QThwcGw1bHlRekhOaVdoSmZibHhJci00YjNEQlc5d1oyWGlDbkpqc3MyUjdzc0pMSjZ1VmVyTXo2bnVzMUozR2pVbU9ET1ZtcHVVbDZFNDR5SkxFcExiMTJfQlJoczVLYkJGQXlIemtuYloyQ3NQaHhUOXVmRk1udVQ1OFdCOUlOVXNxU3Q1cg?oc=5",
+     "published": "2026-11-17"
+    },
+    {
+     "title": "Goldman Sachs sees S&P 500 rising to 8,700 next year despite slower earnings growth",
+     "source": "Reuters",
+     "link": "https://news.google.com/rss/articles/CBMiwAFBVV95cUxQUUY1ZVU4V1FfVjg4bkIxMkpIVWJqQ0tVeDRsb1ZOSGRkWlo5THVweFduVWVjTXloTWVRZnhhdGJqX0I3RnlHRlkxd3MzNzFUcFBibFd2bUJKNkI2RXdPVE5FeXJRNGZLQzZDcnZXQ0pRcGdPRjBvZWs1Xzd6VTlfLXJXb1dNUjZuM0N1LWZpaUExWmk1ZXpIdlhCM29RTkpLWE9YSXdIM3hLQk41c2M5ZFJCWExESUhabjl6Mjg2dTU?oc=5",
+     "published": "2026-11-13"
+    },
+    {
+     "title": "US Stocks Enter New Phase of AI Boom as Goldman Sets 2027 S&P 500 Target of 8,700",
+     "source": "BigGo Finance",
+     "link": "https://news.google.com/rss/articles/CBMidkFVX3lxTFBOdFl6YmxVeEx5MmNyZmc4RmJtSjJZSU5fclJ3MHFWTndFY1h6aHdPVVpySzhjb1RuYkdLdmYtOWZvSUw1X2lxcGxxOF9lcFFiR0dwRWFJamdmWjlIdldyalBFdTBTanVCT19TNlZNTHk3S0RGU2c?oc=5",
+     "published": "2026-11-17"
+    }
+   ],
+   "published": "2026-11-13"
+  },
+  {
+   "firm": "Morgan Stanley",
+   "target": "S&P 500",
+   "horizon": "2027-12",
+   "value": 8700,
+   "low": null,
+   "high": null,
+   "sources": [
+    {
+     "title": "Morgan Stanley lifts S&P 500 target to 8,700 for 2027",
+     "source": "Traders Union",
+     "link": "https://news.google.com/rss/articles/CBMiiAFBVV95cUxPbHEwdmU1LXdzby1fbGxqc0U1VXUtVUQxYVlyZ0Rjd1pTRzFzaWJfbkw3VVUwaW5YYVUwVnNDbUljUFJPdEJWYlUydVd2d2R3a2ZXVzlJS19xdlI2XzVMeklqaEJVWXVTY0ZySzM0cDRhY3ItcnViQk5KZW9GUWFKQzczQmRNcVdo?oc=5",
+     "published": "2026-11-16"
+    },
+    {
+     "title": "Morgan Stanley Raises S&P 500 Target to 8,700 for 2027",
+     "source": "PrimeXBT",
+     "link": "https://news.google.com/rss/articles/CBMihgFBVV95cUxQLVNFNjN3UFBDVXVzcWs3b0htakJjRHZ0dV9yck9CVE91ck1sT19ETy1jaUJ5RnlIZlMyS0NfbGw3YzhwTmh3M2V3eU9aUFcwVDdwSWVNd2dJWnpKOWhrdmVudm1NVzZhSUdVNkQ3cXg3RkNYTVhhTkt3aHBjMzhVUXNnYVJpdw?oc=5",
+     "published": "2026-11-16"
+    }
+   ],
+   "published": "2026-11-16"
+  },
+  {
+   "firm": "Barclays",
+   "target": "S&P 500",
+   "horizon": "2027-12",
+   "value": 8700,
+   "low": null,
+   "high": null,
+   "sources": [
+    {
+     "title": "Barclays lowers 2027 year-end target for S&P 500 index to 8,700",
+     "source": "TradingView",
+     "link": "https://news.google.com/rss/articles/CBMizgFBVV95cUxOc3h4bmJkWTRpQUlMSUZWdHlWMzJod3ZHQ2R2cTdFaVJ0TU5iaUFheXZyQVRMZDVrLWJrZlM5QkYxWE5venktaTh4R1Npb2xkcUlHd3lYaUZPOW9oVk1EZzBRVUhLUkFtVTBLN0tVLVI1MHV5VWljMi15TnU0dkdhTVBrdGJMZ1VubDFYVENpaTE3aFlMVE1LYjZybXhHSDcwS2JiUXFYTzItQTFSSFNZc1FYUGkzLXZXc3l1RFNhSG1KYWt4eFUzWUotMmlRQQ?oc=5",
+     "published": "2026-11-16"
+    },
+    {
+     "title": "Barclays Slightly Cuts S&P 500 Target to 8,700 for End of 2027",
+     "source": "www.tokenpost.com",
+     "link": "https://news.google.com/rss/articles/CBMiWkFVX3lxTE5hX3Voc19FUExfdk9GWEtJbl9OeG40d3c2N3FjSzB2ZUM0Z1NnVWZFa05Va1dHMzgwd0wtZURnRDZVZUw3MF9qMDdPd3hPTDYzZ1hqV2dMa2J5dw?oc=5",
+     "published": "2026-11-16"
+    }
+   ],
+   "published": "2026-11-16"
+  },
+  {
+   "firm": "Wells Fargo",
+   "target": "S&P 500",
+   "horizon": "2027-12",
+   "value": 8200,
+   "low": null,
+   "high": null,
+   "sources": [
+    {
+     "title": "Wells Fargo Sees S&P 500 at 8,200 By End of 2027 as Profits Slow",
+     "source": "Bloomberg.com",
+     "link": "https://news.google.com/rss/articles/CBMitgFBVV95cUxPSkp5Q3REYmx1TkhETnp5TjlpX2lMelhkcjZieE01R0piRzdnc3I1R0N6LUtsUDZiMFREcmYtNERMWnlwbXRYTGJaUmZqT0FUVGFRZnlwS0VhWXh6Tk1kNzdSUjhoclhXRXd6MW5yMjE0cmU1a0RJTzBVeC1acVFTS2RUdXdHY3p3RXJxSFFUSFlnNEJZZURsZnpHcXBxa0JkZzFKNVdVMGUxYkhYb3FzMVdUS1pSUQ?oc=5",
+     "published": "2026-11-16"
+    },
+    {
+     "title": "Wells Fargo Sees S&P 500 at 8,200 by 2027",
+     "source": "Briefs Finance",
+     "link": "https://news.google.com/rss/articles/CBMijAFBVV95cUxOY1hxZklmb2VWTFk1OGNHdTZxZFNtSFRJSEhobGktam5xeVlsaDhvb1AzbkhDTGtuc0ZFU0tUV1BudGh0MXNuQWllYXMtZXRtWVRoOVVnakxVQXZBUVd5RFl5cUtSeDgxOHZienFVUnd5MU9kSVVTWFNpYWNYcFlNWmFwOTJqRUhRNEFrLQ?oc=5",
+     "published": "2026-11-17"
+    },
+    {
+     "title": "Wells Fargo sets 2027 S&P 500 year-end target at 8,200",
+     "source": "Seeking Alpha",
+     "link": "https://news.google.com/rss/articles/CBMilAFBVV95cUxNRFpZdnd2c2NjV2lJSDdJdGYzSGVHN1lwY0xjTjZYanZrVkJkbkdrbTBVV1c1S1JZWUZXUkFBSE1uRGs1NGFUcHVUeE40cUEtem4yMjdMNFBLbExfNEJiR2NCUGxSOUgxS2tXaHQzRWRJS3h2dXdhNWhvUmtVdnNmMnlRWWd2NTBMdHNVQmdpY3RfUks2?oc=5",
+     "published": "2026-11-17"
+    },
+    {
+     "title": "Wells Fargo sets 2027 S&P 500 target at 8,200, favors hyperscalers as AI trade matures",
+     "source": "Zawya",
+     "link": "https://news.google.com/rss/articles/CBMizAFBVV95cUxQcmlLV1k5QkVQM3RNVy1NTEZpOFBPcF8zQ1I3ZFhpejVoY3JoZDBfelVFWG1tdU1lOGNFTlA3QlRha1hXaFBQN1ZGLW1jR1IwdlgzRk5pSjgxb0N1MUdVX0tVNmltOGR2bzZCTXpsY2ZLZU5WZTA5cUlpTGkwZTBFRnJTa1pEUnBPb2RKN0lqZ1BMSEdKV1BWSmJvRzlfUzBxVmV1b3gwUk1MYnR4R3RkYWZEMkV5ckFpMjNfeGY0TFBNZ0ZLYUU4TnpkdzY?oc=5",
+     "published": "2026-11-17"
+    },
+    {
+     "title": "Wells Fargo sets S&P 500 target at 8,200 for 2027, favours hyperscalers in AI trade",
+     "source": "The Globe and Mail",
+     "link": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxQRER5V1gySnkxUGMxWm5fWE02NGZUWjlGSVNiWmF3SlZLa1lnbUpJbDZjVlBfNXR2YW4zclhPMHYyWWllMGRPNVk1TU9Rc250b3Bwcm1SXzh0V0pzRnh6VnhCRGVLWTdrRHdKdWZRMmhMMDFVOG5qNFZYVGxvNVB6dkpMdXRRYnJnQ1l3MzBudnFKc3hPbGlydHBBY1dEQjRDUWhrRVpyd0p0T0xndEhfQllNQXY0bGRiNXNz?oc=5",
+     "published": "2026-11-17"
+    }
+   ],
+   "published": "2026-11-16"
+  },
+  {
+   "firm": "JPMorgan",
+   "target": "S&P 500",
+   "horizon": "2027-12",
+   "value": 8200,
+   "low": null,
+   "high": null,
+   "sources": [
+    {
+     "title": "JPMorgan Sets Below Consensus S&P 500 Target of 8,200 for 2027",
+     "source": "Bloomberg.com",
+     "link": "https://news.google.com/rss/articles/CBMiswFBVV95cUxOV3ZoYzZUODBMSTlOZzV1ZFdKaEtPOFpWVDd0Y0hpd0xsLWFmXzNkRWY4d0FybXhvcmtBVVhzNTZmNjY0LU5pdHltWkZMZ25CTkR1djRqeEIzMzRZNldjaEJfa0cxZklzNnN2eVY0OXBLcEZmOWphQVNYdlZOYmtwblRYWkgzZWFSQzdUSzBEUzNDWDNMZTRhVmtkV3lWQWctUU9vREFJaHNqR2ZqZjJrRkQyZw?oc=5",
+     "published": "2026-11-24"
+    },
+    {
+     "title": "JPMorgan Sets S&P 500 2027 Target at 8,200: \"The AI Supercycle Is Alive and Well\"",
+     "source": "BigGo Finance",
+     "link": "https://news.google.com/rss/articles/CBMidkFVX3lxTE83TUROUjAwM2tJU3p5RXR2MHpYaWY2UEtjNFhlZVBXV3RvNnZwbkFpWWg4WHRYdXRFM29PSGhBakRGcmI5R1RYQ252ekgyMUEtbzdGcGxqcGUzQXpkUzBjWTN3T01PRWpEdXNDM0VtLWhpNGNJU2c?oc=5",
+     "published": "2026-11-25"
+    },
+    {
+     "title": "JPMorgan Sees S&P 500 at 8,200 by End-2027, 13.9% Above Now",
+     "source": "FourWeekMBA",
+     "link": "https://news.google.com/rss/articles/CBMiiwFBVV95cUxOOUoycVROUS0xRTZWUFMxZlVLMHBuWmpHSndkNE51R2JBUDl5Vk9EVEZWNUdSTmlyUTUxazZqNHB4a3RHT0licE5BY3d6MUlTS2VOZkFPSHczNnZzTDg5VDR0ZkdlZS1GWU5XR1NIUjFvUXdEMGd4WHhpLXBVcHd3VVpYcXNKSUVtRlFj?oc=5",
+     "published": "2026-11-25"
+    },
+    {
+     "title": "JPMorgan's 8,200 S&P 500 target for 2027 sits below peers as Fed risk tempers AI upside",
+     "source": "investingLive",
+     "link": "https://news.google.com/rss/articles/CBMizwFBVV95cUxPM2pnZFZfMFJrNTcxM0dieEo3aW1CYV9kbGxuTDhmZi11NjFoU0JkV2liSy1YcUdjMzc1TTNGNU9tV3d2QmhFMGVTVHdNWkNOcWw5N3lmYjRFTC1nb3haUTV2Yl84aTJ5YzdxaFlGbVNoYWRPTGktUGU0azZQY0swR0lZOUdkanlkXzFDR1ZHWU4zOHREYzBJSml4QTFWYWpHMTM0ODE0WEtoS2hYZm9EOEg2a3NsNXBjeUFvVjlBeFVKNnVnNC1tLVZ1MDJDcGc?oc=5",
+     "published": "2026-11-24"
+    },
+    {
+     "title": "JPMorgan Sees S&P 500 Reaching 8,200 by End-2027",
+     "source": "Businesskorea",
+     "link": "https://news.google.com/rss/articles/CBMidEFVX3lxTE1zR0NXUy1pS3BVeFppUEx0TnppVlBUdVlKQVlraTMxNm5JczlMek1KUms4MXl2M2VuZ0VMWnRHZ19uTXhNdVdlSlJwdTVTejNacTRkcjJidDcyN0JXd01ZYlJJaW9zSWFlRi1mS014ZW5jTkNh?oc=5",
+     "published": "2026-11-25"
+    }
+   ],
+   "published": "2026-11-24"
+  },
+  {
+   "firm": "UBS",
+   "target": "S&P 500",
+   "horizon": "2027-12",
+   "value": 8200,
+   "low": null,
+   "high": null,
+   "sources": [
+    {
+     "title": "UBS sees S&P 500 at 8,200 by end-2027 on earnings strength, resilient economy",
+     "source": "Reuters",
+     "link": "https://news.google.com/rss/articles/CBMiswFBVV95cUxOV0lINnoxcGVVcHJmRzZnclQtZ2VMaXE0d1ltZjVGUDRtMnhfMUNzRWdVNDNoallwTjM1Sm1qUHVCblJFV2dpQkNPRFV0QnlNYnN1S2N6ckQ0SnNxNmY1bmU2N015SWF3ekpPUkU1dmx0cGhhd1kwQ2VYTEprYUxTbkVSZFNSMnJ6bjEwTE1BZXM5TWJablh5Rk5ua3ZTdGQ1amZUV3dyRDJIOGozYVA2STcyWQ?oc=5",
+     "published": "2026-11-18"
+    },
+    {
+     "title": "UBS sets S&P 500 end-2027 target at 8,200 on earnings outlook",
+     "source": "Traders Union",
+     "link": "https://news.google.com/rss/articles/CBMigwFBVV95cUxPZ2FrMldLSU5ZNGFFQUo3eE9HSGRnZWd0S3BEV1JhZ05JemMtYWpkNVlqNEwzbW9SV19XTjdwdnpNRDh4aVZ5WmhwV0VaTTVuZktldUdPWFF0d1ZfaFJfUDc1REZQSnJ4emlUdnYteGVzQXNKbXB2Mkl1TnBtYnlVYUNXaw?oc=5",
+     "published": "2026-11-18"
+    },
+    {
+     "title": "S&P 500 index 2027 target: 8200 mark expected by UBS - here's why; but AI-related uncertainties may limit further upside",
+     "source": "Livemint",
+     "link": "https://news.google.com/rss/articles/CBMijAJBVV95cUxNLUo3V0ROazNqcXVENXdnYzd0dVlEbG1XeVYzcW9sTFlkdXV2eHVOQVYtTXBuWm5RSWJmRXVrR1F3MDlYY0d3Q2NObjhoNG4zaFFHX3RNdkZpeC00RzBoZldjb200X0dCM0d2b2FldXp3clhIcWNuLVhHajZXUlFlSDFPVFJjdDJuVEdUaWxGcEloT3lkM1p1aVFvckoyZWE0OVZFRHFOLXFILWVyR08wWlp0MUphckVCODh5WjBIZS0zYnNvcURDREpEbHJoZ3RaWmRRNnhxZWNscmJwa3d3aUgyeXNwSHEzS3BVTVZXMnh2T01sV1NWTU9pRnBGeEhSN1AtNWdweENLSjZG0gGSAkFVX3lxTE9mNFdUSWJtaGVzNXFjU2Vkd3JwMVlmU2I5SEd3ZjdZVGFqREVQS00wRlc0cjQ3aW9ETDZTOGVpMGJIU1Z4cmpVcXhPemlDNWF2c0RsR3I3T29mS21KSU8yNDZqbzZueXhjekp1S1ZxS2VrSEZiVlBkVFZRcFRaLVYzejZtRFo4SG9Qb0tkZDNvNlVRSENOMmp6Zjd4cEpfSjcyTnhnQ2M0NEZ6LU1uZV84WldFRkdiQk5GY0hRRjFxX28tWFdPWTVUWERuOWJ2S2tFc3B2VWZZem9FNTQtWVNFSkJ2Y0R2dVZ5ZEkxMUw2M0JlOUJUV3llbVVBbnFyaEp3bENnS0VaQURjZTdSXzRkT2c?oc=5",
+     "published": "2026-11-19"
+    },
+    {
+     "title": "UBS Sets S&P 500 Target of 8,200 by End-2027, Implying Roughly 12% Upside, But Cuts Rating to Neutral",
+     "source": "BigGo Finance",
+     "link": "https://news.google.com/rss/articles/CBMidkFVX3lxTFBDQk1lMmROWVFYOVh4TU9YcGIxelQ5ZjdjbnptNXdWYm14ZmJkQ3ZSTHVaUWp2cF9vWnZXNkJBUmxFbkNKSnFKSVdnWm9Ibk5tM19vaF9Lal9uTzNvWElzSVZycTl3ZmxjMjBhdVFSYUFjQk9KMVE?oc=5",
+     "published": "2026-11-19"
+    }
+   ],
+   "published": "2026-11-18"
+  },
+  {
+   "firm": "RBC",
+   "target": "S&P 500",
+   "horizon": "2027-12",
+   "value": 8050,
+   "low": null,
+   "high": null,
+   "sources": [
+    {
+     "title": "RBC Sets 8,050 S&P 500 Target for 2027, but Flags Fed Rate Talk as Bigger Worry Than Tech Selloff",
+     "source": "BigGo Finance",
+     "link": "https://news.google.com/rss/articles/CBMidkFVX3lxTFBQeVEwRUhhR1VPaFYweHFSS0Z6aDlIbXpmY3o4TGkxR1ZxMVloSHc5cVdOblk3SG1JaFNXRFhsQVh1UExCZVZiT1FrVi1vRkhUNHhUVHcybEpJWkhDYUQ2dUlnS3l1a0ZnNFNHb1M2MmtGbGpQenc?oc=5",
+     "published": "2026-11-23"
+    }
+   ],
+   "published": "2026-11-23"
+  }
+ ],
+ "check": [
+  {
+   "title": "Wells Fargo resets its S&P 500 price target for 2027",
+   "source": "Yahoo Finance Singapore",
+   "link": "https://news.google.com/rss/articles/CBMifkFVX3lxTFAzOEJmYTdUbThKdDBSZTFLc2lrS1RVZFcxMkR6b1d0OVlqRFQ3akJ3Mk01d013UmRFTlptYkljckl1bkxGM2s4WkF3N181eTZQZExHLU9OTHNfUFE4SVVtcTJDLWp1cmhNZFJteFlQb3M2NktSZFFPMmpIaEx4QQ?oc=5",
+   "published": "2026-11-18",
+   "why": "숫자 없음",
+   "firms": [
+    "Wells Fargo"
+   ]
+  },
+  {
+   "title": "Stock market correction? This chief investment officer sees the S&P 500 soaring 45% to 10,000",
+   "source": "Fortune",
+   "link": "https://news.google.com/rss/articles/CBMioAFBVV95cUxNbWMydm9FbVFNbEVhQVl6RHhuZnVYbzZ3UGE5clZSWWtHd0VnOWZvamxqbGMzVllwaXlqb09Za3FDaFhFMWFGYTN4ZktCSXF4TnNWN0J5VnJ1VFEtUmtIbVBYVVJtWkdxbGRUZ0tmREJtRkhlaVJ0dHlHcU16eEYwdTNvMUpkTEpHVjlqdzNoYk5TMHVtUHFwcjRVc3hGNEJx?oc=5",
+   "published": "2026-11-22",
+   "why": "질문 · 시나리오 — 기본 목표가 아님",
+   "firms": []
+  },
+  {
+   "title": "Why Morgan Stanley Says the S&P 500 Is Poised to Jump 18%",
+   "source": "Business Insider",
+   "link": "https://news.google.com/rss/articles/CBMinwFBVV95cUxOOGc4dnJSVllYd1NGX1BjdExQSUhNcm1TS3l6amgySnpxcXItNXQtemp4bFNHT25uSktBNXBPaEVQb2hCNzk0RTNETWhvcm9Ibk90MjhUNU1PMlk4VV9JQmVwQVJoYVdwX1p1cTRSMUVGUF94V0lmOFh4ZmtuUmg3andfWS1RUjZ5cUpIbHAyV1RmSlNsTXdlSUxhal90Wm8?oc=5",
+   "published": "2026-11-19",
+   "why": "숫자 없음",
+   "firms": [
+    "Morgan Stanley"
+   ]
+  },
+  {
+   "title": "Wall Street Split on 2027 S&P 500 Outlook: Wells Fargo's 8,200 vs. Morgan Stanley's 8,700",
+   "source": "BigGo Finance",
+   "link": "https://news.google.com/rss/articles/CBMidkFVX3lxTFBiYTltNjFfT0ZoNFBGa01TTy1uTEdCcExLZk5KNzdKMW9sV05uT3IzdnpBa3VwT1IzcHM4SUVyN1I0amcxeldaVlJFNmJMZ3VNTEZjQldWaXdMUXRENE1adjI0NURTZ0pFYmRzNjVHQVRCbE9mNlE?oc=5",
+   "published": "2026-11-17",
+   "why": "숫자가 둘 이상 — 목표인지 확인",
+   "firms": [
+    "Morgan Stanley",
+    "Wells Fargo"
+   ]
+  },
+  {
+   "title": "S&P 500: Strong rebound and ambitious 2027 target – Deutsche Bank",
+   "source": "FXStreet",
+   "link": "https://news.google.com/rss/articles/CBMipwFBVV95cUxNQnR6eTZxQ0JrU1Q5ZmxjNDNkSGswTXhCX18wLXg2VXNlUE9IVi0wVTlIYlpiVnREaVlMeEdDU3VyUnN6Ui1NclY3a2t1NXhacmxwMTA0T1N0Y1V0VVUxSHY4T3ZpWTROUm5sQzZOMXMzaDJCcXVmZEo5Z0xFUWQ1MFJQX2kyUkV6bm5XQW9TUV9sME5UdVdwTzRWR0haSW9LWHN3YXJFMA?oc=5",
+   "published": "2026-11-24",
+   "why": "숫자 없음",
+   "firms": [
+    "Deutsche Bank"
+   ]
+  },
+  {
+   "title": "S&P 500: Can the strong rebound support Deutsche Bank’s ambitious 2027 target?",
+   "source": "www.tmgm.com",
+   "link": "https://news.google.com/rss/articles/CBMiygFBVV95cUxONEx0d1laeXlQemdyazU0ZkNEVDlmZWNoY2FMcmxaMWtWXy1KWmkyMVBkVDBLbmxCQmY2VzdFRTliel9kaUtzWnNsNS1iZlBkaERFUmh2d0dENm1wRG9WQTVndEI5dWZadWEzaUVRNXlTU3JHTVNwLUJ0SUgzUGliUHJmcTZHazNpb0ozVWdXWm5SQU93SUZSTC1oN0tSNUFYNDFmamRqb3I5NFJ0bnh3UW96bXVfN1p3N19NOXZQV0tzOVZxZ21ZV2VB?oc=5",
+   "published": "2026-11-24",
+   "why": "숫자 없음",
+   "firms": [
+    "Deutsche Bank"
+   ]
+  },
+  {
+   "title": "Yardeni Cuts S&P 500 Target Again, Says Bear Market Is Unlikely",
+   "source": "Bloomberg.com",
+   "link": "https://news.google.com/rss/articles/CBMiswFBVV95cUxNcThLY0szV3pPS2IxUHRPYm5NSDNZU25MRWJYZkplcU43YjhEb2JSRm5kdmR2ZWYyN2pDMzhOb2RjUUdiMjFBbFZRMDlDNTZVZDRjYWluVmQ3WElhaFVMNkwzZUxGQ2dBSEI2MU4yTlZ2NDFacEdtUUF2aUYyZm9RZl9JSnBvd2Y2UFhpSmdsNDBSRFUtVDJ5ejJSSXZ3cTAwbEtfYzJFR1ZmWGFYQTBrZTNnUQ?oc=5",
+   "published": "2026-11-22",
+   "why": "숫자 없음",
+   "firms": [
+    "Yardeni Research"
+   ]
+  },
+  {
+   "title": "Morgan Stanley Is ‘Max Overweight’ Global Stocks on AI Cycle",
+   "source": "Bloomberg.com",
+   "link": "https://news.google.com/rss/articles/CBMiswFBVV95cUxPeHdTZG14X3RFSFFCSzJ6VGlqaVdNekZxd0t5eXMzLWdjVHlhWjZkSndXSDV2RlZnWVBGdEtZaWxPakR6SjJWSUxSV0l6TGctTWowU25uQjdwWllDallCUnhENV9xeXJvM2RrYTdPSGxiNUtJbzlMZ0JvMUlwVzRQeUxmazFNZlM4alRDdHVhY01ZNnJqOHBtY0RIa2swSjBVV1BoWm5sQ0VubjF6NEVPeFhBNA?oc=5",
+   "published": "2026-11-16",
+   "why": "10년물 · 업종 — 제목만으로는 칸을 못 채움",
+   "firms": [
+    "Morgan Stanley"
+   ]
+  },
+  {
+   "title": "Morgan Stanley Goes 'Maximum Overweight' on Global Stocks, Sets S&P 500 Target of 8,700",
+   "source": "BigGo Finance",
+   "link": "https://news.google.com/rss/articles/CBMidkFVX3lxTE1jWHdCUjc3cTQ2NVZwbDVBQ1BnNmtoUGF1VlVMY2pPZEdoQnRwaFc2LWc5U055Wk9SMFAyNXNGYVhyOGNFa0ZldWNEcGhVR1NKMmp1ZEZtcnI2XzhhZmNwX2hWZThoVzdURlc2TXRsODlJZDUtUkE?oc=5",
+   "published": "2026-11-16",
+   "why": "기한 없음",
+   "firms": [
+    "Morgan Stanley"
+   ]
+  },
+  {
+   "title": "Bank of America Lays Out Extreme 2027 Scenarios: S&P 500 Could Hit 8,888 or Plunge to 6,666",
+   "source": "BigGo Finance",
+   "link": "https://news.google.com/rss/articles/CBMidkFVX3lxTE11QkZnZWVRLW8xaWVXcEYtTV9rM25NRlhBcTU0SWhBVE5lRGhlN2FhaGNGVnBodzdyTHdjMFpKcC1xQ05EVGFrTjhUODltMzczTC0zdGJESUtfMV9FSWEzNFZNWGV3Q2ZmbDdsWVdTc0hsUy1VMFE?oc=5",
+   "published": "2026-11-24",
+   "why": "질문 · 시나리오 — 기본 목표가 아님",
+   "firms": [
+    "Bank of America"
+   ]
+  },
+  {
+   "title": "Morgan Stanley turns most bullish since April as Deutsche Bank sees the S&P 500 at 9,000",
+   "source": "MLQ.ai",
+   "link": "https://news.google.com/rss/articles/CBMiqwFBVV95cUxQM2hfWFduNWZzdzluT25nZVcxZmdjbXFiTkRYeTBFMmJrU2x2TXA3R3JSaEUzeWNZWmh5b2V3emV5TnQ5UGpuZUtUcTNpVlhYX2hOal9RaFh2Y2RFaGdENHlkQjV4N3VETDBDZTRuZVowTlZMUW41UlVJMHY5NGlEcUdyQnFvbDRQSWw4TnhqSS1PdVNOeGNSblNxZlFTbnRrd0FpTXZCdk9zU1U?oc=5",
+   "published": "2026-11-23",
+   "why": "회사가 둘 이상",
+   "firms": [
+    "Deutsche Bank",
+    "Morgan Stanley"
+   ]
+  },
+  {
+   "title": "Morgan Stanley resets S&P 500 target for 2027 as tech stocks slide",
+   "source": "TheStreet",
+   "link": "https://news.google.com/rss/articles/CBMiigFBVV95cUxOTTJ5QU9Uczh0b1NwQlN2bmRGa2d1OWtNN1czcXJnUk5zMmVEYTAyanZRVjRHbjV2Qzg5R1pxNDltU2t5WTJiZ3kyUFU5NG50M1pVczVJT2JtdzY1V3RhMjRrdC1obk1PWFFjSlVxM1cxOEpTY3hjU3daMDhuTlYta05ZaVFfVVlvT1E?oc=5",
+   "published": "2026-11-16",
+   "why": "숫자 없음",
+   "firms": [
+    "Morgan Stanley"
+   ]
+  },
+  {
+   "title": "Can The S&P 500 Keep Rising In 2027? UBS Bets On 8,900, But BofA Warns Of Crowded Trades",
+   "source": "Yahoo Finance",
+   "link": "https://news.google.com/rss/articles/CBMikAFBVV95cUxQLWtfZy15cy0tWm0yVU9mRVRzR0dadkViYXJUY3RNWmR4dkFWRWZ0QmtpZ29Edml5blp1bGRjNjhIX2FxUVhyUHRJbEZna1VGUHJGZFVWTGhGdkVJX0Z1LThzTl9xdUlBNVhVYVk3czdzWGxXd3pjaU01T0Yzb1RpLVI0SDRpeTBteFlLMElPaGc?oc=5",
+   "published": "2026-11-10",
+   "why": "질문 · 시나리오 — 기본 목표가 아님",
+   "firms": [
+    "Bank of America",
+    "UBS"
+   ]
+  },
+  {
+   "title": "S&P 500 forecast today: Goldman Sachs, JPMorgan and Morgan Stanley target 8,000",
+   "source": "Beinsure",
+   "link": "https://news.google.com/rss/articles/CBMijwFBVV95cUxNSGM4YnpmV1JUUEtWYnpEWDhVSEFZWk9kdV80Z0xxZDNKZDRsR3BZQkdobTNGVEtDSHk0ZG9yUnN5eWZWZl8wNWZlNkczd29CSGlQd0hxZkhMUXhZOEMzdTlJVnVqeC1TWU5uZUdLQVlqSGg2eWFMWEdOMVNZUXd2NGV2eGJYNGY2Nkp0Q1VjUQ?oc=5",
+   "published": "2026-11-04",
+   "why": "회사가 둘 이상",
+   "firms": [
+    "Goldman Sachs",
+    "JPMorgan",
+    "Morgan Stanley"
+   ]
+  },
+  {
+   "title": "Goldman Sachs issues sobering verdict on S&P 500 year-end rally",
+   "source": "Yahoo Finance",
+   "link": "https://news.google.com/rss/articles/CBMipAFBVV95cUxOLVVYOVVwSmZ6c2pOenloMnFubHFSd0FLWmxpRVlhWWphbUNDc3dybkRfTkNMNEJvb2pPZWlkZURHSGR6MUlQR1FoaUdfQ2VKa3ljalNIR1BVR2hPa2JsS2tkTERXNDh6Ym5ZVlQtSXAyT1lNSXNLaTZtTEtIQjhIa3pqX3dSamNwdS1ScWJyenJ3Yk1XdTRDRWlubkVxT3NHM2duSA?oc=5",
+   "published": "2026-11-20",
+   "why": "숫자 없음",
+   "firms": [
+    "Goldman Sachs"
+   ]
+  },
+  {
+   "title": "Following Goldman Sachs & UBS? Bet on S&P 500 ETFs for 2027",
+   "source": "Yahoo Finance",
+   "link": "https://news.google.com/rss/articles/CBMinAFBVV95cUxONGFSQVZVNnUwdkVaVWJJNWJ1cTJoUzROeF9ZMkNpbG1RZnlPb3Z2TVVTQjViQllON0g5RWhwTFZmZGNaeHFHSFlwSUpfeGdqa3NDc3hjQzNWcWpYbmNzUnlQbnB0cTVrZm9EV3JrZzJoYUVxMTZtaE4tbTd5Qy1DUkdWTE96Nk5kTUVXY0o5NHhpVjBKa3I1Q3pTcjI?oc=5",
+   "published": "2026-11-18",
+   "why": "회사가 둘 이상",
+   "firms": [
+    "Goldman Sachs",
+    "UBS"
+   ]
+  },
+  {
+   "title": "Goldman Sachs: Year-End S&P 500 Rally Could Lose Half Its Punch as Fear Runs Hot",
+   "source": "BigGo Finance",
+   "link": "https://news.google.com/rss/articles/CBMidkFVX3lxTE9tc1Z0eXlXalhFaWJCQUwtX1N3WjVuY0tTU0gyU1RnU25CaE1jQm5GMW5ONlJVTDU2WjhOajJXeFA4QUJhU1VsbG9JclFTSmRpNDlia19HaGlaNkM1cjZUMkJzZ3F3MHFNNVlRV3NyamhrNzMxX2c?oc=5",
+   "published": "2026-11-20",
+   "why": "숫자 없음",
+   "firms": [
+    "Goldman Sachs"
+   ]
+  },
+  {
+   "title": "Yardeni Cuts S&P 500 Year-End View After Pullback",
+   "source": "ThinkAdvisor",
+   "link": "https://news.google.com/rss/articles/CBMijgFBVV95cUxPNnZweXpVU1V4TzdRcnVLZC13VkNUdE9FSVFLZHQxOFhVRVByLURCNzVjcUtVSmpreXJGT29VSGs4cnN1MFhuTGpxeEdDUG5ZdDFMc083NXhyZW5xdDE1TWQ5aUU4bE10ZXJyZ0FkZFhmVUJfUnBscW5BZTVHRWI2NVY0UkF5QWtxaUpJSjJ3?oc=5",
+   "published": "2026-11-23",
+   "why": "숫자 없음",
+   "firms": [
+    "Yardeni Research"
+   ]
+  },
+  {
+   "title": "UBS Sees S&P 500 at 8,900 by End-2027 as BofA Flags Crowded Index Trade",
+   "source": "BigGo Finance",
+   "link": "https://news.google.com/rss/articles/CBMidkFVX3lxTE9qX2NpT0t6M01lamV4Zm5ab29uYzJDT2c5aVR1cnV2MEpkUGhSdzVKSzFzbUhqNnlJVC1KNjlpb0ZuVGJNSEN3UFNDWEs0WW9Ka1NPUnZ0cFNOcFRHaTJFTTZaWWF2VS1mSVVhSmliakV6MGZGaXc?oc=5",
+   "published": "2026-11-10",
+   "why": "회사가 둘 이상",
+   "firms": [
+    "Bank of America",
+    "UBS"
+   ]
+  },
+  {
+   "title": "JPMorgan: AI cycle still intact, S&P 500 has 14% upside by end of next year",
+   "source": "联合早报",
+   "link": "https://news.google.com/rss/articles/CBMirAFBVV95cUxQZUJvNXVEQllQa2lWN1Bfd1UwcGsya0hCNzN2VnpOMzBld2gzN0p2c0t5YlhOWFNPaWhUUDNsNHFoazQyRkhtRWY1Tjk0MFA3Ri12cVhPWEdobWJkQ1ZfRW1McFFOd2tkd0U4blh0dFduSXMyNFR6WjdXZDlyc3VmRFVRbUhMaDR0RnY1UXczVGlhVWlLRjU0cENHQjlBYlpkWVhxSkw3ZWFlTlNF?oc=5",
+   "published": "2026-11-25",
+   "why": "숫자 없음",
+   "firms": [
+    "JPMorgan"
+   ]
+  },
+  {
+   "title": "Goldman Sachs reset S&P 500 price target for 2027",
+   "source": "TheStreet",
+   "link": "https://news.google.com/rss/articles/CBMilgFBVV95cUxOMVlVOUo2UHRSUERPWU1rcUZMTjhpS2xETWFMUEtSOUNYdWlhVXJxd3NrbERNbkpXRXJjc3kwTktmWUliUXR6QVNxR2pCaDhGQS1GN0JNLURrWFliaHRCM19ISFhnSm50TmZkTFBTSFNJWFg0Y2xFSDg4b2ZmSXFucVROTHBCWXNfRW5SNVpMX0NreVczR0E?oc=5",
+   "published": "2026-11-15",
+   "why": "숫자 없음",
+   "firms": [
+    "Goldman Sachs"
+   ]
+  },
+  {
+   "title": "S&P 500 Forecast Holds at 7,967 as Wall Street Strategists Look Beyond Market Selloff",
+   "source": "Yahoo Finance UK",
+   "link": "https://news.google.com/rss/articles/CBMie0FVX3lxTE9OMmZlMzQyYkRwVlExbm5qbjNwem9aVTgyWG14RWxhTFBmUDhqa2hTWVBJYVFhMmczME0xZEVsemNYM1ZjRjZiT1RCaUFXM3dMeS04dFFDUjFZRk5NQ3lhb0ZKWjA4dDJBZnRQZ3pobVRWTUtYRkJ1REduWQ?oc=5",
+   "published": "2026-10-31",
+   "why": "회사 없음",
+   "firms": []
+  },
+  {
+   "title": "Wall Street Maintains S&P 500 Year-End Target Near 8,000 Despite Market Volatility",
+   "source": "Yahoo Finance",
+   "link": "https://news.google.com/rss/articles/CBMilwFBVV95cUxNbEtINGdhWGFrVmtjblpTc2ttRzlKbXJRcnNwZUFlOVlhRmxwSF8wQzZqZHZvQldIdnJLemVWcnU3YmlNWFY2TUV0c1lHZ0xpZHgxalVpbTdNbnprSlFaNmd6dC0yNTNGbUN2bExqcjhzOUtrcF9CMFhYbDl0cjQ1dm11c0xTQ0V6SVVqUFlXdENBYWhHRHpR?oc=5",
+   "published": "2026-10-31",
+   "why": "회사 없음",
+   "firms": []
+  },
+  {
+   "title": "The S&P 500 may be headed for 'outsized gains' despite tech-stock rout, JPMorgan says",
+   "source": "Business Insider",
+   "link": "https://news.google.com/rss/articles/CBMikwFBVV95cUxNZnRUYTc0MEpsbWhpY1FrRjQzVHAtbWJoMGZMdWNXREt6Y1RJMkhVdUtEaF9OOE01Ump0RmdQY01MYTVkQ1pwLS1WSjNyWjZIVWVEdG1PQV9PWXZCMllGQkRzQTZkOGdPWkJRSEpWTXg3WmhneTRiUUZSQld6LW1uMVczZFFUVEhHdmtnUkpXVF9fRUU?oc=5",
+   "published": "2026-11-02",
+   "why": "숫자 없음",
+   "firms": [
+    "JPMorgan"
+   ]
+  },
+  {
+   "title": "Morgan Stanley Sees Potential End to S&P 500 Correction Following US Midterm Elections",
+   "source": "Yahoo Finance",
+   "link": "https://news.google.com/rss/articles/CBMinwFBVV95cUxOSW1KSktaa1RGS091RWY4V3RtSDFSQk9IdWFBeDZkYlVXRkZhQXhjMWFiZzBxU0RneDVnTHh5WF9SMXJ1UE5PSUkzclNpeGhJV3BTZDhXNkgtZGxPZFByWUNncFFMNi1lTnNpbzYzM01mMW9OVzFVWGs3c1VLdWEwYmxfUEpHcjk4TVRUbDJudWdnSTlCY0JhalY1ZnhuUW8?oc=5",
+   "published": "2026-11-01",
+   "why": "숫자 없음",
+   "firms": [
+    "Morgan Stanley"
+   ]
+  },
+  {
+   "title": "Goldman Sachs sees upside for S&P 500 in 2027 — even as earnings growth slows",
+   "source": "Yahoo Finance",
+   "link": "https://news.google.com/rss/articles/CBMizAFBVV95cUxPQkpkSDhqOV9ZMnZqZWw3b1NSa2ZtNjVNWExCYllGSHBuQUhKdGNKcXBGNVpKT1dKUWFUamxSYUk0cjRhNGhGQ09vUWpwTTA0RmMxeEUyY0ZkWFB6czVrZ0ZoYzBDc3FaNzBJQnNBOXBmRW83cEhYQmdiYVM5R3NYbEF5OE5BQU5KSmhUbW1YVkdoT25DdXJCeDJlNlVZb0IxcXlvS042cnlNYjMxaXZETHBXMnpSaTFOSmVIcmVxb0hKVzVCRVducVp5UjU?oc=5",
+   "published": "2026-11-13",
+   "why": "숫자 없음",
+   "firms": [
+    "Goldman Sachs"
+   ]
+  },
+  {
+   "title": "Morgan Stanley’s Mike Wilson Is Bullish On S&P 500 With A 15% Upside View For 2027",
+   "source": "Yahoo Finance",
+   "link": "https://news.google.com/rss/articles/CBMioAFBVV95cUxOZm8xVWNReUgtVEM2SnMwV0tocFZuVGFoNG1pNWFOenNkTFRMYU1HU3JSVlBQRk9QYWp4OEN0TXdwSlJIX1RIQjN4NUpKamZxc3dhWF9yTHQ0eUVESmtXdjRmZjJxYTJtUVlLc3U5YXNETlFmZXRpT1laQk9sTmR3MEVfai1qMnVKX0FSUGNmbTdTTzFzUGJwTEsyRE1tTjE3?oc=5",
+   "published": "2026-11-16",
+   "why": "숫자 없음",
+   "firms": [
+    "Morgan Stanley"
+   ]
+  },
+  {
+   "title": "Barclays joins Morgan Stanley in seeing S&P 500 at 8,700 by end-2027",
+   "source": "Yahoo Finance",
+   "link": "https://news.google.com/rss/articles/CBMiowFBVV95cUxOeHhRM1oxdlkyaVFxVzdPMFNVQ1FIckt1NHdQdS1XLXpiYjFfZWNYR0trSG9RTE5BZ0dINmJFaVZBR05aYUZ1MzJ5WXlPMFNSMFJPTFlvUmZ6UWl3dEJ1RktXWHNhSDZCOGc2a2JNU1lNUWlqYXBaQnRod1hCV1VCaUpKcUNWVHg2eWxNdW14aGxXbXlLcjNZS0VKdUVybWg0QXEw?oc=5",
+   "published": "2026-11-16",
+   "why": "회사가 둘 이상",
+   "firms": [
+    "Barclays",
+    "Morgan Stanley"
+   ]
+  },
+  {
+   "title": "Phil Neuhart on S&P 8300, AI Cycle and 2027 Sectors",
+   "source": "Opening Bell Daily",
+   "link": "https://news.google.com/rss/articles/CBMiowFBVV95cUxPdGwxNjNqRGlKRHlQMlMyLW8zazlWOV9US21lNEF6VmdnYXljbURyT1Q2MXBzNVphbjRaMmlxd2x3d2FEMm1idEcwY2w3QWJhNlhUOTFRLTNkT25sWFFpdTNxREowdDU4SUl4X0JXTHJJeFREVThrNk5GNjJ1Tml5ejkyUF9hdHA1bUo2bUxTRnU4YkJJSy1jRzhWdWxxOGtrRjJV?oc=5",
+   "published": "2026-11-11",
+   "why": "회사 없음",
+   "firms": []
+  },
+  {
+   "title": "Watch Yardeni Cuts S&P 500 Target After Stock Selloff",
+   "source": "Bloomberg.com",
+   "link": "https://news.google.com/rss/articles/CBMipAFBVV95cUxNeHJOdHVRNkRCY0xvQlpGZjlMaUxRNmNoNFA1ZkJZLXVHSjFmR3FTVk9FQ3oxdDZLOUlzWWotSnZvamoyNHJWWmJDN0l5d0VRbFBRXzliNWxyd2F2Y1hkTHBjQlR3MDVCVXNlVkdZZzF5Yy1xS29mcVVKZ3NhSS1XenJlS1dNZl9jV2dZa2xha0s0STN3cW5VWDdXaVhieURTZTRRbQ?oc=5",
+   "published": "2026-11-23",
+   "why": "숫자 없음",
+   "firms": [
+    "Yardeni Research"
+   ]
+  },
+  {
+   "title": "Report: Goldman Sachs Predicts the S&P 500 Will Gain 26% in 12 Months",
+   "source": "The Motley Fool",
+   "link": "https://news.google.com/rss/articles/CBMitAFBVV95cUxPYWsxYkhYT1AxNzY2RGJadHliRC03cnNDQnl0YXpJZnFxQ284VDhqTzItX0JKUlYydzNxSkFFU0psbDB6OEVBN1NiYW9uZVBlak1NNGNzNk9jdXhNVVpXLXJYWXhqd2VXNWYwRXlsMEhJNzVNWUllYkdjN2ROM05uR1pFUWoyckpUX1dPa2tvWWw4cjhqcGg1djNkaEVKMFRPWE9WbXlmYWVQcW5iWnBTMERkdXE?oc=5",
+   "published": "2026-11-21",
+   "why": "숫자 없음",
+   "firms": [
+    "Goldman Sachs"
+   ]
+  },
+  {
+   "title": "Morgan Stanley says S&P 500 correction is nearing an end, with a likely year-end rally ahead",
+   "source": "Quartz",
+   "link": "https://news.google.com/rss/articles/CBMie0FVX3lxTE9jZ3g2Tjg3c0w4bGZTcGRscDA5NTNNZHZaeWlYUGlHR1JEdWl2YWszZ0wzWEF0UGlZUlpkLXdVM2gwdHUyMG9rNHd0NWloMzZPaVdJeVJ5Qk5TdWRBSzBDTVgyaFBwWkRiY19oVmRKNzVXRFFrTlh5UFdxZw?oc=5",
+   "published": "2026-11-09",
+   "why": "숫자 없음",
+   "firms": [
+    "Morgan Stanley"
+   ]
+  },
+  {
+   "title": "Morgan Stanley's Wilson sees 9% S&P 500 drop before rally to 8,000",
+   "source": "Seeking Alpha",
+   "link": "https://news.google.com/rss/articles/CBMiswFBVV95cUxNOHBxRVF5TVEwLVY5eHoybHBHWlktekdaSy16MEEtRmJ5RmVSbGN3eFhDbkZybzlwQTV5Y3NIVnBOa3FNaXFpa1luZUVIdm9jakhxUUlfX19PclZldXU0cDdJcFJiaXU5c0VpV2tmTjd2TDM5YlVvS2ItLWpfQXJMSXNTd2RoNnJFRms1alJUYzZZN1Q0TGFNTEk3MTBwbGhsZ0RHbDFQWlVyMnlvU2QzbFpERQ?oc=5",
+   "published": "2026-11-01",
+   "why": "기한 없음",
+   "firms": [
+    "Morgan Stanley"
+   ]
+  },
+  {
+   "title": "Yardeni Trims S&P 500 Year-End Forecast Again, Says Bear Market Is Unlikely",
+   "source": "TradingView",
+   "link": "https://news.google.com/rss/articles/CBMi0wFBVV95cUxPMDJIWHlIS3JlX1lYT3lLWVVTNVJ3dXlXdkQxYjFFX0s4S2dOTEJ6UmxEMFZWMkVoUHBVUU9BZDJ2MFlrLXlxVFdGYnp2Z2JZRjk3RWYxYnMyYmR2MDFKSkJ2M2JDMXc5R2tvbEJnZU1iTTZCcmR3cGJDemEydzNKb2JtWHVIRGpXb3djQXVuRTJraTVHbjBiSU5LZ1oweUNHR0ZEOFNMeWFNVmpIeVViZnFLVFFsWkRQckp2bGJURExCeTFlRkhPVlFfazBkUXFUUXpr?oc=5",
+   "published": "2026-11-22",
+   "why": "숫자 없음",
+   "firms": [
+    "Yardeni Research"
+   ]
+  },
+  {
+   "title": "Barclays Joins the Bullish Chorus: S&P 8,700, but Earnings Hinge on Chips",
+   "source": "The Dark Side Of The Boom",
+   "link": "https://news.google.com/rss/articles/CBMigwFBVV95cUxQNU9veGo3a2ZKSTdJRzFFeUVleDh1YXFKN1gwelY0R0pubFNNUmhxUldyR0JuWXVNdWJIWlhxcG5xNVpPT2RJNDhRYTZQQnJ1cllvUUw1TnBxd3BqalZKSV94SU5xM3hZcGJ3eXZ2VkxEbFBsb2tuMTg0TERYdktBMnhfTQ?oc=5",
+   "published": "2026-11-19",
+   "why": "기한 없음",
+   "firms": [
+    "Barclays"
+   ]
+  },
+  {
+   "title": "Morgan Stanley Calls for 'Maximum Overweight' on Global Stocks, Lifts S&P 500 Target to 8,700, Sees 15% Upside",
+   "source": "BigGo Finance",
+   "link": "https://news.google.com/rss/articles/CBMidkFVX3lxTE05Rlh3RnZhZ19ZT3VsSU1uY0RLcEU3R1NwQ0lvdmFQYWQ5RnlCUzBGSm5lbGtfYno1SFFaWmo5bEUxeGNUUWd0ZGVnZGRyWkxiamtKV1ZZNVllMTlDRDJlaElvXzVVUGFZMnFvc29KakRDdFBhcHc?oc=5",
+   "published": "2026-11-15",
+   "why": "기한 없음",
+   "firms": [
+    "Morgan Stanley"
+   ]
+  },
+  {
+   "title": "Goldman Sachs sees the S&P 500 rising 14% to 8,700 on cheap hyperscaler stocks",
+   "source": "Startup Fortune",
+   "link": "https://news.google.com/rss/articles/CBMipgFBVV95cUxPWXlJMHRHeGd1SjhSN2N2aG9SSzQ5UWRQX2JhdkxoRkFsNVF6UlRZNGszcUNJdkdWZWRyMjZ0U09FMEZaaGRYWk1aZC04ZWZBLUlBMzA4dGU1VUJwSXdzdE0xdzBFd3dTWTRXVVM0MlhJS3U5WGpQanQ3bE5CNExOcmg0blNfdm5BRy12ZVBsLVdkMXJkbTJNc19yeUlkb255V29oSzlR?oc=5",
+   "published": "2026-11-13",
+   "why": "기한 없음",
+   "firms": [
+    "Goldman Sachs"
+   ]
+  },
+  {
+   "title": "Wall Street's Big Three Investment Banks Unanimously Say US Stock Selloff Is Nearing Its End; Morgan Stanley Sees S&P 500 Testing 7,100-7,300 Before Year-End Rebound",
+   "source": "BigGo Finance",
+   "link": "https://news.google.com/rss/articles/CBMidkFVX3lxTE9TcXJSWG92blA0Z3JmZVJyVFBfYTdBNGNQOHo4ekRYVlRjcHBqTHdzallNcmFCNlFjX1c0ektkMDcweExxcE5jcGlCVlhoY0RGZTR5eElOZ19vSWR0UkJ1TE5aSFlOVXVZX2ZsdzI2Mkl0RU4xemc?oc=5",
+   "published": "2026-11-09",
+   "why": "숫자가 둘 이상 — 목표인지 확인",
+   "firms": [
+    "Morgan Stanley"
+   ]
+  },
+  {
+   "title": "Morgan Stanley's 2026 S&P 500 Forecast: Can the S&P 500 Rally to 8,000 After Election Day?",
+   "source": "KuCoin",
+   "link": "https://news.google.com/rss/articles/CBMitgFBVV95cUxPMEYweXZfQnJwNWJtem1JZ05LRzNMQ01TVm5hcmd3eDlMeXRTWFBkMm1fWmVDZ3p5bTZoaDB0ZGtuZWtjSllhc2RmbG1fc1RTSUkxTXFlR3NqZnhGNmc3YjI2dzdzUTQ2SWt5NTZaMkFuZERvdlg4VlpmNWxLVXFKcE54Rml3SGFqX1doQVRJVDdPZl9KUXFLVzVkdzB1N1lTNmxDTC14Z25ZX3F0VXRRRHI3SDhnUQ?oc=5",
+   "published": "2026-11-03",
+   "why": "질문 · 시나리오 — 기본 목표가 아님",
+   "firms": [
+    "Morgan Stanley"
+   ]
+  },
+  {
+   "title": "Morgan Stanley Sees 8% S&P 500 Downside, Keeps 8,000 Target",
+   "source": "TOKENPOST",
+   "link": "https://news.google.com/rss/articles/CBMiWkFVX3lxTFBmTkNnVVhkaWFabjEtOXNvMFQ0MGM5ZVZocXIwNUxBdnU1OFFXSHJ6VzBzVE4tczY3SDU2SmRRMGZ0Q2FlaVRkT2FFQ2pTNUp5dElDRmFRZnI0Zw?oc=5",
+   "published": "2026-10-28",
+   "why": "기한 없음",
+   "firms": [
+    "Morgan Stanley"
+   ]
+  },
+  {
+   "title": "Watch Markets: Why Ed Yardeni Lowered His Year-End S&P 500 Target",
+   "source": "Bloomberg.com",
+   "link": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxObTBTVlEzMm9qNjU3dkxyUHQ4UktyRTdNbDFjMlFXMXdjWFBKNHhFTUlqRlJLaDhvS1VuV0tBNGRpX3h6VjlnbTQ5VGxNSWFpMXBlUzFnd1N6WWlXN0FwSGJHbXZGT1EwQnRwQmhVY0RjR1FmdXRpWkt3WHZ3RHFtMjhhMkxyTEdJSWh1UEdnY3VrSWF5T2RmTVRpNlZiLWV6Y2pHdW1WaVg?oc=5",
+   "published": "2026-11-23",
+   "why": "숫자 없음",
+   "firms": [
+    "Yardeni Research"
+   ]
+  },
+  {
+   "title": "Ed Yardeni Sees Buying Opportunities Ahead Despite S&P 500 Valuation Concerns",
+   "source": "Yahoo Finance",
+   "link": "https://news.google.com/rss/articles/CBMiowFBVV95cUxPMldENXBKLUxlMWNxQ1ZCdEJTeTFlelJkb25sV0J2aHYtSXVGbWgtY3cyc2ZfaWpjOVU2YVRpWnVscDdka0VyV2Q5ZV9lMUwtVG8wUGR6MDFmOXh3VWVkTTJ1T1h0cEVxZDhFMVVYRlNsNTMxSk1NX0h1THdab3NYLWRZdzIxTjZxaGF1R2g3ZjZXMWY5TkFOTmMyQ29zWlh5eTNB?oc=5",
+   "published": "2026-10-31",
+   "why": "숫자 없음",
+   "firms": [
+    "Yardeni Research"
+   ]
+  },
+  {
+   "title": "Societe Generale Says S&P 500 Could Hit 8,000 by Year-End, With Three Tailwinds Converging and a Most Bullish Case of 10,000",
+   "source": "BigGo Finance",
+   "link": "https://news.google.com/rss/articles/CBMidkFVX3lxTE5mSFZhUzNmQXZYeTBFRjNKNWNwUEFvMDhKMDhrbUc0UmVQeFRLZXNrTFVDbnZyZGJ6TDliRldqWnNFT2p1WUN3WmRiZmEzN0Z6RDQzaDhsdEZpVzZMX1MzUWZuQVlPTENjMkU1RmtfTXZCMldLYmc?oc=5",
+   "published": "2026-11-12",
+   "why": "질문 · 시나리오 — 기본 목표가 아님",
+   "firms": [
+    "Societe Generale"
+   ]
+  },
+  {
+   "title": "Bolstered by \"three major tailwinds\"? Société Générale predicts another significant rally in the S&P 500 before year-end!",
+   "source": "Moomoo",
+   "link": "https://news.google.com/rss/articles/CBMimgFBVV95cUxQRFB3V3hQRDRaWHZSWWhwZnpMTzFuQVJWb1E3X0xYMHpLUjAwdm5NWWkyWnEyRkRRWGxJLUxCZVZJdkY2bmkyN2JEaHg5d2dpeDVuTGUxVHRaXzNGTDlzYm1LS3dyRDh1Qy00a1I2cnJmZ2tkdldrZ3BsdjdQbkExaFhlOWJiZFFMdTdLejU5bnZpc3BmVlo2TjFB?oc=5",
+   "published": "2026-11-12",
+   "why": "숫자 없음",
+   "firms": [
+    "Societe Generale"
+   ]
+  },
+  {
+   "title": "Barclays lowers 2027 S&P 500 target as tighter financial conditions weigh",
+   "source": "The Globe and Mail",
+   "link": "https://news.google.com/rss/articles/CBMiswFBVV95cUxQZFpXeXdnd2JiU2s3SnFpUnB1aW8tRXRuaE9EYTFMYjcwQUhuMnNQVmw0YmtJekxfNUQwa2lER2JqLW51UHcwQ2UtNDRFRVlsdTdnUWEtaWkzRFczZ3dMT0FXTDMtMURvazFZc0NEQzVuSEs0aU5mdE5UWjZ5dUdQR1NPYXJ0TEFvejZVcVZyMlZUbS1jU3Fialp2a3R3dHJuQXJJbUZmOE1TcmkyUno3dnIyVQ?oc=5",
+   "published": "2026-11-16",
+   "why": "숫자 없음",
+   "firms": [
+    "Barclays"
+   ]
+  },
+  {
+   "title": "Yardeni Says Analysts Still See S&P 500 Earnings Near $500 Per Share by 2028",
+   "source": "BeInCrypto",
+   "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTE9IZHpUYVRubno5eHdOV2M3Z0tUcnEtRVc4VUkzRXl1RE9OcmlmMjRFakVVUHJidV9Sck1iREFnMmUxUVNXc1gxd0hFWGh3VmljdHZiRExlYUdDNG1aeEg5dmE3N1hydXd6Snc3Zw?oc=5",
+   "published": "2026-11-03",
+   "why": "숫자 없음",
+   "firms": [
+    "Yardeni Research"
+   ]
+  },
+  {
+   "title": "S&P 500 2027 Target 8,200: UBS Upside, Scenarios, AI Risks",
+   "source": "Univest",
+   "link": "https://news.google.com/rss/articles/CBMipwFBVV95cUxPOGNLT3FNb2hGTUFjeUxpYVMyd09PT3lYZUZoSDQ0cFh3a1lDRXlFR052NDhDbVVjaVlpMkR0SXoybjd5SHBydnpfUUQzTXh5aEFmTWt0U1dlZU9Tb3BZUlE3aFJhMXhtdEQ1TmJXdXVMWU1NX1BZUXZ5WU9BNC1zRTFWYTZzZG1xb2E4WWYwSnpHdzVoSmhwaXBUNlZtVVFfX2diclF0WQ?oc=5",
+   "published": "2026-11-19",
+   "why": "질문 · 시나리오 — 기본 목표가 아님",
+   "firms": [
+    "UBS"
+   ]
+  },
+  {
+   "title": "Yardeni Lowers S&P 500 Target Again as VIX Tops 35",
+   "source": "JournalArta",
+   "link": "https://news.google.com/rss/articles/CBMihgFBVV95cUxPMEhvM0UwQUhEbUpKRml5UGtEU0x2bkJhSEdMdXRpZ01aM3U3b0hNWFp2VGVJUkJ0TVNRWFk3amtwZUJ4TVZfX0JrQ3BEcDJXUFZXWXRFelNNNUhObjdjeGpwNDNxeEp0RWdXS1J0Q2RXYVE1dkZ1eVU1M0N1em5JSklDSzhmQQ?oc=5",
+   "published": "2026-11-23",
+   "why": "숫자 없음",
+   "firms": [
+    "Yardeni Research"
+   ]
+  },
+  {
+   "title": "Ed Yardeni cuts S&P 500 target for second time in just over two months - Here's why",
+   "source": "CNBC TV18",
+   "link": "https://news.google.com/rss/articles/CBMitAFBVV95cUxNZnJ3aUNEZjRqelBwMEpJdmZWRUhHdHBBOWN2MjBCUW4zNWhsQjQwQUg3dURWRUZ0MHNXZHVRLWdZeGI1YWxmdjdscWl4TDBzanF4R1pXZVZLaWpfOHoxcTBrcXB0eHdKR0E4V2pHUEFYbkliNHpoUnRBd3lxN0VPMUxJUVl1bnN0ckxmdmVscXpxUkRTRUVnbWU0dERZTUZwdzNySGZoVlNEQWlCaUJacXdVUELSAboBQVVfeXFMT2VPZEZBS21WYTdoV2JRcXVlWnRhT0tqUTR0YVRrb3JEQmlYZ2J1em5NSG53aENxaGtuSno4bEpzcEhIcGNlZ3FhMlhrUjRyNEwxNk1wZ3pjS0lyRlhPQUFoMXpaU2UtQ1lHeTE3dGpuMjBYMG1CaU5hcmR2NVlPVjJybXNIWnhZZFhzcXRobjZuNjh2OGVkMFdpTUZxTmpCdXVxczdpdmM5ZGNfaWJVT0hYa2F2VDAyTWRn?oc=5",
+   "published": "2026-11-23",
+   "why": "숫자 없음",
+   "firms": [
+    "Yardeni Research"
+   ]
+  },
+  {
+   "title": "Morgan Stanley raises S&P 500 target on earnings growth, lower oil and AI adoption",
+   "source": "Investing.com",
+   "link": "https://news.google.com/rss/articles/CBMi0wFBVV95cUxQUjNnWFdkSGdJVWN6OXJ6QXpfQVRKeEo1MS1fdU1vSm9WY1NaZmU3NWtaQWhsSnFTRTl4bGVseXpkRlVsX0tyS0REYzJxUkRXT3R0TVVPYWVCeDJWaEZlbHpoalF0ZWVRM0pmZEV6N1ptTTZoUWNrRmVXMWcyWDNmWm9RNzZKZ0xZWlVwOS15cnFURllEYnJfb0pPc0FrMERZaXlBd0ZoWUZlSjBmcnJkeW5BSThBYzBwUnFWTHEtMEl5b0VYOERReTFvWXRoM1haQjFR?oc=5",
+   "published": "2026-11-16",
+   "why": "숫자 없음",
+   "firms": [
+    "Morgan Stanley"
+   ]
+  },
+  {
+   "title": "Morgan Stanley raises its S&P 500 target to 8,700 points, projecting a further 15% upside.",
+   "source": "富途牛牛",
+   "link": "https://news.google.com/rss/articles/CBMilgFBVV95cUxOd0ZPazhXUDk0d3FDQ1ppU1FpY3hxTU5RaU5lSUtWMXBNa1FTSmtXeEJwcFNmZlBBcDhzYjhvMGRxSkZ6SmVuUTVnUHBET1ZmNkd0dzRyTXNYYUtpMFN5NWc5WVJhYUhfVmVWcnppbVZ2bXBqMFA5OGh1MktUNFRfVVl2djJ4LVFuOEw1U0lzX25PY1Fmb3c?oc=5",
+   "published": "2026-11-16",
+   "why": "기한 없음",
+   "firms": [
+    "Morgan Stanley"
+   ]
+  },
+  {
+   "title": "S&P 500 Faces Technical Make-or-Break Moment Below 7,200 Line",
+   "source": "Bloomberg.com",
+   "link": "https://news.google.com/rss/articles/CBMisgFBVV95cUxPYW9kaDNBa3RObmVhRkxBc2laUW5VU0xSVWlCZWNVVVhVN1Y2VHA5QnR2eFdFRC1ieC1UWVNrLXpWdlBuNzdVbm5uTlByWktGNFo2YTRWa2hiaXE1V3ZhX2h2SnJRWFpJLUd4b09jN1ZVQWNKbDQ1NWJFbFcydTdBZDVQNzhNc2wyNXJTYmVmTl9ISGw0aERoRTVVNHBqcDAtLXNidm1RMHlYVmF4akdDUjJR?oc=5",
+   "published": "2026-11-20",
+   "why": "회사 없음",
+   "firms": []
+  },
+  {
+   "title": "Morgan Stanley Raises Global Equities to Maximum Overweight as AI Investment Supports 2027 Outlook",
+   "source": "Yahoo Finance",
+   "link": "https://news.google.com/rss/articles/CBMipAFBVV95cUxOaHJzYmxRU3dCQVlYWm1NdC03Mmk4clVPSVJWcS1jSEpsVlRBNzViYnZleWs1VmZnMXB3aFBXcHJ3VHN3cC0xVUFGd29SNVlveVpRZE1uQmRTRjlvYXEycG1QQnV1bGxfb1otd2FlSDlNSDR4SHp2Y2hlZ2lHd1VXSnlVMlA0bEJBaXptQVNJR0hhZE05OWZoczFVdWlvSFhUSUpSNw?oc=5",
+   "published": "2026-11-21",
+   "why": "10년물 · 업종 — 제목만으로는 칸을 못 채움",
+   "firms": [
+    "Morgan Stanley"
+   ]
+  }
+ ],
+ "counts": {
+  "titles": 229,
+  "got": 12,
+  "check": 53,
+  "dropped": 43
+ }
+}
