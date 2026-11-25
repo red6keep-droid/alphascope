@@ -1,13 +1,14 @@
 # 한국 기사 공용 저장소 — 뉴스 수집기(News-text) 블로그 저장소의 사건별 사실 · 기사 제목 → 날짜별 공개 JSON (2026-11-24 사용자)
 #
 # 실행: Cloudflare Worker(infra/cron-trigger) 09:20 · 18:20 KST — 수집기 정기 실행 07:00 · 16:30 이 facts 를 쓴 뒤(07:46 · 17:1x 쯤).
+#       + 평일 12:20 · 15:20 KST — 수집기 가벼운 회차 11:40 · 14:40 의 장중 사실 뒤 (2026-11-25 사용자 "2회로", 요청 문서 31절).
 #       사람은 Run workflow 버튼(scheduled 끄고). 분 :20 = 운영지침 11절 다른 쓰기 시각과 겹치지 않는 자리(:20 = 06:20 · 08:20 · 16:20 만 씀).
 # 읽기: news-text-blog Firestore(facts · headlines) — 블로그 서비스 계정 roles/datastore.viewer, 읽기 하루 약 2회 × 문서 10개 안팎.
 # 쓰기: ① 비공개 상태 저장소 alphascope-state 의 kr-facts 브랜치(날짜 파일 누적 = 기록, 수집기는 30일 뒤 지운다)
 #       ② gh-pages kr-facts.json = 가장 최근 날 파일 하나(약 100KB, 같은 이름 덮어씀) — 미국 news.json · 방송 kr-news.json 과 같은 자리 · 같은 jsDelivr 길.
 #          한국 홈 · 한국 증시 리포트 뉴스 탭이 읽는다. 날짜 파일은 gh-pages 에 쌓지 않는다(상자 50MB · 이력) — 기록은 ①.
 #          (11-24 첫 판은 Pages 프로젝트 newfact-news 였다 → 다른 뉴스와 따로 놀아 같은 날 gh-pages 로 옮김, 사용자 "왜 뉴팩트 기사만")
-# AI 0 · Blogger 0 · gh-pages 푸시 하루 2회. 실패해도 다른 실행에 영향 없음 — 화면은 지난 파일을 그대로 읽는다.
+# AI 0 · Blogger 0 · gh-pages 푸시 하루 2회(평일 4회). 실패해도 다른 실행에 영향 없음 — 화면은 지난 파일을 그대로 읽는다.
 name: 한국 기사 공용 저장소
 
 on:

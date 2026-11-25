@@ -78,9 +78,13 @@ const KST_JOBS = {
   "17:00": [{ workflow: "commentary.yml", inputs: { scheduled: "true", slot: "pm" }, when: WEEKDAY }],
   "14:30": [{ workflow: "home-ip.yml" }], // 낮 갱신 — 종목 페이지만 다시 그린다 (check.mode=refresh, 2026-11-04 P290). GitHub cron 04:00 UTC 는 예비
   // 한국 기사 공용 저장소 (2026-11-24 사용자) — 뉴스 수집기 정기 실행 07:00 · 16:30 이 facts 를 쓴 뒤(07:46 · 17:1x 쯤). 매일.
-  // gh-pages kr-facts.json 푸시 하루 2회(+ 상태 저장소) — 09:20 · 18:20 에 다른 gh-pages 푸시 없음. 분 :20 은 Worker 가 깨는 분.
+  // gh-pages kr-facts.json 푸시 하루 2회 + 평일 장중 2회(아래, + 상태 저장소) — 09:20 · 18:20 에 다른 gh-pages 푸시 없음. 분 :20 은 Worker 가 깨는 분.
   "09:20": [{ workflow: "kr-facts.yml", inputs: { scheduled: "true" } }],
   "18:20": [{ workflow: "kr-facts.yml", inputs: { scheduled: "true" } }],
+  // 장중 사실 (2026-11-25 사용자 "2회로") — 뉴스 수집기 평일 가벼운 회차 11:40 · 14:40 에 사실 뽑기(보도 2곳 이상 사건 · 본문 20건, 수집기 31절)가 끝난 뒤.
+  // 15:20 = 15:50 한국 증시 리포트 · 한국 종목 전에. :20 에 다른 gh-pages 푸시 없음(12:20 · 15:20 KST 표 · 미국 표 모두 빈 자리)
+  "12:20": [{ workflow: "kr-facts.yml", inputs: { scheduled: "true" }, when: WEEKDAY }],
+  "15:20": [{ workflow: "kr-facts.yml", inputs: { scheduled: "true" }, when: WEEKDAY }],
   // Newfact 뉴스 발행 (2026-11-24 사용자 "발행해줘") — 수집기 글을 블로그 공개 글로(새 글 사이 10분) + 홈 카드 자료 gh-pages news-posts.json. 매일.
   // 수집기 07:00 · 16:30 실행이 글을 쓴 뒤(08시 · 17시 무렵). 분 :50 — 09:20 · 18:20 공용 저장소 gh-pages 푸시와 비킨다(:50 은 Worker 가 깨는 분, 다른 gh-pages 푸시 없음).
   "09:50": [{ workflow: "news-posts.yml", inputs: { scheduled: "true", stage: "publish", draft: "false" } }],
