@@ -7,7 +7,7 @@
     방문 때는 불러오기 코드가 그날 조각(정식 렌더러 카드)으로 바꿔 끼운다 — 조각에도 같은 소개가 맨 앞 요약 아래 · `기업` 탭에 있다.
   - 불러오기 코드: 페이지 스크립트 묶음(js/quick.js = quick_page.js + 봉차트)을 Pages → jsDelivr 순으로 받아 실행.
     스크립트를 고쳐도 768쪽을 다시 쓰지 않는다 — 페이지는 소개가 바뀔 때만 고쳐 쓴다(해시가 같으면 건너뜀).
-쓰기: 새 페이지 하루 NEW_CAP(50) · 고쳐 쓰기 하루 UPDATE_CAP(100), 4초 간격, 429 백오프 후에도 429 면 그 실행 멈춤(publish_pages 와 같은 규칙).
+쓰기: 새 페이지 하루 NEW_CAP(25) · 고쳐 쓰기 하루 UPDATE_CAP(100), 4초 간격, 429 백오프 후에도 429 면 그 실행 멈춤(publish_pages 와 같은 규칙).
      새 페이지 = 밤 23:40 따로 실행(quick-shells-new.yml, --new-only)만, 한국 날짜 하루 합계 NEW_CAP(cache/shells_new_day.json).
      장 마감 실행(quick-data)은 --no-new 로 고쳐 쓰기만 (2026-11-24 사용자: 실행마다 50쪽 · 하루 약 100쪽을 몰아 만든 직후
      Blogger 가 4시간 넘게 새 글을 막아 17:00 · 21:00 시황이 빠졌다).
@@ -37,7 +37,7 @@ sys.path[:0] = [HERE, EXP, os.path.join(EXP, "stock-radar"), os.path.join(EXP, "
 import design_kit as dk  # noqa: E402
 import company_intro as CI  # noqa: E402
 
-NEW_CAP, UPDATE_CAP = 50, 100
+NEW_CAP, UPDATE_CAP = 25, 100   # 새 페이지 하루 50 → 25 (2026-11-25 사용자: 남은 한국 130쪽, 몰아 만들기로 시황 429 — 기존 수량의 50%)
 BUNDLE = os.path.join(HERE, "pages_static", "js", "quick.js")   # 저장소에 둔다 — Pages 가 같은 폴더를 올리고, jsDelivr(@main)가 예비
 PAGES = "https://alpha-scope.pages.dev/"
 JSD = "https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@main/experiments/stock-quick/pages_static/"
