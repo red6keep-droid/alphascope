@@ -1,272 +1,4 @@
 {
- "b6b70931238e": {
-  "lines": [
-   "12월 연방공개시장위원회 회의 예정"
-  ],
-  "tags": [
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "RATES_FED",
-    "dir": "positive",
-    "stage": "talk"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-18T12:46:35.728906+00:00",
-  "n_src": 900
- },
- "52a552a79ca1": {
-  "lines": [
-   "콜레트 크레스 엔비디아 임시 CEO의 첫 실적 발표 컨퍼런스 콜 진행",
-   "엔비디아 전체 직원 대상 타운홀 미팅 개최 예정"
-  ],
-  "tags": [
-   {
-    "scope": "stock",
-    "tickers": [
-     "NVDA"
-    ],
-    "sector": "SMH",
-    "issue": "CORP_EVENT",
-    "dir": "neutral",
-    "stage": "done"
-   },
-   {
-    "scope": "stock",
-    "tickers": [
-     "NVDA"
-    ],
-    "sector": "SMH",
-    "issue": "CORP_EVENT",
-    "dir": "neutral",
-    "stage": "talk"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-18T12:46:35.728906+00:00",
-  "n_src": 900
- },
- "97bd4647f40a": {
-  "lines": [
-   "전주 대비 모기지 신청 볼륨 2.3% 감소",
-   "30년 고정 모기지 평균 계약 금리 7.35%로 상승"
-  ],
-  "tags": [
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLRE",
-    "issue": "REAL_ESTATE",
-    "dir": "negative",
-    "stage": "done"
-   },
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLRE",
-    "issue": "REAL_ESTATE",
-    "dir": "negative",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-18T12:46:35.728906+00:00",
-  "n_src": 900
- },
- "414530abb664": {
-  "lines": [
-   "도널드 트럼프 미국 대통령의 수요일 중국 선전 도착",
-   "시진핑 주석과 블라디미르 푸틴 러시아 대통령과의 삼자 회담 목요일 개최 예정",
-   "마코 루비오 국무장관과 스콧 베센트 재무장관 등의 환영 만찬 참석"
-  ],
-  "tags": [
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "GEOPOLITICS",
-    "dir": "neutral",
-    "stage": "done"
-   },
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "GEOPOLITICS",
-    "dir": "neutral",
-    "stage": "talk"
-   },
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "GEOPOLITICS",
-    "dir": "neutral",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-18T12:46:39.535689+00:00",
-  "n_src": 900
- },
- "5296b6f36502": {
-  "lines": [
-   "타겟의 3분기 순매출 7.1% 성장 및 동일 성장률 5.6% 기록 (예상)",
-   "동일 매장 방문객 수 5% 증가",
-   "연간 순매출 성장률 전망치 6% 안팎으로 상향 조정",
-   "연간 영업이익률 전망치 약 6.2% 제시"
-  ],
-  "tags": [
-   null,
-   null,
-   null,
-   null
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-18T12:46:39.535689+00:00",
-  "n_src": 900
- },
- "138aedbfb49f": {
-  "lines": [
-   "호르무즈 해협의 공급 통로 신뢰도 하락 경고",
-   "전쟁 이전 정상 상태 복귀 가능성 부인"
-  ],
-  "tags": [
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLE",
-    "issue": "OIL_ENERGY",
-    "dir": "negative",
-    "stage": "done"
-   },
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLE",
-    "issue": "OIL_ENERGY",
-    "dir": "negative",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-18T12:46:39.535689+00:00",
-  "n_src": 900
- },
- "ea1ca0398887": {
-  "lines": [
-   "온라인 매출 17.4% 증가 기록",
-   "분기 순매출 227억 6000만 달러 집계",
-   "연간 매출 전망치 925억 달러 상향"
-  ],
-  "tags": [
-   null,
-   null,
-   null
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-18T12:46:41.258098+00:00",
-  "n_src": 900
- },
- "87c3487f69cd": {
-  "lines": [
-   "독일과 영국, 우크라이나의 러시아 본토 타격 관련 미국 비판 반박"
-  ],
-  "tags": [
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "GEOPOLITICS",
-    "dir": "negative",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-18T12:46:41.258098+00:00",
-  "n_src": 900
- },
- "f838ce9f4561": {
-  "lines": [
-   "중국 인민해방군, 엔비디아 고성능 칩 확보 추진",
-   "젠슨 황 엔비디아 CEO 사임"
-  ],
-  "tags": [
-   {
-    "scope": "stock",
-    "tickers": [
-     "NVDA"
-    ],
-    "sector": "SMH",
-    "issue": "GEOPOLITICS",
-    "dir": "negative",
-    "stage": "done"
-   },
-   {
-    "scope": "stock",
-    "tickers": [
-     "NVDA"
-    ],
-    "sector": "SMH",
-    "issue": "CORP_EVENT",
-    "dir": "negative",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-18T12:46:41.258098+00:00",
-  "n_src": 900
- },
- "6e7b64d691b0": {
-  "lines": [
-   "러시아 스파이 혐의 미군 병사 영국서 체포",
-   "체포된 미군 장교 나토 신속대응군 소속 근무"
-  ],
-  "tags": [
-   null,
-   null
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-18T12:46:46.102988+00:00",
-  "n_src": 900
- },
- "bf3d5c701c2e": {
-  "lines": [
-   "미 의회 민주당 상하원 장악 속 러트닉 상무장관 조사 착수",
-   "민주당 의원들 러트닉 아들들의 엔비디아 사업 이해충돌 조사"
-  ],
-  "tags": [
-   null,
-   {
-    "scope": "stock",
-    "tickers": [
-     "NVDA"
-    ],
-    "sector": "SMH",
-    "issue": "REGULATION",
-    "dir": "negative",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-18T12:46:46.102988+00:00",
-  "n_src": 900
- },
- "e81b4644f416": {
-  "lines": [
-   "푸틴 러시아 대통령 아태경제협력체 최고경영자 회의 참석 연설",
-   "푸틴 EU 산업 경쟁력 상실 발언"
-  ],
-  "tags": [
-   null,
-   null
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-18T12:46:46.102988+00:00",
-  "n_src": 900
- },
  "92cdbaff4de0": {
   "lines": [
    "앤트로픽 공모가 83달러 확정 (예상)",
@@ -3548,6 +3280,297 @@
   ],
   "model": "gemini-3.5-flash-lite",
   "at": "2026-11-24T21:48:42.984683+00:00",
+  "n_src": 900
+ },
+ "63d3b91ac76d": {
+  "lines": [
+   "트럼프의 요구에 따른 엔비디아 젠슨 황 CEO의 복귀"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "CORP_EVENT",
+    "dir": "positive",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-25T12:48:25.939475+00:00",
+  "n_src": 900
+ },
+ "41209e3c7e99": {
+  "lines": [
+   "금요일 주가 하락에 따른 연준의 금리 인상 확률 감소",
+   "월요일 엔비디아 CEO 복귀와 함께 발생한 증시 반등"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "RATES_FED",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-25T12:48:25.939475+00:00",
+  "n_src": 900
+ },
+ "4ae389feaa97": {
+  "lines": [
+   "2025년 13% 성장률을 기록한 미국 중고 의류 시장",
+   "2030년까지 연평균 7% 이상 성장하여 800억 달러 규모 도달 예정인 중고 시장"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLY",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "positive",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLY",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "positive",
+    "stage": "talk"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-25T12:48:25.939475+00:00",
+  "n_src": 900
+ },
+ "8f4f4642a91f": {
+  "lines": [
+   "노르스 아틀란틱 주가 77% 폭락",
+   "항공유 가격 약 72% 급등"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLY",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLE",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-25T12:48:30.036762+00:00",
+  "n_src": 900
+ },
+ "f46a16acf1c1": {
+  "lines": [
+   "우크라이나의 러시아 정유시설 공격 지속",
+   "러시아의 보복 조치 예고"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "GEOPOLITICS",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "GEOPOLITICS",
+    "dir": "negative",
+    "stage": "talk"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-25T12:48:30.036762+00:00",
+  "n_src": 900
+ },
+ "72c0ef09bab8": {
+  "lines": [
+   "아서 헤이스의 2027년 하반기 AI 관련주 역풍 전망",
+   "AI 분야 인재의 암호화폐 업계 복귀 전망"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLK",
+    "issue": "OTHER",
+    "dir": "negative",
+    "stage": "talk"
+   },
+   null
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-25T12:48:30.036762+00:00",
+  "n_src": 900
+ },
+ "2efc86804497": {
+  "lines": [
+   "IMF의 2026년 아랍에미리트 실질 GDP 성장률 전망치 수정",
+   "아랍에미리트 경제관광부 장관의 내년 경제 성장률 목표치 발표"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "GROWTH_JOBS",
+    "dir": "positive",
+    "stage": "done"
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "GROWTH_JOBS",
+    "dir": "positive",
+    "stage": "talk"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-25T12:49:00.003873+00:00",
+  "n_src": 900
+ },
+ "e05a025977de": {
+  "lines": [
+   "샤먼항공의 보잉 737-8 항공기 50대 구매 계약 체결",
+   "보잉 항공기 구매 계약 규모 74억 달러 기록"
+  ],
+  "tags": [
+   null,
+   null
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-25T12:49:00.003873+00:00",
+  "n_src": 900
+ },
+ "d4c272d26770": {
+  "lines": [
+   "미국 연방 배심원단의 화웨이 형사재판 유죄 평결",
+   "화웨이의 은행 사기 및 영업비밀 탈취 공모 혐의 유죄 판결"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLK",
+    "issue": "REGULATION",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLK",
+    "issue": "REGULATION",
+    "dir": "negative",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-25T12:49:00.003873+00:00",
+  "n_src": 900
+ },
+ "32626707c81e": {
+  "lines": [
+   "예멘 후티 반군의 사우디 국부펀드 타워 공습으로 11명 부상"
+  ],
+  "tags": [
+   null
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-25T12:49:12.713734+00:00",
+  "n_src": 900
+ },
+ "2ffc1293395e": {
+  "lines": [
+   "트럼프의 엔비디아 이사회 개입으로 젠슨 황 CEO 복귀",
+   "복귀 당일 엔비디아 주가 31% 급등",
+   "이후 시장 조정 속에서 엔비디아 주가 5.9% 하락"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "CORP_EVENT",
+    "dir": "positive",
+    "stage": "done"
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-25T12:49:12.713734+00:00",
+  "n_src": 900
+ },
+ "dd9641ab20f4": {
+  "lines": [
+   "중국의 글로벌 AI 인재 점유율이 3년 만에 미국 추월"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "SMH",
+    "issue": "GROWTH_JOBS",
+    "dir": "negative",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-25T12:49:12.713734+00:00",
   "n_src": 900
  }
 }
