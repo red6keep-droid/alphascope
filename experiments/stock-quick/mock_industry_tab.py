@@ -69,6 +69,7 @@ def fetch_new(flows):
             ind[k] = [{"month": f"{x['TIME'][:4]}-{x['TIME'][4:]}", "v": float(x["DATA_VALUE"])} for x in rows if x.get("DATA_VALUE")]
             time.sleep(0.3)
     flows["industry"].update(C._tourism(flows["industry"]))   # 정식 실행보다 먼저 (2026-11-25 함께 볼 지표)
+    flows["release_plan"] = C._release_plan() or flows.get("release_plan") or []
     for k in {k for v in list(K.RELATED.values()) + list(K.RELATED_CODE.values()) for k, _w in v}:   # 함께 볼 지표 중 상태 파일에 아직 없는 ECOS 지표
         if k in ind or k not in K.INDICATORS or K.INDICATORS[k][0] in ("customs", "tourism"):
             continue

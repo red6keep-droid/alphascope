@@ -412,6 +412,45 @@ def _tourism(prev_ind, months=37, fresh=3):
     return {key: [{"month": m, "v": v} for m, v in sorted(new[key].items())] for key in TOURISM_KEYS if new[key]}
 
 
+PLAN_URL = "https://mods.go.kr/newsPln.es?mid=a10305000000&bid="
+
+
+def _release_plan():
+    """국가데이터처 보도계획 (mods.go.kr 새소식 > 보도계획, 2026-11-25) — 이번 달과 다음 달의 보도일 · 시각 · 보도자료 이름 · 담당과 전부(자르지 않는다, 쓰는 쪽이 고른다).
+    화면이 서버에서 그려진 표라 그대로 읽는다. 다음 달은 월 선택 칸(oa_mm)으로 — 12월에는 다음 해 1월 칸이 없어 이번 달만. 못 받으면 빈 목록(지난 값으로)."""
+    import html as _html
+    import re as _re
+    out = []
+
+    def one(mm=None):
+        if _late():
+            return None
+        r = (requests.post(PLAN_URL, data={"oa_mm": mm, "mid": "a10305000000", "bid": "", "orderby": "", "tag": "", "act": "list"}, headers={"User-Agent": "Mozilla/5.0"}, timeout=15)
+             if mm else requests.get(PLAN_URL, headers={"User-Agent": "Mozilla/5.0"}, timeout=15))
+        s = r.content.decode("utf-8", "ignore")
+        h = _re.search(r"<h3>\s*(\d{4})년\s*(\d{1,2})월\s*보도계획", s)
+        i = s.find('class="bsTable')
+        if not h or i < 0:
+            return None
+        y, m = int(h.group(1)), int(h.group(2))
+        for tr in _re.findall(r"<tr[\s\S]*?</tr>", s[i:s.find("</table>", i)]):
+            c = [_re.sub(r"\s+", " ", _html.unescape(_re.sub(r"<[^>]+>", " ", x))).strip() for x in _re.findall(r"<td[^>]*>([\s\S]*?)</td>", tr)]
+            d = _re.match(r"(\d{1,2})\.(\d{1,2})\.", c[0]) if len(c) >= 3 else None
+            if d and int(d.group(1)) == m:
+                out.append({"day": f"{y}-{m:02d}-{int(d.group(2)):02d}", "time": c[1], "title": c[2], "dept": c[3] if len(c) > 3 else ""})
+        return m
+
+    try:
+        m = one()
+        if m and m < 12:
+            time.sleep(0.3)
+            one(f"{m + 1:02d}")
+    except Exception as e:   # noqa: BLE001
+        print(f"[kr] 보도계획 실패: {str(e)[:80]}")
+    print(f"[kr] 보도계획 {len(out)}줄" + (f" · {out[0]['day']} ~ {out[-1]['day']}" if out else ""))
+    return out
+
+
 def _kosis(item, n=37):
     """통계청 KOSIS 월별 표 한 칸 (2026-11-25 온라인쇼핑 거래액 · 업태별 판매 · 게임 생산) — item = "기관/표/항목/분류1[/분류2]". 키 KOSIS_API_KEY 가 없거나 실패하면 빈 목록(지난 값으로 채움)."""
     k = os.environ.get("KOSIS_API_KEY", "").strip()
@@ -566,6 +605,7 @@ def run_flows():
             if got:
                 out["industry"][key_name] = got
             time.sleep(0.3)
+    out["release_plan"] = _release_plan() or prev.get("release_plan") or []   # 국가데이터처 보도계획 — 카드 줄의 `다음 발표` (2026-11-25)
     # K1~K6 업종별 BSI — 표마다 "?/업종" 한 번에 항목 전부 (ITEM_CODE1 = 항목, ITEM_CODE2 = 업종)
     out["bsi"] = {}
     for ind in U.BSI_INDUSTRY:

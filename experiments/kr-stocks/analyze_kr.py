@@ -200,6 +200,16 @@ def sector_flow(snap, sym):
             "rel_pp": rel, "days": n, "sectors": sectors, "rank": 1 + sum(1 for x in sectors if x["rel"] > rel), "n_pool": len(sectors)}
 
 
+def next_release(key, flow_data, today=None):
+    """지표의 다음 발표일 — 국가데이터처 보도계획에서 그 보도자료 이름(U.RELEASE_OF)의 오늘 이후 첫 줄. 없으면 None."""
+    name = U.RELEASE_OF.get(key)
+    if not name:
+        return None
+    today = today or datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=9))).strftime("%Y-%m-%d")
+    xs = [x for x in (flow_data or {}).get("release_plan") or [] if x["day"] >= today and x["title"].rstrip().endswith(name)]
+    return min(xs, key=lambda x: (x["day"], x["time"])) if xs else None
+
+
 def industry_rows(sym, flow_data):
     """종목의 업종 재료 지표 — 마지막 값 · 비교(전년 동월 또는 전월) · 12개월 범위 위치."""
     ind = dict((flow_data or {}).get("industry") or {})
@@ -222,7 +232,7 @@ def industry_rows(sym, flow_data):
         vals = [x["v"] for x in xs[-12:]]
         pos = (last["v"] - min(vals)) / (max(vals) - min(vals)) * 100 if max(vals) > min(vals) else 50
         out.append({"key": key, "name": name, "kind": kind, "cmp": cmp_, "note": note, "month": last["month"], "v": last["v"], "chg": chg, "pos12": pos,
-                    "series": xs[-24:], "src_stat": stat})   # 24개월 — 그래프 `작년 같은 달` 비교 (2026-10-25)
+                    "series": xs[-24:], "src_stat": stat, "next_release": next_release(key, flow_data)})   # 24개월 — 그래프 `작년 같은 달` 비교 (2026-10-25)
     return out
 
 
@@ -250,7 +260,7 @@ def related_rows(sym, flow_data):
         prev = next((x["v"] for x in xs if x["month"] == f"{y - 1}-{mo}"), None)
         chg = (last["v"] - prev) if (kind == "pct" and prev is not None) else ((last["v"] / prev - 1) * 100 if prev else None)
         out.append({"key": key, "name": name, "kind": kind, "cmp": "yoy", "note": why, "month": last["month"], "v": last["v"], "chg": chg,
-                    "series": xs[-24:], "src_stat": stat})
+                    "series": xs[-24:], "src_stat": stat, "next_release": next_release(key, flow_data)})
     return out
 
 

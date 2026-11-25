@@ -510,6 +510,12 @@ def biz_work_state(s):
     return state, (U.BIZ_Q[b["group"]] if b.get("group") else None)
 
 
+def _release_txt(r):
+    """줄 끝 ` · 다음 발표 11월 30일` — 국가데이터처 보도계획에 있는 지표만 (2026-11-25)."""
+    n = r.get("next_release")
+    return f" · 다음 발표 {int(n['day'][5:7])}월 {int(n['day'][8:])}일" if n else ""
+
+
 def card_industry_work(s):
     """업종 실물 지표 카드 — 2026-10-31 부터 사업 묶음(U.BIZ)마다 질문 · 지표 · 답 낱말 · 비교 기간 (doc/검증/한국-업종지표-재선정.md).
     옛 제목 `이 업종에 일감이 늘고 있나?` 는 묶음이 없는 종목에만. 답 = 1년 전보다 5% 넘게(금리는 0.5%p) 늘면 늘고 있음 · 줄면 줄고 있음."""
@@ -548,7 +554,7 @@ def card_industry_work(s):
         cmp_txt = "전년 같은 달보다" if r["cmp"] == "yoy" else "전달보다"
         u2 = "%p" if r["kind"] == "pct" else "%"
         lines.append(("row", r["name"], _ind_value(r), f"{r['month'][:4]}년 {int(r['month'][5:])}월" + (f" · {cmp_txt} {_sgn(r['chg'], 2 if u2 == '%p' else 1)}{u2}" if r.get("chg") is not None else "")
-                      + (f" · {r['note']}" if r.get("note") else "")))
+                      + (f" · {r['note']}" if r.get("note") else "") + _release_txt(r)))
     title = f"{U.biz_name(s['sym'])} 업계 {U.BIZ_Q[b['group']]}" if b.get("group") else b["q"]   # `가전 업계 수출은?` (P151)
     return R._state_card(title, state, theme, col, lines, "", fold=True)   # 툴팁 없음 — 문장 · 줄이 값과 `1~2달 늦게` 를 말한다 (2026-11-08 사용자: 카드와 겹치는 툴팁 생략, 가이드라인 11절)
 
@@ -602,7 +608,7 @@ def card_related(s):
     for r in rows:
         u = "%p" if r["kind"] == "pct" else "%"
         lines.append(("row", r["name"], _ind_value(r), f"{r['month'][:4]}년 {int(r['month'][5:])}월"
-                      + (f" · 1년 전보다 {_sgn(r['chg'], 2 if u == '%p' else 1)}{u}" if r.get("chg") is not None else "") + f" · {r['note']}"))
+                      + (f" · 1년 전보다 {_sgn(r['chg'], 2 if u == '%p' else 1)}{u}" if r.get("chg") is not None else "") + f" · {r['note']}" + _release_txt(r)))
     return R._state_card("함께 볼 지표", "참고", "neutral", R.MUTED, lines, "", fold=True)
 
 
