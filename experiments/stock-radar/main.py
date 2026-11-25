@@ -28,6 +28,44 @@ def record(a, news):
         except Exception as e:  # noqa: BLE001 — 기록은 게시를 막지 않는다
             print(f"::warning::[radar] {s['sym']} 기록 실패: {e!r}")
     stock_records.save(os.path.join(os.environ["STATE_DIR"], "radar"), rows, stock_records.news_rows(news))
+    record_broker(a, today)
+
+
+def record_broker(a, today):
+    """증권사별 등급 · 목표가 변경 → radar/records/broker (2026-11-25 사용자 "기록부터 쌓아", 비공개 증권사-의견-글-기획.md 5절).
+    날마다 = 이미 받은 30일 창(s["broker"])에서 처음 보는 줄만. 종목마다 한 번 = 야후 이력 전부를 담는다(첫 담기 — 종목이 새로 들어와도 그 종목만).
+    담은 종목은 records/broker/_backfill.json 에 적는다. 첫 담기가 실패한 종목은 적지 않아 다음 실행에 다시."""
+    import json
+    import time
+    import stock_records
+    state = os.path.join(os.environ["STATE_DIR"], "radar")
+    mark = os.path.join(state, "records", "broker", "_backfill.json")
+    try:
+        with open(mark, encoding="utf-8") as f:
+            done = set(json.load(f).get("syms") or [])
+    except (OSError, ValueError):
+        done = set()
+    rows, filled = [], []
+    for s in a["stocks"]:
+        sym, name = s["sym"], s.get("name")
+        rows += stock_records.broker_rows(sym, name, s.get("broker"), today)
+        if sym in done:
+            continue
+        try:
+            rows += stock_records.broker_rows(sym, name, collect_extra.broker_history(sym), today, backfill=True)
+            filled.append(sym)
+        except Exception as e:  # noqa: BLE001 — 다음 실행에 다시
+            print(f"::warning::[radar] {sym} 증권사 이력 첫 담기 실패: {str(e)[:120]}")
+        time.sleep(0.5)
+    n = stock_records.save_broker(state, rows)
+    if n is None:
+        print("::warning::[radar] 증권사 변경 기록 쓰기 실패 — 첫 담기 표시를 남기지 않음(다음 실행에 다시)")
+        return
+    if filled:
+        os.makedirs(os.path.dirname(mark), exist_ok=True)
+        with open(mark, "w", encoding="utf-8") as f:
+            json.dump({"syms": sorted(done | set(filled)), "updated": today}, f, ensure_ascii=False)
+    print(f"[radar] 증권사 변경 기록 {n}줄 새로 · 첫 담기 {len(filled)}종목")
 
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "output")
 

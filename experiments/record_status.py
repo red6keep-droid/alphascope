@@ -28,6 +28,7 @@ REGISTRY = [
     ("증시 전망 — 가설", "전망", "nvda-state", r"/records/hypotheses/", "none"),
     ("미국 종목 카드 판정 · 의견", "종목", "nvda-state", r"/radar/records/verdicts/\d{4}(-\d{2})?\.jsonl$", "line"),
     ("미국 종목 뉴스 분류 (정식 종목)", "이슈", "nvda-state", r"/radar/records/issues/\d{4}(-\d{2})?\.jsonl$", "line"),
+    ("미국 증권사별 등급 · 목표가 변경", "전망", "nvda-state", r"/radar/records/broker/\d{4}-\d{2}\.jsonl$", "line"),   # 2026-11-25 — 마지막 날 = 마지막 변경일(조용한 주에는 멈춰 보임)
     ("엔비디아 리포트 판정 · 이슈", "종목 · 이슈", "nvda-state", r"/output/state/records/(verdicts|issues)/\d{4}(-\d{2})?\.jsonl$", "line"),
     ("엔비디아 옵션 스냅샷", "종목", "nvda-state", r"/option_snapshots\.jsonl$", "line"),
     ("한국 종목 · 시장 판정", "종목 · 시장 상태", "kr-state", r"/data/records/verdicts/\d{4}(-\d{2})?\.jsonl$", "line"),

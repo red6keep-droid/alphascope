@@ -49,13 +49,14 @@ def _analysts(t):
 BROKER_DAYS = 30   # 증권사 등급 · 목표가 변경은 최근 30일 (2026-11-02 사용자 P275: 매수의견 탭에 증권사 의견)
 
 
-def _changes(t):
-    """증권사별 등급 · 목표가 변경 (yfinance upgrades_downgrades, NVDA collect_market 과 같은 칸) — 최근 BROKER_DAYS 일, 최신 먼저."""
+def _changes(t, days=BROKER_DAYS):
+    """증권사별 등급 · 목표가 변경 (yfinance upgrades_downgrades, NVDA collect_market 과 같은 칸) — 최근 days 일, 최신 먼저.
+    days=None = 야후가 주는 이력 전부(기록 첫 담기 broker_history, 2026-11-25 — 화면용 작업 파일에는 넣지 않는다)."""
     ud = t.upgrades_downgrades
     if ud is None or ud.empty:
         return []
     num = lambda v: float(v) if v is not None and v == v and float(v) > 0 else None   # noqa: E731 — NaN · 0 = 없음
-    cut = (datetime.datetime.utcnow() - datetime.timedelta(days=BROKER_DAYS)).strftime("%Y-%m-%dT%H:%M:%SZ")
+    cut = (datetime.datetime.utcnow() - datetime.timedelta(days=days)).strftime("%Y-%m-%dT%H:%M:%SZ") if days else ""
     out = []
     for ts, r in ud.sort_index(ascending=False).iterrows():
         at = ts.strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -65,6 +66,12 @@ def _changes(t):
                     "action": str(r.get("Action") or "").strip(), "pt_action": str(r.get("priceTargetAction") or "").strip(),
                     "pt": num(r.get("currentPriceTarget")), "pt_prior": num(r.get("priorPriceTarget"))})
     return out
+
+
+def broker_history(sym):
+    """한 종목의 증권사 변경 이력 전부 — 기록(records/broker) 첫 담기용. 종목마다 한 번만 부른다(stock-radar/main.record_broker)."""
+    import yfinance as yf
+    return _changes(yf.Ticker(sym), days=None)
 
 
 def _company(t):
