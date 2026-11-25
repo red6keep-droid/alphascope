@@ -38,7 +38,7 @@ IMAGE_BRANCH = "gh-pages"   # 날짜 붙은 코스피 그래프는 지난 글이
 
 OUT = os.path.join(_HERE, "output")
 DAILY_URL = f"{U.BLOG}/search/label/%EB%8D%B0%EC%9D%BC%EB%A6%AC%20%EB%B8%8C%EB%A6%AC%ED%95%91"   # 미국 증시 리포트 라벨(데일리 브리핑) 목록
-TAB_TODAY, TAB_STOCKS, TAB_FLOW, TAB_MARKET, TAB_CAL, TAB_NEWS = "오늘", "종목", "수급", "시장", "일정", "뉴스"   # 뉴스 = 오늘 옆 탭, 미국 증시 리포트와 같게 (M81)   # 시장 탭은 수급에서 나눔 (M11)
+TAB_TODAY, TAB_STOCKS, TAB_FLOW, TAB_MARKET, TAB_CAL, TAB_NEWS = "오늘", "종목", "수급", "시장", "일정", "뉴스"   # 위쪽 탭 = 미국과 같게 `뉴스` (2026-11-25 사용자) — 칸 안 첫 칩만 `Newfact`   # 뉴스 = 오늘 옆 탭, 미국 증시 리포트와 같게 (M81)   # 시장 탭은 수급에서 나눔 (M11)
 INDEX = {U.BENCH: "코스피", U.KOSDAQ: "코스닥"}
 CAL_DAYS, EARN_DAYS = 14, 30
 GROUP_SHORT = {"반도체": "반도체", "2차전지": "2차전지", "바이오": "바이오", "방산 · 조선 · 원전": "방산 · 조선"}
@@ -463,7 +463,8 @@ def _utc16(iso):
 def _kr_articles(d):
     """한국 기사 → news_pick.build extra (2026-11-24 사용자 "미국처럼 합치고 탭도 적용"):
     사실 기사(보도 2곳 이상) = kind fact — 팝업 = 사실 줄(끝에 작은 회색 출처), 원문 보기 없음, 점수 `보도 n곳` · 방향은 막대에 함께 센다.
-    제목만 있는 기사 = kind head — 같은 사건 2 ~ 4줄 묶음(news_render.headline_bundles), 사실 기사와 같은 사건은 뺀다. AI 0."""
+    언론사 기사 제목 · 원문 링크(옛 kind head 제목 묶음)는 싣지 않는다 (2026-11-25 사용자: "사실만 모아 전달" — 소개 페이지 문장과 같게.
+    1곳만 보도한 사건 = 단독도 함께 빠진다). 사실이 한 줄뿐인 사건도 묶지 않고 한 사건 한 줄 — 묶으면 큰 사건이 다른 사건 밑에 묻힌다(11-25 시험: 젠슨 황 복귀가 4건 묶음의 한 줄). AI 0."""
     if not d:
         return [], {}
     import hashlib
@@ -487,34 +488,6 @@ def _kr_articles(d):
                     "theme": _dk.ISSUE_KO.get(e.get("cat"), "그 밖"), "published_at": _utc16(e["at"]), "url": None, "source": f"보도 {sc}곳",
                     "detail": facts[0].get("what") or "", "related": rel[:4], "surprise": e.get("surprise"),
                     "market_dir": NR.DIR_KIND.get(e.get("direction"), "neutral"), "lines": lines, "n_out": sc})
-    used = {e["event"] for e in evs}
-    bundles = [b for b in NR.headline_bundles(d.get("headlines") or [], d["day"]) if b["event"] not in used]
-    # 제목 1개짜리 = 같은 분야끼리 2 ~ 4개 묶음 (2026-11-24 사용자 — 종목 페이지 `한 줄짜리 묶음` 규칙과 같게). 분야에 1건뿐이면 `그 밖` 으로 모으고,
-    # 그래도 혼자면 한 줄 그대로(버리지 않음). 11-24 아침: 제목 1개짜리 사건 103개가 원문으로 바로 가는 줄이었다
-    multi = [b for b in bundles if len(b["rows"]) > 1]
-    by_cat = {}
-    for b in bundles:
-        if len(b["rows"]) == 1:
-            by_cat.setdefault(b.get("cat") or "OTHER", []).append(b["rows"][0])
-    lone = [r for c, rs in by_cat.items() if len(rs) == 1 for r in rs]
-    by_cat = {c: rs for c, rs in by_cat.items() if len(rs) > 1}
-    if lone:
-        by_cat.setdefault("OTHER", []).extend(lone)
-    for c, rs in by_cat.items():
-        rs.sort(key=lambda r: r["at"], reverse=True)
-        i = 0
-        for n in _dk.bundle_sizes(len(rs)) or [len(rs)]:
-            part, i = rs[i:i + n], i + n
-            multi.append({"event": part[0].get("event") or part[0]["title"], "rows": part, "at": max(r["at"] for r in part), "cat": None if c == "OTHER" else c})
-    for b in multi:
-        rows = b["rows"]
-        outlets = list(dict.fromkeys(r.get("outlet") for r in rows if r.get("outlet")))
-        src = (outlets[0] + (f" 외 {len(outlets) - 1}곳" if len(outlets) > 1 else "")) if outlets else ""
-        out.append({"id": "k" + hashlib.sha1((b["event"] + rows[0]["url"]).encode()).hexdigest()[:11], "kind": "head", "text": rows[0]["title"],
-                    "title": rows[0]["title"], "theme": _dk.ISSUE_KO.get(b.get("cat"), "그 밖"), "published_at": _utc16(b["at"]),
-                    "url": rows[0]["url"], "source": src, "detail": rows[1]["title"] if len(rows) > 1 else "", "related": [], "surprise": 0,
-                    "market_dir": None, "lines": [r["title"] for r in rows],
-                    "rows": [{"line": r["title"], "source": r.get("outlet"), "url": r["url"]} for r in rows]})
     return out, codes
 
 
@@ -546,7 +519,7 @@ def news_section():
     # 옛: 사실 층 · 그 밖의 기사를 방송 목록 위에 따로 얹었다(같은 날 아침, _facts_sections)
     facts = ""
     articles, art_codes = _kr_articles(_facts_doc())
-    head = "뉴스"
+    head = "뉴스"   # 탭 이름과 같아 테마가 숨긴다 — 위쪽 탭은 미국과 같게 `뉴스` (2026-11-25 사용자)
     try:
         RH = _daily_render()
         mf, NP = RH.media_feed, RH.news_pick
@@ -573,6 +546,12 @@ def news_section():
                          all_channels={x["channel"] for x in rows if str(x["published_at"])[:16] >= since},
                          stories_cache=os.path.join(OUT, "state", "news_stories.json"), label="kr-report-stories", extra=articles)
         built["names"] = names
+        # 한국 방송 줄 = 영상 링크 · 채널 이름 없이 (2026-11-25 사용자: "출처는 발언자 표시하는 형태로") — 팝업 줄 끝 작은 회색 `- 발언자`(dk.speaker_html)가 출처,
+        # 메타 매체 자리는 `방송`. 언론사 원문 링크도 이미 없음(_kr_articles). 미국 리포트는 그대로
+        for g in built["stories"]:
+            for x in g.get("items") or []:
+                if x.get("kind") == "media":
+                    x["url"], x["source"] = None, ""   # 방송 라벨도 뺌 — 메타 = 시각만 (2026-11-25 사용자)
         if not built["stories"]:
             raise ValueError("뉴스 없음")
         dirs = mf.direction_counts(media)
@@ -581,11 +560,14 @@ def news_section():
             if x["kind"] == "fact" and x.get("market_dir"):
                 dirs[x["market_dir"]] = dirs.get(x["market_dir"], 0) + 1
                 week[x["market_dir"]] = week.get(x["market_dir"], 0) + 1
-        return facts + _dk.keep_tone(_dk.section(head, RH.news_tab(built, dirs, week), tab=TAB_NEWS))   # 헤드라인체 그대로 · 탭 이름과 같은 제목은 테마가 숨긴다
+        tab_html = RH.news_tab(built, dirs, week, pick_name="Newfact", kr=True)
+        # 한국 = 진행자 · 앵커 줄에 붙던 `- 방송 의견` 을 뺀다 — 사실 줄은 출처 없이 (2026-11-25 사용자: "모호하고 책임을 피하려는 말처럼"). 미국 리포트는 그대로
+        tab_html = re.sub(r' <span style="[^"]*">- 방송 의견</span>', "", tab_html)
+        return facts + _dk.keep_tone(_dk.section(head, tab_html, tab=TAB_NEWS))   # 헤드라인체 그대로 · 탭 이름과 같은 제목은 테마가 숨긴다
     except Exception as e:  # noqa: BLE001
         print(f"[kr-report] 뉴스 못 읽음 (목업은 자리만): {str(e)[:120]}")
     # 독자 화면에 내부 안내(`뉴스 자리 — 발행 때 …`)가 나가던 것 (2026-11-09 사용자) → 독자 말 한 줄
-    return facts + _dk.section(head, _dk.muted("최근 나흘 동안 한국 증시를 다룬 방송 뉴스가 없습니다."), tab=TAB_NEWS)
+    return facts + _dk.section(head, _dk.muted("최근 나흘 동안 실을 Newfact 가 없습니다."), tab=TAB_NEWS)
 
 
 SORT_BTN = R.SORT_BTN

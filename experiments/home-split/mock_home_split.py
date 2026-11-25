@@ -154,6 +154,12 @@ def split_html(src, mkt, files=FILES):
         kn = kr_news()
         if kn:
             html = html.replace("<head>", "<head>\n<script>window.PV_KR_NEWS = " + json.dumps(kn, ensure_ascii=False).replace("</", "<\\/") + ";</script>", 1)
+        try:   # Newfact 글(news-posts.json) = 운영 gh-pages 공개 파일 읽기만 — 홈 `오늘의 Newfact` 배지 줄 (2026-11-25)
+            import urllib.request
+            with urllib.request.urlopen(KR_FACTS_PUBLIC.replace("kr-facts.json", "news-posts.json"), timeout=20) as r:
+                html = html.replace("<head>", "<head>\n<script>window.PV_NF_POSTS = " + r.read().decode("utf-8").replace("</", "<\\/") + ";</script>", 1)
+        except Exception as e:  # noqa: BLE001
+            print("[home-split] news-posts.json 못 받음:", str(e)[:120])
         kf = kr_facts()
         if kf:
             html = html.replace("<head>", "<head>\n<script>window.PV_KR_FACTS = " + json.dumps(kf, ensure_ascii=False).replace("</", "<\\/") + ";</script>", 1)

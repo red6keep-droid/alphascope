@@ -29,6 +29,8 @@ import news_pick  # noqa: E402  — 뉴스 묶기 · 꼭 볼 뉴스 · 팝업 �
 
 MEDIA_SHOWN = 5    # 뉴스 구획 끝의 방송 줄 — 앞 5건만 펼쳐 두고 나머지는 `방송 n건 더 보기` 접기 (2026-10-30 사용자: 상한 없이 다 싣는다. 옛 MEDIA_MAX=3 은 미디어 데일리가 나머지를 들던 때 숫자)
 MEDIA_HOURS = 48   # 글을 만드는 시각 기준 최근 48시간 영상 (2026-10-30 사용자, 옛 24)
+KR_CLAMP2 = "display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;"   # 한국 뉴스 보조 줄 두 줄 자르기 (2026-11-25 사용자 "세 줄은 안 돼")
+KR_CHIP_MIN, KR_CHIPS = 3, 3   # 한국 분야 칩 = 3건 넘게 다룬 분야만 · 많은 순 3개까지 (2026-11-25 사용자 "탭이 너무 많다")
 NEW_LEAD = dk.NEW_PILL.replace("margin-left:4px;", "margin-right:5px;").replace("vertical-align:middle;", "vertical-align:middle;position:relative;top:-2px;")   # 제목 글자와 세로 가운데 (2026-11-07 사용자 P347: 아래로 치우침)   # 새 뉴스 N 은 제목 앞에 (2026-11-05 사용자)
 STORY_SHOWN = 5    # `여러 방송이 같이 다룬 뉴스는?` 카드에 보이는 묶음 수 (2026-11-05 batch 8 ③)
 CHART_MAIN = getattr(dk, "CHART_MAIN", "#F59E0B")   # 우리 그래프 기본색(주황 · 사용자가 노랑이라 부르는 색) · 비교 대상 회색 — 가이드라인 8-0 (⑨)
@@ -590,7 +592,8 @@ def _has_pop(g, built):
     """두 줄 이상 있을 때만 팝업 (batch 9 ④: 한 줄 팝업은 의미 없다 — 목록 보조 글씨로).
     한국 사실 기사 · 제목 묶음은 한 줄이어도 팝업 — 원문 주소가 없거나(사실) 여럿이라(묶음) 줄 링크로 보낼 곳이 없다 (2026-11-24)."""
     n = len(_pop_lines(g, built))
-    return n >= 1 if g["rep"]["kind"] in ("fact", "head") else n >= 2
+    # 주소가 없는 줄(한국 방송 — 영상 링크를 뺌, 2026-11-25 사용자)도 한 줄이어도 팝업 — 줄 링크로 보낼 곳이 없다
+    return n >= 1 if (g["rep"]["kind"] in ("fact", "head") or not g["rep"].get("url")) else n >= 2
 
 
 def _story_dir(g):
@@ -608,7 +611,7 @@ def _dir_pill(g):
     return dk.pill(dk.DIR_KO[d], d, bare=True)
 
 
-def _story_row(g, built, first):
+def _story_row(g, built, first, kr=False):
     """주요 뉴스 한 줄 (2026-11-05 사용자: `여러 방송이 같이 다룬 뉴스` 5줄과 주요 뉴스 5건이 같아 하나로) — 대표 기사 제목 · 보조 한 줄 · 사건 이름 + `n곳 / 전체` 칸 막대 · 시각 · 매체."""
     n_ch = built["n_channels_all"]
     rep = g["rep"]
@@ -616,11 +619,12 @@ def _story_row(g, built, first):
     sub = _first_text(lines[0]) if lines else ""
     attrs = (f' data-news-pop="{_esc(g["id"])}"' if _has_pop(g, built) else "") + ' data-trhelp="skip"'
     head = dk.keep_tone(f'<a href="{_esc(rep.get("url") or "#")}" target="_blank" rel="noopener"{attrs} style="color:#111;font-weight:700;text-decoration:none;font-size:{dk.NEWS_TITLE_FS};line-height:{dk.NEWS_TITLE_LH};display:block;">'
-                        f'{NEW_LEAD if g.get("new") else ""}{_esc(rep["text"])}</a>')   # 헤드라인은 합니다체로 바꾸지 않는다 (공용 카드와 같게)
-    meta = f'<span style="color:{dk.SUB};font-size:{dk.TINY};line-height:{dk.LH_TINY};">{_kst(rep["published_at"])} · {_esc(rep["source"])}</span>'   # 메타 = `시각 · 매체` (0-6)
+                        f'{NEW_LEAD if g.get("new") and not kr else ""}{_esc(rep["text"])}</a>')   # 한국 = N 없음 (2026-11-25 사용자)   # 헤드라인은 합니다체로 바꾸지 않는다 (공용 카드와 같게)
+    meta = f'<span style="color:{dk.SUB};font-size:{dk.TINY};line-height:{dk.LH_TINY};">{" · ".join(_esc(x) for x in (_kst(rep["published_at"]), rep["source"]) if x)}</span>'   # 메타 = `시각 · 매체` (0-6) — 매체가 비면 시각만(한국 방송, 2026-11-25)
     count = (f'<span style="display:inline-flex;align-items:center;gap:6px;">{_meter(g["n_channels"], n_ch)}'
              f'<span style="font-size:{dk.TINY};line-height:{dk.LH_TINY};color:#333;"><b style="color:#111;">{g["n_channels"]}곳</b> / {n_ch}곳</span></span>') if g["n_channels"] >= 2 else ""
-    return (head + (dk.keep_tone(f'<span style="{dk.NEWS_SUM}">{dk.speaker_html(sub, tail=False)}</span>') if sub else "")   # 목록 줄은 발언자 없이 — 팝업에서만 (P364)
+    clamp = KR_CLAMP2 if kr else ""   # 한국 = 보조 줄 두 줄까지 · 넘으면 … (2026-11-25 사용자)
+    return (head + (dk.keep_tone(f'<span style="{dk.NEWS_SUM}{clamp}">{dk.speaker_html(sub, tail=False)}</span>') if sub else "")   # 목록 줄은 발언자 없이 — 팝업에서만 (P364)
             + f'<span style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin:8px 0 0;line-height:1;">'
             + dk.pill_row(dk.pill(g["theme"], bare=True) + " " + _dir_pill(g)) + "</span>"   # 분야 · 방향 (P335 · P336)
             + f'<span style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin:8px 0 1px;line-height:1;">{count}{meta}</span>')   # 다음 줄 = 곳 수 막대 + 시각 · 매체 (2026-11-07 사용자 P348)
@@ -716,7 +720,7 @@ def sec_news(input_data, report, analysis):
     return news_tab(built, dirs, week, reaction, known)
 
 
-def news_tab(built, dirs, week, reaction=None, known=()):
+def news_tab(built, dirs, week, reaction=None, known=(), pick_name="주요 뉴스", kr=False):
     """뉴스 탭 내용 — 분야 칩 · 방향 막대 · 주요 뉴스 · 칩별 목록 · 팝업. 미국 증시 · 한국 증시 리포트 공용 (2026-11-07 사용자 M82: 한국 뉴스 탭을 미국과 같게)."""
     reaction = reaction or (lambda s: "")
     bars = dk.direction_bars(dirs, week)   # 뉴스 방향 막대 오늘 · 최근 7일 (P143 의 `오늘` 만 → 둘, 2026-11-07) — 분야 탭 아래 (P334)
@@ -725,7 +729,11 @@ def news_tab(built, dirs, week, reaction=None, known=()):
     picks, rest = built["picks"], built["rest"]
     pops = []
     if picks or rest:
-        chips = [("주요 뉴스", len(picks))] + news_pick.tab_order(picks, rest)   # 탭 = 8개 묶음(P357) · 순서 = 그날 주요 뉴스 순 → 건수 순(P358). `전체` 없음 (batch 9 ①)
+        if kr:   # 한국 (2026-11-25 사용자): 첫 칩 `Newfact` = 전체 보기(5건 + 10건씩), 분야 칩은 이슈 된 것만 — 3건 이상인 분야, 많은 순 3개까지(나머지 분야 줄도 Newfact 칩에 다 있음)
+            order = news_pick.tab_order(picks, rest)
+            chips = [(pick_name, len(picks) + len(rest))] + sorted([c for c in order if c[1] >= KR_CHIP_MIN], key=lambda c: -c[1])[:KR_CHIPS]
+        else:
+            chips = [(pick_name, len(picks))] + news_pick.tab_order(picks, rest)   # 탭 = 8개 묶음(P357) · 순서 = 그날 주요 뉴스 순 → 건수 순(P358). `전체` 없음 (batch 9 ①)
         # 분야 탭 = 홈 `테마 종목` 묶음 탭 모양 (2026-11-07 사용자 P332): 하나로 이은 둥근 박스 · 메뉴 사이 세로 구분선 · 선택 = 굵은 검정 + 1px 검정 외곽선(테마 CSS).
         # 박스 테두리는 버튼들이 나눠 가진다(위 · 아래 + 첫 버튼 왼쪽 · 끝 버튼 오른쪽) — 가로로 밀면 박스째 움직인다 (P333). 위치 = 뉴스 탭 맨 위, 방향 막대는 그 아래 (P334)
         last = len(chips) - 1
@@ -738,17 +746,18 @@ def news_tab(built, dirs, week, reaction=None, known=()):
         out += bars
         lis = []
         for i, g in enumerate(picks + rest):
-            is_pick = i < len(picks)
-            item = _story_row(g, built, i == 0) if is_pick else _story_item(g, built, reaction, known, compact=True)   # 주요 뉴스 = 사건 이름 + n곳 막대 줄
+            is_pick = kr or i < len(picks)   # 한국 = 모든 줄이 첫 칩(Newfact 전체 보기) · 같은 줄 꼴
+            item = _story_row(g, built, i == 0, kr=kr) if is_pick else _story_item(g, built, reaction, known, compact=True)   # 주요 뉴스 = 사건 이름 + n곳 막대 줄
             pick_attr = ' data-pick="1"' if is_pick else " hidden"
             pick_attr += (f' data-news-pop="{_esc(g["id"])}"' if _has_pop(g, built) else f' data-row-link="1" data-href="{_esc(g["rep"].get("url") or "#")}"')   # 구분선 안 아무 데나 눌러도 팝업 · 원문 (2026-11-05 사용자, 가이드라인 10-9 줄 전체 링크)
             lis.append(f'<li data-theme="{_esc(news_pick.tab_of(g["theme"]))}"{pick_attr} style="margin:0;padding:{dk.RULE_GAP - dk.NEWS_VP}px {dk.ALIGN_PX}px {dk.RULE_GAP - dk.NEWS_VP}px;'
                        f'line-height:{dk.LH_BODY};box-shadow:inset 0 1px 0 #E2E8F0;">{item}</li>')   # 첫 줄 구분선은 테마 JS 가 지운다. 주요 뉴스 외는 숨김 — 칩이 켠다
             if _has_pop(g, built):
                 pops.append(_news_pop_body(g, built))
-        out += f'<ul data-news-list="1" data-shown="{news_pick.LIST_SHOWN}" style="margin:0 0 8px;padding:0;list-style:none;font-size:{dk.SMALL};">{"".join(lis)}</ul>'
+        more_attrs = f' data-shown="5" data-step="10" data-more-label="{_esc(pick_name)}"' if kr else f' data-shown="{news_pick.LIST_SHOWN}"'   # 한국 = 5건 + `Newfact 10건 더 보기` (홈과 같은 규칙)
+        out += f'<ul data-news-list="1"{more_attrs} style="margin:0 0 8px;padding:0;list-style:none;font-size:{dk.SMALL};">{"".join(lis)}</ul>'
         out += (f'<button type="button" data-news-more="1" style="{dk.FOLD_BTN}width:100%;margin:0 0 8px;display:none;">'
-                f'<span>뉴스 더 보기</span> {dk.ACC_CHEV}</button>')   # 글자 · 보임은 테마 JS (분야 칩마다 LIST_SHOWN 넘는 만큼)
+                f'<span>{_esc(pick_name) if kr else "뉴스"} 더 보기</span> {dk.ACC_CHEV}</button>')   # 글자 · 보임은 테마 JS (분야 칩마다 LIST_SHOWN 넘는 만큼)
     else:
         out += bars
     out += "".join(pops)
