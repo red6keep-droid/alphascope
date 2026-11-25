@@ -88,9 +88,15 @@ KR_FIX = {
 # 업계 카드가 실제 사업과 맞지 않는 종목 — 대표 종목도 큰 업종 대체도 쓰지 않는다 (2026-11-25 사용자 `하림지주가 왜 건설` → 316개 점검).
 # 업종 고침(큰 업종 · 세부 업종)은 build_ref.py 가 같은 파일로 quick_ref.json 에 넣는다
 try:
-    CARD_OFF = set(json.load(open(os.path.join(EXP, "ref", "kr_industry_fix.json"), encoding="utf-8")).get("card_off") or {})
+    _FIX = json.load(open(os.path.join(EXP, "ref", "kr_industry_fix.json"), encoding="utf-8"))
 except (OSError, ValueError):
-    CARD_OFF = set()
+    _FIX = {}
+CARD_OFF = set(_FIX.get("card_off") or {})
+# 종목마다 고른 사업 묶음(2026-11-25 사용자 "2번 진행") → 그 묶음의 업계 자료를 빌려 올 정식 종목. 원자료 업종의 대표 종목이 같은 묶음이면 그것을 그대로(생보 · 손보 구분 등)
+CARD = {c: x["group"] for c, x in (_FIX.get("card") or {}).items()}
+GROUP_REP = {"반도체": "000660.KS", "가전": "066570.KS", "2차전지": "373220.KS", "자동차": "005380.KS", "바이오": "068270.KS",
+             "은행": "105560.KS", "보험": "000810.KS", "플랫폼": "035420.KS", "통신": "017670.KS", "조선": "009540.KS",
+             "방산": "064350.KS", "원전 · 발전설비": "034020.KS", "건설": "028260.KS", "철강": "005490.KS", "비철금속": "010130.KS", "전력": "015760.KS"}
 
 
 def code_of(sym):
@@ -99,6 +105,9 @@ def code_of(sym):
 
 def rep_of(sym, e):
     c = code_of(sym)
+    if c in CARD:
+        old = IND_REP.get(e.get("industry_en"))
+        return old if old and K.BIZ_OF.get(code_of(old)) == CARD[c] else GROUP_REP[CARD[c]]
     if c in CARD_OFF:
         return None
     if c in KR_FIX:
