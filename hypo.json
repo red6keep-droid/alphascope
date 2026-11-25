@@ -1,7 +1,7 @@
 {
  "id": "hypo-card",
  "label": "증시 전망",
- "generated": "2026-11-25T07:33:34Z",
+ "generated": "2026-11-25T21:44:53Z",
  "list_url": "https://www.newfact.app/p/forecast-list.html",
  "open": [
   {
@@ -30,35 +30,7 @@
    ],
    "event": "11.23 브로드컴 급락",
    "market": "us",
-   "lean": 0
-  },
-  {
-   "no": 1,
-   "eh": "EH-2026-012",
-   "title": "반도체 급등, 조정 올까 더 오를까?",
-   "url": "https://www.newfact.app/p/forecast-2026-012.html",
-   "posted": "11.24",
-   "tags": [
-    "반도체",
-    "조정"
-   ],
-   "event": "11.23 반도체 급등",
-   "market": "us",
-   "lean": 0
-  },
-  {
-   "no": 1,
-   "eh": "EH-2026-013",
-   "title": "기술 업종 급등, 조정 올까 더 오를까?",
-   "url": "https://www.newfact.app/p/forecast-2026-013.html",
-   "posted": "11.24",
-   "tags": [
-    "기술",
-    "조정"
-   ],
-   "event": "11.23 기술 업종 급등",
-   "market": "us",
-   "lean": 0
+   "lean": 1
   },
   {
    "no": 1,
@@ -72,7 +44,7 @@
    ],
    "event": "11.23 에너지 업종 급락",
    "market": "us",
-   "lean": 0
+   "lean": 1
   },
   {
    "no": 1,
@@ -100,11 +72,11 @@
    ],
    "event": "11.13 한국전력 급락",
    "market": "kr",
-   "lean": 1
+   "lean": 0
   }
  ],
  "done_count": {
-  "us": 7,
+  "us": 9,
   "kr": 0
  },
  "ops": {
