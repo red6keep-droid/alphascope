@@ -413,7 +413,7 @@ def _tourism(prev_ind, months=37, fresh=3):
 
 
 def _kosis(item, n=37):
-    """통계청 KOSIS 월별 표 한 칸 (2026-11-25 온라인쇼핑 거래액) — item = "기관/표/분류1/분류2". 키 KOSIS_API_KEY 가 없거나 실패하면 빈 목록(지난 값으로 채움)."""
+    """통계청 KOSIS 월별 표 한 칸 (2026-11-25 온라인쇼핑 거래액 · 업태별 판매 · 게임 생산) — item = "기관/표/항목/분류1[/분류2]". 키 KOSIS_API_KEY 가 없거나 실패하면 빈 목록(지난 값으로 채움)."""
     k = os.environ.get("KOSIS_API_KEY", "").strip()
     if not k:
         try:
@@ -428,10 +428,10 @@ def _kosis(item, n=37):
     if _late():
         print("[kr] KOSIS — 시간 상한, 지난 값으로")
         return []
-    org, tbl, o1, o2 = item.split("/")
+    org, tbl, itm, o1, *o2 = item.split("/")
     try:
         r = requests.get("https://kosis.kr/openapi/Param/statisticsParameterData.do",
-                         params={"method": "getList", "apiKey": k, "orgId": org, "tblId": tbl, "itmId": "ALL", "objL1": o1, "objL2": o2,
+                         params={"method": "getList", "apiKey": k, "orgId": org, "tblId": tbl, "itmId": itm, "objL1": o1, "objL2": o2[0] if o2 else "",
                                  "format": "json", "jsonVD": "Y", "prdSe": "M", "newEstPrdCnt": str(n)}, timeout=15)
         j = r.json()
         if isinstance(j, dict):
@@ -565,6 +565,7 @@ def run_flows():
             got = _kosis(item)
             if got:
                 out["industry"][key_name] = got
+            time.sleep(0.3)
     # K1~K6 업종별 BSI — 표마다 "?/업종" 한 번에 항목 전부 (ITEM_CODE1 = 항목, ITEM_CODE2 = 업종)
     out["bsi"] = {}
     for ind in U.BSI_INDUSTRY:
