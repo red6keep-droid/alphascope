@@ -263,7 +263,7 @@ def sec_pairs(s, a=None):
 
 
 IND_SRC = {"derived": "한국은행 금리 통계", "121Y006": "한국은행 대출금리", "121Y002": "한국은행 수신금리", "151Y002": "한국은행 가계대출", "901Y054": "은행연합회 연체율", "402Y016": "한국은행 수출물가지수", "901Y039": "국가데이터처 광공업 생산", "901Y019": "한국전력공사", "901Y073": "한국석유공사", "901Y072": "에너지경제연구원",
-           "901Y020": "국가데이터처 건설수주", "901Y105": "국가데이터처 주택건설인허가", "901Y074": "국가데이터처 미분양주택", "901Y149": "한국부동산원", "601Y003": "한국은행 신용카드"}
+           "901Y020": "국가데이터처 건설수주", "901Y105": "국가데이터처 주택건설인허가", "901Y074": "국가데이터처 미분양주택", "901Y149": "한국부동산원", "601Y003": "한국은행 신용카드", "tourism": "한국문화관광연구원", "daily": "한국은행 ECOS"}
 
 
 def _ind_value(r):
@@ -280,6 +280,10 @@ def _ind_value(r):
         return f"{v / 1e3:,.0f}조 원"
     if kind == "won_k":   # 천원 (증시 거래대금, 2026-11-25)
         return f"{v / 1e9:,.1f}조 원" if abs(v) >= 1e9 else f"{v / 1e5:,.0f}억 원"
+    if kind == "ppl":   # 명 (출입국 관광, 2026-11-25)
+        return f"{v / 1e4:,.1f}만 명"
+    if kind == "krw":   # 환율 원 (함께 볼 지표, 2026-11-25)
+        return f"{v:,.1f}원"
     if kind == "won":   # 원 (투자자 예탁금 · 신용융자, 2026-11-25)
         return f"{v / 1e12:,.1f}조 원" if abs(v) >= 1e12 else f"{v / 1e8:,.0f}억 원"
     if kind == "pct":
@@ -419,7 +423,7 @@ def _mo(m):
 
 def _chart_unit(kind):
     """그래프 숫자는 짧게 — 단위는 그래프 제목에."""
-    return {"won_m": (1e6, "조 원"), "won_b": (1e3, "조 원"), "won_k": (1e9, "조 원"), "won": (1e12, "조 원"), "mwh": (1e4, "만 MWh"), "kbbl": (1e3, "백만 배럴"), "ktoe": (1e3, "백만 TOE"), "ton": (1e4, "만 톤"),
+    return {"won_m": (1e6, "조 원"), "won_b": (1e3, "조 원"), "won_k": (1e9, "조 원"), "won": (1e12, "조 원"), "ppl": (1e4, "만 명"), "krw": (1, "원"), "mwh": (1e4, "만 MWh"), "kbbl": (1e3, "백만 배럴"), "ktoe": (1e3, "백만 TOE"), "ton": (1e4, "만 톤"),
             "cnt": (1, "호"), "pct": (1, "%"), "idx": (1, ""), "usd": (1e8, "억 달러")}.get(kind, (1, ""))
 
 
@@ -587,8 +591,23 @@ def card_sector_flow(s):
     return R._state_card(f"{sf['name']} 업계 자금 흐름은?", sf["state"], th, col, _kospi(R.sector_lines(sf, "KOSPI")), "", fold=True, opened=True)   # 탭 첫 강조 카드는 펼침 (P216)
 
 
+def card_related(s):
+    """함께 볼 지표 (2026-11-25 사용자) — 업계 통계는 아니지만 회사의 원가 · 손님 수와 상식적으로 이어지는 지표. 판정 없이 참고, 업계 카드 아래.
+    줄마다 1년 전 같은 달과 견준 값(계절 착시를 빼려고). 주가와의 관계는 확인한 것이 아니라고 작은 글씨로."""
+    rows = s.get("related") or []
+    if not rows:
+        return ""
+    lines = [("업계 통계는 아니지만 이 회사의 원가나 손님 수와 이어지는 지표입니다."
+              + R.small_note("모두 1년 전 같은 달과 견줍니다. 주가를 설명한다고 확인한 지표는 아니고, 참고로만 봅니다."), "plain")]
+    for r in rows:
+        u = "%p" if r["kind"] == "pct" else "%"
+        lines.append(("row", r["name"], _ind_value(r), f"{r['month'][:4]}년 {int(r['month'][5:])}월"
+                      + (f" · 1년 전보다 {_sgn(r['chg'], 2 if u == '%p' else 1)}{u}" if r.get("chg") is not None else "") + f" · {r['note']}"))
+    return R._state_card("함께 볼 지표", "참고", "neutral", R.MUTED, lines, "", fold=True)
+
+
 def sec_industry_tab(s):
-    out = card_sector_flow(s) + card_industry_mood(s) + card_industry_work(s) + card_industry_money(s)
+    out = card_sector_flow(s) + card_industry_mood(s) + card_industry_work(s) + card_industry_money(s) + card_related(s)
     return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{out}</div>' if out else _dk.muted("이 종목은 업계 자료를 아직 연결하지 않았습니다.")
 
 

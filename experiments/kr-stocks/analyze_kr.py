@@ -4,6 +4,7 @@
 시장(자금 흐름, ECOS): 외국인 일별 순매수(20일 누적 · 평소 범위) · 투자자별 월별 · 예탁금 · 신용융자.
 실적 발표 · 옵션 · 공시 · 애널리스트는 없다(1단계, 기획 11-1).
 """
+import datetime
 import json
 import math
 import os
@@ -225,6 +226,34 @@ def industry_rows(sym, flow_data):
     return out
 
 
+def related_rows(sym, flow_data):
+    """함께 볼 지표 (U.related_for) — 업계 지표와 같은 줄 모양. 일별 값(환율 · 금리)은 다 끝난 달의 평균으로 바꾼다."""
+    ind = (flow_data or {}).get("industry") or {}
+    daily = (flow_data or {}).get("more_d") or {}
+    out = []
+    for key, why in U.related_for(sym):
+        if key in U.RELATED_DAILY:
+            src, name, kind = U.RELATED_DAILY[key]
+            mon = {}
+            for x in daily.get(src) or []:
+                mon.setdefault(x["day"][:7], []).append(x["v"])
+            cur = datetime.date.today().strftime("%Y-%m")   # 다 끝난 달만 — 이번 달 일부 평균을 1년 전 한 달 전체와 견주면 비교가 어긋난다
+            xs = [{"month": m, "v": sum(v) / len(v)} for m, v in sorted(mon.items()) if m < cur]
+            stat = "daily"
+        else:
+            xs = ind.get(key) or []
+            stat, _item, name, kind, *_r = U.INDICATORS[key]
+        if len(xs) < 13:
+            continue
+        last = xs[-1]
+        y, mo = int(last["month"][:4]), last["month"][5:]
+        prev = next((x["v"] for x in xs if x["month"] == f"{y - 1}-{mo}"), None)
+        chg = (last["v"] - prev) if (kind == "pct" and prev is not None) else ((last["v"] / prev - 1) * 100 if prev else None)
+        out.append({"key": key, "name": name, "kind": kind, "cmp": "yoy", "note": why, "month": last["month"], "v": last["v"], "chg": chg,
+                    "series": xs[-24:], "src_stat": stat})
+    return out
+
+
 def stock(sym, snap, hist, flow_data=None):
     bars = snap["bars"].get(sym) or []
     if len(bars) < 2:
@@ -240,7 +269,7 @@ def stock(sym, snap, hist, flow_data=None):
          "cap": snap["caps"].get(sym), "normal_range": A.normal_range(bars, set()),
          "periods": A.period_returns(bars, bench), "year_range": yr, "tech": tech,
          "bollinger": A.bollinger(bars), "overheat": A.overheat(bars, tech), "drawdown": drawdown(bars, yr, hist, sym),
-         "pairs": pair_moves(sym, snap, t["day"]), "industry": industry_rows(sym, flow_data), "bsi": bsi_rows(sym, flow_data), "fin": fin_rows(sym, flow_data),
+         "pairs": pair_moves(sym, snap, t["day"]), "industry": industry_rows(sym, flow_data), "bsi": bsi_rows(sym, flow_data), "fin": fin_rows(sym, flow_data), "related": related_rows(sym, flow_data),
          "mom_12_1": momentum(bars), "trade_tag": U.TRADE_TAG.get(sym), "_bars": bars}
     return s
 

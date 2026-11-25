@@ -33,6 +33,7 @@ SAMPLES = [("267260.KS", "새 묶음 `전력기기`"), ("010120.KS", "새 묶음
            ("007660.KS", "새 묶음 `인쇄회로기판` — 물량 줄고 값 오름"), ("009150.KS", "새 묶음 `콘덴서` — 사업 일부만이라 안내 줄"), ("011070.KS", "카메라모듈 — 맞는 지표 없어 카드 없음"),
            ("214150.KQ", "새 묶음 `의료기기` — 수출 + 업계 경기(의료 · 정밀기기)"), ("096530.KQ", "진단 키트 — 진단 시약 수출이 넓고 출렁여 카드 없음"),
            ("003230.KS", "새 묶음 `라면`"), ("007310.KS", "새 묶음 `가공식품` — 판매 값과 원료 값"), ("139480.KS", "새 묶음 `유통`"), ("011170.KS", "새 묶음 `석유화학` — 수출 + 업계 경기 · 수익성"), ("039490.KS", "새 묶음 `증권` — 거래대금"), ("032500.KQ", "새 묶음 `통신장비`"), ("003490.KS", "새 묶음 `항공`"), ("010950.KS", "새 묶음 `정유` — 수출금액과 원유 값"), ("011200.KS", "새 묶음 `해운`"), ("035900.KQ", "새 묶음 `엔터` — 음반 수출"), ("259960.KS", "게임 — 맞는 월 통계 없어 카드 없음"),
+           ("008770.KS", "함께 볼 지표 — 중국인 · 외국인 관광객"), ("383220.KS", "업계 카드 없음 · 함께 볼 지표 = 원/위안"),
            ("036930.KQ", "건설 수주 → `반도체` 묶음으로 옮김"), ("032820.KQ", "메모리 값 → `원전 · 발전설비` 묶음으로 옮김"),
            ("003380.KQ", "지주회사 — 건설 수주 카드 뺌"), ("006260.KS", "지주회사 — 카드 없음")]
 NEW_GROUPS = ("전력기기", "전선", "화장품", "로봇", "인쇄회로기판", "콘덴서", "의료기기",
@@ -63,6 +64,7 @@ def fetch_new(flows):
                 rows = [x for x in rows if "원화" in (x.get("ITEM_NAME2") or "")]
             ind[k] = [{"month": f"{x['TIME'][:4]}-{x['TIME'][4:]}", "v": float(x["DATA_VALUE"])} for x in rows if x.get("DATA_VALUE")]
             time.sleep(0.3)
+    flows["industry"].update(C._tourism(flows["industry"]))   # 정식 실행보다 먼저 (2026-11-25 함께 볼 지표)
     bsi = flows.setdefault("bsi", {})
     for g in NEW_GROUPS:   # 업계 경기 업종이 상태 파일에 아직 없으면 직접 (정식 실행보다 먼저, 의료기기 C2700)
         for ind in (K.BIZ_STATS.get(g) or ())[:1]:
@@ -101,7 +103,7 @@ def main():
         if rep:
             F.alias(rep, s)
         x = {"sym": s, "code": c, "name": e["ko"], "sector": e.get("sector"), "industry": analyze_kr.industry_rows(s, flows),
-             "bsi": analyze_kr.bsi_rows(s, flows), "fin": analyze_kr.fin_rows(s, flows), "sector_flow": None}
+             "bsi": analyze_kr.bsi_rows(s, flows), "fin": analyze_kr.fin_rows(s, flows), "related": analyze_kr.related_rows(s, flows), "sector_flow": None}
         body.append(f'<h3 style="margin:28px 0 4px;">{html.escape(e["ko"])} <span style="font-weight:400;font-size:13px;color:#64748B;">'
                     f'{html.escape(e.get("sector") or "")} · {html.escape(e.get("sub") or "")}</span></h3>'
                     f'<div style="margin:0 0 10px;font-size:13px;color:#64748B;">{html.escape(note)}</div>' + render_kr.sec_industry_tab(x))

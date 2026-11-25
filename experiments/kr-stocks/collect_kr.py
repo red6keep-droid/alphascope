@@ -353,6 +353,65 @@ def _customs(hs_list, years=3):
     return [{"month": m, "v": v} for m, v in sorted(mon.items())]
 
 
+TOURISM_URL = "https://apis.data.go.kr/B551940/EdrcntTourismStatsService/getEdrcntTourismStatsList"
+TOURISM_KEYS = ("tour_in", "tour_in_cn", "tour_in_jp", "tour_out")
+
+
+def _tourism(prev_ind, months=37, fresh=3):
+    """출입국 관광 (한국문화관광연구원 · 공공데이터포털 15158830 · 이용허락범위 제한 없음, 2026-11-25) — 달마다 국적별 방한 외래관광객(E) · 국민 해외관광객(D).
+    한 번 부르면 한 달치. 지난번 값(prev_ind)에 있는 달은 다시 부르지 않고, 최근 fresh 달만 새로 받는다(늦게 고쳐지는 값). 첫 실행만 months 번.
+    방한 외국인 = 국적별 줄의 합(합계 줄이 없다). 키 = DATA_GO_KR_API_KEY(관세청과 같은 키). 못 받은 달은 지난 값 그대로."""
+    import xml.etree.ElementTree as ET
+    k = os.environ.get("DATA_GO_KR_API_KEY", "").strip()
+    if not k:
+        try:
+            from dotenv import load_dotenv
+            load_dotenv(os.path.join(BASE, "..", "..", ".env"))
+            k = os.environ.get("DATA_GO_KR_API_KEY", "").strip()
+        except ImportError:
+            pass
+    old = {key: {x["month"]: x["v"] for x in prev_ind.get(key) or []} for key in TOURISM_KEYS}
+    if not k:
+        print("[kr] 관광 통계 키(DATA_GO_KR_API_KEY) 없음 — 지난 값으로")
+        return {key: [{"month": m, "v": v} for m, v in sorted(old[key].items())] for key in TOURISM_KEYS if old[key]}
+    today = datetime.date.today().replace(day=1)
+    ym = []
+    y, m = today.year, today.month
+    for _ in range(months):
+        ym.append(f"{y}-{m:02d}")
+        y, m = (y - 1, 12) if m == 1 else (y, m - 1)
+    new = {key: dict(v) for key, v in old.items()}
+    calls = 0
+    for i, mo in enumerate(ym):
+        if i >= fresh and all(mo in old[key] for key in TOURISM_KEYS):
+            continue
+        if _late():
+            print("[kr] 관광 통계 — 시간 상한, 지난 값으로")
+            break
+        try:
+            r = requests.get(TOURISM_URL, params={"serviceKey": k, "numOfRows": "500", "pageNo": "1", "YM": mo.replace("-", "")}, timeout=15)
+            calls += 1
+            root = ET.fromstring(r.content)
+            if root.findtext("header/resultCode") not in ("00", "0000"):
+                print(f"[kr] 관광 통계 {mo}: {(root.findtext('header/resultMsg') or '')[:60]}")
+                break
+            rows = [((it.findtext("edCd") or ""), (it.findtext("natKorNm") or "").replace(" ", ""), float(it.findtext("num") or 0)) for it in root.findall("body/items/item")]
+            if not rows:   # 아직 안 나온 달
+                continue
+            new["tour_in"][mo] = sum(v for e, _n, v in rows if e == "E")
+            new["tour_in_cn"][mo] = sum(v for e, n, v in rows if e == "E" and n == "중국")
+            new["tour_in_jp"][mo] = sum(v for e, n, v in rows if e == "E" and n == "일본")
+            new["tour_out"][mo] = sum(v for e, _n, v in rows if e == "D")
+        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError) as e:
+            print(f"[kr] 관광 통계 {mo} 시간 초과 · 연결 실패 — 나머지는 지난 값으로: {str(e)[:80]}")
+            break
+        except Exception as e:   # noqa: BLE001
+            print(f"[kr] 관광 통계 {mo} 실패: {str(e)[:80]}")
+        time.sleep(0.3)
+    print(f"[kr] 관광 통계 {calls}번 부름 · 마지막 {max(new['tour_in']) if new['tour_in'] else '없음'}")
+    return {key: [{"month": m, "v": v} for m, v in sorted(new[key].items())] for key in TOURISM_KEYS if new[key]}
+
+
 def _ecos(key, stat, cycle, start, end, item, n=2000):
     """item 은 항목 코드 하나, 또는 항목이 둘인 표는 "ITEM1/ITEM2" (예: 기업경기조사 전산업/업황실적)."""
     if _late():
@@ -444,7 +503,7 @@ def run_flows():
     # 업종 재료 지표 (기획 11-4, 2026-10-24) — 표 · 항목이 겹치면 한 번만 받는다. 수출물가지수는 원화 · 계약통화 두 줄이 오므로 원화 기준만
     out["industry"] = {}
     for key_name, (stat, item, *_rest) in U.INDICATORS.items():   # DERIVED 는 analyze 에서 두 시계열의 차로 만든다
-        if stat == "customs":   # 관세청 품목 수출 — 아래 _customs 가 받는다 (2026-10-31)
+        if stat in ("customs", "tourism"):   # 관세청 품목 수출 · 출입국 관광 — 아래 _customs · _tourism 이 받는다 (2026-10-31, 11-25)
             continue
         try:
             rows = _ecos(key, stat, "M", m0, m1, item)
@@ -468,6 +527,7 @@ def run_flows():
         got = _customs(hs_list)
         if got:
             out["industry"][key_name] = got
+    out["industry"].update(_tourism(prev.get("industry") or {}))
     # K1~K6 업종별 BSI — 표마다 "?/업종" 한 번에 항목 전부 (ITEM_CODE1 = 항목, ITEM_CODE2 = 업종)
     out["bsi"] = {}
     for ind in U.BSI_INDUSTRY:
