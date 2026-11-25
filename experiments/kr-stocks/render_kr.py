@@ -275,7 +275,7 @@ def _ind_value(r):
     if kind == "won_m":
         return f"{v / 1e6:,.1f}조 원" if abs(v) >= 1e6 else f"{v / 1e2:,.0f}억 원"   # 1조 아래는 억 원 (발전설비 수주, 2026-10-31)
     if kind == "usd":
-        return f"{v / 1e8:,.1f}억 달러"   # 관세청 수출금액 (방산, 2026-10-31)
+        return f"{v / 1e8:,.1f}억 달러" if abs(v) >= 1e8 else f"{v / 1e4:,.0f}만 달러"   # 관세청 수출금액 (방산, 2026-10-31) · 1억 달러 아래는 만 달러 (로봇, 2026-11-25)
     if kind == "won_b":
         return f"{v / 1e3:,.0f}조 원"
     if kind == "pct":
