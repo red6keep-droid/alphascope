@@ -518,8 +518,9 @@ def card_industry_work(s):
     v0 = _ind_value(r0)
     if months > 1 and chg is not None:
         by = {x["month"]: x["v"] for x in r0.get("series") or []}
-        tot = dict(r0, v=sum(v for m, v in sorted(by.items())[-months:]))
-        head = (f"{_name_josa(r0['name'], '은')} 최근 3개월({r0['month'][:4]}년 {span_txt}) 합이 {_dk.josa(_ind_value(tot), '로')} "
+        idx = r0["kind"] == "idx"   # 지수는 더한 값이 뜻이 없어 3개월 평균으로 적는다 — 바뀐 정도(%)는 합과 같다 (2026-11-25 전력기기 묶음, 옛 묶음은 모두 금액)
+        tot = dict(r0, v=sum(v for m, v in sorted(by.items())[-months:]) / (months if idx else 1))
+        head = (f"{_name_josa(r0['name'], '은')} 최근 3개월({r0['month'][:4]}년 {span_txt}) {'평균이' if idx else '합이'} {_dk.josa(_ind_value(tot), '로')} "
                 f"1년 전 같은 3개월보다 {_sgn(chg, 1)}{unit}.")
         note = "월별 자료라 1~2달 늦게 나오고, 큰 계약이 들어온 달에 크게 튑니다. 그래서 3개월을 묶어 봅니다."
     else:

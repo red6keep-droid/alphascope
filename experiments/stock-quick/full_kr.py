@@ -107,7 +107,7 @@ def rep_of(sym, e):
     c = code_of(sym)
     if c in CARD:
         old = IND_REP.get(e.get("industry_en"))
-        return old if old and K.BIZ_OF.get(code_of(old)) == CARD[c] else GROUP_REP[CARD[c]]
+        return old if old and K.BIZ_OF.get(code_of(old)) == CARD[c] else GROUP_REP.get(CARD[c])   # 정식 종목이 없는 묶음(전력기기 · 전선) = None, build 가 지표만 잇는다
     if c in CARD_OFF:
         return None
     if c in KR_FIX:
@@ -507,6 +507,8 @@ def build(ref_kr, bars_all, flows, hist_full, det, dart_data, hist_quick, only=N
         K.BY_SYM[s] = K.CANDIDATES[-1]
         if code_of(s) in CARD_OFF:
             K.SECTOR_FALLBACK_OFF.add(s)
+        if not rep and CARD.get(code_of(s)) in K.BIZ:   # 대표 종목이 없는 새 묶음 — 업계 일감 카드만 (업계 경기 · 자금 흐름은 빌릴 곳이 없다)
+            K.BIZ_OF[code_of(s)] = CARD[code_of(s)]
         if rep:
             alias(rep, s)
         groups.setdefault(e.get("sector") or "기타", []).append(s)
