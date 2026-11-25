@@ -69,6 +69,9 @@ def fetch_new(flows):
     for k in {k for v in list(K.RELATED.values()) + list(K.RELATED_CODE.values()) for k, _w in v}:   # 함께 볼 지표 중 상태 파일에 아직 없는 ECOS 지표
         if k in ind or k not in K.INDICATORS or K.INDICATORS[k][0] in ("customs", "tourism"):
             continue
+        if K.INDICATORS[k][0] == "kosis":
+            ind[k] = C._kosis(K.INDICATORS[k][1])
+            continue
         stat, item = K.INDICATORS[k][:2]
         rows = C._ecos(key, stat, "M", "202301", "202612", item)
         if len({x.get("ITEM_CODE2") for x in rows}) > 1:

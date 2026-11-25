@@ -54,7 +54,8 @@ concurrency:
 
 env:
   ECOS_API_KEY: ${{ secrets.ECOS_API_KEY }}
-  DATA_GO_KR_API_KEY: ${{ secrets.DATA_GO_KR_API_KEY }}   # 관세청 품목별 수출 (방산, 2026-10-31)
+  DATA_GO_KR_API_KEY: ${{ secrets.DATA_GO_KR_API_KEY }}   # 관세청 품목별 수출 (방산, 2026-10-31) · 출입국 관광 (2026-11-25)
+  KOSIS_API_KEY: ${{ secrets.KOSIS_API_KEY }}   # 온라인쇼핑 거래액 (통계청 KOSIS, 함께 볼 지표 플랫폼, 2026-11-25)
   KIS_APP_KEY: ${{ secrets.KIS_APP_KEY }}         # 마지막 봉 대조(한국투자증권 실전, 집 IP 로만 — kis_last.py) · 바꾸는 값은 네이버 (2026-11-23 사용자)
   KIS_APP_SECRET: ${{ secrets.KIS_APP_SECRET }}
   DART_API_KEY: ${{ secrets.DART_API_KEY }}   # `실적과 기대` 분기 매출 (collect_kr_dart.py, 2026-10-25) — 없으면 Yahoo 매출

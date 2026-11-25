@@ -412,6 +412,38 @@ def _tourism(prev_ind, months=37, fresh=3):
     return {key: [{"month": m, "v": v} for m, v in sorted(new[key].items())] for key in TOURISM_KEYS if new[key]}
 
 
+def _kosis(item, n=37):
+    """통계청 KOSIS 월별 표 한 칸 (2026-11-25 온라인쇼핑 거래액) — item = "기관/표/분류1/분류2". 키 KOSIS_API_KEY 가 없거나 실패하면 빈 목록(지난 값으로 채움)."""
+    k = os.environ.get("KOSIS_API_KEY", "").strip()
+    if not k:
+        try:
+            from dotenv import load_dotenv
+            load_dotenv(os.path.join(BASE, "..", "..", ".env"))
+            k = os.environ.get("KOSIS_API_KEY", "").strip()
+        except ImportError:
+            pass
+    if not k:
+        print("[kr] KOSIS 키(KOSIS_API_KEY) 없음 — 지난 값으로")
+        return []
+    if _late():
+        print("[kr] KOSIS — 시간 상한, 지난 값으로")
+        return []
+    org, tbl, o1, o2 = item.split("/")
+    try:
+        r = requests.get("https://kosis.kr/openapi/Param/statisticsParameterData.do",
+                         params={"method": "getList", "apiKey": k, "orgId": org, "tblId": tbl, "itmId": "ALL", "objL1": o1, "objL2": o2,
+                                 "format": "json", "jsonVD": "Y", "prdSe": "M", "newEstPrdCnt": str(n)}, timeout=15)
+        j = r.json()
+        if isinstance(j, dict):
+            print(f"[kr] KOSIS {tbl}: {str(j.get('errMsg') or j)[:60]}")
+            return []
+        return sorted(({"month": f"{x['PRD_DE'][:4]}-{x['PRD_DE'][4:6]}", "v": float(x["DT"])} for x in j if x.get("DT") not in (None, "", "-")),
+                      key=lambda x: x["month"])
+    except Exception as e:   # noqa: BLE001
+        print(f"[kr] KOSIS {tbl} 실패: {str(e)[:80]}")
+        return []
+
+
 def _ecos(key, stat, cycle, start, end, item, n=2000):
     """item 은 항목 코드 하나, 또는 항목이 둘인 표는 "ITEM1/ITEM2" (예: 기업경기조사 전산업/업황실적)."""
     if _late():
@@ -503,7 +535,7 @@ def run_flows():
     # 업종 재료 지표 (기획 11-4, 2026-10-24) — 표 · 항목이 겹치면 한 번만 받는다. 수출물가지수는 원화 · 계약통화 두 줄이 오므로 원화 기준만
     out["industry"] = {}
     for key_name, (stat, item, *_rest) in U.INDICATORS.items():   # DERIVED 는 analyze 에서 두 시계열의 차로 만든다
-        if stat in ("customs", "tourism"):   # 관세청 품목 수출 · 출입국 관광 — 아래 _customs · _tourism 이 받는다 (2026-10-31, 11-25)
+        if stat in ("customs", "tourism", "kosis"):   # 관세청 품목 수출 · 출입국 관광 · 통계청 KOSIS — 아래 _customs · _tourism · _kosis 가 받는다 (2026-10-31, 11-25)
             continue
         try:
             rows = _ecos(key, stat, "M", m0, m1, item)
@@ -528,6 +560,11 @@ def run_flows():
         if got:
             out["industry"][key_name] = got
     out["industry"].update(_tourism(prev.get("industry") or {}))
+    for key_name, (stat, item, *_rest) in U.INDICATORS.items():
+        if stat == "kosis":
+            got = _kosis(item)
+            if got:
+                out["industry"][key_name] = got
     # K1~K6 업종별 BSI — 표마다 "?/업종" 한 번에 항목 전부 (ITEM_CODE1 = 항목, ITEM_CODE2 = 업종)
     out["bsi"] = {}
     for ind in U.BSI_INDUSTRY:
