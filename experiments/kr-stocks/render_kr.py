@@ -522,11 +522,14 @@ def card_industry_work(s):
         tot = dict(r0, v=sum(v for m, v in sorted(by.items())[-months:]) / (months if idx else 1))
         head = (f"{_name_josa(r0['name'], '은')} 최근 3개월({r0['month'][:4]}년 {span_txt}) {'평균이' if idx else '합이'} {_dk.josa(_ind_value(tot), '로')} "
                 f"1년 전 같은 3개월보다 {_sgn(chg, 1)}{unit}.")
-        note = "월별 자료라 1~2달 늦게 나오고, 큰 계약이 들어온 달에 크게 튑니다. 그래서 3개월을 묶어 봅니다."
+        note = b.get("note3") or "월별 자료라 1~2달 늦게 나오고, 큰 계약이 들어온 달에 크게 튑니다. 그래서 3개월을 묶어 봅니다."   # 큰 계약 사업이 아닌 묶음은 BIZ note3 (콘덴서, 2026-11-25)
     else:
         head = (f"{_name_josa(r0['name'], '은')} {r0['month'][:4]}년 {int(r0['month'][5:])}월 "
                 + (f"{_dk.josa(v0, '로')} 1년 전 같은 달보다 {_sgn(chg, 1)}{unit}." if chg is not None else f"{v0}다."))
         note = "월별 자료라 1~2달 늦게 나오고, 주가는 이보다 먼저 움직이곤 합니다."
+    part = getattr(U, "BIZ_PART_NOTE", {}).get(s["sym"].split(".")[0])   # 지표가 회사 사업 일부만 볼 때 (삼성전기 = 콘덴서만, 2026-11-25)
+    if part:
+        note += " " + part
     lines = [(head + R.small_note(note), "plain")]   # 늘 같은 안내는 작은 글씨 (P67)
     div, u = _chart_unit(r0["kind"])
     scaled = [dict(x, v=x["v"] / div) for x in r0.get("series") or []]   # 단위를 먼저 나눠 그린다 — 막대 숫자만 나누면 세로 눈금이 5000000 처럼 원래 숫자로 나왔다 (2026-10-31)
