@@ -1,0 +1,163 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>루멘텀 개성이 태어난 때</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;900&amp;family=Inter:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+/* 디자인 가이드라인(저장소 맨 위 `디자인-가이드라인.md`) 값 — 글자 세 톤 #111 · #333 · #6B7280(4절), 증감 #D93025 · #1A73E8, 중립 강조 보라 #6D28D9(5절),
+   카드 테두리 #E2E8F0 · 흰 카드 모서리 8 · 강조 카드 모서리 10(7절), 그래프 색 dk.CHART_*(4절), 라벨(8절), 정수 px · 글자와 줄 높이 홀짝 맞춤(3 · 6절), 폰 먼저(1절). */
+:root{--ink:#111;--body:#333;--sub:#6B7280;--faint:#9CA3AF;--line:#E2E8F0;--up:#D93025;--dn:#1A73E8;--vio:#6D28D9;--c-up:#ED8E87;--c-dn:#82B1F0;--c-main:#F59E0B;--c-cmp:#CBD5E1}
+*{box-sizing:border-box}
+body{margin:0;background:#fff;color:var(--body);font-family:'Noto Sans KR',-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:19px;line-height:35px;word-break:keep-all;font-variant-numeric:tabular-nums}
+main{max-width:680px;margin:0 auto;padding:26px 14px 60px}
+h1{font-size:22px;line-height:28px;font-weight:700;color:var(--ink);margin:0 0 12px;padding-left:6px}
+@media(max-width:680px){h1{font-size:20px;line-height:26px}}
+.stamp{background:#F3F4F6;border-radius:8px;padding:10px 12px;margin:0 0 14px;font-size:13px;line-height:19px;color:var(--sub)}
+.lead{font-size:19px;line-height:35px;color:var(--body);margin:0 0 12px;padding-left:6px}
+h2{font-size:19px;line-height:29px;font-weight:700;color:var(--ink);margin:24px 0 10px;padding-left:6px}
+.guide{font-size:14px;line-height:20px;color:var(--sub);margin:0 0 10px;padding-left:12px}
+.ct{display:block;font-weight:700;color:var(--ink);font-size:16px;line-height:24px;margin:16px 0 4px;padding-left:6px}
+.ct i{font-style:normal;font-weight:400;font-size:14px;position:relative;top:-2px}
+.ct small{font-size:14px;font-weight:400;color:var(--sub)}
+.emph{background:#F8FAFC;border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+.srow{padding:14px 0;border-top:1px solid #EAEDF2}.srow:first-child{border-top:0}
+.sname{font-size:18px;line-height:30px;font-weight:500;color:var(--ink);display:flex;justify-content:space-between;align-items:center;gap:12px}
+.sname b{font-weight:600}.smean{font-size:14px;line-height:20px;color:var(--sub);margin:0 0 6px}
+.caps{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.cap{font:inherit;font-size:14px;line-height:20px;font-weight:400;color:var(--sub);background:#fff;border:1px solid var(--line);border-radius:999px;padding:5px 12px;cursor:pointer}
+.cap.on{color:var(--ink);font-weight:700;background:#F1F5F9;border-color:var(--c-cmp)}
+label.cap{display:inline-flex;align-items:center;gap:6px}label.cap input{margin:0;width:14px;height:14px;accent-color:#111}
+input[type=range]{width:100%;margin:8px 0 0;accent-color:#111}
+.ticks{display:flex;justify-content:space-between;font-size:13px;line-height:19px;color:var(--sub)}
+.num{width:56px;font:inherit;font-size:16px;line-height:24px;font-weight:700;color:var(--ink);padding:3px 6px;border:1px solid var(--line);border-radius:8px;text-align:right;background:#fff}
+.vio{color:var(--vio);font-weight:700}
+.up{color:var(--up);font-weight:700;white-space:nowrap}.dn{color:var(--dn);font-weight:700;white-space:nowrap}.tr{position:relative;top:-1px;margin-right:2px}
+.box{display:inline-block;vertical-align:middle;font-size:14px;line-height:18px;font-weight:700;padding:3px 7px 2px;border-radius:4px;background:#E8EDF3;border:1px solid #D6DEE8;color:#475569;white-space:nowrap}
+.pill{display:inline-block;vertical-align:middle;position:relative;top:-1px;font-size:14px;line-height:1;font-weight:400;padding:3px 5px 2px;border-radius:4px;border:1px solid #86EFAC;color:#15803D;background:#F0FDF4;white-space:nowrap;margin-left:5px}
+.gh{display:flex;align-items:center;gap:8px;font-size:16px;line-height:24px;font-weight:700;color:var(--ink);margin:18px 0 8px;padding-left:6px}
+.gh span.cnt{margin-left:auto;font-size:17px;line-height:25px}
+.kid{background:#fff;border:1px solid var(--line);border-radius:8px;padding:12px;margin:0 0 6px}
+.khead{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.kname{font-size:16px;line-height:24px;font-weight:700;color:var(--ink);min-width:0}
+.kval{flex:none;display:flex;align-items:center;gap:4px;font-size:17px;line-height:25px;font-weight:700;color:var(--body);white-space:nowrap}
+.ksub{font-size:14px;line-height:20px;color:var(--sub);margin-top:6px}
+.fb{flex:none;width:31px;height:31px;border-radius:7px;border:1px solid var(--line);background:#fff;color:#111;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;margin-left:4px}
+.fb svg,.fbtn svg{transition:transform .15s}.fb.open svg,.fbtn.open svg{transform:rotate(180deg)}
+.fbtn{width:100%;font:inherit;cursor:pointer;display:flex;justify-content:center;align-items:center;gap:6px;padding:8px 12px;background:#fff;border:1px solid var(--line);border-radius:8px;color:#111;font-size:14px;line-height:20px;font-weight:700;margin:2px 0 8px}
+.strip{display:flex;gap:1px;margin-top:8px}.strip u{display:block;flex:none;width:6px;height:12px;background:var(--line);text-decoration:none}
+.strip u.l{background:var(--c-dn)}.strip u.h{background:var(--c-up)}.strip u.m{background:#A78BFA}.strip u.n{background:#fff;box-shadow:inset 0 0 0 1px #EEF2F7}.strip u.c{outline:2px solid #111;outline-offset:0}
+.ds{border-top:1px solid var(--line);margin-top:12px;padding-top:2px;font-size:16px;line-height:26px;color:var(--body)}
+.ds p{margin:12px 0 0}.ds .ph{font-weight:700;color:var(--ink);font-size:16px;line-height:24px;margin-top:16px}
+.ds ul{list-style:none;margin:4px 0 0;padding:0}.ds li{display:flex;align-items:flex-start;gap:7px;margin:9px 0}
+.ds li>i{flex:none;width:3px;height:3px;border-radius:50%;background:var(--body);margin-top:12px}
+.ds .tn{font-size:14px;line-height:20px;color:var(--sub)}.ds b{color:var(--ink)}
+.white{background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px 12px;overflow-x:auto}
+.white svg{display:block}
+.rows{margin:6px 0 0;padding:0 6px}.rw{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line);font-size:16px;line-height:24px}
+.rw:first-child{border-top:0}.rw>span:first-child{font-weight:700;color:var(--ink)}.rw>span:last-child{font-size:17px;line-height:25px;font-weight:700;color:var(--body);text-align:right;white-space:nowrap}
+.legend{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:13px;line-height:19px;color:var(--sub);margin:10px 0 0;padding-left:6px}
+.legend span{display:inline-flex;align-items:center;gap:5px}.legend u{display:inline-block;width:10px;height:10px;text-decoration:none}
+.empty{font-size:14px;line-height:20px;color:var(--sub);text-align:center;background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px 12px;margin:0 0 6px}
+.tabsw{position:sticky;top:0;z-index:30;padding-top:12px;margin-bottom:14px;background:#fff}
+.tabs{display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px;border-bottom:2px solid #eee}.tabs::-webkit-scrollbar,.subs::-webkit-scrollbar{display:none}
+.tab{flex:none;padding:8px 13px;font:inherit;font-size:18px;line-height:24px;font-weight:700;color:var(--sub);border:0;background:none;border-bottom:3px solid transparent;margin-bottom:-2px;white-space:nowrap;cursor:pointer}
+.tab[aria-selected="true"]{color:#FF3333;border-bottom-color:#FF3333}
+.subs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--line);margin:0 0 12px}
+.subs.mid{margin:20px 0 22px}
+.sub1{flex:none;padding:6px 11px;font:inherit;font-size:19px;line-height:25px;font-weight:400;color:var(--sub);background:none;border:0;border-bottom:3px solid transparent;margin-bottom:-1px;white-space:nowrap;cursor:pointer}
+.sub1[aria-selected="true"]{color:#111;font-weight:700;border-bottom-color:#FF3333}.sub1 small{font-size:14px;font-weight:400}
+[data-p][hidden]{display:none}
+.tip{display:inline-flex;vertical-align:middle;margin:0 3px;padding:0;border:0;background:none;color:var(--sub);cursor:pointer;line-height:0}
+.tips{display:flex;justify-content:flex-end;align-items:center;gap:6px;font-size:14px;line-height:20px;color:var(--sub);margin:10px 0 0;white-space:nowrap}
+.tips>i{font-style:normal;color:#CBD5E1}.tips>span{display:inline-flex;align-items:center}
+.pop{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:16px}.pop[hidden]{display:none}
+.pop::before{content:"";position:fixed;top:-100px;right:0;bottom:-100px;left:0;z-index:-1;background:rgba(15,23,42,.45)}
+.popbox{position:relative;display:flex;flex-direction:column;width:100%;max-width:520px;max-height:80vh;overflow:hidden;background:#fff;border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,.25)}
+.pophead{position:relative;flex:none;padding:20px 60px 12px 20px}.pophead::after{content:"";position:absolute;left:20px;right:12px;bottom:0;border-bottom:1px solid var(--line)}
+.poptitle{margin:0;font-size:19px;line-height:25px;font-weight:700;color:#111}
+.popx{position:absolute;top:14px;right:12px;width:32px;height:32px;border:1px solid var(--line);border-radius:8px;background:#fff;color:#111;font-size:20px;line-height:30px;padding:0;cursor:pointer}
+.popbody{flex:1 1 auto;min-height:0;overflow-y:auto;padding:12px 20px 22px;font-size:19px;line-height:28px;color:var(--body)}
+.popbody p{margin:14px 0 0}.popli{display:flex;align-items:flex-start;gap:7px;margin:21px 0 11px;padding-left:7px}
+.popli>i{flex:none;width:3px;height:3px;margin-top:12px;border-radius:50%;background:#111}.popli b{color:#111}
+.rk{font-size:14px;line-height:20px;color:var(--sub);margin-top:10px}.rk .strip{margin-top:4px}
+
+/* look_born.py 가 look_band_page.html 의 <style> 앞부분(디자인 가이드라인 값)을 붙이고 이어서 이 파일을 붙인다. */
+.seen{margin:0;padding:0;list-style:none}.seen li{display:flex;gap:8px;align-items:flex-start;margin:8px 0;font-size:17px;line-height:29px;color:var(--body)}
+.seen li>i{flex:none;width:4px;height:4px;border-radius:50%;background:var(--body);margin-top:13px}.seen b{color:var(--ink)}
+.gl{margin:0;padding:0 0 0 6px;list-style:none}.gl li{font-size:14px;line-height:20px;color:var(--sub);margin:6px 0}
+.cmp{background:#fff;border:1px solid var(--line);border-radius:8px;padding:12px;margin:0 0 6px}
+.cmp .nm{font-size:16px;line-height:24px;font-weight:700;color:var(--ink)}.cmp .rw{padding:6px 0}
+.hy{background:#fff;border:1px solid var(--line);border-radius:8px;padding:12px;margin:0 0 12px;font-size:16px;line-height:26px;color:var(--body)}
+.hy b{color:var(--ink)}
+</style></head><body><main>
+<h1 id="h1"></h1>
+<div class="stamp" id="stamp"></div>
+<div class="hy"><b>보려는 가설</b><br>개성은 환경이 만든다. 돈과 관심이 몰린 종목이 개성을 갖고, 돈이 끊기면 급등과 급락이 잦아진다. 전고점 근처에 머무는 민감한 때에는 작은 자극에도 크게 내린다.</div>
+<h2>본 것</h2>
+<div class="emph"><ul class="seen" id="seen"></ul></div>
+<p class="guide">순서와 날짜만 적었습니다. 가설이 맞는지는 이 화면으로 정하지 않습니다.</p>
+<h2>구간마다 대부분의 종목과 견줌</h2>
+<div id="charts"></div>
+<div class="legend"><span><u style="background:#E2E8F0"></u>대부분의 종목(가운데 80%)</span><span><u style="background:#F59E0B;height:3px"></u><span id="lgn"></span></span><span><u style="background:#FDECEA"></u>돌이 잦았던 때</span><span><u style="background:#A78BFA;height:4px"></u>전고점 근처에 머문 때</span></div>
+<h2>돌이 잦았던 때마다</h2>
+<div id="runs"></div>
+<div id="wikiw"></div>
+<h2>전고점 근처에 머문 때가 어떻게 끝났나</h2>
+<div id="eps"></div>
+<h2>이 자료로 볼 수 없는 것</h2>
+<ul class="gl" id="cant"></ul>
+</main>
+<script>
+const D={"sym":"LITE","ko":"루멘텀","labels":["2023-12-11 ~ 2024-01-09","2024-01-10 ~ 2024-02-07","2024-02-08 ~ 2024-03-07","2024-03-08 ~ 2024-04-05","2024-04-08 ~ 2024-05-03","2024-05-06 ~ 2024-06-03","2024-06-04 ~ 2024-07-02","2024-07-03 ~ 2024-07-31","2024-08-01 ~ 2024-08-28","2024-08-29 ~ 2024-09-26","2024-09-27 ~ 2024-10-24","2024-10-25 ~ 2024-11-21","2024-11-22 ~ 2024-12-20","2024-12-23 ~ 2025-01-23","2025-01-24 ~ 2025-02-21","2025-02-24 ~ 2025-03-21","2025-03-24 ~ 2025-04-21","2025-04-22 ~ 2025-05-19","2025-05-20 ~ 2025-06-17","2025-06-18 ~ 2025-07-17","2025-07-18 ~ 2025-08-14","2025-08-15 ~ 2025-09-12","2025-09-15 ~ 2025-10-10","2025-10-13 ~ 2025-11-07","2025-11-10 ~ 2025-12-08","2025-12-09 ~ 2026-01-07","2026-01-08 ~ 2026-02-05","2026-02-06 ~ 2026-03-06","2026-03-09 ~ 2026-04-06","2026-04-07 ~ 2026-05-04","2026-05-05 ~ 2026-06-02","2026-06-03 ~ 2026-07-01","2026-07-02 ~ 2026-07-30","2026-07-31 ~ 2026-08-27","2026-08-28 ~ 2026-09-25","2026-09-28 ~ 2026-10-23","2026-10-26 ~ 2026-11-20"],"last":"2026-11-20","series":[{"name":"주가","unit":"배","dec":1,"pts":[[0.98,0.784,1.06],[1.11,0.813,1.055],[0.92,0.87,1.105],[0.87,0.895,1.104],[0.85,0.893,1.041],[0.84,0.903,1.055],[1.02,0.905,1.064],[0.98,0.943,1.108],[1.07,0.932,1.151],[1.22,0.954,1.2],[1.22,0.935,1.24],[1.62,0.91,1.352],[1.61,0.846,1.336],[1.88,0.884,1.444],[1.39,0.848,1.401],[1.26,0.81,1.316],[0.95,0.703,1.277],[1.47,0.797,1.45],[1.63,0.78,1.459],[1.94,0.789,1.532],[2.17,0.804,1.589],[3.08,0.79,1.668],[2.83,0.77,1.619],[4.54,0.773,1.722],[6.48,0.808,1.772],[7.43,0.818,1.907],[9.54,0.774,1.897],[10.56,0.793,1.888],[14.61,0.75,1.916],[18.47,0.723,2.085],[19.47,0.735,2.208],[15.16,0.723,2.271],[13.11,0.767,2.256],[18.09,0.788,2.311],[17.81,0.728,2.298],[14.31,0.774,2.185],[8.71,0.74,1.974]]},{"name":"거래 주식 수","unit":"배","dec":1,"pts":[[0.77,0.821,1.306],[0.99,0.824,1.408],[1.69,0.847,1.41],[0.88,0.817,1.347],[0.73,0.827,1.288],[1.01,0.783,1.26],[0.64,0.841,1.343],[0.97,0.779,1.222],[1.66,0.746,1.219],[1.12,0.809,1.307],[1.15,0.673,1.142],[1.6,0.859,1.467],[1.33,0.839,1.62],[1.02,0.699,1.241],[2.26,0.846,1.722],[2.23,1.038,1.945],[2.37,1.081,1.952],[2.02,0.895,1.663],[1.51,0.802,1.765],[1.63,0.863,1.805],[2.18,0.869,1.926],[2.88,0.765,1.716],[2.46,0.853,1.952],[3.16,0.879,1.969],[3.87,0.836,1.808],[2.84,0.808,1.8],[4.02,0.966,2.171],[4.26,0.963,2.509],[5.55,0.895,2.249],[4.16,0.799,2.057],[4.91,0.892,2.392],[4.4,0.961,2.574],[3.29,0.78,2.001],[3.82,0.736,2.002],[3.31,0.798,2.177],[3.7,0.79,2.105],[4.84,0.871,2.17]]},{"name":"예고 없는 돌 수","unit":"일","dec":0,"pts":[[1.0,0.0,1.0],[1.0,0.0,0.0],[1.0,0.0,1.0],[1.0,0.0,1.0],[0.0,0.0,1.0],[0.0,0.0,1.0],[2.0,0.0,1.0],[2.0,0.0,2.0],[6.0,0.0,2.0],[4.0,0.0,1.0],[1.0,0.0,1.0],[0.0,0.0,1.0],[2.0,0.0,1.0],[1.0,0.0,1.0],[2.0,0.0,1.0],[7.0,0.0,2.0],[5.0,0.0,1.0],[3.0,0.0,1.0],[0.0,0.0,1.0],[1.0,0.0,1.0],[0.0,0.0,1.0],[4.0,0.0,1.0],[3.0,0.0,2.0],[6.0,0.0,1.0],[9.0,0.0,2.0],[7.0,0.0,1.0],[7.0,0.0,2.0],[9.0,0.0,3.0],[12.0,0.0,2.0],[8.0,0.0,2.0],[6.0,0.0,3.0],[8.0,0.0,3.0],[11.0,0.0,3.0],[10.0,0.0,2.0],[6.0,0.0,2.0],[8.0,0.0,2.0],[9.0,0.0,3.0]]},{"name":"평소 하루 폭","unit":"%","dec":1,"pts":[[2.47,1.22,2.43],[2.86,1.303,2.687],[4.14,1.27,2.597],[2.77,1.23,2.62],[3.32,1.436,2.982],[3.22,1.18,2.55],[3.65,1.35,2.676],[3.03,1.44,3.03],[5.16,1.31,3.123],[3.57,1.41,2.91],[3.27,1.267,2.526],[3.39,1.46,2.92],[4.71,1.417,3.049],[3.6,1.417,2.72],[5.26,1.55,3.202],[6.87,1.81,3.994],[6.33,2.188,4.46],[4.27,1.66,3.104],[4.09,1.36,2.77],[3.15,1.42,2.822],[3.81,1.47,2.962],[3.81,1.3,2.704],[5.27,1.418,3.172],[6.5,1.588,3.314],[7.73,1.51,3.46],[6.22,1.31,2.91],[9.0,1.75,3.684],[8.04,1.94,4.302],[8.5,1.768,4.212],[7.34,1.79,3.7],[7.46,1.71,4.242],[7.76,1.87,4.448],[6.85,1.878,4.244],[7.72,1.55,3.824],[5.46,1.508,3.544],[6.51,1.588,3.712],[8.44,1.74,4.71]]}],"first":{"돌 3일":8,"주가 +30%":11,"거래 주식 수 1.5배":14},"runs":[{"a":8,"b":9,"px0":0.98,"px1":1.22,"pmax":1.22,"pmin":1.07,"vol":1.4,"volhi":1.3,"st":10,"open":false,"news":null,"ncnt":null},{"a":14,"b":17,"px0":1.88,"px1":1.47,"pmax":1.47,"pmin":0.95,"vol":2.2,"volhi":1.8,"st":17,"open":false,"news":null,"ncnt":null},{"a":21,"b":36,"px0":2.17,"px1":8.71,"pmax":19.47,"pmin":2.83,"vol":3.8,"volhi":2.1,"st":123,"open":true,"news":null,"ncnt":null}],"eps":[{"start":"2024-09-11","len":69,"end":"2024-12-18","kind":"예고 없는","stone":-6.8,"runup":11,"fall":10},{"start":"2025-06-24","len":64,"end":"2025-09-24","kind":"예고 없는","stone":-6.9,"runup":9,"fall":4},{"start":"2026-01-27","len":24,"end":"2026-03-03","kind":"예고 없는","stone":-11.3,"runup":243,"fall":1}],"nkids":499,"news":null,"wiki":{"title":"Lumentum","items":[["202603",2057],["202604",7227],["202605",9853],["202606",6554],["202607",4823],["202608",6551],["202609",4962],["202610",8075],["202611",16707]]}},$=id=>document.getElementById(id);
+const L=D.labels.map(s=>s.split(' ~ ')),np=L.length,S=D.series;
+const ym=s=>`${s.slice(0,4)}.${s.slice(5,7)}`,dk=s=>s.replace(/-/g,'.'),pm=p=>ym(L[p][0]),pe=p=>ym(L[p][1]);
+const f1=v=>v.toFixed(1),span=r=>`${pm(r.a)} ~ ${r.open?'지금':pe(r.b)}`;
+$('h1').textContent=`${D.ko}(${D.sym}) 개성이 태어난 때`;$('lgn').textContent=D.ko;
+$('stamp').textContent=`기준일 ${dk(D.last)} · 최근 3년을 20거래일씩 ${np}구간 · 대부분의 종목 = 구간마다 S&P 500 ${D.nkids}종목의 가운데 80% · 주가와 거래 주식 수는 첫 1년 가운데 값의 몇 배인지`;
+// 돌이 잦았던 때에 주가가 어떻게 갔나
+const dip=r=>r.pmin<=r.px0*.7&&r.pmin<=r.px1*.7;
+const way=r=>dip(r)?`${f1(r.px0)}배에서 ${f1(r.pmin)}배까지 내렸다가 ${f1(r.px1)}배로 올라온 동안`:r.pmax>=r.px1*1.3&&r.pmax>=r.px0*1.3?`${f1(r.px0)}배에서 ${f1(r.pmax)}배까지 올랐다가 ${f1(r.px1)}배로 내려온 동안`:r.px1>=r.px0*1.1?`${f1(r.px0)}배에서 ${f1(r.px1)}배로 오르는 동안`:r.px1<=r.px0*.9?`${f1(r.px0)}배에서 ${f1(r.px1)}배로 내리는 동안`:`${f1(r.px0)}배 언저리에서 옆으로 가는 동안`;
+const kind=r=>dip(r)?'내렸다 오름':r.pmax>=r.px1*1.3&&r.pmax>=r.px0*1.3?'올랐다 내림':r.px1>=r.px0*1.1?'오름':r.px1<=r.px0*.9?'내림':'옆걸음';
+const fo=Object.entries(D.first).filter(([,p])=>p!=null).sort((a,b)=>a[1]-b[1]);
+const ended=D.eps.filter(e=>e.end),byStone=ended.filter(e=>e.kind==='예고 없는');
+const cnt={};D.runs.forEach(r=>{const k=kind(r);cnt[k]=(cnt[k]||0)+1});
+$('seen').innerHTML=[
+  `처음 넘은 순서는 ${fo.map(([k,p])=>`<b>${k}</b> ${pm(p)}`).join(' → ')}입니다. 두 구간 이어서 넘은 첫 구간입니다.`,
+  `돌이 잦았던 때는 ${D.runs.length}번입니다. `+D.runs.map(r=>`${span(r)}에는 주가가 ${way(r)} 돌이 ${r.st}일 있었고 거래 주식 수는 ${f1(r.vol)}배였습니다(대부분의 종목 위 끝 ${f1(r.volhi)}배).`).join(' '),
+  `주가가 가던 길로 나누면 ${Object.entries(cnt).map(([k,n])=>`${k} ${n}번`).join(' · ')}입니다.`,
+  ...(D.news?[`관심은 ${D.news.query} 이름이 나온 온라인 기사 수로 봤습니다. 첫 1년에는 구간마다 ${D.news.base}건쯤이었고, 1.5배를 두 구간 이어서 넘은 것은 <b>${D.news.first!=null?pm(D.news.first):'없음'}</b>입니다. 돌이 잦았던 때마다의 기사 수(구간들의 가운데 값)는 ${D.runs.map(r=>`${span(r)} ${f1(r.news)}배`).join(' · ')}입니다.`]:[]),
+  ...(D.wiki&&D.wiki.items.length?[`영어 위키백과 문서(${D.wiki.title})는 <b>${D.wiki.items[0][0].slice(0,4)}.${D.wiki.items[0][0].slice(4)}에 처음 조회가 잡혔습니다</b>. 그 앞 달에는 조회가 잡히지 않았습니다.`]:[]),
+  ended.length?`전고점 근처에 20거래일 넘게 머문 때는 ${D.eps.length}번이고, 끝난 ${ended.length}번 중 <b>${byStone.length}번이 예고 없는 돌</b>로 끝났습니다.`:`전고점 근처에 20거래일 넘게 머문 때는 ${D.eps.length}번입니다.`
+].map(t=>`<li><i></i><span>${t}</span></li>`).join('');
+// 그래프 넷 — 가로 = 구간(왼쪽이 옛날), 회색 띠 = 대부분의 종목, 주황 = 이 종목, 분홍 바탕 = 돌이 잦았던 때, 보라 줄 = 전고점 근처에 머문 때
+const pieceOf=d=>{for(let p=0;p<np;p++)if(d<=L[p][1])return p;return np-1};
+function chart(s,top){const w=Math.min(652,$('charts').clientWidth-26),H=150,pl=30,pr=52,pt=12,pb=24;
+  const ymax=Math.max(...s.pts.map(v=>Math.max(v[0]||0,v[2])))*1.1||1,X=p=>Math.round(pl+p*(w-pl-pr)/(np-1)),Y=v=>Math.round(H-pb-Math.max(0,v)/ymax*(H-pt-pb));
+  const all=[...Array(np).keys()],band=all.map(p=>`${X(p)},${Y(s.pts[p][2])}`).concat(all.slice().reverse().map(p=>`${X(p)},${Y(s.pts[p][1])}`)).join(' ');
+  const have=all.filter(p=>s.pts[p][0]!=null),line=have.map(p=>`${X(p)},${Y(s.pts[p][0])}`).join(' ');
+  const sh=D.runs.map(r=>`<rect x="${X(r.a)-4}" y="${pt}" width="${X(r.b)-X(r.a)+8}" height="${H-pt-pb}" fill="#FDECEA"/>`).join('');
+  const ep=top?D.eps.map(e=>{const a=X(pieceOf(e.start)),b=X(e.end?pieceOf(e.end):np-1);return `<rect x="${a}" y="${pt-6}" width="${Math.max(4,b-a)}" height="4" fill="#A78BFA"/>`}).join(''):'';
+  const ys=[];let last='';all.forEach(p=>{const y=L[p][0].slice(0,4);if(y!==last){ys.push([X(p),y]);last=y}});
+  const yr=ys.map(([px,y],k)=>`<line x1="${px}" y1="${pt}" x2="${px}" y2="${H-pb}" stroke="#ECF0F5"/>`+(k===ys.length-1||ys[k+1][0]-px>=40?`<text x="${px+2}" y="${H-7}" font-size="13" fill="#6B7280">${y}</text>`:'')).join('');
+  const lp=have[have.length-1],lv=s.pts[lp][0],u=s.unit==='일'?'일':s.unit;
+  return `<span class="ct">※ 구간마다 ${s.name} <small>(${s.unit}${s.noband?' · 다른 종목 것은 받지 않아 범위 없음':''})</small></span><div class="white"><svg width="${w}" height="${H}" role="img" aria-label="구간마다 ${s.name}">${sh}${yr}${ep}`+
+    `<line x1="${pl}" y1="${H-pb}" x2="${w-pr}" y2="${H-pb}" stroke="#CBD5E1"/><text x="${pl-4}" y="${pt+8}" text-anchor="end" font-size="10" fill="#6B7280">${ymax.toFixed(s.dec)}</text><text x="${pl-4}" y="${H-pb}" text-anchor="end" font-size="10" fill="#6B7280">0</text>`+
+    `<polygon points="${band}" fill="#E2E8F0"/><polyline points="${line}" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`+
+    `<circle cx="${X(lp)}" cy="${Y(lv)}" r="3" fill="#F59E0B"/><text x="${X(lp)+7}" y="${Y(lv)+4}" font-size="13" font-weight="700" fill="#111" font-family="Inter,sans-serif">${lv.toFixed(s.dec)}${u}</text></svg></div>`}
+function charts(){$('charts').innerHTML=S.map((s,i)=>chart(s,i===0)).join('')}
+charts();addEventListener('resize',charts);
+$('runs').innerHTML=D.runs.map(r=>`<div class="cmp"><div class="nm">${span(r)} <span class="box">${kind(r)}</span></div><div class="rows">`+
+  `<div class="rw"><span>예고 없는 돌</span><span>${r.st}일</span></div>`+
+  `<div class="rw"><span>주가</span><span>${f1(r.px0)}배 → ${f1(r.px1)}배</span></div>`+
+  `<div class="rw"><span>거래 주식 수</span><span>${f1(r.vol)}배</span></div>`+
+  `<div class="rw"><span>대부분의 종목 위 끝</span><span>${f1(r.volhi)}배</span></div>`+(r.news!=null?`<div class="rw"><span>기사 수</span><span>${f1(r.news)}배 · ${r.ncnt}건</span></div>`:'')+`</div>`+
+  `<div class="ksub">${r.b-r.a+1}구간 · 주가는 시작 바로 앞 구간과 마지막 구간 · 가장 높을 때 ${f1(r.pmax)}배 · 가장 낮을 때 ${f1(r.pmin)}배 · 거래 주식 수는 구간들의 가운데 값</div></div>`).join('')||'<div class="empty">없음</div>';
+$('eps').innerHTML=D.eps.map(e=>`<div class="cmp"><div class="nm">${dk(e.start)} ~ ${e.end?dk(e.end):'지금'}</div><div class="rows">`+
+  `<div class="rw"><span>머문 날</span><span>${e.len}거래일</span></div>`+
+  (e.runup!=null?`<div class="rw"><span>들어오기 전 120일</span><span class="${e.runup>=0?'up':'dn'}"><span class="tr">${e.runup>=0?'▲':'▼'}</span>${Math.abs(e.runup)}%</span></div>`:'')+
+  (e.end?`<div class="rw"><span>끝낸 것</span><span>${e.kind==='돌 없이'?'큰 하루 없이':e.kind+' 돌'}</span></div>`+(e.stone!=null?`<div class="rw"><span>그날 등락</span><span class="dn"><span class="tr">▼</span>${Math.abs(e.stone).toFixed(1)}%</span></div>`:''):'')+
+  `</div><div class="ksub">전고점 근처 = 종가가 1년 고점의 10% 안 · 끝 = 고점의 90% 아래로 내려간 첫날${e.fall!=null?` · 마지막 고점에서 끝까지 ${e.fall}거래일`:''}</div></div>`).join('')||'<div class="empty">없음</div>';
+if(D.wiki&&D.wiki.items.length){$('wikiw').innerHTML=`<h2>영어 위키백과 조회수</h2><div class="cmp"><div class="rows">`+D.wiki.items.map(([m,v])=>`<div class="rw"><span>${m.slice(0,4)}.${m.slice(4)}</span><span>${v.toLocaleString()}회</span></div>`).join('')+`</div><div class="ksub">달마다 · 기준일까지 · 살펴본 3년 가운데 조회가 잡힌 달만</div></div>`}
+$('cant').innerHTML=[D.news?'관심: 온라인 기사 수 하나로만 봤습니다. 한 달 10 ~ 20건으로 수가 작아 구간마다 흔들립니다. 투자자 게시판 · 검색량 · 증권사 보고서 수는 보지 않았고, 다른 종목의 기사 수와 견주지 못했습니다.'+(D.news.thin.length?` 자료가 얇은 구간(${D.news.thin.map(t=>t.replace('-','.')).join(' · ')})은 뺐습니다.`:''):'관심: 뉴스 수와 검색량은 받지 않았습니다. 그래서 돈과 관심 가운데 돈(거래 주식 수)만 봤습니다.',
+  '누구의 돈인지: 거래 주식 수만으로는 들어오는 돈인지 나가는 돈인지, 기관인지 개인인지 가를 수 없습니다. 주가 방향을 같이 봐야 합니다.',
+  '작은 자극이었는지: 전고점 근처에서 끝낸 날에 어떤 뉴스가 있었는지는 보지 않았습니다.',
+  '3년 앞: 살펴본 기간 전의 모습은 보지 않았습니다.'].map(t=>`<li>${t}</li>`).join('');
+</script></body></html>
