@@ -31,9 +31,10 @@ SAMPLES = [("267260.KS", "새 묶음 `전력기기`"), ("010120.KS", "새 묶음
            ("090430.KS", "새 묶음 `화장품`"), ("192820.KS", "새 묶음 `화장품` (위탁생산)"),
            ("454910.KS", "새 묶음 `로봇` — 완제품 로봇 회사만"), ("058610.KQ", "로봇 부품(감속기) — 수출 통계가 완제품만이라 카드 없음"),
            ("007660.KS", "새 묶음 `인쇄회로기판` — 물량 줄고 값 오름"), ("009150.KS", "새 묶음 `콘덴서` — 사업 일부만이라 안내 줄"), ("011070.KS", "카메라모듈 — 맞는 지표 없어 카드 없음"),
+           ("214150.KQ", "새 묶음 `의료기기` — 수출 + 업계 경기(의료 · 정밀기기)"), ("096530.KQ", "진단 키트 — 진단 시약 수출이 넓고 출렁여 카드 없음"),
            ("036930.KQ", "건설 수주 → `반도체` 묶음으로 옮김"), ("032820.KQ", "메모리 값 → `원전 · 발전설비` 묶음으로 옮김"),
            ("003380.KQ", "지주회사 — 건설 수주 카드 뺌"), ("006260.KS", "지주회사 — 카드 없음")]
-NEW_GROUPS = ("전력기기", "전선", "화장품", "로봇", "인쇄회로기판", "콘덴서")   # 정식 실행보다 먼저 지표를 직접 받는 묶음 — 묶음을 더하면 여기에도
+NEW_GROUPS = ("전력기기", "전선", "화장품", "로봇", "인쇄회로기판", "콘덴서", "의료기기")   # 정식 실행보다 먼저 지표를 직접 받는 묶음 — 묶음을 더하면 여기에도
 
 
 def load_flows(path):
@@ -60,6 +61,18 @@ def fetch_new(flows):
                 rows = [x for x in rows if "원화" in (x.get("ITEM_NAME2") or "")]
             ind[k] = [{"month": f"{x['TIME'][:4]}-{x['TIME'][4:]}", "v": float(x["DATA_VALUE"])} for x in rows if x.get("DATA_VALUE")]
             time.sleep(0.3)
+    bsi = flows.setdefault("bsi", {})
+    for g in NEW_GROUPS:   # 업계 경기 업종이 상태 파일에 아직 없으면 직접 (정식 실행보다 먼저, 의료기기 C2700)
+        for ind in (K.BIZ_STATS.get(g) or ())[:1]:
+            if bsi.get(ind):
+                continue
+            got = {}
+            for stat in ("512Y007", "512Y008"):
+                for x in C._ecos(key, stat, "M", C.BSI_START, "202612", f"?/{ind}", n=5000):
+                    if x.get("DATA_VALUE") not in (None, ""):
+                        got.setdefault(x["ITEM_CODE1"], []).append({"month": f"{x['TIME'][:4]}-{x['TIME'][4:]}", "v": float(x["DATA_VALUE"])})
+                time.sleep(0.3)
+            bsi[ind] = {k: sorted(v, key=lambda r: r["month"]) for k, v in got.items()}
 
 
 def main():
