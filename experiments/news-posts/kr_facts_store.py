@@ -74,7 +74,8 @@ def clean_event(e, at):
         facts.append(g)
     if (e.get("sourceCount") or 0) < MIN_SOURCES or not facts:
         return None
-    out = {k: e.get(k) for k in ("event", "cat", "direction", "stage", "sourceCount", "outletCount", "stocks", "sector", "numbers")}
+    out = {k: e.get(k) for k in ("event", "cat", "direction", "stage", "sourceCount", "outletCount", "stocks", "sector", "numbers",
+                                 "scheduled", "surprise", "post")}   # 수집기 19 · 20절 scheduled · surprise(리포트 `예상 밖` 점수) · 28 · 30절 post(그 사건으로 쓴 Newfact 글 slug — 같은 사건 두 줄 합치기), 2026-11-25 — 전엔 버려졌다
     out.update(tag=dk.ISSUE_KO.get(e.get("cat"), "그 밖"), dir=DIR_KIND.get(e.get("direction"), "neutral"), at=at, facts=facts)
     return out
 

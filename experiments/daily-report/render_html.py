@@ -741,8 +741,8 @@ def news_tab(built, dirs, week, reaction=None, known=(), pick_name="주요 뉴�
             return (f"flex:1 0 auto;padding:6px 14px;margin:0;background:#fff;color:#333;font:inherit;font-size:{dk.TINY};line-height:{dk.LH_TINY};cursor:pointer;white-space:nowrap;"
                     f"border:1px solid #E2E8F0;{'border-left:0;' if i else ''}border-radius:{'7px' if i == 0 else '0'} {'7px' if i == last else '0'} {'7px' if i == last else '0'} {'7px' if i == 0 else '0'};")
         out += (f'<div data-news-chips="1" style="display:flex;overflow-x:auto;margin:0 0 12px;padding:0;-webkit-overflow-scrolling:touch;scrollbar-width:none;">'
-                + "".join(f'<button type="button" data-chip="{_esc(k)}" aria-pressed="{"true" if i == 0 else "false"}" style="{chip_css(i)}">{_esc(k)} <span style="color:{dk.SUB};">{n}</span></button>'
-                          for i, (k, n) in enumerate(chips)) + "</div>")
+                + "".join(f'<button type="button" data-chip="{_esc("주요 뉴스" if (kr and i == 0) else k)}" aria-pressed="{"true" if i == 0 else "false"}" style="{chip_css(i)}">{_esc(k)} <span style="color:{dk.SUB};">{n}</span></button>'
+                          for i, (k, n) in enumerate(chips)) + "</div>")   # 한국 첫 칩 = 보이는 글자 `Newfact` · 안쪽 키는 `주요 뉴스` — 테마 붙여넣기 전 옛 칩 JS(`주요 뉴스` 고정)에서도 다시 눌렀을 때 비지 않게 (2026-11-25)
         out += bars
         lis = []
         for i, g in enumerate(picks + rest):
