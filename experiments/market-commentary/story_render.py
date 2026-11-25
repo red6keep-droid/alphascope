@@ -84,8 +84,13 @@ class Linker:
         return html
 
 
+# 본문 줄바꿈 = 글자 단위(보통 글처럼) — 테마 .post-body 의 keep-all(띄어쓰기 단위)을 본문 문단에서만 푼다. 머리글 · 제목 영역은 keep-all 그대로
+# (2026-11-25 사용자 "뉴스랑 시황 본문은 그냥 텍스트로 줄바꿈 — 요즘 뉴스 기사들처럼, 타이틀 영역은 제외")
+BODY_WRAP = "word-break:normal;"
+
+
 def para(html):
-    return f'<p style="margin:0 0 14px;padding:0 0 0 {dk.ALIGN_PX}px;word-break:keep-all;">{html}</p>'
+    return f'<p style="margin:0 0 14px;padding:0 0 0 {dk.ALIGN_PX}px;{BODY_WRAP}">{html}</p>'
 
 
 IDX_CELL_PCT = 44   # 넘기는 지수 칸 폭 = 본문 폭의 44% → 두 칸(88%) + 셋째 칸 12% 걸침
@@ -275,7 +280,7 @@ def logo(t, row):
             f'{dk.esc(re.sub(r"[-.]", "", str(t))[:2])}</span>')
 
 
-def stock_row(x, row, slot, first):
+def stock_row(x, row, slot, first, inline_sub=False, small=False):
     """종목 줄 = 종목 모아보기 규칙 (2026-11-19 사용자 "그 규칙으로 통일"): 로고 35 · 이름 16 굵게 · 보조 줄 14 회색(한국 = 업종, 미국 = 티커 · 업종) │ 오른쪽 증감 17 굵게 위 · 가격 15 증감 색 아래. 줄 전체가 그 종목 페이지로."""
     t, v = str(x.get("ticker") or ""), x["chg_pct"]
     sec = (row or {}).get("s") or ""
@@ -285,12 +290,19 @@ def stock_row(x, row, slot, first):
         p = row["p"]
         price = f"${p:,.2f}" if slot == "am" else f"{round(p):,}원"
     col = dk.UP if v > 0 else dk.DOWN if v < 0 else "#111"
-    left = (f'<span style="display:flex;align-items:center;min-width:0;flex:1 1 auto;"><span style="flex:none;display:flex;align-items:center;">{logo(t, row)}</span>'
-            f'<span style="min-width:0;"><span style="display:block;font-size:16px;line-height:24px;font-weight:700;color:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{dk.esc(x["name"])}</span>'
-            + (f'<span style="display:block;font-size:{dk.TINY};line-height:20px;color:#6B7280;white-space:nowrap;">{dk.esc(sub)}</span>' if sub else "") + '</span></span>')
+    if inline_sub:   # 업종(보조 줄)을 이름 옆 같은 줄에 — 줄바꿈 없이 (2026-11-25 사용자, Newfact 뉴스 관련 정보 칸만)
+        left = (f'<span style="display:flex;align-items:center;min-width:0;flex:1 1 auto;"><span style="flex:none;display:flex;align-items:center;">{logo(t, row)}</span>'
+                f'<span style="min-width:0;display:block;font-size:16px;line-height:24px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'
+                f'<span style="font-weight:700;color:#111;">{dk.esc(x["name"])}</span>'
+                + (f'<span style="margin-left:6px;font-size:{dk.TINY};color:#6B7280;">{dk.esc(sub)}</span>' if sub else "") + '</span></span>')
+    else:
+        left = (f'<span style="display:flex;align-items:center;min-width:0;flex:1 1 auto;"><span style="flex:none;display:flex;align-items:center;">{logo(t, row)}</span>'
+                f'<span style="min-width:0;"><span style="display:block;font-size:16px;line-height:24px;font-weight:700;color:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{dk.esc(x["name"])}</span>'
+                + (f'<span style="display:block;font-size:{dk.TINY};line-height:20px;color:#6B7280;white-space:nowrap;">{dk.esc(sub)}</span>' if sub else "") + '</span></span>')
+    cs, ps = (16, 14) if small else (int(dk.CHG_SIZE[:-2]), 15)   # 증감 · 가격 1px 작게 (2026-11-25 사용자, 뉴스 관련 정보 칸만)
     right = (f'<span style="flex:none;display:flex;flex-direction:column;align-items:flex-end;white-space:nowrap;">'
-             f'<span style="font-size:{dk.CHG_SIZE};line-height:24px;">{chg(v)}</span>'
-             + (f'<span style="font-size:15px;line-height:20px;color:{col};">{price}</span>' if price else "") + '</span>')
+             f'<span style="font-size:{cs}px;line-height:24px;">{chg(v)}</span>'
+             + (f'<span style="font-size:{ps}px;line-height:20px;color:{col};">{price}</span>' if price else "") + '</span>')
     href = (row or {}).get("u") or (dk.stock_href(t) if not re.fullmatch(r"\d{6}", t) else "")
     attr = f' data-row-link="1" data-href="{dk.esc(href)}"' if href else ""
     sep = "" if first else "border-top:1px solid #E2E8F0;"
@@ -363,14 +375,14 @@ def render(column, briefing, banner_url=None, banner_alt="", lists_live=True, li
 
     def soft_card(inner, head="", margin="0 0 8px", bg=dk.CARD_DIR["neutral"][0], pad=(18, 14), style="", attr="", left=None):
         return (f'<div style="background:{bg};border-radius:10px;padding:{pad[0] - dk.VP}px {pad[1]}px {pad[0] - dk.VP}px {pad[1] if left is None else left}px;margin:{margin};">'
-                f'{head}<p {attr}style="margin:0;word-break:keep-all;{style}">{inner}</p></div>')
+                f'{head}<p {attr}style="margin:0;{BODY_WRAP}{style}">{inner}</p></div>')
 
     if col.get("overview"):   # 안쪽 여백 +5 (보이는 23 · 좌우 19)
         sb, si = th["soft"] if th else OVERVIEW_ICON[1:]
         head = head_row(dk.soft_icon(OVERVIEW_ICON[0], bg=sb, ink=si), "한눈에 보기")
         body.append(soft_card(prose(col["overview"], True), head, "8px 0 8px", th["card"] if th else dk.CARD_DIR["uncertain"][0], pad=(23, 19), attr=lead_attr))
     else:
-        body.append(f'<p {lead_attr}style="{dk.SEO_LEAD}padding:0 0 0 {dk.ALIGN_PX}px;">'
+        body.append(f'<p {lead_attr}style="{dk.SEO_LEAD}{BODY_WRAP}padding:0 0 0 {dk.ALIGN_PX}px;">'
                     f'{m}월 {d}일 {"아침" if slot == "am" else "저녁"}, {prose(col.get("summary") or "")}</p>')
 
     # 이유가 먼저 (시황 = 왜 움직였나), 숫자는 그 아래 표로

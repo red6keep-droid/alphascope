@@ -214,6 +214,11 @@ def _md(d):
     return f"{int(d[5:7])}.{d[8:10]}"
 
 
+IDX_NAME, IDX_CHG = 15, 16   # 지수 칸 이름 · 종가 16 → 15, 증감(굵은 색) 17 → 16 (2026-11-25 사용자 "한 포인트 정도 작게")
+SEC_TITLE = 15               # 칸 제목 `관련 정보` = 지수 칸 이름(코스피)과 같은 크기 — 폰 테마 h2 20px !important 를 피해 안쪽 span 이 크기를 갖는다
+SEC_ICON = 18                # 제목 앞 아이콘 20 → 18 (2026-11-25 사용자 "10% 작게")
+
+
 def _idx_card(cells_src):
     """지수 칸 = 카드 하나를 넷(2 × 2)으로 — 코스피 · 코스닥 / S&P 500 · 나스닥 (2026-11-23 사용자 "하나의 카드로 4등분"). 한국만이면 한 줄 둘.
     칸 꼴 = 시황 해설 지수 칸(SR.index_row)과 같은 이름 · 종가 · 증감."""
@@ -222,9 +227,9 @@ def _idx_card(cells_src):
         if x.get("close") is None or x.get("chg_pct") is None:
             continue
         ink = dk.UP if x["chg_pct"] > 0 else dk.DOWN if x["chg_pct"] < 0 else "#111"
-        cells.append(f'<span style="font-weight:700;color:#111;font-size:{dk.NAME};line-height:{dk.LH_CARD};white-space:nowrap;display:block;">{dk.paren(dk.esc(SR.INDEX_NAMES.get(x["name"], x["name"])))}</span>'
-                     f'<span style="display:block;margin-top:4px;line-height:25px;white-space:nowrap;"><span style="font-size:{dk.NAME};color:{ink};">{x["close"]:,.2f}</span> '
-                     f'<span style="font-size:{dk.CHG_SIZE};">{SR.chg(x["chg_pct"])}</span></span>')
+        cells.append(f'<span style="font-weight:700;color:#111;font-size:{IDX_NAME}px;line-height:{dk.LH_CARD};white-space:nowrap;display:block;">{dk.paren(dk.esc(SR.INDEX_NAMES.get(x["name"], x["name"])))}</span>'
+                     f'<span style="display:block;margin-top:4px;line-height:25px;white-space:nowrap;"><span style="font-size:{IDX_NAME}px;color:{ink};">{x["close"]:,.2f}</span> '
+                     f'<span style="font-size:{IDX_CHG}px;">{SR.chg(x["chg_pct"])}</span></span>')
     if not cells:
         return ""
     line = dk.card_line("neutral")
@@ -248,7 +253,7 @@ def market_section(market, lists, ink):
     if stocks:
         rows = []
         for i, x in enumerate(stocks):
-            r = SR.stock_row(x, lists.get(x["ticker"]), "am" if x.get("mk") == "us" else "pm", i in (0, STOCKS_SHOWN))   # 미국 = 달러 · 티커 · 업종
+            r = SR.stock_row(x, lists.get(x["ticker"]), "am" if x.get("mk") == "us" else "pm", i in (0, STOCKS_SHOWN), inline_sub=True, small=True)   # 미국 = 달러 · 티커 · 업종
             line = _cmp_line(x)
             if line:
                 r = r.replace(f"padding:{SR.LIST_ROW_PAD}px 12px;", f"padding:{SR.LIST_ROW_PAD}px 12px 6px;", 1)
@@ -271,9 +276,10 @@ def market_section(market, lists, ink):
         note = ""
     aside = (f'<span data-basis="{dk.esc(b)}" style="margin-left:auto;font-size:13px;line-height:19px;font-weight:400;color:#6B7280;white-space:nowrap;">'
              f'{dk.esc(note)}</span>') if note else ""
-    sec = dk.section("관련 종목" if stocks else "같은 날 지수", inner, line=False, aside=aside)   # 이름 = 관련 종목 (기획 3-3, 수혜주 X)
-    sec = SR.tinted(SR.iconed(sec, dk.solid_icon("bars", ink, size=20)), ink).replace(f"margin:{SR.H2_TOP}px 0 11px;", f"margin:{SR.BIG_TOP}px 0 11px;", 1)
-    return sec.replace("font-size:22px;font-weight:700;line-height:28px;", f"font-size:{dk.NAME};font-weight:700;line-height:{dk.LH_CARD};", 1)   # 제목 = 지수 칸 이름(코스피) 크기 16/24 (2026-11-23 사용자 "공간 효율")
+    name = "관련 정보" if stocks else "같은 날 지수"   # 관련 종목 → 관련 정보 (2026-11-25 사용자, 기획 3-3 수혜주 X)
+    sec = dk.section(f'<span style="font-size:{SEC_TITLE}px;line-height:{dk.LH_CARD};">{name}</span>', inner, line=False, aside=aside)
+    sec = SR.tinted(SR.iconed(sec, dk.solid_icon("bars", ink, size=SEC_ICON)), ink).replace(f"margin:{SR.H2_TOP}px 0 11px;", f"margin:{SR.BIG_TOP}px 0 11px;", 1)
+    return sec.replace("font-size:22px;font-weight:700;line-height:28px;", f"font-size:{SEC_TITLE}px;font-weight:700;line-height:{dk.LH_CARD};", 1)   # 제목 = 지수 칸 이름(코스피) 크기 (2026-11-23 · 11-25 사용자 "공간 효율")
 
 
 ISSUE_PAT = {"IRAN": r"이란|호르무즈", "TARIFF": r"관세(?!청)|무역 ?전쟁", "EXPORT": r"수출 ?통제|거래 제한 명단",
@@ -338,7 +344,7 @@ def render(post, market, lists=None, issues=(), forecasts=()):
     body.append(f'<p style="margin:0 0 18px;padding:0 0 0 {dk.ALIGN_PX}px;line-height:1;display:flex;justify-content:flex-end;">{dk.pill_row("".join(pills))}</p>')   # 라벨 = 오른쪽 정렬 (2026-11-23 사용자)
     summary = (post.get("summary") or "").strip() or _first_sentence(post.get("body"))
     body.append(f'<div style="background:{th["card"]};border-radius:10px;padding:{23 - dk.VP}px 19px;margin:0 0 26px;">'
-                f'<p data-seo-lead="1" data-lead="1" style="margin:0;word-break:keep-all;font-weight:700;color:#111;">{prose(SR.emph(summary, False), False)}</p></div>')
+                f'<p data-seo-lead="1" data-lead="1" style="margin:0;{SR.BODY_WRAP}font-weight:700;color:#111;">{prose(SR.emph(summary, False), False)}</p></div>')
     for p in _paras(post.get("body")):
         body.append(SR.para(prose(p)))
     body.append(market_section(market, lists, th["solid"]))
