@@ -20,7 +20,6 @@ sys.path.insert(0, os.path.join(HERE, ".."))
 import design_kit as dk  # noqa: E402
 import outlook_us as OU  # noqa: E402
 
-SHOW = 5
 
 
 def esc(s):
@@ -41,52 +40,58 @@ def latest_by_firm(items, horizon):
     return sorted(rows, key=lambda r: -r["value"])
 
 
-def gap(v, now):
+def md(iso):
+    d = dt.date.fromisoformat(iso)
+    return f"{d.month}.{d.day}"   # 날짜 = 점 · 앞자리 0 없음 (가이드라인 5절)
+
+
+def gap(v, now, px=17):
+    """지금 값과의 차이 — 증감 = 삼각형 + 절댓값 + 증감 색 (가이드라인 5절)."""
     p = (v / now - 1) * 100
-    c = dk.UP if p > 0 else dk.DOWN
-    tri = "▲" if p > 0 else "▼"
-    return f'<span style="color:{c};white-space:nowrap;">{tri} {abs(p):.1f}%</span>'
+    return (f'<span style="color:{dk.UP if p > 0 else dk.DOWN};white-space:nowrap;">'
+            f'{dk.tri_span(p > 0, px)}{abs(p):.1f}%</span>')
 
 
-def dots(rows, now, lo=None, hi=None):
-    """회사별 점 + 지금 값 세로선. 축 = 값들과 지금 값을 다 담는 범위."""
+def dots(rows, now, title):
+    """※ 그래프 제목(카드 밖) + 흰 카드 — 회사 목표 = 주인공 주황 점, 지금 값 = 비교 회색 점선 (가이드라인 4 · 7-3 · 9절)."""
     vals = [r["value"] for r in rows] + [now]
-    a, b = (lo or min(vals)) * 0.98, (hi or max(vals)) * 1.02
+    a, b = min(vals) * 0.98, max(vals) * 1.02
     x = lambda v: (v - a) / (b - a) * 100  # noqa: E731
-    pts = "".join(f'<span title="{esc(r["firm"])} {r["value"]:,}" style="position:absolute;left:calc({x(r["value"]):.2f}% - 6px);top:{10 + (i % 3) * 9}px;'
-                  f'width:12px;height:12px;border-radius:50%;background:#334155;border:2px solid #fff;"></span>' for i, r in enumerate(rows))
-    now_line = (f'<span style="position:absolute;left:{x(now):.2f}%;top:2px;bottom:18px;border-left:2px dashed {dk.DOWN};"></span>'
-                f'<span style="position:absolute;left:{x(now):.2f}%;bottom:0;transform:translateX(-50%);font-size:12px;color:{dk.DOWN};white-space:nowrap;">지금 {now:,.0f}</span>')
-    ends = (f'<span style="position:absolute;left:0;bottom:0;font-size:12px;color:{dk.SUB};">{a:,.0f}</span>'
-            f'<span style="position:absolute;right:0;bottom:0;font-size:12px;color:{dk.SUB};">{b:,.0f}</span>')
-    return (f'<div style="position:relative;height:64px;margin:6px {dk.ALIGN_PX}px 14px;border-top:1px solid #E2E8F0;">'
-            f'{pts}{now_line}{ends}</div>')
+    pts = "".join(f'<span title="{esc(r["firm"])} {r["value"]:,}" style="position:absolute;left:calc({x(r["value"]):.2f}% - 6px);top:{14 + (i % 3) * 10}px;'
+                  f'width:12px;height:12px;border-radius:50%;background:{dk.CHART_MAIN};border:2px solid #fff;box-sizing:border-box;"></span>'
+                  for i, r in enumerate(rows))
+    now_x = x(now)
+    anchor = "translateX(-100%)" if now_x > 80 else "translateX(0)" if now_x < 20 else "translateX(-50%)"
+    now_line = (f'<span style="position:absolute;left:{now_x:.2f}%;top:6px;height:44px;border-left:2px dashed {dk.CHART_CMP};"></span>'
+                f'<span style="position:absolute;left:{now_x:.2f}%;top:52px;transform:{anchor};font-size:12px;line-height:16px;color:{dk.SUB};white-space:nowrap;">지금 {now:,.0f}</span>')
+    ends = (f'<span style="position:absolute;left:0;top:52px;font-size:12px;line-height:16px;color:{dk.SUB};">{a:,.0f}</span>'
+            f'<span style="position:absolute;right:0;top:52px;font-size:12px;line-height:16px;color:{dk.SUB};">{b:,.0f}</span>')
+    axis = '<span style="position:absolute;left:0;right:0;top:50px;border-top:1px solid #ECF0F5;"></span>'
+    return (f'<div style="margin:0 {dk.ALIGN_PX}px;">{dk.CHART_TITLE_M}{esc(title)} (포인트)</span></div>'
+            f'<div style="margin:0 {dk.CHART_CARD_X}px 8px;padding:{dk.CHART_CARD_PAD}px 12px 0;background:#fff;border:1px solid #E2E8F0;border-radius:8px;">'
+            f'<div style="position:relative;height:78px;">{axis}{pts}{now_line}{ends}</div></div>')
 
 
-def table(rows, now, show_prev=True):
+def firm_rows(rows, now, show_prev=True):
+    """이름 · 값 카드(표 대신, 7-4절) — 왼쪽 회사 │ 보조 줄(발표일 · 바꾼 것), 오른쪽 목표. 지금과의 차이는 보조 줄."""
     out = []
-    for i, r in enumerate(rows):
-        prev = (f'<div style="font-size:13px;line-height:19px;color:{dk.SUB};">{r["prev"]:,} → {r["value"]:,}'
-                f' ({"올림" if r["value"] > r["prev"] else "내림"})</div>') if show_prev and r.get("prev") else ""
-        d = dt.date.fromisoformat(r["published"])
-        out.append(f'<div style="display:flex;justify-content:space-between;gap:12px;padding:10px 12px;{"border-top:1px solid #E2E8F0;" if i else ""}">'
-                   f'<div style="min-width:0;"><div style="font-weight:600;">{esc(r["firm"])}</div>{prev}'
-                   f'<div style="font-size:13px;line-height:19px;color:{dk.SUB};">{d:%m.%d} 발표 · 보도 {r["sources"]}건</div></div>'
-                   f'<div style="text-align:right;white-space:nowrap;"><div style="font-weight:700;">{r["value"]:,}</div>'
-                   f'<div style="font-size:13px;line-height:19px;">지금보다 {gap(r["value"], now)}</div></div></div>')
-    head, rest = out[:SHOW], out[SHOW:]
-    more = (f'<details><summary style="padding:10px 12px;border-top:1px solid #E2E8F0;color:{dk.SUB};cursor:pointer;">{len(rest)}곳 더 보기</summary>'
-            + "".join(rest) + "</details>") if rest else ""
-    return f'<div style="margin:0 0 6px;background:#fff;border:1px solid #E2E8F0;border-radius:8px;font-size:15px;line-height:22px;">{"".join(head)}{more}</div>'
+    for r in rows:
+        sub = [f"{md(r['published'])} 발표"]
+        if show_prev and r.get("prev"):
+            sub.append(f"{r['prev']:,} 에서 {'올림' if r['value'] > r['prev'] else '내림'}")
+        sub.append(f"지금보다 {gap(r['value'], now, 14)}")
+        out.append((esc(r["firm"]), f"{r['value']:,}", " · ".join(sub)))
+    return dk.ccard(out, fold_at=5 if len(out) > 5 else None, noun="회사")
 
 
 def summary(rows, now, label):
     vs = sorted(r["value"] for r in rows)
     mid = vs[len(vs) // 2] if len(vs) % 2 else (vs[len(vs) // 2 - 1] + vs[len(vs) // 2]) / 2
     lo, hi = rows[-1], rows[0]
-    return (f'<p style="margin:0 0 6px;padding:0 {dk.ALIGN_PX}px;font-size:16px;line-height:26px;word-break:keep-all;">'
-            f'{label} — 회사 {len(rows)}곳 · 가운데 <b>{mid:,.0f}</b> · 가장 낮음 {lo["value"]:,}({esc(lo["firm"])}) · '
-            f'가장 높음 {hi["value"]:,}({esc(hi["firm"])}). 지금 {now:,.0f} 에서 가운데까지 {gap(mid, now)}</p>')
+    return (f'<p style="margin:0 0 14px;padding:0 0 0 {dk.ALIGN_PX}px;font-size:{dk.BODY};line-height:{dk.LH_BODY};color:#333;word-break:keep-all;">'
+            f'{label} 목표를 낸 곳은 {dk.violet(f"{len(rows)}곳")}입니다. 가운데 값은 <b>{mid:,.0f}</b>, '
+            f'가장 낮은 곳은 {esc(lo["firm"])} {lo["value"]:,}, 가장 높은 곳은 {esc(hi["firm"])} {hi["value"]:,} 입니다. '
+            f'지금 값({now:,.0f})에서 가운데 값까지 {gap(mid, now, 19)} 남았습니다.</p>')
 
 
 def main():
@@ -100,22 +105,24 @@ def main():
     ly_items, _, _ = OU.sift(ly["rows"])
     last = latest_by_firm([i for i in ly_items if i["published"] < f"{this_y}-01-15"], f"{this_y}-12")   # 작년 이맘때(연초 전까지) 낸 것만
     d = dt.date.fromisoformat(day)
-
-    body = (f'<p data-seo-lead style="{dk.SEO_LEAD}">투자회사들이 낸 S&P 500 연말 목표를 회사별로 모았습니다. '
-            f'{d:%m.%d} 종가 {now:,.0f} 와 견줘 보고, 작년 이맘때 같은 회사들이 본 올해 말 목표와 지금 값도 함께 봅니다.</p>')
+    kday = f"{d.month}월 {d.day}일"
+    stamp = (f'<p data-report-stamp="1" style="display:flex;gap:6px;align-items:flex-start;margin:0 0 14px;padding:10px 12px;background:#F3F4F6;border-radius:8px;'
+             f'font-size:13px;line-height:19px;color:#6B7280;word-break:keep-all;"><span>{kday} 종가 기준 · 새 전망이 보도된 날 고칩니다.</span></p>')
+    body = stamp + (f'<p data-seo-lead style="{dk.SEO_LEAD}">{kday} 기준으로 투자회사들이 낸 S&P 500 연말 목표를 회사별로 모았습니다. '
+                    f'지금 값({now:,.0f})과 견주고, 작년 이맘때 같은 회사들이 본 올해 말 목표도 함께 봅니다.</p>')
     if nxt:
-        body += dk.section(f"{this_y + 1}년 말 S&P 500 목표", summary(nxt, now, f"{this_y + 1}년 말") + dots(nxt, now) + table(nxt, now), line=False)
+        body += dk.section(f"{this_y + 1}년 말 S&P 500 목표은?".replace("목표은", "목표는"),
+                           summary(nxt, now, f"{this_y + 1}년 말") + dots(nxt, now, f"회사별 {this_y + 1}년 말 목표와 지금 값") + firm_rows(nxt, now), line=False)
     if last:
-        body += dk.section(f"작년 이맘때 본 {this_y}년 말 목표와 지금",
-                           f'<p style="margin:0 0 6px;padding:0 {dk.ALIGN_PX}px;font-size:16px;line-height:26px;word-break:keep-all;">'
-                           f'{this_y - 1}년 11 ~ 12월에 {len(last)}곳이 낸 목표입니다. 지금 {now:,.0f} 는 '
-                           f'{sum(1 for r in last if r["value"] > now)}곳의 목표보다 아래, {sum(1 for r in last if r["value"] <= now)}곳의 목표보다 위입니다. '
-                           f'연말(12.31 종가)에 다시 맞춰 봅니다.</p>'
-                           + dots(last, now) + table(last, now, show_prev=False), line=False)
+        below = sum(1 for r in last if r["value"] > now)
+        body += dk.section(f"작년에 본 {this_y}년 말 목표와 지금은?",
+                           f'<p style="margin:0 0 14px;padding:0 0 0 {dk.ALIGN_PX}px;font-size:{dk.BODY};line-height:{dk.LH_BODY};color:#333;word-break:keep-all;">'
+                           f'{this_y - 1}년 11 ~ 12월에 {dk.violet(f"{len(last)}곳")}이 {this_y}년 말 목표를 냈습니다. '
+                           f'지금 값({now:,.0f})은 그중 {dk.violet(f"{below}곳")}의 목표보다 아래입니다. 연말 종가로 다시 맞춰 봅니다.</p>'
+                           + dots(last, now, f"작년에 낸 {this_y}년 말 목표와 지금 값") + firm_rows(last, now, show_prev=False), line=False)
     if cur:
-        body += dk.section(f"올해 들어 바꾼 {this_y}년 말 목표", table(cur, now), line=False)
-    body += dk.muted("목표는 각 회사가 발표하고 언론이 보도한 숫자입니다. Newfact 의 전망이 아니며, 사거나 팔라는 뜻이 아닙니다. 리포트 원문은 싣지 않습니다.")
-
+        body += dk.section(f"올해 {this_y}년 말 목표를 바꾼 곳은?", firm_rows(cur, now), line=False)
+    body += dk.muted("목표는 각 회사가 발표하고 언론이 보도한 숫자입니다. Newfact 의 전망이 아니며, 리포트 원문은 싣지 않습니다.")
     c = j["counts"]
     chk = "".join(f'<li style="margin:2px 0;">{esc(x["why"])} — {esc(x["title"][:120])}</li>' for x in j["check"])
     st = " · ".join(f'{s["status"]}' for s in j.get("status") or [])
@@ -125,7 +132,8 @@ def main():
              f'작년 줄 = 11-25 시험 때 받은 제목(목업 자료) · AI 0'
              f'<details style="margin-top:8px;"><summary style="cursor:pointer;">확인 필요 {c["check"]}건 — 왜 빠졌나</summary><ul style="margin:6px 0 0 18px;padding:0;">{chk}</ul></details></div>')
     p = os.path.join(OUT, "mock_outlook_us.html")
-    dk.write_mock(body, p, "시장 전망 지도(가칭) — 미국")
+    body = f'{dk.WRAP_OPEN}{dk.fix_colons(body)}{dk.WRAP_CLOSE}'
+    dk.write_mock(body, p, "시장 전망 지도(가칭) 미국")
     print(f"[mock] {p} · 내년 {len(nxt)}곳 · 작년 {len(last)}곳 · 올해 {len(cur)}곳")
 
 
