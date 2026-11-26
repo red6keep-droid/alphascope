@@ -455,7 +455,7 @@ def card_industry_mood(s):
     theme, col = {"좋아지는 중": ("positive", UP), "나빠지는 중": ("negative", DOWN)}.get(state, ("neutral", R.MUTED))
     v0 = f"{f0['v']:.0f}"
     lines = [(f"{b['industry_name']} 회사들이 느끼는 {f0['name']} 경기(BSI)는 {_mo_txt(f0['month'])} {_dk.josa(v0, '로')} 전달보다 {_sgn(f0['chg'], 0)}p, 석 달 전보다 {_sgn(d3, 0)}p, "
-              f"2009년 이후 아래에서 {f0['pct_all']:.0f}% 지점이다."   # 최근 한 달 먼저 (2026-11-26 사용자 "Newfact = 달라진 것") — 판정은 석 달 전 기준 그대로(한 달은 1년에 5번 되돌림, doc/검증/업계카드-판정-기간.md)
+              f"2009년 이후 아래에서 {f0['pct_all']:.0f}% 지점입니다."   # 합니다체 (2026-11-26 사용자 "카드 문장 통일") · 최근 한 달 먼저 (2026-11-26 사용자 "Newfact = 달라진 것") — 판정은 석 달 전 기준 그대로(한 달은 1년에 5번 되돌림, doc/검증/업계카드-판정-기간.md)
               + R.small_note("100보다 낮으면 나쁘다고 답한 회사가 더 많다는 뜻입니다. 좋아지는 중 · 나빠지는 중은 한 달씩 오르내림이 잦아 석 달 전과 견줘 정합니다." + U.biz_mix_note(s["sym"], 0)), "plain")]   # 늘 같은 안내는 작은 글씨 (P67)
     lines += _yoy_chart(f"{f0['name']} 경기(BSI), 올해와 작년 같은 달", _yoy_groups(ser, "month", _mo, n=12), lambda v: f"{v:.0f}")   # `업황 BSI` → `업황 경기(BSI)` (P66) · 선 그래프 12개월 (P161)
     for r in b["rows"]:
@@ -542,12 +542,12 @@ def card_industry_work(s):
         idx = r0["kind"] == "idx"   # 지수는 더한 값이 뜻이 없어 3개월 평균으로 적는다 — 바뀐 정도(%)는 합과 같다 (2026-11-25 전력기기 묶음, 옛 묶음은 모두 금액)
         tot = dict(r0, v=sum(v for m, v in sorted(by.items())[-months:]) / (months if idx else 1))
         c1 = r0.get("chg") if r0.get("cmp") == "yoy" else _window_change(r0, 1)[0]
-        head = ((f"{_name_josa(r0['name'], '은')} {_mo_txt(r0['month'])} {_dk.josa(v0, '로')} 작년 같은 달보다 {_sgn(c1, 1)}{unit}. " if c1 is not None else "")   # 최근 한 달 먼저 (2026-11-26 사용자)
-                + f"최근 3개월({r0['month'][:4]}년 {span_txt})로 묶으면 {'평균' if idx else '합'} {_ind_value(tot)}, 작년 같은 3개월보다 {_sgn(chg, 1)}{unit}.")
+        head = ((f"{_name_josa(r0['name'], '은')} {_mo_txt(r0['month'])} {_dk.josa(v0, '로')} 작년 같은 달보다 {_sgn(c1, 1)}{unit}입니다. " if c1 is not None else "")   # 최근 한 달 먼저 (2026-11-26 사용자)
+                + f"최근 3개월({r0['month'][:4]}년 {span_txt})로 묶으면 {'평균' if idx else '합'} {_ind_value(tot)}, 작년 같은 3개월보다 {_sgn(chg, 1)}{unit}입니다.")
         note = (b.get("note3") or "월별 자료라 1~2달 늦게 나오고, 큰 계약이 들어온 달에 크게 튑니다. 그래서 3개월을 묶어 봅니다.") + " 늘고 · 줄고는 3개월로 정합니다."   # 큰 계약 사업이 아닌 묶음은 BIZ note3 (콘덴서, 2026-11-25)
     else:
         head = (f"{_name_josa(r0['name'], '은')} {r0['month'][:4]}년 {int(r0['month'][5:])}월 "
-                + (f"{_dk.josa(v0, '로')} 1년 전 같은 달보다 {_sgn(chg, 1)}{unit}." if chg is not None else f"{v0}다."))
+                + (f"{_dk.josa(v0, '로')} 작년 같은 달보다 {_sgn(chg, 1)}{unit}입니다." if chg is not None else f"{v0}입니다."))
         note = "월별 자료라 1~2달 늦게 나오고, 주가는 이보다 먼저 움직이곤 합니다."
     part = getattr(U, "BIZ_PART_NOTE", {}).get(s["sym"].split(".")[0])   # 지표가 회사 사업 일부만 볼 때 (삼성전기 = 콘덴서만, 2026-11-25)
     if part:
@@ -588,7 +588,7 @@ def card_industry_money(s):
     d = r0.get("chg")
     state = biz_money_state(s)
     theme, col = {"나아짐": ("positive", UP), "나빠짐": ("negative", DOWN)}.get(state, ("neutral", R.MUTED))
-    lines = [(f"{_dk.josa(r0['name'], '은')} {_qlabel(r0['q'])} {r0['v']:.1f}%" + (f"로 1년 전 같은 분기보다 {_sgn(d, 1)}%p." if d is not None else "다.")
+    lines = [(f"{_dk.josa(r0['name'], '은')} {_qlabel(r0['q'])} {r0['v']:.1f}%" + (f"로 작년 같은 분기보다 {_sgn(d, 1)}%p입니다." if d is not None else "입니다.")
               + R.small_note("설문이 아니라 업종 전체 회사를 모은 실제 집계이고, 분기 끝 2~3달 뒤에 나옵니다." + U.biz_mix_note(s["sym"], 1)), "plain")]   # 늘 같은 안내는 작은 글씨 (P67)
     # 업종 이름은 위 문장에서 한 번만 — 그래프 제목 · 근거 줄은 `매출액 영업이익률` 처럼 (2026-10-28 사용자 P68)
     lines += _yoy_chart(f"{_fin_short(s, r0['name'])}, 올해와 작년 같은 분기 (%)", _yoy_groups(r0.get("series") or [], "q", _dk.q_axis, n=8), lambda v: f"{v:.1f}", now="이번 분기", then="작년 같은 분기")
@@ -616,7 +616,7 @@ def card_related(s):
     if not rows:
         return ""
     lines = [("업계 통계는 아니지만 이 회사의 원가나 손님 수와 이어지는 지표입니다."
-              + R.small_note("모두 1년 전 같은 달과 견줍니다. 주가를 설명한다고 확인한 지표는 아니고, 참고로만 봅니다."), "plain")]
+              + R.small_note("모두 작년 같은 달과 견줍니다. 주가를 설명한다고 확인한 지표는 아니고, 참고로만 봅니다."), "plain")]
     for r in rows:
         u = "%p" if r["kind"] == "pct" else "%"
         lines.append(R.chg_row(r["name"], ("지수 " if r["kind"] == "idx" else "") + _ind_value(r), r.get("chg"),

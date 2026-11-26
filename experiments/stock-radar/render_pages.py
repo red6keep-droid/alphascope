@@ -646,7 +646,7 @@ def industry_cards(s):
         theme, col = ("neutral", R.MUTED) if x["state"] in ("판단 유보", "비슷함") else ("positive", R.UP) if up else ("negative", R.DOWN)
         q = x.get("quarterly", False)
         unit = "분기" if q else "달"
-        head = f"{_dk.josa(x['name'], '은')} {_when(x['month'], q)} {_dk.josa(_fred_value(x['fred'], x['v']), '로')} 1년 전 같은 {unit}보다 {_sgn(x['chg'])}%였다."
+        head = f"{_dk.josa(x['name'], '은')} {_when(x['month'], q)} {_dk.josa(_fred_value(x['fred'], x['v']), '로')} 작년 같은 {unit}보다 {_sgn(x['chg'])}%입니다."   # 합니다체 (2026-11-26 사용자)
         note = ("분기 자료라 2~3달 늦게 나옵니다." if q else "월별 자료라 1~2달 늦게 나옵니다.") + " 1년 전보다 5% 넘게 바뀌면 방향을 적습니다."   # 옛 툴팁 기준을 문장 작은 글씨로 (2026-11-08)
         lines = [(head + R.small_note(note), "plain")]
         lines += _fred_chart(x, f"{x['name']}, 올해와 작년 같은 {unit}", q=q)
@@ -656,7 +656,7 @@ def industry_cards(s):
     m = d.get("money")
     if m:
         theme, col = {"나아짐": ("positive", R.UP), "나빠짐": ("negative", R.DOWN)}.get(m["state"], ("neutral", R.MUTED))
-        head = f"{_dk.josa(m['name'], '은')} {_when(m['month'], True)} {_dk.josa(_fred_value(m['fred'], m['v']), '로')} 1년 전 같은 분기보다 {_sgn(m['chg'])}%였다."
+        head = f"{_dk.josa(m['name'], '은')} {_when(m['month'], True)} {_dk.josa(_fred_value(m['fred'], m['v']), '로')} 작년 같은 분기보다 {_sgn(m['chg'])}%입니다."
         lines = [(head + R.small_note("분기 자료라 2~3달 늦게 나오고, 1년치로 환산한 금액입니다. 1년 전보다 10% 넘게 바뀌면 방향을 적습니다."), "plain")]
         lines += _fred_chart(m, f"{m['name']}, 올해와 작년 같은 분기", q=True)
         lines.append(R.chg_row("업종 기업이익", _fred_level(m["fred"], m["v"]), m.get("chg"), f"{_sgn(m['chg'])}%" if m.get("chg") is not None else "",
@@ -671,7 +671,7 @@ def card_related(s):
     if not rows:
         return ""
     lines = [("업계 통계는 아니지만 이 회사의 원가나 손님 수와 이어지는 지표입니다."
-              + R.small_note("모두 1년 전 같은 달(분기 자료는 같은 분기)과 견줍니다. 주가를 설명한다고 확인한 지표는 아니고, 참고로만 봅니다."), "plain")]
+              + R.small_note("모두 작년 같은 달(분기 자료는 같은 분기)과 견줍니다. 주가를 설명한다고 확인한 지표는 아니고, 참고로만 봅니다."), "plain")]
     for r in rows:
         q = r.get("quarterly", False)
         lines.append(R.chg_row(r["name"], _fred_level(r["fred"], r["v"]), r.get("chg"), f"{_sgn(r['chg'])}{'%p' if r.get('pct') else '%'}" if r.get("chg") is not None else "",

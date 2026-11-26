@@ -38,7 +38,7 @@ def main():
         body.append(f'<h3 style="margin:28px 0 4px;">{html.escape(x["name"])} <span style="font-weight:400;font-size:13px;color:#64748B;">'
                     f'{html.escape(e.get("sector") or "")} · {html.escape(e.get("sub") or "")}</span></h3>'
                     f'<div style="margin:0 0 10px;font-size:13px;color:#64748B;">{html.escape(note)}</div>' + R.small_rows(RP.sec_industry_tab(x)))
-    print(dk.write_mock("".join(body), os.path.join(HERE, "output", "mock_industry_tab_us.html"), "미국 종목 업계상황 탭 — 배정 고침 뒤"))
+    print(dk.write_mock(dk.formal("".join(body)), os.path.join(HERE, "output", "mock_industry_tab_us.html"), "미국 종목 업계상황 탭 — 배정 고침 뒤"))
 
 
 if __name__ == "__main__":

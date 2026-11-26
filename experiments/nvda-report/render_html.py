@@ -2198,11 +2198,11 @@ def regime_plain(mr):
     where = f"1년 최고가보다 {abs(ph):.1f}% 아래" if ph < -0.05 else "1년 최고가 근처"
     pm = mr.get("pct_vs_ma200")
     ma_part = f"200일 평균선보다 {abs(pm):.1f}% {'위' if above else '아래'}" if pm is not None else f"200일 평균선 {'위' if above else '아래'}"   # 괄호 설명은 첫 줄에 두지 않는다 (2026-10-17 사용자)
-    first = f"S&P 500이 {where}, {ma_part}, '{mr['regime']}'이다."   # 사용자 문구 (2026-10-17)
+    first = f"S&P 500이 {where}, {ma_part}, '{mr['regime']}'입니다."   # 합니다체를 처음부터 (2026-11-26 — 블로그에 반말로 남아 있었다)   # 사용자 문구 (2026-10-17)
     vix = mr.get("vix")
     if vix is not None:
         calm = "차분한 편" if vix < 20 else ("보통보다 높은 편" if vix < config.REGIME_VIX_HIGH else "크게 흔들리는 편")
-        first += f" 시장 흔들림(VIX)은 {vix:.1f}로 {calm}이다."
+        first += f" 시장 흔들림(VIX)은 {vix:.1f}로 {calm}입니다."
     return first
 
 def regime_lines(mr):
