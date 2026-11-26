@@ -3648,5 +3648,224 @@
   "model": "gemini-3.5-flash-lite",
   "at": "2026-11-26T12:47:00.412489+00:00",
   "n_src": 900
+ },
+ "0b6e4500df56": {
+  "lines": [
+   "미국 3분기 실질 GDP 성장률 4.3%로 상향 수정 (예상)",
+   "트럼프 대통령 GDP 수정치 오류 조사 요구"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "GROWTH_JOBS",
+    "dir": "positive",
+    "stage": "done"
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "FISCAL_POLITICS",
+    "dir": "neutral",
+    "stage": "done"
+   }
+  ],
+  "model": "groq:qwen/qwen3.8-27b",
+  "at": "2026-11-26T21:46:20.443541+00:00",
+  "n_src": 900
+ },
+ "971aeaf326b0": {
+  "lines": [
+   "미국 마이크로드라마 시장 2026년 매출 15억 달러 전망"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLC",
+    "issue": "OTHER",
+    "dir": "positive",
+    "stage": "talk"
+   }
+  ],
+  "model": "groq:qwen/qwen3.8-27b",
+  "at": "2026-11-26T21:46:20.443541+00:00",
+  "n_src": 900
+ },
+ "37c53964f6b5": {
+  "lines": [
+   "반도체 수출액 2026년 유가 수출액 추월"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "SMH",
+    "issue": "AI_CAPEX",
+    "dir": "positive",
+    "stage": "done"
+   }
+  ],
+  "model": "groq:qwen/qwen3.8-27b",
+  "at": "2026-11-26T21:46:20.443541+00:00",
+  "n_src": 900
+ },
+ "b934334e836a": {
+  "lines": [
+   "그래니셰어스의 2배 숏 엔비디아 일일 ETF 63% 하락",
+   "그래니셰어스의 2배 롱 엔비디아 ETF 62% 급등",
+   "젠슨 황의 엔비디아 최고경영자 재임명",
+   "월요일 세션 동안 엔비디아 주가 31% 상승"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "CORP_EVENT",
+    "dir": "neutral",
+    "stage": "done"
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-26T21:46:22.147413+00:00",
+  "n_src": 900
+ },
+ "981d7fc3754d": {
+  "lines": [
+   "파블로 에르난데스 데 코스 유럽중앙은행 차기 총재 내정",
+   "유럽연합 정상회의에서 유로존 지도자들의 지지 확보",
+   "네덜란드의 클래스 노트 지지 철회 합의"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "RATES_FED",
+    "dir": "positive",
+    "stage": "talk"
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "RATES_FED",
+    "dir": "positive",
+    "stage": "done"
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "RATES_FED",
+    "dir": "positive",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-26T21:46:22.147413+00:00",
+  "n_src": 900
+ },
+ "3c62ef67b306": {
+  "lines": [
+   "웨이트로스의 연례 식품 보고서 발표",
+   "텍스처 맥싱 식품 트렌드 부상"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLP",
+    "issue": "CORP_EVENT",
+    "dir": "neutral",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLP",
+    "issue": "CORP_EVENT",
+    "dir": "positive",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-26T21:46:22.147413+00:00",
+  "n_src": 900
+ },
+ "f8e49df6ca16": {
+  "lines": [
+   "추수감사절 기간 50마일 이상 이동 미국인 8,150만 명 전망",
+   "11월 24일부터 11월 30일까지 여행 기간 설정",
+   "연료 가격 전년 동기 대비 약 17% 상승 기록"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "GROWTH_JOBS",
+    "dir": "neutral",
+    "stage": "talk"
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLE",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-26T21:46:23.115224+00:00",
+  "n_src": 900
  }
 }
