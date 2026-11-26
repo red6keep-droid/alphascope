@@ -103,7 +103,10 @@ def check(ko, name):
     hangul = len(re.findall(r"[가-힣]", ko))
     if not (1 <= len(sents) <= 3 and 30 <= len(ko) <= 260 and hangul >= len(ko) * 0.5):
         return None
-    if re.search(r"\d", ko) or re.search(r"최고|최대|선도|혁신|세계적|유망|추천|매수|매도|전망", ko):
+    # 숫자 금지는 매출 · 순위 같은 수치를 막으려는 것 — 회사 이름(3M · F5 · L3해리스)과 기술 이름(3D · 5G)의 숫자는 뺀다
+    # (2026-11-26: 이 넷이 날마다 AI 1번을 쓰고도 버려져 전용 페이지가 안 생겼다)
+    bare = re.sub(r"\b[2-6][DG]\b", "", ko.replace(name, "")) if name else ko
+    if re.search(r"\d", bare) or re.search(r"최고|최대|선도|혁신|세계적|유망|추천|매수|매도|전망", ko):
         return None
     if not ko.endswith("다.") or not ko.startswith(name[:2]):
         return None

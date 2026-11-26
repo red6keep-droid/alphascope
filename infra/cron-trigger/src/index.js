@@ -93,6 +93,10 @@ const KST_JOBS = {
   "22:50": [{ workflow: "news-posts.yml", inputs: { scheduled: "true", stage: "publish", draft: "false" } }],
   // 아침 글 기준일 고치기 — 한국 장 마감(15:30) 뒤 그날 종가로 관련 종목 표를 고쳐 씀(같은 주소 PUT, gh-pages 안 씀). 평일만(휴장 · 주말은 기준일이 안 바뀌어 건드릴 글이 없다)
   "16:10": [{ workflow: "news-posts.yml", inputs: { scheduled: "true", stage: "refresh", draft: "false" }, when: WEEKDAY }],
+  // 간단 종목 새 전용 페이지 (2026-11-26 사용자 "그렇게 해") — GitHub 예약(23:40)이 11-25 · 11-26 다음 날 08시대에 와
+  // 워크플로 시간 창(23~06시)에 걸려 이틀 동안 새 페이지 0. Worker 가 걸면 제시각. 입력 없는 워크플로(inputs: null), GitHub 예약은 예비.
+  // 하루 25쪽 상한 · 같은 날 두 번 돌아도 cache/shells_new_day.json 합계라 더 만들지 않는다. 매일.
+  "23:40": [{ workflow: "quick-shells-new.yml", inputs: null }],
 };
 
 const JOBS = {
@@ -156,6 +160,7 @@ const NAMES = {
   "ops-dashboard.yml": "운영 대시보드 · 발행 시간",
   "quick-dart.yml": "한국 DART 새벽 받기",
   "news-posts.yml": "Newfact 뉴스 발행",
+  "quick-shells-new.yml": "간단 종목 새 전용 페이지",
 };
 const WATCH_AFTER_MIN = 60;
 const RETRY_AGAIN_MIN = 170;   // 한 번 더 본다(18:40) — 다시 건 실행도 실패했으면 알림, 100분 때 아직 돌다가 그 뒤 끊겼으면 그때 다시 건다
