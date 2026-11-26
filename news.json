@@ -1,114 +1,171 @@
 {
-  "updated_at": "2026-11-25 21:46:30 UTC",
+  "updated_at": "2026-11-26 12:47:00 UTC",
   "items": [
     {
-      "title": "Macy's postpones Thanksgiving Day Parade due to severe weather",
+      "title": "Global stocks rally as investors shrug off U.S. tariffs and AI jitters to 'fish for bargains'",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/25/macys-thanksgiving-day-parade-postponed.html",
-      "published": "2026-11-25 21:26:36",
-      "title_ko": "메이시스, 악천후로 인해 추수감사절 퍼레이드 연기",
-      "summary_ko": "악천후로 인해 토요일로 연기",
+      "link": "https://www.cnbc.com/2026/11/26/stock-markets-today-.html",
+      "published": "2026-11-26 12:22:25",
+      "title_ko": "미국 관세와 AI 불안을 딛고 투자자들이 저가 매수에 나서며 글로벌 증시 랠리",
+      "summary_ko": "백악관이 수십 개 주요 교역국을 겨냥한 새로운 관세 조치를 발표했으나 투자자들은 동요하지 않음",
       "lines": [
-        "메이시스 악천후로 추수감사절 퍼레이드 토요일 연기 발표",
-        "연기된 퍼레이드 토요일 오전 8시 30분 개최 예정"
+        "목요일 미국 증시 추수감사절 휴장",
+        "수요일 정규 세션에서 다우지수 0.33% 상승",
+        "수요일 나스닥 종합지수 0.62% 하락",
+        "수요일 S&P 500 지수 0.25% 하락"
       ]
     },
     {
-      "title": "10-year Treasury yield slides despite sticky inflation data as investors buy bonds for protection",
+      "title": "U.S. tariff-hike threats pile pressure on partners to sign trade deals",
       "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/25/treasury-yields-bonds-inflation.html",
-      "published": "2026-11-25 21:02:05",
-      "title_ko": "끈질긴 인플레이션 데이터에도 불구하고 투자자들이 보호를 위해 채권 매수에 나서면서 10년물 국채 금리가 하락",
-      "summary_ko": "인플레이션 데이터 지속 속 투자자들의 채권 매수",
+      "link": "https://www.cnbc.com/2026/11/26/us-tariffs-hike-trade-agreement.html",
+      "published": "2026-11-26 11:44:19",
+      "title_ko": "미국의 관세 인상 위협, 무역 협정 체결 압박 가중",
+      "summary_ko": "미국, 무역 협정 체결 국가에 더 낮은 관세율 제시",
       "lines": [
-        "10년물 미 국채 금리 4.866%로 3bp 이상 하락",
-        "2년물 미 국채 금리 4.65%로 2bp 이상 하락",
-        "30년물 미 국채 금리 5.254%로 3bp 이상 하락"
+        "미국 정부의 14개 교역 상대국 대상 신규 관세 부과 계획",
+        "유럽연합, 한국, 스위스, 대만 등 15% 관세 제안",
+        "베트남 최대 35% 관세 부과 직면",
+        "무역 협정 체결국 대상 관세 상한 하향 조정 방침"
       ]
     },
     {
-      "title": "트럼프 행정부 관세 부활",
-      "title_ko": "트럼프 행정부 관세 부활",
-      "summary_ko": "트럼프 행정부가 관세를 이전 수준으로 인상하며 시장에 단기적인 충격을 주었",
-      "source": "블룸버그",
-      "link": "https://www.youtube.com/watch?v=Nw2ibHMUmbk",
-      "published": "2026-11-25 20:45:40",
+      "title": "Switzerland’s biggest bank set for showdown with lawmakers as capital fight intensifies amid crisis planning",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/26/ubs-swiss-capital-rules-finma-crisis-plan.html",
+      "published": "2026-11-26 11:17:39",
+      "title_ko": "스위스 최대 은행, 위기 계획 수립 속 자본 규제 싸움으로 입법부와 격돌 예고",
+      "summary_ko": "더 엄격한 자본 요건을 둘러싼 의회와의 갈등 지속",
+      "lines": [
+        "스위스 금융시장감독청 UBS 위기 해결 전략 집행 가능 평가",
+        "해외 자회사 자본 보유 요건 강화 관련 의회 심의 직면",
+        "크레디트 스위스 통합 이후 UBS 위기 대응 능력 개선"
+      ]
+    },
+    {
+      "title": "Trump, NATO chief caution Russia as attacks on Ukraine’s energy infrastructure intensify",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/26/trump-nato-rutte-russia-ukraine-war.html",
+      "published": "2026-11-26 10:45:45",
+      "title_ko": "트럼프와 NATO 수장, 우크라이나 에너지 인프라 공격 격화 속 러시아에 경고",
+      "summary_ko": "우크라이나 에너지 인프라 공격 심화 속 평화적 해결 요구",
+      "lines": [
+        "도널드 트럼프 미국 대통령과 마르크 뤼터 나토 사무총장의 러시아에 대한 확전 자제 촉구 공동 성명 발표",
+        "도널드 트럼프 미국 대통령과 마르크 뤼터 나토 사무총장의 플로리다주 팜비치 마르아라고 회동 진행"
+      ]
+    },
+    {
+      "title": "Norse Atlantic suspends all flights, warns it may file for bankruptcy after share price collapse",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/26/norse-airline-finance-business.html",
+      "published": "2026-11-26 09:02:30",
+      "title_ko": "노스 아틀란틱, 모든 항공편 운항 중단 및 주가 폭락 후 파산보호 신청 경고",
+      "summary_ko": "재무 상태가 위태롭다고 경고한 지 하루 만에 파산 신청 가능성 발표",
+      "lines": [
+        "노스 아틀란틱의 모든 항공편 운항 중단 및 파산 신청 가능성 경고",
+        "단기 자금 조달 방안 마련을 위한 노스 아틀란틱 이사회의 대책 검토"
+      ]
+    },
+    {
+      "title": "Taking on Starlink: Europe’s largest satellite factory opens in push to rival Musk",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/26/starlink-satellites-aerospacelab-factory-belgium.html",
+      "published": "2026-11-26 07:45:05",
+      "title_ko": "스타링크에 도전장: 머스크에 맞설 유럽 최대 위성 공장 개소",
+      "summary_ko": "연간 최대 500개 위성 생산 능력 보유",
+      "lines": [
+        "유럽 최대 위성 공장 벨기에 개소",
+        "에어로스페이스랩 26억 달러 규모 계약 체결"
+      ]
+    },
+    {
+      "title": "Robots could be doing household chores in just 1-2 years, Chinese EV firm says",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/26/china-ev-xpeng-humanoid-robots-household-chores.html",
+      "published": "2026-11-26 07:30:11",
+      "title_ko": "로봇, 불과 1~2년 안에 집안일 할 수 있을 것이라고 중국 EV 기업 밝혀",
+      "summary_ko": "CNBC 인터뷰에서 1~2년 내 가사 노동 수행 가능성 언급",
+      "lines": [
+        "샤오펑 휴머노이드 로봇 아이언 공개",
+        "내년 1월 로봇 양산 시작 예정"
+      ]
+    },
+    {
+      "title": "SpaceX, Musk pledge to donate a share each to active Trump Accounts",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/25/spacex-musk-trump-account-stock.html",
+      "published": "2026-11-26 06:39:34",
+      "title_ko": "스페이스X와 머스크, 활성화된 트럼프 계정 각각에 주식 기부 약속",
+      "summary_ko": "CEO 일론 머스크 매칭 기부 예정",
+      "lines": [
+        "스페이스엑스의 트럼프 계정당 A주 보통주 1주 기부 발표",
+        "일론 머스크의 스페이스엑스 주식 기부 개인 매칭 계획 발표",
+        "10월 백악관의 트럼프 계정 약 7천만 개 생성 발표",
+        "목요일 엑스 게시물을 통한 일론 머스크의 다음 달 주식 이전 계획 공개"
+      ]
+    },
+    {
+      "title": "North Korea's Kim calls for nuclear arsenal expansion, says status 'will never change'",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/26/north-korea-kim-nuclear-weapons-expansion.html",
+      "published": "2026-11-26 05:50:34",
+      "title_ko": "북한 김정은, 핵무기 아스날 확장 촉구하며 지위 절대 변하지 않을 것이라고 밝혀",
+      "summary_ko": "국제사회의 비핵화 압박 거부",
+      "lines": [
+        "목요일 북한 매체의 김정은 국무위원장 핵무기 아스날 확장 및 전술핵 사용 촉구 보도",
+        "수요일 김정은의 핵물질 생산 및 무기 연구 시설 현지 지도 방문"
+      ]
+    },
+    {
+      "title": "미국 신규 과잉생산 관세 발표",
+      "title_ko": "미국 신규 과잉생산 관세 발표",
+      "summary_ko": "미국 트럼프 행정부가 산업 과잉 생산을 이유로 새로운 관세 부과 방안을 발표",
+      "source": "MTN 퀵브리핑",
+      "link": "https://www.youtube.com/watch?v=KzUXJBOebfk",
+      "published": "2026-11-26 01:34:55",
       "kind": "media",
       "tag": "관세 · 무역",
       "direction": "negative",
-      "n_channels": 3,
-      "lines": [
-        "중국 대상 관세율 20% 적용 및 내년 두 배 인상 가능성",
-        "택스페이어스 포 커먼 센스 대표 발언 : 관세 비용은 외국이 아닌 미국 소비자가 부담"
-      ]
-    },
-    {
-      "title": "Nvidia's billion-dollar board bet: Who's protected as lawsuits mount?",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/25/nvidias-billion-dollar-board-bet-whos-protected-as-lawsuits-mount.html",
-      "published": "2026-11-25 19:16:24",
-      "title_ko": "엔비디아의 수십억 달러 이사회 도박: 소송이 쏟아지는 가운데 누가 보호받는가?",
-      "summary_ko": "이사들이 회사의 적절한 감독 소홀 혐의로 주주 소송 피고인 상태",
-      "lines": [
-        "엔비디아 이사진 대상 주주 소송 및 당국 조사 진행",
-        "캘리포니아주 법무부의 엔비디아 투자자 오인 정보 제공 여부 조사 착수"
-      ]
-    },
-    {
-      "title": "연준 12월 금리 인상 예상",
-      "title_ko": "연준 12월 금리 인상 예상",
-      "summary_ko": "모하메드 엘에리언은 인플레이션 수치와 시장 가격 반영으로 인해 연준이 12월에 금리 인상을 단행할 것으로 봄",
-      "source": "CNBC",
-      "link": "https://www.youtube.com/watch?v=1Dh6fw_zSpw",
-      "published": "2026-11-25 17:57:08",
-      "kind": "media",
-      "tag": "금리 · 연준",
-      "direction": "positive",
       "n_channels": 4,
       "lines": [
-        "시장 12월 금리 인상 기대치 약 100% 육박",
-        "알리안츠 수석 경제 자문 발언 : 인플레이션 수치와 시장 가격 반영으로 12월 25bp 금리 인상 불가피"
+        "미국 트럼프 행정부 산업 과잉 생산 이유 새로운 관세 부과 방안 발표",
+        "한국 포함 14개 경제 주체 부과 대상 지정",
+        "한국 기존 한미 무역 합의 따라 15퍼센트 관세 상한 유지",
+        "철강 및 자동차 등 기존 품목별 관세 이번 조치 영향 없음",
+        "신규 관세 의견 수렴 및 공청회 거쳐 내년 1월 시행 전망"
       ]
     },
     {
-      "title": "중국 및 EU 등 14개국 대상 신규 관세 제안",
-      "title_ko": "중국 및 EU 등 14개국 대상 신규 관세 제안",
-      "summary_ko": "미국 무역대표부는 초과 설비 문제에 대응하기 위해 중국과 EU 등 14개 교역 상대를 대상으로 한 신규 타겟 관세 제안을 발표",
-      "source": "CNBC",
-      "link": "https://www.youtube.com/watch?v=RZJfbY21fCk",
-      "published": "2026-11-25 17:55:05",
+      "title": "미국 물가 압력 및 12월 금리 인상 가능성",
+      "title_ko": "미국 물가 압력 및 12월 금리 인상 가능성",
+      "summary_ko": "높은 미국 물가 압력과 12월 FOMC 회의에서의 금리 인상 가능성이 시장의 소비 심리를 위축시키고 변동성을 확대시키고 있음",
+      "source": "MTN 투자뉴스7",
+      "link": "https://www.youtube.com/watch?v=CYSuuose31g",
+      "published": "2026-11-25 23:14:37",
       "kind": "media",
-      "tag": "관세 · 무역",
+      "tag": "금리 · 연준",
+      "direction": "negative",
+      "n_channels": 4,
+      "lines": [
+        "미국에서 발표된 PCE 물가 지수 지속이 예상치보다 높게 나옴",
+        "SK증권 최영지 PV 발언 : 올해 12월 FOMC 회의에서 금리 인상 가능성이 높아진 상황",
+        "SK증권 최영지 PV 발언 : 당분간 매크로 흐름에 따라 변동성이 확대될 것으로 봄"
+      ]
+    },
+    {
+      "title": "반도체 사이클 및 소부장 투자 전략",
+      "title_ko": "반도체 사이클 및 소부장 투자 전략",
+      "summary_ko": "AI 수요에 힘입어 반도체 체질이 변화하여 사이클이 내년까지 지속될 전망이며, 소부장은 영업 이익 중심으로 선별 접근해야 ",
+      "source": "MTN 투자뉴스7",
+      "link": "https://www.youtube.com/watch?v=CYSuuose31g",
+      "published": "2026-11-25 23:14:37",
+      "kind": "media",
+      "tag": "AI 투자 · 반도체 수요",
       "direction": "negative",
       "n_channels": 3,
       "lines": [
-        "미국 무역대표부 발표 : 중국 및 EU 등 14개 교역 상대국 대상 신규 관세 제안",
-        "신규 관세는 기존 조치와 무역 협정 세율을 반영하여 조정될 예정",
-        "미국 무역대표부 대표 발언 : 중국의 20% 관세는 기존 조치에 추가되며 일부 소비재는 면제될 것"
-      ]
-    },
-    {
-      "title": "Kalshi traders say state data center moratoriums are more likely than not",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/25/kalshi-traders-say-the-odds-of-states-imposing-data-center-moratoriums-is-more-likely-than-not.html",
-      "published": "2026-11-25 17:36:54",
-      "title_ko": "칼시 트레이더들, 주 정부의 데이터센터 일시 중단 가능성 높다고 전망",
-      "summary_ko": "민주당의 의회 및 주요 주지사 선거 승리 이후 데이터센터 구축 일시 중단 가능성 변화",
-      "lines": [
-        "칼시 거래자들의 4개 이상 주 데이터센터 건설 유예 확률 57% 기록",
-        "7월 14일 뉴욕주 하이퍼스케일 데이터센터 관련 1년 허가 중단 첫 시행"
-      ]
-    },
-    {
-      "title": "Prediction markets push OpenAI IPO expectations later into 2027",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/25/openai-ipo-odds-2027-prediction-markets.html",
-      "published": "2026-11-25 17:08:03",
-      "title_ko": "예측 시장, 오픈AI 기업공개(IPO) 예상 시점을 2027년 후반으로 연기",
-      "summary_ko": "AI 주식과 관련 시장 약세로 기업공개 예상 시점 연기",
-      "lines": [
-        "칼시 거래자들의 2027년 6월 이전 오픈에이아이 기업공개 확률 28% 산정 (예상)",
-        "최근 펀딩 라운드 기준 오픈에이아이 기업가치 1조 2500억 달러 기록"
+        "SK증권 최영지 PV 발언 : 반도체 사이클은 적어도 내년까지 지속될 가능성이 높음",
+        "김태성 본부장 발언 : 반도체 소부장 중 최근 분기 영업 이익이 YoY 대비 큰 폭으로 성장한 기업으로 압축하여 추가 매수하는"
       ]
     }
   ]

@@ -1,544 +1,4 @@
 {
- "92cdbaff4de0": {
-  "lines": [
-   "앤트로픽 공모가 83달러 확정 (예상)",
-   "나스닥 거래 개시일 목요일 예정",
-   "목표 발행 주식수 8억 2500만 주",
-   "조달 자금 약 685억 달러 규모",
-   "기존 목표치 상회하는 1조 4000억 달러 이상 기업가치 전망"
-  ],
-  "tags": [
-   null,
-   null,
-   null,
-   null,
-   null
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-18T21:46:33.646201+00:00",
-  "n_src": 900
- },
- "879c59d879df": {
-  "lines": [
-   "엔비디아 임시 최고경영자 콜레트 크레스 임원진과 전체 회의 개최",
-   "젠슨 황 사임 후 첫 전 직원 미팅 진행",
-   "신임 이사회 의장 하비 존스 및 주요 임원 참석"
-  ],
-  "tags": [
-   {
-    "scope": "stock",
-    "tickers": [
-     "NVDA"
-    ],
-    "sector": "SMH",
-    "issue": "CORP_EVENT",
-    "dir": "neutral",
-    "stage": "done"
-   },
-   {
-    "scope": "stock",
-    "tickers": [
-     "NVDA"
-    ],
-    "sector": "SMH",
-    "issue": "CORP_EVENT",
-    "dir": "neutral",
-    "stage": "done"
-   },
-   {
-    "scope": "stock",
-    "tickers": [
-     "NVDA"
-    ],
-    "sector": "SMH",
-    "issue": "CORP_EVENT",
-    "dir": "neutral",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-18T21:46:33.646201+00:00",
-  "n_src": 900
- },
- "69a85382a6c6": {
-  "lines": [
-   "에스토니아 출신 기술 억만장자 앤트로픽 초기 투자 참여",
-   "과거 1억 2400만 달러 규모 시리즈 A 투자 주도",
-   "앤트로픽 나스닥 상장 예정"
-  ],
-  "tags": [
-   null,
-   null,
-   null
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-18T21:46:33.646201+00:00",
-  "n_src": 900
- },
- "3da9c50c1b19": {
-  "lines": [
-   "미국 식품의약품안전청의 불법 처방약 수입 관련 형사 사건 기소",
-   "캐나다 헬스케어 기업 간부 존 토마스 하워드의 11월 8일 체포 및 밀수 등 혐의 기소"
-  ],
-  "tags": [
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLV",
-    "issue": "REGULATION",
-    "dir": "negative",
-    "stage": "done"
-   },
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLV",
-    "issue": "REGULATION",
-    "dir": "negative",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-18T21:46:35.835967+00:00",
-  "n_src": 900
- },
- "ef28fb89fd52": {
-  "lines": [
-   "엔비디아의 수요일 주가 2.89% 하락 기록",
-   "코어위브의 주가 4.13% 하락 및 아이렌의 3.61% 하락",
-   "엔비디아의 3분기 매출 1158억 4000만 달러 발표 (예상)",
-   "엔비디아의 4분기 매출 가이던스 1300억 달러 제시"
-  ],
-  "tags": [
-   {
-    "scope": "stock",
-    "tickers": [
-     "NVDA"
-    ],
-    "sector": "SMH",
-    "issue": "MARKET_STRUCTURE",
-    "dir": "neutral",
-    "stage": "done",
-    "price": true
-   },
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "SMH",
-    "issue": "MARKET_STRUCTURE",
-    "dir": "neutral",
-    "stage": "done",
-    "price": true
-   },
-   {
-    "scope": "stock",
-    "tickers": [
-     "NVDA"
-    ],
-    "sector": "SMH",
-    "issue": "EARNINGS",
-    "dir": "positive",
-    "stage": "done"
-   },
-   {
-    "scope": "stock",
-    "tickers": [
-     "NVDA"
-    ],
-    "sector": "SMH",
-    "issue": "EARNINGS",
-    "dir": "positive",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-18T21:46:35.835967+00:00",
-  "n_src": 900
- },
- "a4a855012e76": {
-  "lines": [
-   "엔비디아 주가의 164달러에서 152달러 아래로의 변동 (예상)",
-   "구리 선물 가격의 5% 급락으로 4월 이후 최저치 기록"
-  ],
-  "tags": [
-   {
-    "scope": "stock",
-    "tickers": [
-     "NVDA"
-    ],
-    "sector": "SMH",
-    "issue": "MARKET_STRUCTURE",
-    "dir": "neutral",
-    "stage": "done",
-    "price": true
-   },
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLB",
-    "issue": "MARKET_STRUCTURE",
-    "dir": "neutral",
-    "stage": "done",
-    "price": true
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-18T21:46:35.835967+00:00",
-  "n_src": 900
- },
- "c9bcd104c52a": {
-  "lines": [],
-  "tags": [],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-18T21:46:37.540510+00:00",
-  "n_src": 900
- },
- "c50ef9f1c5c7": {
-  "lines": [],
-  "tags": [],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-18T21:46:37.540510+00:00",
-  "n_src": 361
- },
- "3a261481b746": {
-  "lines": [
-   "연방준비제도 10월 정책 회의 기준금리 3.75%-4% 동결 (예상)",
-   "연방준비제도 당국자들의 추가 금리 인상 필요성 언급 및 인플레이션 위험 요인 지적",
-   "인공지능 수요의 물가 상승 압력 위험 요인 부각"
-  ],
-  "tags": [
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "RATES_FED",
-    "dir": "neutral",
-    "stage": "done"
-   },
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "INFLATION",
-    "dir": "negative",
-    "stage": "talk"
-   },
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "INFLATION",
-    "dir": "negative",
-    "stage": "talk"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-18T21:46:37.540510+00:00",
-  "n_src": 900
- },
- "be113688fd9a": {
-  "lines": [
-   "부통령 JD 밴스의 딜북 서밋 일정 취소",
-   "미국 정부의 전국적 기술 장애 관련 회의 참석",
-   "트럼프 행정부 당국자의 기술 장애 사이버 공격 아님 발표"
-  ],
-  "tags": [
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "CORP_EVENT",
-    "dir": "neutral",
-    "stage": "done"
-   },
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "CORP_EVENT",
-    "dir": "neutral",
-    "stage": "done"
-   },
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "CORP_EVENT",
-    "dir": "neutral",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-18T21:46:39.309792+00:00",
-  "n_src": 900
- },
- "9ebb9a6aefb3": {
-  "lines": [
-   "하킴 제프리스의 민주당 하원 의장 후보 선출",
-   "민주당의 의장 후보 투표 결과 251대 11 기록",
-   "내년 1월 하원 의장 선출을 위한 본회의 투표 예정"
-  ],
-  "tags": [
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "FISCAL_POLITICS",
-    "dir": "positive",
-    "stage": "done"
-   },
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "FISCAL_POLITICS",
-    "dir": "positive",
-    "stage": "done"
-   },
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "FISCAL_POLITICS",
-    "dir": "neutral",
-    "stage": "talk"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-18T21:46:39.309792+00:00",
-  "n_src": 900
- },
- "51c5886a825b": {
-  "lines": [
-   "월마트 3분기 실적 예상치 상회 및 연간 실적 전망 상향",
-   "월마트 글로벌 전자상거래 매출 17% 증가"
-  ],
-  "tags": [
-   {
-    "scope": "stock",
-    "tickers": [
-     "WMT"
-    ],
-    "sector": "XLP",
-    "issue": "EARNINGS",
-    "dir": "positive",
-    "stage": "done"
-   },
-   {
-    "scope": "stock",
-    "tickers": [
-     "WMT"
-    ],
-    "sector": "XLP",
-    "issue": "EARNINGS",
-    "dir": "positive",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-19T12:46:31.708924+00:00",
-  "n_src": 900
- },
- "53a0250bb8d5": {
-  "lines": [
-   "패밀리 오피스 3분기 주식 비중 36.4%로 확대"
-  ],
-  "tags": [
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "MARKET_STRUCTURE",
-    "dir": "positive",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-19T12:46:31.708924+00:00",
-  "n_src": 900
- },
- "f6260030e1e5": {
-  "lines": [
-   "앤스로픽 주가 83달러 및 기업가치 1조 4천억 달러 전망",
-   "앤스로픽 임직원 400명 이상 자산 1억 달러 상회 전망"
-  ],
-  "tags": [
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLK",
-    "issue": "MARKET_STRUCTURE",
-    "dir": "neutral",
-    "stage": "talk",
-    "price": true
-   },
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLK",
-    "issue": "CORP_EVENT",
-    "dir": "positive",
-    "stage": "talk"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-19T12:46:31.708924+00:00",
-  "n_src": 900
- },
- "fb9b219e0042": {
-  "lines": [
-   "덴마크 의회 그린란드 미국 안보 협정 비준",
-   "미국 워싱턴 그린란드 군사 주둔 확대 허용"
-  ],
-  "tags": [
-   null,
-   null
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-19T12:46:36.150429+00:00",
-  "n_src": 900
- },
- "d5ba42fbe1ea": {
-  "lines": [
-   "2030년 데이터센터 전력 소비량 두 배 증가 전망",
-   "국제에너지기구 데이터센터 연간 전력 소비 1000테라와트시 예상"
-  ],
-  "tags": [
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLU",
-    "issue": "OIL_ENERGY",
-    "dir": "negative",
-    "stage": "talk"
-   },
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLU",
-    "issue": "OIL_ENERGY",
-    "dir": "neutral",
-    "stage": "talk"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-19T12:46:36.150429+00:00",
-  "n_src": 900
- },
- "4e7dae822fd0": {
-  "lines": [
-   "미국 러시아 중국 아시아태평양경제협력체 정상회의 참석",
-   "국제통화기금 총재 인공지능과 에너지 충격 글로벌 인플레이션 가속 지적"
-  ],
-  "tags": [
-   null,
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "INFLATION",
-    "dir": "negative",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-19T12:46:36.150429+00:00",
-  "n_src": 900
- },
- "795407703f90": {
-  "lines": [
-   "미국·중국·러시아 정상의 선전 회동 개최"
-  ],
-  "tags": [
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "GEOPOLITICS",
-    "dir": "neutral",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-19T12:46:37.314171+00:00",
-  "n_src": 900
- },
- "9086ca40964e": {
-  "lines": [
-   "노바티스의 주요 신약 최고 매출 전망치 180억 달러 상향"
-  ],
-  "tags": [
-   null
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-19T12:46:37.314171+00:00",
-  "n_src": 900
- },
- "f451ee32b4d5": {
-  "lines": [
-   "미국·러시아·중국 정상의 아시아태평양경제협력체 부대 행사 회동"
-  ],
-  "tags": [
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "GEOPOLITICS",
-    "dir": "neutral",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-19T12:46:37.314171+00:00",
-  "n_src": 900
- },
- "f40c45200895": {
-  "lines": [
-   "다카이치 일본 총리 아태경제협력체 정상회의 참석차 중국 방문",
-   "중국 측 공항 영접에 현직 대신 은퇴한 외교관 참석"
-  ],
-  "tags": [
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "GEOPOLITICS",
-    "dir": "neutral",
-    "stage": "done"
-   },
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "GEOPOLITICS",
-    "dir": "negative",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-19T12:46:38.333781+00:00",
-  "n_src": 900
- },
- "564866e14a73": {
-  "lines": [
-   "일론 머스크 우크라이나 대통령의 스타쉴드 관련 발언 반박"
-  ],
-  "tags": [
-   {
-    "scope": "stock",
-    "tickers": [
-     "TSLA"
-    ],
-    "sector": "XLY",
-    "issue": "GEOPOLITICS",
-    "dir": "negative",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-19T12:46:38.333781+00:00",
-  "n_src": 900
- },
  "0911d83ee1a9": {
   "lines": [
    "상무부의 대중국 AI 칩 판매 승인",
@@ -3850,6 +3310,343 @@
   ],
   "model": "gemini-3.5-flash-lite",
   "at": "2026-11-25T21:46:30.306812+00:00",
+  "n_src": 900
+ },
+ "62bdeb72533b": {
+  "lines": [
+   "목요일 미국 증시 추수감사절 휴장",
+   "수요일 정규 세션에서 다우지수 0.33% 상승",
+   "수요일 나스닥 종합지수 0.62% 하락",
+   "수요일 S&P 500 지수 0.25% 하락"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done"
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-26T12:46:39.088401+00:00",
+  "n_src": 900
+ },
+ "02d65ac20e4b": {
+  "lines": [
+   "미국 정부의 14개 교역 상대국 대상 신규 관세 부과 계획",
+   "유럽연합, 한국, 스위스, 대만 등 15% 관세 제안",
+   "베트남 최대 35% 관세 부과 직면",
+   "무역 협정 체결국 대상 관세 상한 하향 조정 방침"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "TARIFF_TRADE",
+    "dir": "negative",
+    "stage": "talk"
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "TARIFF_TRADE",
+    "dir": "negative",
+    "stage": "talk"
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "TARIFF_TRADE",
+    "dir": "negative",
+    "stage": "talk"
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "TARIFF_TRADE",
+    "dir": "positive",
+    "stage": "talk"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-26T12:46:39.088401+00:00",
+  "n_src": 900
+ },
+ "47ecbd36a314": {
+  "lines": [
+   "스위스 금융시장감독청 UBS 위기 해결 전략 집행 가능 평가",
+   "해외 자회사 자본 보유 요건 강화 관련 의회 심의 직면",
+   "크레디트 스위스 통합 이후 UBS 위기 대응 능력 개선"
+  ],
+  "tags": [
+   null,
+   null,
+   null
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-26T12:46:39.088401+00:00",
+  "n_src": 900
+ },
+ "798dddff646f": {
+  "lines": [
+   "도널드 트럼프 미국 대통령과 마르크 뤼터 나토 사무총장의 러시아에 대한 확전 자제 촉구 공동 성명 발표",
+   "도널드 트럼프 미국 대통령과 마르크 뤼터 나토 사무총장의 플로리다주 팜비치 마르아라고 회동 진행"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "GEOPOLITICS",
+    "dir": "positive",
+    "stage": "done"
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "GEOPOLITICS",
+    "dir": "neutral",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-26T12:46:56.544599+00:00",
+  "n_src": 900
+ },
+ "bd454e6f28e7": {
+  "lines": [
+   "노스 아틀란틱의 모든 항공편 운항 중단 및 파산 신청 가능성 경고",
+   "단기 자금 조달 방안 마련을 위한 노스 아틀란틱 이사회의 대책 검토"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLY",
+    "issue": "CORP_EVENT",
+    "dir": "negative",
+    "stage": "talk"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLY",
+    "issue": "CORP_EVENT",
+    "dir": "uncertain",
+    "stage": "talk"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-26T12:46:56.544599+00:00",
+  "n_src": 900
+ },
+ "1b019289d66a": {
+  "lines": [
+   "인공지능 인프라 전력 및 원자재 수요에 따른 라틴아메리카 구리 및 에너지 자원 공급 역할 대두"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLB",
+    "issue": "AI_CAPEX",
+    "dir": "positive",
+    "stage": "talk"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-26T12:46:56.544599+00:00",
+  "n_src": 900
+ },
+ "f2aecb4cd2e1": {
+  "lines": [
+   "유럽 최대 위성 공장 벨기에 개소",
+   "에어로스페이스랩 26억 달러 규모 계약 체결"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLI",
+    "issue": "CORP_EVENT",
+    "dir": "positive",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLI",
+    "issue": "EARNINGS",
+    "dir": "positive",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-26T12:46:58.493989+00:00",
+  "n_src": 900
+ },
+ "9327a647c67d": {
+  "lines": [
+   "샤오펑 휴머노이드 로봇 아이언 공개",
+   "내년 1월 로봇 양산 시작 예정"
+  ],
+  "tags": [
+   null,
+   null
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-26T12:46:58.493989+00:00",
+  "n_src": 900
+ },
+ "178d12731302": {
+  "lines": [
+   "유럽 고액 자산가 대체 투자 선호"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "MARKET_STRUCTURE",
+    "dir": "positive",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-26T12:46:58.493989+00:00",
+  "n_src": 900
+ },
+ "00e68d185acb": {
+  "lines": [
+   "스페이스엑스의 트럼프 계정당 A주 보통주 1주 기부 발표",
+   "일론 머스크의 스페이스엑스 주식 기부 개인 매칭 계획 발표",
+   "10월 백악관의 트럼프 계정 약 7천만 개 생성 발표",
+   "목요일 엑스 게시물을 통한 일론 머스크의 다음 달 주식 이전 계획 공개"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLY",
+    "issue": "CORP_EVENT",
+    "dir": "positive",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLY",
+    "issue": "CORP_EVENT",
+    "dir": "positive",
+    "stage": "talk"
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "FISCAL_POLITICS",
+    "dir": "neutral",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLY",
+    "issue": "CORP_EVENT",
+    "dir": "neutral",
+    "stage": "talk"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-26T12:47:00.412489+00:00",
+  "n_src": 900
+ },
+ "f82391e30c2a": {
+  "lines": [
+   "목요일 북한 매체의 김정은 국무위원장 핵무기 아스날 확장 및 전술핵 사용 촉구 보도",
+   "수요일 김정은의 핵물질 생산 및 무기 연구 시설 현지 지도 방문"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "GEOPOLITICS",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "GEOPOLITICS",
+    "dir": "neutral",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-26T12:47:00.412489+00:00",
+  "n_src": 900
+ },
+ "5bfa4d5f1dbd": {
+  "lines": [
+   "싱가포르 아이컨nections 글로벌 올츠 아시아 컨퍼런스 패널 토론 개최",
+   "DSC 메리디안 캐피털 셰루 초우드리의 AI 투자 거품 및 대규모 실업으로 인한 경기 침체 우려 제기"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "GROWTH_JOBS",
+    "dir": "neutral",
+    "stage": "done"
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "GROWTH_JOBS",
+    "dir": "negative",
+    "stage": "talk"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-26T12:47:00.412489+00:00",
   "n_src": 900
  }
 }
