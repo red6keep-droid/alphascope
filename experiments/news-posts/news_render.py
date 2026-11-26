@@ -290,7 +290,8 @@ def follow_links(post, market, lists, issues=(), forecasts=()):
     종목 페이지(기사에 나온 종목) · Hot Issue(낱말) · 증시 전망(기사 종목 이름이 걸린 전망, 시장 전체 사건이면 한국 전망) · 테마(종목 모아보기) · 지난 기사."""
     text = _text(post)
     out = []
-    for x in market.get("stocks") or []:
+    shown = bool(market.get("indices") or market.get("us_indices"))   # 관련 정보 칸이 그려지면 종목 줄을 누르면 종목 페이지 — 여기 또 싣지 않는다(2026-11-26 사용자 "정보 중복")
+    for x in ([] if shown else market.get("stocks") or []):
         r = lists.get(x["ticker"]) or {}
         if x.get("why") == "기사" and r.get("u"):
             out.append((f'{x["name"]} 종목 페이지', BLOG.rstrip("/") + r["u"]))
