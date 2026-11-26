@@ -514,8 +514,6 @@ def _counted(ds):
 def summary(res, now, reasons=None):
     """운영 대시보드 요약 칸 · 할 일 · Slack — (값HTML, 보조, 오늘 어긴 것 [(이름, 라벨HTML, 알림 key, {line, cause})])."""
     reasons = reasons or {}
-    allc = [x for _, ds in res for x in _counted(ds)]
-    bad = sum(x[1] != "on" for x in allc)
     today = []
     for svc, ds in res:
         for d, st, t, m, url in ds:
@@ -527,7 +525,22 @@ def summary(res, now, reasons=None):
             r = reasons.get(k)
             line = f"{svc['name']} — 기준 {a}" + ("" if svc["reader"] else " (내부)") + f" · {what}"
             today.append((svc["name"], _pill(st, m), k, {"line": line, "cause": r[1] if r else "원인을 아직 보지 않음"}))
-    return (warn(f"늦음 · 안 나감 {bad}번") if bad else ok("모두 정시")), f"서비스 {len(res)}개 · 기준 {len(allc)}번 중 정시 {len(allc) - bad}번", today
+    # 요약 칸 값 = 오늘 기준 (2026-11-26 사용자 "그렇게 해") — 11.1부터 쌓인 횟수가 오늘 문제처럼 주황으로 보이던 것.
+    # 주황은 오늘 늦음 · 안 나감이 있을 때만. 누적은 보조 줄에 비교와 함께: 이번 달 1일부터 vs 지난달 같은 날까지(발행 시간 탭 그래프와 같은 비교 대상).
+    td = now.date()
+    wait = sum(1 for _, ds in res for x in ds if x[0] == td and x[1] == "wait")
+    val = warn(f"오늘 {len(today)}개 늦음") if today else (idle(f"{wait}개 기다림") if wait else ok("오늘 정시"))
+    m0 = td.replace(day=1)
+    p0 = (m0 - dt.timedelta(days=1)).replace(day=1)
+    p_end = p0.replace(day=min(td.day, (m0 - p0).days))   # 지난달이 더 짧으면 말일까지
+
+    def bad_between(a, b):
+        return sum(1 for _, ds in res for x in ds if a <= x[0] <= b and x[1] in ("late", "miss"))
+
+    sub = f"{td.month}월 누적 {bad_between(m0, td)}번"
+    sub += (f" · 지난달 같은 날까지 {bad_between(p0, p_end)}번" if p0 >= START
+            else f" · 비교 대상 없음(기록이 {START.month}.{START.day}부터)")
+    return val, sub, today
 
 
 # 시장 — 탭 나누기 (2026-11-24 사용자 "탭으로 미국 한국 콘텐츠 나눠"). 홈 주요 뉴스(news.json) · Hot Issue · 전망 아침 · 테마 · 인물 발언은 미국 아침 실행이라 미국
