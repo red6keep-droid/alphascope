@@ -244,7 +244,7 @@ def points(items, link, pad=dk.ALIGN_PX):
             when = ""   # 장 시작 줄의 시각은 뺀다 (2026-11-19 사용자 "고정이면 삭제")
         lead = f'<b style="color:#111;">{dk.esc(when)}</b> : ' if when else ""
         rows.append(dk.dot_li(lead + emph(link(directional(dk.tint(dk.esc(what)))), False), lh=35, margin="12px 0"))
-    return f'<ul style="list-style:none;margin:-12px 0;padding:0 0 0 {pad}px;">{"".join(rows)}</ul>'   # 음수 = 첫 · 끝 줄 12 지우기 (카드 안)
+    return f'<ul style="list-style:none;margin:-12px 0;padding:0 0 0 {pad}px;font-size:calc(1em - 1px);">{"".join(rows)}</ul>'   # 글자 = 본문보다 1 작게(PC 19 → 18 · 폰 16 → 15, 2026-11-26 사용자 "관전 포인트 한 포인트 작게") · 음수 = 첫 · 끝 줄 12 지우기 (카드 안)
 
 
 def md(iso):
