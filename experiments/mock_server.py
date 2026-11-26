@@ -94,13 +94,13 @@ ARCHIVE_SEED = [
 # 목업 = 기능 단위 세 칸 (2026-11-17 사용자: "목업이 너무 많아, 과거 거랑 뒤섞여 — 내가 항상 지우고 옮겨야 돼?" → 아니다, 표가 정한다).
 # 발행 예정 = 아직 블로그에 없는 기능(남은 일 한 줄) · 발행된 화면 = 블로그에 있는 기능의 목업(접어 둠) · 어느 표에도 없는 파일 = 자동으로 `쓰지 않는 목업`.
 # 기능이 발행되면 Claude 가 PLAN → LIVE 로 옮긴다(사용자 몫 아님). 새 목업 묶음을 만들면 같은 커밋에서 PLAN 에 한 줄.
+# 발행 예정 줄 = 전부 `미확정`(사용자가 아직 확정하지 않은 시안 · 기획) — 묶음 제목에 라벨이 붙고, 며칠이 지나도 첫 화면에 남는다 (2026-11-26 사용자
+# "미확정은 라벨로 계속 — 그래야 내가 다시 확정을 짓지"). 넷째 칸 = 라벨 글자(기본 `미확정`, 미뤄 둔 것은 `보류`).
+# 발행 여부는 블로그 실제 페이지(www.newfact.app 글자 · 피드)와 origin/main 코드로 확인해 옮긴다 — 발행된 기능은 LIVE 로, 대표가 아닌 지난 시안은 표에서 빼 휴지통으로.
+# 11-26 대조: 업계상황 탭 · Newfact 뉴스(글 · 홈 카드 · 사실) · 종목 새 카드 넷 · 회사 소개 안내 줄 · 늦은 날 상자 · 푸터 링크 = 블로그에 있음 → 발행 예정에서 뺌.
 PLAN = [   # (기능 이름, 남은 일 — 한 줄, 파일 패턴 "폴더/파일")
-    ("한국 · 미국 종목 업계상황 탭 — 업종 고침 · 사업 묶음 · 함께 볼 지표 (한국 316 점검 · 미국 503 배정)", "11-25 main 반영: 한국 묶음 39 · 함께 볼 지표 · 다음 발표일, 미국 묶음 64 · 함께 볼 지표 → 운영 첫 실행 확인 · 사용자 일괄 수정 — 이어가기 = 비공개 doc/기획/업종-묶음-이어가기.md · 목업 다시 = stock-quick/mock_industry_tab.py(한국) · mock_industry_tab_us.py(미국)", ["stock-quick/mock_industry_*"]),
-    ("종목 페이지 회사 소개 안내 줄 10/15 · ※ (옛 12px · 느낌표 아이콘)", "목업 확인 → render_pages.lead_note 12 → 10/15 · ※ 로 바꾸고 가이드라인 한 줄 (2026-11-25 사용자)", ["stock-lists/mock_stock-star-kr-note13.html"]),
+    ("업계 카드 근거 줄 — 오른쪽 굵은 값을 증감으로 (지금 · A · B, HD현대일렉트릭)", "사용자가 A · B 고르기 → 한국 · 미국 · 정식 종목에 적용 → 발행된 화면 `업계상황 탭` 목업에 합치고 이 줄은 휴지통 (2026-11-26)", ["stock-quick/mock_industry_row.html"]),
     ("개성 있는 아이 찾기 게임 — 평범의 범위 · 설정으로 나온 답 · 그림 확인", "기준 설정(80% · 20일 간격)에서 나온 그룹 후보를 여덟 명씩 그림으로 확인 · 길잡이 = 비공개 doc/기획/종목-그래프-패턴-분류-목적.md", ["stock-character/mock_*.html"]),
-    ("Newfact 주요 기사 (뉴스 수집기 글 → 블로그 새 글) · 한국 기사 제목 묶음", "목업 확인 → 실제 글로 다시 그리기(fetch_samples) → 발행기(하루 4번, 시험은 Blogger 초안) · 제목 묶음을 한국 기사 공용 저장소에 연결", ["news-posts/mock_news_*"]),
-    ("한국 주요 뉴스 · 사건별 사실 (보도 2곳 이상 사건 + 사실 팝업 · 그 밖의 기사 제목 묶음)", "시안: 수집기 사건 묶기 결과를 facts 모양으로 바꾼 표본 → 사용자 디자인 확인 → 첫 facts 문서로 다시 그리기", ["news-posts/mock_news_facts*"]),
-    ("한국 홈 — Newfact 주요 기사 카드(한국 증시 카드 아래) · 맨 아래 주요 뉴스(방송 + 뉴스 수집기 사건, 미국 홈과 같은 팝업)", "사용자 목업 확인 → 테마(alphaflow-home) 홈 카드 · 한국 주요 뉴스 켜기 · 자료 파일(Pages)", ["news-posts/mock_news_home_kr*"]),
     ("주식마을 3D (날씨 도시 · 마을 · 행성 시안)", "날씨 도시 판 모델링 · 연출 다듬기(물에 잠김 · 남은 날씨 7가지) → 방향 확정 뒤 휴대폰 발열 줄이기 5가지 · 날씨 기준 정하기 · Blogger 모듈 스크립트 시험 (흰 도시 · 3D 시험 1판은 11-24 사용자 삭제)", ["fantasy-world/mock_city_weather.html", "fantasy-world/mock_village_flat.html", "fantasy-world/mock_village_polish.html", "fantasy-world/mock_village_3d_v2.html"]),
     ("시장 지도 (업종 · 종목 네모 칸 지도, 손가락 확대 · 축소 · 전체 화면, 미국 · 한국 따로)", "목업 확인(사용자 판단) → 어디에 둘지 · 색 기준 정하기 → 한국 시가총액을 목록 파일에 채우기", ["market-map/mock_market_map_*"]),
     ("시장 전망 지도(가칭) — 미국 (투자회사 S&P 500 연말 목표 · 작년 전망과 지금)", "목업 확인 → 며칠 그림자 실행(구글 뉴스 제목만 · AI 0) → 기록 records/outlooks · 고정 페이지. 한국 = 수집기 요청 25절 답 대기", ["market-outlook/mock_outlook_us*"]),
@@ -108,12 +108,10 @@ PLAN = [   # (기능 이름, 남은 일 — 한 줄, 파일 패턴 "폴더/파�
     ("전체 메뉴 · 헤더 · 푸터 고침 (프로필 서랍 안 · 미국 증시 / 한국 증시 · 검색 상자 · 메뉴 아이콘 · Hot Issue · 테마 접기 · 빠진 메뉴 · 푸터 문장 줄임)", "index.html 에 넣음(11-26) → 사용자 테마 붙여넣기 → 블로그에서 메뉴 · 로그인 · 검색 · 푸터 확인되면 이 줄 빼기", ["home-split/mock_menu_*"]),
     ("종목 이슈 (종목 페이지 가격 카드 아래 Hot Issue)", "목업 확인 → 뉴스 양으로 자동 열고 닫는 코드 (블로그에 아직 없음)", ["issue_store/mock_stock_issue*"]),
     ("회원 `내 종목`", "목업 3화면 → Firebase 규칙 게시 · 댓글 저장 확인이 먼저 → 고정 페이지 · 10명 열기", ["my-stocks/*"]),
-    ("종목 새 카드 `발표 때 예상을 넘었나?` · `같은 업종 안 주가 순위는?` · `재무 건전성은?` · `이익에 비해 주가 수준은?`", "정식 코드 peer_cards.py(11-22) → main 합침 · 첫 정식 실행(재무는 하루 안에 전 종목) 확인 뒤 발행된 화면으로", ["stock-radar/mock_earnmom_*"]),
     ("댓글 다듬기 (신고 · 가려진 댓글 · 하루 30개 · 날짜를 넘어 이어지는 시황 댓글 · 별명)", "목업 확인 → 댓글 저장 확인 → 테마 JS · Firestore 규칙 · 댓글 봇 가림 (2026-11-21 기획 댓글-토론방-기획.md)", ["comments/mock_comments_*"]),
     ("모의투자 (가상의 10억 원 · 종가 체결 · 세금까지 실전처럼 · 순위는 100명부터)", "목업 확인 → 댓글 저장 확인 · 별명 → Cloudflare D1 · R2 · Worker → 정산 코드 (2026-11-21 기획 모의투자-기획.md, 결정 전부 확정)", ["mock-invest/mock_invest-*"]),
-    ("종목별 토론방 (종목 페이지 맨 끝 탭) · 보류", "2026-11-21 사용자: 종목마다 토론방은 미룸 → 댓글 다듬기 먼저. 한 종목에 댓글이 꾸준히 달리면 다시", ["stock-board/mock_board_*"]),
+    ("종목별 토론방 (종목 페이지 맨 끝 탭) · 보류", "2026-11-21 사용자: 종목마다 토론방은 미룸 → 댓글 다듬기 먼저. 한 종목에 댓글이 꾸준히 달리면 다시", ["stock-board/mock_board_*"], "보류"),
     ("검색 `왜 떨어졌어` · 질문하기", "질문하기 버튼 꺼 둠 — 켤지 사용자 결정", ["site-search/mock_why_demo*"]),
-    ("늦은 날 기준일 상자 (자료가 늦으면 노랑 상자 · `오늘 자료가 늦어 지난 값을 보여 드립니다`)", "목업 확인 → 가이드라인 2절 3번 · 853종목 통 차단 풀기에 연결 (2026-11-21)", ["stock-quick/mock_qpage_late_*"]),
 ]
 PLAN_NOMOCK = [   # 목업 파일이 이 PC 에 없는 발행 예정 기능 — 줄만 보인다
 ]
@@ -126,7 +124,9 @@ LIVE = [
     ("미국 종목 페이지", ["stock-radar/mock_NVDA.html", "stock-radar/mock_AAPL.html"]),
     ("한국 종목 페이지", ["kr-stocks/mock_005930.html", "kr-stocks/mock_000660.html"]),
     ("ETF 페이지", ["stock-etf/mock_etf_SPY.html", "stock-etf/mock_etf_069500.html"]),
-    ("간단 종목 (종목을 누르면 나오는 페이지)", ["stock-quick/mock_qpage_UBER.html", "stock-quick/mock_qpage_011200.html"]),
+    ("간단 종목 (종목을 누르면 나오는 페이지)", ["stock-quick/mock_qpage_UBER.html", "stock-quick/mock_qpage_011200.html", "stock-quick/mock_qpage_late_UBER.html"]),   # late = 늦은 날 기준일 상자(11-21 발행)
+    ("업계상황 탭 (한국 · 미국 종목 — 사업 묶음 · 함께 볼 지표)", ["stock-quick/mock_industry_tab_kr.html", "stock-quick/mock_industry_tab_us.html"]),   # 11-25 main · 다시 = stock-quick/mock_industry_tab.py · mock_industry_tab_us.py · 이어가기 = 비공개 doc/기획/업종-묶음-이어가기.md
+    ("Newfact 뉴스 (글 · 한국 홈 `오늘의 Newfact` · 리포트 뉴스 사실)", ["news-posts/mock_news_post.html", "news-posts/mock_news_post_5.html", "news-posts/mock_news_home_kr.html", "news-posts/mock_news_facts.html"]),   # 11-25 발행(피드 `Newfact 뉴스` 라벨 확인 11-26) · 표본 글 20여 개는 휴지통
     ("미국 증시 리포트", ["daily-report/daily_mock.html"]), ("한국 증시 리포트", ["kr-market-report/kr_report_mock.html"]),
     ("주요 인물 발언", ["people-radar/radar_mock.html"]), ("테마", ["theme-monitor/mock_theme-ai-capex.html"]),
     ("Hot Issue", ["issue_store/mock_issue_watch.html"]),
@@ -211,7 +211,7 @@ def stage_of(d, f):
     """('plan', 번호) · ('live', 번호) · None(= 자동 보관)."""
     from fnmatch import fnmatch
     k = f"{d}/{f}"
-    for i, (_, _, pats) in enumerate(PLAN):
+    for i, (_, _, pats, *_st) in enumerate(PLAN):
         if any(fnmatch(k, p) for p in pats):
             return ("plan", i)
     for i, (_, pats) in enumerate(LIVE):
@@ -356,6 +356,24 @@ def design_mtime():
     return max(os.path.getmtime(x) for x in (os.path.join(os.path.dirname(BASE), "index.html"), os.path.join(BASE, "design_kit.py")) if os.path.exists(x))
 
 
+def rebuilt_at():
+    """rebuild_mocks.py 가 전부 다시 그리기를 시작한 마지막 시각 (없으면 0)."""
+    try:
+        return float(open(os.path.join(BASE, ".mock_rebuilt"), encoding="utf-8").read().strip())
+    except (OSError, ValueError):
+        return 0
+
+
+# 발행된 화면 목업 중 옛 디자인으로 남은 것 = 공통 디자인이 바뀐 뒤에 전부 다시 그리기를 돌렸는데도 다시 안 그려진 파일 → 첫 화면에서 내려 `일주일 넘은 목업` 으로
+# (2026-11-26 사용자 "최종안과 비슷한 옛 디자인 목업은 전부 넘겨"). 다시 그리기를 아직 안 돌린 것뿐인 목업은 `옛 버전` 표시만 붙고 남는다.
+# 미확정(발행 예정) · N 표시 · 즐겨찾기는 내리지 않는다. 다시 그리기 묶음에 일부러 뺀 것(운영 대시보드 = GitHub · Cloudflare 를 읽어 만듦)도 남긴다.
+NO_SINK = ("ops-dashboard/",)
+
+
+def sunk_old(x, ref, rebuilt):
+    return bool(rebuilt) and x[2] < ref and x[2] < rebuilt and (stage_of(x[0], x[1]) or ("",))[0] == "live" and not f"{x[0]}/".startswith(NO_SINK)
+
+
 OLD_TAG = '<span class="old">옛 버전</span>'
 
 
@@ -415,13 +433,15 @@ def index_page(mode="main"):
     cut = datetime.combine(datetime.now().date() - timedelta(days=WEEK_D), datetime.min.time()).timestamp()   # 달력 기준 — `7일 전 고침` 까지 첫 화면
     newd = prefs["new"]
     wk = prefs["week"]   # --week 로 넘긴 목업 = 그 뒤에 다시 고치기 전까지 `일주일 넘은 목업` (2026-11-22 사용자: 발행된 강좌)
-    recent = [x for x in kept if (lc[k := f"{x[0]}/{x[1]}"][0] >= cut or k in newd) and not (k in wk and wk[k] >= lc[k][0] and k not in newd)]
+    recent = [x for x in kept if (lc[k := f"{x[0]}/{x[1]}"][0] >= cut or k in newd) and not (k in wk and wk[k] >= lc[k][0] and k not in newd)
+              or stage_of(x[0], x[1])[0] == "plan"]   # 미확정(발행 예정)은 며칠이 지나도 첫 화면 — 사용자가 확정할 때까지 (2026-11-26)
+    ref, rebuilt = design_mtime(), rebuilt_at()
+    recent = [x for x in recent if not (sunk_old(x, ref, rebuilt) and f"{x[0]}/{x[1]}" not in newd and f"{x[0]}/{x[1]}" not in stars)]   # 옛 디자인으로 남은 발행된 화면 목업은 내린다
     stale = [x for x in kept if x not in recent]
     items = old if archive else recent if mode == "main" else stale
     items = sorted(items, key=lambda x: -lc[f"{x[0]}/{x[1]}"][0])   # 고친 순
     by_key = {f"{d}/{f}": (d, f, t) for d, f, t in items}
     names = display_names(every)
-    ref = design_mtime()
     n_old = sum(1 for x in items if x[2] < ref)
     W = lambda x: lc[f"{x[0]}/{x[1]}"][0]
     parts = []
@@ -462,11 +482,11 @@ def index_page(mode="main"):
             st = stage_of(x[0], x[1])
             (plan if st[0] == "plan" else live).setdefault(st[1], []).append(x)
 
-        def block(name, todo, rows, opened):
+        def block(name, todo, rows, opened, tag=""):
             last = max(W(x) for x in rows)
             note = next((lc[f"{x[0]}/{x[1]}"][1] for x in rows if lc[f"{x[0]}/{x[1]}"][1]), "")
             when = f'{ago(last)} 고침' if last else "고친 기록 없음"
-            out = [f'<details{" open" if opened else ""}><summary>{html.escape(name)} <span class="n">{len(rows)}</span>'
+            out = [f'<details{" open" if opened else ""}><summary>{f"""<span class="st{" hold" if tag == "보류" else ""}">{tag}</span>""" if tag else ""}{html.escape(name)} <span class="n">{len(rows)}</span>'
                    f'<span class="when">{when}{" · " + html.escape(note) if note else ""}</span>'
                    + (f'<span class="todo">{html.escape(todo)}</span>' if todo else "") + '</summary>']
             out += [row(*x, stars=stars, names=names, ref=ref, new=newd, when_t=W(x)) for x in rows]
@@ -475,9 +495,9 @@ def index_page(mode="main"):
 
         order = lambda dct: sorted(dct, key=lambda i: -max(W(x) for x in dct[i]))   # 최근에 고친 기능이 위로
         if plan or (mode == "main" and PLAN_NOMOCK):
-            parts.append('<h2 class="zone">발행 예정</h2>')
+            parts.append('<h2 class="zone">발행 예정 <span class="zs">아직 확정 전 · 확정되면 발행된 화면으로 옮기고 지난 시안은 휴지통</span></h2>')
             for n, i in enumerate(order(plan)):
-                parts += block(PLAN[i][0], PLAN[i][1], plan[i], mode == "main" and n == 0)
+                parts += block(PLAN[i][0], PLAN[i][1], plan[i], mode == "main" and n == 0, tag=PLAN[i][3] if len(PLAN[i]) > 3 else "미확정")
             if mode == "main":
                 for name, todo in PLAN_NOMOCK:
                     parts.append(f'<div class="nomock"><b>{html.escape(name)}</b><span class="todo">{html.escape(todo)}</span></div>')
@@ -517,6 +537,7 @@ body.edit .edit-btn:not(.reload-btn){{background:#1d2127;border-color:#1d2127;co
 .back{{flex:0 0 auto;border:0;background:none;font-size:13px;color:#5b6370;cursor:pointer;padding:0 14px}}
 .big{{display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:48px;padding:0 14px;margin:0 0 16px;background:#fff;border:1px solid #e3e6eb;border-radius:10px;color:inherit;text-decoration:none;font-weight:600}}
 .big span{{color:#8a919c;font-weight:400;font-size:13px}} .ti{{display:inline-flex;align-items:center;gap:8px}}
+.st{{display:inline-block;margin-right:7px;padding:1px 7px;border-radius:5px;background:#EDE9FE;color:#5B21B6;font-size:12px;font-weight:700;vertical-align:1px}} .st.hold{{background:#F1F5F9;color:#475569}} .zs{{display:block;margin-top:3px;color:#8a919c;font-size:12px;font-weight:400}}
 .when{{display:block;margin-top:4px;color:#2563EB;font-size:13px;font-weight:400}} .cut{{color:#5b6370;font-size:13px;margin:-6px 0 16px}} .cut a{{color:#2563EB}}
 .foot{{margin-top:24px}} details.more{{background:none;border:0}} details.more>summary{{padding:10px 14px;color:#2563EB;font-weight:600;font-size:14px}} details.more .row{{border:1px solid #e3e6eb;border-radius:10px;margin-bottom:8px}} .big.dark{{background:#1d2127;border-color:#1d2127;color:#fff}} .big.dark span{{color:#c3c8d0}}
 </style></head><body>

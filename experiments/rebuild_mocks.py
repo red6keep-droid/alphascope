@@ -59,6 +59,11 @@ JOBS = [
     ("홈 증시시황 C안", ["experiments/market-commentary/mock_home_commentary.py"]),   # 테마(index.html) 복사 → 미국 · 한국 홈 C안 (2026-11-17, 11-18 JOBS 추가)
     ("종목별 토론방", ["experiments/stock-board/mock_board.py"]),   # 엔비디아 목업 뒤에 돌아야 한다(미국 종목 · 목록 다음) (2026-11-20)
     ("시장 지도", ["experiments/market-map/mock_map.py"]),   # 받아 둔 목록 파일(output/lists_*.json)로 다시 그림 — 인터넷 0 (2026-11-22)
+    # 발행된 화면인데 빠져 있어 옛 디자인으로 남던 묶음 (2026-11-26 — 목업 서버가 다시 안 그려진 발행 화면 목업을 `일주일 넘은 목업` 으로 내리면서 드러남)
+    ("증시 시황 글", ["experiments/market-commentary/mock_story.py"]),   # 받아 둔 표본 · AI 0 · 인터넷 0
+    ("Newfact 뉴스 글 · 홈 카드 · 사실", ["experiments/news-posts/mock_news_post.py"]),
+    ("업계상황 탭 · 한국", ["experiments/stock-quick/mock_industry_tab.py"]),   # 상태 저장소 flows.json(gh) + ECOS · 공공데이터포털 · KOSIS 읽기(약 50초, 키 = .env) — 쓰기 · AI 0
+    ("업계상황 탭 · 미국", ["experiments/stock-quick/mock_industry_tab_us.py"]),   # FRED 읽기(받아 둔 것 있으면 그대로)
 ]
 
 
@@ -86,6 +91,9 @@ def main(words):
             bad.append(name)
         else:
             print(f"[완료] {name} ({took:.0f}초)")
+    if not words:   # 전부 다시 그린 시각 — 목업 서버가 `이때도 다시 안 그려진 발행된 화면 목업`(= 옛 디자인으로 남은 것)을 일주일 넘은 목업으로 내린다 (2026-11-26 사용자)
+        with open(os.path.join(ROOT, "experiments", ".mock_rebuilt"), "w", encoding="utf-8") as f:
+            f.write(str(t0))
     print(f"\n{len(jobs) - len(bad)}/{len(jobs)} 묶음 다시 그림 · {time.time() - t0:.0f}초" + (f" · 실패 {', '.join(bad)}" if bad else ""))
     return 1 if bad else 0
 

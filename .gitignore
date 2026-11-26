@@ -76,3 +76,4 @@ experiments/home-ip/data/
 experiments/news-posts/samples/
 # 토론 Worker 로컬 시험 값 (infra/board/test/run.sh 가 만들고 지움)
 infra/board/.dev.vars
+experiments/.mock_rebuilt

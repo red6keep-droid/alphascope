@@ -244,7 +244,7 @@ def points(items, link, pad=dk.ALIGN_PX):
             when = ""   # 장 시작 줄의 시각은 뺀다 (2026-11-19 사용자 "고정이면 삭제")
         lead = f'<b style="color:#111;">{dk.esc(when)}</b> : ' if when else ""
         rows.append(dk.dot_li(lead + emph(link(directional(dk.tint(dk.esc(what)))), False), lh=32, margin="12px 0").replace("font-size:18px;", "", 1))   # 행간 35 → 32 (2026-11-26 사용자 "3픽셀 줄여") — dot_li 가 행간 32 에 박는 18px 은 뺀다(글자는 ul 의 본문 −1)
-    return f'<ul style="list-style:none;margin:-12px 0;padding:0 0 0 {pad}px;font-size:calc(1em - 1px);">{"".join(rows)}</ul>'   # 글자 = 본문보다 1 작게(PC 19 → 18 · 폰 16 → 15, 2026-11-26 사용자 "관전 포인트 한 포인트 작게") · 음수 = 첫 · 끝 줄 12 지우기 (카드 안)
+    return f'<ul style="list-style:none;margin:-12px 0;padding:0 0 0 {pad}px;font-size:calc(1em - 1px);{BODY_WRAP}">{"".join(rows)}</ul>'   # 줄바꿈 = 본문처럼 글자 단위 (2026-11-26 사용자 "관전 포인트도 단어 말고 글자로")   # 글자 = 본문보다 1 작게(PC 19 → 18 · 폰 16 → 15, 2026-11-26 사용자 "관전 포인트 한 포인트 작게") · 음수 = 첫 · 끝 줄 12 지우기 (카드 안)
 
 
 def md(iso):
@@ -453,7 +453,7 @@ def render(column, briefing, banner_url=None, banner_alt="", lists_live=True, li
         mk += soft_card(plain, margin=f"0 0 {CARD_GAP}px", bg=tb, left=14 + 5 + 3,   # 글 앞 여백 +5 +3 = 22 (2026-11-19 사용자)
                           style=f"font-size:{FLOW_FS};line-height:{FLOW_LH};font-weight:700;color:{ti};")
     if secs:   # 업종 = 흰 카드 줄(구분선 17), 제목 줄 없음 (2026-11-19 사용자 "많이 오른 업종 같은 타이틀 삭제")
-        rows = [(sector_name(x, emph(dk.esc(checks.get(x["name"]) or ""), False)), chg(x["chg_pct"]), "", 78) for x in secs]   # 왼쪽 78% — 볼 것이 이름 옆 한 줄에 들어갈 자리
+        rows = [(sector_name(x, emph(dk.esc(checks.get(x["name"]) or ""), False)), f'<span style="font-size:16px;">{chg(x["chg_pct"])}</span>', "", 78) for x in secs]   # 왼쪽 78% — 볼 것이 이름 옆 한 줄에 들어갈 자리 · 증감 16 = 아래 종목 줄 증감(stock_row small)과 같게 (2026-11-26 사용자, ccard 기본 17)
         if lists_live:
             c = dk.ccard(rows[:TOP_N], pad=pad)
             k = c.rindex("</span></div>")
