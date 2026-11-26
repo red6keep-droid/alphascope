@@ -419,23 +419,53 @@ def _cell(x):
     return f'<span style="color:{col};font-weight:{700 if st == "late" else 400};">{_link(url, _hm(t))}{sub}</span>'
 
 
-def grid(res, now):
-    """최근 GRID_DAYS 날 표 — 줄 = 서비스(기준 시각 순), 칸 = 날짜(최신 오른쪽)."""
-    days = [now.date() - dt.timedelta(days=i) for i in range(GRID_DAYS - 1, -1, -1)]
-    th = (f'<th style="width:78px;padding:8px 2px 8px 12px;text-align:left;font-weight:400;font-size:12px;line-height:16px;color:{NOTE_C};">서비스 · 기준</th>'
-          + "".join(f'<th style="padding:8px 1px;text-align:center;font-weight:400;font-size:12px;line-height:16px;color:{"#111" if d == now.date() else NOTE_C};">'
+MONTH_COL = 46   # 월 표 날짜 칸 폭 — 넘치면 표만 옆으로 넘김, 서비스 칸은 고정
+
+
+def _grid_table(res, now, days, wide=False):
+    """줄 = 서비스(기준 시각 순), 칸 = 날짜(최신 오른쪽). wide = 월 표 — 칸 폭 고정 · 옆으로 넘김 · 서비스 칸 고정."""
+    stick = "position:sticky;left:0;z-index:1;background:#fff;" if wide else ""
+    th = (f'<th style="{stick}width:78px;padding:8px 2px 8px 12px;text-align:left;font-weight:400;font-size:12px;line-height:16px;color:{NOTE_C};">서비스 · 기준</th>'
+          + "".join(f'<th style="{f"width:{MONTH_COL}px;" if wide else ""}padding:8px 1px;text-align:center;font-weight:400;font-size:12px;line-height:16px;color:{"#111" if d == now.date() else NOTE_C};">'
                     f'{_md(d)}<br>{WEEK[d.weekday()]}</th>' for d in days))
     rows = ""
     for svc, ds in res:
         by = {x[0]: x for x in ds}
         mark = "" if svc["reader"] else f'<span style="color:{GRAY};"> 내부</span>'
-        rows += (f'<tr><td style="border-top:1px solid {LINE};padding:7px 2px 7px 12px;font-size:13px;line-height:17px;color:#333;word-break:keep-all;">'
+        rows += (f'<tr><td style="{stick}border-top:1px solid {LINE};padding:7px 2px 7px 12px;font-size:13px;line-height:17px;color:#333;word-break:keep-all;">'
                  f'{esc(svc["short"])}<br><span style="font-size:11px;color:{NOTE_C};">{svc["at"]}{mark}</span></td>'
                  + "".join(f'<td style="border-top:1px solid {LINE};padding:7px 1px;text-align:center;font-size:12px;line-height:16px;white-space:nowrap;">{_cell(by.get(d))}</td>'
                            for d in days) + "</tr>")
-    tbl = (f'<table style="display:table;width:100%;border-collapse:collapse;table-layout:fixed;">'
+    width = f"width:{90 + MONTH_COL * len(days)}px;min-width:100%;" if wide else "width:100%;"
+    tbl = (f'<table style="display:table;{width}border-collapse:collapse;table-layout:fixed;">'
            f'<tr>{th}</tr>{rows}</table>')   # display:table — 테마 .post-body table{display:block} 이 표를 좁게 만든다
+    if wide:
+        tbl = f'<span style="display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;">{tbl}</span>'
     return f'<div data-cards="1" style="margin:0 0 8px;"><span style="{dk.MULTI}">{tbl}</span></div>'
+
+
+def grid(res, now, gid="ot"):
+    """`7일` 표 + 월로 보기 버튼 (2026-11-26 사용자 "표에서 월로 보기 버튼도 추가해").
+    버튼 = 7일 · 이번 달 · 지난 달들(기록 시작 START 부터, 최신 먼저). 월 표 = 그달 1일 ~ 말일(이번 달은 오늘까지), 옆으로 넘김.
+    자바스크립트 없이 라디오 + CSS 로 바꾼다 — gid 는 시장 탭마다 달라야 한다(한 페이지에 둘)."""
+    views = [("7일", [now.date() - dt.timedelta(days=i) for i in range(GRID_DAYS - 1, -1, -1)], False)]
+    m = now.date().replace(day=1)
+    while m >= START.replace(day=1):
+        nxt = (m + dt.timedelta(days=32)).replace(day=1)
+        end = min(nxt - dt.timedelta(days=1), now.date())
+        views.append((f"{m.month}월" if m.year == now.year else f"{m.year % 100}년 {m.month}월",
+                      [m + dt.timedelta(days=i) for i in range((end - m).days + 1)], True))
+        m = (m - dt.timedelta(days=1)).replace(day=1)
+    css = (f".{gid} input{{position:absolute;opacity:0;pointer-events:none;}}.{gid} .otp{{display:none;}}"
+           f".{gid} .otb label{{display:inline-block;margin:0 6px 0 0;padding:4px 12px;border:1px solid {LINE};border-radius:999px;"
+           f"font-size:13px;line-height:18px;color:{NOTE_C};background:#fff;cursor:pointer;}}"
+           + "".join(f"#{gid}-{k}:checked~.otps>.otp{k}{{display:block;}}"
+                     f"#{gid}-{k}:checked~.otb label[for={gid}-{k}]{{color:#fff;background:#111;border-color:#111;}}" for k in range(len(views))))
+    radios = "".join(f'<input type="radio" name="{gid}" id="{gid}-{k}"{" checked" if k == 0 else ""}>' for k in range(len(views)))
+    bar = (f'<div class="otb" style="margin:0 0 8px;padding-left:{dk.ALIGN_PX}px;">'
+           + "".join(f'<label for="{gid}-{k}">{esc(nm)}</label>' for k, (nm, _, _) in enumerate(views)) + "</div>")
+    panes = "".join(f'<div class="otp otp{k}">{_grid_table(res, now, ds, wide)}</div>' for k, (_, ds, wide) in enumerate(views))
+    return f'<div class="{gid}"><style>{css}</style>{radios}{bar}<div class="otps">{panes}</div></div>'
 
 
 DAYS = {_us_day: "화~토", _us_am_day: "월~토", _kr_day: "평일", _every: "매일"}
@@ -568,7 +598,7 @@ def market_tab(name, res, reasons, now, legend, in_tab=False):
     head, T = (dk.sub_label(name), _inner_title) if in_tab else (dk.h2(name, tab=name), dk.sub_label)
     return (head
             + T("오늘") + white_card(tr or [("오늘 나올 것", idle("없음"), "오늘은 쉬는 날")], fold_at=5, noun="서비스")
-            + T("7일") + grid(res, now) + legend
+            + T("7일") + grid(res, now, "ot-us" if name == "미국" else "ot-kr") + legend
             + T("기준") + std_table(res, now)
             + _note(f"기준 = 이 시각 + {GRACE_MIN}분 안에 나와야 정시. 보통 = 최근 14일 실제 시각의 가운데 값(초록 = 기준 안). 정시 = 최근 14일, 그날의 기준으로 셈. 실행 일정을 바꾼 서비스(11.20 한국 15:50 · 미국 이어 붙기)는 바꾼 날부터 셉니다.")
             + T("원인") + white_card(tally or [("늦은 일", ok("없음"), "")])
