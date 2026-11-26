@@ -2600,8 +2600,6 @@ body[data-home-mkt="kr"] #news-list .news-sum { display: -webkit-box; -webkit-bo
 /* 상세 화면(글 · 고정 페이지) = 작은 푸터 (2026-11-12 사용자) — 제목 `Newfact` · 저작권 줄 없이 문단 + 개인정보처리방침. 홈 · 목록 = 제목 + 문단 + 개인정보처리방침 + 저작권 */
 body.item-view .footer-title { display: none; }
 body.item-view .footer-copy { display: none; }   /* 상세 화면은 저작권 줄 삭제 (2026-11-15 사용자) */
-body.item-view .footer-disclaimer { margin-bottom: 0; }
-.footer-copy { display: none; }   /* 상세 화면은 저작권 줄 삭제 (2026-11-15 사용자) */
 body.item-view .footer-disclaimer { margin-bottom: 0; }   /* 저작권 줄 위 11 도 함께 — 줄 19 + 11 = 30 만큼 푸터가 짧아진다 */
 .footer-copy {
   margin: 0;
@@ -4792,7 +4790,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
   </div>
 </main>
 
-<footer class="site-footer"><div class="footer-disclaimer"><div class="footer-title"><span class="footer-name"><span class="brand-word">Newfact</span></span></div><p class="footer-lead">공개된 시세 · 공시 · 경제 지표 · 뉴스를 정해진 규칙으로 정리한 기록이며, 해설 일부는 AI 가 씁니다. 모든 정보는 참고용으로, 매수 · 매도를 권유하지 않으며 투자 판단과 책임은 투자자 본인에게 있습니다. 종목 로고는 각 회사의 상표입니다.</p></div><div class="attribution"><p class="footer-copy">© 2026 <span class="brand-word">Newfact</span>. All rights reserved.</p></div></footer>
+<footer class="site-footer"><div class="footer-disclaimer"><div class="footer-title"><span class="footer-name"><span class="brand-word">Newfact</span></span></div><p class="footer-lead">공개된 시세 · 공시 · 경제 지표 · 뉴스를 정해진 규칙으로 정리한 기록이며, 해설 일부는 AI 가 씁니다. 모든 정보는 참고용으로, 매수 · 매도를 권유하지 않으며 투자 판단과 책임은 투자자 본인에게 있습니다. 종목 로고는 각 회사의 상표입니다.</p></div><nav class="footer-links" aria-label="사이트 안내"><a class="fl-privacy" href="/p/privacy.html">개인정보처리방침</a></nav><div class="attribution"><p class="footer-copy">© 2026 <span class="brand-word">Newfact</span>. All rights reserved.</p></div></footer>
 
 <div class="pv-bar" role="group" aria-label="미리보기 화면 전환">
   <span class="pv-bar-label">PREVIEW</span>
