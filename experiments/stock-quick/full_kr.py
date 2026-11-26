@@ -142,8 +142,9 @@ def bars(syms):
         except Exception as e:  # noqa: BLE001
             print(f"[quick-kr] 일봉 묶음 {i} 실패: {str(e)[:120]}")
         time.sleep(2)
-    # 마지막 봉 대조 = 한국투자증권(집 IP, quick-data.yml 이 QUICK_KIS_LAST 에 받아 둠) · 바꾸는 값 = 네이버 — 정식 한국 종목과 같은 함수 (2026-11-23 사용자)
-    return collect_kr._fix_last(out, os.environ.get("QUICK_KIS_LAST") or None)
+    # 마지막 봉 대조 겸 값 = 네이버 — 정식 한국 종목과 같은 함수 (2026-11-23). 네이버도 못 받은 종목만 KIS_NEED_OUT 파일로 →
+    # quick-data.yml 이 수집 뒤 그 종목만 한국투자증권으로 확인(맨 뒤 · 평소 0번, 2026-11-26 사용자)
+    return collect_kr._fix_last(out)
 
 
 def details(cache_dir, syms):

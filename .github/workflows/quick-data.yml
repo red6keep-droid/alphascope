@@ -185,32 +185,6 @@ jobs:
             if git fetch -q origin quick-$m 2>/dev/null; then git archive FETCH_HEAD $m | tar -x -C /tmp/prev; git show FETCH_HEAD:version.json > /tmp/prev/$m/version.json || true; echo "전날 $m $(ls /tmp/prev/$m | wc -l)"; else echo "전날 $m 없음 (첫 실행)"; fi
           done
 
-      # 한국 마지막 봉 대조용 한국투자증권 일봉 — 집 IP(VPN newfact 계정)로만, 한국 350 + 지수 · 업종 ETF 약 2분 (2026-11-23 사용자).
-      # 값은 대조에만 쓰고 바꾸는 값은 네이버(full_kr.bars → collect_kr._fix_last). 안 되면 파일이 없어 네이버로만 대조(약 2분 더) — 수집은 멈추지 않는다
-      - name: 집 VPN 연결 (newfact)
-        id: vpn
-        if: env.MARKET == 'kr' || env.MARKET == 'all'
-        continue-on-error: true
-        timeout-minutes: 5
-        run: sudo env VPN_SERVER="$VPN_SERVER" VPN_PSK="$VPN_PSK" VPN_USER="$VPN_USER" VPN_PASSWORD="$VPN_PASSWORD" GITHUB_OUTPUT="$GITHUB_OUTPUT" bash scripts/vpn/vpn-up.sh
-        env:
-          VPN_SERVER: ${{ secrets.VPN_SERVER }}
-          VPN_PSK: ${{ secrets.VPN_PSK }}
-          VPN_USER: ${{ secrets.VPN_USER_NEWFACT }}
-          VPN_PASSWORD: ${{ secrets.VPN_PASSWORD_NEWFACT }}
-      - name: 한국투자증권 최근 일봉 (집 IP · 대조용)
-        if: steps.vpn.outputs.ok == 'true'
-        continue-on-error: true
-        timeout-minutes: 8
-        env:
-          HOME_SOURCE_ADDRESS: ${{ steps.vpn.outputs.ip }}
-          KIS_APP_KEY: ${{ secrets.KIS_APP_KEY }}
-          KIS_APP_SECRET: ${{ secrets.KIS_APP_SECRET }}
-        run: python -u experiments/kr-stocks/kis_last.py --quick --out /tmp/kis_quick.json
-      - name: VPN 끊기
-        if: always() && steps.vpn.outcome != 'skipped'
-        run: sudo bash scripts/vpn/vpn-down.sh
-
       - name: Collect · render
         id: collect
         env:
@@ -220,7 +194,7 @@ jobs:
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
           YTB_FIRESTORE_KEY: ${{ secrets.YTB_FIRESTORE_KEY }}   # 방송 줄 · 방송 의견 (media_feed, 정식과 같은 읽기 전용 키) — 없으면 그 칸 없이
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}   # 기업 소개(company_intro) — Gemini lite 하루 25회까지, 한도면 다음 날 (2026-11-15 사용자)
-          QUICK_KIS_LAST: /tmp/kis_quick.json   # 한국 마지막 봉 대조(한국투자증권, 위 단계) — 없으면 네이버로 대조 (2026-11-23)
+          KIS_NEED_OUT: /tmp/kis_need.json   # 한국 마지막 봉 대조 = 네이버, 네이버도 못 받은 종목만 → 잡 끝 한국투자증권 확인 (2026-11-26 사용자)
           QUICK_DART_FETCH: '0'   # DART 매출 · 손익 · 기업개황 받기는 새벽 quick-dart.yml — 여기선 저장값만 (2026-11-20 사용자, 한국 21~30분 줄임)
           PYTHONUNBUFFERED: '1'   # 출력 바로 — 11-16 실행이 상한에 걸려 취소될 때 버퍼에 있던 로그가 한 줄도 안 남았다
         run: |
@@ -366,6 +340,41 @@ jobs:
           git add -A && git commit -q -m "quick state $(date -u +%F) [skip ci]"
           git push -q -f git@github.com:red6keep-droid/alphascope-state.git HEAD:quick-state
           echo "저장값 $(du -sh . | cut -f1)"
+
+      # 한국투자증권 = 시세 예비 맨 뒤 (2026-11-26 사용자: 야후 → 네이버 → 한국투자증권 · 부를 때마다 폰 알림 · 세 값 날짜별 비교 안 함).
+      # 수집 단계(collect_kr._fix_last)가 네이버도 못 받은 종목만 /tmp/kis_need.json 에 남긴다 — 0개면(평소) VPN · 한국투자증권 0번 · 알림 0번.
+      # 있으면 집 IP(VPN newfact)로 그 종목만 받아 야후 마지막 봉이 맞나 틀리나 로그만 — 값은 야후 그대로, 한국투자증권 값은 싣지 않는다(11-23).
+      # 확인만 하는 단계라 게시 뒤(잡 끝) — 게시를 늦추지 않게. 실패해도 잡은 그대로.
+      - name: 한국투자증권 필요 종목 (네이버 실패분)
+        id: kis_need
+        if: always() && steps.collect.outcome != 'skipped'
+        run: |
+          N="$(python -c "import json;print(len(json.load(open('/tmp/kis_need.json'))['bars']))" 2>/dev/null || echo 0)"
+          echo "n=$N" >> "$GITHUB_OUTPUT"
+          if [ "$N" = "0" ]; then echo "[kis] 한국투자증권 건너뜀(필요 0)"; else echo "[kis] 한국투자증권 필요 $N — 집 VPN 연결"; fi
+      - name: 집 VPN 연결 (newfact)
+        id: vpn
+        if: always() && steps.kis_need.outputs.n != '0' && steps.kis_need.outputs.n != ''
+        continue-on-error: true
+        timeout-minutes: 5
+        run: sudo env VPN_SERVER="$VPN_SERVER" VPN_PSK="$VPN_PSK" VPN_USER="$VPN_USER" VPN_PASSWORD="$VPN_PASSWORD" GITHUB_OUTPUT="$GITHUB_OUTPUT" bash scripts/vpn/vpn-up.sh
+        env:
+          VPN_SERVER: ${{ secrets.VPN_SERVER }}
+          VPN_PSK: ${{ secrets.VPN_PSK }}
+          VPN_USER: ${{ secrets.VPN_USER_NEWFACT }}
+          VPN_PASSWORD: ${{ secrets.VPN_PASSWORD_NEWFACT }}
+      - name: 한국투자증권 확인 (집 IP · 네이버 실패 종목만)
+        if: always() && steps.vpn.outputs.ok == 'true'
+        continue-on-error: true
+        timeout-minutes: 5
+        env:
+          HOME_SOURCE_ADDRESS: ${{ steps.vpn.outputs.ip }}
+          KIS_APP_KEY: ${{ secrets.KIS_APP_KEY }}
+          KIS_APP_SECRET: ${{ secrets.KIS_APP_SECRET }}
+        run: python -u experiments/kr-stocks/kis_last.py --need /tmp/kis_need.json
+      - name: VPN 끊기
+        if: always() && steps.vpn.outcome != 'skipped'
+        run: sudo bash scripts/vpn/vpn-down.sh
 
       - name: Notify failure
         if: failure()

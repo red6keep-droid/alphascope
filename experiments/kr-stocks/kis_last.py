@@ -1,5 +1,11 @@
 """한국투자증권 최근 일봉 받기 — 집 IP(VPN newfact 계정)로, 대조용 (2026-11-23 사용자).
 
+    HOME_SOURCE_ADDRESS=<ppp0 주소> python experiments/kr-stocks/kis_last.py --need /tmp/kis_need.json   # 워크플로가 쓰는 길(2026-11-26)
+
+2026-11-26 사용자: 순서 = 야후 → 네이버 → 한국투자증권(맨 뒤, 부를 때마다 폰 알림). 워크플로(kr-stocks · quick-data)는 수집 **뒤**,
+collect_kr._fix_last 가 남긴 `네이버도 못 받은 종목` 파일(--need)이 비어 있지 않을 때만 VPN 을 열고 이걸 부른다 — 평소 0번.
+--need 는 그 종목만 받아 야후 마지막 봉이 맞나 틀리나만 로그에 적는다(종목 · 칸 이름만, 한국투자증권 값은 파일 · 로그에 남기지 않음 — 공개 실행 로그).
+
     HOME_SOURCE_ADDRESS=<ppp0 주소> python experiments/kr-stocks/kis_last.py            # 한국 종목 수집(kr-stocks) 35종목 · 지수 · ETF
     HOME_SOURCE_ADDRESS=<ppp0 주소> python experiments/kr-stocks/kis_last.py --quick --out PATH   # 간단 종목(한국 350)
 
@@ -85,13 +91,44 @@ def bars(sess, base, tok, key, sec, sym, start, end):
     return out
 
 
+def check_need(need, got):
+    """네이버도 못 받은 종목의 야후 마지막 봉 대조 — 로그엔 종목 · 칸 이름만(한국투자증권 값 X). 값은 바꾸지 않는다(야후 그대로)."""
+    ok, diff, late, none = [], [], [], []
+    for s, t in need.items():
+        ref = got.get(s) or {}
+        r = ref.get(t.get("day"))
+        if not r:
+            none.append(s)
+            continue
+        bad = [k for k in ("open", "high", "low", "close") if r.get(k) and abs((t.get(k) or 0) - r[k]) > 1e-6 * max(1.0, r[k])]
+        (diff if bad else ok).append(f"{s}({'·'.join(bad)})" if bad else s)
+        if any(d > t["day"] for d in ref):
+            late.append(s)
+    print(f"[kis] 대조 {len(ok) + len(diff)}줄 · 맞음 {len(ok)} · 다름 {len(diff)} · 늦은 봉 {len(late)} · 못 받음 {len(none)} (싣는 값 = 야후 그대로)")
+    if diff or late:
+        print(f"::warning::[kis] 야후 마지막 봉이 한국투자증권과 다름(네이버도 실패) — 화면 값 = 야후 그대로: "
+              f"{', '.join(diff[:10])}" + (f" · 늦은 봉 {', '.join(late[:10])}" if late else ""))
+    return 0
+
+
 def main():
     ap = argparse.ArgumentParser()
+    ap.add_argument("--need", help="collect_kr._fix_last 가 쓴 확인 대상(JSON) — 그 종목만 받아 야후 마지막 봉과 대조, 결과는 로그만(파일 안 씀)")
     ap.add_argument("--codes", help="심볼 목록 파일(한 줄에 하나, 005930.KS · ^KS11) — 없으면 한국 종목 수집 목록")
     ap.add_argument("--quick", action="store_true", help="간단 종목(한국 350) 명단 = experiments/ref/quick_ref.json + 지수 · 업종 ETF")
     ap.add_argument("--out", default=OUT)
     ap.add_argument("--days", type=int, default=7, help="며칠 전부터 (늦은 봉 확인용)")
     a = ap.parse_args()
+    need = None
+    if a.need:
+        try:
+            with open(a.need, encoding="utf-8") as f:
+                need = json.load(f).get("bars") or {}
+        except (OSError, ValueError):
+            need = {}
+        if not need:   # 토큰도 받지 않는다 — 토큰 = 폰 알림
+            print("[kis] 한국투자증권 건너뜀(필요 0)")
+            return 0
     key, sec = os.environ.get("KIS_APP_KEY", "").strip(), os.environ.get("KIS_APP_SECRET", "").strip()
     if not (key and sec):
         print("::warning::[kis] 한국투자증권 키 없음 — 대조는 네이버로만")
@@ -106,7 +143,9 @@ def main():
         print("::warning::[kis] 한국투자증권 토큰을 못 받음 — 대조는 네이버로만")
         return 0
     name, base, tok = t
-    if a.codes:
+    if need is not None:
+        syms = list(need)
+    elif a.codes:
         syms = [x.strip() for x in open(a.codes, encoding="utf-8") if x.strip()]
     elif a.quick:
         with open(os.path.join(BASE, "..", "ref", "quick_ref.json"), encoding="utf-8") as f:
@@ -138,6 +177,8 @@ def main():
                 print(f"[kis] {s} 실패: {str(e)[:80]}")
         time.sleep(GAP)
     print(f"[kis] {name} · 집 IP · {len(got)}/{len(syms)} 받음 · {time.time() - t0:.0f}초" + (f" · 실패 {len(fail)}: {', '.join(fail[:8])}" if fail else ""))
+    if need is not None:
+        return check_need(need, got)
     if not got:
         print("::warning::[kis] 받은 것 0 — 파일 안 씀, 대조는 네이버로만")
         return 0
