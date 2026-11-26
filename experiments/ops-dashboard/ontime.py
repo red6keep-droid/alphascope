@@ -605,10 +605,13 @@ def page_body(res, reasons, now, in_tab=False):
             xs.append(c)
         return xs
 
-    cumc = chart_top(dk.trend_card("기준 시각을 넘긴 횟수 (누적, 번)", [_md(d) for d in days],
+    # 가로축 = 카드 폭에 다 넣고(넘겨 보기 X) 날짜는 6개쯤만 — 마지막 날은 꼭, 그 앞 이름이 너무 붙으면 뺀다 (2026-11-26 사용자: 26일째 날짜가 전부 겹침)
+    gap = max(1, -(-len(days) // 6))
+    xlab = [_md(d) if (i % gap == 0 and len(days) - 1 - i >= gap / 2) or i == len(days) - 1 else "" for i, d in enumerate(days)]
+    cumc = chart_top(dk.trend_card("기준 시각을 넘긴 횟수 (누적, 번)", xlab,
                                    [("모두", cum(lambda s: True), "#111827", "solid"), ("미국", cum(lambda s: market(s) == "미국"), dk.CHART_SERIES[0], "solid"),
                                     ("한국", cum(lambda s: market(s) == "한국"), dk.CHART_SERIES[1], "solid")],
-                                   lambda v: f"{v:.0f}", legend_note=f"늦음 + 안 나감 · 기준 {GRACE_MIN}분 뒤까지 정시"), top=0)
+                                   lambda v: f"{v:.0f}", legend_note=f"늦음 + 안 나감 · 기준 {GRACE_MIN}분 뒤까지 정시", ends_only=True), top=0)
     legend = (f'<p style="margin:4px 0 12px;padding-left:{dk.ALIGN_PX}px;font-size:13px;line-height:19px;color:{NOTE_C};word-break:keep-all;">'
               f'<span style="color:{GOOD};">초록 = 정시</span> · <span style="color:{BAD};font-weight:700;">주황 = 늦음 · 없음</span> · '
               f'회색 = 제외 · 대기 · 점 = 나오지 않는 날. 시각을 누르면 그 글 · 커밋 · 실행이 열립니다. `내부` = 독자에게 알리지 않은 기준.</p>')
