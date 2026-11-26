@@ -291,8 +291,8 @@ def stock_row(x, row, slot, first, inline_sub=False, small=False):
         price = f"${p:,.2f}" if slot == "am" else f"{round(p):,}원"
     col = dk.UP if v > 0 else dk.DOWN if v < 0 else "#111"
     if inline_sub:   # 업종(보조 줄)을 이름 옆 같은 줄에 — 줄바꿈 없이 (2026-11-25 사용자, Newfact 뉴스 관련 정보 칸만)
-        # 이름 줄 = 오른쪽 증감 줄과 같은 가로선 (2026-11-26 사용자): 줄을 위로 붙이고 로고(35)를 이름 줄(24) 가운데에 — 위로 (35 - 24) / 2
-        left = (f'<span style="display:flex;align-items:center;min-width:0;flex:1 1 auto;margin-top:-5.5px;"><span style="flex:none;display:flex;align-items:center;">{logo(t, row)}</span>'
+        # 이름 줄 = 오른쪽 증감 줄과 같은 가로선 (2026-11-26 사용자 "엔비디아 위치는 고정하고 증감을 내려"): 이름은 옛 자리(오른쪽 두 줄 44 의 가운데 = 위에서 22) 그대로 — 왼쪽 묶음(35) 위 4.5 · 오른쪽 증감 줄(24) 위 10 → 증감 가운데도 22
+        left = (f'<span style="display:flex;align-items:center;min-width:0;flex:1 1 auto;margin-top:4.5px;"><span style="flex:none;display:flex;align-items:center;">{logo(t, row)}</span>'
                 f'<span style="min-width:0;display:block;font-size:16px;line-height:24px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'
                 f'<span style="font-weight:700;color:#111;">{dk.esc(x["name"])}</span>'
                 + (f'<span style="margin-left:6px;font-size:{dk.TINY};color:#6B7280;">{dk.esc(sub)}</span>' if sub else "") + '</span></span>')
@@ -301,7 +301,7 @@ def stock_row(x, row, slot, first, inline_sub=False, small=False):
                 f'<span style="min-width:0;"><span style="display:block;font-size:16px;line-height:24px;font-weight:700;color:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{dk.esc(x["name"])}</span>'
                 + (f'<span style="display:block;font-size:{dk.TINY};line-height:20px;color:#6B7280;white-space:nowrap;">{dk.esc(sub)}</span>' if sub else "") + '</span></span>')
     cs, ps = (16, 14) if small else (int(dk.CHG_SIZE[:-2]), 15)   # 증감 · 가격 1px 작게 (2026-11-25 사용자, 뉴스 관련 정보 칸만)
-    right = (f'<span style="flex:none;display:flex;flex-direction:column;align-items:flex-end;white-space:nowrap;">'
+    right = (f'<span style="flex:none;display:flex;flex-direction:column;align-items:flex-end;white-space:nowrap;{"margin-top:10px;" if inline_sub else ""}">'
              f'<span style="font-size:{cs}px;line-height:24px;">{chg(v)}</span>'
              + (f'<span style="font-size:{ps}px;line-height:20px;color:{col};">{price}</span>' if price else "") + '</span>')
     href = (row or {}).get("u") or (dk.stock_href(t) if not re.fullmatch(r"\d{6}", t) else "")
