@@ -2026,6 +2026,18 @@ def src_line(note, url, label):
             f'<span>출처 : {_esc(note)} <a href="{_esc(url)}" target="_blank" rel="noopener" style="color:inherit;font-weight:700;text-decoration:none;white-space:nowrap;">{_esc(label)} ›</a></span></div>')
 
 
+def chg_row(name, level, chg, chg_txt, when, base, rest=""):
+    """업계 카드 근거 줄 — 오른쪽 위 = 증감(증감 색 굵게) · 아래 = 수준 값(작은 회색), 뜻 줄 = `2026년 10월 · 작년 같은 달 대비 · …`
+    (2026-11-26 사용자 "87 · 647.1 같은 지수 값은 독자가 모른다 — 증감이 원하는 정보". 시황 종목 줄 = 증감 위 · 가격 아래와 같은 모양).
+    증감이 없으면 옛 모양(오른쪽 = 수준 값). 한국 render_kr · 미국 render_pages 업계 카드 · 함께 볼 지표가 같이 쓴다."""
+    if chg is None:
+        return ("row", name, level, when + rest)
+    col = "#111" if chg_txt.lstrip("+−").strip("0.%p") == "" else UP if chg > 0 else DOWN
+    val = (f'<span style="color:{col};">{_esc(chg_txt)}</span>'
+           f'<br><span style="font-size:13px;line-height:18px;font-weight:400;color:{NOTE};">{_esc(level)}</span>')
+    return ("row", name, val, f"{when} · {base} 대비{rest}", True)
+
+
 def small_rows(html):
     """근거 줄(_state_card row) 글자를 기술지표 표 크기로 — 실적 · 업계상황 탭 (SMALL_ROW_TABS)."""
     html = _ROW_LI.sub(lambda m: m.group(1) + f"font-size:{_ts_fs()[0]};line-height:{_ts_fs()[1]};", html)
