@@ -16,9 +16,9 @@ import mock_industry_tab as M  # noqa: E402
 
 F, K, analyze_kr, render_kr, dk, R, EXP = M.F, M.K, M.analyze_kr, M.render_kr, M.dk, M.R, M.EXP
 SYM = "267260.KS"
-VERSIONS = [("지금", False, False, "오른쪽 굵은 값 = 수준 값(87 · 647.1), 증감은 아래 회색 줄 안"),
-            ("바꾼 뒤 A — 오른쪽 값을 증감으로", True, False, "오른쪽 위 = 증감(빨강 · 파랑 굵게), 아래 = 수준 값(작은 회색). 비교 말은 `작년 같은 달 대비` 하나로. 비교 기준은 지금 그대로(경기 = 전달, 수출 = 한 달)"),
-            ("바꾼 뒤 B — A + 비교 기준을 결론 문장과 같게", True, True, "경기 줄 = 결론 문장처럼 석 달 전 대비 · 수출 줄 = 결론 문장처럼 최근 3개월(작년 같은 3개월 대비)")]
+VERSIONS = [("바꾼 뒤 A — 오른쪽 값을 증감으로", True, False, "오른쪽 위 = 증감(빨강 · 파랑 굵게), 아래 = 수준 값(작은 회색). 비교 말은 `작년 같은 달 대비` 하나로. 비교 기준은 지금 그대로(경기 = 전달, 수출 = 한 달)"),
+            ("바꾼 뒤 B — A + 비교 기준을 결론 문장과 같게", True, True, "경기 줄 = 결론 문장처럼 석 달 전 대비 · 수출 줄 = 결론 문장처럼 최근 3개월(작년 같은 3개월 대비)"),
+            ("비교용 — 지금 블로그 모양", False, False, "오른쪽 굵은 값 = 수준 값(87 · 647.1), 증감은 아래 회색 줄 안")]   # 새 모양을 맨 위에 — 옛 모양이 먼저 보여 "바뀐 게 없다"로 읽혔다 (2026-11-26 사용자)
 
 
 def main():
@@ -34,11 +34,11 @@ def main():
         tbl[ind][1].append(SYM)
     x = {"sym": SYM, "code": c, "name": e["ko"], "sector": e.get("sector"), "industry": analyze_kr.industry_rows(SYM, flows),
          "bsi": analyze_kr.bsi_rows(SYM, flows), "fin": analyze_kr.fin_rows(SYM, flows), "related": analyze_kr.related_rows(SYM, flows), "sector_flow": None}
-    body = ['<div style="margin:0 0 16px;">' + dk.muted(f"업계 카드 근거 줄 새 모양 — {e['ko']}(전력기기) 업계상황 탭을 세 가지로 그렸습니다. 값은 실제 ECOS 값. 카드는 접혀 있으니 눌러 펼쳐 보세요.") + "</div>"]
+    body = ['<div style="margin:0 0 16px;">' + dk.muted(f"업계 카드 근거 줄 새 모양 — {e['ko']}(전력기기) 업계상황 탭을 세 가지로 그렸습니다. 값은 실제 ECOS 값. 맨 위 A · B 가 새 모양, 맨 아래가 지금 블로그 모양입니다. 카드는 모두 펼쳐 두었습니다.") + "</div>"]
     for title, a, b, note in VERSIONS:
         render_kr.ROW_CHG_FIRST, render_kr.ROW_SAME_BASE = a, b
         body.append(f'<h3 style="margin:36px 0 4px;">{html.escape(title)}</h3>'
-                    f'<div style="margin:0 0 10px;font-size:13px;color:#64748B;">{html.escape(note)}</div>' + R.small_rows(render_kr.sec_industry_tab(x)))
+                    f'<div style="margin:0 0 10px;font-size:13px;color:#64748B;">{html.escape(note)}</div>' + R.small_rows(render_kr.sec_industry_tab(x)).replace('<details data-acc="1">', '<details open>'))   # 카드 모두 펼침 — 눌러 보지 않아도 근거 줄이 보이게
     render_kr.ROW_CHG_FIRST = render_kr.ROW_SAME_BASE = False
     print(dk.write_mock("".join(body), os.path.join(HERE, "output", "mock_industry_row.html"), "업계 카드 근거 줄 — 증감을 오른쪽 값으로"))
 
