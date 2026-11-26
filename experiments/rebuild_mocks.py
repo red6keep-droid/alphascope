@@ -53,6 +53,7 @@ JOBS = [
     ("디자인 샘플 · 브랜드", ["experiments/design-samples/build_brand.py"]),
     ("내 종목", ["experiments/my-stocks/mock_my_stocks.py"]),
     ("검색 · 질문하기", ["experiments/site-search/mock_search.py"]),
+    ("Newfact 소개 · 안내 페이지", ["experiments/site-pages/render_site_pages.py"]),   # 소개 · 개인정보처리방침 · 문의 (11-27 LIVE)
     ("주식 공부", ["experiments/course/render_course.py"]),
     ("주식 공부 · 목록", ["experiments/course/render_list.py"]),
     ("홈 나누기", ["experiments/home-split/mock_home_split.py"]),   # 테마 미리보기(build_theme --preview) → 미국 · 한국 홈 — 주식 공부 배너 포함 (2026-11-15)

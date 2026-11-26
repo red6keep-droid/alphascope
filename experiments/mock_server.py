@@ -99,7 +99,6 @@ ARCHIVE_SEED = [
 # 발행 여부는 블로그 실제 페이지(www.newfact.app 글자 · 피드)와 origin/main 코드로 확인해 옮긴다 — 발행된 기능은 LIVE 로, 대표가 아닌 지난 시안은 표에서 빼 휴지통으로.
 # 11-26 대조: 업계상황 탭 · Newfact 뉴스(글 · 홈 카드 · 사실) · 종목 새 카드 넷 · 회사 소개 안내 줄 · 늦은 날 상자 · 푸터 링크 = 블로그에 있음 → 발행 예정에서 뺌.
 PLAN = [   # (기능 이름, 남은 일 — 한 줄, 파일 패턴 "폴더/파일")
-    ("소개 페이지 다시 정리 (이름의 뜻 · 독자 · 지금 메뉴 · 비교 대상 · 원칙 · 앞으로)", "문안 확인(사용자) → render_site_pages.py --publish (2026-11-26)", ["site-pages/mock_about.html"]),
     ("개성 있는 아이 찾기 게임 — 평범의 범위 · 설정으로 나온 답 · 그림 확인", "기준 설정(80% · 20일 간격)에서 나온 그룹 후보를 여덟 명씩 그림으로 확인 · 길잡이 = 비공개 doc/기획/종목-그래프-패턴-분류-목적.md", ["stock-character/mock_*.html"]),
     ("주식마을 3D (날씨 도시 · 마을 · 행성 시안)", "날씨 도시 판 모델링 · 연출 다듬기(물에 잠김 · 남은 날씨 7가지) → 방향 확정 뒤 휴대폰 발열 줄이기 5가지 · 날씨 기준 정하기 · Blogger 모듈 스크립트 시험 (흰 도시 · 3D 시험 1판은 11-24 사용자 삭제)", ["fantasy-world/mock_city_weather.html", "fantasy-world/mock_village_flat.html", "fantasy-world/mock_village_polish.html", "fantasy-world/mock_village_3d_v2.html"]),
     ("시장 지도 (업종 · 종목 네모 칸 지도, 손가락 확대 · 축소 · 전체 화면, 미국 · 한국 따로)", "목업 확인(사용자 판단) → 어디에 둘지 · 색 기준 정하기 → 한국 시가총액을 목록 파일에 채우기", ["market-map/mock_market_map_*"]),
@@ -133,6 +132,7 @@ LIVE = [
                 "issue_store/mock_real_forecast-nvda-2026q3.html", "issue_store/mock_real_forecast-list.html", "issue_store/mock_real_forecast-2026-007.html", "issue_store/mock_real_forecast-2026-008.html", "issue_store/mock_real_forecast-2.html"]),   # mock_real_ = 상태 저장소 실제 판정 기록으로 그린 것 (2026-11-22 모든 날짜 줄 확인용)
     ("주식 제대로 알기", ["course/mock_study_list.html", "course/mock_입문-*.html", "course/mock_착각-*.html"]),   # 목록 + 나온 편 전부 (2026-11-20 사용자: 모든 편을 목업에서 확인) · 입문 12편 발행 11-22
     ("검색", ["site-search/mock_search.html"]),
+    ("Newfact 소개 · 안내 페이지 (소개 · 개인정보처리방침 · 문의)", ["site-pages/mock_about.html", "site-pages/mock_privacy.html", "site-pages/mock_contact.html"]),   # 11-27 소개 다시 정리 발행
     ("디자인 기준표 (그래프 · 팝업 · 아이콘)", ["design-samples/*"]),
     ("운영 현황 (관리자)", ["ops-dashboard/*"]),
 ]
