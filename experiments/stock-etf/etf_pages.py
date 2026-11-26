@@ -666,7 +666,7 @@ def kr_pages(snap, flows, hist, live, us_fund, kfund=None):
             body += ((render_kr.R._section("업계상황", f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{ind}</div>', tab="업계상황") if ind else "")
                      + (render_kr.R._section("구성", hold + cmp, tab="구성") if hold else "")
                      + render_kr.R._section("기본 정보", tab_basic(sym, basic, snap["bars"].get(sym)) + ("" if hold else cmp), tab="기본 정보") + related(sym, live) + ("</div>" if cut else ""))   # 잘라낸 본문의 바깥 틀 닫기
-            pages[code] = (E.page_title(sym), body)
+            pages[code] = (E.page_title(sym), dk.formal(body))   # 업계상황 · 구성 · 기본 정보 탭은 wrap 뒤에 붙어 합니다체를 안 거쳤다 (2026-11-26 블로그 반말 점검)
         except Exception as e:  # noqa: BLE001
             print(f"::warning::[etf] {sym} 페이지 실패: {e!r}")
     return pages

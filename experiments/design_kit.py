@@ -761,26 +761,28 @@ def keep_tone(html):
     return TONE_OFF + html + TONE_ON if html else html
 
 
+_CODE_BLOCK = re.compile(r"(<script\b[\s\S]*?</script\s*>|<style\b[\s\S]*?</style\s*>)", re.I)
+
+
 def formal(html):
     """보이는 글과 툴팁 속성의 반말 문장 끝을 합니다체로 (엔비디아 리포트 · 종목 페이지 build 마지막에 한 번). style · script 안 · keep_tone 구획은 건드리지 않는다."""
-    out, skip, off = [], False, False
-    for part in _TAG.split(html):
-        if part == TONE_OFF or part == TONE_ON:
-            off = part == TONE_OFF
-            continue   # 표시는 결과에 남기지 않는다
-        if off:
-            out.append(part)
+    out, off = [], False
+    for block in _CODE_BLOCK.split(html):   # script · style 덩어리는 통째로 건너뛴다 — 태그 단위로 보면 스크립트 속 `a < b` 가 `</script>` 를 삼켜
+        if _CODE_BLOCK.fullmatch(block):    # 그 뒤 본문 전체를 스크립트로 알고 반말이 그대로 나갔다(봉차트 스크립트 뒤 카드 전부, 2026-11-26 블로그 전체 점검)
+            out.append(block)
             continue
-        if part.startswith("<") and part.endswith(">"):
-            low = part[:8].lower()
-            if low.startswith(("<script", "<style")):
-                skip = True
-            elif low.startswith(("</script", "</style")):
-                skip = False
-            out.append(_TIP_ATTR.sub(lambda m: m.group(1) + _formal_text(m.group(2).replace("&#10;", "\n")).replace("\n", "&#10;") + m.group(3)
+        for part in _TAG.split(block):
+            if part == TONE_OFF or part == TONE_ON:
+                off = part == TONE_OFF
+                continue   # 표시는 결과에 남기지 않는다
+            if off:
+                out.append(part)
+                continue
+            if part.startswith("<") and part.endswith(">"):
+                out.append(_TIP_ATTR.sub(lambda m: m.group(1) + _formal_text(m.group(2).replace("&#10;", "\n")).replace("\n", "&#10;") + m.group(3)
                                      if "&#10;" in m.group(2) else m.group(1) + _formal_text(m.group(2)) + m.group(3), part))
-        else:
-            out.append(part if skip else _formal_text(part))
+            else:
+                out.append(_formal_text(part))
     return "".join(out)
 
 
