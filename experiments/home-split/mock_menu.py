@@ -156,6 +156,8 @@ LEAD_OLD = "Newfact 리포트는 공개된 시세 · SEC 공시 · FRED 경제 �
 LEAD_A = "공개된 시세 · 공시 · 경제 지표 · 뉴스를 정해진 규칙으로 정리한 기록이며, 매수 · 매도를 권유하지 않습니다."
 FOOT = ("공개된 시세 · 공시 · 경제 지표 · 뉴스를 정해진 규칙으로 정리한 기록이며, 해설 일부는 AI 가 씁니다. "
         "모든 정보는 참고용으로, 매수 · 매도를 권유하지 않으며 투자 판단과 책임은 투자자 본인에게 있습니다. 종목 로고는 각 회사의 상표입니다.")   # 푸터 한 문단 (2026-11-26)
+MORE_OLD = ("해설 문장 일부는 AI 가 씁니다. 모든 정보는 참고용이며, 앞으로의 결과는 지난 기록과 다를 수 있습니다. 애널리스트 의견 · 목표가는 외부 의견을 옮긴 것입니다. "
+            "개별 투자 상담을 하지 않으며, 투자 판단과 책임은 투자자 본인에게 있습니다. 종목 로고는 각 회사의 상표이며, 종목을 구분하는 용도로만 쓰고 해당 회사와 제휴 관계가 없습니다.")   # 11-26 전 접힌 글(비교용)
 MORE_A = "해설 일부는 AI 가 씁니다. 모든 정보는 참고용이며, 투자 판단과 책임은 투자자 본인에게 있습니다. 종목 로고는 각 회사의 상표입니다."   # 접힌 글 줄임 추천 (2026-11-26 사용자 "장황하다, 소개 페이지에 있으니 짧게")
 MORE_B = "해설 일부는 AI 가 씁니다. 투자 판단과 책임은 투자자 본인에게 있습니다."
 LEAD_B = "공개 자료를 정해진 규칙으로 정리한 기록이며, 매수 · 매도를 권유하지 않습니다."
@@ -215,7 +217,6 @@ def parts(mkt, files):
     js = "\n".join(re.findall(r"//<!\[CDATA\[(.*?)//\]\]>", idx, re.S))
     fonts = "".join(re.findall(r"<link[^>]+fonts\.googleapis\.com/css2[^>]+>", idx)).replace("&amp;", "&")
     logo = re.search(r"<svg class='logo-full'.*?</svg>", idx, re.S).group(0)
-    hidden_p = re.search(r"<details class='footer-disclaimer'>.*?<p>(.*?)</p>", idx, re.S).group(1)
     header = (f'<header class="navbar"><div class="nav-left"><div class="section"><div class="widget"><a class="logo" href="{files["us"]}">{logo}</a></div></div>'
               f'{drawer(mkt, files)}</div>'
               '<div class="nav-right">'
@@ -244,7 +245,7 @@ def build(mkt):
     title = "전체 메뉴 고침 — " + ("한국 증시 화면" if mkt == "kr" else "미국 증시 화면")
     write(files[mkt], '<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">'
           f'<title>{title}</title>{fonts}<style>{css}</style><style>{CSS}</style></head>'
-          f'<body class="no-dashboard" data-home-mkt="{mkt}">{header}<div class="header-bar"></div><main class="main-content">{note(mkt, files, logo, re.search(r"<details class='footer-disclaimer'>.*?<p>(.*?)</p>", open(os.path.join(ROOT, 'index.html'), encoding='utf-8').read(), re.S).group(1))}</main>{footer}'
+          f'<body class="no-dashboard" data-home-mkt="{mkt}">{header}<div class="header-bar"></div><main class="main-content">{note(mkt, files, logo, MORE_OLD)}</main>{footer}'
           f'<script>{js}</script><script>if(location.search.indexOf("open=1")>=0)setTimeout(function(){{document.querySelector(".nav-toggle").click()}},300);</script></body></html>')
 
 
