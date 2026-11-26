@@ -190,24 +190,8 @@ def _pct(v, unit="%"):
 
 
 def _cmp_line(x):
-    """종목 줄 아래 회색 한 줄 = 비교 두 개 (헌법 제1조): `코스피보다 0.32%p 더 상승 · 평소 하루 1.6%의 1.4배` (미국 종목은 S&P 500). 인과 말은 넣지 않는다 (요청 Q10)."""
-    bits = []
-    b, kospi = x.get("base") or "코스피", x.get("base_chg")
-    wa = b + ("과" if b.endswith("500") else "와")   # S&P 500(오백)과 · 코스피와
-    if x.get("vs") is not None and kospi is not None:
-        v, c = x["vs"], x["chg_pct"]
-        if abs(v) < 0.005:
-            bits.append(f"{wa} 같은 폭")
-        elif c * kospi < 0:   # 방향이 반대인 날
-            bits.append(f'{wa} 반대로 {"상승" if c > 0 else "하락"}')   # 오름 · 내림 → 상승 · 하락 (2026-11-26 사용자 "상승, 하락 용어로")
-        elif c >= 0 and kospi >= 0:
-            bits.append(f'{b}보다 {_pct(v, "%p")} {"더" if v > 0 else "덜"} 상승')
-        else:
-            bits.append(f'{b}보다 {_pct(v, "%p")} {"더" if v < 0 else "덜"} 하락')
-    if x.get("usual"):
-        r = abs(x["chg_pct"]) / x["usual"] if x["usual"] else 0
-        bits.append(f'평소 하루 움직임({_pct(x["usual"])})' + (f"의 {r:.1f}배" if r >= 1.5 else "과 비슷" if r >= 0.5 else "보다 작음"))
-    return bits   # 줄마다 한 비교 — 화면은 줄바꿈으로 (2026-11-23 사용자)
+    """종목 줄 아래 회색 비교 줄 — 시황과 같은 함수(story_render.cmp_bits). 인과 말은 넣지 않는다 (요청 Q10)."""
+    return SR.cmp_bits(x["chg_pct"], x.get("base") or "코스피", x.get("base_chg"), x.get("usual"))
 
 
 def _md(d):

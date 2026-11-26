@@ -280,6 +280,31 @@ def logo(t, row):
             f'{dk.esc(re.sub(r"[-.]", "", str(t))[:2])}</span>')
 
 
+def _pct2(v, unit="%"):
+    return f"{abs(v):.2f}{unit}".replace(".00", "") if v is not None else ""
+
+
+def cmp_bits(chg, base, base_chg, usual=None):
+    """종목 이름 아래 회색 비교 줄(헌법 제1조) — Newfact 뉴스 · 시황 같이 씀. `코스피보다 0.32%p 더 상승` · `평소 하루 움직임(1.6%)의 1.4배`.
+    base = 비교 지수 이름(한국 = 코스피, 미국 = S&P 500), usual = 직전 60거래일 하루 등락률 절댓값 중앙값(없으면 둘째 줄 없음). 줄마다 한 비교."""
+    bits = []
+    wa = base + ("과" if base.endswith("500") else "와")   # S&P 500(오백)과 · 코스피와
+    if chg is not None and base_chg is not None:
+        v = round(chg - base_chg, 2)
+        if abs(v) < 0.005:
+            bits.append(f"{wa} 같은 폭")
+        elif chg * base_chg < 0:   # 방향이 반대인 날
+            bits.append(f'{wa} 반대로 {"상승" if chg > 0 else "하락"}')   # 상승 · 하락 (헌법 제10조)
+        elif chg >= 0 and base_chg >= 0:
+            bits.append(f'{base}보다 {_pct2(v, "%p")} {"더" if v > 0 else "덜"} 상승')
+        else:
+            bits.append(f'{base}보다 {_pct2(v, "%p")} {"더" if v < 0 else "덜"} 하락')
+    if usual and chg is not None:
+        r = abs(chg) / usual
+        bits.append(f'평소 하루 움직임({_pct2(usual)})' + (f"의 {r:.1f}배" if r >= 1.5 else "과 비슷" if r >= 0.5 else "보다 작음"))
+    return bits
+
+
 def stock_row(x, row, slot, first, inline_sub=False, small=False, below=""):
     """종목 줄 = 종목 모아보기 규칙 (2026-11-19 사용자 "그 규칙으로 통일"): 로고 35 · 이름 16 굵게 · 보조 줄 14 회색(한국 = 업종, 미국 = 티커 · 업종) │ 오른쪽 증감 17 굵게 위 · 가격 15 증감 색 아래. 줄 전체가 그 종목 페이지로."""
     t, v = str(x.get("ticker") or ""), x["chg_pct"]
@@ -437,7 +462,12 @@ def render(column, briefing, banner_url=None, banner_alt="", lists_live=True, li
             mk += dk.ccard(rows, pad=pad, fold_at=5 if len(rows) > 6 else None, noun="업종")
     if movers:   # 종목 = 종목 모아보기 줄 규칙. 페이지가 없으면 자르지 않고 전부(접기 없이 — 버릴 곳이 없으므로)
         shown = movers[:TOP_N] if lists_live else movers
-        inner = "".join(stock_row(x, lists.get(str(x.get("ticker") or "").upper()), slot, i == 0) for i, x in enumerate(shown))
+        # 줄 모양 = Newfact 뉴스 관련 정보와 같게 (2026-11-26 사용자 "시황 종목도 이런 디자인과 구성으로"): 업종을 이름 옆 · 증감 16 · 가격 14 · 이름 아래 회색 비교 줄
+        bname = "S&P 500" if slot == "am" else "코스피"
+        bchg = next((x["chg_pct"] for x in indices if x.get("name") == bname and x.get("chg_pct") is not None), None)
+        inner = "".join(stock_row(x, lists.get(str(x.get("ticker") or "").upper()), slot, i == 0, inline_sub=True, small=True,
+                                  below="<br>".join(dk.esc(y) for y in cmp_bits(x["chg_pct"], bname, bchg, x.get("usual"))))
+                        for i, x in enumerate(shown))
         mk += white_card(inner + (tail("오늘 움직인 종목 전체 보기", "오늘 움직임") if lists_live else ""))
     if mk:
         # 제목 = 내용대로 `업종과 주요 종목`(옛 `지수 · 업종 흐름` — 지수 칸은 한눈에 보기 위로 갔다) · 크기 = 장을 움직인 변수와 같은 구획 제목(22/28, 폰 20/26) (2026-11-19 사용자)
