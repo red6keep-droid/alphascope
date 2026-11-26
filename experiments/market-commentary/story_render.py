@@ -465,8 +465,11 @@ def render(column, briefing, banner_url=None, banner_alt="", lists_live=True, li
         # 줄 모양 = Newfact 뉴스 관련 정보와 같게 (2026-11-26 사용자 "시황 종목도 이런 디자인과 구성으로"): 업종을 이름 옆 · 증감 16 · 가격 14 · 이름 아래 회색 비교 줄
         bname = "S&P 500" if slot == "am" else "코스피"
         bchg = next((x["chg_pct"] for x in indices if x.get("name") == bname and x.get("chg_pct") is not None), None)
+        def usual(x):   # 평소 하루 움직임 = 목록 파일 w — 목록 날짜가 이 장 날짜와 같을 때만(다른 날 기준이면 둘째 줄 없이)
+            r = lists.get(str(x.get("ticker") or "").upper()) or {}
+            return x.get("usual") or (r.get("w") if r.get("d") == td else None)
         inner = "".join(stock_row(x, lists.get(str(x.get("ticker") or "").upper()), slot, i == 0, inline_sub=True, small=True,
-                                  below="<br>".join(dk.esc(y) for y in cmp_bits(x["chg_pct"], bname, bchg, x.get("usual"))))
+                                  below="<br>".join(dk.esc(y) for y in cmp_bits(x["chg_pct"], bname, bchg, usual(x))))
                         for i, x in enumerate(shown))
         mk += white_card(inner + (tail("오늘 움직인 종목 전체 보기", "오늘 움직임") if lists_live else ""))
     if mk:

@@ -14,6 +14,7 @@
 import argparse
 import json
 import os
+import statistics
 import sys
 import urllib.request
 from urllib.parse import urlparse
@@ -108,6 +109,15 @@ def sector_etf(day, data=None):
             if s.get("cp") is not None and (s.get("name") or "").replace(" ", "") in names}
 
 
+def usual_move(px):
+    """평소 하루 움직임 = 마지막 날을 뺀 직전 60거래일 하루 등락률 절댓값의 중앙값(%, Newfact 뉴스 news_render._move 와 같은 정의). 20일 못 되면 None.
+    시황 종목 줄 둘째 줄 `평소 하루 움직임(1.6%)의 n배` 에 씀 (2026-11-26 사용자)."""
+    c = [x for x in (px or []) if x]
+    rets = [abs(c[i] / c[i - 1] * 100 - 100) for i in range(1, len(c))]
+    prev = rets[-61:-1]
+    return round(statistics.median(prev), 2) if len(prev) >= 20 else None
+
+
 def build(m, qd, cache, search, shells, logos):
     rows = {}
     folder = os.path.join(qd, m)
@@ -119,7 +129,8 @@ def build(m, qd, cache, search, shells, logos):
             continue
         code = f[:-5]
         rows[d["s"]] = {"t": code, "n": d.get("n") or code, "s": sector11(d.get("sec")), "p": d["c"], "r": _r((d.get("chg") or {}).get("1d")),
-                        "v": _r(d.get("vol_ratio")), "h": _r(d.get("off_hi")), "d": d.get("d"), "u": _path(shells.get(code))}
+                        "v": _r(d.get("vol_ratio")), "h": _r(d.get("off_hi")), "d": d.get("d"), "u": _path(shells.get(code)),
+                        "w": usual_move(d.get("px"))}   # w = 평소 하루 움직임 % (날짜 d 기준)
     # 정식 검색 색인 — 정식 주소 · 시가총액, 간단 명단 밖 정식 종목은 줄을 새로
     idx = _load(os.path.join(search, f"{m}.json"), {}) or {}
     for s in idx.get("stocks", []):
