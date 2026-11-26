@@ -225,7 +225,7 @@ def parts(mkt, files):
               '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>'
               '<span class="sr-only">메뉴 열기</span></button></div></header>')
     # 펼침 버튼 · 접힌 글 없앰 → 한 문단 · 소개 줄은 전체 메뉴로 옮겨 푸터에서 뺌 (2026-11-26 사용자)
-    footer = ('<footer class="site-footer"><div class="footer-disclaimer"><div class="footer-title"><span class="footer-name"><span class="brand-word">Newfact</span></span></div>'
+    footer = ('<footer class="site-footer"><div class="footer-disclaimer"><div class="footer-title"><span class="footer-name">' + logo.replace("class='logo-full'", "class='footer-logo'", 1) + '</span></div>'
               f'<p class="footer-lead">{FOOT}</p></div>'
               '<nav class="footer-links" aria-label="사이트 안내"><a class="fl-privacy" href="/p/privacy.html">개인정보처리방침</a></nav>'
               '<div class="attribution"><p class="footer-copy">© 2026 <span class="brand-word">Newfact</span>. All rights reserved.</p></div></footer>')
