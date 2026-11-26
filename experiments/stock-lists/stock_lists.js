@@ -186,7 +186,7 @@
     return { board: '<div class="hm" data-sl-pills="' + key + '" data-sl-heat style="height:' + H + 'px;">' + cells.join('') + '</div>',
       groups: sized.map(function (t) { return [t.n, t.xs]; }),
       basis: (sized.length && sized[0].how === 'cap' ? '칸 크기 = 시가총액' : '칸 크기 = 종목 수') +
-        (fix ? ' · 색 = 업종 ETF 등락(마지막 종가)' : ' · 색 = 묶음 평균 등락(마지막 종가)') };
+        (fix ? ' · 색 = 업종 ETF 등락률(마지막 종가)' : ' · 색 = 묶음 평균 등락률(마지막 종가)') };
   }
 
   function byDesc(f) { return function (a, b) { return (f(b) == null ? -1e18 : f(b)) - (f(a) == null ? -1e18 : f(a)); }; }

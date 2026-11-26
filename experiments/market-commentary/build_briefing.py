@@ -163,7 +163,7 @@ def build_am(day_kst, report_input, data=None, hypo=None, news=None):
     ups = sum(1 for s in sectors if (s["chg_pct"] or 0) > 0)
     downs = sum(1 for s in sectors if (s["chg_pct"] or 0) < 0)
     if sectors:
-        signals.append({"name": "업종 폭", "text": f"11개 업종 중 오름 {ups} · 내림 {downs}",
+        signals.append({"name": "업종 폭", "text": f"11개 업종 중 상승 {ups} · 하락 {downs}",
                         "dir": "up" if ups > downs else "down" if downs > ups else "flat"})
     vix = ((report_input or {}).get("macro") or {}).get("vix") or {}
     if vix.get("value") is not None:   # 수준만 있고 전날 대비가 없어 방향을 못 정함 → flat (근거 건수에 안 셈)

@@ -65,7 +65,7 @@
   }
 
   var MODES = [
-    { key: 'day', label: '오늘 등락', unit: '%', lo: '▼' + LIMIT + '%', hi: '▲' + LIMIT + '%', what: '전날 종가와 견준 오늘 등락률' },
+    { key: 'day', label: '오늘 등락률', unit: '%', lo: '▼' + LIMIT + '%', hi: '▲' + LIMIT + '%', what: '전날 종가와 견준 오늘 등락률' },
     { key: 'rel', label: null, unit: '%p', lo: '▼' + LIMIT + '%p', hi: '▲' + LIMIT + '%p', what: null },
     { key: 'vol', label: '거래량', unit: '배', lo: '평소', hi: '3배', what: '직전 20거래일 평균 거래량과 견준 오늘 거래량' }
   ];
@@ -384,7 +384,7 @@
       + '<span style="flex:1 1 auto;min-width:0;"><b style="font-size:19px;line-height:28px;font-weight:700;word-break:keep-all;">' + esc(r.n) + '</b> <span style="font-size:13px;line-height:19px;color:' + SUB + ';white-space:nowrap;">' + esc(r.t) + ' · ' + esc(g.name) + '</span></span>'
       + '<button type="button" data-x="1" aria-label="닫기" style="flex:none;display:flex;align-items:center;justify-content:center;width:32px;height:32px;padding:0;border:1px solid #CBD5E1;border-radius:6px;background:#fff;color:#111;cursor:pointer;"><svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M3.5 3.5l9 9M12.5 3.5l-9 9"/></svg></button></div>'
       + '<div style="margin:6px 0 8px;font-size:16px;line-height:24px;word-break:keep-all;">' + esc(this.says(r)) + '</div>'
-      + this.line('오늘 등락', '종가 ' + price, sign(r.r, '%'), dirColor(r.r))
+      + this.line('오늘 등락률', '종가 ' + price, sign(r.r, '%'), dirColor(r.r))
       + this.line(b.n + ' 대비', b.n + ' ' + sign(b.r, '%'), sign(rel, '%p'), dirColor(rel))
       + this.line(g.name + ' 업종 대비', '업종 평균 ' + sign(g.avg, '%'), sign(rs, '%p'), dirColor(rs))
       + (r.v != null ? this.line('거래량', '직전 20거래일 평균 대비', r.v.toFixed(1) + '배') : '')

@@ -205,7 +205,7 @@ def korea_pairs_card(a, opened=False):
     if lines:
         lines[0] = lines[0] + ("noline",)   # 카드 머리 아래 선과 겹치지 않게
     if ps:
-        lines.append(("국내 종목마다 함께 보는 미국 쪽 움직임입니다. 오른쪽 값은 지난밤 미국 쪽 등락이고, 상관이 1에 가까울수록 다음 날 시작 가격이 미국 쪽을 따라갔습니다.", "plain"))
+        lines.append(("국내 종목마다 함께 보는 미국 쪽 움직임입니다. 오른쪽 값은 지난밤 미국 쪽 등락률이고, 상관이 1에 가까울수록 다음 날 시작 가격이 미국 쪽을 따라갔습니다.", "plain"))
         for p in ps:
             t1, t2 = _bucket_text(p, p["kr_name"])
             if p["bucket"] in ("up", "down") and t1.startswith("미국 쪽이"):

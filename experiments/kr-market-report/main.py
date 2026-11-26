@@ -227,8 +227,8 @@ def _overnight(r):
 
 # 한 줄 답의 결과 단어 색 (2026-10-26 사용자: "늘어나면 빨간색, 나빠지면 파란색, 평소면 회색") — " · " 덩어리마다. 비싸짐은 싸짐보다 먼저 본다
 WORD_GRAY = ("비슷", "그대로", "평소 수준", "평소 안")
-WORD_UP = ("늘어남", "오름", "비싸짐", "순매수", "좋아짐", "활발", "강세")
-WORD_DOWN = ("줄어듦", "내림", "싸짐", "순매도", "나빠짐", "한산", "약세")
+WORD_UP = ("늘어남", "금리 상승", "오름", "비싸짐", "순매수", "좋아짐", "활발", "강세")
+WORD_DOWN = ("줄어듦", "금리 하락", "내림", "싸짐", "순매도", "나빠짐", "한산", "약세")
 
 
 def _word_color(chunk, default):
@@ -601,7 +601,7 @@ def top_section(r):
     rows = "".join(_top_row(s, r, i == 0) for i, s in enumerate(outs))
     rest_rows = "".join(_top_row(s, r, i == 0) for i, s in enumerate(rest))
     now = ("· 오늘 평소 밖 : " + " · ".join(f"{s['name']} {_s(s['ret_1d'])}" for s in outs)) if outs else "· 오늘 : 10개 모두 평소 범위 안"
-    tip = ("한국 유가증권시장 시가총액 상위 10개 가운데 오늘 그 종목의 평소 크기 밖으로 움직인 종목. 나머지는 접어 두었고, 종가 · 등락은 홈 시총 TOP 10 에도 있습니다\n" + now)
+    tip = ("한국 유가증권시장 시가총액 상위 10개 가운데 오늘 그 종목의 평소 크기 밖으로 움직인 종목. 나머지는 접어 두었고, 종가 · 등락률은 홈 시총 TOP 10 에도 있습니다\n" + now)
     body = _title_with_sort("시총 상위 10개 중 평소와 다르게 움직인 종목은?", _dk.with_src(tip, "Yahoo Finance"), "kr-top10")
     if outs:
         body += f'<div style="margin:0 0 8px;font-size:{_dk.SMALL};"><span data-sort-list="kr-top10" style="display:block;">{rows}</span></div>'
@@ -880,7 +880,7 @@ def foreign_card(m):
     rets = [{"day": x["day"], "v": (ks[x["day"]] / ks[kd[kd.index(x["day"]) - 1]] - 1) * 100} for x in ser if x["day"] in ks and kd.index(x["day"]) > 0]
     if len(rets) == len(ser):
         g2, _ = _day_groups(rets, scale=1)
-        lines.append((_bars("같은 날 코스피 하루 등락 (%)", g2, C.sign_fg, C.gray, lambda v: _s(v, 1, ""), "비교 대상 : 코스피 하루 등락"), "html"))
+        lines.append((_bars("같은 날 코스피 하루 등락률 (%)", g2, C.sign_fg, C.gray, lambda v: _s(v, 1, ""), "비교 대상 : 코스피 하루 등락률"), "html"))
     y = f["series"][-2] if len(f["series"]) >= 2 else None
     lines.append(("row", "오늘", _flow(f["today"], 0, "억"), f"{f['streak']}일 연속 {word}" if f["streak"] > 1 else _md(f["day"])))
     if y:
@@ -1013,7 +1013,7 @@ def rates_card(m):
     st, lines, sg = [], [], []
     if k3 and k3.get("chg_n") is not None:
         bp = k3["chg_n"] * 100
-        st.append("금리 내림" if bp <= -10 else "금리 오름" if bp >= 10 else "금리 그대로")
+        st.append("금리 하락" if bp <= -10 else "금리 상승" if bp >= 10 else "금리 그대로")
         sg.append(-1 if bp <= -10 else 1 if bp >= 10 else 0)
         lines.append((f"시장 금리(국고채 3년)는 {k3['v']:.2f}%로 20일 동안 {_s(k3['chg_n'], 2, '%p')} 움직여, 1년 범위({k3['lo_1y']:.2f}~{k3['hi_1y']:.2f}%)의 {_pos_word(k3['v'], k3['lo_1y'], k3['hi_1y'])}에 있습니다. "
                       + ("금리가 내리면 돈을 빌리는 비용이 줄어드는 쪽입니다." if bp <= -10 else "금리가 오르면 돈을 빌리는 비용이 늘어나는 쪽입니다." if bp >= 10 else "20일 동안 크게 바뀌지 않았습니다."), "plain"))
@@ -1038,7 +1038,7 @@ def rates_card(m):
         if x:
             lines.append(("row", name, f"{x['v']:,.1f}원", " · ".join(p for p in (f"오늘 {_s(x['chg_1d'], 1, '원')}" if x.get("chg_1d") is not None else "",
                                                                              f"20일 {_s(x['chg_n'], 1, '원')}" if x.get("chg_n") is not None else "", f"1년 {x['lo_1y']:,.0f}~{x['hi_1y']:,.0f}원") if p)))
-    tip = ("시장 금리(국고채 · 회사채)와 원화 값(환율)의 지금 위치. 20일 동안 국고채 3년이 0.1%p 넘게 움직이면 내림 · 오름, 원/달러가 1% 넘게 움직이면 원화 강세 · 약세로 봅니다\n"
+    tip = ("시장 금리(국고채 · 회사채)와 원화 값(환율)의 지금 위치. 20일 동안 국고채 3년이 0.1%p 넘게 움직이면 하락 · 상승, 원/달러가 1% 넘게 움직이면 원화 강세 · 약세로 봅니다\n"
            "· 오늘 : " + " · ".join(st))
     return _qc("금리 · 환율은?", " · ".join(st), *_dir_of(sg), lines, tip=_dk.with_src(tip, RK.SRC))
 
@@ -1667,7 +1667,7 @@ def index_tech_card(r):
         rows = []
         x = r["idx"].get(k) or {}
         if x.get("normal"):
-            rows.append(f'<span>하루 등락 <span style="font-size:{TS.WHY_FS};color:#6B7280;">평소 ±{x["normal"]["sigma_pct"]:.2f}%의 {_times(x["normal"]["z"])}</span></span><b>{_dk.arrow(round(x["ret"], 2))}</b>')
+            rows.append(f'<span>하루 등락률 <span style="font-size:{TS.WHY_FS};color:#6B7280;">평소 ±{x["normal"]["sigma_pct"]:.2f}%의 {_times(x["normal"]["z"])}</span></span><b>{_dk.arrow(round(x["ret"], 2))}</b>')
         for d in (20, 50):
             m = _ma(c, d)
             if m:

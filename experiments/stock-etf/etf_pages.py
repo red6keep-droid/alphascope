@@ -345,7 +345,7 @@ def line_card(name, days, c, bench_days_close, bench_name):
     bc = [x if x is not None else first for x in bc]
     series = [(name, [(x / c[0] - 1) * 100 for x in c], dk.CHART_MAIN, "solid"),   # 그래프 색 = 가이드라인 4절 (주인공 주황 · 비교 회색 점선)
               (bench_name, [(x / bc[0] - 1) * 100 for x in bc], dk.CHART_CMP, "dash")]
-    return dk.trend_card("1년 전 대비 등락", dk.month_ticks(days), series, pct)
+    return dk.trend_card("1년 수익률", dk.month_ticks(days), series, pct)
 
 
 E_MOCK, E_REAL = ("<!--etf-mock-->", "<!--/etf-mock-->"), ("<!--etf-real-->", "<!--/etf-real-->")
@@ -404,7 +404,7 @@ def us_move_card(sym, snap, f, s):
         return ""
     name = E.BY_SYM[sym][1]
     series = [(name, norm([x["close"] for x in b]), dk.CHART_MAIN, "solid"), (peer[1], pv, dk.CHART_SERIES[1], "thin")]
-    chart = dk.trend_card("최근 3개월 등락 (%)", dk.month_ticks(days, every=1), series, pct)
+    chart = dk.trend_card("최근 3개월 수익률 (%)", dk.month_ticks(days, every=1), series, pct)
     pb = snap["bars"].get(peer[0]) or []
     peer_ret = (pb[-1]["close"] / pb[-2]["close"] - 1) * 100 if len(pb) >= 2 and pb[-1]["day"] == days[-1] and pb[-2]["close"] else None
     if peer_ret is None:
@@ -580,7 +580,7 @@ def move_card(sym, snap, stocks, K, s=None):
             us_ret, us_day = (ub[k]["close"] / ub[k - 1]["close"] - 1) * 100, ub[k]["day"]
     if len(series) < 2:
         return ""
-    chart = dk.trend_card("최근 3개월 등락 (%)", dk.month_ticks(days, every=1), series, pct)
+    chart = dk.trend_card("최근 3개월 수익률 (%)", dk.month_ticks(days, every=1), series, pct)
     note = "미국 값은 한국 장이 열리기 전 마지막 미국 종가입니다." if us else ""
     name = E.BY_SYM[sym][1]
     ret_1d = (s or {}).get("ret_1d")

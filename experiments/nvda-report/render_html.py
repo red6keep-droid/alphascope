@@ -384,9 +384,9 @@ def _glance_state(a):
     vr, rg, vs = h.get("vol_ratio_20d") or 0, h.get("range_pct") or 0, abs(h.get("ret_vs_spy") or 0)
     big, mid = [], []
     if k is not None and k >= 2:
-        big.append(f"등락이 평소의 {k:.1f}배")
+        big.append(f"등락률이 평소의 {k:.1f}배")
     elif k is not None and k >= 1:
-        mid.append(f"등락이 평소의 {k:.1f}배")
+        mid.append(f"등락률이 평소의 {k:.1f}배")
     if vr >= config.VOL_RATIO_EVENT:
         big.append(f"거래량 평소의 {vr:.1f}배")
     elif vr >= 1.5:
@@ -430,7 +430,7 @@ def glance_sub(a):
     # 2026-10-27: `평소범위` 와 배수는 한 마디(띄어쓰기 · 점 없이 붙임) · 오른쪽 정렬 그대로 (P30 의 두 줄 왼쪽 정렬은 사용자 요청으로 되돌림)
     lead = ("실적 반응일" if earn else "평소범위" if k < 2 else "평소범위 밖") + f" {k:.1f}배(하루 ±{sd:.1f}%)"
     _, reasons = _glance_state(a)
-    parts = [lead] + [x.replace("하루 흔들림", "흔들림").replace("거래량 평소의", "거래량") for x in reasons if not x.startswith("등락이 평소의")]   # 등락 배수는 첫 마디에 있다
+    parts = [lead] + [x.replace("하루 흔들림", "흔들림").replace("거래량 평소의", "거래량") for x in reasons if not x.startswith("등락률이 평소의")]   # 등락 배수는 첫 마디에 있다
     vr = h.get("vol_ratio_20d")
     if vr and not any(x.startswith("거래량") for x in parts):   # 거래량은 늘 보인다 — 1.5배 넘는 날만이 아니라 (2026-10-18 사용자: 가격 정보 줄에 거래량)
         parts.append(f"거래량 {vr:.1f}배")
@@ -599,7 +599,7 @@ def sec_periods(a):
         return ""
     pad = _dk.SEP_GAP - _dk.VP - 1
     chart = _col_chart([(p["label"], [p["nvda"], p.get("spy")]) for p in ps[::-1]], [_sign_bg, lambda v: _GRAY_BAR], [_sign_fg, lambda v: NOTE], right=True)   # 1년 → 1주, 가까운 쪽 오른쪽 (P165)
-    legend = _legend_chips([("엔비디아 오름", _PASTEL_UP), ("엔비디아 내림", _PASTEL_DN), ("S&P 500", _GRAY_BAR)])
+    legend = _legend_chips([("엔비디아 상승", _PASTEL_UP), ("엔비디아 하락", _PASTEL_DN), ("S&P 500", _GRAY_BAR)])
     card = f'<div data-cards="1" style="margin:0 0 8px;"><span style="{MULTI}"><span style="display:block;padding:{_dk.CHART_CARD_PAD}px 12px 0;">{_dk.legend_top(chart, legend)}</span></span></div>'
     return _card_title("기간별 수익률 (%)", periods_tip(ps)) + card
 
@@ -2446,13 +2446,13 @@ def bollinger_lines(bb):
     return lines
 
 
-OVERHEAT_TIP_NAME = {"rsi80": "오르는 힘 {v:.0f}점", "ma200_40": "200일 평균보다 {v:.0f}% 위", "ret20_25": "한 달 {v:.0f}% 오름"}
+OVERHEAT_TIP_NAME = {"rsi80": "오르는 힘 {v:.0f}점", "ma200_40": "200일 평균보다 {v:.0f}% 위", "ret20_25": "한 달 {v:.0f}% 상승"}
 
 
 def overheat_rule(oh):
     names = ", ".join(OVERHEAT_TIP_NAME[k].format(v=oh["values"].get(k) or 0) for k in oh["active"])
     return (f"최근 너무 빨리 올랐는지 세 가지로 본다. 2주 오르는 힘 {config.OVERHEAT_RSI:.0f}점 이상, 200일 평균보다 {config.OVERHEAT_MA200_PCT:.0f}% 넘게 위, "
-            f"한 달에 {config.OVERHEAT_RET20_PCT:.0f}% 넘게 오름\n"
+            f"한 달에 {config.OVERHEAT_RET20_PCT:.0f}% 넘게 상승\n"
             f"· 오늘 {len(oh['active'])}개 해당 : {names}")
 
 
@@ -3293,7 +3293,7 @@ def card_eps(c):
         first += f" 30일 동안 {c['up30']}명이 올리고 {c['down30']}명이 내렸다."
     first += SMALL_NOTE + EPS_NOT_OPINION   # 문장 아래 작은 회색 (P141)
     groups = [(f'{b["label"]} 전', [b["stock"], b["peers"]]) for b in c["bars"][::-1]]   # `7일` → `7일 전` (P64) · 90일 전 → 7일 전, 가까운 쪽 오른쪽 (P165)
-    chart = _chart_card(groups, [_sign_bg, _gray], [_sign_fg, _note_fg], [("엔비디아 올림", _PASTEL_UP), ("엔비디아 내림", _PASTEL_DN), (_PEER_LBL, _GRAY_BAR)], right=True)
+    chart = _chart_card(groups, [_sign_bg, _gray], [_sign_fg, _note_fg], [("엔비디아 상승", _PASTEL_UP), ("엔비디아 하락", _PASTEL_DN), (_PEER_LBL, _GRAY_BAR)], right=True)
     lines = [(first, "plain"), (f'{_dk.CHART_TITLE_M}{EPS_CHART_TITLE}</span>{chart}', "html")]
     if p30 is not None:
         lines.append(("row", "기술주 15개와 차이 (30일)", _pp(c["c30"] - p30, 1), "같은 기간 중앙값과 비교"))

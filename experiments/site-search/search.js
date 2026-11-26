@@ -425,7 +425,7 @@
     var W = s.why || {}, inWin = function (r) { return r[0] >= f && r[0] <= p.d; };
     var mine = (W[down ? 'bad' : 'good'] || []).filter(inWin), other = (W[down ? 'good' : 'bad'] || []).filter(inWin), open = (W.open || []).filter(inWin);
     var an = (W.an || []).filter(inWin), cnt = function (k) { return an.filter(function (a) { return a[1] === k; }).length; };
-    var anTxt = down ? [cnt('down') ? '목표가 내림 ' + cnt('down') + '곳' : '', cnt('cut') ? '의견 낮춤 ' + cnt('cut') + '곳' : ''] : [cnt('up') ? '목표가 올림 ' + cnt('up') + '곳' : ''];
+    var anTxt = down ? [cnt('down') ? '목표가 낮춤 ' + cnt('down') + '곳' : '', cnt('cut') ? '의견 낮춤 ' + cnt('cut') + '곳' : ''] : [cnt('up') ? '목표가 높임 ' + cnt('up') + '곳' : ''];
     anTxt = anTxt.filter(Boolean).join(' · ');
     var line = function (r) { return '<li><span>' + md(r[0]) + '</span>' + esc(r[1]) + (r[2] ? ' <small>' + esc(r[2]) + '</small>' : '') + (r[3] === 2 ? ' <em class="as-lv">업종</em>' : '') + '</li>'; };
     out += '<div class="as-sec"><h4>' + ico('news') + '무엇이 이유로 꼽혔나? <small>(' + w[1] + ')</small></h4>';
@@ -482,7 +482,7 @@
       + '<p class="as-note">지난 가격으로 잰 위치입니다. 움직인 이유나 앞으로의 방향을 알려 주지 않습니다.</p></div>';
     return out;
   }
-  var TITLE = { change: '기간별 등락', range: '52주 범위', volume: '거래량', cap: '시가총액', earnDate: '실적 발표일', earnings: '실적', valuation: 'EPS · PER · 목표가', tech: '기술 지표', company: '회사 정보', news: '최근 소식' };
+  var TITLE = { change: '기간별 수익률', range: '52주 범위', volume: '거래량', cap: '시가총액', earnDate: '실적 발표일', earnings: '실적', valuation: 'EPS · PER · 목표가', tech: '기술 지표', company: '회사 정보', news: '최근 소식' };
 
   function card(s, c, compact, doc) {
     var list = c.intents.slice();

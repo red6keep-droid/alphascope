@@ -476,16 +476,16 @@ def mom_card(name, sym, gname, group, rets):
         t = ax(x).split("\n")[1]
         col = R.UP if round(x["ret"]) > 0 else R.DOWN if round(x["ret"]) < 0 else "#111"
         chart = chart.replace(f"<br>{t}</span>", f'<br><span style="font-size:12px;color:{col};">{t}</span></span>')
-    lines = [(first, "plain"), (f'{dk.CHART_TITLE_M}기간별 상승률 순위 (위로 갈수록 1위)</span>{chart}', "html"),
+    lines = [(first, "plain"), (f'{dk.CHART_TITLE_M}기간별 수익률 순위 (위로 갈수록 1위)</span>{chart}', "html"),
              ("row", "비교 묶음", f"{gname} {base['n']}종목", f"S&P 500 안 같은 업종 · {name} 포함"),
              ("row", "기준 기간", base["lb"], "답(상위 · 중간 · 하위)을 정하는 기간")]
     if missing:
         lines.append((f"{' · '.join(missing)}은 상장한 지 그만큼 되지 않아 뺐습니다.", "note"))
     if len({x["n"] for x in rows}) > 1:   # 긴 기간은 그만큼 상장하지 않은 종목이 빠져 묶음이 작아진다
         lines.append((" · ".join(f"{x['lb']} {x['n']}종목" for x in rows if x["n"] != base["n"]) + "은 그 기간만큼 상장하지 않은 종목을 빼고 견줬습니다.", "note"))
-    tip = ("같은 업종 종목들과 견준 기간별 주가 상승률 순위. 가운데 가로선이 업종 중앙값, 위로 뻗으면 중앙값보다 많이 오른 것이고 맨 위가 1위\n"
+    tip = ("같은 업종 종목들과 견준 기간별 주가 수익률 순위. 가운데 가로선이 업종 중앙값, 위로 뻗으면 중앙값보다 많이 오른 것이고 맨 위가 1위\n"
            f"· 나누는 법 : {base['lb']} 순위가 위 4분의 1이면 상위 25%, 아래 4분의 1이면 하위 25%, 그 사이는 중간\n"
-           "· 상승률 : 기간 이름 아래 숫자. 배당을 다시 넣은 수정 종가 기준\n"
+           "· 수익률 : 기간 이름 아래 숫자. 배당을 다시 넣은 수정 종가 기준\n"
            "· 비교 묶음 : S&P 500 구성 종목의 업종 분류(GICS). 반도체는 반도체끼리")
     return state, theme, lines, tip
 

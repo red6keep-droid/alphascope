@@ -82,15 +82,15 @@ def card_lines(x, name):
     up = x["ret"] >= 0
     first = (f"{_md(x['day'])} {x['index']}{_josa(x['index'], '이', '가')} {_sgn(x['index_ret'])}% 내린 날 {name}{_josa(name, '은', '는')} {_sgn(x['ret'])}% "
              + ("올랐다" if up else "내렸다") + f". 지수보다 {_sgn(x['excess'])}%p " + ("앞섰다." if up else "덜 내렸다."))
-    rows = [("row", "그날 등락", f"{_sgn(x['ret'])}%", f"{x['index']} {_sgn(x['index_ret'])}%"),
-            ("row", "지수와 차이", f"{_sgn(x['excess'])}%p", "이 종목 등락 − 지수 등락"),
+    rows = [("row", "그날 등락률", f"{_sgn(x['ret'])}%", f"{x['index']} {_sgn(x['index_ret'])}%"),
+            ("row", "지수와 차이", f"{_sgn(x['excess'])}%p", "이 종목 등락률 − 지수 등락률"),
             ("row", "최근 2년 급락일", f"{x['held_total']}번 중 {x['held_n']}번", f"{x['index']}{_josa(x['index'], '이', '가')} {x['pct']:.0f}% 넘게 내린 날 가운데 올랐거나 {x['hold_pp']:.0f}%p 넘게 덜 내린 날")]
     return first, rows
 
 
 def tip(x):
     return (f"{x['index']}{_josa(x['index'], '이', '가')} 하루 {x['pct']:.0f}% 넘게 내린 날, 이 종목은 어땠나. 홈 `주목할 종목` 카드와 같은 기준\n"
-            f"· 버텼다 : 그날 올랐거나 지수보다 {x['hold_pp']:.0f}%p 넘게 덜 내린 것. 등락은 배당을 넣은 수정 종가\n"
+            f"· 버텼다 : 그날 올랐거나 지수보다 {x['hold_pp']:.0f}%p 넘게 덜 내린 것. 등락률은 배당을 넣은 수정 종가\n"
             "· 왜 버텼는지는 단정하지 않는다 — 그날 이 종목 주변에 있었던 일(뉴스 방향 · 업종 자금 · 실적 일정)을 나란히 둘 뿐\n"
             "· 최근 2년 급락일 n번 중 m번 : 늘 덜 움직이는 종목(유틸리티 · 필수소비재)인지, 그날만 버틴 것인지 가르는 수\n"
             "· 앞으로도 버틴다는 뜻이 아니다. 이 줄은 기록이지 신호가 아니다")

@@ -405,7 +405,7 @@ def pairs_card(s, peers, by):
         recs = [(r["t"], US_KO.get(r["t"], r["t"]), ", ".join(x for x in (r.get("why") or "", render_kr.RP.rec_years(r.get("n"))) if x), r["spread1"])
                 for r in LINKS.get(s["sym"]) or [] if r["t"] in {m["sym"] for m, _ in links}]
         lines.append((render_kr.RP.link_record_table("미국 연관 종목 기록", recs, theme), "html"))
-    R.add_small_note(lines, ("함께 움직여 온 종목은 같은 업종에서 최근 1년 하루 등락이 가장 비슷한 종목입니다. " if moves else "")
+    R.add_small_note(lines, ("함께 움직여 온 종목은 같은 업종에서 최근 1년 하루 등락률이 가장 비슷한 종목입니다. " if moves else "")
                      + "±0.5% 넘게 움직인 종목만 오른 곳 · 내린 곳으로 셉니다.")
     tip = "미국 연관 종목은 사업으로 이어진 미국 종목 가운데, 그 종목이 크게 움직인 밤 다음 날 이 종목도 같은 쪽으로 열려 온 것만 골랐습니다." if links else ""   # 카드 작은 글씨 → 툴팁 (2026-11-15 사용자)
     card = R._state_card("함께 움직이는 종목은?", state, theme, col, lines, "", tip=tip, fold=True)

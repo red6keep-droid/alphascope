@@ -104,7 +104,7 @@ def body_ai(t, a, day, guide):
     # ① 돈이 몰리나 — 갈래별 20일 상대 수익률 + 막대
     lines = [("row", b["name"], f"{_pp(b['rel_20d'])}%p", f"{b['state']} · 20일 {_pp(b['ret_20d'])}% (S&P {_pp(a['bench_ret_20d'])}%)") for b in bs]
     chart = R._col_chart([(b["name"], [b["ret_20d"], a["bench_ret_20d"]]) for b in bs], [R._sign_bg, lambda v: R._GRAY_BAR], [R._sign_fg, lambda v: NOTE], height=130)
-    legend = R._legend_chips([("갈래 오름", R._PASTEL_UP), ("갈래 내림", R._PASTEL_DN), ("S&P 500", R._GRAY_BAR)])
+    legend = R._legend_chips([("갈래 상승", R._PASTEL_UP), ("갈래 하락", R._PASTEL_DN), ("S&P 500", R._GRAY_BAR)])
     lines.append((f'<span style="{R.MULTI}margin:0 {dk.CHART_CARD_X}px;"><span style="display:block;padding:{dk.CHART_CARD_PAD}px 12px 0;">{dk.legend_top(chart, legend)}</span></span>', "html"))   # 그래프는 흰 카드 (2026-10-26 가이드라인: 강조 카드 안 흰 카드 = 그래프만)
     tip = (f"갈래마다 동일가중 바스켓의 20거래일 수익률에서 S&P 500 수익률을 뺀 값. +{T.FLOW_PP:.0f}%p 넘으면 유입, −{T.FLOW_PP:.0f}%p 아래면 유출\n"
            "· 세 갈래가 같이 유입이면 AI 테마 자체로 돈이 오는 것, 한 갈래만이면 다른 이유일 수 있다")
@@ -113,14 +113,14 @@ def body_ai(t, a, day, guide):
     # ② 넓게 오르나
     br = whole.get("breadth") or {}
     share = br["above_ma20"] / br["n"] if br.get("n") else None
-    st2 = "넓게 오름" if share is not None and share >= 0.6 else "몇 종목만" if share is not None and share <= 0.4 else "반반"
-    k2 = "positive" if st2 == "넓게 오름" else "negative" if st2 == "몇 종목만" else "neutral"
+    st2 = "넓게 상승" if share is not None and share >= 0.6 else "몇 종목만" if share is not None and share <= 0.4 else "반반"
+    k2 = "positive" if st2 == "넓게 상승" else "negative" if st2 == "몇 종목만" else "neutral"
     # 값 = 20일선 위 종목 수, 설명 = 그 뜻 + 오늘 오른 종목 수 (2026-10-21 사용자: "0/5 가 뭐지?" — 두 숫자가 한 줄에 섞여 있었다)
     # 값 = "20일선 위는 (0/5)" — 앞말은 보통 굵기, 숫자만 굵게. 뜻 = "5종목 오름" (2026-10-21 사용자)
-    lines = [("row", b["name"], f'<span style="font-weight:400;">20일선 위는</span> ({b["breadth"]["above_ma20"]}/{b["breadth"]["n"]})', f"{b['breadth']['up_today']}종목 오름", True)
+    lines = [("row", b["name"], f'<span style="font-weight:400;">20일선 위는</span> ({b["breadth"]["above_ma20"]}/{b["breadth"]["n"]})', f"{b['breadth']['up_today']}종목 상승", True)
              for b in bs if b.get("breadth")]
     cards += R._state_card("넓게 오르나?", st2, k2, KIND_COLOR[k2], lines, "",
-                           tip=f"{n_all}종목 가운데 20일 이동평균선(최근 20거래일 평균 가격) 위에 있는 종목이 몇인가. 60% 이상이면 넓게 오름, 40% 이하면 몇 종목만\n"
+                           tip=f"{n_all}종목 가운데 20일 이동평균선(최근 20거래일 평균 가격) 위에 있는 종목이 몇인가. 60% 이상이면 넓게 상승, 40% 이하면 몇 종목만\n"
                                f"· 오늘 {br.get('above_ma20', 0)}종목 / {n_all}종목 : 테마가 올라도 몇 종목이 끌고 있으면 넓게 오른 게 아니다", fold=True,
                            below_notes=True)   # "5종목 오름" 은 괄호 없이 이름 아래 줄 (2026-10-21 사용자)
 

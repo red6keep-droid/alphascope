@@ -698,7 +698,7 @@ def index_tech_card(a, prev):
         rows = []
         if k in nr:
             x = nr[k]
-            rows.append(f'<span>하루 등락 <span style="font-size:{TS.WHY_FS};color:#6B7280;">평소 ±{x["sigma_pct"]:.2f}%의 {sx._times(x["z"])}</span></span><b>{dk.arrow(x["ret_pct"])}</b>')   # `오늘` → `하루 등락` (2026-11-07 사용자: 오늘이라고 쓰면 무엇인지 모른다) — 평소 ± = 그 지수의 평소 하루 움직임 크기
+            rows.append(f'<span>하루 등락률 <span style="font-size:{TS.WHY_FS};color:#6B7280;">평소 ±{x["sigma_pct"]:.2f}%의 {sx._times(x["z"])}</span></span><b>{dk.arrow(x["ret_pct"])}</b>')   # `오늘` → `하루 등락` (2026-11-07 사용자: 오늘이라고 쓰면 무엇인지 모른다) — 평소 ± = 그 지수의 평소 하루 움직임 크기
         s_ = se.get(k) or {}
         for d in (20, 50):   # 값 = 평균 가격 대비 % (7-1: 방향 글자만 있는 값 금지, 2026-11-07)
             if s_.get("last") and s_.get(f"ma{d}"):
