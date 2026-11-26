@@ -214,7 +214,7 @@ def _md(d):
     return f"{int(d[5:7])}.{d[8:10]}"
 
 
-IDX_NAME, IDX_CHG = 15, 16   # 지수 칸 이름 · 종가 16 → 15, 증감(굵은 색) 17 → 16 (2026-11-25 사용자 "한 포인트 정도 작게")
+IDX_NAME, IDX_CHG = 15, 16   # 이름 · 숫자 사이 위 4 → 1(보이는 간격 약 13 → 10, 2026-11-26 사용자 "20% 줄여") · 지수 칸 이름 · 종가 16 → 15, 증감(굵은 색) 17 → 16 (2026-11-25 사용자 "한 포인트 정도 작게")
 SEC_TITLE = 15               # 칸 제목 `관련 정보` = 지수 칸 이름(코스피)과 같은 크기 — 폰 테마 h2 20px !important 를 피해 안쪽 span 이 크기를 갖는다
 SEC_ICON = 18                # 제목 앞 아이콘 20 → 18 (2026-11-25 사용자 "10% 작게")
 
@@ -228,7 +228,7 @@ def _idx_card(cells_src):
             continue
         ink = dk.UP if x["chg_pct"] > 0 else dk.DOWN if x["chg_pct"] < 0 else "#111"
         cells.append(f'<span style="font-weight:700;color:#111;font-size:{IDX_NAME}px;line-height:{dk.LH_CARD};white-space:nowrap;display:block;">{dk.paren(dk.esc(SR.INDEX_NAMES.get(x["name"], x["name"])))}</span>'
-                     f'<span style="display:block;margin-top:4px;line-height:25px;white-space:nowrap;"><span style="font-size:{IDX_NAME}px;color:{ink};">{x["close"]:,.2f}</span> '
+                     f'<span style="display:block;margin-top:1px;line-height:25px;white-space:nowrap;"><span style="font-size:{IDX_NAME}px;color:{ink};">{x["close"]:,.2f}</span> '
                      f'<span style="font-size:{IDX_CHG}px;">{SR.chg(x["chg_pct"])}</span></span>')
     if not cells:
         return ""
@@ -256,8 +256,8 @@ def market_section(market, lists, ink):
             r = SR.stock_row(x, lists.get(x["ticker"]), "am" if x.get("mk") == "us" else "pm", i in (0, STOCKS_SHOWN), inline_sub=True, small=True)   # 미국 = 달러 · 티커 · 업종
             line = _cmp_line(x)
             if line:
-                r = r.replace(f"padding:{SR.LIST_ROW_PAD}px 12px;", f"padding:{SR.LIST_ROW_PAD}px 12px 6px;", 1)
-                r += (f'<span style="display:block;padding:0 12px {SR.LIST_ROW_PAD}px {12 + SR.LOGO_Z + SR.LOGO_GAP}px;font-size:{dk.TINY};line-height:{dk.LH_TINY};'
+                r = r.replace(f"padding:{SR.LIST_ROW_PAD}px 12px;", f"padding:{SR.LIST_ROW_PAD}px 12px 0;", 1)   # 이름 줄(엔비디아 NVDA · 기술) 아래 여백 반으로 — 아래 6 → 0 · 비교 줄 위 -4 (2026-11-26 사용자 "50% 줄여")
+                r += (f'<span style="display:block;margin-top:-4px;padding:0 12px {SR.LIST_ROW_PAD}px {12 + SR.LOGO_Z + SR.LOGO_GAP}px;font-size:{dk.TINY};line-height:{dk.LH_TINY};'
                       f'color:#6B7280;word-break:keep-all;">{"<br>".join(dk.esc(x) for x in line)}</span>')
             rows.append(r)
         if len(rows) > STOCKS_SHOWN:   # 전부 싣고 접기 — 버튼은 카드 안 맨 아래 줄(dk.fold_card, `관련 종목 n개 더 보기 ⌄`)
@@ -337,11 +337,9 @@ def render(post, market, lists=None, issues=(), forecasts=()):
     y, m, d = post["date"].split("-")
     style = ('<style>body:has([data-headline]) .pr-sticky{border-bottom:0;margin-bottom:0;}</style>')
     body = [style + f'<p data-title-basis="1" data-news-post="{dk.esc(post.get("slug") or "")}" data-news-date="{dk.esc(post["date"])}" data-post-id="{dk.esc(post.get("id") or "")}" style="margin:0 0 14px;font-size:13px;line-height:19px;color:#6B7280;">{int(m)}.{d} 기사</p>']
-    body.append(f'<h2 data-headline="1" style="margin:0 0 14px;padding:25px 0 0 {dk.ALIGN_PX}px;font-size:26px;line-height:38px;font-weight:700;color:#111;word-break:keep-all;">'
+    body.append(f'<h2 data-headline="1" style="margin:0 0 18px;padding:25px 0 0 {dk.ALIGN_PX}px;font-size:26px;line-height:38px;font-weight:700;color:#111;word-break:keep-all;">'
                 f'<span style="display:block;font-size:26px;line-height:38px;">{SR.emph(dk.esc(post["title"]), False)}</span></h2>')   # 폰 테마가 h2 에 20/26 !important — 크기는 안쪽 span 이 갖는다
-    pills = [dk.pill(dk.ISSUE_KO.get(post.get("cat"), "그 밖"), "area", bare=True),
-             dk.pill(dk.DIR_KO.get(DIR_KIND.get(post.get("direction"), "neutral")) + "적", DIR_KIND.get(post.get("direction"), "neutral"), bare=True)]   # 상세 = 긍정적 · 부정적 · 중립적 (2026-11-23 사용자, 목록 라벨은 두 글자 그대로)
-    body.append(f'<p style="margin:0 0 18px;padding:0 0 0 {dk.ALIGN_PX}px;line-height:1;display:flex;justify-content:flex-end;">{dk.pill_row("".join(pills))}</p>')   # 라벨 = 오른쪽 정렬 (2026-11-23 사용자)
+    # 제목 아래 라벨(분야 `기업 사건` · 방향 `긍정적`) 뺌 — 2026-11-26 사용자 "라벨도 삭제해". 제목 아래 = 18 로 요약 상자와 띄움
     summary = (post.get("summary") or "").strip() or _first_sentence(post.get("body"))
     body.append(f'<div style="background:{th["card"]};border-radius:10px;padding:{23 - dk.VP}px 19px;margin:0 0 26px;">'
                 f'<p data-seo-lead="1" data-lead="1" style="margin:0;{SR.BODY_WRAP}font-weight:700;color:#111;">{prose(SR.emph(summary, False), False)}</p></div>')
