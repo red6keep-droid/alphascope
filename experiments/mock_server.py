@@ -99,12 +99,12 @@ ARCHIVE_SEED = [
 # 발행 여부는 블로그 실제 페이지(www.newfact.app 글자 · 피드)와 origin/main 코드로 확인해 옮긴다 — 발행된 기능은 LIVE 로, 대표가 아닌 지난 시안은 표에서 빼 휴지통으로.
 # 11-26 대조: 업계상황 탭 · Newfact 뉴스(글 · 홈 카드 · 사실) · 종목 새 카드 넷 · 회사 소개 안내 줄 · 늦은 날 상자 · 푸터 링크 = 블로그에 있음 → 발행 예정에서 뺌.
 PLAN = [   # (기능 이름, 남은 일 — 한 줄, 파일 패턴 "폴더/파일")
+    ("소개 페이지 다시 정리 (이름의 뜻 · 독자 · 지금 메뉴 · 비교 대상 · 원칙 · 앞으로)", "문안 확인(사용자) → render_site_pages.py --publish (2026-11-26)", ["site-pages/mock_about.html"]),
     ("개성 있는 아이 찾기 게임 — 평범의 범위 · 설정으로 나온 답 · 그림 확인", "기준 설정(80% · 20일 간격)에서 나온 그룹 후보를 여덟 명씩 그림으로 확인 · 길잡이 = 비공개 doc/기획/종목-그래프-패턴-분류-목적.md", ["stock-character/mock_*.html"]),
     ("주식마을 3D (날씨 도시 · 마을 · 행성 시안)", "날씨 도시 판 모델링 · 연출 다듬기(물에 잠김 · 남은 날씨 7가지) → 방향 확정 뒤 휴대폰 발열 줄이기 5가지 · 날씨 기준 정하기 · Blogger 모듈 스크립트 시험 (흰 도시 · 3D 시험 1판은 11-24 사용자 삭제)", ["fantasy-world/mock_city_weather.html", "fantasy-world/mock_village_flat.html", "fantasy-world/mock_village_polish.html", "fantasy-world/mock_village_3d_v2.html"]),
     ("시장 지도 (업종 · 종목 네모 칸 지도, 손가락 확대 · 축소 · 전체 화면, 미국 · 한국 따로)", "목업 확인(사용자 판단) → 어디에 둘지 · 색 기준 정하기 → 한국 시가총액을 목록 파일에 채우기", ["market-map/mock_market_map_*"]),
     ("시장 전망 지도(가칭) — 미국 (투자회사 S&P 500 연말 목표 · 작년 전망과 지금)", "목업 확인 → 며칠 그림자 실행(구글 뉴스 제목만 · AI 0) → 기록 records/outlooks · 고정 페이지. 한국 = 수집기 요청 25절 답 대기", ["market-outlook/mock_outlook_us*"]),
     ("오늘 달라진 것 (홈 맨 위 카드 · 증시 리포트 첫 구획, 미국 · 한국 따로)", "목업 배치 확인(사용자 판단) → 며칠 계산만 돌려 줄 다듬기 → 테마 · 리포트에 붙이기", ["today-changes/mock_today_*"]),
-    ("전체 메뉴 · 헤더 · 푸터 고침 (프로필 메뉴 안 · 미국 증시 / 한국 증시 · 🔍 종목 · 메뉴 아이콘 · Hot Issue 접기 · 푸터 한 문단)", "index.html 에 넣음(11-26) → 사용자 테마 붙여넣기 → 블로그에서 메뉴 · 로그인 · 검색 · 푸터 확인되면 이 줄 빼기", ["home-split/mock_menu_*"]),
     ("종목 이슈 (종목 페이지 가격 카드 아래 Hot Issue)", "목업 확인 → 뉴스 양으로 자동 열고 닫는 코드 (블로그에 아직 없음)", ["issue_store/mock_stock_issue*"]),
     ("회원 `내 종목`", "목업 3화면 → Firebase 규칙 게시 · 댓글 저장 확인이 먼저 → 고정 페이지 · 10명 열기", ["my-stocks/*"]),
     ("댓글 다듬기 (신고 · 가려진 댓글 · 하루 30개 · 날짜를 넘어 이어지는 시황 댓글 · 별명)", "목업 확인 → 댓글 저장 확인 → 테마 JS · Firestore 규칙 · 댓글 봇 가림 (2026-11-21 기획 댓글-토론방-기획.md)", ["comments/mock_comments_*"]),
@@ -117,7 +117,7 @@ PLAN_NOMOCK = [   # 목업 파일이 이 PC 에 없는 발행 예정 기능 — 
 # 블로그에 있는 기능 — 대표 목업만 (2026-11-20 사용자: "확정된 시안 목업은 정리, 너무 많아 못 보겠다").
 # 종목 100여 개 · 지난 시안 · 게시용 본문은 표에 안 적어 자동으로 `쓰지 않는 목업` (주소로는 그대로 열림).
 LIVE = [
-    ("홈 (미국 · 한국)", ["home-split/mock_home_kr.html", "home-split/mock_home_us.html"]),
+    ("홈 (미국 · 한국)", ["home-split/mock_menu_home_kr.html", "home-split/mock_menu_home_us.html", "home-split/mock_menu_item_kr.html"]),   # 11-27 새 헤더 · 전체 메뉴 · 푸터 확정 — 홈 둘 + 상세 페이지 푸터(삼성전자). 옛 mock_home_* 은 이 화면들의 재료(여정 테스트도 씀)
     ("증시 시황 글", ["market-commentary/mock_story.html", "market-commentary/mock_story_us.html"]),
     ("종목 모아보기", ["stock-lists/mock_stock-lists-live-kr.html", "stock-lists/mock_stock-lists-live-us.html"]),
     ("미국 종목 페이지", ["stock-radar/mock_NVDA.html", "stock-radar/mock_AAPL.html"]),
