@@ -454,16 +454,19 @@ def card_industry_mood(s):
     d3, state = bsi_state(s)
     theme, col = {"좋아지는 중": ("positive", UP), "나빠지는 중": ("negative", DOWN)}.get(state, ("neutral", R.MUTED))
     v0 = f"{f0['v']:.0f}"
+    mix = U.biz_mix_note(s["sym"], 0)
+    tip = _dk.with_src("한국은행이 매달 기업에 경기가 좋은지 나쁜지 물어 만든 지수(BSI). 100보다 낮으면 나쁘다고 답한 회사가 더 많다는 뜻\n"
+                       "· 좋아지는 중 · 나빠지는 중 : 한 달씩 오르내림이 잦아 석 달 전과 견줘 3p 넘게 바뀔 때", "한국은행 ECOS 기업경기조사")
     lines = [(f"{b['industry_name']} 회사들이 느끼는 {f0['name']} 경기(BSI)는 {_mo_txt(f0['month'])} {_dk.josa(v0, '로')} 전달보다 {_sgn(f0['chg'], 0)}p, 석 달 전보다 {_sgn(d3, 0)}p, "
               f"2009년 이후 아래에서 {f0['pct_all']:.0f}% 지점입니다."   # 합니다체 (2026-11-26 사용자 "카드 문장 통일") · 최근 한 달 먼저 (2026-11-26 사용자 "Newfact = 달라진 것") — 판정은 석 달 전 기준 그대로(한 달은 1년에 5번 되돌림, doc/검증/업계카드-판정-기간.md)
-              + R.small_note("100보다 낮으면 나쁘다고 답한 회사가 더 많다는 뜻입니다. 좋아지는 중 · 나빠지는 중은 한 달씩 오르내림이 잦아 석 달 전과 견줘 정합니다." + U.biz_mix_note(s["sym"], 0)), "plain")]   # 늘 같은 안내는 작은 글씨 (P67)
+              + (R.small_note(mix.strip()) if mix else ""), "plain")]   # 늘 같은 안내(100 의 뜻 · 판정 기준)는 툴팁으로 — 카드에는 이 종목에만 붙는 안내만 (2026-11-27 사용자 "너무 길다 · 부담스럽다")
     lines += _yoy_chart(f"{f0['name']} 경기(BSI), 올해와 작년 같은 달", _yoy_groups(ser, "month", _mo, n=12), lambda v: f"{v:.0f}")   # `업황 BSI` → `업황 경기(BSI)` (P66) · 선 그래프 12개월 (P161)
     for r in b["rows"]:
         lines.append(R.chg_row(f"{r['name']} 경기(BSI)", f"{r['v']:.0f} · 기준 100", r["chg"], f"{_sgn(r['chg'], 0)}p",
                               f"{r['month'][:4]}년 {int(r['month'][5:])}월 실적", "전달",
                               f" · 2009년 이후 아래에서 {r['pct_all']:.0f}% 지점" + (f" · 다음 달 전망 {r['forecast']:.0f}" if r.get("forecast") is not None else "")))
     return R._state_card(f"{U.biz_name(s['sym'])} 업계 경기는?", state,   # `[업계] 업계 경기는?` — 한 회사 얘기로 읽히지 않게 (2026-10-31 사용자 P151, 옛 업종 경기는?)
-                          theme, col, lines, "", tip=_tip_of(sec_bsi(s)), fold=True)
+                          theme, col, lines, "", tip=tip, fold=True)
 
 
 # 답 낱말 — 사업 묶음 질문에 맞춘다 (2026-10-31 사용자: "메모리 반도체 값은? · 이자 마진은? 처럼 짧게, 방향은 답이")
@@ -544,15 +547,19 @@ def card_industry_work(s):
         c1 = r0.get("chg") if r0.get("cmp") == "yoy" else _window_change(r0, 1)[0]
         head = ((f"{_name_josa(r0['name'], '은')} {_mo_txt(r0['month'])} {_dk.josa(v0, '로')} 작년 같은 달보다 {_sgn(c1, 1)}{unit}입니다. " if c1 is not None else "")   # 최근 한 달 먼저 (2026-11-26 사용자)
                 + f"최근 3개월({r0['month'][:4]}년 {span_txt})로 묶으면 {'평균' if idx else '합'} {_ind_value(tot)}, 작년 같은 3개월보다 {_sgn(chg, 1)}{unit}입니다.")
-        note = (b.get("note3") or "월별 자료라 1~2달 늦게 나오고, 큰 계약이 들어온 달에 크게 튑니다. 그래서 3개월을 묶어 봅니다.") + " 늘고 · 줄고는 3개월로 정합니다."   # 큰 계약 사업이 아닌 묶음은 BIZ note3 (콘덴서, 2026-11-25)
+        why = f"\n· 3개월로 묶는 까닭 : {b.get('note3') or '큰 계약이 들어온 달에 크게 튀어서'}"   # 큰 계약 사업이 아닌 묶음은 BIZ note3 (콘덴서, 2026-11-25)
     else:
         head = (f"{_name_josa(r0['name'], '은')} {r0['month'][:4]}년 {int(r0['month'][5:])}월 "
                 + (f"{_dk.josa(v0, '로')} 작년 같은 달보다 {_sgn(chg, 1)}{unit}입니다." if chg is not None else f"{v0}입니다."))
-        note = "월별 자료라 1~2달 늦게 나오고, 주가는 이보다 먼저 움직이곤 합니다."
+        why = ""
+    up_w, dn_w = BIZ_WORDS[b["mode"]]
+    lim = "0.5%p" if r0["kind"] == "pct" else "5%"
+    base = "작년 같은 3개월" if months > 1 and chg is not None else "작년 같은 달"
+    srcs = sorted({IND_SRC.get(r["src_stat"], "한국은행 ECOS") for r in rows_data if r.get("src_stat")})
+    tip = _dk.with_src(f"이 업계의 실물 통계. 월별 자료라 1~2달 늦게 나와 주가가 먼저 움직이곤 한다\n· {up_w} · {dn_w} : {base}보다 {lim} 넘게 바뀔 때" + why,
+                       " · ".join(srcs) or "한국은행 ECOS")   # 늘 같은 안내(늦게 나옴 · 3개월 까닭 · 판정 기준)는 툴팁으로 (2026-11-27 사용자 "너무 길다 · 생략하면 안 돼?")
     part = getattr(U, "BIZ_PART_NOTE", {}).get(s["sym"].split(".")[0])   # 지표가 회사 사업 일부만 볼 때 (삼성전기 = 콘덴서만, 2026-11-25)
-    if part:
-        note += " " + part
-    lines = [(head + R.small_note(note), "plain")]   # 늘 같은 안내는 작은 글씨 (P67)
+    lines = [(head + (R.small_note(part) if part else ""), "plain")]   # 카드에는 이 종목에만 붙는 안내만
     div, u = _chart_unit(r0["kind"])
     scaled = [dict(x, v=x["v"] / div) for x in r0.get("series") or []]   # 단위를 먼저 나눠 그린다 — 막대 숫자만 나누면 세로 눈금이 5000000 처럼 원래 숫자로 나왔다 (2026-10-31)
     chart_name = r0["name"].replace(" (전차 · 무기 · 탄약)", "")   # 그래프 제목엔 품목 괄호를 빼고 (2026-10-31 사용자 P135) — 근거 줄 · 툴팁에는 그대로
@@ -567,7 +574,7 @@ def card_industry_work(s):
         lines.append(R.chg_row(r["name"], lv, c, f"{_sgn(c, 2 if u2 == '%p' else 1)}{u2}" if c is not None else "", when, cmp_txt,
                               (f" · {r['note']}" if r.get("note") else "") + _release_txt(r)))
     title = f"{U.biz_name(s['sym'])} 업계 {U.BIZ_Q[b['group']]}" if b.get("group") else b["q"]   # `가전 업계 수출은?` (P151)
-    return R._state_card(title, state, theme, col, lines, "", fold=True)   # 툴팁 없음 — 문장 · 줄이 값과 `1~2달 늦게` 를 말한다 (2026-11-08 사용자: 카드와 겹치는 툴팁 생략, 가이드라인 11절)
+    return R._state_card(title, state, theme, col, lines, "", tip=tip, fold=True)   # 툴팁 = 뜻 · 판정 기준만(카드 값과 겹치지 않게, 가이드라인 11절)
 
 
 def biz_money_state(s):
@@ -588,8 +595,10 @@ def card_industry_money(s):
     d = r0.get("chg")
     state = biz_money_state(s)
     theme, col = {"나아짐": ("positive", UP), "나빠짐": ("negative", DOWN)}.get(state, ("neutral", R.MUTED))
+    mix = U.biz_mix_note(s["sym"], 1)
+    tip = _dk.with_src("설문이 아니라 업종 전체 회사를 모은 실제 집계. 분기 끝 2~3달 뒤에 나온다\n· 나아짐 · 나빠짐 : 작년 같은 분기보다 0.5%p 넘게 바뀔 때", "한국은행 ECOS 기업경영분석")
     lines = [(f"{_dk.josa(r0['name'], '은')} {_qlabel(r0['q'])} {r0['v']:.1f}%" + (f"로 작년 같은 분기보다 {_sgn(d, 1)}%p입니다." if d is not None else "입니다.")
-              + R.small_note("설문이 아니라 업종 전체 회사를 모은 실제 집계이고, 분기 끝 2~3달 뒤에 나옵니다." + U.biz_mix_note(s["sym"], 1)), "plain")]   # 늘 같은 안내는 작은 글씨 (P67)
+              + (R.small_note(mix.strip()) if mix else ""), "plain")]   # 늘 같은 안내는 툴팁으로 (2026-11-27 사용자)
     # 업종 이름은 위 문장에서 한 번만 — 그래프 제목 · 근거 줄은 `매출액 영업이익률` 처럼 (2026-10-28 사용자 P68)
     lines += _yoy_chart(f"{_fin_short(s, r0['name'])}, 올해와 작년 같은 분기 (%)", _yoy_groups(r0.get("series") or [], "q", _dk.q_axis, n=8), lambda v: f"{v:.1f}", now="이번 분기", then="작년 같은 분기")
     for r in s.get("fin") or []:   # 산업별 대출(늦게 따라오는 지표)도 여기 — 질문 카드로 따로 두지 않는다
@@ -597,7 +606,7 @@ def card_industry_money(s):
         lines.append(R.chg_row(_fin_short(s, r["name"]), val, r.get("chg"), f"{_sgn(r['chg'], 1)}{r['chg_unit']}" if r.get("chg") is not None else "",
                               _qlabel(r["q"]), "작년 같은 분기", f" · {r['note']}"))
     return R._state_card(f"{U.biz_name(s['sym'])} 업계 수익성은?",   # `[업계] 업계 수익성은?` (P151, 옛 회사들의 돈 버는 힘은?)
-                          state, theme, col, lines, "", fold=True)   # 툴팁 없음 — 문장이 `실제 집계 · 2~3달 뒤` 를 말한다(옛 툴팁은 카드와 다른 첫 줄 값을 적었다) (2026-11-08 사용자: 카드와 겹치는 툴팁 생략, 가이드라인 11절)
+                          state, theme, col, lines, "", tip=tip, fold=True)   # 툴팁 = 뜻 · 판정 기준만
 
 
 def card_sector_flow(s):
@@ -616,7 +625,7 @@ def card_related(s):
     if not rows:
         return ""
     lines = [("업계 통계는 아니지만 이 회사의 원가나 손님 수와 이어지는 지표입니다."
-              + R.small_note("모두 작년 같은 달과 견줍니다. 주가를 설명한다고 확인한 지표는 아니고, 참고로만 봅니다."), "plain")]
+              + R.small_note("주가를 설명한다고 확인한 지표는 아닙니다."), "plain")]
     for r in rows:
         u = "%p" if r["kind"] == "pct" else "%"
         lines.append(R.chg_row(r["name"], ("지수 " if r["kind"] == "idx" else "") + _ind_value(r), r.get("chg"),

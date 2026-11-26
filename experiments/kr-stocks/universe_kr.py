@@ -449,25 +449,25 @@ BIZ = {
     "로봇": {"inds": ["robot_exp", "robot_px"], "q": "로봇 수출은?", "mode": "qty", "months": 3},   # 달마다 크게 출렁여 3개월 합. 부품 · 소프트웨어 회사에는 붙이지 않는다(수출 통계가 완제품만)
     "인쇄회로기판": {"inds": ["pcb_exp_amt", "pcb_exp_vol", "pcb_px"], "q": "기판 수출은?", "mode": "qty", "months": 1},
     "콘덴서": {"inds": ["cap_exp_amt", "cap_exp_vol", "cap_px"], "q": "콘덴서 수출은?", "mode": "qty", "months": 3,   # 매달 값은 1년에 판정 6번 바뀜(3개월 합 4번) — 3개월 합
-               "note3": "월별 자료라 1~2달 늦게 나오고, 달마다 오르내림이 커서 3개월을 묶어 봅니다."},
+               "note3": "달마다 오르내림이 커서"},
     "의료기기": {"inds": ["med_exp_amt", "med_exp_vol"], "q": "의료기기 수출은?", "mode": "qty", "months": 3,   # 매달 값은 1년에 판정 7번 바뀜(3개월 합 2번)
-               "note3": "월별 자료라 1~2달 늦게 나오고, 달마다 오르내림이 커서 3개월을 묶어 봅니다."},
+               "note3": "달마다 오르내림이 커서"},
     # 남은 묶음 일괄 (2026-11-25). months 3 = 매달 값의 판정이 1년에 여러 번 바뀌는 지표(3개월 합이 덜 바뀜)
     "라면": {"inds": ["ramen_exp_amt", "ramen_exp_vol", "ramen_px"], "q": "라면 수출은?", "mode": "qty", "months": 1},
     "가공식품": {"inds": ["food_cpi", "imp_grain", "imp_sugar"], "q": "가공식품 값은?", "mode": "price", "months": 1},   # 국내 판매 회사 — 판매 값(소비자물가)과 원료 값(수입물가)을 나란히
     # 유통 → 업태별 넷 (2026-11-25, 통계청 소매업태별 판매액지수). 판정이 덜 바뀌는 기간: 백화점 · 면세점 3달, 대형마트 · 편의점 1달
-    "백화점": {"inds": ["dept_sales", "card_spend"], "q": "백화점 판매는?", "mode": "qty", "months": 3, "note3": "월별 자료라 1~2달 늦게 나오고, 달마다 오르내림이 커서 3개월을 묶어 봅니다."},
+    "백화점": {"inds": ["dept_sales", "card_spend"], "q": "백화점 판매는?", "mode": "qty", "months": 3, "note3": "달마다 오르내림이 커서"},
     "대형마트": {"inds": ["mart_sales", "card_spend"], "q": "대형마트 판매는?", "mode": "qty", "months": 1},
-    "면세점": {"inds": ["dutyfree_sales"], "q": "면세점 판매는?", "mode": "qty", "months": 3, "note3": "월별 자료라 1~2달 늦게 나오고, 달마다 오르내림이 커서 3개월을 묶어 봅니다."},
+    "면세점": {"inds": ["dutyfree_sales"], "q": "면세점 판매는?", "mode": "qty", "months": 3, "note3": "달마다 오르내림이 커서"},
     "편의점": {"inds": ["cvs_sales", "card_spend"], "q": "편의점 판매는?", "mode": "qty", "months": 1},
     "게임": {"inds": ["game_prod"], "q": "게임 매출은?", "mode": "qty", "months": 1},   # 통계청 서비스업생산 게임 소프트웨어(J5821) — 3달은 1년에 판정 6번, 1달은 4번
-    "석유화학": {"inds": ["chem_exp_amt", "chem_exp_vol", "ethylene_px", "imp_naphtha"], "q": "석유화학 수출은?", "mode": "qty", "months": 3, "note3": "월별 자료라 1~2달 늦게 나오고, 달마다 오르내림이 커서 3개월을 묶어 봅니다."},
+    "석유화학": {"inds": ["chem_exp_amt", "chem_exp_vol", "ethylene_px", "imp_naphtha"], "q": "석유화학 수출은?", "mode": "qty", "months": 3, "note3": "달마다 오르내림이 커서"},
     "증권": {"inds": ["kospi_turnover", "kosdaq_turnover", "deposits_m", "credit_m"], "q": "증시 거래는?", "mode": "qty", "months": 1},
-    "통신장비": {"inds": ["telecom_exp_amt", "telecom_exp_vol", "relay_px"], "q": "통신장비 수출은?", "mode": "qty", "months": 3, "note3": "월별 자료라 1~2달 늦게 나오고, 달마다 오르내림이 커서 3개월을 묶어 봅니다."},
-    "항공": {"inds": ["air_pax_prod", "air_cargo_prod", "imp_oil"], "q": "항공 여객은?", "mode": "qty", "months": 3, "note3": "월별 자료라 1~2달 늦게 나오고, 달마다 오르내림이 커서 3개월을 묶어 봅니다."},
-    "정유": {"inds": ["oil_exp_amt", "oil_exp_vol", "diesel_px", "imp_oil"], "q": "석유제품 수출은?", "mode": "qty", "months": 3, "note3": "월별 자료라 1~2달 늦게 나오고, 달마다 오르내림이 커서 3개월을 묶어 봅니다."},
-    "해운": {"inds": ["sea_prod"], "q": "해상 운송은?", "mode": "qty", "months": 3, "note3": "월별 자료라 1~2달 늦게 나오고, 달마다 오르내림이 커서 3개월을 묶어 봅니다."},
-    "엔터": {"inds": ["album_exp"], "q": "음반 수출은?", "mode": "qty", "months": 3, "note3": "월별 자료라 1~2달 늦게 나오고, 큰 그룹이 앨범을 낸 달에 크게 튑니다. 그래서 3개월을 묶어 봅니다."},
+    "통신장비": {"inds": ["telecom_exp_amt", "telecom_exp_vol", "relay_px"], "q": "통신장비 수출은?", "mode": "qty", "months": 3, "note3": "달마다 오르내림이 커서"},
+    "항공": {"inds": ["air_pax_prod", "air_cargo_prod", "imp_oil"], "q": "항공 여객은?", "mode": "qty", "months": 3, "note3": "달마다 오르내림이 커서"},
+    "정유": {"inds": ["oil_exp_amt", "oil_exp_vol", "diesel_px", "imp_oil"], "q": "석유제품 수출은?", "mode": "qty", "months": 3, "note3": "달마다 오르내림이 커서"},
+    "해운": {"inds": ["sea_prod"], "q": "해상 운송은?", "mode": "qty", "months": 3, "note3": "달마다 오르내림이 커서"},
+    "엔터": {"inds": ["album_exp"], "q": "음반 수출은?", "mode": "qty", "months": 3, "note3": "큰 그룹이 앨범을 낸 달에 크게 튀어서"},
 }
 # 카드 제목용 짧은 업계 이름 · 질문 꼬리 (2026-10-31 사용자 P151: `업종` → `업계 상황`, 제목 = `[업계] 업계 [질문]` 짧게)
 BIZ_SHORT = {"원전 · 발전설비": "발전", "2차전지": "배터리", "비철금속": "제련", "인쇄회로기판": "기판"}
