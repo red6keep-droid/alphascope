@@ -291,7 +291,8 @@ def stock_row(x, row, slot, first, inline_sub=False, small=False):
         price = f"${p:,.2f}" if slot == "am" else f"{round(p):,}원"
     col = dk.UP if v > 0 else dk.DOWN if v < 0 else "#111"
     if inline_sub:   # 업종(보조 줄)을 이름 옆 같은 줄에 — 줄바꿈 없이 (2026-11-25 사용자, Newfact 뉴스 관련 정보 칸만)
-        left = (f'<span style="display:flex;align-items:center;min-width:0;flex:1 1 auto;"><span style="flex:none;display:flex;align-items:center;">{logo(t, row)}</span>'
+        # 이름 줄 = 오른쪽 증감 줄과 같은 가로선 (2026-11-26 사용자): 줄을 위로 붙이고 로고(35)를 이름 줄(24) 가운데에 — 위로 (35 - 24) / 2
+        left = (f'<span style="display:flex;align-items:center;min-width:0;flex:1 1 auto;margin-top:-5.5px;"><span style="flex:none;display:flex;align-items:center;">{logo(t, row)}</span>'
                 f'<span style="min-width:0;display:block;font-size:16px;line-height:24px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'
                 f'<span style="font-weight:700;color:#111;">{dk.esc(x["name"])}</span>'
                 + (f'<span style="margin-left:6px;font-size:{dk.TINY};color:#6B7280;">{dk.esc(sub)}</span>' if sub else "") + '</span></span>')
@@ -306,7 +307,7 @@ def stock_row(x, row, slot, first, inline_sub=False, small=False):
     href = (row or {}).get("u") or (dk.stock_href(t) if not re.fullmatch(r"\d{6}", t) else "")
     attr = f' data-row-link="1" data-href="{dk.esc(href)}"' if href else ""
     sep = "" if first else "border-top:1px solid #E2E8F0;"
-    return (f'<span{attr} style="display:flex;justify-content:space-between;gap:12px;padding:{LIST_ROW_PAD}px 12px;white-space:nowrap;line-height:24px;align-items:center;{sep}">'
+    return (f'<span{attr} style="display:flex;justify-content:space-between;gap:12px;padding:{LIST_ROW_PAD}px 12px;white-space:nowrap;line-height:24px;align-items:{"flex-start" if inline_sub else "center"};{sep}">'
             f'{left}{right}</span>')
 
 
