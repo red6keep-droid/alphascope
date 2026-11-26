@@ -624,8 +624,7 @@ def card_related(s):
     rows = s.get("related") or []
     if not rows:
         return ""
-    lines = [("업계 통계는 아니지만 이 회사의 원가나 손님 수와 이어지는 지표입니다."
-              + R.small_note("주가를 설명한다고 확인한 지표는 아닙니다."), "plain")]
+    lines = [("업계 통계는 아니지만 이 회사의 원가나 손님 수와 이어지는 지표입니다.", "plain")]   # 옛 괄호 `주가를 설명한다고 확인한 지표는 아닙니다` 뺌 — 다른 카드는 확인된 것처럼 읽혔다(업계 카드도 주가 검증 지표 아님) (2026-11-27 사용자)
     for r in rows:
         u = "%p" if r["kind"] == "pct" else "%"
         lines.append(R.chg_row(r["name"], ("지수 " if r["kind"] == "idx" else "") + _ind_value(r), r.get("chg"),
