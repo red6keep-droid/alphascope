@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>스타벅스 SBUX 주가 — 목업</title><link href='https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&family=Inter:wght@400;600;700;800&display=swap' rel='stylesheet'/><style>/*
+<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>스타벅스 SBUX 주가 — 목업</title><link href='https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&family=Inter:wght@400;500;600;700;800&display=swap' rel='stylesheet'/><style>/*
 <Variable name="keycolor" description="Main Color" type="color" default="#FF3333" value="#FF3333"/>
 <Group description="Page Text">
   <Variable name="body.text.color" description="Text color" type="color" default="#0F172A" value="#0F172A"/>
@@ -13,10 +13,17 @@
 */
 
 /* ==========================================================================
-   AlphaScope — main home
+   Newfact — main home
    Figma: alphaflow-main-home (1440 x 2674)
    ========================================================================== */
 
+/* 숫자 글꼴 = Inter 하나 (2026-11-21 사용자: "숫자는 Inter 것으로 통일" — Roboto 는 $ · % 가 어색해 되돌림). 'AS Num' 은 숫자 · 숫자 기호에만 걸리는 Inter(unicode-range) —
+   글꼴 목록 맨 앞에 두면 한글은 뒤 글꼴 그대로, 숫자만 Inter. 리포트 본문 인라인 글꼴(-apple-system …)도 아래 규칙으로 같은 목록을 받는다 */
+@font-face { font-family: 'AS Num'; font-style: normal; font-weight: 100 900; font-display: swap;
+  src: url(https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw.woff2) format('woff2');
+  unicode-range: U+0030-0039, U+0025, U+002B-002E, U+003A, U+0024, U+2212; }
+.post-body [style*="font-family:-apple-system"] { font-family: var(--report-font) !important; }
+.post-body svg text { font-family: var(--report-font); }
 :root {
   color-scheme: light;
 
@@ -49,9 +56,9 @@
   --badge-teal:  #0F766E;
 
   /* type */
-  --sans: 'Noto Sans KR', 'Noto Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --num:  'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --report-font: -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;   /* 리포트 본문 글꼴 (design_kit.WRAP_OPEN) — 홈 · 목록 구획 제목도 이것 (2026-10-13) */
+  --sans: 'AS Num', 'Noto Sans KR', 'Noto Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --num:  'AS Num', 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --report-font: 'AS Num', -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;   /* 리포트 본문 글꼴 (design_kit.WRAP_OPEN) — 홈 · 목록 구획 제목도 이것 (2026-10-13) */
 
   /* rhythm */
   --gutter:  40px;
@@ -110,6 +117,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 
 .logo { display: flex; align-items: center; gap: 8px; flex: none; }
 .logo-mark { width: 36px; height: 33px; flex: none; display: block; }   /* 로고 313:286 (2026-10-13 사용자 새 로고). 36 → 32.4 → 34 → 36 (5% 키움 35.7 → 정수, 2026-11-10 사용자) */
+.logo-full { width: 144px; height: 33px; flex: none; display: block; }   /* 로고 = 마크 + newfact 글자 한 그림 505:116 (2026-11-21 사용자 제작 · experiments/design-samples/newfact_logo.svg). 높이 = 옛 마크 33 그대로 */
 .logo-word {
   font-family: 'Noto Sans KR', sans-serif;
   font-weight: 900;
@@ -216,8 +224,8 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .nav-overlay { position: fixed; inset: 0; z-index: 49; background: transparent; }   /* 헤더(50) 아래 — 서랍은 헤더 안에 있어 55로 두면 가림막이 서랍을 덮어 메뉴가 눌리지 않았다 (2026-10-13 사용자: "메뉴를 클릭시 목록 화면으로 이동되지 않는다")   /* 가림막은 바깥 누르기용 — 어둡게 하지 않는다 (2026-10-13 사용자: "왜 딤 효과") */
 .nav-overlay[hidden] { display: none; }
 body.menu-open { overflow: hidden; }
-/* 미국 ⇄ 한국 스위치 (2026-11-10 사용자: "스위치로. 홈은 미국이니 미국일 때는 한국 국기") — 지금 화면이 아닌 쪽 국기 + 이름 하나 */
-.nav-switch { display: inline-flex; align-items: center; gap: 6px; flex: none; padding: 7px 12px 7px 8px; border: 1px solid var(--border-strong); border-radius: 999px; background: #fff; color: #111; font-size: 14px; font-weight: 700; line-height: 20px; white-space: nowrap; -webkit-tap-highlight-color: transparent; transition: border-color .15s ease, background-color .15s ease; }
+/* 미국 ⇄ 한국 스위치 (2026-11-10 사용자: "스위치로. 홈은 미국이니 미국일 때는 한국 국기") — 지금 화면이 아닌 쪽 국기 + 이름 하나. 2026-11-26 사용자: 이름 `미국 증시` · `한국 증시`, 알약 → 메뉴 버튼과 같은 둥근 사각(반지름 8) */
+.nav-switch { display: inline-flex; align-items: center; gap: 6px; flex: none; padding: 7px 10px 7px 8px; border: 1px solid var(--border-strong); border-radius: 8px; background: #fff; color: #111; font-size: 14px; font-weight: 700; line-height: 20px; white-space: nowrap; -webkit-tap-highlight-color: transparent; transition: border-color .15s ease, background-color .15s ease; }
 .nav-switch:hover { border-color: #94A3B8; background: #F8FAFC; }
 /* 높이 36 = 메뉴 아이콘 테두리 36 과 같게 (국기 23 + 위아래 5.5 + 테두리 1). 국기 26 → 23 으로 10% 줄임(2026-11-11 사용자) */
 .nav-switch svg { width: 18px; height: 18px; flex: none; display: block; border-radius: 50%; }   /* 국기 23 → 18 (20%) · 글자 15/22 → 14/20 · 위아래 안쪽 5.5 → 7 · 왼쪽 8 = 스위치 높이 36 그대로 (2026-11-11 사용자) */
@@ -342,7 +350,7 @@ body.menu-open { overflow: hidden; }
   color: inherit;
 }
 /* 카드 머리: 어느 연재인지와 그 글의 날짜. 날짜는 피드에서 채운다. */
-.report-card-date { margin-left: auto; margin-right: 8px; font-family: var(--num); font-size: 14px; font-weight: 400; line-height: 20px; color: #7A7A7A; white-space: nowrap; }   /* 발행 날짜 — 리포트 제목 줄 오른쪽 (2026-10-13 사용자) */
+.report-card-date { margin-left: auto; margin-right: 8px; font-family: var(--num); font-size: 13px; font-weight: 400; line-height: 19px; color: #7A7A7A; white-space: nowrap; }   /* 발행 날짜 — 리포트 제목 줄 오른쪽 (2026-10-13 사용자) · 14/20 → 13/19 = 증시 시황 기준 줄 글씨 (2026-11-19 사용자) */
 .report-block { display: flex; flex-direction: column; gap: 8px; }
 .report-chart { display: block; width: 100%; height: auto; border: 1px solid #eee; border-radius: 8px; }   /* 홈 미국 · 한국 증시 카드 그래프 (2026-10-21 사용자). 확대 없음 — 눌러도 카드처럼 상세 리포트로 (2026-11-10 사용자) */
 .report-chart[hidden] { display: none; }
@@ -355,19 +363,34 @@ body.menu-open { overflow: hidden; }
 .day-mark .k { font-weight: 400; }
 /* 홈 인물 발언 카드 — 트럼프 카드와 같은 줄 (2026-10-20 사용자). 엔비디아 카드는 삭제 (같은 날) */
 /* #radar-col 전폭 규칙은 뺐다 (2026-11-08 H34): 넷째 카드 `증시 전망` 이 들어와 미국 · 한국 / 인물 · 증시 전망 2 × 2 */
-/* 홈 증시 전망 카드 (2026-11-08 H34) — 줄 = 전망 질문(18 · 행간 34 · 보통 굵기, 인물 발언 줄과 같게) + 분류 라벨 · 게시일. 국면 · 문장은 전망 페이지에서. 자료 = gh-pages hypo.json (forecast_daily, 하루 1회) */
-#hypo-card { padding: 0 16px; gap: 0; }
-#hypo-card .kv-rows { padding: 12px 0 14px; }
-#hypo-card .kv-row.plain-row { display: block; padding: 4px 0; border-top: 0; font-size: 18px; line-height: 34px; font-weight: 400; color: #111; word-break: keep-all; overflow-wrap: anywhere; }
-#hypo-card .kv-row.plain-row + .kv-row.plain-row { border-top: 1px solid #E2E8F0; padding-top: 12px; margin-top: 8px; }
-#hypo-card .hypo-empty { padding: 14px 0 16px; font-size: 16px; line-height: 24px; color: #7A7A7A; }
-/* 홈 Hot Issue 카드 (2026-11-16 사용자) — 증시 전망 카드와 같은 줄: 이슈 이름(18 · 행간 34) + 바늘 말 라벨(좋은 쪽 종전 · 완화 빨강, 나쁜 쪽 확전 · 강화 파랑, 향방미정 회색 = 뉴스 긍정 · 부정 라벨 색) + `최근 일주일 뉴스` · 평소보다 많음. 자료 = gh-pages issues.json (issue_watch_daily, 07:30), 없으면 카드 숨김 */
+/* 홈 Hot Issue · 증시 전망 = 좌우로 넘어가는 배너 카드 (2026-11-18 사용자 확정, 목업 experiments/market-commentary/mock_home_issue_banner.py)
+   카드 틀 = 홈 카드 기본(.home-cards .report-col) · 안쪽 좌우 16 더(글자 왼쪽 = 카드 끝에서 26) · 위아래 14(카드 끝에서 30).
+   머리 줄 = 라벨 상자(Hot Issue 빨강 · 증시 전망 보라, 모서리 6) + 점(바로 옆) … 날짜(.report-card-date 공통 자리) · 라벨 ↔ 질문 16.
+   한 건 = 한 장 — 질문(20 · 행간 28, 두 줄까지, 강조만 굵게 · 전부 검정) + 오른쪽 그림 100 × 56. 4초마다 왼쪽으로 · 손가락으로 밀기 · 누르는 동안 멈춤.
+   그림: Hot Issue = 반원 계기판(바늘 = 그 주 뉴스 방향) · 증시 전망 = 연한 꺾은선 + 끝 안쪽 점(lean: 상승 빨강 · 하락 파랑 · 횡보 회색) */
 #issue-col { grid-column: 1 / -1; }
 #issue-col[hidden] { display: none; }
-#issue-card { padding: 0 16px; gap: 0; }
-#issue-card .kv-rows { padding: 12px 0 14px; }
-#issue-card .kv-row.plain-row { display: block; padding: 4px 0; border-top: 0; font-size: 18px; line-height: 34px; font-weight: 400; color: #111; word-break: keep-all; overflow-wrap: anywhere; }
-#issue-card .kv-row.plain-row + .kv-row.plain-row { border-top: 1px solid #E2E8F0; padding-top: 12px; margin-top: 8px; }
+.ib { position: relative; margin: 0 16px; padding: 14px 0; touch-action: pan-y; -webkit-user-select: none; user-select: none; }
+.ib-head { display: flex; align-items: center; gap: 8px; height: 20px; margin-bottom: 16px; }
+.home-cards .ib-head .report-card-date { margin-left: auto; margin-right: 0; }
+.ib-box { flex: none; padding: 0 8px; border-radius: 6px; color: #fff; font-size: 11px; line-height: 18px; font-weight: 700; }
+.ib-view { overflow: hidden; }
+.ib-track { display: flex; transition: transform .45s ease; will-change: transform; }
+.ib-slide { flex: 0 0 100%; min-width: 0; position: relative; display: block; height: 56px; padding-right: 112px; box-sizing: border-box;
+  color: #111; text-decoration: none; -webkit-tap-highlight-color: transparent; }
+.ib-slide:active { opacity: .7; }
+.ib-q { margin: 0; font-family: var(--report-font); font-size: 20px; line-height: 28px; font-weight: 400; color: #111; word-break: keep-all; overflow-wrap: anywhere;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.ib-q b { font-weight: 700; }
+.ib-note { padding-right: 0; font-size: 16px; line-height: 28px; color: #7A7A7A; }   /* 불러오는 중 · 실패 · 지켜보는 전망 없음 */
+.ib-art { position: absolute; right: 0; top: 0; width: 100px; height: 56px; }
+.ib-slide.negative .ib-art { color: #1D4ED8; } .ib-slide.positive .ib-art { color: #B91C1C; } .ib-slide.neutral .ib-art { color: #475569; }
+.ib-dots { display: flex; gap: 5px; color: #475569; }
+.ib-dots i { display: block; width: 6px; height: 6px; border-radius: 3px; background: currentColor; opacity: .3; transition: width .3s, opacity .3s; }
+.ib-dots i.on { width: 16px; opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .ib-track, .ib-dots i { transition: none; } }
+/* 미국 · 한국 증시 카드 여백 (2026-11-18 사용자) — 제목 ↔ 그래프 16 → 11 · 그래프 ↔ 요약 18 → 13 · 요약 아래 33 → 28 */
+#report-card, #kr-report-card { padding-top: 11px; padding-bottom: 11px; gap: 13px; }
 .news-tag.issue-tag.positive { border-color: #FCA5A5; background: #FEF2F2; color: #B91C1C; }
 .news-tag.issue-tag.negative { border-color: #93C5FD; background: #EFF6FF; color: #1D4ED8; }
 .news-tag.issue-tag.neutral { color: #64748B; }
@@ -399,7 +422,31 @@ body[data-home-mkt="us"] #kr-report-col, body[data-home-mkt="kr"] #us-report-col
 body[data-home-mkt="us"] [data-hook="notable-kr"], body[data-home-mkt="kr"] [data-hook="notable-us"] { display: none; }
 body[data-home-mkt] #notable-col { grid-column: auto; }
 body[data-home-mkt] .nt-grid { grid-template-columns: minmax(0, 1fr); }
-body[data-home-mkt="kr"] .news-section { display: none; }   /* 한국 뉴스 자료가 아직 없다 — 새 수집 없이 시작 */
+/* 한국 홈 주요 뉴스 = 한국 증시 방송 이슈(kr-news.json) — 옛 숨김(자료 없던 때)은 뺌 (2026-11-24 사용자) */
+/* 실적 한 줄 자리 — 일정이 없는 날 주요 뉴스 줄 (2026-11-19 사용자). 같은 한 줄 칸(높이 47) · 같은 바탕색 돌림 · 같은 점 */
+#event-banner .eb-news { gap: 8px; }
+#event-banner .eb-news .eb-tag { flex: none; font-size: 12px; line-height: 19px; padding: 0 6px; border-radius: 4px; background: rgba(255, 255, 255, .2); color: #fff; font-weight: 700; }
+#event-banner .eb-news .eb-headline { flex: 1 1 auto; min-width: 0; font-size: 15px; line-height: 24px; font-weight: 700; color: #fff;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: 0; }
+/* 홈 증시시황 C안 (2026-11-17 사용자 결정 · 11-19 적용) — 맨 위 시황 배너 = 그 편 시황 글 맨 위 배너 그림 그대로(gh-pages images/commentary-날짜-편.webp, 새로 그리지 않음).
+   좌우 꽉 · 모서리 직선 · 로고 줄에 붙임. 편 이름 상자 = 제목 글자 왼쪽 끝(그림 가로 8.1%) · 제목 윗선(25.4%, 두 줄 제목 실측)에서 5 위, 검정 네모 */
+.home-cards > .cm-wide { grid-column: 1 / -1; }
+.cm-wide { position: relative; margin: calc(-1 * var(--card-gap)) calc(50% - 50vw) 0; background: #06121A; }
+.cm-wide a { display: block; position: relative; border-radius: 0; -webkit-tap-highlight-color: transparent; }
+.cm-wide a:active { opacity: .85; }
+.cm-wide img { display: block; width: 100%; height: auto; aspect-ratio: 900 / 374; border-radius: 0; }   /* 배너 900×374 (11-19 사용자 시안 C, 옛 350) */
+.cm-pill { position: absolute; left: 8.0%; bottom: calc(74.9% + 5px); padding: 2px 8px; border-radius: 0; background: rgba(6,18,26,.72);
+  color: #fff; font-size: 11px; line-height: 16px; font-weight: 600; }
+/* 실적 발표 배너를 한 줄로(같은 일정 배너, 모양만): 로고 24 · 종목 이름 · 실적 발표 · D-n, 날짜 · 시각 줄은 숨김. 높이 47 */
+#event-banner.cm-strip .eb-slide { gap: 8px; padding: 11.5px 72px 11.5px 7px; }   /* 높이 54 → 47 (2026-11-20 사용자 "7 줄여") */
+#event-banner.cm-strip .stock-avatar { width: 24px; height: 24px; font-size: 10px; }
+#event-banner.cm-strip .eb-text { flex-direction: row; align-items: center; gap: 8px; }
+#event-banner.cm-strip .eb-kicker, #event-banner.cm-strip .eb-title-line { display: contents; }
+#event-banner.cm-strip .eb-name { order: 1; min-width: 0; font-size: 15px; line-height: 24px; font-weight: 700; letter-spacing: 0; flex: 0 1 auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#event-banner.cm-strip .eb-title { order: 2; font-size: 14px; line-height: 24px; font-weight: 500; color: rgba(255, 255, 255, .85); }
+#event-banner.cm-strip .eb-dday { order: 3; font-size: 12px; line-height: 19px; padding: 0 6px; align-self: center; }
+#event-banner.cm-strip .eb-when, #event-banner.cm-strip .eb-more { display: none; }
+#event-banner.cm-strip .eb-dots { top: 0; bottom: 0; right: 8px; left: auto; align-items: center; }
 #radar-card .kv-row.plain-row::before { content: ''; flex: none; width: 3px; height: 3px; margin-top: 15px; border-radius: 50%; background: currentColor; }   /* 점 글머리표 = 홈 리포트 카드 목록과 같은 점 (2026-10-24 사용자) */
 .kv-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 19px 0; border-top: 1px solid #E2E8F0; }
 .kv-row:first-child { border-top: 0; }
@@ -655,6 +702,11 @@ img[src$="/CEG.svg"], img[src$="/CRCL.svg"], img[src$="/CRWV.svg"], img[src$="/C
 .news-sum { display: block; margin-top: 4px; font-size: 16px; line-height: 26px; font-weight: 400; color: #333; word-break: keep-all; }   /* 기사 소개 (2026-10-19 사용자) — 제목 아래, 선정 이유 위 */
 .news-why { display: block; margin-top: 2px; font-size: 14px; line-height: 20px; color: #7A7A7A; word-break: keep-all; }   /* 선정 이유 (2026-10-14 사용자) — 제목은 18px(19 − 1) */
 .news-sub .num { margin-left: 6px; }
+.news-labels > .news-sub:first-child { margin-left: 0; }   /* 라벨 없는 줄(Newfact 글)은 메타가 맨 앞 — 왼쪽 띄움 없음 (2026-11-25) */
+/* 한국 홈 `오늘의 Newfact` (2026-11-25 사용자) — 제목 위 +8(15 → 23) · 제목 한 줄 … ("한 줄로 하고 점점점") · 보조 글 두 줄까지 … (세 줄 안 됨) */
+body[data-home-mkt="kr"] .news-section { margin-top: 23px; }
+body[data-home-mkt="kr"] #news-list .news-item a:not(.nf-post), body[data-home-mkt="kr"] #news-list .nf-post > span:last-child { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+body[data-home-mkt="kr"] #news-list .news-sum { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
 .news-item.load-status { color: var(--gray-400); }
 .news-item[hidden] { display: none; }
 /* 뉴스 더 보기 = 외곽선 있는 버튼(기본 .fold-btn), 버튼 위 구분선 없음 (2026-10-24 사용자). 옛: 윗선만 있는 줄 (2026-10-20) */
@@ -688,22 +740,12 @@ img[src$="/CEG.svg"], img[src$="/CRCL.svg"], img[src$="/CRWV.svg"], img[src$="/C
   line-height: 1.8;
   color: var(--gray-350);
 }
-.footer-disclaimer summary { list-style: none; cursor: pointer; }   /* 제목 + 첫 문장 — 눌러서 나머지 (2026-10-24 사용자 · 10-25 버튼을 제목 오른쪽으로) */
-.footer-lead { display: block; }
-.footer-disclaimer summary::-webkit-details-marker { display: none; }
-.footer-more { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; margin-left: 8px; flex: none; border: 1px solid #E2E8F0; border-radius: 6px; background: #fff; color: #111; box-sizing: border-box; }   /* 외곽선 있는 화살표 버튼 = 다른 더 보기 버튼(.fold-btn)과 같은 테두리 · 바탕 (2026-10-24 사용자) */
-.footer-more svg { width: 12px; height: 12px; }
-.footer-more svg { transition: transform .15s; }
-.footer-disclaimer[open] .footer-more svg { transform: rotate(180deg); }
-.footer-disclaimer > p { margin: 4px 0 0; }
-/* 상세 화면(글 · 고정 페이지) = 작은 푸터 (2026-11-12 사용자 "푸터는 홈에만?" → Claude 안: 면책은 투자 정보를 보는 화면에 있어야 한다) —
-   제목 `ALPHASCOPE 주식 리포트` 는 빼고, 면책 첫 문장(접지 않음) 한 줄 + 오른쪽 더 보기 버튼(AI 고지 · 외부 의견 안내는 접힌 채) + 저작권 줄. 홈 · 목록은 그대로 */
-body.item-view .footer-name { display: none; }
-body.item-view .footer-disclaimer summary { display: flex; align-items: flex-start; gap: 8px; }
-body.item-view .footer-title { order: 2; flex: none; margin: 0; }
-body.item-view .footer-more { margin-left: 0; }
-body.item-view .footer-lead { flex: 1 1 auto; min-width: 0; }
+.footer-lead { display: block; margin: 0; }   /* 2026-11-26 사용자: 펼침 버튼 · 접힌 글 없앰 → 한 문단 */
+/* 상세 화면(글 · 고정 페이지) = 작은 푸터 (2026-11-12 사용자) — 제목 `Newfact` · 저작권 줄 없이 문단 + 개인정보처리방침. 홈 · 목록 = 제목 + 문단 + 개인정보처리방침 + 저작권 */
+body.item-view .footer-title { display: none; }
 body.item-view .footer-copy { display: none; }   /* 상세 화면은 저작권 줄 삭제 (2026-11-15 사용자) */
+body.item-view .footer-disclaimer { margin-bottom: 0; }
+.footer-copy { display: none; }   /* 상세 화면은 저작권 줄 삭제 (2026-11-15 사용자) */
 body.item-view .footer-disclaimer { margin-bottom: 0; }   /* 저작권 줄 위 11 도 함께 — 줄 19 + 11 = 30 만큼 푸터가 짧아진다 */
 .footer-copy {
   margin: 0;
@@ -712,6 +754,15 @@ body.item-view .footer-disclaimer { margin-bottom: 0; }   /* 저작권 줄 위 1
   line-height: 19px;
   color: var(--gray-400);
 }
+/* 푸터 브랜드 글자 Newfact = 로고 글꼴 Noto Sans KR 900 (2026-11-21 사용자: 영어 Newfact · 노토 산스, 옛 AlphaScope 와 같게) */
+.brand-word { font-family: 'Noto Sans KR', sans-serif; font-weight: 900; }
+/* 푸터 링크 줄 — 개인정보처리방침 하나(2026-11-26 사용자: 소개 · 문의는 전체 메뉴로) (2026-11-21 사용자: 개인정보처리방침은 모든 화면에서 보여야 함 · 개인정보보호법 30조 공개 의무 · 애드센스).
+   13/19 회색, 개인정보처리방침만 굵게 · 검정(개인정보위 작성지침: 다른 고지와 구분). 누르는 칸 높이 31. 홈 · 목록 = 저작권 줄 위, 상세 = 면책 줄 아래 */
+.footer-links { margin: 0 0 6px; font-size: 13px; line-height: 19px; text-align: center; color: #CBD5E1; }
+.footer-links a { display: inline-block; padding: 6px 6px; color: #6B7280; text-decoration: none; -webkit-tap-highlight-color: transparent; }
+.footer-links a:active { opacity: .55; }
+.footer-links a.fl-privacy { color: #111; font-weight: 700; }
+body.item-view .footer-links { margin: 5px 0 -6px; }   /* 상세 = 면책 줄 아래 11(5 + 글자 칸 6), 아래 푸터 여백 19 그대로 */
 
 /* ==========================================================================
    홈 카드 (2026-10-15 사용자) — 회색 바탕 #F3F4F6 위 흰 카드,
@@ -797,6 +848,14 @@ body.item-view .footer-disclaimer { margin-bottom: 0; }   /* 저작권 줄 위 1
   border-bottom: 1px solid #E5E7EB;
 }
 #us-report-col > .report-title, #kr-report-col > .report-title { border-bottom: 0; padding-bottom: 0; }   /* 미국 · 한국 증시 카드 = 제목 아래 구분선 없이 바로 그래프, 구분선 자리(아래 13)만큼 그래프를 올림 (2026-11-11 사용자) */
+/* Newfact 기사 배지 (2026-11-25 사용자 "네모만" · "미들 정렬") — 한국 `오늘의 Newfact` 목록에서 상세 글이 있는 줄의 제목 앞. 흰 둥근 네모 22 · 회색 테두리 · 로고 마크(빨강 · 검정 사선) 14x13.
+   제목 첫 줄 가운데: 위 = (행간 − 22) ÷ 2 — PC 행간 31 → 4 · 폰 32 → 5 (정수 px) */
+.nf-badge { flex: none; display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box; width: 22px; height: 22px; border-radius: 6px; background: #fff; border: 1px solid #CBD5E1; margin: 4px 6px 0 0; }
+.nf-badge svg { display: block; width: 14px; height: 13px; }
+/* 배지 줄 = 배지 칸 + 글 칸 — 두 번째 줄도 배지 오른쪽에서 시작(글이 배지 아래로 들어오지 않게, 2026-11-25 사용자) */
+.news-item a.nf-post { display: flex; align-items: flex-start; }
+/* 한국 홈 `오늘의 Newfact` 제목 행간 5% 줄임 (2026-11-25 사용자) — PC 31 → 29 · 폰 32 → 30(폰 구획). 배지 위 = (행간 − 22) ÷ 2 → 폰 4 · PC 3.5 → 4 */
+body[data-home-mkt="kr"] #news-list .news-item a { line-height: 29px; }
 .home-cards .index-card,
 .home-cards .rank-card,
 .home-cards .sector-card { margin: 0 16px; }
@@ -812,13 +871,13 @@ body.item-view .footer-disclaimer { margin-bottom: 0; }   /* 저작권 줄 위 1
 .home-cards .seg-row:not(.mkt-tabs) { padding-left: 0; padding-right: 0; }   /* 테마 종목 묶음 알약도 같은 기준선 (2026-10-25) */
 /* 테마 종목 묶음 탭 = 하나로 이은 둥근 박스, 메뉴 사이는 세로 구분선만 (2026-10-25 사용자, 홈 수정 H10). 선택: 글자 굵은 검정 + 진한 외곽선 */
 /* 가로로 밀면 박스(테두리 · 둥근 모서리)째 움직이게 — 테두리를 스크롤 상자가 아니라 버튼들이 나눠 가진다 (2026-11-07 사용자 P333, 옛: 상자 테두리가 제자리에 남았다) */
-.home-cards #watch-tabs { gap: 0; padding: 0; margin: 12px 0 4px; border: 0; border-radius: 0; background: none; }
-.home-cards #watch-tabs .seg { flex: 1 0 auto; padding: 6px 14px; border: 1px solid #E2E8F0; border-radius: 0; background: #fff; color: var(--gray-600); font-weight: 400; text-align: center; }
-.home-cards #watch-tabs .seg + .seg { border-left: 0; }
-.home-cards #watch-tabs .seg:first-child { border-radius: 7px 0 0 7px; }   /* 모서리는 바깥 네 귀퉁이만 둥글고 안쪽은 직선 (2026-10-25 사용자) */
-.home-cards #watch-tabs .seg:last-child { border-radius: 0 7px 7px 0; }
-.home-cards #watch-tabs .seg:only-child { border-radius: 7px; }
-.home-cards #watch-tabs .seg[aria-selected="true"] { background: #fff; color: #111; font-weight: 700; box-shadow: inset 0 0 0 1px #111; }   /* 선택 외곽선 2 → 1px, 높이 −4 (패딩 8 → 6) */
+.home-cards #watch-tabs, .home-cards #sector-tabs { gap: 0; padding: 0; margin: 12px 0 4px; border: 0; border-radius: 0; background: none; }   /* 업종 종목 알약도 같은 줄 (2026-11-18 사용자: 테마 종목과 같은 느낌) */
+.home-cards #watch-tabs .seg, .home-cards #sector-tabs .seg { flex: 1 0 auto; padding: 6px 14px; border: 1px solid #E2E8F0; border-radius: 0; background: #fff; color: var(--gray-600); font-weight: 400; text-align: center; }
+.home-cards #watch-tabs .seg + .seg, .home-cards #sector-tabs .seg + .seg { border-left: 0; }
+.home-cards #watch-tabs .seg:first-child, .home-cards #sector-tabs .seg:first-child { border-radius: 7px 0 0 7px; }   /* 모서리는 바깥 네 귀퉁이만 둥글고 안쪽은 직선 (2026-10-25 사용자) */
+.home-cards #watch-tabs .seg:last-child, .home-cards #sector-tabs .seg:last-child { border-radius: 0 7px 7px 0; }
+.home-cards #watch-tabs .seg:only-child, .home-cards #sector-tabs .seg:only-child { border-radius: 7px; }
+.home-cards #watch-tabs .seg[aria-selected="true"], .home-cards #sector-tabs .seg[aria-selected="true"] { background: #fff; color: #111; font-weight: 700; box-shadow: inset 0 0 0 1px #111; }   /* 선택 외곽선 2 → 1px, 높이 −4 (패딩 8 → 6) */
 .home-cards .report-card-date,
 .home-cards .section-note { margin-right: 0; }
 /* 안쪽 카드는 테두리 · 모서리를 겉 카드에 맡긴다 */
@@ -846,6 +905,23 @@ body.item-view .footer-disclaimer { margin-bottom: 0; }   /* 저작권 줄 위 1
 .study-banner a { display: block; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 22.5px -5px rgba(0,0,0,.029), 0 8px 9px -6px rgba(0,0,0,.029); -webkit-tap-highlight-color: transparent; }
 .study-banner img { display: block; width: 100%; height: auto; aspect-ratio: 1110 / 344; border-radius: 0; }
 .study-banner a:active { opacity: .85; }
+/* 홈 종목 줄 = 종목 모아보기(하단 메뉴 `종목`)와 같은 틀 (2026-11-18 사용자): 로고 35 · 로고 ~ 이름 11 · 이름 16 굵게 · 보조 줄 14 회색(미국 티커 · 업종, 한국 업종만)
+   · 오른쪽 = 증감 17 굵게 위 + 가격 15 아래(같은 증감 색) · 줄 위아래 16. 시총 TOP 10 은 폰에서 머리줄 · 업종 · 거래량 · 거래대금 칸을 숨기고 그 값은 보조 줄로 */
+.home-cards .stock-cell { gap: 11px; }
+.home-cards .stock-avatar { width: 35px; height: 35px; font-size: 14px; }
+.home-cards .stock-name { font-size: 16px; line-height: 24px; color: #111; }
+.home-cards .stock-ticker { font-family: inherit; font-weight: 400; font-size: 14px; line-height: 20px; color: #6B7280; white-space: nowrap; }
+.home-cards .cell-price { display: inline-flex; flex-direction: column-reverse; align-items: flex-end; font-weight: 400; font-size: 15px; line-height: 20px; }
+.home-cards .cell-price small { display: block; margin: 0; font-size: 17px; line-height: 24px; font-weight: 700; }
+.home-cards .rank-table td { padding-top: 16px; padding-bottom: 16px; vertical-align: top; }
+.home-cards .rank-table td.col-name { vertical-align: middle; }
+.home-cards .rank-no { font-size: 15px; font-weight: 700; color: #6B7280; }
+.home-cards .rank-table td.col-rank { vertical-align: middle; }
+@media (max-width: 900px) {
+  .home-cards .rank-card .rank-table { min-width: 0; }
+  .home-cards .rank-card thead, .home-cards .rank-card td.col-sector, .home-cards .rank-card td.col-vol, .home-cards .rank-card td.col-turn { display: none; }
+  .home-cards .rank-card td.col-name + td { padding-right: 0; }   /* 숨긴 칸 대신 가격 칸이 오른쪽 끝 */
+}
 .picks-section .tabs { align-items: flex-end; }
 .picks-day { padding: 8px 16px 0; font-family: var(--num); font-size: 14px; line-height: 20px; color: var(--gray-400); text-align: right; }   /* 기준일 — 탭 아래 오른쪽 한 줄 (탭 줄에 두면 폰에서 잘린다) */
 .picks-day:empty { display: none; }
@@ -968,6 +1044,7 @@ a.theme-row:hover .theme-name { text-decoration: underline; }
   .nav-right { gap: 4px; }
   .logo { gap: 6px; }
   .logo-mark { width: 28px; height: 26px; }   /* 28 → 25.2 → 27 → 28 (5% 키움 28.35 → 정수, 2026-11-10) */
+  .logo-full { width: 113px; height: 26px; }   /* 폰 = 옛 마크 높이 26 그대로 (505:116 → 113) */
   .logo-word { font-size: 18px; line-height: 26px; letter-spacing: -0.3px; }   /* 19 → 15.2 → 17 → 18 (5% 키움 17.85 → 정수, 2026-11-10) */
   .menu-quick .nav-item { padding: 6px 5px; font-size: 15px; letter-spacing: -0.3px; }
 }
@@ -1023,20 +1100,23 @@ a, button, summary, .tab { -webkit-tap-highlight-color: transparent; }
 a.report-card.is-pressed, .post-card.is-pressed { background-color: #F1F5F9 !important; transform: scale(.985); }
 a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-pressed { opacity: .55; }
 .news-item:not(.load-status), [data-row-link] { transition: background-color .15s ease; }
-.news-item:not(.load-status) { margin-left: -12px; margin-right: -12px; padding-left: 12px; padding-right: 12px; border-radius: 8px; }
+.news-item:not(.load-status) { margin-left: -12px; margin-right: -12px; padding-left: 12px; padding-right: 12px; border-radius: 8px; position: relative; border-top-color: transparent; }
+.news-item:not(.load-status):not(:first-child)::before { content: ''; position: absolute; top: -1px; left: 12px; right: 12px; height: 1px; background: #E2E8F0; }   /* 구분선 = 둥근 모서리(누름 효과)와 떼어 끝까지 곧게 — 테두리 선이면 8px 모서리에 양 끝이 휨 (2026-11-24 사용자) */
 /* 페이지 이동 표시: 맨 위 진행 막대는 바로, 0.4초 넘게 걸리면 가운데 돌기 */
 #nav-progress { position: fixed; top: 0; left: 0; height: 3px; width: 0; background: #E53E3E; z-index: 10000; opacity: 0; pointer-events: none; transition: width 6s cubic-bezier(.08, .7, .2, 1), opacity .2s; }
 #nav-progress.on { opacity: 1; width: 88%; }
 #nav-veil { position: fixed; inset: 0; z-index: 9999; display: none; align-items: center; justify-content: center; background: rgba(255, 255, 255, .5); }
 #nav-veil.on { display: flex; }
-#nav-veil span { width: 34px; height: 34px; border: 3px solid #CBD5E1; border-top-color: #111; border-radius: 50%; animation: nav-spin .8s linear infinite; }
+#nav-veil span { position: relative; width: 56px; height: 56px; border-radius: 50%; background: #fff; box-shadow: 0 2px 10px rgba(0, 0, 0, .14), 0 0 0 1px rgba(0, 0, 0, .04); display: flex; align-items: center; justify-content: center; }   /* 흰 원 + 로고, 둘레를 로고 색 줄이 돈다 (2026-11-21 사용자 시안 5번) */
+#nav-veil span::after { content: ""; position: absolute; inset: -4px; border-radius: 50%; border: 3px solid transparent; border-top-color: #DD0000; border-right-color: #111; animation: nav-spin .9s linear infinite; }
+#nav-veil svg { width: 30px; height: 28px; display: block; }
 @keyframes nav-spin { to { transform: rotate(360deg); } }
 /* ===== 장중 가격 토글 · 장중 차트 (2026-11-05 사용자) — 구획 제목 줄 오른쪽: 기준 표시 · 토글 · 미국 | 한국 한 줄. 토글 · 표시는 한국 탭에서만 보인다 ===== */
 .head-right { display: flex; align-items: center; gap: 12px; margin-left: auto; flex: none; white-space: nowrap; }
 .home-cards .section-head .head-right .mkt-tabs { margin: 0; }
 .section-title { min-width: 0; }
 .live-note { font-size: 12px; color: var(--gray-500); }
-.day-note { font-family: var(--num); font-size: 14px; font-weight: 400; line-height: 20px; color: #7A7A7A; white-space: nowrap; }   /* 구획 제목 줄 오른쪽 `11월 11일 기준` — 홈 카드 날짜와 같은 모양 (2026-11-12 사용자: 종가 기준이니 날짜 표기, 한글로 통일) */
+.day-note { font-family: var(--num); font-size: 13px; font-weight: 400; line-height: 19px; color: #7A7A7A; white-space: nowrap; }   /* 구획 제목 줄 오른쪽 `11월 11일 기준` — 홈 카드 날짜와 같은 모양 (2026-11-12 사용자: 종가 기준이니 날짜 표기, 한글로 통일) */
 .live-note.on { color: #0E7490; font-weight: 600; }
 .live-note .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #0E7490; margin-right: 5px; vertical-align: 1px; animation: livepulse 1.6s ease-in-out infinite; }
 @keyframes livepulse { 0%, 100% { opacity: 1; } 50% { opacity: .25; } }
@@ -1152,8 +1232,8 @@ body.item-view .main-content { max-width: calc(var(--shell) + var(--gutter) * 2)
 .post-title {
   margin: 0 0 10px;
   font-weight: 700;
-  font-size: 35px;   /* 제목 +1 (2026-10-13 사용자: "타이틀 사이즈도 1포인트 크게") */
-  line-height: 49px;   /* 홀짝 — 줄 높이 − 글자 = 짝수 (2026-11-07 가이드라인 3절) */
+  font-size: 34px;   /* 제목 +1 (2026-10-13 사용자: "타이틀 사이즈도 1포인트 크게") → −1 (2026-11-19 사용자: 상단 종목명 한 포인트 작게, 모든 글 공통) */
+  line-height: 48px;   /* 홀짝 — 줄 높이 − 글자 = 짝수 (2026-11-07 가이드라인 3절) */
   letter-spacing: -.6px;
   color: var(--ink);
 }
@@ -1283,16 +1363,26 @@ body.item-view .navbar { position: static; }
 /* 종목 페이지 공유 버튼 = 제목 아래 회색 기준 상자 오른쪽 (2026-11-11 사용자) — 31 상자 · 아이콘 19(28 · 16 → 10% 30 · 18 → 2% 더, 같은 날 사용자), 위아래 −6 · 오른쪽 −6 이라 상자(위아래 10 + 글 19 = 39) 높이는 그대로, 상자 세로 가운데 */
 body.item-view .post-body [data-report-stamp].has-share .title-share { width: 31px; height: 31px; margin: -6px -6px -6px auto; align-self: center; }
 body.item-view .post-body [data-report-stamp].has-share .title-share svg { width: 19px; height: 19px; }
+body.item-view .post-title-meta .post-title-basis { font-size: 13px; line-height: 19px; font-weight: 400; letter-spacing: 0; color: #6B7280; white-space: nowrap; }   /* 시황 해설 기준 날짜 = 제목 줄 오른쪽 · 공유 버튼 앞, 13/19 = 기준 상자 글씨 (2026-11-19 사용자) */
 body.detail-nav .navbar { display: none; }
 body.detail-nav .pr-sticky .nav-toggle { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; flex: none; padding: 0; background: #fff; border: 1px solid var(--border-strong); border-radius: 8px; color: var(--gray-600); }   /* 글 보기: 로고 줄은 스크롤되어 사라지고 제목 줄(.pr-sticky)만 맨 위에 고정 (2026-10-23 사용자, 모든 상세 페이지) */
 .pr-sticky { position: sticky; top: 0; z-index: 40; display: flex; align-items: center; gap: 12px; margin: 0 0 14px; padding: 4px 0 12px; background: var(--surface, #fff); border-bottom: 1px solid #E2E8F0; }
 .pr-sticky .post-title { margin: 0; min-width: 0; }
+.nf-title { display: inline-flex; align-items: center; gap: 8px; }
+.post-title:has(.nf-title) .post-title-text, .post-title:has(.nf-title) .post-title-label { display: flex; align-items: center; line-height: 22px; }   /* 로고 · 주요 기사 · 오른쪽 11.23 기사를 한 가로선에 — 제목 줄 행간(48)이 로고 칸을 아래로 밀던 것 (2026-11-23 사용자) */
+@media (min-width: 681px) { .post-title:has(.nf-title) .post-title-text, .post-title:has(.nf-title) .post-title-label { line-height: 28px; } }
+.nf-title-logo { width: 122px; height: 28px; flex: none; display: block; }   /* Newfact 주요 기사 제목 줄 로고 = 머리 줄 로고 144 × 33 의 85% (2026-11-23 사용자 "15% 작게", 505:116 정수) */
+.nf-title-sub { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; line-height: 19px; font-weight: 400; letter-spacing: 0; color: #6B7280; white-space: nowrap; }
+.nf-title-sub::before { content: ''; width: 1px; height: 13px; background: #CBD5E1; }   /* 로고 | 주요 기사 — 사이 막대 (2026-11-23 사용자) */
+@media (max-width: 680px) { .nf-title-logo { width: 96px; height: 22px; } }   /* 폰 113 × 26 의 85% */
 .pr-sticky .post-title .pr-role { margin-left: 10px; font-size: 16px; line-height: 24px; font-weight: 400; letter-spacing: 0; color: #7A7A7A; white-space: nowrap; }
 .pr-back { display: inline-flex; flex: none; align-items: center; justify-content: center; width: 36px; height: 36px; padding: 0; background: #fff; border: 1px solid #E2E8F0; border-radius: 8px; color: #111 !important; cursor: pointer; text-decoration: none; }   /* 네모 박스 안 화살표 — 공식 접기 버튼과 같은 상자 */
 .pr-back svg { width: 20px; height: 20px; }
 .pr-sticky .post-title { display: flex; align-items: center; }
 .pr-sticky .post-title { flex: 1 1 auto; }   /* 날짜가 든 제목(미디어 데일리, 2026-10-23)도 날짜는 오른쪽 끝 — 가이드라인 3-1 */
 .pr-sticky .post-title .post-title-date, .pr-sticky .post-title .post-title-meta { margin-left: auto; }
+.pr-sticky .post-title .post-title-asof { flex: none; font-family: var(--num); font-size: 14px; line-height: 20px; font-weight: 400; letter-spacing: 0; color: #7A7A7A; white-space: nowrap; }   /* 머리 줄 `11.22 아침` = 본문 data-head-date(Hot Issue · 증시 전망) — 공유 버튼 앞, 홈 카드 날짜와 같은 말 (2026-11-22 사용자) */
+.pr-sticky .post-title > .post-title-asof { margin-left: auto; }
 .pr-sticky .post-title .pr-photo { flex: none; width: 36px; height: 36px; margin-right: 10px; border-radius: 50%; object-fit: cover; background: #F1F5F9; border: 1px solid #E2E8F0; }   /* 상세 제목 앞 공직자 얼굴 */
 @media (max-width: 680px) { .pr-sticky { background: var(--bg); padding-top: 2px; } .pr-sticky .post-title .pr-role { font-size: 14px; line-height: 20px; margin-left: 8px; } }
 .img-pop[hidden] { display: none; }
@@ -1409,6 +1499,13 @@ body.detail-nav .pr-sticky .nav-toggle { display: flex; align-items: center; jus
 .post-nav-top { grid-column: 3; justify-self: end; display: inline-flex; align-items: center; gap: 4px; padding: 8px 0; background: none; border: 0;
   font: inherit; font-size: 14px; line-height: 24px; font-weight: 700; color: #111; cursor: pointer; -webkit-tap-highlight-color: transparent; }   /* `TOP` 글자 16 → 14 (P517, 2026-11-11 사용자) — 화살표 원 22 그대로 */
 .post-nav-top:hover { color: var(--accent); }
+.as-star { display: inline-flex; flex: none; align-items: center; justify-content: center; width: 22px; height: 22px; margin: 0 0 0 5px; position: relative; top: 1px; vertical-align: middle; padding: 0; border: 0; background: none; cursor: pointer; color: #9CA3AF; -webkit-tap-highlight-color: transparent; }   /* 종목 제목 옆 관심 종목 ☆ 22 · 이름과 5 · 아래선 = 글자 아래선(+1, 2026-11-19 사용자) — 담기면 채운 노랑 */
+.as-star svg { width: 22px; height: 22px; display: block; }
+.as-star[aria-pressed="true"] { color: #F5B400; }
+.as-toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: 24px; z-index: 60; display: flex; gap: 14px; align-items: center; padding: 12px 16px; background: #111; color: #fff; border-radius: 10px; font-size: 15px; line-height: 22px; box-shadow: 0 6px 20px rgba(0,0,0,.2); white-space: nowrap; }
+.as-toast a { color: #FCD34D; font-weight: 700; text-decoration: none; }
+@media (max-width: 900px) { .as-toast { bottom: calc(85px + env(safe-area-inset-bottom)); } }   /* 하단 메뉴 위 */
+.post-nav-top.is-short { visibility: hidden; }   /* 페이지가 화면 2배보다 짧으면 숨김 — 자리는 남긴다 (테마 JS, 2026-11-19 사용자) */
 .post-nav-top { gap: 6px; }   /* 화살표는 원형 외곽선 22px 안 (2026-10-14 사용자: "top 버튼 우측의 화살표 아이콘에 원형 외각선") */
 .post-nav .post-nav-top { margin-right: 10px; }   /* 오른쪽 끝에서 10px 안쪽 (2026-10-13 사용자) */
 .post-nav-cm { grid-column: 1; grid-row: 1; justify-self: start; display: inline-flex; align-items: center; gap: 6px; margin-left: 10px; padding: 8px 0; background: none; border: 0;
@@ -1559,7 +1656,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
   .post-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .post-outer-container { padding: 24px; }
   body.item-view .post-outer-container { padding-top: 13px; }   /* 카드 위 → 제목 글자 보이는 20 (2026-10-12 사용자) */
-  .post-title { font-size: 27px; line-height: 37px; }
+  .post-title { font-size: 26px; line-height: 36px; }   /* −1 (2026-11-19 사용자) */
 }
 @media (max-width: 680px) {
   .post-grid { grid-template-columns: minmax(0, 1fr); }
@@ -1568,7 +1665,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
   .post-outer-container { padding: 16px 0 24px; border: 0; border-radius: 0; background: transparent; }
   body.item-view .post-outer-container { padding-top: 0; }
   body.item-view .main-content, body.item-view.no-dashboard .main-content { padding-top: 26px; }   /* 헤더 → 제목 글자 보이는 30 (2026-10-13 사용자: +10) → −5 (2026-10-25 사용자: 상세 제목 줄 위 여백) */
-  .post-title { font-size: 23px; line-height: 33px; letter-spacing: -.3px; }   /* 22 → 23 (+1, 2026-10-13) */   /* 폰 제목 2px 작게 24 → 22 (2026-10-13 사용자) */
+  .post-title { font-size: 22px; line-height: 32px; letter-spacing: -.3px; }   /* 22 → 23 (+1, 2026-10-13) → 22 (−1, 2026-11-19 사용자: 상단 종목명 한 포인트 작게) */   /* 폰 제목 2px 작게 24 → 22 (2026-10-13 사용자) */
   .post-body h2 { font-size: 20px !important; line-height: 26px !important; }   /* 폰 구획 제목 20 (공식 22 − 2, 2026-10-13) */   /* 리포트 구획 제목 21 → 19 — 렌더러 인라인 크기를 덮는다 (2026-10-13 사용자) */
   .post-body { font-size: 19px; line-height: 35px; }   /* 본문 19 (2026-10-13 사용자: 블로그 전체 본문 19포인트) */
   .post-body [data-sent] { display: inline; }   /* 모바일: 문장 줄바꿈 없이 이어 흐른다 — 문단(빈 줄)만 남는다 (2026-10-16 사용자) */
@@ -1586,8 +1683,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
   body.has-bar .menu-items .nav-item { font-size: 16px; line-height: 25px; }
   .section-title { font-size: 18.5px; line-height: 23.5px; }
   .report-title { font-size: 18.5px; line-height: 23.5px; }
-  #hypo-card .kv-row.plain-row { font-size: 16px; line-height: 32px; }
-  #issue-card .kv-row.plain-row { font-size: 16px; line-height: 32px; }
+  .ib-q { font-size: 17px; line-height: 24px; }
   #radar-card .kv-row.plain-row { font-size: 16px; line-height: 32px; }
   .kv-value { font-size: 16px; line-height: 21px; }
   .kv-stat-value { font-size: 16px; line-height: 23.5px; }
@@ -1596,11 +1692,13 @@ body.no-dashboard .main-content { padding-top: 32px; }
   .tab { font-size: 16px; line-height: 21.5px; }
   .news-item { font-size: 16px; line-height: 32px; }
   .news-item a { font-size: 16px; line-height: 32px; }
+  body[data-home-mkt="kr"] #news-list .news-item a { line-height: 30px; }   /* 한국 홈 제목 행간 5% 줄임 32 → 30 (2026-11-25) · 배지 위 (30 − 22) ÷ 2 = 4 */
   .eb-name { font-size: 18.5px; line-height: 25px; }
   .eb-title { font-size: 16px; line-height: 23px; }
+  .home-cards .cell-price small { font-size: 16px; line-height: 22.5px; }
   .theme-name { font-size: 16px; line-height: 23px; }
   .post-card-title { font-size: 17px; }
-  .post-title { font-size: 28px; line-height: 36px; }
+  .post-title { font-size: 27px; line-height: 35px; }   /* −1 (2026-11-19 사용자) */
   .post-body { font-size: 16px; line-height: 32px; }
   .rt-pop-title { font-size: 16px; line-height: 21px; }
   .post-body .rt-tab { font-size: 16px; line-height: 21.5px; }
@@ -1632,7 +1730,7 @@ body.no-dashboard .main-content { padding-top: 32px; }
   .post-body li[style*="line-height:34px"] > span[style*="height:2px"][style*="margin-top:16px"] { margin-top: 15px !important; }
   .post-body li[style*="line-height:34px"] > span[style*="height:3px"][style*="margin-top:15px"] { margin-top: 14px !important; }
   .report-columns li::before, .kv-row--block li::before { margin-top: 14px; }
-  :root { --sans: 'AS Barun', 'NanumBarunGothic', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; --report-font: 'AS Barun', 'NanumBarunGothic', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; }
+  :root { --sans: 'AS Num', 'AS Barun', 'NanumBarunGothic', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; --report-font: 'AS Num', 'AS Barun', 'NanumBarunGothic', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; }
   .logo-word { font-family: 'Noto Sans KR', sans-serif; }
   .post-body [style*="font-family"]:not([style*="monospace"]):not([data-brand-font]) { font-family: var(--report-font) !important; }
   .post-body [data-brand-font] { font-family: 'Noto Sans KR', sans-serif !important; }
@@ -1648,10 +1746,12 @@ body.no-dashboard .main-content { padding-top: 32px; }
 }
 
 /* AlphaScope 검색 즉답 · 질문하기 (2026-11-10 목업) — 테마 변수(--ink · --up · --down · --border …)를 그대로 쓴다 */
-.as-search-btn { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border: 0; border-radius: 50%;
-  background: transparent; color: var(--ink, #0F172A); cursor: pointer; }
-.as-search-btn:hover { background: var(--surface-sub, #F8FAFC); }
-.as-search-btn svg, .as-search-form svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+.as-search-btn { display: inline-flex; align-items: center; gap: 4px; height: 36px; flex: none; padding: 0 10px 0 8px; border: 1px solid var(--border-strong); border-radius: 8px;
+  background: #fff; color: #111; font: inherit; font-size: 14px; line-height: 20px; font-weight: 700; white-space: nowrap; cursor: pointer; -webkit-tap-highlight-color: transparent; }   /* 검색 = 테두리 상자 + `종목`, 스위치와 같은 높이 36 (2026-11-26 사용자: 아이콘만이면 약하다 · 사람들이 종목을 많이 찾는다) */
+.as-search-btn:hover { border-color: #94A3B8; background: #F8FAFC; }
+.as-search-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+.as-search-form svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+.menu-quick { gap: 6px !important; }
 html.as-lock, html.as-lock body { overflow: hidden; }
 
 .as-search-layer { position: fixed; inset: 0; z-index: 200; background: transparent; overflow-y: auto; }   /* 가림막은 ::before (팝업과 같이, 2026-11-14 사용자) */
@@ -1685,9 +1785,11 @@ html.as-lock, html.as-lock body { overflow: hidden; }
 .as-card header { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
 .as-card h3 { margin: 0; font-size: 19px; font-weight: 700; }
 .as-tk { color: #6B7280; font-family: var(--num); font-weight: 500; font-size: .85em; }
-.as-mkt { font-size: 12px; font-weight: 700; color: #fff; border-radius: 4px; padding: 2px 6px; }
-.as-mkt.as-us { background: var(--badge-blue, #4963CA); }
-.as-mkt.as-kr { background: var(--badge-teal, #0F766E); }
+/* 카드 머리 로고 28 = 이름 19px 보다 조금 크게 (2026-11-19 사용자, 옛 시장 라벨 .as-mkt 한국 · 미국) — 흰 바탕 + 회색 외곽선 = dk.ticker_logo 와 같게 */
+.as-logo { flex: none; width: 28px; height: 28px; border-radius: 50%; background: #fff; object-fit: cover; outline: 1px solid #E2E8F0; outline-offset: -1px; }
+.as-logo-b { display: inline-block; line-height: 28px; text-align: center; color: #fff; font-size: 12px; font-weight: 700; outline: 0; overflow: hidden; white-space: nowrap; }
+.as-sg-lg { flex: none; width: 20px; height: 20px; margin-right: -2px; border-radius: 50%; background: #fff; object-fit: cover; outline: 1px solid #E2E8F0; outline-offset: -1px; }   /* 미리보기 줄 앞 로고 20 · 이름과 8(줄 사이 10 − 2) (2026-11-19 사용자) */
+.as-sg-lg.as-logo-b { line-height: 20px; font-size: 10px; }
 .as-day { margin-left: auto; color: #6B7280; font-size: 13px; }
 .as-say { margin: 4px 0 8px; font-size: 16px; line-height: 27px; }
 .as-say b, .as-v, .as-grid b, .as-bars b { font-family: var(--num); }
@@ -1712,6 +1814,13 @@ html.as-lock, html.as-lock body { overflow: hidden; }
 .as-k { color: #475569; flex: none; }
 .as-v { text-align: right; word-break: keep-all; }
 .as-v small, .as-news small { color: #94A3B8; }
+/* 검색어가 가리킨 구획(.as-hit) = 보라 #6D28D9 (2026-11-19 사용자, 가이드라인 5절 보라 · 검색 카드 전용 예외): 문장의 기본 글자 · 줄 구분명 = 보라 보통, 줄 값 = 보라 굵게,
+   문장 속 굵은 값 = 검정 · 증감(▲▼ %) = 증감 색 · 티커 · 괄호 작은 글씨 = 회색 그대로. 구획 제목 · 안내 줄 · 그래프는 칠하지 않는다 */
+.as-hit .as-say, .as-hit .as-k, .as-hit .as-v { color: #6D28D9; }
+.as-hit .as-v { font-weight: 700; }
+.as-hit .as-say b { color: #111; }
+.as-hit .as-v small { font-weight: 400; }
+.as-hit .as-say [class=""] { color: #111; }   /* 보합 0% = 검정 (증감 색 없음) */
 .as-note { color: #6B7280; font-size: 13px; line-height: 21px; margin: 6px 0; }
 .as-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
 .as-grid div { background: var(--surface-sub, #F8FAFC); border-radius: 8px; padding: 8px 4px; text-align: center; }
@@ -1744,8 +1853,9 @@ html.as-lock, html.as-lock body { overflow: hidden; }
 .as-related h4 { font-size: 16px; line-height: 26px; color: #111; margin: 0 0 8px; }
 .as-related .as-h-next { margin-top: 18px; }
 /* 종목 페이지 = 흰 버튼(가이드라인 10절 `.cm-login`: 흰 바탕 · 1px #B5BAC0 · 모서리 8 · #111 16/24 굵게 · 안쪽 11 12 · 가운데 · 폭 전체, 올리면 테두리 #111) */
-.as-go { display: flex; align-items: center; justify-content: center; margin-top: 14px; padding: 11px 12px; border: 1px solid #B5BAC0; border-radius: 8px;
+.as-go { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 14px; padding: 7px 12px; border: 1px solid #B5BAC0; border-radius: 8px;
   background: #fff; color: #111 !important; font-size: 16px; line-height: 24px; font-weight: 700; text-decoration: none; }
+.as-go svg { flex: none; display: block; width: 14px; height: 14px; position: relative; top: 1px; }   /* 글자 + 이동 아이콘 가운데 정렬 · 사이 8, 높이 46 → 38(안쪽 11 → 7, 2026-11-19 사용자 "8픽셀 줄여"). 아이콘 16 → 14 · 1 내림 = 글자 잉크 가운데(같은 날 사용자) */
 .as-go:hover { border-color: #111; }
 /* 안내 한 줄 = 느낌표 13 + 13/19 회색, 왼쪽 정렬, 아이콘 = 첫 줄 가운데 (증시 전망 근거 안내 why_note 와 같은 꼴) */
 .as-go-note { display: flex; align-items: flex-start; gap: 4px; margin: 8px 0 0; color: #6B7280; font-size: 13px; line-height: 19px; word-break: keep-all; }
@@ -1824,26 +1934,43 @@ html.as-lock, html.as-lock body { overflow: hidden; }
 /* ==========================================================================
    하단 고정 메뉴 · 전체 메뉴 · 글 끝 순서 (2026-11-12 사용자 여정 테스트 → 확정. 목업 = experiments/mock_server.py /j · /icons, 가이드라인 2절)
    ========================================================================== */
-/* 전체 메뉴(서랍) — 미국 · 한국 홈 두 버튼, 메뉴 줄 = 이름(오늘) + 오른쪽 작은 `지난 …`, 테마 묶음만 타이틀 */
-.menu-items .menu-mk { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 14px 20px; border-bottom: 1px solid var(--border); }
-.menu-items .menu-mk .nav-item { flex-direction: row; align-items: center; justify-content: center; height: 40px; padding: 0 !important; border: 1px solid #E2E8F0 !important; border-radius: 8px; font-size: 15px !important; line-height: 20px !important; font-weight: 400; color: #111; }
+/* 전체 메뉴(서랍) — 2026-11-26 사용자 다시 짬: 가로 320 → 360(폰 화면의 90%까지) · 맨 위 프로필 · 미국 증시 · 한국 증시 버튼(위 간격 36 → 18 · 높이 40 → 35) · 줄 앞 아이콘 20 회색 · Hot Issue 접기 · 맨 아래 소개 줄 */
+.menu-items, body.has-bar .menu-items { width: min(360px, 90vw); padding-top: 61px; }
+.menu-items > * { flex-shrink: 0; }
+.menu-items .menu-mk { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 7px 20px 14px; border-bottom: 1px solid var(--border); }
+.menu-items .menu-mk .nav-item { flex-direction: row; align-items: center; justify-content: center; gap: 6px; height: 35px; padding: 0 !important; border: 1px solid #E2E8F0 !important; border-radius: 8px; font-size: 15px !important; line-height: 20px !important; font-weight: 400; color: #111; }
 .menu-items .menu-mk .nav-item[aria-current="page"] { border-color: #111 !important; font-weight: 700; color: #111; }
-.menu-items .menu-mk .nav-item::after, .menu-items .menu-mk .nav-item[aria-current="page"]::after { content: '\00a0홈'; display: inline !important; position: static !important; width: auto !important; height: auto !important; background: none !important; border: 0 !important; transform: none !important; }
+.menu-items .menu-mk .nav-item::after, .menu-items .menu-mk .nav-item[aria-current="page"]::after { content: none !important; display: none !important; }
+.menu-items .menu-mk .mf { width: 18px; height: 18px; flex: none; display: block; }
 .menu-items .menu-row { display: flex; align-items: stretch; border-bottom: 1px solid var(--border); }
-.menu-items .menu-row .nav-item { flex: 1 1 auto; min-width: 0; border-bottom: 0 !important; padding: 14px 12px 14px 20px !important; font-size: 16px !important; line-height: 24px !important; font-weight: 600; color: #111; white-space: normal; }
+.menu-items .menu-row .nav-item { display: flex; flex-direction: row; align-items: center; justify-content: flex-start; gap: 12px; flex: 1 1 auto; min-width: 0; border-bottom: 0 !important; padding: 14px 12px 14px 20px !important; font-size: 16px !important; line-height: 24px !important; font-weight: 600; color: #111; text-align: left; white-space: normal; }
+.menu-items .menu-row .nav-item > span { white-space: nowrap; }
+.menu-items .mi { width: 20px; height: 20px; flex: none; display: block; color: #6B7280; }
+.menu-items .mi * { vector-effect: non-scaling-stroke; }
 .menu-items .menu-past { flex: none; display: flex; align-items: center; padding: 0 20px 0 12px; color: #6B7280; font-size: 13px; line-height: 18px; text-decoration: none; -webkit-tap-highlight-color: transparent; }
-.menu-items .menu-grp { padding: 6px 0 8px; border-bottom: 1px solid var(--border); }
-.menu-items .menu-grp-t { padding: 12px 20px 4px; font-size: 16px; line-height: 24px; font-weight: 700; color: #111; }
-.menu-items .menu-grp .nav-item { border-bottom: 0 !important; padding: 11px 20px 11px 32px !important; font-size: 15px !important; line-height: 22px !important; font-weight: 400; color: #333; }
-.menu-items .menu-row .nav-item:active, .menu-items .menu-grp .nav-item:active, .menu-items .menu-past:active { background: #F1F5F9; }
+.menu-items .menu-acc { border-bottom: 1px solid var(--border); }
+.menu-items .menu-acc summary { display: flex; align-items: center; gap: 12px; padding: 14px 20px; font-size: 16px; line-height: 24px; font-weight: 600; color: #111; cursor: pointer; list-style: none; -webkit-tap-highlight-color: transparent; }
+.menu-items .menu-acc summary::-webkit-details-marker { display: none; }
+.menu-items .menu-acc .mc { width: 18px; height: 18px; flex: none; margin-left: auto; color: #6B7280; transition: transform .15s ease; }
+.menu-items .menu-acc[open] .mc { transform: rotate(180deg); }
+.menu-items .menu-acc-b { padding: 0 0 8px; }
+.menu-items .menu-acc-b .nav-item { border-bottom: 0 !important; padding: 10px 20px 10px 52px !important; font-size: 15px !important; line-height: 22px !important; font-weight: 400; color: #333; }
+.menu-items .menu-site { display: flex; align-items: center; flex-wrap: wrap; margin-top: auto; padding: 12px 14px 0; border-top: 1px solid var(--border); }   /* 서랍 맨 아래(메뉴가 짧으면 화면 아래, 길면 마지막 메뉴 다음) · 아이콘 없음 · 개인정보처리방침만 굵게 · 검정 */
+.menu-items .menu-site a { display: block; padding: 6px; font-size: 14px; line-height: 20px; color: #6B7280; text-decoration: none; }
+.menu-items .menu-site i { font-style: normal; font-size: 14px; line-height: 20px; color: #CBD5E1; }
+.menu-items .menu-site a.fl-privacy { color: #111; font-weight: 700; }
+.menu-items .menu-site a:active, .menu-items .menu-acc summary:active, .menu-items .menu-acc-b .nav-item:active { background: #F1F5F9; }
+.menu-items .menu-row .nav-item:active, .menu-items .menu-past:active { background: #F1F5F9; }
 .menu-items .nav-item.is-here { background: #F8FAFC; box-shadow: inset 3px 0 0 #111; font-weight: 700; }   /* 지금 보는 메뉴 — 빨강은 ▲상승과 겹쳐 안 씀 */
 .menu-items .menu-admin[hidden] { display: none; }   /* 관리자 줄 — .menu-row 의 flex 가 hidden 을 이기지 않게 (2026-11-13) */
-/* 로그인 · 계정 (2026-11-13 사용자) — 헤더 메뉴 버튼 앞, 메뉴 버튼과 같은 36 상자. 로그인 뒤엔 상자 안에 내 사진 26 원 */
-.as-login-btn { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; flex: none; padding: 0; border: 1px solid var(--border-strong); border-radius: 8px; background: #fff; color: var(--gray-600); cursor: pointer; -webkit-tap-highlight-color: transparent; }
-.as-login-btn svg { width: 20px; height: 20px; display: block; }
-.as-login-btn img, .as-login-btn .as-ini { width: 26px; height: 26px; border-radius: 50%; display: block; object-fit: cover; }
-.as-login-btn .as-ini { display: flex; align-items: center; justify-content: center; background: #94A3B8; color: #fff; font-family: var(--num); font-size: 13px; font-weight: 700; line-height: 26px; }
-.as-login-btn:hover { border-color: #94A3B8; }
+/* 로그인 · 계정 = 전체 메뉴 맨 위 왼쪽, 닫기 버튼(위 18 · 높이 32)과 같은 줄 (2026-11-26 사용자, 옛 헤더 36 상자). 로그인 뒤 = 내 사진 32 원 + 별명 */
+.menu-items .menu-me { position: absolute; top: 18px; left: 20px; right: 64px; }
+.menu-me-btn { display: flex; align-items: center; gap: 10px; max-width: 100%; height: 32px; padding: 0; border: 0; background: none; font: inherit; font-size: 15px; line-height: 22px; font-weight: 700; color: #111; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.menu-me-n { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.menu-me-pic { display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; flex: none; border-radius: 50%; background: #F1F5F9; color: #6B7280; overflow: hidden; }
+.menu-me-pic svg { width: 20px; height: 20px; display: block; }
+.menu-me-pic img, .menu-me-pic .as-ini { width: 32px; height: 32px; border-radius: 50%; display: block; object-fit: cover; }
+.menu-me-pic .as-ini { display: flex; align-items: center; justify-content: center; background: #94A3B8; color: #fff; font-family: var(--num); font-size: 14px; font-weight: 700; line-height: 32px; }
 .as-acct .rt-pop-box, .share-pop .rt-pop-box { max-width: 400px; }   /* 짧은 창(계정 · 공유) = 400 (2026-11-14 사용자) */
 .as-acct-x { position: absolute; top: 12px; right: 12px; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; padding: 0; border: 1px solid #E2E8F0; border-radius: 8px; background: #fff; color: #111; cursor: pointer; }   /* 계정 닫기 = 다른 팝업과 같은 테두리 네모 32 (2026-11-14 사용자) */
 .as-acct-x:hover { border-color: #111; }
@@ -1876,6 +2003,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
 .post-shell .post-nav .post-nav-list { display: none !important; }
 .post-shell .post-nav .post-nav-list.post-nav-study { display: inline-flex !important; padding: 9px 25px; }   /* 주식 공부 글만 가운데 `주식 공부 목록` — 댓글 · TOP 사이, 높이 40 = 양옆 글자 버튼과 같게 · 양옆 16 → 25(가로 15% 넓게, 실측 폭 약 117 → 135, 폰 375 에서 세 버튼이 한 줄 그대로) (2026-11-15 사용자) */
 .post-shell .post-nav, .post-shell.ends-text .post-nav { border-top: 0 !important; border-bottom: 1px solid #E2E8F0 !important; padding-top: 0 !important; padding-bottom: 12px !important; }   /* 버튼 줄 아래 구분선 — 버튼 글자 → 선 20(버튼 안쪽 8 + 12), 그 아래 푸터 · 열린 댓글 (2026-11-12 사용자) */
+.post-shell:has(.post-body [data-head-sub]) .post-nav, .post-shell:has(.post-body [data-head-sub]) .post-share-buttons-bottom { border-top: 0 !important; border-bottom: 0 !important; }   /* 주식 공부 글(머리 줄 옆 `- 주식공부` 표시 data-head-sub)만 버튼 줄 아래 · 푸터 위 구분선 없음 (2026-11-20 사용자) */
 .post-nav-cm { color: #6B7280; }   /* 댓글이 없거나 아직 개수를 모를 때 = 회색(글자 · 말풍선 아이콘 모두 currentColor) — 안 고른 칸 색과 같다 (2026-11-12 사용자) */
 .post-nav-cm.has-cm { color: #111; }   /* 댓글이 하나라도 있으면 검정 */
 .post-nav-cm.has-cm:hover { color: var(--accent); }
@@ -1896,8 +2024,8 @@ html.as-lock, html.as-lock body { overflow: hidden; }
   var CDN = 'https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@';
   var RAW = 'https://raw.githubusercontent.com/red6keep-droid/alphascope/';
   var PAGES = 'https://alpha-scope.pages.dev/';   // 먼저 읽는 곳 — 안 되면 jsDelivr → GitHub 원본
-  var LIST_US = root.getAttribute('data-list-us') || '/p/us-market-cap-top10.html';
-  var LIST_KR = root.getAttribute('data-list-kr') || '/p/kr-market-cap-top10.html';
+  var LIST_US = root.getAttribute('data-list-us') || '/p/stock-lists.html?m=us#tab-%EC%8B%9C%EA%B0%80%EC%B4%9D%EC%95%A1';
+  var LIST_KR = root.getAttribute('data-list-kr') || '/p/stock-lists.html?m=kr#tab-%EC%8B%9C%EA%B0%80%EC%B4%9D%EC%95%A1';
   var local = root.getAttribute('data-local');
   var q = '';
   try { q = new URLSearchParams(location.search).get('s') || ''; } catch (e) { q = ''; }
@@ -2101,7 +2229,8 @@ html.as-lock, html.as-lock body { overflow: hidden; }
       ind.setAttribute('aria-label', '지표'); ind.onclick = function () { self.menu = !self.menu; self.topBar(); self.draw(); }; t.appendChild(ind);
       return this.menuDraw();
     }
-    var fs = el('button', IB + 'border:1px solid #E2E8F0;background:#fff;',
+    var fs = el('button', IB + 'border:1px solid #94A3B8;background:#fff;',   // 테두리 = `일` 버튼과 같은 살짝 진한 색 (2026-11-22 사용자)
+     
       '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#111" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2h4v4M14 2l-4 4M6 2H2v4M2 2l4 4M10 14h4v-4M14 14l-4-4M6 14H2v-4M2 14l4-4"/></svg>');   // 네 방향 화살표 (2026-11-14 사용자 C안)
     fs.setAttribute('aria-label', '전체 화면');
     fs.onclick = function () { self.toggleFull(); }; t.appendChild(fs);
@@ -2463,7 +2592,13 @@ html.as-lock, html.as-lock body { overflow: hidden; }
     t.style.top = (top + 4) + 'px'; t.style.left = (lx >= 0 ? lx : Math.min(Math.round(x) + 8, Math.max(0, pw - tw))) + 'px';
   };
 
-  function init() { document.querySelectorAll('[data-candle]').forEach(function (r) { if (!r.__c) r.__c = new Chart(r); }); }
+  // 한국 종목 `실시간 가격은 네이버 증권에서 보기` — 장중(평일 9:00~15:30 한국 시간)에만 보이고 장이 끝나면 사라진다 (2026-11-23 사용자). 휴장일은 모른다.
+  function krLive() {
+    var n = new Date(Date.now() + 9 * 3600e3), d = n.getUTCDay(), m = n.getUTCHours() * 60 + n.getUTCMinutes(), on = d > 0 && d < 6 && m >= 540 && m < 930;
+    document.querySelectorAll('[data-kr-live="1"]').forEach(function (e) { e.style.display = on ? 'flex' : 'none'; });
+  }
+  function init() { document.querySelectorAll('[data-candle]').forEach(function (r) { if (!r.__c) r.__c = new Chart(r); }); krLive(); }
+  setInterval(krLive, 60000);
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
 </script></div><div class="post-share-buttons post-share-buttons-bottom"><div class="byline post-share-buttons goog-inline-block"><div class="sharing"><button class="sharing-button touch-icon-button"></button><div class="share-buttons-container"><ul class="share-buttons hidden"><li><span class="sharing-platform-button"><span class="platform-sharing-text">링크 가져오기</span></span></li><li><span class="sharing-platform-button"><span class="platform-sharing-text">Facebook</span></span></li><li><span class="sharing-platform-button"><span class="platform-sharing-text">X</span></span></li><li><span class="sharing-platform-button"><span class="platform-sharing-text">Pinterest</span></span></li><li><span class="sharing-platform-button"><span class="platform-sharing-text">이메일</span></span></li><li><span class="sharing-platform-button"><span class="platform-sharing-text">다른 앱</span></span></li></ul></div></div></div></div></div></article><p class="post-nav"><a class="post-nav-list" href="#">목록</a><button aria-label="맨 위로" class="post-nav-top" type="button">TOP<svg aria-hidden="true" fill="none" height="22" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" viewBox="0 0 22 22" width="22"><circle cx="11" cy="11" r="10"/><path d="M11 15.5V7M7.5 10.5 11 7l3.5 3.5"/></svg></button></p></div></main><script>
@@ -2552,9 +2687,9 @@ html.as-lock, html.as-lock body { overflow: hidden; }
           META: 'meta-stock', AVGO: 'broadcom-avgo-stock', TSLA: 'tesla-tsla-stock', 'BRK-B': 'berkshire-hathaway-brk-b-stock', LLY: 'eli-lilly-lly-stock',
           MU: 'micron-mu-stock', WMT: 'walmart-wmt-stock', JPM: 'jpmorgan-jpm-stock', AMD: 'amd-stock', V: 'visa-v-stock', XOM: 'exxonmobil-xom-stock',
           JNJ: 'johnson-johnson-jnj-stock', MA: 'mastercard-ma-stock', ABBV: 'abbvie-abbv-stock', INTC: 'intel-intc-stock' };
-        var BLOG_HOME = 'https://alpha-scope.blogspot.com/';
+        var BLOG_HOME = 'https://www.newfact.app/';
         function pageFor(ticker) {
-          return PAGE_SLUG[ticker] ? BLOG_HOME + 'p/' + PAGE_SLUG[ticker] + '.html' : BLOG_HOME + 'p/us-market-cap-top10.html';
+          return PAGE_SLUG[ticker] ? BLOG_HOME + 'p/' + PAGE_SLUG[ticker] + '.html' : BLOG_HOME + 'p/stock-lists.html?m=us#tab-%EC%8B%9C%EA%B0%80%EC%B4%9D%EC%95%A1';
         }
 
         function metaFor(ticker) {
@@ -2592,8 +2727,41 @@ html.as-lock, html.as-lock body { overflow: hidden; }
         /* 한국 탭 (2026-10-24 사용자) — kr.json (experiments/kr-stocks/home_feed_kr.py, 한국 장 마감 뒤 하루 1회). 두 카드가 각자 미국 · 한국을 고른다 */
         /* 미국 · 한국 화면 (H35, 2026-11-10 사용자) — body[data-home-mkt] 가 있으면 그 시장만. 없으면 '' = 지금 홈(두 시장) */
         var HOME_MKT = (document.body && document.body.getAttribute('data-home-mkt')) || '';
+
+        /* 홈 증시시황 배너 (C안, 2026-11-19 적용) — 미국 홈 = 아침 편(am) · 한국 홈 = 저녁 편(pm) · 두 시장 홈 = 둘 중 최근 편.
+           그림 = 그 편 시황 글 맨 위 배너(gh-pages images/commentary-날짜-편.webp) 그대로. 수집기 작성 시각(08:10 · 16:40)이 지난 편부터 최근 순으로 그림을 찾고(수집 완료 즉시 발행, 2026-11-26),
+           4일 안에 없으면 카드를 숨긴다(쉬는 날 · 발행 전). 누르면 그 편 라벨(증시 시황 + 미국 · 한국 증시) 최신 글로(data-latest, 누를 때만 피드). */
+        (function () {
+          var sec = document.getElementById('cm-banner');
+          if (!sec) return;
+          var img = sec.querySelector('img'), a = sec.querySelector('a'), pill = sec.querySelector('.cm-pill');
+          var BASE = 'https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/commentary-';
+          var ED = { am: { at: 8 * 60 + 10, name: '미국 증시시황', lab: '증시 시황/미국 증시' }, pm: { at: 16 * 60 + 40, name: '한국 증시시황', lab: '증시 시황/한국 증시' } };   /* 찾기 시작 = 수집기 작성 시각(08:10 · 16:40) — 수집 완료 즉시 발행(2026-11-26 사용자). 그림이 아직 없으면 onerror 로 지난 편 */
+          var slots = HOME_MKT === 'us' ? ['am'] : HOME_MKT === 'kr' ? ['pm'] : ['pm', 'am'];
+          var kst = new Date(Date.now() + 9 * 3600000), mins = kst.getUTCHours() * 60 + kst.getUTCMinutes(), list = [];
+          for (var d = 0; d < 4; d++) {
+            var t = new Date(kst.getTime() - d * 86400000);
+            var day = t.getUTCFullYear() + '-' + ('0' + (t.getUTCMonth() + 1)).slice(-2) + '-' + ('0' + t.getUTCDate()).slice(-2);
+            slots.forEach(function (s) { if (d > 0 || mins >= ED[s].at) list.push({ day: day, slot: s }); });
+          }
+          var i = 0;
+          function next() {
+            if (i >= list.length) { sec.hidden = true; return; }
+            var c = list[i++], e = ED[c.slot];
+            img.onload = function () {
+              pill.textContent = e.name;
+              img.alt = e.name + ' 배너 (AI 생성 이미지)';
+              a.setAttribute('data-latest', e.lab);
+              a.setAttribute('href', '/search/label/' + encodeURIComponent('증시 시황'));
+              sec.hidden = false;
+            };
+            img.onerror = next;
+            img.src = BASE + c.day + '-' + c.slot + '.webp';
+          }
+          next();
+        })();
         var krHome = null, rankMarket = HOME_MKT || 'us', picksMarket = HOME_MKT || 'us';
-        if (HOME_MKT === 'kr') { var ntCard = document.getElementById('notable-card'); if (ntCard) ntCard.href = BLOG_HOME + 'p/kr-market-cap-top10.html'; }
+        if (HOME_MKT === 'kr') { var ntCard = document.getElementById('notable-card'); if (ntCard) ntCard.href = BLOG_HOME + 'p/stock-lists.html?m=kr#tab-%EC%8B%9C%EA%B0%80%EC%B4%9D%EC%95%A1'; }
         var KR_URL = GH + 'kr.json';
 
         /* ===== 장중 가격 (2026-11-05 사용자) — 한국 종목 live.json (experiments/kr-stocks/collect_kr_live.py, 장중 10분마다, 야후 약 20분 지연).
@@ -2603,7 +2771,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
         var LIVE_URL = GH + 'live.json', LIVE_BARS_URL = GH + 'live_bars.json', LIVE_KEY = 'as_live_kr';
         var LIVE_ENABLED = false;   /* 한국 장중 가격 · 장중 차트 끔 (2026-11-12 사용자: 우리는 종목 리포트 블로그 — 장중 가격에 얽매이지 말자, 종가 기준). kr-live 수집도 멈춤. 켜려면 true + kr-live.yml 되살리기 */
         var mktDay = { us: '', kr: '' };   /* 시장별 종가 날짜 — stocks.json · kr.json 의 day (2026-11-12) */
-        function dayKo(day, part) { var p = String(day || '').split(/[-.]/); return p.length === 3 ? Number(p[1]) + '월 ' + Number(p[2]) + '일 ' + (part || '기준') : ''; }   /* 날짜 표기 `11월 14일 아침` — 독자는 한국 시간 기준, 날짜 뒤 = 아침 · 오후 (2026-11-14 사용자: `미국 시간` 헷갈림. 옛 `11월 11일 기준` 11-12) */
+        function dayKo(day, part) { var p = String(day || '').split(/[-.]/); return p.length === 3 ? ('0' + Number(p[1])).slice(-2) + '.' + ('0' + Number(p[2])).slice(-2) + ' ' + (part || '기준') : ''; }   /* 날짜 표기 `11월 14일 아침` — 독자는 한국 시간 기준, 날짜 뒤 = 아침 · 오후 (2026-11-14 사용자: `미국 시간` 헷갈림. 옛 `11월 11일 기준` 11-12) */
         function closeKo(day, mkt) { if (!day) return ''; if (mkt !== 'us') return dayKo(day, '오후'); var d = new Date(String(day).slice(0, 10) + 'T00:00:00Z'); if (isNaN(d)) return ''; d.setUTCDate(d.getUTCDate() + 1); return dayKo(d.toISOString().slice(0, 10), '아침'); }   /* 시장 종가일 → 한국 시간: 미국 장은 한국 다음 날 새벽에 끝남 = 다음 날 아침, 한국 = 그날 오후 */
         function genKo(iso) { var t = Date.parse(iso || ''); if (!(t > 0)) return ''; var k = new Date(t + 9 * 3600000); return dayKo(k.toISOString().slice(0, 10), k.getUTCHours() < 12 ? '아침' : '오후'); }   /* 만든 시각(UTC) → 한국 날짜 + 아침 · 오후 */
         function nyDay(iso) { var t = Date.parse(iso || ''); return t > 0 ? new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(t)) : ''; }   /* 미국 리포트 = 뉴욕 날짜(장 마감 뒤 실행) = 종가 날짜 */
@@ -2715,7 +2883,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
           av.appendChild(img);
           return av;
         }
-        function krPage(r) { return r.page && r.slug ? BLOG_HOME + 'p/' + r.slug + '.html' : ((krHome && krHome.list_url) || BLOG_HOME + 'p/kr-market-cap-top10.html'); }
+        function krPage(r) { return r.page && r.slug ? BLOG_HOME + 'p/' + r.slug + '.html' : ((krHome && krHome.list_url) || BLOG_HOME + 'p/stock-lists.html?m=kr#tab-%EC%8B%9C%EA%B0%80%EC%B4%9D%EC%95%A1'); }
         var activeSort = 'cap';   /* 시총 TOP 10 이라 기본은 시가총액 순 (2026-10-18) */
         /* data.json 에 시총(mc)이 없던 때의 순서 — fetch_stocks.TICKERS 와 같은 2026-10-18 장 마감 순위 */
         var CAP_ORDER = ['NVDA', 'AAPL', 'GOOGL', 'MSFT', 'AMZN', 'META', 'AVGO', 'TSLA', 'BRK-B', 'LLY'];
@@ -2754,10 +2922,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
             var turnover = (pOf(s) || 0) * (vOf(s) || 0);
             var tr = el('tr');
 
-            /* 순위 */
-            var tdRank = el('td', 'col-rank');
-            tdRank.appendChild(el('span', 'rank-no', String(i + 1)));
-            tr.appendChild(tdRank);
+            /* 순위 숫자 삭제 (2026-11-18 사용자: 시총 순이라 숫자 없어도 된다) */
 
             /* 종목명 */
             var tdName = el('td', 'col-name');
@@ -2768,7 +2933,9 @@ html.as-lock, html.as-lock body { overflow: hidden; }
             var av = kr ? krAvatar(s.name, meta.color, s.s) : stockAvatar(s.s, meta.color);
             var label = el('span', 'stock-label');
             label.appendChild(el('span', 'stock-name', meta.name));
-            label.appendChild(el('span', 'stock-ticker', s.s));
+            var tail = activeSort === 'volume' ? '거래량 ' + Number(vOf(s) || 0).toLocaleString('en-US') + '주'
+              : activeSort === 'turnover' ? '거래대금 ' + (kr ? eokWon(turnover) : eok(turnover)) : meta.sector;   /* 거래상위 · 거래대금 탭은 그 값을 보조 줄에 — 폰에서 숨긴 칸 대신 (2026-11-18) */
+            label.appendChild(el('span', 'stock-ticker', stockSub(s.s, tail, kr)));
             cell.appendChild(av);
             cell.appendChild(label);
             tdName.appendChild(cell);
@@ -2788,11 +2955,11 @@ html.as-lock, html.as-lock body { overflow: hidden; }
             tr.appendChild(tdSector);
 
             /* 거래량 / 거래대금 / 시가총액 */
-            var tdVol = el('td');
+            var tdVol = el('td', 'col-vol');
             tdVol.appendChild(el('span', 'cell-num', Number(vOf(s) || 0).toLocaleString('en-US') + '주'));
             tr.appendChild(tdVol);
 
-            var tdTurn = el('td');
+            var tdTurn = el('td', 'col-turn');
             tdTurn.appendChild(el('span', 'cell-num', kr ? eokWon(turnover) : eok(turnover)));
             tr.appendChild(tdTurn);
 
@@ -2831,7 +2998,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
               btns.forEach(function (x) { x.setAttribute('aria-selected', String(x === b)); });
               /* 펼친 더 보기는 탭을 바꿔도 그대로 (2026-10-25 사용자, 디자인 가이드라인 10-11) — 펼침 상태를 건드리지 않는다 */
               if (card === 'rank') { rankMarket = m; renderRankings(); syncLiveUI(); }
-              else { picksMarket = m; watchTab = 0; picksSort = ''; syncSortButtons(); renderPicks(); syncLiveUI(); }   /* 미국 · 한국 전환도 정렬 풀림 (2026-10-25 사용자: 다른 탭을 누르면) */
+              else { picksMarket = m; watchTab = 0; secTab = 0; picksSort = ''; syncSortButtons(); renderPicks(); syncLiveUI(); }   /* 미국 · 한국 전환도 정렬 풀림 (2026-10-25 사용자: 다른 탭을 누르면) */
             });
           });
         });
@@ -2870,7 +3037,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
           var t = el('span', 'eb-text');
           var k = el('span', 'eb-kicker');
           k.appendChild(el('span', 'eb-name', kr ? e.name : e.s + ' ' + e.name));   /* 한국 종목 코드는 숫자라 이름만 */
-          k.appendChild(el('span', 'eb-dday' + (left > 0 ? ' is-ahead' : ''), left === 0 ? 'D-DAY' : 'D-' + left));
+          k.appendChild(el('span', 'eb-dday' + (left > 0 ? ' is-ahead' : ''), left === 0 ? 'D-Day' : 'D-' + left));
           t.appendChild(k);
           var line = el('span', 'eb-title-line');   /* 발표 시점은 '실적 발표' 오른쪽 (2026-10-29 사용자) */
           line.appendChild(el('span', 'eb-title', '실적 발표'));
@@ -2904,10 +3071,52 @@ html.as-lock, html.as-lock body { overflow: hidden; }
           var a = el('a', 'eb-slide eb-study'); a.href = '/p/study.html';
           var im = document.createElement('img');
           im.src = 'https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/study/top_banner.webp?v=2';
-          im.width = 1110; im.height = 291; im.alt = '주식 공부. 초보가 흔히 하는 착각, 데이터로 확인해 봤습니다'; im.decoding = 'async';
+          im.width = 1110; im.height = 291; im.alt = '주식 제대로 알기. 초보가 흔히 하는 착각, 데이터로 확인해 봤습니다'; im.decoding = 'async';
           a.appendChild(im);
           return a;
         }
+      /* 일정이 없는 날 = 주요 뉴스 줄 롤링 (2026-11-19 사용자 "실적 날짜가 없으면 주요 뉴스를 롤링, 미국도 같은 규칙").
+         미국 = 홈 주요 뉴스와 같은 news.json · 한국 = 한국 증시 리포트 뉴스 탭과 같은 재료(한국 증시 방송 이슈, kr-news.json).
+         최근 24시간 · 최신 5줄. 줄을 누르면 요약이 있으면 홈 주요 뉴스와 같은 팝업, 없으면 미국 = 홈 아래 주요 뉴스로 · 한국 = 한국 증시 리포트(최신 글). 줄이 없으면 칸을 숨긴다 */
+      var NEWS_STRIP_N = 5, KR_NEWS_URL = GH + 'kr-news.json', stripNewsCache = {};
+      function newsStrip(box, track, dotBox) {
+        var mk = HOME_MKT || 'us';
+        var p = stripNewsCache[mk] || (stripNewsCache[mk] = fetch((mk === 'kr' ? KR_NEWS_URL : NEWS_URL) + '?v=' + Math.floor(Date.now() / 6e5))
+          .then(function (r) { return r.json(); }));
+        p.then(function (j) {
+          if (pickEvents().length) return;   /* 그 사이 일정이 왔으면 일정이 먼저 */
+          var since = Date.now() - 24 * 3600e3;
+          var items = (j.items || []).filter(function (it) {
+            var s = String(it.published || it.at || '').replace(' ', 'T'), t = s ? Date.parse(/[Z+]/.test(s.slice(10)) ? s : s + 'Z') : 0;   /* 두 파일 모두 UTC 시각 */
+            return (it.title_ko || it.title) && (!t || t >= since);
+          }).slice(0, NEWS_STRIP_N);
+          if (!items.length) { box.hidden = true; return; }
+          track.textContent = ''; dotBox.textContent = '';
+          items.forEach(function (it, i) {
+            var a = el('a', 'eb-slide eb-news');
+            /* 누르면 홈 주요 뉴스와 같은 팝업(요약 줄 · 원문/영상 링크) — 요약이 두 줄 넘는 줄만 (2026-11-20 사용자 "다른 뉴스들처럼 팝업"). 한국 = 방송 요약 다섯 줄 · 영상 링크 */
+            var pop = (it.lines || []).length >= 2 ? { title: it.title_ko || it.title, lines: it.lines, link: it.link || it.url, source: it.source || it.channel, kind: it.kind || (mk === 'kr' ? 'media' : '') } : null;
+            if (pop) {
+              a.href = '#'; a.setAttribute('aria-haspopup', 'dialog');
+              a.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); homeNewsPop(pop, a); });
+            }
+            else if (mk === 'kr') { a.href = '/search/label/' + encodeURIComponent('한국 증시 리포트'); a.setAttribute('data-latest', '한국 증시 리포트'); }
+            else {
+              a.href = '#news-list';
+              a.addEventListener('click', function (e) { var n = document.querySelector('.news-section'); if (n) { e.preventDefault(); n.scrollIntoView({ behavior: 'smooth', block: 'start' }); } });
+            }
+            a.appendChild(el('span', 'eb-tag', 'News'));   /* 라벨 = 미국 · 한국 모두 영어 `News`, 한국 `방송` 라벨 따로 두지 않음 (2026-11-19 사용자) */
+            a.appendChild(el('span', 'eb-headline', it.title_ko || it.title));
+            track.appendChild(a);
+            var d = el('button', 'eb-dot'); d.type = 'button'; d.setAttribute('aria-label', (i + 1) + '번째 뉴스');
+            d.addEventListener('click', function () { ebGo(i); ebStart(); });
+            dotBox.appendChild(d);
+          });
+          dotBox.hidden = items.length < 2;
+          box.hidden = false; ebIndex = 0; ebGo(0); ebStart();
+        }).catch(function () { box.hidden = true; });
+      }
+
         function setEvents(market, list) {
           eventFeeds[market] = list || [];
           eventLoaded[market] = true;
@@ -2921,7 +3130,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
             ebStop(); ebIndex = 0; track.style.transform = '';
             var ready = HOME_MKT ? eventLoaded[HOME_MKT] : (eventLoaded.us && eventLoaded.kr);
             box.hidden = !ready;
-            if (ready) { box.style.setProperty('--eb-bg', STUDY_BG); track.appendChild(studySlide()); dotBox.hidden = true; }
+            if (ready) newsStrip(box, track, dotBox);   /* 일정이 없으면 주요 뉴스 줄 롤링 (2026-11-19 사용자, 옛: 주식 공부 배너 — 홈 아래에 따로 있음) */
             return;
           }
           box.hidden = false;
@@ -2989,7 +3198,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
             c.appendChild(el('span', 'nt-ex', '지수보다 ' + ntPct(r.ex, '%p')));
             d.appendChild(c);
             var href = r.page && r.slug ? BLOG_HOME + 'p/' + r.slug + '.html#tab-' + encodeURIComponent('오늘')
-              : (market === 'kr' ? ((krHome && krHome.list_url) || BLOG_HOME + 'p/kr-market-cap-top10.html') : BLOG_HOME + 'p/us-market-cap-top10.html');
+              : (market === 'kr' ? ((krHome && krHome.list_url) || BLOG_HOME + 'p/stock-lists.html?m=kr#tab-%EC%8B%9C%EA%B0%80%EC%B4%9D%EC%95%A1') : BLOG_HOME + 'p/stock-lists.html?m=us#tab-%EC%8B%9C%EA%B0%80%EC%B4%9D%EC%95%A1');
             d.setAttribute('data-row-link', '1'); d.setAttribute('data-href', href);
             list.appendChild(d);
           });
@@ -3020,57 +3229,97 @@ html.as-lock, html.as-lock body { overflow: hidden; }
         /* ================================================= 증시 전망 (hypo.json, 2026-11-08 사용자 H34) — experiments/issue_store/forecast_daily.py 가 하루 1회 gh-pages 에 올린다.
            j = { generated, list_url, open: [{ title, url, posted, tags }] }. 줄 = 질문 + 라벨 + `게시일 게시`. 지켜보는 전망이 없으면 한 줄 안내 */
         function renderHypo(j) {
-          var box = document.querySelector('[data-hook="hypo-rows"]');
-          if (!box) return;
-          box.textContent = '';
-          if (HOME_MKT === 'kr') { var hc = document.getElementById('hypo-card'), ht = document.querySelector('#hypo-col .report-title');
-            if (hc) hc.href = '/p/forecast-list.html#tab-1'; if (ht) ht.setAttribute('data-href', '/p/forecast-list.html#tab-1'); }
-          if (!j) { box.appendChild(el('div', 'hypo-empty', LOAD_FAILED)); return; }
-          /* 미국 · 한국 화면이면 그 나라 전망만 (2026-11-12 사용자 홈 나누기) — market 없는 옛 자료는 미국. 한국 화면 카드는 목록 한국 탭(#tab-1)으로 */
+          var tr = document.querySelector('[data-hook="hypo-rows"]');
+          if (!tr) return;
+          var list = HOME_MKT === 'kr' ? '/p/forecast-list.html#tab-1' : '/p/forecast-list.html';   /* 한국 화면 = 목록 한국 탭 */
+          if (!j) { ibRoll(tr, [ibNote(LOAD_FAILED, list)]); return; }
+          /* 미국 · 한국 화면이면 그 나라 전망만 (2026-11-12 사용자 홈 나누기) — market 없는 옛 자료는 미국 */
           var rows = (j.open || []).filter(function (q) { return !HOME_MKT || (q.market || 'us') === HOME_MKT; });
-          if (!rows.length) { box.appendChild(el('div', 'hypo-empty', '지금 지켜보는 전망이 없습니다')); }
-          rows.forEach(function (q) {
-            var d = el('div', 'kv-row plain-row', q.title);
-            var labels = el('div', 'news-labels');
-            (q.tags || []).forEach(function (t) { labels.appendChild(el('span', 'news-tag', t)); });
-            if (q.posted) labels.appendChild(el('span', 'news-sub', q.posted + ' 게시'));
-            d.appendChild(labels);
-            if (q.url) { d.setAttribute('data-row-link', '1'); d.setAttribute('data-href', q.url); }
-            box.appendChild(d);
-          });
+          ibRoll(tr, rows.length ? rows.map(function (q) {
+            var m = String(q.event || '').match(/^\S+\s+(.*?)\s*실적$/), lead = m ? m[1] + ' 실적' : '';   /* 강조 = `엔비디아 실적` 처럼 사건 이름으로 시작하면 그 부분, 아니면 쉼표 앞 */
+            var ln = q.lean > 0 ? 1 : (q.lean < 0 ? -1 : 0);
+            return ibSlide(q.url || list, ibQ(q.title, lead), FC_ART[ln], '');
+          }) : [ibNote('지금 지켜보는 전망이 없습니다', list)]);
           if (j.generated) setDate('hypo-card', genKo(j.generated));   /* 한국 날짜 — generated 는 UTC 라 아침 실행이 하루 앞으로 보였다 (2026-11-12) */
         }
         fetch(GH + 'hypo.json?v=' + Date.now())
           .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
           .then(renderHypo)
           .catch(function () { renderHypo(null); });
-
-              /* ================================================= Hot Issue (issues.json, 2026-11-16 사용자) — experiments/issue_store/issue_watch_daily.py 가 07:30 본 실행에 gh-pages 에 올린다.
-                 j = { generated, issues: [{ id, name, url, gauge, kind, hot }] }. 줄 = 이슈 이름 + 바늘 말 라벨 + `최근 일주일 뉴스`(평소보다 많으면 덧붙임). 자료가 없으면 카드 숨김(빈 카드 X) */
-              function renderIssues(j) {
-                var col = document.getElementById('issue-col'), box = document.querySelector('[data-hook="issue-rows"]');
-                if (!col || !box) return;
-                var rows = (j && j.issues) || [];
-                if (!rows.length) { col.hidden = true; return; }
-                col.hidden = false;
-                box.textContent = '';
-                rows.forEach(function (q) {
-                  var d = el('div', 'kv-row plain-row', q.q || q.name);   /* 줄 = 이슈 페이지 질문 제목(증시 전망 카드처럼) */
-                  var labels = el('div', 'news-labels');
-                  labels.appendChild(el('span', 'news-tag issue-tag ' + (q.kind || 'neutral'), q.gauge || '향방미정'));
-                  labels.appendChild(el('span', 'news-sub', '최근 일주일 뉴스' + (q.hot ? ' · 평소보다 많음' : '')));
-                  d.appendChild(labels);
-                  if (q.url) { d.setAttribute('data-row-link', '1'); d.setAttribute('data-href', q.url); }
-                  box.appendChild(d);
-                });
-                var card = document.getElementById('issue-card'), ht = document.querySelector('#issue-col .report-title');
-                if (rows[0].url) { if (card) card.href = rows[0].url; if (ht) ht.setAttribute('data-href', rows[0].url); }
-                if (j.generated) setDate('issue-card', genKo(j.generated));
-              }
-              fetch(GH + 'issues.json?v=' + Date.now())
-                .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
-                .then(renderIssues)
-                .catch(function () { renderIssues(null); });
+  
+        /* Hot Issue (issues.json) — experiments/issue_store/issue_watch_daily.py 가 07:30 본 실행에 gh-pages 에 올린다.
+           j = { generated, issues: [{ id, name, q, url, gauge, kind, hot }] }. 한 장 = 이슈 질문 + 반원 계기판(바늘 = kind · gauge). 자료가 없으면 카드 숨김(빈 카드 X) */
+        function renderIssues(j) {
+          var col = document.getElementById('issue-col'), tr = document.querySelector('[data-hook="issue-rows"]');
+          if (!col || !tr) return;
+          var rows = (j && j.issues) || [];
+          if (!rows.length) { col.hidden = true; return; }
+          col.hidden = false;
+          ibRoll(tr, rows.map(function (q) { return ibSlide(q.url || '#', ibQ(q.q || q.name, ''), ibGauge(q), q.kind || 'neutral'); }));
+          if (j.generated) setDate('issue-card', genKo(j.generated));
+        }
+        fetch(GH + 'issues.json?v=' + Date.now())
+          .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+          .then(renderIssues)
+          .catch(function () { renderIssues(null); });
+  
+        /* ---- 배너 카드 공통 (2026-11-18 사용자) ---- */
+        function ibEsc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+        function ibQ(t, lead) {   /* 강조(굵게) + 나머지(보통) — lead 로 시작하면 그 부분, 아니면 쉼표 앞 */
+          t = String(t || ''); var n = 0;
+          if (lead && t.indexOf(lead) === 0) n = lead.length; else { var i = t.indexOf(','); if (i > 0) n = i + 1; }
+          return n ? '<b>' + ibEsc(t.slice(0, n)) + '</b> ' + ibEsc(t.slice(n).trim()) : ibEsc(t);
+        }
+        function ibSlide(href, q, art, cls) { return '<a class="ib-slide' + (cls ? ' ' + cls : '') + '" href="' + ibEsc(href) + '"><p class="ib-q">' + q + '</p>' + art + '</a>'; }
+        function ibNote(text, href) { return '<a class="ib-slide ib-note" href="' + ibEsc(href) + '">' + ibEsc(text) + '</a>'; }
+        /* 반원 계기판 — 이슈 페이지 게이지를 줄인 그림. 왼쪽 나쁜 쪽 · 오른쪽 좋은 쪽, 뚜렷이면 끝까지. 바늘 29.8 = 반원 안쪽(36)과 여백 */
+        function ibGauge(q) {
+          var k = q.kind || 'neutral', s = /뚜렷/.test(q.gauge || '') ? 0.8 : 0.45, net = k === 'negative' ? -s : (k === 'positive' ? s : 0);
+          var a = Math.PI * (1 - (net + 1) / 2), x = 50 + 29.8 * Math.cos(a), y = 50 - 29.8 * Math.sin(a);
+          return '<svg class="ib-art" viewBox="0 0 100 56" aria-hidden="true"><path d="M10 50a40 40 0 0 1 80 0" fill="none" stroke="currentColor" stroke-opacity=".3" stroke-width="8" stroke-linecap="round"/>' +
+            '<path d="M10 50a40 40 0 0 1 80 0" fill="none" stroke="currentColor" stroke-width="8" stroke-linecap="round" stroke-dasharray="1 200" stroke-dashoffset="' + (-((net + 1) / 2 * 125.7)) + '"/>' +
+            '<line x1="50" y1="50" x2="' + x.toFixed(1) + '" y2="' + y.toFixed(1) + '" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><circle cx="50" cy="50" r="5" fill="currentColor"/></svg>';
+        }
+        /* 증시 전망 그림 — 연한 꺾은선(굵기 8) + 끝 안쪽 점(지름 8). 상승 · 하락 가로 62 · 횡보 71 */
+        var FC_ART = {
+          '1': '<svg class="ib-art" viewBox="0 0 100 56" aria-hidden="true"><polyline points="19,44 38,24 54,34 81,10" fill="none" stroke="#B91C1C" stroke-opacity=".3" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="81" cy="10" r="4" fill="#B91C1C"/></svg>',
+          '-1': '<svg class="ib-art" viewBox="0 0 100 56" aria-hidden="true"><polyline points="19,10 38,30 54,20 81,44" fill="none" stroke="#1D4ED8" stroke-opacity=".3" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="81" cy="44" r="4" fill="#1D4ED8"/></svg>',
+          '0': '<svg class="ib-art" viewBox="0 0 100 56" aria-hidden="true"><polyline points="15,30 36,20 54,36 86,26" fill="none" stroke="#475569" stroke-opacity=".3" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="86" cy="26" r="4" fill="#475569"/></svg>'
+        };
+        /* 좌우 롤링 — 끝에 첫 장 복사(마지막 → 첫 장도 왼쪽으로). 가로로 40 넘게 밀면 넘김, 누르는 동안 멈춤, 민 뒤에는 링크로 가지 않음 */
+        function ibRoll(tr, slides) {
+          var box = tr.closest('.ib'), dotBox = box && box.querySelector('.ib-dots'), n = slides.length;
+          if (box && box._ibStop) box._ibStop();
+          tr.style.transition = 'none'; tr.style.transform = '';
+          tr.innerHTML = slides.concat(n > 1 ? [slides[0]] : []).join('');
+          if (dotBox) dotBox.innerHTML = n > 1 ? slides.map(function (_, i) { return '<i' + (i ? '' : ' class="on"') + '></i>'; }).join('') : '';
+          if (!box || n < 2) return;
+          var ds = [].slice.call(dotBox ? dotBox.children : []), cur = 0, timer = null, MS = 4000;
+          var still = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+          void tr.offsetHeight; tr.style.transition = '';
+          function go(i, anim) { tr.style.transition = anim === false ? 'none' : ''; cur = i; tr.style.transform = 'translateX(' + (-100 * i) + '%)'; ds.forEach(function (d, k) { d.classList.toggle('on', k === i % n); }); }
+          tr.addEventListener('transitionend', function () { if (cur === n) { go(0, false); void tr.offsetHeight; tr.style.transition = ''; } });
+          function stop() { if (timer) { clearInterval(timer); timer = null; } }
+          function play() { stop(); if (!still) timer = setInterval(function () { go(cur + 1); }, MS); }
+          box._ibStop = stop;
+          var x0 = null, y0 = 0, dx = 0, moved = false;
+          box.addEventListener('pointerdown', function (ev) { x0 = ev.clientX; y0 = ev.clientY; dx = 0; moved = false; stop(); tr.style.transition = 'none'; });
+          box.addEventListener('pointermove', function (ev) {
+            if (x0 === null) return; dx = ev.clientX - x0;
+            if (Math.abs(dx) > 6 && Math.abs(dx) > Math.abs(ev.clientY - y0)) moved = true;
+            if (moved) tr.style.transform = 'translateX(calc(' + (-100 * cur) + '% + ' + dx + 'px))';
+          });
+          function end() {
+            if (x0 === null) return; x0 = null; tr.style.transition = '';
+            if (moved && dx < -40) go(cur + 1);
+            else if (moved && dx > 40) { if (cur === 0) { go(n, false); void tr.offsetHeight; tr.style.transition = ''; go(n - 1); } else go(cur - 1); }
+            else go(cur);
+            play();
+          }
+          box.addEventListener('pointerup', end); box.addEventListener('pointercancel', end); box.addEventListener('pointerleave', end);
+          box.addEventListener('click', function (ev) { if (moved) { ev.preventDefault(); ev.stopPropagation(); } }, true);
+          play();
+        }
 
         fetch(DATA_URL + '?v=' + Date.now())
           .then(function (r) { return r.json(); })
@@ -3103,7 +3352,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
         function feedPage(r) {
           if (isKR(r)) return krPage(r);
           if (r.s === 'NVDA') return pageFor('NVDA');
-          return r.page && r.slug ? BLOG_HOME + 'p/' + r.slug + '.html' : BLOG_HOME + 'p/us-market-cap-top10.html';
+          return r.page && r.slug ? BLOG_HOME + 'p/' + r.slug + '.html' : BLOG_HOME + 'p/stock-lists.html?m=us#tab-%EC%8B%9C%EA%B0%80%EC%B4%9D%EC%95%A1';
         }
         function feedCell(r) {
           var cell = el('a', 'stock-cell');
@@ -3111,11 +3360,13 @@ html.as-lock, html.as-lock body { overflow: hidden; }
           var av = isKR(r) ? krAvatar(r.name, feedColor(r.s), r.s) : stockAvatar(r.s, (META[r.s] && META[r.s].color) || feedColor(r.s));   /* 한국 종목은 한글 첫 글자 */
           var label = el('span', 'stock-label');
           label.appendChild(el('span', 'stock-name', r.name));
-          label.appendChild(el('span', 'stock-ticker', r.s));
+          label.appendChild(el('span', 'stock-ticker', stockSub(r.s, r.sector || '', isKR(r))));
           cell.appendChild(av);
           cell.appendChild(label);
           return cell;
         }
+        /* 종목 줄 회색 보조 줄 — 종목 모아보기와 같은 틀: 미국 = 티커 · 업종, 한국 = 업종만(종목 코드 숫자 넣지 않음) (2026-11-18 사용자) */
+        function stockSub(sym, tail, kr) { return kr ? (tail || '') : (tail ? sym + ' · ' + tail : sym); }
         function feedPrice(r) {
           var cpv = cpOf(r), cp = cpv == null ? 0 : cpv;   /* 장중 가격 토글이 켜져 있으면 live.json 값 (2026-11-05) */
           var pr = el('span', 'cell-price ' + signClass(cp) + (liveRow(r) && liveOpen() ? ' live' : ''), isKR(r) ? fmt(pOf(r), 0) + '원' : '$' + fmt(r.p));
@@ -3172,49 +3423,75 @@ html.as-lock, html.as-lock body { overflow: hidden; }
           if (!rows.length) { feedEmpty(body, 2, '데이터를 불러올 수 없습니다.'); return; }
           body.textContent = '';
           rows.sort(pickCmp());   /* 기본 시총순, 상승순 · 하락순 버튼으로 오늘 등락 정렬 (옛: 많이 오른 순) */
-          rows.forEach(function (r) {
+          rows.forEach(function (r, i) {
             var tr = el('tr');
+            if (i >= PICK_SHOWN) { tr.className = 'rank-more'; tr.hidden = !watchOpen; }   /* 처음 3개, 나머지 더 보기 (2026-11-18 사용자) */
             var tdName = el('td', 'col-name'); tdName.appendChild(feedCell(r)); tr.appendChild(tdName);
             var tdPrice = el('td'); tdPrice.appendChild(feedPrice(r)); tr.appendChild(tdPrice);
             if (isKR(r) && LIVE_ENABLED) tr.appendChild(chartTd('watch', r));   /* 장중 차트 (2026-11-05) */
-            body.appendChild(tr);   /* 테마 종목은 더 보기 없이 묶음 종목 전부 (2026-10-25 사용자) */
-            if (isKR(r) && openChart.watch === r.s) body.appendChild(chartRow('watch', r, 3));
+            body.appendChild(tr);   /* 묶음 종목 전부 싣고 3개만 펼침 (2026-11-18 사용자 — 옛 10-25: 더 보기 없이 전부) */
+            if (isKR(r) && openChart.watch === r.s && !(i >= PICK_SHOWN && !watchOpen)) body.appendChild(chartRow('watch', r, 3));
           });
+          setFold('watch-toggle', rows.length - PICK_SHOWN, watchOpen, '종목');
+        }
+        /* 업종 종목 (2026-11-18 사용자, 옛 섹터 대표주 = 업종별 1 · 2 · 3위): 테마 종목과 같은 꼴 — 업종 알약 줄 + 그 업종의 우리 종목 전부(간단 종목 포함), 처음 3개 · 나머지 더 보기.
+           자료 = 종목 모아보기가 읽는 목록 파일 <시장>/_lists.json(간단 종목 실행이 매일 씀). 이 탭을 처음 열 때만 받는다(Pages → jsDelivr, 시장마다 1번 · 압축 약 18KB) */
+        var PICK_SHOWN = 3, SEC_MAX = 10, watchOpen = false, secOpen = false, secTab = 0, listsDoc = {}, listsBusy = {};
+        function loadLists(m) {
+          if (listsDoc[m] || listsBusy[m]) return;
+          if (window.PV_LISTS && window.PV_LISTS[m]) { listsDoc[m] = window.PV_LISTS[m]; return; }   /* 목업 · 미리보기 */
+          listsBusy[m] = true;
+          var urls = ['https://alpha-scope.pages.dev/' + m + '/_lists.json', 'https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@quick-' + m + '/' + m + '/_lists.json'];
+          (function next(i) {
+            if (i >= urls.length) { listsBusy[m] = false; listsDoc[m] = { rows: [] }; renderSectorTop(); return; }
+            fetch(urls[i]).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+              .then(function (d) { listsBusy[m] = false; listsDoc[m] = d; renderSectorTop(); })
+              .catch(function () { next(i + 1); });
+          })(0);
+        }
+        function listRow(x, kr) {   /* 목록 파일 한 줄 → 종목 카드 줄 꼴 */
+          var slug = x.u ? String(x.u).replace(/^\/p\//, '').replace(/\.html$/, '') : '';
+          return { s: x.t, sym: kr ? x.t + '.KS' : x.t, name: x.n, sector: x.s, p: x.p, cp: x.r, mc: x.c || 0, page: !!slug, slug: slug };
         }
         function renderSectorTop() {
-          var body = document.getElementById('sector-top-body');
-          if (!body) return;
-          var F = curFeed();
-          var rows = F.sectors.filter(function (x) { return x.syms && x.syms.length && F.stocks[x.syms[0]]; });
-          if (!rows.length) { feedEmpty(body, 3, '데이터를 불러올 수 없습니다.'); return; }
-          /* 업종 줄 순서 = 대표 종목 기준 — 기본 시총순, 상승순 · 하락순이면 대표 종목 오늘 등락 순 (2026-10-25 사용자, 홈 수정 H12) */
-          var cmp = pickCmp();
-          rows = rows.map(function (x, i) { return { x: x, i: i }; }).sort(function (a, b) { return cmp(F.stocks[a.x.syms[0]], F.stocks[b.x.syms[0]]) || a.i - b.i; }).map(function (o) { return o.x; });
+          var body = document.getElementById('sector-top-body'), tabsBox = document.getElementById('sector-tabs');
+          var panel = document.querySelector('[data-pick-panel="sector"]');
+          if (!body || !panel || panel.hidden) return;   /* 탭을 열 때만 그리고 받는다 */
+          var m = picksMarket === 'kr' ? 'kr' : 'us', kr = m === 'kr';
+          loadLists(m);
+          var doc = listsDoc[m];
+          if (!doc) { if (tabsBox) tabsBox.textContent = ''; feedEmpty(body, 2, '데이터를 불러오는 중…'); setFold('sector-toggle', 0, false, '종목'); return; }
+          var groups = {}, order = [];
+          (doc.rows || []).forEach(function (x) { var r = listRow(x, kr), k = r.sector || '기타'; if (!groups[k]) { groups[k] = []; order.push(k); } groups[k].push(r); });
+          if (!order.length) { if (tabsBox) tabsBox.textContent = ''; feedEmpty(body, 2, '데이터를 불러올 수 없습니다.'); setFold('sector-toggle', 0, false, '종목'); return; }
+          function avg(k) { var v = groups[k].filter(function (r) { return r.cp != null; }); return v.length ? v.reduce(function (t, r) { return t + r.cp; }, 0) / v.length : -Infinity; }
+          order.sort(function (a, b) { return avg(b) - avg(a); });   /* 알약 순서 = 테마 종목처럼 업종 평균 등락이 큰 순 */
+          if (secTab >= order.length) secTab = 0;
+          if (tabsBox) {
+            tabsBox.textContent = '';
+            order.forEach(function (k, i) {
+              var b = el('button', 'seg', k);
+              b.type = 'button'; b.setAttribute('role', 'tab'); b.setAttribute('aria-selected', String(i === secTab));
+              b.addEventListener('click', function () { secTab = i; picksSort = ''; syncSortButtons(); renderSectorTop(); });
+              tabsBox.appendChild(b);
+            });
+          }
+          var rows = groups[order[secTab]].slice().sort(pickCmp()).slice(0, SEC_MAX);   /* 펼쳐도 10개까지 (2026-11-18 사용자 "너무 많다, 나머지는 검색") — CLAUDE.md `상한으로 버리지 않기`의 사용자 지정 예외 */
           body.textContent = '';
-          rows.forEach(function (x) {
-            var top = F.stocks[x.syms[0]];
+          rows.forEach(function (r, i) {
             var tr = el('tr');
-            var tdName = el('td', 'col-name');
-            tdName.appendChild(feedCell(top));
-            var others = x.syms.slice(1, 3).map(function (s) { return F.stocks[s]; }).filter(Boolean).sort(pickCmp());
-            if (others.length) {   /* 2위 · 3위는 작은 줄 — 각각 그 종목 페이지로 */
-              var sub = el('span', 'sector-sub');
-              others.forEach(function (o, j) {   /* 2위 · 3위는 종목마다 한 줄 — 가운뎃점 없이 줄바꿈 (2026-10-25 사용자) */
-                var chunk = el('span', 'sector-sub-item');
-                var a = el('a', null, o.name); a.href = feedPage(o); chunk.appendChild(a);
-                chunk.appendChild(el('span', signClass(cpOf(o) || 0), ' ' + arrow(cpOf(o) || 0) + fmt(Math.abs(cpOf(o) || 0)) + '%'));
-                sub.appendChild(chunk);
-              });
-              tdName.appendChild(sub); tdName.className += ' has-sub';
-            }
-            tr.appendChild(tdName);
-            var tdSector = el('td', 'col-sector'); tdSector.appendChild(el('span', 'cell-sector', x.sector)); tr.appendChild(tdSector);   /* 종목 → 업종 → 종가 (2026-10-25 사용자) */
-            var tdPrice = el('td'); tdPrice.appendChild(feedPrice(top)); tr.appendChild(tdPrice);
-            if (isKR(top) && LIVE_ENABLED) tr.appendChild(chartTd('sector', top));   /* 장중 차트 (2026-11-05) */
-            body.appendChild(tr);   /* 업종 줄은 접기 없이 전부 (2026-10-25 사용자: 시장 흐름과 종목의 더 보기 버튼 전부 삭제) */
-            if (isKR(top) && openChart.sector === top.s) body.appendChild(chartRow('sector', top, 4));
+            if (i >= PICK_SHOWN) { tr.className = 'rank-more'; tr.hidden = !secOpen; }
+            var tdName = el('td', 'col-name'); tdName.appendChild(feedCell(r)); tr.appendChild(tdName);
+            var tdPrice = el('td'); tdPrice.appendChild(feedPrice(r)); tr.appendChild(tdPrice);
+            body.appendChild(tr);
           });
+          setFold('sector-toggle', rows.length - PICK_SHOWN, secOpen, '종목');
         }
+        (function () {   /* 테마 종목 · 업종 종목 더 보기 — 펼침은 알약 · 시장을 바꿔도 그대로(가이드라인 10-11) */
+          var w = document.getElementById('watch-toggle'), sc = document.getElementById('sector-toggle');
+          if (w) w.addEventListener('click', function () { watchOpen = !watchOpen; renderWatch(); });
+          if (sc) sc.addEventListener('click', function () { secOpen = !secOpen; renderSectorTop(); });
+        })();
         (function () {   /* 시장 흐름과 종목 탭 전환 — 시장 흐름은 세 번째 탭 (2026-10-25 사용자) */
           var tabs = [].slice.call(document.querySelectorAll('#picks-tabs [data-pick]'));
           tabs.forEach(function (t) {
@@ -3325,12 +3602,13 @@ html.as-lock, html.as-lock body { overflow: hidden; }
             var dot = el('span'); dot.style.cssText = 'flex:none;width:3px;height:3px;margin-top:12px;border-radius:50%;background:#111;';
             /* 발언자 = 내용 뒤 작은 회색 `- 이름`, 이름 없으면 `- 방송 의견` (P353, design_kit.speaker_split 과 같은 규칙) */
             var m = /^\s*([^:：]{0,30}?)\s*(진행자 발언|기자 보도|발언|진행자|앵커|보도|발표)\s*[:：]\s*(.+)$/.exec(ln), who = '';   /* 접두 꼴 넓힘 (P377) */
-            if (m) { ln = m[3]; who = /^(진행자|앵커|방송|패널|출연자|기자)?$/.test(m[1].trim()) ? '방송 의견' : m[1].trim() + (m[2] === '기자 보도' ? ' 기자' : ''); }
+            if (m) { ln = m[3]; who = /^(진행자|앵커|방송|패널|출연자|기자)?$/.test(m[1].trim()) ? (HOME_MKT === 'kr' ? '' : '방송 의견') : m[1].trim() + (m[2] === '기자 보도' ? ' 기자' : ''); }
+            if (!who && it.bys && it.bys[i]) who = it.bys[i];   /* 사실 줄 출처(정부 발표 · 공시 · 말한 사람) = 발언자와 같은 꼴 (2026-11-24 사용자) */
             var tx = el('span', null, ln); tx.style.cssText = 'min-width:0;font-size:19px;line-height:28px;color:#333;word-break:keep-all;';
             if (who) { var wt = el('span', null, ' - ' + who); wt.style.cssText = 'color:#999;font-size:14px;white-space:nowrap;'; tx.appendChild(wt); }
             row.appendChild(dot); row.appendChild(tx); body.appendChild(row);
           });
-          if (it.link) {
+          if (it.link && !(HOME_MKT === 'kr' && media)) {   /* 한국 방송 팝업 = 영상 보기 없음, 출처 = 줄 끝 발언자 (2026-11-25 사용자) */
             var wrap = el('span'); wrap.style.cssText = 'display:block;text-align:right;margin:14px 0 0;';
             var ln2 = el('a', null, (media ? '영상 보기 (' : '원문 보기 (') + (it.source || 'CNBC') + (media ? ')' : ' · 영어)'));
             ln2.href = it.link; ln2.target = '_blank'; ln2.rel = 'noopener'; ln2.setAttribute('data-trhelp', 'skip');
@@ -3340,11 +3618,38 @@ html.as-lock, html.as-lock body { overflow: hidden; }
           body.scrollTop = 0; homePop.hidden = false; homePop.querySelector('.rt-pop-close').focus();
         }
 
+        var NF_MARK = "<svg viewBox='0 0 126 116' aria-hidden='true'><path d='M126 53.9424L66.4091 115.131H14.0898L76.0954 53.9424H126Z' fill='#DD0000'/><path d='M66.228 0H115.534L51.9111 59.1757H0L66.228 0Z' fill='#000'/></svg>";   /* 머리 줄 로고 앞 두 사선 */
+        var KR_FACTS_URL = GH + 'kr-facts.json';   /* 한국 기사 공용 저장소 (kr-facts.yml 09:20 · 18:20) — 미국 news.json · 방송 kr-news.json 과 같은 gh-pages */
+        function krFactItems(d) {   /* 사건 하나 = 줄 하나: 제목 = 사건 이름 · 요약 = 첫 사실 · 팝업 = 사실 줄 전부 · 출처 자리 = 보도 n곳(비교 대상) */
+          var evs = (d && d.facts && d.facts[0] && d.facts[0].events) || [];
+          return evs.map(function (e) { var fs = e.facts || []; return { title: e.event, summary_ko: (fs[0] && fs[0].what) || '', kind: 'fact', post: e.post || '', tag: e.tag, source: '보도 ' + e.sourceCount + '곳', published: e.at, lines: fs.map(function (f) { return f.line; }), bys: fs.map(function (f) { return f.by || ''; }) };   /* by = 출처 · 발언자, 팝업에서 작은 회색 - 출처 (2026-11-24) */ });
+        }
+        function nfPostItems(j) {   /* Newfact 글 → 목록 줄: 제목 앞 네모 배지 · 같은 창 상세 글 · 출처 자리 `Newfact 기사` · 팝업 없음 (2026-11-25 사용자) */
+          var kday = function (t) { var d = new Date(t); return isNaN(d) ? '' : new Date(d.getTime() + 9 * 36e5).toISOString().slice(0, 10); };
+          var today = kday(Date.now());
+          return ((j && j.items) || []).filter(function (it) { return it.url && kday(it.published) === today; })
+            .map(function (it) { return { title: it.title, summary_ko: it.summary || '', kind: 'post', slug: it.slug || '', tag: it.tag || '', source: 'Newfact', published: new Date(it.published).toISOString().slice(0, 19) + 'Z', link: it.url }; });
+        }
+        if (HOME_MKT === 'kr') {   /* 한국 목록 제목 = `오늘의 Newfact` (2026-11-25 사용자) — 브랜드는 로고 글꼴(.brand-word) */
+          var nt = document.getElementById('news-title');
+          if (nt && nt.lastChild && nt.lastChild.nodeType === 3) { var ic = nt.querySelector('.report-icon'); if (ic) nt.removeChild(ic);   /* 한국 = 제목 앞 아이콘 없음 (2026-11-25 사용자) */
+    var tt = el('span', null, '오늘의 '); tt.appendChild(el('span', 'brand-word', 'Newfact')); nt.replaceChild(tt, nt.lastChild); }   /* 한 조각으로 — 제목 칸(flex)이 조각마다 세로 가운데를 따로 잡아 Newfact 가 내려가던 것 */
+        }
         var NEWS_SHOWN = 5, NEWS_STEP = 10;   /* 홈 주요 뉴스 5건 + 누를 때마다 10건씩 (2026-11-07 사용자 P340, 옛 3건 · 8건까지 한 번에) */
-        fetch(NEWS_URL + '?v=' + Date.now())
-          .then(function (r) { return r.json(); })
+        /* 한국 홈 = 한국 증시 방송 이슈(kr-news.json) + 한국 기사 공용 저장소의 사건별 사실(kr-facts.json, 보도 2곳 이상) — 시각 순으로 섞음 (2026-11-24 사용자).
+           사실 파일을 못 받으면 방송만, 방송을 못 받으면 사실만 */
+        (HOME_MKT === 'kr' ? Promise.all([
+            fetch(GH + 'kr-news.json?v=' + Date.now()).then(function (r) { return r.json(); }).catch(function () { return { items: [] }; }),
+            fetch(KR_FACTS_URL + '?v=' + Date.now()).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }),
+            /* Newfact 글(news-posts.json, publish_news.py) = 오늘(한국 시간) 공개 글만 — 옛 홈 카드 규칙 그대로 (2026-11-24 "홈은 무조건 오늘 기사"), 10분 캐시 깨기 */
+            fetch(GH + 'news-posts.json?v=' + Math.floor(Date.now() / 6e5)).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; })
+          ]).then(function (p) { var po = nfPostItems(p[2]), sl = {}; po.forEach(function (x) { if (x.slug) sl[x.slug] = 1; });   /* 같은 사건 = 글 줄만 (2026-11-26 사용자): 사실 줄의 post(수집기 facts.post = 그 사건으로 쓴 Newfact 글 slug)가 오늘 글과 맞으면 사실 줄을 뺌 — post 가 없거나 안 맞으면 둘 다(잘못 지우는 것보다 겹쳐 보이는 게 낫다). 종목 페이지 · 한국 리포트와 같은 규칙(2ceccc8d) */
+      return { items: (p[0].items || []).concat(krFactItems(p[1]).filter(function (f) { return !(f.post && sl[f.post]); })).concat(po) }; })
+          : fetch(NEWS_URL + '?v=' + Date.now()).then(function (r) { return r.json(); }))
           .then(function (json) {
             var items = (json.items || []).filter(function (i) { return i && i.title; });
+            items.forEach(function (i) { if (!i.published && i.at) i.published = /[Z+]/.test(String(i.at).slice(10)) ? i.at : i.at + 'Z'; });   /* kr-news.json 은 시각이 at(UTC) */
+            if (HOME_MKT === 'kr') items.sort(function (a, b) { return String(b.published || '').localeCompare(String(a.published || '')); });   /* 방송 · 사실을 시각 순으로 */
             /* 번역된 제목이 있으면 그것을 쓴다 (fetch_news.py 가 Gemini 로 채운 title_ko). 분류는 영문 원제로 한다. */
             items.forEach(function (i) { i.title_en = i.title; if (i.title_ko) i.title = i.title_ko; });
             if (!items.length) throw new Error('no items');
@@ -3365,19 +3670,24 @@ html.as-lock, html.as-lock body { overflow: hidden; }
               var card = el('article', 'news-item');
               if (idx >= NEWS_SHOWN) { card.hidden = true; card.setAttribute('data-news-more', '1'); }   /* 5건 뒤는 더 보기 안 (P340) */
               var a = el('a', null, it.title);
-              if (it.link) { a.href = it.link; a.target = '_blank'; a.rel = 'noopener'; }
+              if (it.kind === 'post') {   /* Newfact 글 = 제목 앞 네모 배지(로고 마크) · 같은 창 */
+                a.href = it.link; var bd = el('span', 'nf-badge'); bd.setAttribute('role', 'img'); bd.setAttribute('aria-label', 'Newfact');
+                bd.innerHTML = NF_MARK; a.textContent = ''; a.className = 'nf-post'; a.appendChild(bd); a.appendChild(el('span', null, it.title));
+              }
+              else if (it.link && !(HOME_MKT === 'kr' && it.kind === 'media')) { a.href = it.link; a.target = '_blank'; a.rel = 'noopener'; }   /* 한국 방송 = 영상 링크 없음 (2026-11-25) */
               card.appendChild(a);
               var media = it.kind === 'media';   /* 방송 줄 — 미디어 데일리 재료의 시장 이슈 (fetch_news.py media_items, 2026-10-25 사용자). 한국어 주제 + 유튜브라 번역 안내 없음 */
               if (media) a.setAttribute('data-trhelp', 'skip');
               /* 제목 아래 기사 소개 한 줄 — RSS 요약을 한국어로 옮긴 것 (2026-10-19 사용자: 원문이 영어라 내용을 한국어로 조금). fetch_news.py 가 summary_ko 를 채운다.
                  명사형으로 끝낸다 "… 애널리스트가 선정" (2026-10-20 사용자: "전한다" 금지) — 옛 "기사는 … 전한다" 문장은 다음 수집에서 바뀔 때까지 싣지 않는다 */
-              if (it.summary_ko && !/^기사는|전한다\.?$|본다\.?$/.test(it.summary_ko)) card.appendChild(el('span', 'news-sum', it.summary_ko));
+              if (it.summary_ko && (it.kind === 'fact' || !/^기사는|전한다\.?$|본다\.?$/.test(it.summary_ko))) card.appendChild(el('span', 'news-sum', it.summary_ko));
               /* 선정 이유(why_ko)는 홈에 보이지 않는다 (2026-10-24 사용자). 옛: 제목 아래 14px 회색 (2026-10-14) */
               var labs = el('span', 'news-labels');   /* 라벨 줄: 분류 라벨 뒤에 출처 · 시각 (2026-10-14 사용자) */
-              labs.appendChild(el('span', 'news-tag', media ? (it.tag || '시장') : newsCategory(it)));
-              if (media) labs.appendChild(el('span', 'news-tag', '방송'));   /* 기사가 아니라 방송 내용(의견 포함) — 채널이 매체 자리 */
+              if (it.kind !== 'post') labs.appendChild(el('span', 'news-tag', media ? (it.tag || '시장') : (it.tag || newsCategory(it))));   /* Newfact 글 = 분야 라벨 없이(배지 · `Newfact 기사`) */   /* 한국 사실 줄 = 분야 이름(tag) */
+              if (media && HOME_MKT !== 'kr') labs.appendChild(el('span', 'news-tag', '방송'));   /* 한국 = 방송 라벨 없음 (2026-11-25 사용자) */   /* 기사가 아니라 방송 내용(의견 포함) — 채널이 매체 자리 */
               /* 메타 = `11.07 07:07 · 매체 · 방송 n곳` — 종목 페이지 뉴스와 같은 순서 · 형식 (2026-11-07 사용자: 뉴스 폼 통일, 옛 `CNBC 17:06`) */
-              var sub = el('span', 'news-sub', [mdhm(kstTime(it.published)), it.source || 'CNBC'].concat(media && it.n_channels > 1 ? ['방송 ' + it.n_channels + '곳'] : []).filter(Boolean).join(' · '));
+              var krMedia = HOME_MKT === 'kr' && media;   /* 한국 방송 = 채널 이름 없이 — 출처는 팝업 줄 끝 발언자 (2026-11-25 사용자) */
+              var sub = el('span', 'news-sub', [mdhm(kstTime(it.published)), krMedia ? '' : (it.source || 'CNBC')].concat(media && it.n_channels > 1 ? ['방송 ' + it.n_channels + '곳'] : []).filter(Boolean).join(' · '));
               labs.appendChild(sub);
               card.appendChild(labs);
               if (it.lines && it.lines.length >= 2) {   /* 요약 다섯 줄이 있으면 줄을 눌러 팝업 — 원문은 팝업 안 작은 링크 (2026-11-07 사용자 P342, 리포트 뉴스 팝업과 같은 모양) */
@@ -3388,7 +3698,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
             });
             var nb = document.getElementById('news-toggle');
             var hid = function () { return [].slice.call(list.querySelectorAll('[data-news-more]')).filter(function (x) { return x.hidden; }); };
-            var paint = function () { var h = hid().length; nb.firstChild.textContent = h ? '뉴스 ' + Math.min(NEWS_STEP, h) + '건 더 보기' : '접기'; nb.setAttribute('aria-expanded', String(!h)); };
+            var paint = function () { var h = hid().length; nb.firstChild.textContent = h ? (HOME_MKT === 'kr' ? 'Newfact ' : '뉴스 ') + Math.min(NEWS_STEP, h) + '건 더 보기' : '접기'; nb.setAttribute('aria-expanded', String(!h)); };
             if (nb && items.length > NEWS_SHOWN) {
               nb.hidden = false; paint();
               nb.addEventListener('click', function () {
@@ -3401,7 +3711,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
           })
           .catch(function () {
             var l2 = document.getElementById('news-list');
-            if (l2) { l2.textContent = ''; l2.appendChild(el('article', 'news-item load-status', '뉴스를 불러올 수 없습니다.')); }
+            if (l2) { l2.textContent = ''; l2.appendChild(el('article', 'news-item load-status', HOME_MKT === 'kr' ? 'Newfact 를 불러올 수 없습니다.' : '뉴스를 불러올 수 없습니다.')); }
           });
 
         /* ====================================================== 오늘의 데일리 리포트
@@ -3742,7 +4052,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
           var pc = +d.prev, close = +d.close;
           var lo = Math.min.apply(null, d.c.concat([pc])), hi = Math.max.apply(null, d.c.concat([pc]));
           if (!(hi > lo) || !(pc > 0)) return false;
-          function X(m) { return 2 + Math.min(m, S) / S * (W - 4); }
+          function X(m) { return Math.min(m, S) / S * W; }   /* 양 끝 = 카드 테두리에 딱 (2026-11-18 사용자, 옛 좌우 2 여백 삭제) */
           function Y(v) { return T + (hi - v) / (hi - lo) * (H - T - B); }
           function f1(n) { return n.toFixed(1); }
           function money(n) { return (+n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
@@ -4024,13 +4334,14 @@ html.as-lock, html.as-lock body { overflow: hidden; }
         })();
 
         /* ============================================================ 로그인 · 계정 · 관리자 줄 (2026-11-13 사용자: "상단 메뉴 앞에 로그인 버튼", "관리자 페이지는 우측 메뉴 버튼 아래")
-           헤더 `.as-login-btn` — 로그인 전 = 사람 아이콘, 누르면 계정 창(구글 로그인 흰 버튼). 로그인 뒤 = 내 사진, 누르면 계정 창(이름 · [운영 현황] · 로그아웃).
+           전체 메뉴 맨 위 `.menu-me-btn`(2026-11-26 헤더에서 옮김) — 로그인 전 = 사람 아이콘 + `로그인`, 누르면 계정 창(구글 로그인 흰 버튼). 로그인 뒤 = 내 사진, 누르면 계정 창(이름 · [운영 현황] · 로그아웃).
            방문자 요청 0: Firebase 로그인 도구(gstatic)는 계정 창을 열 때 · 이 기기에서 로그인해 둔 표시(as-signed)가 있을 때만 불러온다.
            구글 로그인 창은 계정 창의 버튼을 누를 때 연다 — 도구를 그 전에 불러 두어야 폰 브라우저가 팝업을 막지 않는다.
            블로그 주인(UID)이면 as-admin 표시 → 메뉴 맨 아래 `운영 현황` 줄 + 계정 창 버튼. 누르면 ID 토큰을 운영 Worker /fb-login 으로 POST(주소에 넣지 않음).
            주소 끝 #ops 도 표시를 남긴다(예비 입구). 로그아웃하면 두 표시를 지운다. */
         (function () {
-          var btn = document.querySelector('.as-login-btn'), row = document.querySelector('#primary-menu .menu-admin');
+          var btn = document.querySelector('.menu-me-btn'), row = document.querySelector('#primary-menu .menu-admin');
+          var pic = btn && btn.querySelector('.menu-me-pic'), nm = btn && btn.querySelector('.menu-me-n');
           var OPS = 'https://alphascope-ops-console.red6keep.workers.dev';
           var SDK = 'https://www.gstatic.com/firebasejs/10.14.1/';
           var CFG = { apiKey: 'AIzaSyDY59SYxDKvQAAOxwbxYwZexolbx_5B-q0', authDomain: 'alphascope-352e9.firebaseapp.com', projectId: 'alphascope-352e9', appId: '1:143644264576:web:96972235fa5e8ac58c3e65', owner: 'u1vln4bbDgSgWQDe2F2FaNs81D43' };   /* 댓글 CFG 와 같은 공개 값 */
@@ -4039,7 +4350,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
           function showRow() { if (row) row.hidden = !flag('as-admin'); }
           showRow();
           var fb = null, au = null, user = null, readyP = null, pop = null, from = null;
-          var ICON = btn ? btn.innerHTML : '';
+          var ICON = pic ? pic.innerHTML : '';
           function gProvider(fb) { var p = new fb.auth.GoogleAuthProvider(); p.setCustomParameters({ prompt: 'select_account' }); return p; }   /* 매번 계정 고르는 창 — 계정이 둘 이상이면 마지막 계정으로 바로 들어가던 것 (2026-11-13 사용자) */
           function load(src) { return new Promise(function (ok, no) { var s = document.createElement('script'); s.src = src; s.async = true; s.onload = ok; s.onerror = no; document.head.appendChild(s); }); }
           function ready() {
@@ -4065,7 +4376,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
             flag('as-signed', !!user);
             flag('as-admin', !!user && user.uid === CFG.owner);
             showRow();
-            if (btn) { btn.innerHTML = ''; if (user) { btn.appendChild(face(user)); btn.setAttribute('aria-label', '내 계정'); } else { btn.innerHTML = ICON; btn.setAttribute('aria-label', '로그인'); } }
+            if (btn && pic) { pic.innerHTML = ''; if (user) { pic.appendChild(face(user)); nm.textContent = user.uid === CFG.owner ? 'Newfact 운영자' : (user.displayName || '내 계정'); btn.setAttribute('aria-label', '내 계정'); } else { pic.innerHTML = ICON; nm.textContent = '로그인'; btn.setAttribute('aria-label', '로그인'); } }
             if (pop && !pop.hidden) paint();
           }
           /* 운영 현황 — 토큰을 POST(form) 로 Worker 에 */
@@ -4102,7 +4413,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
               body.appendChild(lg);
             } else {
               title.textContent = '내 계정';
-              var me = mk('div', 'as-acct-me'); me.appendChild(face(user)); me.appendChild(mk('span', null, user.uid === CFG.owner ? 'AlphaScope 운영자' : (user.displayName || '이름 없음')));
+              var me = mk('div', 'as-acct-me'); me.appendChild(face(user)); me.appendChild(mk('span', null, user.uid === CFG.owner ? 'Newfact 운영자' : (user.displayName || '이름 없음')));
               body.appendChild(me);
               if (user.uid === CFG.owner) {
                 var ob = mk('button', 'as-acct-btn', '운영 현황'); ob.type = 'button';
@@ -4217,7 +4528,41 @@ html.as-lock, html.as-lock body { overflow: hidden; }
         window.addEventListener('resize', function () { if (!hasBar && !narrow() && menu.classList.contains('is-open')) setMenu(false); });   /* PC 도 서랍이면 닫지 않는다 */
       })();
 
-      /* ============================================================ 글 제목 끝의 날짜 (2026-10-12 사용자: 16px, 볼드 없음, 모든 리포트 제목 — 글 보기·글 목록)
+      /* ============================================================ 시황 해설 글 제목 줄 = ` : ` 앞(`11.19 증시 시황`)만 (2026-11-19 사용자 — 발행 글 제목 줄에 그날 주제까지 길게 나오던 것).
+               저장 제목 `11.19 증시 시황 : 그날 주제`는 검색 · 목록용으로 그대로, 그날 주제는 본문 머리글([data-headline])이 보여 준다. 목록 카드 제목은 그대로 */
+            (function () {
+              'use strict';
+              function trim() {
+                if (!document.querySelector('.post-body [data-headline]')) return;
+                var h = document.querySelector('.post-outer-container .post-title') || document.querySelector('.post-title');
+                if (!h) return;
+                /* 제목 줄을 고정 머리 · 공유 버튼으로 묶는 다른 스크립트가 먼저 돌았어도 되게 — ` : ` 가 든 글자 조각만 찾아 자른다 */
+                var w = document.createTreeWalker(h, NodeFilter.SHOW_TEXT, null), n;
+                while ((n = w.nextNode())) {
+                  var i = n.nodeValue.indexOf(' : ');
+                  if (i > 0) { n.nodeValue = n.nodeValue.slice(0, i).replace(/\s+$/, ''); break; }
+                }
+                /* Newfact 주요 기사 글([data-news-post]): 제목 줄 `Newfact 주요 기사` → 머리 줄과 같은 Newfact 로고 + 작은 글씨 `주요 기사` (2026-11-23 사용자) */
+                if (!document.querySelector('.post-body [data-news-post]') || h.querySelector('.nf-title-logo')) return;
+                var tp = document.querySelector('.post-body template[data-nf-logo]'), logo = document.querySelector('svg.logo-full') || (tp && tp.content.querySelector('svg'));   /* 목업엔 머리 줄이 없어 본문 template */
+                w = document.createTreeWalker(h, NodeFilter.SHOW_TEXT, null);
+                while ((n = w.nextNode())) {
+                  var j = n.nodeValue.indexOf('Newfact ');
+                  if (j < 0 || !logo) continue;
+                  var rest = n.nodeValue.slice(j + 8).trim(), box = document.createElement('span');
+                  box.className = 'nf-title';
+                  var lg = logo.cloneNode(true); lg.setAttribute('class', 'nf-title-logo');
+                  var sm = document.createElement('span'); sm.className = 'nf-title-sub'; sm.textContent = rest;
+                  box.appendChild(lg); box.appendChild(sm);
+                  n.parentNode.replaceChild(box, n);
+                  return;
+                }
+              }
+              trim();
+              document.addEventListener('DOMContentLoaded', trim);
+            })();
+
+            /* ============================================================ 글 제목 끝의 날짜 (2026-10-12 사용자: 16px, 볼드 없음, 모든 리포트 제목 — 글 보기·글 목록)
          "엔비디아 NVDA 주가 2026년 10월 19일" → 날짜 부분을 span.post-title-date 로 감싼다. 모양 · 오른쪽 정렬은 테마 CSS (2026-10-18 사용자: 날짜는 우측 정렬, 줄표 삭제).
          옛 글 "엔비디아 리포트 — 2026년 10월 11일" 도 줄표를 떼고 날짜만 감싼다. */
       (function () {
@@ -4288,6 +4633,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
         btn.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
           '<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 10.7l6.8-4M8.6 13.3l6.8 4"/></svg>';
         meta.appendChild(btn);
+        if (document.querySelector('.post-body [data-no-share]')) btn.style.display = 'none';   /* 본인 · 운영자만 보는 화면(내 정보 · 지갑 · 알림 · 보유 종목 등) = 본문의 data-no-share 표시로 공유 버튼 없음 (2026-11-21 사용자) */
         /* 제목 글자(+로고)를 한 칸(.post-title-text)으로 묶는다 — 제목이 길어 줄이 바뀌어도 공유 버튼은 오른쪽 끝에 그대로, 글자만 그 안에서 줄바꿈 (2026-10-23 사용자: 종목 페이지 긴 제목) */
         var txt = document.createElement('span'); txt.className = 'post-title-text';
         var lab = document.createElement('span'); lab.className = 'post-title-label';   /* 글자 칸 — 로고는 이 칸 왼쪽에 따로 붙어(아래 티커 로고 스크립트) 둘째 줄이 첫 글자 선에 맞는다 */
@@ -4296,9 +4642,13 @@ html.as-lock, html.as-lock body { overflow: hidden; }
         var tw = document.createTreeWalker(lab, NodeFilter.SHOW_TEXT, null), tn; while ((tn = tw.nextNode())) tn.nodeValue = tn.nodeValue.replace(/ · /g, '\u00a0· ');   /* 가운뎃점이 줄 맨 앞에 오지 않게 앞 낱말에 붙인다 */
         /* 종목 제목 꼬리 `주가 · 실적 일정` 은 작은 회색 · 점 없이 `주가 실적 일정` (2026-10-27 사용자 P20: 검색어는 제목에 그대로 두되 독자 눈에는 이름이 제목).
            글자는 지우거나 숨기지 않는다 — 크기만 다르게(검색엔진 숨은 글자 정책). 로고 스크립트가 읽는 textContent 도 그대로 */
+        /* 이름 옆 티커(`엔비디아 NVDA`)도 꼬리로 — 큰 제목 = 이름만, 꼬리 = `NVDA 주가 실적 일정` (2026-11-19 사용자). `AMD 주가` 는 그대로, `인베스코 QQQ` 는 본문 [data-title-keep-ticker] 로 뺀다 */
+        var keepTk = !!document.querySelector('.post-body [data-title-keep-ticker]');
         tw = document.createTreeWalker(lab, NodeFilter.SHOW_TEXT, null);
         while ((tn = tw.nextNode())) {
-          var sm = /\s(주가(?:\u00a0· 실적 일정)?)\s*$/.exec(tn.nodeValue);
+          var sm = keepTk ? null : /\S(\s([A-Z][A-Z0-9.\-]{0,5}\s주가(?:\u00a0· 실적 일정)?))\s*$/.exec(tn.nodeValue);
+          if (sm) sm = { index: sm.index + 1, 1: sm[2] };
+          else sm = /\s(주가(?:\u00a0· 실적 일정)?)\s*$/.exec(tn.nodeValue);
           if (!sm) continue;
           var sub = document.createElement('span'); sub.className = 'post-title-sub'; sub.textContent = sm[1].replace('\u00a0· ', ' ');   /* 꼬리 안 가운데 점은 뺀다 — 글 제목 · 주소는 그대로 (P21) */
           var tail = tn.splitText(sm.index + 1); tail.nodeValue = tail.nodeValue.slice(sm[1].length);
@@ -4429,6 +4779,18 @@ html.as-lock, html.as-lock body { overflow: hidden; }
         stamp.classList.add('has-share');
       })();
 
+      /* ============================================================ 시황 해설 기준 날짜 = 제목 줄 오른쪽 · 공유 버튼 앞 (2026-11-19 사용자: "기준 줄을 타이틀 줄 우측에, 공유도 타이틀 우측에")
+         본문의 [data-title-basis](`11월 16일 미국장 종가 기준`)를 제목 줄 .post-title-meta 의 공유 버튼 앞으로 옮긴다. 회색 기준 상자(data-report-stamp)가 없는 글이라 공유 버튼은 제목 줄에 그대로 남는다.
+         테마를 붙이기 전에는 본문 맨 위 작은 회색 줄로 보인다 */
+      (function () {
+        'use strict';
+        var b = document.querySelector('.post-body [data-title-basis]'), meta = document.querySelector('.post-title .post-title-meta');
+        if (!b || !meta) return;
+        var s = document.createElement('span'); s.className = 'post-title-basis'; s.textContent = b.textContent.trim();
+        meta.insertBefore(s, meta.querySelector('.title-share'));
+        b.parentNode.removeChild(b);
+      })();
+
       /* ============================================================ `함께 보는 페이지` 자리 (2026-11-10 사용자: 홈 · TOP 버튼 줄 아래로)
          렌더러는 본문 맨 끝에 [data-related] 를 둔다 — 이미 게시된 글까지 테마가 버튼 줄(+ 댓글 판) 아래로 옮긴다.
          본문 끝 구분선 판정(아래 .ends-text)보다 먼저 옮겨야 옮긴 뒤 본문 끝으로 정한다 */
@@ -4445,7 +4807,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
           after.parentNode.insertBefore(r, after.nextSibling); after = r;
           r.classList.add('is-moved');
           /* 최대 3줄 (2026-11-10 사용자) — 이미 게시된 글의 4줄 이상도 앞 3줄만. 렌더러(dk.related_buttons)도 3개로 자른다 */
-          [].slice.call(r.querySelectorAll('a[data-row-link]')).slice(3).forEach(function (x) { x.parentNode.removeChild(x); });
+          if (!r.hasAttribute('data-related-all')) [].slice.call(r.querySelectorAll('a[data-row-link]')).slice(3).forEach(function (x) { x.parentNode.removeChild(x); });   /* Newfact 주요 기사 = 연결되는 서비스 전부 (data-related-all, 2026-11-23 사용자) */
         });
         /* 글 끝 순서 = 본문 → 함께 보는 페이지 → [댓글 · TOP] → 푸터 (2026-11-12 사용자 여정 테스트) — 버튼 줄 · 댓글 칸을 마지막 함께 보는 페이지 뒤로 */
         var rels = [].slice.call(shell.querySelectorAll('.post-shell > [data-related].is-moved'));
@@ -4512,7 +4874,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
           return p.year + '.' + p.month + '.' + p.day + ' ' + pad(parseInt(p.hour, 10) % 24) + ':' + p.minute;
         }
         /* 운영자 댓글은 이름 `AlphaScope` · 사진 자리에 로고 (2026-10-14 사용자: "다른 이름처럼 보이게") — 저장된 이름(구글 프로필)은 그대로, 보일 때만 바꾼다 */
-        var OWNER_NAME = 'AlphaScope';
+        var OWNER_NAME = 'Newfact';
         var LOGO_SVG = '<svg viewBox="0 0 313 286" width="18" height="16" aria-hidden="true"><path d="M313 134L164.968 286H35L189.03 134H313Z" fill="#DD0000"/><path d="M164.519 0H287L128.954 147H0L164.519 0Z" fill="#000000"/></svg>';
         function isOwnerC(c) { return !!OWNER && c.uid === OWNER; }
         function nameOf(c) { return isOwnerC(c) ? OWNER_NAME : c.name; }
@@ -4842,6 +5204,33 @@ html.as-lock, html.as-lock body { overflow: hidden; }
               rs.unshift(rk); localStorage.setItem('as-recent', JSON.stringify(rs.slice(0, 10)));
             } catch (e) {}
           }
+          /* 관심 종목 ☆ (2026-11-19 사용자 "적용해") — 종목 고정 페이지 제목의 이름 뒤(회색 꼬리 앞). 로그인 없이 이 브라우저(localStorage as-watch)에 담고 뺀다.
+             as-watch = [{m, t}] 담은 순서, 미국 · 한국 합쳐 100개 — 종목 모아보기 관심 탭(stock_lists.js)이 같은 칸을 읽는다 */
+          if (h.classList.contains('post-title') && document.body.classList.contains('item-view') && !/^\/\d{4}\/\d{2}\//.test(location.pathname) && !h.querySelector('.as-star')) {
+            (function () {
+              var wk = { m: kr ? 'kr' : 'us', t: kr ? kr[1] : sym.split('.')[0] };
+              function load() { try { var a = JSON.parse(localStorage.getItem('as-watch') || '[]'); return Array.isArray(a) ? a : []; } catch (e) { return []; } }
+              function has() { return load().some(function (x) { return x && x.m === wk.m && x.t === wk.t; }); }
+              var P = 'M12 3.2l2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 17l-5.4 2.9 1.1-6.1-4.5-4.2 6.1-.8z';
+              var sb = document.createElement('button'); sb.type = 'button'; sb.className = 'as-star';
+              function draw() { var on = has(); sb.setAttribute('aria-pressed', String(on)); sb.setAttribute('aria-label', on ? '관심 종목에서 빼기' : '관심 종목에 담기');
+                sb.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="' + P + '" fill="' + (on ? 'currentColor' : 'none') + '" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>'; }
+              function toast(msg, link) { var o = document.querySelector('.as-toast'); if (o) o.remove(); var d = document.createElement('div'); d.className = 'as-toast';
+                d.innerHTML = '<span>' + msg + '</span>' + (link ? '<a href="/p/stock-lists.html?m=' + wk.m + '#tab-%EA%B4%80%EC%8B%AC">관심 목록 보기</a>' : ''); document.body.appendChild(d); setTimeout(function () { d.remove(); }, 3000); }
+              sb.addEventListener('click', function (e) {
+                e.preventDefault(); e.stopPropagation();
+                var a = load().filter(function (x) { return x && !(x.m === wk.m && x.t === wk.t); }), on = has();
+                if (!on && a.length >= 100) { toast('관심 종목은 100개까지 담을 수 있습니다'); return; }
+                if (!on) a.push(wk);
+                try { localStorage.setItem('as-watch', JSON.stringify(a)); } catch (err) { toast('이 브라우저에서는 저장할 수 없습니다'); return; }
+                if (!on) { try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (err) {} }
+                draw(); toast(on ? '관심 종목에서 뺐습니다' : '관심 종목에 담았습니다', !on);
+              });
+              draw();
+              var lab = h.querySelector('.post-title-label'), sub = lab && lab.querySelector('.post-title-sub');
+              if (sub) lab.insertBefore(sb, sub); else if (lab) lab.appendChild(sb); else h.appendChild(sb);
+            })();
+          }
           var host = h.querySelector('.post-title-text') || h.querySelector('a') || h;   /* 제목 글자 칸이 있으면 그 안 맨 앞 — 로고가 첫 글자 앞에 붙는다 */
           /* 2026-10-21: 제3자 로고 핫링크(financialmodelingprep) 중단 — 운영지침 4-6. 티커 두 글자 둥근 배지(리포트 design_kit.ticker_logo 와 같은 모양) */
           var b = document.createElement('span'); b.className = 'title-logo title-badge'; b.setAttribute('aria-hidden', 'true');
@@ -5119,28 +5508,32 @@ html.as-lock, html.as-lock body { overflow: hidden; }
         /* 분야 칩 · 더 보기 (batch 9 ①): `전체` 칩 없음 — 첫 칩 `주요 뉴스` = li[data-pick], 분야 칩 = li[data-theme]. 분야마다 data-shown 건 보이고 `뉴스 n건 더 보기` 가 나머지를 편다 */
         var chips = root.querySelector('[data-news-chips]'), list = root.querySelector('[data-news-list]'), more = root.querySelector('[data-news-more]');
         if (!chips || !list) return;
-        var items = [].slice.call(list.querySelectorAll('li[data-theme]')), shown = parseInt(list.getAttribute('data-shown') || '10', 10), opened = false, current = '주요 뉴스';
+        var items = [].slice.call(list.querySelectorAll('li[data-theme]')), shown = parseInt(list.getAttribute('data-shown') || '10', 10), opened = false, extra = 0, current = '주요 뉴스';
+        /* 한국 리포트 (2026-11-25 사용자): 첫 칩 이름 = 렌더러가 준 것(`Newfact` = 전체 보기), data-step 이 있으면 누를 때마다 그만큼(10건씩), 버튼 글자 = data-more-label. 없으면 옛 동작(미국) */
+        var firstChip = chips.querySelector('[data-chip]'), step = parseInt(list.getAttribute('data-step') || '0', 10), moreLabel = list.getAttribute('data-more-label') || '뉴스';
+        if (firstChip) current = firstChip.getAttribute('data-chip');
+        var pickChip = current;
         function apply() {
           var n = 0, hidden = 0;
           items.forEach(function (li) {
-            var hit = current === '주요 뉴스' ? li.hasAttribute('data-pick') : li.getAttribute('data-theme') === current;
-            var hide = !hit || (!opened && n >= shown);
+            var hit = current === pickChip ? li.hasAttribute('data-pick') : li.getAttribute('data-theme') === current;
+            var hide = !hit || (!opened && n >= shown + extra);
             if (hit) n++;
             if (hit && hide) hidden++;
             li.hidden = hide;
           });
-          if (more) { more.style.display = hidden ? '' : 'none'; var t = more.querySelector('span'); if (t) t.textContent = '뉴스 ' + hidden + '건 더 보기'; }
+          if (more) { more.style.display = hidden ? '' : 'none'; var t = more.querySelector('span'); if (t) t.textContent = moreLabel + ' ' + (step ? Math.min(step, hidden) : hidden) + '건 더 보기'; }
           var first = true;
           items.forEach(function (li) { if (li.hidden) return; li.style.boxShadow = first ? 'none' : 'inset 0 1px 0 #E2E8F0'; first = false; });
         }
         [].slice.call(chips.querySelectorAll('[data-chip]')).forEach(function (b) {
           b.addEventListener('click', function () {
-            current = b.getAttribute('data-chip'); opened = false;
+            current = b.getAttribute('data-chip'); opened = false; extra = 0;
             [].slice.call(chips.querySelectorAll('[data-chip]')).forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
             apply();
           });
         });
-        if (more) more.addEventListener('click', function () { opened = true; apply(); });
+        if (more) more.addEventListener('click', function () { if (step) extra += step; else opened = true; apply(); });
         apply();
       })();
 
@@ -5411,6 +5804,13 @@ html.as-lock, html.as-lock body { overflow: hidden; }
             var texts = [].slice.call(title.childNodes).filter(function (n) { return n.nodeType === 3 && n.nodeValue.trim(); });
             texts.forEach(function (n, i) { n.nodeValue = i ? '' : ht.getAttribute('data-head-title'); });
           }
+          /* 머리 줄 오른쪽 날짜 (2026-11-22 사용자: 홈 카드는 `11.22 아침` 인데 상세에선 언제 화면인지 안 보였다) — 본문 data-head-date 를 공유 버튼 앞에 회색 글자로 */
+          var hd = ht.getAttribute('data-head-date');
+          if (hd && !title.querySelector('.post-title-asof')) {
+            var asof = document.createElement('span'); asof.className = 'post-title-asof'; asof.textContent = hd;
+            var meta = title.querySelector('.post-title-meta');
+            if (meta) meta.insertBefore(asof, meta.firstChild); else title.appendChild(asof);
+          }
         }
       })();
 
@@ -5528,7 +5928,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
            글 제목(검색 · 공유 · <title>)은 그대로, 화면의 머리 줄 글자만. 제목 칸 정리 스크립트가 끝난 뒤에도 한 번 더(load) */
         var hl = document.querySelector('.post-body [data-head-label]');
         if (hl) {
-          var setHead = function () { var l = document.querySelector('.post-title-label') || document.querySelector('.post-title'); if (l) l.textContent = hl.getAttribute('data-head-label'); };
+          var setHead = function () { var l = document.querySelector('.post-title-label') || document.querySelector('.post-title'); if (l) { l.textContent = hl.getAttribute('data-head-label'); var sub = hl.getAttribute('data-head-sub'); if (sub) { var s = document.createElement('span'); s.textContent = ' - ' + sub; s.style.cssText = 'font-size:11px;font-weight:500;opacity:.6;margin-left:3px;letter-spacing:0;vertical-align:baseline;'; l.appendChild(s); } } };   /* data-head-sub = 머리 줄 옆 아주 작은 글씨(주식 제대로 알기 - 주식공부, 2026-11-20 사용자) */
           setHead();
           window.addEventListener('load', setHead);
         }
@@ -5537,6 +5937,23 @@ html.as-lock, html.as-lock body { overflow: hidden; }
             try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) { window.scrollTo(0, 0); }
           });
         });
+        /* 짧은 화면엔 TOP 을 숨긴다 (2026-11-19 사용자: "세로 길이가 짧으면 쓸 이유가 없다") — 페이지 전체 높이가 화면 높이의 2배보다 짧으면 숨김.
+           자리는 남긴다(visibility) — 가운데 목록 · 왼쪽 댓글 버튼이 흔들리지 않게. 탭 · 접기 · 댓글을 열면 길이가 바뀌어 다시 잰다 */
+        var tops = [].slice.call(document.querySelectorAll('.post-nav-top'));
+        if (tops.length) {
+          var topCheck = function () {
+            var h = Math.max(document.documentElement.scrollHeight, document.body ? document.body.scrollHeight : 0);
+            var short = h < window.innerHeight * 2;
+            tops.forEach(function (b) { b.classList.toggle('is-short', short); });
+          };
+          var topLater = function () { setTimeout(topCheck, 0); setTimeout(topCheck, 400); };
+          topCheck();
+          window.addEventListener('load', topCheck);
+          window.addEventListener('resize', topCheck);
+          document.addEventListener('click', topLater, true);   /* 탭 · 접기 · 더 보기 · 댓글 열기 — 무엇이든 누른 뒤 다시 잰다 */
+          document.addEventListener('toggle', topLater, true);   /* <details> 펼침 */
+          setTimeout(topCheck, 1500);   /* 목록 · 그래프를 늦게 채우는 페이지(종목 모아보기 등) */
+        }
       })();
 
       /* ============================================================ 홈 화면 추가 안내 (2026-10-13 사용자, 디자인 가이드 10-4)
@@ -5560,8 +5977,9 @@ html.as-lock, html.as-lock body { overflow: hidden; }
         var inapp = /NAVER\(inapp|Instagram|FBAN|FBAV|Line\/|DaumApps|everytimeApp|; wv\)/i.test(ua);
         var mode = force || (standalone ? '' : kakao ? 'kakao' : inapp ? 'inapp' : ios ? 'ios' : android ? 'android' : '');
         if (!mode) return;
+        var auto = true;   /* 저절로 띄우기 — 닫은 지 14일 안이면 끔. 버튼(window.asA2hs)으로 여는 것은 늘 된다 (2026-11-19 사용자: 관심 종목 `홈 화면에 추가` 버튼) */
         if (!force) {
-          try { if (Date.now() < Number(localStorage.getItem(KEY) || 0)) return; } catch (e) {}
+          try { if (Date.now() < Number(localStorage.getItem(KEY) || 0)) auto = false; } catch (e) {}
         }
 
         function quiet(days) { try { localStorage.setItem(KEY, String(Date.now() + days * DAY)); } catch (e) {} }
@@ -5588,7 +6006,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
         box.innerHTML =
           '<div class="a2hs-head">' +
             '<img class="a2hs-icon" alt="" width="44" height="44" src="' + ICON + '"/>' +
-            '<div class="a2hs-text"><p class="a2hs-title">홈 화면에 AlphaScope 추가</p><p class="a2hs-sub">' + TEXT.sub + '</p></div>' +
+            '<div class="a2hs-text"><p class="a2hs-title">홈 화면에 Newfact 추가</p><p class="a2hs-sub">' + TEXT.sub + '</p></div>' +
             '<button type="button" class="a2hs-close" aria-label="닫기"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>' +
           '</div>' +
           '<button type="button" class="a2hs-btn">' + TEXT.btn + '</button>' +
@@ -5614,7 +6032,9 @@ html.as-lock, html.as-lock body { overflow: hidden; }
         };
 
         document.body.appendChild(box);
-        setTimeout(function () { box.hidden = false; }, force ? 0 : 2500);
+        if (auto) setTimeout(function () { box.hidden = false; }, force ? 0 : 2500);
+        /* 버튼으로 열기 — 안내 상자를 띄우고 바로 `홈 화면에 추가` 단계로(안드로이드 설치 창 · 아이폰 방법 · 카카오 바깥 브라우저). 홈 화면 앱 · PC 에서는 없다(mode 없음) */
+        window.asA2hs = function () { box.hidden = false; var b = box.querySelector('.a2hs-btn'); if (b && !b.hidden) b.click(); };
       })();
       /* ================================================================ 터치 장치 (2026-10-19 사용자, 가이드라인 10-9)
          1) 행 · 카드 전체가 그 안의 첫 링크로 간다 — 시총 TOP 10 줄 · 뉴스 · 글 목록 카드 · 본문의 [data-row-link] 줄.
@@ -5631,7 +6051,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
         function startNav() {
           if (!bar) {
             bar = document.createElement('div'); bar.id = 'nav-progress'; document.body.appendChild(bar);
-            veil = document.createElement('div'); veil.id = 'nav-veil'; veil.appendChild(document.createElement('span')); document.body.appendChild(veil);
+            veil = document.createElement('div'); veil.id = 'nav-veil'; var vs = document.createElement('span'); vs.innerHTML = '<svg viewBox="0 0 126 116" aria-hidden="true"><path d="M66.228 0H115.534L51.9111 59.1757H0L66.228 0Z" fill="#111"/><path d="M126 53.9424L66.4091 115.131H14.0898L76.0954 53.9424H126Z" fill="#DD0000"/></svg>'; veil.appendChild(vs); document.body.appendChild(veil);
           }
           bar.classList.remove('on'); void bar.offsetWidth; bar.classList.add('on');
           clearTimeout(veilTimer);
@@ -5724,7 +6144,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
         });
         /* 서랍 — 지금 보는 메뉴 표시 */
         var here = cur === 'report' ? lab : cur === 'people' ? PEOPLE : '';
-        [].forEach.call(document.querySelectorAll('.menu-items .menu-row .nav-item, .menu-items .menu-grp .nav-item'), function (a) {
+        [].forEach.call(document.querySelectorAll('.menu-items .menu-row .nav-item, .menu-items .menu-acc-b .nav-item'), function (a) {
           var h = a.getAttribute('href') || '';
           if ((here && a.getAttribute('data-latest') === here) || (!a.hasAttribute('data-latest') && h === path)) a.classList.add('is-here');
         });
@@ -5732,7 +6152,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
            6초 안에 못 찾으면 목록 주소로 — 폰 통신에서 피드가 2.5초를 넘겨 미국 리포트가 목록으로 가던 것 (2026-11-17 사용자) */
         var pre = {};
         function latest(lbl) {
-          if (!pre[lbl]) pre[lbl] = fetch('/feeds/posts/summary/-/' + encodeURIComponent(lbl) + '?alt=json&max-results=1')
+          if (!pre[lbl]) pre[lbl] = fetch('/feeds/posts/summary/-/' + encodeURIComponent(lbl).replace(/%2F/g, '/') + '?alt=json&max-results=1')
             .then(function (r) { return r.json(); })
             .then(function (j) {
               var en = j && j.feed && j.feed.entry && j.feed.entry[0];
