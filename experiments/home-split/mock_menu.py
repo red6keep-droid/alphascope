@@ -277,6 +277,8 @@ def build_home(mkt):
     write(HOME[mkt], html)
 
 
+ITEM_A = "매수 · 매도를 권유하지 않으며, 투자 판단과 책임은 투자자 본인에게 있습니다. 해설 일부는 AI 가 씁니다."   # 상세 화면 푸터 시안 (2026-11-27)
+ITEM_B = "참고용 기록이며 매수 · 매도를 권유하지 않습니다. 해설 일부는 AI 가 씁니다."
 ITEM_SRC = os.path.join(ROOT, "experiments", "kr-stocks", "output", "mock_005930.html")   # 상세 페이지 = 삼성전자 종목 페이지 목업
 
 
@@ -290,7 +292,11 @@ def build_item():
     b = '<body class="item-view no-dashboard">'
     i = html.index(b) + len(b)
     j = html.index("</main>", i) + len("</main>")
-    html = html[:i] + header + '<div class="header-bar"></div>' + html[i:j] + footer + html[j:]
+    # 상세 화면 푸터 시안 A · B — 홈 푸터의 긴 문단 대신 핵심 두세 줄 (2026-11-27 사용자 "상세는 핵심만"). 맨 아래에 두 안을 차례로, 위에 목업 전용 이름표
+    tag = lambda t: f'<div style="max-width:880px;margin:0 auto 6px;text-align:left"><span style="display:inline-block;padding:0 6px;border-radius:4px;background:#111;color:#fff;font-size:12px;line-height:20px;font-weight:700">{t}</span></div>'
+    alt = "".join(f'<footer class="site-footer" style="border-top:1px dashed #CBD5E1">{tag(t)}<div class="footer-disclaimer"><p class="footer-lead">{x}</p></div></footer>'
+                  for t, x in ((f"A안 (추천) · {len(ITEM_A)}자", ITEM_A), (f"B안 · {len(ITEM_B)}자", ITEM_B), (f"지금 · {len(FOOT)}자 (홈 푸터와 같은 문단)", FOOT)))
+    html = html[:i] + header + '<div class="header-bar"></div>' + html[i:j] + alt + html[j:]
     html = html.replace("</head>", f"<style>{css}</style><style>{CSS}</style></head>", 1)
     html = re.sub(r"<title>.*?</title>", "<title>전체 메뉴 고침 — 상세 페이지(삼성전자)</title>", html, count=1, flags=re.S)
     write("mock_menu_item_kr.html", html)
