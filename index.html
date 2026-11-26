@@ -3990,13 +3990,13 @@ html.as-lock, html.as-lock body { overflow: hidden; }
         var KR_FACTS_URL = GH + 'kr-facts.json';   /* 한국 기사 공용 저장소 (kr-facts.yml 09:20 · 18:20) — 미국 news.json · 방송 kr-news.json 과 같은 gh-pages */
         function krFactItems(d) {   /* 사건 하나 = 줄 하나: 제목 = 사건 이름 · 요약 = 첫 사실 · 팝업 = 사실 줄 전부 · 출처 자리 = 보도 n곳(비교 대상) */
           var evs = (d && d.facts && d.facts[0] && d.facts[0].events) || [];
-          return evs.map(function (e) { var fs = e.facts || []; return { title: e.event, summary_ko: (fs[0] && fs[0].what) || '', kind: 'fact', tag: e.tag, source: '보도 ' + e.sourceCount + '곳', published: e.at, lines: fs.map(function (f) { return f.line; }), bys: fs.map(function (f) { return f.by || ''; }) };   /* by = 출처 · 발언자, 팝업에서 작은 회색 - 출처 (2026-11-24) */ });
+          return evs.map(function (e) { var fs = e.facts || []; return { title: e.event, summary_ko: (fs[0] && fs[0].what) || '', kind: 'fact', post: e.post || '', tag: e.tag, source: '보도 ' + e.sourceCount + '곳', published: e.at, lines: fs.map(function (f) { return f.line; }), bys: fs.map(function (f) { return f.by || ''; }) };   /* by = 출처 · 발언자, 팝업에서 작은 회색 - 출처 (2026-11-24) */ });
         }
         function nfPostItems(j) {   /* Newfact 글 → 목록 줄: 제목 앞 네모 배지 · 같은 창 상세 글 · 출처 자리 `Newfact 기사` · 팝업 없음 (2026-11-25 사용자) */
           var kday = function (t) { var d = new Date(t); return isNaN(d) ? '' : new Date(d.getTime() + 9 * 36e5).toISOString().slice(0, 10); };
           var today = kday(Date.now());
           return ((j && j.items) || []).filter(function (it) { return it.url && kday(it.published) === today; })
-            .map(function (it) { return { title: it.title, summary_ko: it.summary || '', kind: 'post', tag: it.tag || '', source: 'Newfact', published: new Date(it.published).toISOString().slice(0, 19) + 'Z', link: it.url }; });
+            .map(function (it) { return { title: it.title, summary_ko: it.summary || '', kind: 'post', slug: it.slug || '', tag: it.tag || '', source: 'Newfact', published: new Date(it.published).toISOString().slice(0, 19) + 'Z', link: it.url }; });
         }
         if (HOME_MKT === 'kr') {   /* 한국 목록 제목 = `오늘의 Newfact` (2026-11-25 사용자) — 브랜드는 로고 글꼴(.brand-word) */
           var nt = document.getElementById('news-title');
@@ -4011,7 +4011,8 @@ html.as-lock, html.as-lock body { overflow: hidden; }
             fetch(KR_FACTS_URL + '?v=' + Date.now()).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }),
             /* Newfact 글(news-posts.json, publish_news.py) = 오늘(한국 시간) 공개 글만 — 옛 홈 카드 규칙 그대로 (2026-11-24 "홈은 무조건 오늘 기사"), 10분 캐시 깨기 */
             fetch(GH + 'news-posts.json?v=' + Math.floor(Date.now() / 6e5)).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; })
-          ]).then(function (p) { return { items: (p[0].items || []).concat(krFactItems(p[1])).concat(nfPostItems(p[2])) }; })
+          ]).then(function (p) { var po = nfPostItems(p[2]), sl = {}; po.forEach(function (x) { if (x.slug) sl[x.slug] = 1; });   /* 같은 사건 = 글 줄만 (2026-11-26 사용자): 사실 줄의 post(수집기 facts.post = 그 사건으로 쓴 Newfact 글 slug)가 오늘 글과 맞으면 사실 줄을 뺌 — post 가 없거나 안 맞으면 둘 다(잘못 지우는 것보다 겹쳐 보이는 게 낫다). 종목 페이지 · 한국 리포트와 같은 규칙(2ceccc8d) */
+      return { items: (p[0].items || []).concat(krFactItems(p[1]).filter(function (f) { return !(f.post && sl[f.post]); })).concat(po) }; })
           : fetch(NEWS_URL + '?v=' + Date.now()).then(function (r) { return r.json(); }))
           .then(function (json) {
             var items = (json.items || []).filter(function (i) { return i && i.title; });
