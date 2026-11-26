@@ -277,7 +277,7 @@ def market_section(market, lists, ink):
     aside = (f'<span data-basis="{dk.esc(b)}" style="margin-left:auto;font-size:13px;line-height:19px;font-weight:400;color:#6B7280;white-space:nowrap;">'
              f'{dk.esc(note)}</span>') if note else ""
     name = "관련 정보" if stocks else "같은 날 지수"   # 관련 종목 → 관련 정보 (2026-11-25 사용자, 기획 3-3 수혜주 X)
-    sec = dk.section(f'<span style="font-size:{SEC_TITLE}px;line-height:{dk.LH_CARD};">{name}</span>', inner, line=False, aside=aside)
+    sec = dk.section(name, inner, line=False, aside=aside).replace(name, f'<span style="font-size:{SEC_TITLE}px;line-height:{dk.LH_CARD};">{name}</span>', 1)   # dk.h2 가 제목을 이스케이프 — span 을 넘기면 태그가 글자로 보였다(2026-11-26 사용자 지적). 이름만 넘기고 첫 자리(제목)에 끼움
     sec = SR.tinted(SR.iconed(sec, dk.solid_icon("bars", ink, size=SEC_ICON)), ink).replace(f"margin:{SR.H2_TOP}px 0 11px;", f"margin:{SR.BIG_TOP}px 0 11px;", 1)
     return sec.replace("font-size:22px;font-weight:700;line-height:28px;", f"font-size:{SEC_TITLE}px;font-weight:700;line-height:{dk.LH_CARD};", 1)   # 제목 = 지수 칸 이름(코스피) 크기 (2026-11-23 · 11-25 사용자 "공간 효율")
 
