@@ -596,22 +596,41 @@ def page_body(res, reasons, now, in_tab=False):
         mk_rows.append((f"{mk} ({len(sub)}개)", val, f"11.1부터 정시 {sum(x[1] == 'on' for x in c)}/{len(c)}"))
     top = dk.cards(lead + head + white_card(mk_rows))
 
-    days = [START + dt.timedelta(days=i) for i in range((now.date() - START).days + 1)]
+    # 누적 = 이번 달 1일부터, 매달 새로 센다 — 끝없이 쌓으면 선이 위로만 가서 요즘 늘었는지 안 보인다 (2026-11-26 사용자 "그렇게 해").
+    # 비교 대상 = 지난달 같은 날까지의 누적(모두). 지난달이 기록 시작(START) 전이면 비교 대상 없음. 날마다 판정 기록은 그대로 둔다 — 그래프 기간만 바꿈.
+    m0 = now.date().replace(day=1)
+    days = [m0 + dt.timedelta(days=i) for i in range((now.date() - m0).days + 1)]
+    p0 = (m0 - dt.timedelta(days=1)).replace(day=1)
+    p_len = (m0 - p0).days
 
-    def cum(pred):
+    def bad_on(d, pred):
+        return sum(1 for svc, ds in res if pred(svc) for x in ds if x[0] == d and x[1] in ("late", "miss"))
+
+    def cum(pred, ds_):
         c, xs = 0, []
-        for d in days:
-            c += sum(1 for svc, ds in res if pred(svc) for x in ds if x[0] == d and x[1] in ("late", "miss"))
+        for d in ds_:
+            c += bad_on(d, pred) if d else 0
             xs.append(c)
         return xs
 
+    series = [("모두", cum(lambda s: True, days), "#111827", "solid"), ("미국", cum(lambda s: market(s) == "미국", days), dk.CHART_SERIES[0], "solid"),
+              ("한국", cum(lambda s: market(s) == "한국", days), dk.CHART_SERIES[1], "solid")]
+    if p0 >= START:   # 지난달 k일까지 — 지난달이 더 짧으면 마지막 날 값 그대로
+        series.append(("지난달 같은 날까지", cum(lambda s: True, [p0 + dt.timedelta(days=i) if i < p_len else None for i in range(len(days))]),
+                       dk.CHART_CMP, "dash"))
+        cmp_note = "비교 대상 = 지난달 같은 날까지의 누적(모두)"
+    else:
+        cmp_note = f"비교 대상 없음 — 기록이 {START.month}.{START.day}부터라 지난달이 없습니다"
     # 가로축 = 카드 폭에 다 넣고(넘겨 보기 X) 날짜는 6개쯤만 — 마지막 날은 꼭, 그 앞 이름이 너무 붙으면 뺀다 (2026-11-26 사용자: 26일째 날짜가 전부 겹침)
     gap = max(1, -(-len(days) // 6))
     xlab = [_md(d) if (i % gap == 0 and len(days) - 1 - i >= gap / 2) or i == len(days) - 1 else "" for i, d in enumerate(days)]
-    cumc = chart_top(dk.trend_card("기준 시각을 넘긴 횟수 (누적, 번)", xlab,
-                                   [("모두", cum(lambda s: True), "#111827", "solid"), ("미국", cum(lambda s: market(s) == "미국"), dk.CHART_SERIES[0], "solid"),
-                                    ("한국", cum(lambda s: market(s) == "한국"), dk.CHART_SERIES[1], "solid")],
-                                   lambda v: f"{v:.0f}", legend_note=f"늦음 + 안 나감 · 기준 {GRACE_MIN}분 뒤까지 정시", ends_only=True), top=0)
+    title = f"기준 시각을 넘긴 횟수 ({now.month}월 누적, 번)"
+    if len(days) < 2:   # 1일 = 점 하나라 선을 못 그림
+        cumc = white_card([(title, warn(f"{series[0][1][-1]}번") if series[0][1][-1] else ok("0번"), "오늘 1일 — 내일부터 선으로")])
+    else:
+        cumc = chart_top(dk.trend_card(title, xlab, series,
+                                       lambda v: f"{v:.0f}", legend_note=f"늦음 + 안 나감 · 기준 {GRACE_MIN}분 뒤까지 정시", ends_only=True), top=0)
+    cumc += _note(f"매달 1일부터 새로 셉니다. {cmp_note}. 지난 달들의 늦은 날 하나하나는 미국 · 한국 탭 `원인` 목록에 그대로 있습니다.")
     legend = (f'<p style="margin:4px 0 12px;padding-left:{dk.ALIGN_PX}px;font-size:13px;line-height:19px;color:{NOTE_C};word-break:keep-all;">'
               f'<span style="color:{GOOD};">초록 = 정시</span> · <span style="color:{BAD};font-weight:700;">주황 = 늦음 · 없음</span> · '
               f'회색 = 제외 · 대기 · 점 = 나오지 않는 날. 시각을 누르면 그 글 · 커밋 · 실행이 열립니다. `내부` = 독자에게 알리지 않은 기준.</p>')
