@@ -720,7 +720,7 @@ def sec_news(input_data, report, analysis):
     return news_tab(built, dirs, week, reaction, known)
 
 
-def news_tab(built, dirs, week, reaction=None, known=(), pick_name="주요 뉴스", kr=False):
+def news_tab(built, dirs, week, reaction=None, known=(), pick_name="주요 뉴스", kr=False, posts=()):
     """뉴스 탭 내용 — 분야 칩 · 방향 막대 · 주요 뉴스 · 칩별 목록 · 팝업. 미국 증시 · 한국 증시 리포트 공용 (2026-11-07 사용자 M82: 한국 뉴스 탭을 미국과 같게)."""
     reaction = reaction or (lambda s: "")
     bars = dk.direction_bars(dirs, week)   # 뉴스 방향 막대 오늘 · 최근 7일 (P143 의 `오늘` 만 → 둘, 2026-11-07) — 분야 탭 아래 (P334)
@@ -731,7 +731,7 @@ def news_tab(built, dirs, week, reaction=None, known=(), pick_name="주요 뉴�
     if picks or rest:
         if kr:   # 한국 (2026-11-25 사용자): 첫 칩 `Newfact` = 전체 보기(5건 + 10건씩), 분야 칩은 이슈 된 것만 — 3건 이상인 분야, 많은 순 3개까지(나머지 분야 줄도 Newfact 칩에 다 있음)
             order = news_pick.tab_order(picks, rest)
-            chips = [(pick_name, len(picks) + len(rest))] + sorted([c for c in order if c[1] >= KR_CHIP_MIN], key=lambda c: -c[1])[:KR_CHIPS]
+            chips = [(pick_name, len(picks) + len(rest) + len(posts))] + sorted([c for c in order if c[1] >= KR_CHIP_MIN], key=lambda c: -c[1])[:KR_CHIPS]
         else:
             chips = [(pick_name, len(picks))] + news_pick.tab_order(picks, rest)   # 탭 = 8개 묶음(P357) · 순서 = 그날 주요 뉴스 순 → 건수 순(P358). `전체` 없음 (batch 9 ①)
         # 분야 탭 = 홈 `테마 종목` 묶음 탭 모양 (2026-11-07 사용자 P332): 하나로 이은 둥근 박스 · 메뉴 사이 세로 구분선 · 선택 = 굵은 검정 + 1px 검정 외곽선(테마 CSS).
@@ -745,6 +745,9 @@ def news_tab(built, dirs, week, reaction=None, known=(), pick_name="주요 뉴�
                           for i, (k, n) in enumerate(chips)) + "</div>")   # 한국 첫 칩 = 보이는 글자 `Newfact` · 안쪽 키는 `주요 뉴스` — 테마 붙여넣기 전 옛 칩 JS(`주요 뉴스` 고정)에서도 다시 눌렀을 때 비지 않게 (2026-11-25)
         out += bars
         lis = []
+        for p in posts if kr else ():   # Newfact 글 줄 = 첫 칩(Newfact) 맨 위, 홈 글 줄 꼴(배지 · 제목 한 줄 …) — 분야 칩엔 안 나옴 (2026-11-26 사용자)
+            lis.append(f'<li data-theme="Newfact" data-pick="1" data-row-link="1" data-href="{_esc(p["url"])}" style="margin:0;padding:{dk.RULE_GAP - dk.NEWS_VP}px {dk.ALIGN_PX}px {dk.RULE_GAP - dk.NEWS_VP}px;'
+                       f'line-height:{dk.LH_BODY};box-shadow:inset 0 1px 0 #E2E8F0;">{p["html"]}</li>')
         for i, g in enumerate(picks + rest):
             is_pick = kr or i < len(picks)   # 한국 = 모든 줄이 첫 칩(Newfact 전체 보기) · 같은 줄 꼴
             item = _story_row(g, built, i == 0, kr=kr) if is_pick else _story_item(g, built, reaction, known, compact=True)   # 주요 뉴스 = 사건 이름 + n곳 막대 줄

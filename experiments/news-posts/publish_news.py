@@ -327,10 +327,26 @@ def write_card(blog):
         items.append({"slug": slug, "title": H.unescape(title), "summary": H.unescape(_text(bp.get("content"), "data-seo-lead")),
                       "url": bp.get("url"), "published": pub, "date": nd.group(1)})
     items.sort(key=lambda x: x["published"], reverse=True)
+    # recent = 최근 48시간 공개 글 + 관련 정보에 나온 한국 종목 코드 — 종목 페이지 · 한국 리포트 뉴스에 Newfact 글 줄로 (2026-11-26 사용자). 홈은 items 만 읽는다(그대로)
+    recent, cut = [], datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(hours=48)
+    for slug, bp in live.items():
+        try:
+            pt = datetime.datetime.fromisoformat((bp.get("published") or "").replace("Z", "+00:00"))
+        except ValueError:
+            continue
+        if pt < cut:
+            continue
+        c = bp.get("content") or ""
+        m = re.search(r'data-news-stocks="([^"]*)"', c)
+        codes = [x for x in (m.group(1).split(",") if m else re.findall(r'data-href="[^"]*-(\d{6})-stock\.html"', c)) if re.fullmatch(r"\d{6}", x)]   # 옛 글(칸 없음) = 관련 정보 종목 줄 주소
+        title = re.sub(r"^" + re.escape(NR.NAME) + r"\s*:\s*", "", bp.get("title") or "")
+        recent.append({"slug": slug, "title": H.unescape(title), "summary": H.unescape(_text(c, "data-seo-lead")), "url": bp.get("url"),
+                       "published": bp.get("published"), "stocks": list(dict.fromkeys(codes))})
+    recent.sort(key=lambda x: x["published"], reverse=True)
     os.makedirs(OUT, exist_ok=True)
-    json.dump({"generated": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds"), "items": items},
+    json.dump({"generated": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds"), "items": items, "recent": recent},
               open(os.path.join(OUT, "news-posts.json"), "w", encoding="utf-8"), ensure_ascii=False)
-    log(f"홈 카드 자료 {len(items)}편")
+    log(f"홈 카드 자료 {len(items)}편 · 최근 48시간 글 {len(recent)}편(종목 붙은 글 {sum(1 for x in recent if x['stocks'])})")
 
 
 def stage_refresh(a):

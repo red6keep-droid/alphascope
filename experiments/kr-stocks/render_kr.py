@@ -931,13 +931,32 @@ def _fact_event(e):
             "detail": (facts[0].get("what") if facts else "") or "", "url": None, "direction": e.get("dir") or "neutral", "emphasis": False,
             "published_at": at if not at or at.endswith("Z") or "+" in at[10:] else at + "Z",
             "source": f'보도 {e.get("sourceCount")}곳', "n_all": 0, "speaker": None, "media": False, "has_fact": False, "rel": 0, "prio": False,
-            "issue": e.get("cat"), "related": [], "pop_lines": [], "bundle": rows, "pop_key": "kf:" + e["event"]}
+            "issue": e.get("cat"), "related": [], "pop_lines": [], "bundle": rows, "pop_key": "kf:" + e["event"], "fact_post": e.get("post") or ""}   # fact_post = 수집기 facts.post(같은 사건의 Newfact 글 slug)
 
 
 def sec_facts_only(s):
     """방송 자료를 못 읽은 실행(간단 종목 MEDIA_OK 거짓)용 — 기사 사건만, 방송 방향 막대 · `방송이 없습니다` 안내 없이. 사건이 없으면 "" (구획 숨김)."""
-    ev = sorted((_fact_event(e) for e in _kr_facts_by_code().get(str(s["code"]), [])), key=_when_key, reverse=True)
+    ev = sorted(_news_mix(s["code"], [_fact_event(e) for e in _kr_facts_by_code().get(str(s["code"]), [])]), key=_when_key, reverse=True)
     return R.sec_events({"events": ev[:MAX_NEWS], "events_overflow": ev[MAX_NEWS:MAX_NEWS + 12]}) if ev else ""
+
+
+def _nf_post_events(code):
+    """이 종목이 관련 정보에 나온 Newfact 글(최근 48시간) → 뉴스 줄 (2026-11-26 사용자 "하이닉스 기사가 있으면 개별 종목에도 — 로고 · 말줄임").
+    줄 모양 = 홈 `오늘의 Newfact` 글 줄(news_render.post_row). 재료 = gh-pages news-posts.json recent — 빌드 때 한 번, 방문자 요청 0."""
+    try:
+        sys.path.insert(0, os.path.join(_HERE, "..", "news-posts"))
+        import news_render as NR
+        return [{"published_at": p["published"], "nf_post": p, "nf_html": NR.post_row(p)} for p in NR.recent_posts(KR_FACTS_HOURS, NOW) if str(code) in (p.get("stocks") or [])]
+    except Exception as e:  # noqa: BLE001 — 뉴스의 덤
+        print(f"[kr] Newfact 글 줄 못 만듦: {str(e)[:120]}")
+        return []
+
+
+def _news_mix(code, ev):
+    """Newfact 글 줄 + 나머지 줄. 같은 사건의 사실 줄(수집기 facts.post = 글 slug)은 글 줄만 남긴다 — post 가 없거나 안 맞으면 둘 다(잘못 지우는 것보다 겹쳐 보이는 게 낫다)."""
+    posts = _nf_post_events(code)
+    slugs = {p["nf_post"].get("slug") for p in posts}
+    return posts + [e for e in ev if not (e.get("fact_post") and e["fact_post"] in slugs)]
 
 
 def _when_key(r):
@@ -953,6 +972,7 @@ def sec_today(s):
     한국 증시 채널 · 미국 채널 모두. 공용 뉴스 카드(엔비디아 · 미국 종목 페이지와 같은 _event_html): 주제 / 방송 주장 / [영역] [방향] [방송]  시각 · 채널."""
     ev = [media_feed.event(r, _dk.n_channels_of(MEDIA), KR_PRICES) for r in media_feed.for_kr_page(MEDIA, s["code"])]
     ev += [_fact_event(e) for e in _kr_facts_by_code().get(str(s["code"]), [])]   # 기사 사건 (2026-11-24 사용자)
+    ev = _news_mix(s["code"], ev)   # Newfact 글 줄 (2026-11-26)
     ev.sort(key=_when_key, reverse=True)   # 방송 · 기사 시각 표기가 달라도(+09:00 · Z) 실제 시각 순
     bars = R.sec_direction_bars({"direction_counts": {"today": media_feed.direction_counts(media_feed.for_kr_page(MEDIA, s["code"])),
                                                       "week": media_feed.direction_counts(media_feed.for_kr_page(MEDIA_WEEK, s["code"]))},

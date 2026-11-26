@@ -487,7 +487,7 @@ def _kr_articles(d):
         out.append({"id": "f" + hashlib.sha1(e["event"].encode()).hexdigest()[:11], "kind": "fact", "text": e["event"], "title": e["event"],
                     "theme": _dk.ISSUE_KO.get(e.get("cat"), "그 밖"), "published_at": _utc16(e["at"]), "url": None, "source": f"보도 {sc}곳",
                     "detail": facts[0].get("what") or "", "related": rel[:4], "surprise": e.get("surprise"),
-                    "market_dir": NR.DIR_KIND.get(e.get("direction"), "neutral"), "lines": lines, "n_out": sc})
+                    "market_dir": NR.DIR_KIND.get(e.get("direction"), "neutral"), "lines": lines, "n_out": sc, "post": e.get("post") or ""})   # post = 같은 사건의 Newfact 글 slug(수집기 facts.post)
     return out, codes
 
 
@@ -519,6 +519,17 @@ def news_section():
     # 옛: 사실 층 · 그 밖의 기사를 방송 목록 위에 따로 얹었다(같은 날 아침, _facts_sections)
     facts = ""
     articles, art_codes = _kr_articles(_facts_doc())
+    # Newfact 글 줄 (2026-11-26 사용자) — 최근 48시간 공개 글, 첫 칩 맨 위. 같은 사건 사실 줄(facts.post = 글 slug)은 글 줄만 남김(안 맞으면 둘 다)
+    posts = []
+    try:
+        sys.path.insert(0, os.path.join(_HERE, "..", "news-posts"))
+        import news_render as NR
+        posts = [dict(p, html=NR.post_row(p)) for p in NR.recent_posts(NEWS_HOURS)]
+        slugs = {p.get("slug") for p in posts}
+        articles = [x for x in articles if not (x.get("post") and x["post"] in slugs)]
+        print(f"[kr-report] Newfact 글 줄 {len(posts)}편")
+    except Exception as e:  # noqa: BLE001
+        print(f"[kr-report] Newfact 글 줄 못 만듦: {str(e)[:120]}")
     head = "뉴스"   # 탭 이름과 같아 테마가 숨긴다 — 위쪽 탭은 미국과 같게 `뉴스` (2026-11-25 사용자)
     try:
         RH = _daily_render()
@@ -560,7 +571,7 @@ def news_section():
             if x["kind"] == "fact" and x.get("market_dir"):
                 dirs[x["market_dir"]] = dirs.get(x["market_dir"], 0) + 1
                 week[x["market_dir"]] = week.get(x["market_dir"], 0) + 1
-        tab_html = RH.news_tab(built, dirs, week, pick_name="Newfact", kr=True)
+        tab_html = RH.news_tab(built, dirs, week, pick_name="Newfact", kr=True, posts=posts)
         # 한국 = 진행자 · 앵커 줄에 붙던 `- 방송 의견` 을 뺀다 — 사실 줄은 출처 없이 (2026-11-25 사용자: "모호하고 책임을 피하려는 말처럼"). 미국 리포트는 그대로
         tab_html = re.sub(r' <span style="[^"]*">- 방송 의견</span>', "", tab_html)
         return facts + _dk.keep_tone(_dk.section(head, tab_html, tab=TAB_NEWS))   # 헤드라인체 그대로 · 탭 이름과 같은 제목은 테마가 숨긴다

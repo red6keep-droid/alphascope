@@ -2566,6 +2566,8 @@ def _when(iso):
 def _event_html(e):
     """뉴스 한 줄 = 공용 뉴스 카드 (design_kit.news_item, 2026-10-25 사용자: 뉴스 형식 통일) — 헤드라인 / 요약 한 줄 / [영역] [방향] (발언자 · 방송)  시각 · 매체.
     문서(기사 · 뉴스룸 · 관보 · 법원)는 사실 문장이 헤드라인, 요약 = detail(기사 첫 문단에서 · 방송 주장). 가격 · 옵션 같은 계산 이벤트는 제목 + 사실 줄."""
+    if e.get("nf_html"):   # Newfact 글 줄 — 홈 `오늘의 Newfact` 꼴(배지 · 제목 한 줄 …), 만든 쪽(news_render.post_row)이 그린 그대로 (2026-11-26)
+        return e["nf_html"]
     tag = (_pill(_dk.ISSUE_KO.get(e["issue"], "그 밖"), "area") + " " + _pill(rr.DIR_KO.get(e["direction"], e["direction"]), e["direction"])
            if e.get("issue") else _tag(e["area"], e["direction"]))   # 분야 라벨 = 기록 이슈 코드 이름 (2026-11-07 사용자 P339). 공시 · 계산 이벤트(issue 없음)는 옛 영역 라벨
     if e.get("speaker"):   # 발언자 라벨 — 영역·방향 뒤 세 번째 알약 (2026-10-11 사용자: 대표 발언에 "누가 말했다") · 방송 줄은 `방송`

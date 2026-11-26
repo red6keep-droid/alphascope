@@ -11,6 +11,7 @@
     title, html, meta = render(post, market, lists=…)
 """
 import datetime
+import json
 import os
 import re
 import statistics
@@ -174,6 +175,65 @@ def same_day(post, lists, closes_of, closed_through, now_kst=None, themes=None):
     return out
 
 
+# ── Newfact 글 줄 (다른 화면에 싣는 한 줄) ──
+# 홈 `오늘의 Newfact` 글 줄과 같은 꼴 (2026-11-26 사용자 "하이닉스 기사가 있으면 개별 종목에도 — 앞에 뉴팩트 로고, 말줄임"):
+# 제목 앞 네모 배지(흰 22 · 회색 테두리 · 로고 두 사선) · 제목 한 줄 … · 요약 두 줄 … · 메타 = 시각 · Newfact · 같은 창 상세 글.
+# 재료 = gh-pages news-posts.json `recent`(발행기 write_card — 최근 48시간 공개 글 + 관련 정보에 나온 한국 종목 코드). 받는 쪽(종목 페이지 · 한국 리포트)은 빌드 때 한 번 읽는다 — 방문자 요청 0, AI 0.
+NF_POSTS_URL = "https://raw.githubusercontent.com/red6keep-droid/alphascope/gh-pages/news-posts.json"
+NF_MARK = ('<svg viewBox="0 0 126 116" width="14" height="13" aria-hidden="true" style="display:block;">'
+           '<path d="M126 53.9424L66.4091 115.131H14.0898L76.0954 53.9424H126Z" fill="#DD0000"/><path d="M66.228 0H115.534L51.9111 59.1757H0L66.228 0Z" fill="#000"/></svg>')
+NF_CLAMP2 = "display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;"
+_RECENT = None
+
+
+def recent_posts(hours=48, now=None):
+    """news-posts.json `recent` 중 hours 안 공개 글 [{slug, title, summary, url, published, stocks}]. 목업 · 시험 = NF_POSTS_FILE. 못 받으면 []."""
+    global _RECENT
+    if _RECENT is None:
+        _RECENT = []
+        try:
+            p = os.environ.get("NF_POSTS_FILE")
+            if p:
+                d = json.load(open(p, encoding="utf-8"))
+            else:
+                import urllib.request
+                with urllib.request.urlopen(NF_POSTS_URL, timeout=20) as r:
+                    d = json.loads(r.read().decode("utf-8"))
+            _RECENT = [x for x in d.get("recent") or [] if x.get("url") and x.get("title")]
+        except Exception as e:  # noqa: BLE001 — 뉴스의 덤, 페이지를 막지 않는다
+            print(f"[news] Newfact 글 목록 못 읽음 — 글 줄 없이: {str(e)[:120]}")
+    now = now or datetime.datetime.now(datetime.timezone.utc)
+    out = []
+    for x in _RECENT:
+        try:
+            t = datetime.datetime.fromisoformat(x["published"].replace("Z", "+00:00"))
+        except (KeyError, ValueError):
+            continue
+        if now - t <= datetime.timedelta(hours=hours):
+            out.append(x)
+    return out
+
+
+def nf_badge():
+    return ('<span role="img" aria-label="Newfact" style="flex:none;display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;'
+            f'width:22px;height:22px;border-radius:6px;background:#fff;border:1px solid #CBD5E1;margin:4px 6px 0 0;">{NF_MARK}</span>')
+
+
+def post_row(p):
+    """Newfact 글 한 줄(공용 뉴스 카드 자리) — 배지 + 제목 한 줄 … / 요약 두 줄 … / 시각 · Newfact. 누르면 같은 창 상세 글."""
+    try:
+        t = datetime.datetime.fromisoformat(p["published"].replace("Z", "+00:00")).astimezone(datetime.timezone(datetime.timedelta(hours=9)))
+        when = f"{t.month:02d}.{t.day:02d} {t.hour:02d}:{t.minute:02d}"
+    except (KeyError, ValueError):
+        when = ""
+    head = (f'<a href="{dk.esc(p["url"])}" data-nf-post="{dk.esc(p.get("slug") or "")}" style="display:flex;align-items:flex-start;color:#111;font-weight:700;text-decoration:none;'
+            f'font-size:{dk.NEWS_TITLE_FS};line-height:{dk.NEWS_TITLE_LH};">{nf_badge()}'
+            f'<span style="min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{dk.esc(p["title"])}</span></a>')
+    summ = (f'<span style="{dk.NEWS_SUM}{NF_CLAMP2}">{dk.esc(p["summary"])}</span>') if p.get("summary") else ""
+    meta = f'<span style="display:flex;align-items:center;margin:8px 0 1px;line-height:1;"><span style="color:{dk.SUB};font-size:{dk.TINY};line-height:{dk.LH_TINY};">{" · ".join(x for x in (when, "Newfact") if x)}</span></span>'
+    return dk.keep_tone(head + summ) + meta
+
+
 # ── 화면 ──
 def _paras(body):
     return [p.strip() for p in re.split(r"\n\s*\n|\n", body or "") if p.strip()]
@@ -319,7 +379,7 @@ def render(post, market, lists=None, issues=(), forecasts=()):
     _, stored = titles(post)
     y, m, d = post["date"].split("-")
     style = ('<style>body:has([data-headline]) .pr-sticky{border-bottom:0;margin-bottom:0;}</style>')
-    body = [style + f'<p data-title-basis="1" data-news-post="{dk.esc(post.get("slug") or "")}" data-news-date="{dk.esc(post["date"])}" data-post-id="{dk.esc(post.get("id") or "")}" style="margin:0 0 14px;font-size:13px;line-height:19px;color:#6B7280;">{int(m)}.{d} 기사</p>']
+    body = [style + f'<p data-title-basis="1" data-news-post="{dk.esc(post.get("slug") or "")}" data-news-date="{dk.esc(post["date"])}" data-news-stocks="{dk.esc(",".join(x["ticker"] for x in market.get("stocks") or [] if x.get("mk") == "kr"))}" data-post-id="{dk.esc(post.get("id") or "")}" style="margin:0 0 14px;font-size:13px;line-height:19px;color:#6B7280;">{int(m)}.{d} 기사</p>']
     body.append(f'<h2 data-headline="1" style="margin:0 0 18px;padding:25px 0 0 {dk.ALIGN_PX}px;font-size:26px;line-height:38px;font-weight:700;color:#111;word-break:keep-all;">'
                 f'<span style="display:block;font-size:26px;line-height:38px;">{SR.emph(dk.esc(post["title"]), False)}</span></h2>')   # 폰 테마가 h2 에 20/26 !important — 크기는 안쪽 span 이 갖는다
     # 제목 아래 라벨(분야 `기업 사건` · 방향 `긍정적`) 뺌 — 2026-11-26 사용자 "라벨도 삭제해". 제목 아래 = 18 로 요약 상자와 띄움
