@@ -253,12 +253,9 @@ def market_section(market, lists, ink):
     if stocks:
         rows = []
         for i, x in enumerate(stocks):
-            r = SR.stock_row(x, lists.get(x["ticker"]), "am" if x.get("mk") == "us" else "pm", i in (0, STOCKS_SHOWN), inline_sub=True, small=True)   # 미국 = 달러 · 티커 · 업종
-            line = _cmp_line(x)
-            if line:
-                r = r.replace(f"padding:{SR.LIST_ROW_PAD}px 12px;", f"padding:{SR.LIST_ROW_PAD}px 12px 0;", 1)   # 이름 줄(엔비디아 NVDA · 기술) 아래 여백 반으로 — 아래 6 → 0 · 비교 줄 위 -4 (2026-11-26 사용자 "50% 줄여")
-                r += (f'<span style="display:block;margin-top:-4px;padding:0 12px {SR.LIST_ROW_PAD}px {12 + SR.LOGO_Z + SR.LOGO_GAP}px;font-size:{dk.TINY};line-height:{dk.LH_TINY};'
-                      f'color:#6B7280;word-break:keep-all;">{"<br>".join(dk.esc(x) for x in line)}</span>')
+            line = _cmp_line(x)   # 비교 줄 = 이름 바로 아래(왼쪽 칸 안), 이름과 간격 6 고정 (2026-11-26 사용자)
+            r = SR.stock_row(x, lists.get(x["ticker"]), "am" if x.get("mk") == "us" else "pm", i in (0, STOCKS_SHOWN), inline_sub=True, small=True,
+                             below="<br>".join(dk.esc(y) for y in line) if line else "")   # 미국 = 달러 · 티커 · 업종
             rows.append(r)
         if len(rows) > STOCKS_SHOWN:   # 전부 싣고 접기 — 버튼은 카드 안 맨 아래 줄(dk.fold_card, `관련 종목 n개 더 보기 ⌄`)
             inner += dk.fold_card("".join(rows[:STOCKS_SHOWN]), "".join(rows[STOCKS_SHOWN:]), f"관련 종목 {len(rows) - STOCKS_SHOWN}개 더 보기", box=WHITE_BOX)

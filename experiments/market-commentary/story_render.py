@@ -280,7 +280,7 @@ def logo(t, row):
             f'{dk.esc(re.sub(r"[-.]", "", str(t))[:2])}</span>')
 
 
-def stock_row(x, row, slot, first, inline_sub=False, small=False):
+def stock_row(x, row, slot, first, inline_sub=False, small=False, below=""):
     """종목 줄 = 종목 모아보기 규칙 (2026-11-19 사용자 "그 규칙으로 통일"): 로고 35 · 이름 16 굵게 · 보조 줄 14 회색(한국 = 업종, 미국 = 티커 · 업종) │ 오른쪽 증감 17 굵게 위 · 가격 15 증감 색 아래. 줄 전체가 그 종목 페이지로."""
     t, v = str(x.get("ticker") or ""), x["chg_pct"]
     sec = (row or {}).get("s") or ""
@@ -292,10 +292,13 @@ def stock_row(x, row, slot, first, inline_sub=False, small=False):
     col = dk.UP if v > 0 else dk.DOWN if v < 0 else "#111"
     if inline_sub:   # 업종(보조 줄)을 이름 옆 같은 줄에 — 줄바꿈 없이 (2026-11-25 사용자, Newfact 뉴스 관련 정보 칸만)
         # 이름 줄 = 오른쪽 증감 줄과 같은 가로선 (2026-11-26 사용자 "엔비디아 위치는 고정하고 증감을 내려"): 이름은 옛 자리(오른쪽 두 줄 44 의 가운데 = 위에서 22) 그대로 — 왼쪽 묶음(35) 위 4.5 · 오른쪽 증감 줄(24) 위 10 → 증감 가운데도 22
-        left = (f'<span style="display:flex;align-items:center;min-width:0;flex:1 1 auto;margin-top:4.5px;"><span style="flex:none;display:flex;align-items:center;">{logo(t, row)}</span>'
-                f'<span style="min-width:0;display:block;font-size:16px;line-height:24px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'
+        # below = 이름 아래 회색 비교 줄(뉴스) — 왼쪽 칸 안에 두어 오른쪽 증감 · 가격 높이와 상관없이 이름과의 간격이 고정 (2026-11-26 사용자 "왜 더 벌어졌나")
+        left = (f'<span style="display:flex;align-items:flex-start;min-width:0;flex:1 1 auto;margin-top:4.5px;"><span style="flex:none;display:flex;align-items:center;">{logo(t, row)}</span>'
+                f'<span style="min-width:0;flex:1 1 auto;margin-top:5.5px;"><span style="display:block;font-size:16px;line-height:24px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'
                 f'<span style="font-weight:700;color:#111;">{dk.esc(x["name"])}</span>'
-                + (f'<span style="margin-left:6px;font-size:{dk.TINY};color:#6B7280;">{dk.esc(sub)}</span>' if sub else "") + '</span></span>')
+                + (f'<span style="margin-left:6px;font-size:{dk.TINY};color:#6B7280;">{dk.esc(sub)}</span>' if sub else "") + '</span>'
+                + (f'<span style="display:block;margin-top:6px;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:#6B7280;white-space:normal;word-break:keep-all;">{below}</span>' if below else "")
+                + '</span></span>')
     else:
         left = (f'<span style="display:flex;align-items:center;min-width:0;flex:1 1 auto;"><span style="flex:none;display:flex;align-items:center;">{logo(t, row)}</span>'
                 f'<span style="min-width:0;"><span style="display:block;font-size:16px;line-height:24px;font-weight:700;color:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{dk.esc(x["name"])}</span>'
