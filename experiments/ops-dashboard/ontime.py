@@ -277,7 +277,7 @@ def judge(svc, first, now):
 
 
 # ---------------------------------------------------------------- 원인
-TAGS = ["앞 단계 늦음", "실행 없음", "실패", "늦게 시작", "여유 부족", "오래 걸림", "다시 돌림", "원인 못 찾음"]
+TAGS = ["앞 단계 늦음", "실행 없음", "수집기 부름 없음", "실패", "늦게 시작", "여유 부족", "오래 걸림", "다시 돌림", "원인 못 찾음"]
 
 
 def _steps(run_id):
@@ -285,6 +285,9 @@ def _steps(run_id):
     return [(j.get("name", ""), s) for j in js.get("jobs") or [] for s in j.get("steps") or []]
 
 
+CALLED_SVCS = {"us_brief", "kr_brief"}   # 수집기가 글 저장 직후 블로그 commentary.yml 을 부르는 서비스 (실행 이름에 `collector`)
+CALL_FROM = dt.date(2026, 11, 27)        # 수집기 부르기를 켠 날 — 그 전 실행 이름엔 부른 곳이 없다
+CALLED = {}   # (서비스 key, 날짜) → "수집기 부름" · "안전망 실행" — build 가 채우고 `오늘` 줄에 붙인다
 OPS_RECS = []   # 운영 기록(KV ops:…) — build(…, recs) 가 채운다. 실행이 `성공` 인데 스크립트가 멈춘 것(continue-on-error)을 여기서 본다
 
 
@@ -305,6 +308,10 @@ def why(svc, d, st, t, res_by_key, runs):
         rs = [r for r in rs if r["title"].endswith(svc["src"][2])]
     if runs.get(svc["wf"]) is None:
         return (tags or ["원인 못 찾음"]), (" · ".join(bits) or "실행 기록을 읽지 못함")
+    if svc["key"] in CALLED_SVCS and d >= CALL_FROM and not any("collector" in r["title"] for r in rs):
+        # 수집 완료 즉시 발행(2026-11-26 사용자) — 수집기가 블로그를 부르지 않았으면 Worker 안전망(08:40 · 17:00 · 21:00)으로만 나간다
+        tags.append("수집기 부름 없음")
+        bits.append("수집기가 글 저장 뒤 블로그를 부르지 않음(토큰 만료 · 수집기 실패 · 1차만 저장) — 정시 안전망 실행으로 나감")
     if not rs:
         tags.append("실행 없음")
         bits.append(f"{st_at} 예약 뒤 {svc['wf'].replace('.yml', '')} 실행이 없음")
@@ -550,6 +557,8 @@ def today_rows(res, reasons, now):
             txt = f"기준 {a} · " + (f"{_late_text(left)} 남음" if left > 0 else f"{GRACE_MIN}분 유예 중")
         else:
             txt = f"기준 {a} · 아직 없음"
+        if CALLED.get((svc["key"], d)):
+            txt += " · " + CALLED[(svc["key"], d)]
         r = reasons.get(f"{svc['key']}|{d}")
         if r:
             txt += " · " + esc(r[1])
@@ -674,7 +683,7 @@ def page_body(res, reasons, now, in_tab=False):
             + market_tab("한국", by_mk["한국"], reasons, now, legend, in_tab)
             + cum_head + cumc
             + dk.guide("판정", f"기준 시각 {GRACE_MIN}분 뒤까지 정시, 그 뒤는 늦음, 그날 결과가 없으면 안 나감입니다. 오늘 기준 전이면 세지 않습니다. "
-                       "원인은 그날 맡은 GitHub 실행 기록으로 봅니다 — 앞 단계 늦음(이어 붙는 서비스) · 실행 없음 · 실패(실패한 단계) · 늦게 시작(예약보다 10분 넘게) · "
+                       "원인은 그날 맡은 GitHub 실행 기록으로 봅니다 — 앞 단계 늦음(이어 붙는 서비스) · 실행 없음 · 수집기 부름 없음(시황 — 수집기가 글 저장 뒤 블로그를 안 부름) · 실패(실패한 단계) · 늦게 시작(예약보다 10분 넘게) · "
                        "여유 부족(예약 ~ 기준 시간보다 실행이 오래 걸림) · 오래 걸림(20분 넘게, 가장 긴 단계) · 다시 돌림(첫 실행이 아닌 실행에서 나감). "
                        "Hot Issue 오후 · 방송 줄처럼 바뀐 날만 올리는 자료는 `안 나감`을 가릴 수 없어 넣지 않았습니다. "
                        "미국 탭 = 미국 장 마감 뒤 아침 실행(홈 뉴스 포함), 한국 탭 = 한국 장 마감 뒤."))
@@ -702,6 +711,16 @@ def build(now, cache=None, recs=None):
         runs = {svc["src"][1]: runs_for(svc["src"][1])} if svc["src"][0] == "run" else {}
         res.append((svc, judge(svc, actuals(svc, posts, commits, runs), now)))
     res.sort(key=lambda r: r[0]["at"])
+    CALLED.clear()
+    for svc, ds in res:   # 수집 완료 즉시 발행 — 글을 낸 실행이 수집기가 부른 것인지(실행 이름), 정시 안전망인지
+        if svc["key"] not in CALLED_SVCS:
+            continue
+        for d, st, t, m, url in ds:
+            if not t or d < CALL_FROM:
+                continue
+            made = [r for r in runs_for(svc["wf"]) or [] if r["start"] <= t <= r["end"] + dt.timedelta(minutes=5)]
+            if made:
+                CALLED[(svc["key"], d)] = "수집기 부름" if "collector" in made[0]["title"] else "안전망 실행"
     res_by_key = {svc["key"]: ds for svc, ds in res}
     reasons = {}
     for svc, ds in res:

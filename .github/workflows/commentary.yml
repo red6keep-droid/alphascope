@@ -6,6 +6,11 @@ name: Market Commentary
 # 정시 = Cloudflare Worker(infra/cron-trigger KST 08:40 · 17:00 저녁 1차(평일) · 21:00). GitHub cron 은 예비 — 이미 발행됐으면 publish 단계가 건너뛴다
 # (단 수집기 rev 가 올랐으면 같은 주소에 고쳐 쓴다 — 저녁 편 17:00 1차 → 21:00 rev 2, 2026-11-20 사용자 News-doc 31절),
 # 발행 시각이 한참 지난 글(아침 12:00 · 저녁 23:59 KST 뒤)은 내지 않는다.
+# 수집 완료 즉시 발행 (2026-11-26 사용자 "수집 완료 시점에서 발행"): 수집기가 ready 를 저장한 직후 이 워크플로를 부른다
+# (inputs: scheduled=true · caller=collector · slot · date). 아침 편 1차(round 1)는 거른다 — 완성본(2차)만 (사용자 "완성본만 내자").
+# Worker 08:40 · 17:00 · 21:00 은 안전망으로 그대로 — 수집기 부르기가 실패한 날 지금처럼 낸다. 이미 나갔으면 바로 끝남.
+
+run-name: "Market Commentary · ${{ inputs.caller || (inputs.scheduled && 'worker') || github.event_name }} ${{ inputs.slot }}"
 
 on:
   schedule:
@@ -43,6 +48,11 @@ on:
         type: boolean
         required: false
         default: false
+      caller:
+        description: '부른 곳 — collector = 수집기가 글 저장 직후 부름(발행 시간 페이지가 이 이름으로 셈). 사람은 비움'
+        type: string
+        required: false
+        default: ''
 
 permissions:
   contents: write
@@ -54,6 +64,7 @@ concurrency:
 
 env:
   IS_SCHEDULED: ${{ github.event_name == 'schedule' || inputs.scheduled }}
+  CALLER: ${{ inputs.caller }}
   PYTHONIOENCODING: utf-8
   SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 

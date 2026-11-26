@@ -173,6 +173,11 @@ def stage_prepare(a):
     log(f"columns/{key} 읽음 — rev {col.get('rev')} · 저장 {written.astimezone(KST):%m-%d %H:%M} KST" if isinstance(written, datetime.datetime)
         else f"columns/{key} 읽음 — rev {col.get('rev')} · 저장 시각 없음")
     log(f"  모델 {col.get('model')} · 요청 {col.get('calls')}")
+    if slot == "am" and os.environ.get("CALLER") == "collector" and str(col.get("round")) == "1":
+        # 아침 편은 완성본(2차)만 (2026-11-26 사용자 "완성본만 내자") — 수집기가 1차 저장 뒤 불러도 내지 않는다.
+        # 2차가 실패해 1차만 남은 날은 Worker 08:40 안전망이 그 1차를 낸다(그때는 CALLER 가 비어 있음)
+        log(f"{key} — 아침 편 1차(rev {col.get('rev')})라 내지 않음 · 2차 또는 08:40 안전망을 기다림")
+        return 0
     if slot == "pm" and not a.column_json and os.environ.get("IS_SCHEDULED") == "true":   # 정시 · 예비만 — 사람이 손으로 돌릴 땐 막지 않음
         h, mi = PM_MIN_WRITTEN
         floor = datetime.datetime.fromisoformat(day).replace(hour=h, minute=mi, tzinfo=KST)
