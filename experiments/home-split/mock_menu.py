@@ -277,7 +277,27 @@ def build_home(mkt):
     write(HOME[mkt], html)
 
 
+ITEM_SRC = os.path.join(ROOT, "experiments", "kr-stocks", "output", "mock_005930.html")   # 상세 페이지 = 삼성전자 종목 페이지 목업
+
+
+def build_item():
+    """상세 페이지(종목 · 글) 푸터 확인용 — 종목 페이지 목업(헤더 · 푸터 없이 본문만)에 새 헤더 · 전체 메뉴 · 푸터를 붙인다 (2026-11-26 사용자 "상세 페이지 푸터는 어떻게 확인해?").
+    body 가 item-view 라 푸터는 상세 모양(제목 · 저작권 줄 없음)으로 그려진다"""
+    if not os.path.exists(ITEM_SRC):
+        print("상세 페이지 목업 없음:", ITEM_SRC); return
+    html = open(ITEM_SRC, encoding="utf-8").read()
+    css, js, fonts, logo, header, footer = parts("kr", HOME)
+    b = '<body class="item-view no-dashboard">'
+    i = html.index(b) + len(b)
+    j = html.index("</main>", i) + len("</main>")
+    html = html[:i] + header + '<div class="header-bar"></div>' + html[i:j] + footer + html[j:]
+    html = html.replace("</head>", f"<style>{css}</style><style>{CSS}</style></head>", 1)
+    html = re.sub(r"<title>.*?</title>", "<title>전체 메뉴 고침 — 상세 페이지(삼성전자)</title>", html, count=1, flags=re.S)
+    write("mock_menu_item_kr.html", html)
+
+
 if __name__ == "__main__":
+    build_item()
     for m in ("kr", "us"):
         build(m)
         build_home(m)
