@@ -25,6 +25,7 @@ import analyze_kr  # noqa: E402
 import render_kr  # noqa: E402
 import collect_kr as C  # noqa: E402
 import design_kit as dk  # noqa: E402
+import render_html as R  # noqa: E402  (실제 페이지처럼 업계상황 탭 근거 줄 작게 — small_rows, 2026-11-26 사용자)
 
 # (종목, 목업에 적는 한 줄)
 SAMPLES = [("267260.KS", "새 묶음 `전력기기`"), ("010120.KS", "새 묶음 `전력기기`"), ("001440.KS", "새 묶음 `전선`"),
@@ -123,7 +124,7 @@ def main():
              "bsi": analyze_kr.bsi_rows(s, flows), "fin": analyze_kr.fin_rows(s, flows), "related": analyze_kr.related_rows(s, flows), "sector_flow": None}
         body.append(f'<h3 style="margin:28px 0 4px;">{html.escape(e["ko"])} <span style="font-weight:400;font-size:13px;color:#64748B;">'
                     f'{html.escape(e.get("sector") or "")} · {html.escape(e.get("sub") or "")}</span></h3>'
-                    f'<div style="margin:0 0 10px;font-size:13px;color:#64748B;">{html.escape(note)}</div>' + render_kr.sec_industry_tab(x))
+                    f'<div style="margin:0 0 10px;font-size:13px;color:#64748B;">{html.escape(note)}</div>' + R.small_rows(render_kr.sec_industry_tab(x)))
     print(dk.write_mock("".join(body), os.path.join(HERE, "output", "mock_industry_tab_kr.html"), "한국 간단 종목 업계상황 탭 — 업종 고침 뒤"))
 
 

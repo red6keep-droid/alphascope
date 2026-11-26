@@ -15,6 +15,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path[:0] = [HERE]
 import full_us as F  # noqa: E402  (full_us 가 stock-radar · nvda-report 경로를 넣는다)
 import industry_us as I  # noqa: E402
+import render_html as R  # noqa: E402  (실제 페이지처럼 업계상황 탭 근거 줄 작게 — small_rows, 2026-11-26 사용자)
 
 RP, dk = F.RP, F.dk
 # (종목, 목업에 적는 한 줄)
@@ -36,7 +37,7 @@ def main():
         x = {"sym": s, "name": e.get("ko") or s, "industry_us": I.build(s, data), "sector_flow": None}
         body.append(f'<h3 style="margin:28px 0 4px;">{html.escape(x["name"])} <span style="font-weight:400;font-size:13px;color:#64748B;">'
                     f'{html.escape(e.get("sector") or "")} · {html.escape(e.get("sub") or "")}</span></h3>'
-                    f'<div style="margin:0 0 10px;font-size:13px;color:#64748B;">{html.escape(note)}</div>' + RP.sec_industry_tab(x))
+                    f'<div style="margin:0 0 10px;font-size:13px;color:#64748B;">{html.escape(note)}</div>' + R.small_rows(RP.sec_industry_tab(x)))
     print(dk.write_mock("".join(body), os.path.join(HERE, "output", "mock_industry_tab_us.html"), "미국 종목 업계상황 탭 — 배정 고침 뒤"))
 
 
