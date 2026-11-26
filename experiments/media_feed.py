@@ -340,6 +340,39 @@ def _ticker(t):
     return ALIAS.get(t, t)
 
 
+# 한국 방송 요약 줄 앞머리의 한국 사람 이름 지우기 (2026-11-27 사용자 "김미영 팀장이라고 하면 독자는 아무도 몰라").
+# 수집기는 11-26 저녁(News-doc 52절)부터 새 요약에만 이 규칙을 쓰고 이미 저장된 요약은 다시 만들지 않는다 → 옛 줄이 7일 창에 남아 화면에 나왔다.
+# 같은 규칙을 블로그가 읽을 때 한 번 더(AI 0): 회사를 알면 `회사 직함` · 모르면 채널 이름(역할 말 없이, 11-26 사용자) · 기자가 전한 줄 = 사실이라 출처 없음.
+# 국가 요직 · 금융 수장 · 대기업 총수(총재 · 장관 · 회장 등)는 이름 그대로(News-text-doc 23절과 같은 예외).
+_KR_SURNAME = "김이박최정강조윤장임한오서신권황안송류유전홍고문양손배백허남심노하곽성차주우구민진나지엄채원천방공현함변염여추도소석선설마길연위표명기반왕금옥육인맹제모탁국어은편용예경봉사부태"
+_KR_TITLE = (r"리서치센터장|센터장|본부장|부문장|팀장|파트장|실장|수석연구원|책임연구원|연구원|애널리스트|이코노미스트|전략가|대표이사|대표|부사장|사장|"
+             r"전무|상무|이사|부장|차장|과장|매니저|PV|PB|위원|교수|소장|CIO|CEO|기자|앵커")
+_KR_PUBLIC = re.compile(r"(대통령|총리|장관|총재|위원장|회장|의장|원장|청장)$")
+_KR_PREFIX = re.compile(r"^\s*([^:：]{1,40}?)\s*(진행자 발언|기자 보도|발언|보도)\s*[:：]\s*(.+)$")
+_KR_NAME = re.compile(rf"(?:^|(?<=\s))[{_KR_SURNAME}][가-힣]{{1,2}}\s+(?=(?:{_KR_TITLE})(?:\s|$))")
+
+
+def kr_line_no_name(line, channel):
+    """한국 방송 줄 한 줄 — 접두의 한국 사람 이름을 회사 직함 · 채널 이름으로. 이름이 없는 줄은 그대로."""
+    m = _KR_PREFIX.match(str(line or ""))
+    if not m:
+        return line
+    who, verb, text = m.group(1).strip(), m.group(2), m.group(3).strip()
+    if _KR_PUBLIC.search(who):
+        return line
+    if not _KR_NAME.search(who):
+        return line
+    if verb == "기자 보도" or re.search(r"(기자|앵커)$", who):
+        return text   # 기자 · 앵커가 전한 것 = 사실 줄 → 출처 없음 (46 · 47절 규칙)
+    rest = re.sub(r"\s+", " ", _KR_NAME.sub("", who)).strip()
+    t = re.search(rf"(?:^|\s)((?:{_KR_TITLE}))$", rest)
+    org = (rest[:t.start()] if t else rest).strip()
+    org = re.sub(r"(?<=[가-힣]) (?=[가-힣])", "", org)   # `한국 투자 증권` → `한국투자증권`
+    if org:
+        return f"{org} {t.group(1) if t else ''}".strip() + f" 발언 : {text}"
+    return f"{channel} 발언 : {text}" if channel else text   # 회사 모름 = 채널 이름, 채널도 없으면 출처 없이
+
+
 def rows(items):
     """영상 × 이슈 한 줄씩. 같은 채널이 같은 주제를 여러 영상에서 다루면 가장 최근 하나만."""
     out, seen = [], set()
@@ -353,6 +386,8 @@ def rows(items):
                 continue
             seen.add(key)
             pub = it.get("publishedAt")
+            if re.search("[가-힣]", ch):   # 한국어 채널만 — 미국 방송 줄은 그대로
+                iss = dict(iss, lines=[kr_line_no_name(x, MC.CHANNEL_SHORT.get(ch, ch)) for x in (iss.get("lines") or []) if x])
             out.append({"id": f"{it.get('id')}/{i}", "topic": iss["topic"], "note": iss.get("note") or "",
                         "lines": [str(x) for x in (iss.get("lines") or []) if x][:5],   # 수집기 요약 다섯 줄 — 데일리 뉴스 팝업 (2026-11-05 요청, yutb-sub doc/요청-이슈-요약-다섯-줄.md)
                         "category": issue_codes.FROM_YTB_CATEGORY.get(iss.get("category") or "OTHER", "OTHER"), "scope": iss.get("scope") or "",
