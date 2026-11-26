@@ -959,6 +959,17 @@ def _news_mix(code, ev):
     return posts + [e for e in ev if not (e.get("fact_post") and e["fact_post"] in slugs)]
 
 
+def _kr_media(e):
+    """한국 종목 페이지 방송 줄 = 한국 증시 리포트와 같은 규칙 (2026-11-26 사용자 "종목 페이지도 리포트와 같은 규칙으로", 리포트 11-25):
+    영상 링크(`영상 보기`) · 채널 이름 없이 — 메타 = 시각만, 출처는 팝업 줄 끝 발언자. 방송 곳 수 막대는 그대로."""
+    return dict(e, url=None, source="", channel="")
+
+
+def _no_generic_by(html):
+    """진행자 · 앵커 줄에 붙던 `- 방송 의견` 을 뺀다 — 사실 줄은 출처 없이 (리포트와 같은 규칙, 2026-11-25)."""
+    return re.sub(r' <span style="[^"]*">- 방송 의견</span>', "", html)
+
+
 def _when_key(r):
     try:
         t = datetime.datetime.fromisoformat(str(r.get("published_at") or "").replace("Z", "+00:00"))
@@ -970,7 +981,7 @@ def _when_key(r):
 def sec_today(s):
     """`오늘` 탭 — 방송 뉴스 (2026-10-25 사용자: 한국 종목 뉴스는 방송 자막 뉴스로). 이 종목이 중심인 이슈 + 이 종목 묶음(반도체 · 2차전지 …)의 업종 이슈,
     한국 증시 채널 · 미국 채널 모두. 공용 뉴스 카드(엔비디아 · 미국 종목 페이지와 같은 _event_html): 주제 / 방송 주장 / [영역] [방향] [방송]  시각 · 채널."""
-    ev = [media_feed.event(r, _dk.n_channels_of(MEDIA), KR_PRICES) for r in media_feed.for_kr_page(MEDIA, s["code"])]
+    ev = [_kr_media(media_feed.event(r, _dk.n_channels_of(MEDIA), KR_PRICES)) for r in media_feed.for_kr_page(MEDIA, s["code"])]
     ev += [_fact_event(e) for e in _kr_facts_by_code().get(str(s["code"]), [])]   # 기사 사건 (2026-11-24 사용자)
     ev = _news_mix(s["code"], ev)   # Newfact 글 줄 (2026-11-26)
     ev.sort(key=_when_key, reverse=True)   # 방송 · 기사 시각 표기가 달라도(+09:00 · Z) 실제 시각 순
@@ -980,7 +991,7 @@ def sec_today(s):
     if not ev:
         # 최근 7일 방송이 아예 없으면 뉴스 구획을 숨긴다 · 오늘 0건 안내는 카드의 막대 자리(아이콘 없음) (2026-11-08 사용자)
         return (bars + MOCK_NEWS) if bars else ""   # 목업에서만 샘플 카드로 바뀐다 (P26)
-    return bars + R.sec_events({"events": ev[:MAX_NEWS], "events_overflow": ev[MAX_NEWS:MAX_NEWS + 12], "brief_events": ev, "brief_key": s["code"], "brief_name": s["name"]})   # 한 줄 소식 키워드 (2026-11-15)
+    return _no_generic_by(bars + R.sec_events({"events": ev[:MAX_NEWS], "events_overflow": ev[MAX_NEWS:MAX_NEWS + 12], "brief_events": ev, "brief_key": s["code"], "brief_name": s["name"]}))   # 한 줄 소식 키워드 (2026-11-15)
 
 
 def mock_news():
