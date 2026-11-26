@@ -95,16 +95,56 @@ def read_links():
 _closes = {}
 
 
+NAVER_INDEX = {"^KS11": "KOSPI", "^KQ11": "KOSDAQ"}
+
+
+def _naver_closes(sym, days=20):
+    """네이버 일봉 종가 {날짜: 종가} 최근 days 일 — 한국 지수 · 종목의 예비(collect_kr 와 같은 출처 · 같은 주소). 못 받으면 {}."""
+    code = NAVER_INDEX.get(sym) or (sym.split(".")[0] if sym.endswith((".KS", ".KQ")) else None)
+    if not code:
+        return {}
+    end = kst_now().date()
+    start = end - datetime.timedelta(days=days)
+    url = (f"https://api.finance.naver.com/siseJson.naver?symbol={code}&requestType=1"
+           f"&startTime={start:%Y%m%d}&endTime={end:%Y%m%d}&timeframe=day")
+    try:
+        txt = urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"}), timeout=10).read().decode("utf-8", "ignore")
+    except Exception as e:  # noqa: BLE001
+        log(f"네이버 못 받음 {sym}: {str(e)[:80]}")
+        return {}
+    return {f"{d[:4]}-{d[4:6]}-{d[6:]}": float(c) for d, c in re.findall(r'\["(\d{8})",\s*[0-9.]+,\s*[0-9.]+,\s*[0-9.]+,\s*([0-9.]+)', txt)}
+
+
 def closes_of(sym):
-    """[(날짜, 종가)] 1년 — yfinance 일봉 (목업과 같은 출처). 못 받으면 빈 목록(그 종목만 빠진다)."""
+    """[(날짜, 종가)] 1년. 사슬 = 블로그 시세 규칙과 같게 (2026-11-26 사용자 "예비 2개 있다"):
+    한국 지수 · 종목 = 야후 → 네이버(최근 20일 — 빈 날짜를 메우고 다른 종가는 네이버 값으로, collect_kr._fix_last 와 같은 규칙.
+    한국투자증권 대조 파일은 집 IP 실행에만 있어 여기선 없음) · 미국 = 야후 → 실패하면 price_source 예비 사슬(FRED · Polygon · Twelve Data …).
+    11-26 아침 야후 코스피 · 코스닥에 11-25 가 빠져 뉴스 기준일이 11-24 로 밀렸던 것. 못 받으면 빈 목록(그 종목만 빠진다)."""
     if sym not in _closes:
+        rows = []
         try:
             import yfinance as yf
             h = yf.Ticker(sym).history(period="1y", auto_adjust=False)["Close"].dropna()
-            _closes[sym] = [(str(i.date()), float(v)) for i, v in h.items()]
+            rows = [(str(i.date()), float(v)) for i, v in h.items()]
         except Exception as e:  # noqa: BLE001
-            log(f"시세 못 받음 {sym}: {str(e)[:80]}")
-            _closes[sym] = []
+            log(f"야후 못 받음 {sym}: {str(e)[:80]}")
+        nav = _naver_closes(sym)
+        if nav:
+            have = dict(rows)
+            fixed = [d for d, c in nav.items() if d not in have or abs(have[d] - c) > 1e-6 * max(1.0, c)]
+            if fixed:
+                have.update(nav)
+                rows = sorted(have.items())
+                log(f"{sym} 네이버로 메움 · 바꿈: {', '.join(sorted(fixed)[-5:])}")
+        elif not rows and not NAVER_INDEX.get(sym) and not sym.endswith((".KS", ".KQ")):
+            try:
+                import price_source
+                rows = price_source.daily_closes(sym, str(kst_now().date() - datetime.timedelta(days=370)))
+                if rows:
+                    log(f"{sym} 야후 대신 예비 사슬 {len(rows)}일")
+            except Exception as e:  # noqa: BLE001
+                log(f"예비 사슬 못 받음 {sym}: {str(e)[:80]}")
+        _closes[sym] = rows
     return _closes[sym]
 
 

@@ -157,6 +157,39 @@ def _kis_ref(path=None):
     return j.get("bars") or None
 
 
+def _fill_gaps(bars, span=10):
+    """빈 중간 날짜 메우기 (2026-11-26 사용자). 11-26 아침 야후 코스피 · 코스닥 일봉에 11-25 가 빠지고 11-26 장중 봉만 있었다
+    — 마지막 봉 대조(_fix_last)는 맨 끝 봉만 보므로 못 잡는다. 장 날짜 = 최근 span 일 동안 한국 줄 절반 이상에 있는 날.
+    그 날이 빠진 줄만 네이버에서 받아 끼운다(평소 추가 호출 0). adj 는 바로 앞 봉의 adj/종가 비율을 지킨다."""
+    kr = {s: bs for s, bs in bars.items() if bs and _naver_code(s)}
+    if len(kr) < 2:
+        return bars
+    count = {}
+    for bs in kr.values():
+        for b in bs[-span:]:
+            count[b["day"]] = count.get(b["day"], 0) + 1
+    days = sorted(d for d, n in count.items() if n * 2 >= len(kr))
+    filled = []
+    for s, bs in kr.items():
+        have = {b["day"] for b in bs}
+        miss = [d for d in days if d not in have and d > bs[0]["day"]]
+        if not miss:
+            continue
+        nav = _naver_bars(s, miss[0], miss[-1])
+        time.sleep(0.3)
+        got = [nav[d] for d in miss if d in nav]
+        for v in got:
+            prev = [b for b in bs if b["day"] < v["day"]]
+            ratio = (prev[-1]["adj"] / prev[-1]["close"]) if prev and prev[-1].get("close") and prev[-1].get("adj") else 1.0
+            bs.append(dict(v, adj=v["close"] * ratio))
+        bs.sort(key=lambda b: b["day"])
+        if got:
+            filled.append(f"{s} {','.join(v['day'] for v in got)}")
+    if filled:
+        print(f"[kr] 빈 날짜 네이버로 메움 {len(filled)}줄: {', '.join(filled[:10])}{' …' if len(filled) > 10 else ''}")
+    return bars
+
+
 def _fix_last(bars, kis_path=None):
     """마지막 봉 대조 (2026-11-23 사용자). 11-23 야후가 ① 전 종목 · 지수 시가를 0.0 으로 주고
     ② 삼성전자 177,500 · SK하이닉스 1,085,000 처럼 장 막판 전에서 멈춘 종가를 줬다(거래소 180,600 · 1,101,000).
@@ -165,6 +198,7 @@ def _fix_last(bars, kis_path=None):
     네이버도 못 받으면 야후 값 그대로 + 경고. 과거 봉 · 수정주가는 야후 그대로 — 바꾼 날의 adj 는 야후 adj/종가 비율을 지킨다."""
     if not bars:
         return bars
+    bars = _fill_gaps(bars)   # 빈 중간 날짜 먼저 (2026-11-26)
     kis = _kis_ref(kis_path)
     last_day = max(b[-1]["day"] for b in bars.values() if b)
     changed, added, failed, n_chk = [], [], [], 0
