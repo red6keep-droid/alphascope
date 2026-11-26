@@ -190,7 +190,7 @@ def _pct(v, unit="%"):
 
 
 def _cmp_line(x):
-    """종목 줄 아래 회색 한 줄 = 비교 두 개 (헌법 제1조): `코스피보다 0.32%p 더 · 평소 하루 1.6%의 1.4배` (미국 종목은 S&P 500). 인과 말은 넣지 않는다 (요청 Q10)."""
+    """종목 줄 아래 회색 한 줄 = 비교 두 개 (헌법 제1조): `코스피보다 0.32%p 더 상승 · 평소 하루 1.6%의 1.4배` (미국 종목은 S&P 500). 인과 말은 넣지 않는다 (요청 Q10)."""
     bits = []
     b, kospi = x.get("base") or "코스피", x.get("base_chg")
     wa = b + ("과" if b.endswith("500") else "와")   # S&P 500(오백)과 · 코스피와
@@ -199,11 +199,11 @@ def _cmp_line(x):
         if abs(v) < 0.005:
             bits.append(f"{wa} 같은 폭")
         elif c * kospi < 0:   # 방향이 반대인 날
-            bits.append(f'{wa} 반대로 {"오름" if c > 0 else "내림"}')
+            bits.append(f'{wa} 반대로 {"상승" if c > 0 else "하락"}')   # 오름 · 내림 → 상승 · 하락 (2026-11-26 사용자 "상승, 하락 용어로")
         elif c >= 0 and kospi >= 0:
-            bits.append(f'{b}보다 {_pct(v, "%p")} {"더" if v > 0 else "덜"} 오름')
+            bits.append(f'{b}보다 {_pct(v, "%p")} {"더" if v > 0 else "덜"} 상승')
         else:
-            bits.append(f'{b}보다 {_pct(v, "%p")} {"더" if v < 0 else "덜"} 내림')
+            bits.append(f'{b}보다 {_pct(v, "%p")} {"더" if v < 0 else "덜"} 하락')
     if x.get("usual"):
         r = abs(x["chg_pct"]) / x["usual"] if x["usual"] else 0
         bits.append(f'평소 하루 움직임({_pct(x["usual"])})' + (f"의 {r:.1f}배" if r >= 1.5 else "과 비슷" if r >= 0.5 else "보다 작음"))
@@ -274,7 +274,7 @@ def market_section(market, lists, ink):
     aside = (f'<span data-basis="{dk.esc(b)}" style="margin-left:auto;font-size:13px;line-height:19px;font-weight:400;color:#6B7280;white-space:nowrap;">'
              f'{dk.esc(note)}</span>') if note else ""
     name = "관련 정보" if stocks else "같은 날 지수"   # 관련 종목 → 관련 정보 (2026-11-25 사용자, 기획 3-3 수혜주 X)
-    sec = dk.section(name, inner, line=False, aside=aside).replace(name, f'<span style="font-size:{SEC_TITLE}px;line-height:{dk.LH_CARD};">{name}</span>', 1)   # dk.h2 가 제목을 이스케이프 — span 을 넘기면 태그가 글자로 보였다(2026-11-26 사용자 지적). 이름만 넘기고 첫 자리(제목)에 끼움
+    sec = dk.section(name, inner, line=False, aside=aside).replace(name, f'<span style="font-size:{SEC_TITLE}px;line-height:{dk.LH_CARD};font-weight:700;">{name}</span>', 1)   # dk.h2 가 제목을 이스케이프 — span 을 넘기면 태그가 글자로 보였다(2026-11-26 사용자 지적). 이름만 넘기고 첫 자리(제목)에 끼움
     sec = SR.tinted(SR.iconed(sec, dk.solid_icon("bars", ink, size=SEC_ICON)), ink).replace(f"margin:{SR.H2_TOP}px 0 11px;", f"margin:{SR.BIG_TOP}px 0 11px;", 1)
     sec = sec.replace("align-self:center;margin-right:1px;", "align-self:center;margin-right:-2px;", 1)   # 아이콘 ~ 관련 정보 글자 11 → 8 (30% 줄임, 2026-11-26 사용자) — 뉴스 글만
     return sec.replace("font-size:22px;font-weight:700;line-height:28px;", f"font-size:{SEC_TITLE}px;font-weight:700;line-height:{dk.LH_CARD};", 1)   # 제목 = 지수 칸 이름(코스피) 크기 (2026-11-23 · 11-25 사용자 "공간 효율")
