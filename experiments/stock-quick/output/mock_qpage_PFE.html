@@ -117,7 +117,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 
 .logo { display: flex; align-items: center; gap: 8px; flex: none; }
 .logo-mark { width: 36px; height: 33px; flex: none; display: block; }   /* 로고 313:286 (2026-10-13 사용자 새 로고). 36 → 32.4 → 34 → 36 (5% 키움 35.7 → 정수, 2026-11-10 사용자) */
-.logo-full { width: 144px; height: 33px; flex: none; display: block; }   /* 로고 = 마크 + newfact 글자 한 그림 505:116 (2026-11-21 사용자 제작 · experiments/design-samples/newfact_logo.svg). 높이 = 옛 마크 33 그대로 */
+.logo-full { width: 145px; height: 33px; flex: none; display: block; }   /* 로고 = 마크 + newfact 글자 한 그림 510:116 (2026-11-26 사용자: 마크 ↔ 글자 1px 정도 더 띄움 — 글자를 5 옮김, 옛 505:116 · 가로 144) (2026-11-21 사용자 제작 · experiments/design-samples/newfact_logo.svg). 높이 = 옛 마크 33 그대로 */
 .logo-word {
   font-family: 'Noto Sans KR', sans-serif;
   font-weight: 900;
@@ -742,10 +742,12 @@ body[data-home-mkt="kr"] #news-list .news-sum { display: -webkit-box; -webkit-bo
 }
 .footer-lead { display: block; margin: 0; }   /* 2026-11-26 사용자: 펼침 버튼 · 접힌 글 없앰 → 한 문단 */
 /* 상세 화면(글 · 고정 페이지) = 작은 푸터 (2026-11-12 사용자) — 제목 `Newfact` · 저작권 줄 없이 문단 + 개인정보처리방침. 홈 · 목록 = 제목 + 문단 + 개인정보처리방침 + 저작권 */
+/* 푸터 제목 = Newfact 로고(헤더 로고 그대로) */
+.footer-logo { display: block; width: 84px; height: 19px; }   /* 20 → 19 (5% 줄임, 2026-11-26 사용자) · 510:116 → 가로 84 */
+.footer-logo path { fill: #A1A7B3; }   /* 색 빼고 연한 회색 하나 (2026-11-26 사용자) — 빨강 · 검정 → 회색, #9CA3AF 에서 5% 더 연하게 */
+.footer-logo path[fill='white'] { fill: var(--bg); }   /* e · a 속 구멍 = 푸터 바탕색 */
 body.item-view .footer-title { display: none; }
 body.item-view .footer-copy { display: none; }   /* 상세 화면은 저작권 줄 삭제 (2026-11-15 사용자) */
-body.item-view .footer-disclaimer { margin-bottom: 0; }
-.footer-copy { display: none; }   /* 상세 화면은 저작권 줄 삭제 (2026-11-15 사용자) */
 body.item-view .footer-disclaimer { margin-bottom: 0; }   /* 저작권 줄 위 11 도 함께 — 줄 19 + 11 = 30 만큼 푸터가 짧아진다 */
 .footer-copy {
   margin: 0;
@@ -758,11 +760,14 @@ body.item-view .footer-disclaimer { margin-bottom: 0; }   /* 저작권 줄 위 1
 .brand-word { font-family: 'Noto Sans KR', sans-serif; font-weight: 900; }
 /* 푸터 링크 줄 — 개인정보처리방침 하나(2026-11-26 사용자: 소개 · 문의는 전체 메뉴로) (2026-11-21 사용자: 개인정보처리방침은 모든 화면에서 보여야 함 · 개인정보보호법 30조 공개 의무 · 애드센스).
    13/19 회색, 개인정보처리방침만 굵게 · 검정(개인정보위 작성지침: 다른 고지와 구분). 누르는 칸 높이 31. 홈 · 목록 = 저작권 줄 위, 상세 = 면책 줄 아래 */
-.footer-links { margin: 0 0 6px; font-size: 13px; line-height: 19px; text-align: center; color: #CBD5E1; }
+/* 저작권(왼쪽) · 개인정보처리방침(오른쪽) 한 줄 (2026-11-26 사용자). 상세 화면은 저작권 줄을 숨겨 개인정보처리방침만 오른쪽 */
+.footer-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; max-width: 880px; margin: 0 auto; text-align: left; }
+.footer-links { flex: none; margin: -6px -6px -6px auto; font-size: 13px; line-height: 19px; color: #CBD5E1; white-space: nowrap; }   /* 개인정보처리방침은 줄바꿈 없이 — 좁으면 왼쪽 저작권이 먼저 줄어든다 */
+.footer-row .footer-copy { min-width: 0; }
 .footer-links a { display: inline-block; padding: 6px 6px; color: #6B7280; text-decoration: none; -webkit-tap-highlight-color: transparent; }
 .footer-links a:active { opacity: .55; }
-.footer-links a.fl-privacy { color: #111; font-weight: 700; }
-body.item-view .footer-links { margin: 5px 0 -6px; }   /* 상세 = 면책 줄 아래 11(5 + 글자 칸 6), 아래 푸터 여백 19 그대로 */
+.footer-links a.fl-privacy { color: #6B7280; font-weight: 400; }   /* 굵게 · 검정 → 보통 · 회색(2026-11-26 사용자 — 법은 게재만 요구, 구분은 권고). 저작권(#9CA3AF)보다 한 단계 진하게 */
+body.item-view .footer-links { margin: 5px -6px -6px auto; }   /* 상세 = 면책 줄 아래 11(5 + 글자 칸 6), 아래 푸터 여백 19 그대로 */
 
 /* ==========================================================================
    홈 카드 (2026-10-15 사용자) — 회색 바탕 #F3F4F6 위 흰 카드,
@@ -1044,7 +1049,7 @@ a.theme-row:hover .theme-name { text-decoration: underline; }
   .nav-right { gap: 4px; }
   .logo { gap: 6px; }
   .logo-mark { width: 28px; height: 26px; }   /* 28 → 25.2 → 27 → 28 (5% 키움 28.35 → 정수, 2026-11-10) */
-  .logo-full { width: 113px; height: 26px; }   /* 폰 = 옛 마크 높이 26 그대로 (505:116 → 113) */
+  .logo-full { width: 114px; height: 26px; }   /* 폰 = 옛 마크 높이 26 그대로 (510:116 → 114, 옛 505 → 113) */
   .logo-word { font-size: 18px; line-height: 26px; letter-spacing: -0.3px; }   /* 19 → 15.2 → 17 → 18 (5% 키움 17.85 → 정수, 2026-11-10) */
   .menu-quick .nav-item { padding: 6px 5px; font-size: 15px; letter-spacing: -0.3px; }
 }
