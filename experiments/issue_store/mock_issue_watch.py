@@ -58,8 +58,13 @@ SIDE_NAME = {"멀어짐": "확전", "종전": "종전", "확전": "확전"}
 SIDE_KIND = {"종전": "positive", "확전": "negative", "방향 미정": "neutral"}   # 종전 = 시장에 좋은 쪽 빨강 · 확전 = 나쁜 쪽 파랑 — 증시 전망 `전망A · B` · 뉴스 긍정 · 부정과 같은 색
 def josa(w, pair):
     """받침에 맞춘 조사 — pair = ("은", "는") · ("이", "가")."""
-    c = w.rstrip()[-1]
-    has = "가" <= c <= "힣" and (ord(c) - 0xAC00) % 28 != 0
+    t = w.rstrip()
+    c = t[-1]
+    if c.isdigit():   # 숫자는 읽는 소리로 — `S&P 500` = 오백 → 은 (십 · 백 · 천 · 만 · 영 · 일 · 삼 · 육 · 칠 · 팔 = 받침)
+        z = len(t) - len(t.rstrip("0"))
+        has = (z in (1, 2, 3, 4)) if z else c in "136780"
+    else:
+        has = "가" <= c <= "힣" and (ord(c) - 0xAC00) % 28 != 0
     return w + (pair[0] if has else pair[1])
 
 
@@ -157,6 +162,7 @@ REF2 = {"IRAN": [("브렌트유", "BZ=F", None, "{:,.1f}달러", 1), ("에너지
         "TARIFF": [("S&P 500", "^GSPC", None, "{:,.0f}", -1), ("불안 지수", "^VIX", None, "{:.1f}", 1)],
         "EXPORT": [("반도체 시장 대비", "^SOX", "^GSPC", None, -1), ("엔비디아 반도체 대비", "NVDA", "^SOX", None, -1)]}
 PAIR = [[]]   # 지금 그리는 이슈의 카드 줄 (page 가 채우고 q_align 이 읽는다)
+PAIR_SIDES = [[]]   # 대표 지표 둘의 (이름, 쪽 또는 None, 평소의 몇 배) — pair_lines 가 채운다(6-11 시안이 읽음)
 
 
 def _ref_series(px, sym, base):
@@ -175,6 +181,7 @@ def pair_lines(px):
     """`시장도 같은 쪽인가?` 카드 맨 위 — 비교 지표 둘의 5거래일 움직임 + 읽는 법 한 줄. 쪽 = 평소(직전 60거래일)의 1배 넘게 움직인 방향."""
     refs = REF2.get(C["iss"]["id"]) or []
     rows, sides = [], []
+    PAIR_SIDES[0] = []
     for name, sym, base, fmt, sgn in refs:
         s = _ref_series(px, sym, base)
         if s is None or len(s) < BASE + WIN + 2:
@@ -185,6 +192,7 @@ def pair_lines(px):
                if round(pct, 1) != 0 else "0.0" + ("%p" if base else "%"))
         rows.append(("row", name, val, f"{side} 쪽 · 평소의 {abs(z):.1f}배" if side else "평소 범위"))
         sides.append((name, side))
+        PAIR_SIDES[0].append((name, side, abs(z)))
     if len(sides) < 2:
         return []
     (n1, s1), (n2, s2) = sides
@@ -1472,7 +1480,7 @@ def _align_table(gs):
     return f'<span style="display:block;margin-top:-12px;">{out}</span>'
 
 
-def q_align(word, links, gs, oil_gr, oil_line, hist, asof):
+def q_align(word, links, gs, oil_gr, oil_line, hist, asof, over=None):
     """시장도 같은 쪽인가? — 옛 `지금은` · `시장이 먼저 움직이나?` · `지난 2주는?` 셋을 하나로.
     기간 = 최근 일주일(뉴스 7일 · 시장 5거래일), 시장 지표도 양쪽을 다 센다. 뉴스와 시장이 다르면 `엇갈림` 이라고 말한다."""
     g, b = C["good"], C["bad"]
@@ -1485,12 +1493,16 @@ def q_align(word, links, gs, oil_gr, oil_line, hist, asof):
         ans = f"시장만 {mk} 쪽"
     else:
         ans = f"같은 쪽 ({mk})" if ns == mk else "엇갈림"
+    if over:   # 6-11 시안 — (답, 판정 문장 대신 쓸 문장)
+        ans = over[0]
     d0, d1 = links[0]["d0"], links[0]["d1"]
     nd = f"{ns} 소식이 더 많았습니다" if ns else f"{g} · {b} 소식이 엇갈렸습니다"
     mv = [f"{josa(x['g'], ('이', '가'))} {x['side']} 쪽으로" for x in gs if x["side"] != "평소 범위"]
     calm = [x["g"] for x in gs if x["side"] == "평소 범위"]
     md = (" · ".join(mv) + " 움직였습니다." if mv else "") + ((" " if mv else "") + f"{josa(' · '.join(calm), ('은', '는'))} 평소 범위입니다." if calm else "")
     verdict = ("" if mk == "평소 범위" or ns is None else " 뉴스와 시장이 같은 쪽을 가리킵니다." if ns == mk else " 뉴스와 시장이 서로 다른 쪽을 가리킵니다.")
+    if over:
+        verdict = " " + over[1]
     first = f"최근 일주일 뉴스는 {nd}. 같은 기간({H.md(d0.strftime('%Y-%m-%d'))} → {H.md(d1.strftime('%Y-%m-%d'))} 종가) 시장은 " + md + verdict
     lines = [(first, "plain")] + PAIR[0] + [(_align_table(gs), "html")]   # 대표 지표 둘 = 묶음 표 위 (헌법 제1조, 2026-11-22)
     lines += [(_ttl("날마다 어느 쪽이었나") + _hist_grid(hist), "html"),
@@ -1505,8 +1517,51 @@ def q_align(word, links, gs, oil_gr, oil_line, hist, asof):
     # 카드 색 = 답 방향 — 같은 쪽 · 시장만 한쪽 = 그 쪽 색(좋은 쪽 빨강 · 나쁜 쪽 파랑),
     # 엇갈림 · 시장 안에서 엇갈림 · 평소 범위 = 회색. 옛: 움직임이 있으면 보라(_theme)
     side = mk if (mk in (g, b) and (ns is None or ns == mk)) else None
+    side = None if over else side
     th, ink = ("positive", dk.UP) if side == g else ("negative", dk.DOWN) if side == b else ("neutral", "#111")
     return qc.question_card("시장도 같은 쪽인가?", ans, th, ink, lines, tip=tip), ans
+
+
+def align_variants(word, links, gs, oil_gr, oil_line, hist, asof, px):
+    """6-11 시안 (목업만) — 같은 시장 움직임을 두 이슈가 각자 `같은 쪽` 근거로 쓰는 문제.
+    A안 = 대표 지표 둘이 모두 평소 범위면 `같은 쪽` 대신 갈림을 말한다(헌법 제1조).
+    B안 = A안 + 같은 기간 시장 전체(S&P 500 · 코스피)가 그 쪽으로 평소보다 크게 움직였으면 `시장 전체 움직임` 이라고 말한다."""
+    mk, ns = market_side(gs), news_side(word)
+    ps = PAIR_SIDES[0]
+    pnames = " · ".join(n for n, _, _ in ps)
+    pair_on = [n for n, sd, _ in ps if sd == mk]
+    wave = []
+    for nm, sym in (("S&P 500", "^GSPC"), ("코스피", "^KS11")):
+        if px is not None and sym in px:
+            z, pct, _, _ = z10(px[sym], end=links[0]["d1"], n=WIN)   # 카드와 같은 마지막 날(미국 종가 날)
+            if abs(z) >= Z_SOME and ((z < 0 and mk == C["bad"]) or (z > 0 and mk == C["good"])):   # 세 이슈 모두 나쁜 쪽 = 주가 내림
+                wave.append((nm, pct, abs(z)))
+    def a_over():
+        if mk in (C["good"], C["bad"]) and not pair_on and ps:
+            if not any(sd for _, sd, _ in ps):
+                each = f"대표 지표 둘({pnames})은 모두 평소 범위입니다."
+            else:
+                each = "대표 지표를 보면 " + ", ".join(f"{josa(n, ('은', '는'))} {sd + ' 쪽' if sd else '평소 범위'}" for n, sd, _ in ps) + "입니다."
+            return (f"묶음만 {mk} 쪽", f"다만 {each} 묶음과 대표 지표가 갈립니다.")
+        return None
+    def b_over():
+        if mk in (C["good"], C["bad"]) and wave:
+            w = " · ".join(f"{josa(n, ('이', '가'))} {abs(p):.1f}% {'내려' if p < 0 else '올라'} 평소의 {z:.1f}배" for n, p, z in wave)
+            return ("시장 전체 움직임", f"같은 기간 {w} 움직였습니다. 시장 전체가 함께 움직여 이 이슈만의 움직임으로 가를 수 없습니다.")
+        return a_over()
+    rows = [("지금", None, "묶음 판정 하나로 답합니다. 대표 지표 둘은 카드 안 줄로만 보입니다."),
+            ("A안 (추천)", a_over(), "대표 지표 둘이 모두 평소 범위면 `같은 쪽` 대신 갈림을 답합니다."),
+            ("B안", b_over(), "A안에 더해, 같은 5거래일 S&P 500 · 코스피가 그 쪽으로 평소보다 크게(1배 넘게) 움직였으면 `시장 전체 움직임` 이라고 답합니다.")]
+    out = ('<p style="margin:16px 6px 8px;font-size:14px;line-height:21px;color:#6B7280;word-break:keep-all;">'
+           f'6-11 시안 — `시장도 같은 쪽인가?` 답 정하기. 지금 이 이슈: 묶음 판정 = {dk.esc(mk)} · 대표 지표 = '
+           + dk.esc(" · ".join(f"{n} {sd + ' 쪽' if sd else '평소 범위'}" for n, sd, _ in ps) or "없음")
+           + ' · 시장 전체 = ' + dk.esc(" · ".join(f"{n} {p:+.1f}%" for n, p, _ in wave) or "평소 범위") + '</p>')
+    for k, (tag, over, how) in enumerate(rows):
+        card, ans = q_align(word, links, gs, oil_gr, oil_line, hist, asof, over=over)
+        same = "" if k == 0 or over else " — 이 이슈는 지금과 같은 답"
+        out += (f'<div style="margin:{8 if k == 0 else 28}px 0 0;padding:0 6px;font-size:16px;line-height:24px;font-weight:700;color:#111;">{dk.esc(tag)}{dk.esc(same)}</div>'
+                f'<div style="padding:0 6px 6px;font-size:13px;line-height:19px;color:#6B7280;word-break:keep-all;">{dk.esc(how)}</div>' + card)
+    return out + '<div style="margin:40px 6px 0;padding-top:16px;border-top:2px solid #111;font-size:14px;color:#6B7280;">아래 = 지금 페이지 전체</div>'
 
 
 def q_now(st, kind, iran, groups, sides48, asof):
@@ -2008,6 +2063,7 @@ def page(cur, watch, items, px, now, today, days, sums, logs):
     gs5 = group_side(links5)
     PAIR[0] = pair_lines(px)
     c_align, align = q_align(gauge_word(evs, today), links5, gs5, chart_gr, chart_line, hist, asof)
+    top = "" if PUBLIC else align_variants(gauge_word(evs, today), links5, gs5, chart_gr, chart_line, hist, asof, px)   # 6-11 시안 (목업만)
     cur["align"] = align
 
     c_news, r2w = q_news(cur, counts, days, r48)
