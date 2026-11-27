@@ -1126,7 +1126,7 @@ ARTICLE_CSS = """<style>
 .cc-article .cc-page-h .cc-n{font-weight:400;}              /* 숫자는 굵게 빼기 */
 .cc-article .cv-guard{margin:5px 0 9px !important;background:none !important;border:1px solid #E2E8F0 !important;}   /* 위 14 → 7 → 5 · 아래(첫 댓글까지) 14 → 9 · 회색 면 빼고 회색 외곽선만 */
 .cc-article .cv-list .cv-main .cv-title{margin-top:1px;}    /* 이름 줄 ~ 제목 4 → 3 → 1 */
-.cc-article .cv-list .cv-main .cv-text{margin-top:4px;line-height:25px;color:#606773;}   /* 제목 아래 6 → 4 · 행간 26 → 25 · 글자 #6B7280 → 10% 진하게 */
+.cc-article .cv-list .cv-main .cv-text{margin-top:4px;line-height:25px;color:#565D68;}   /* 제목 아래 6 → 4 · 행간 26 → 25 · 글자 #6B7280 → #606773 → #565D68(10%씩 두 번 진하게) */
 .cc-article [data-cmore]{margin:8px 0 0;}
 .cc-article [data-cmore].is-open .acc-chev{transform:rotate(180deg);}
 </style>"""
