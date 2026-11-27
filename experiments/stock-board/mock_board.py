@@ -1,4 +1,4 @@
-"""종목별 토론방 목업 (2026-11-20 사용자 "가 종목별 토론방으로 목업 만들어 줘").
+"""종목별 토론방 목업.
 
     python experiments/stock-board/mock_board.py   → output/mock_board_NVDA*.html (목업 서버 `stock-board` 묶음)
 

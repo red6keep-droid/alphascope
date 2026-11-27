@@ -1,4 +1,4 @@
-"""발행 시간 — 모든 서비스의 기준 발행 시각과 실제 시각, 늦은 날은 왜 늦었는지 (2026-11-24 사용자).
+"""발행 시간 — 모든 서비스의 기준 발행 시각과 실제 시각, 늦은 날은 왜 늦었는지.
 
     "독자들한테 공지한 시간… 약속한 발행 시간에 실패했으면 그 누적 그래프를 계속 그려줘."
     "우리 발행시간 체크 페이지에서 모든 서비스의 기준 발행시간을 알고 싶고 왜 기준시간에 발행이 안되는지 현황 파악하고 싶다."
@@ -90,7 +90,7 @@ SERVICES = [
          wf="commentary.yml", start="08:40", up="us_report"),
     dict(key="quick_us", name="간단 종목 853 (미국)", short="간단 미국", at="09:00", reader=True, why="안내 상자 `아침 9시 무렵` (11.24 고침)",
          since=dt.date(2026, 11, 17), due=_us_day, src=("run", "quick-data.yml", "· us"), wf="quick-data.yml", start="08:20", up="us_pages"),
-    # 새벽 받기 (2026-11-24 사용자) — 한국 간단 종목 DART · 정식 종목 매출 · 수주 읽기. 결과가 화면에 바로 안 보여도 안 돌면 화면이 지난 값으로 나간다.
+    # 새벽 받기 — 한국 간단 종목 DART · 정식 종목 매출 · 수주 읽기. 결과가 화면에 바로 안 보여도 안 돌면 화면이 지난 값으로 나간다.
     # GitHub 예약이 08~13시에 와 `Too late?` 로 받기를 건너뛰고도 `성공` 이던 날(11-21~24)을 잡는다 — 5분 넘게 돈 실행만 `받음`
     dict(key="kr_dart", name="한국 DART 새벽 받기", short="새벽 받기", at="06:00", reader=False, why="03:20 Worker 예약 · 02~06시 창 안에서만 받음",
          since=dt.date(2026, 11, 21), due=_every, src=("run", "quick-dart.yml", ""), wf="quick-dart.yml", start="03:20"),
@@ -309,7 +309,7 @@ def why(svc, d, st, t, res_by_key, runs):
     if runs.get(svc["wf"]) is None:
         return (tags or ["원인 못 찾음"]), (" · ".join(bits) or "실행 기록을 읽지 못함")
     if svc["key"] in CALLED_SVCS and d >= CALL_FROM and not any("collector" in r["title"] for r in rs):
-        # 수집 완료 즉시 발행(2026-11-26 사용자) — 수집기가 블로그를 부르지 않았으면 Worker 안전망(08:40 · 17:00 · 21:00)으로만 나간다
+        # 수집 완료 즉시 발행 — 수집기가 블로그를 부르지 않았으면 Worker 안전망(08:40 · 17:00 · 21:00)으로만 나간다
         tags.append("수집기 부름 없음")
         bits.append("수집기가 글 저장 뒤 블로그를 부르지 않음(토큰 만료 · 수집기 실패 · 1차만 저장) — 정시 안전망 실행으로 나감")
     if not rs:
@@ -452,7 +452,7 @@ def _grid_table(res, now, days, wide=False):
 
 
 def grid(res, now, gid="ot"):
-    """`7일` 표 + 월로 보기 버튼 (2026-11-26 사용자 "표에서 월로 보기 버튼도 추가해").
+    """`7일` 표 + 월로 보기 버튼.
     버튼 = 7일 · 이번 달 · 지난 달들(기록 시작 START 부터, 최신 먼저). 월 표 = 그달 1일 ~ 말일(이번 달은 오늘까지), 옆으로 넘김.
     자바스크립트 없이 라디오 + CSS 로 바꾼다 — gid 는 시장 탭마다 달라야 한다(한 페이지에 둘)."""
     views = [("7일", [now.date() - dt.timedelta(days=i) for i in range(GRID_DAYS - 1, -1, -1)], False)]
@@ -487,11 +487,11 @@ def std_table(res, now):
                                ("보통", "text-align:center;width:44px;"), ("정시", "text-align:center;width:40px;padding-right:12px;")))
     rows = ""
     for svc, ds in res:
-        since = max([cut] + [u for u, _ in START_BEFORE.get(svc["key"], [])])   # 예약 시각이 바뀐 서비스는 바뀐 날부터 — 옛 일정 탓 주황이 섞이지 않게 (2026-11-24 사용자)
+        since = max([cut] + [u for u, _ in START_BEFORE.get(svc["key"], [])])   # 예약 시각이 바뀐 서비스는 바뀐 날부터 — 옛 일정 탓 주황이 섞이지 않게
         recent = [x for x in _counted(ds) if x[0] >= since]
         times = sorted(x[2].hour * 60 + x[2].minute for x in recent if x[2])
         med = f"{times[(len(times) - 1) // 2] // 60:02d}:{times[(len(times) - 1) // 2] % 60:02d}" if times else "—"
-        a = svc["at"]   # 지금 기준만 — 옛 기준은 보이지 않는다(판정은 그날 기준으로, 2026-11-24 사용자 "옛 기준은 필요없지")
+        a = svc["at"]   # 지금 기준만 — 옛 기준은 보이지 않는다
         lim = int(a[:2]) * 60 + int(a[3:]) + GRACE_MIN
         mcol = GOOD if times and times[(len(times) - 1) // 2] <= lim else (BAD if times else NOTE_C)
         n_on = sum(x[1] == "on" for x in recent)
@@ -525,7 +525,7 @@ def summary(res, now, reasons=None):
             r = reasons.get(k)
             line = f"{svc['name']} — 기준 {a}" + ("" if svc["reader"] else " (내부)") + f" · {what}"
             today.append((svc["name"], _pill(st, m), k, {"line": line, "cause": r[1] if r else "원인을 아직 보지 않음"}))
-    # 요약 칸 값 = 오늘 기준 (2026-11-26 사용자 "그렇게 해") — 11.1부터 쌓인 횟수가 오늘 문제처럼 주황으로 보이던 것.
+    # 요약 칸 값 = 오늘 기준 — 11.1부터 쌓인 횟수가 오늘 문제처럼 주황으로 보이던 것.
     # 주황은 오늘 늦음 · 안 나감이 있을 때만. 누적은 보조 줄에 비교와 함께: 이번 달 1일부터 vs 지난달 같은 날까지(발행 시간 탭 그래프와 같은 비교 대상).
     td = now.date()
     wait = sum(1 for _, ds in res for x in ds if x[0] == td and x[1] == "wait")
@@ -543,7 +543,7 @@ def summary(res, now, reasons=None):
     return val, sub, today
 
 
-# 시장 — 탭 나누기 (2026-11-24 사용자 "탭으로 미국 한국 콘텐츠 나눠"). 홈 주요 뉴스(news.json) · Hot Issue · 전망 아침 · 테마 · 인물 발언은 미국 아침 실행이라 미국
+# 시장 — 탭 나누기. 홈 주요 뉴스(news.json) · Hot Issue · 전망 아침 · 테마 · 인물 발언은 미국 아침 실행이라 미국
 KR_KEYS = {"kr_dart", "kr_report", "kr_pages", "kr_home", "hypo_pm", "quick_kr", "kr_brief"}
 
 
@@ -608,7 +608,7 @@ def _note(text):
 
 
 def _inner_title(t):
-    """운영 현황 `발행 시간` 탭 안, 시장 서브탭 안의 작은 제목 — data-sub 를 달지 않아 서브탭이 되지 않는다(탭이 세 겹이 되지 않게, 2026-11-24 사용자)."""
+    """운영 현황 `발행 시간` 탭 안, 시장 서브탭 안의 작은 제목 — data-sub 를 달지 않아 서브탭이 되지 않는다."""
     return f'<div style="font-size:17px;line-height:25px;color:#111;font-weight:700;margin:20px 0 8px;">{esc(t)}</div>'
 
 
@@ -648,7 +648,7 @@ def page_body(res, reasons, now, in_tab=False):
         mk_rows.append((f"{mk} ({len(sub)}개)", val, f"11.1부터 정시 {sum(x[1] == 'on' for x in c)}/{len(c)}"))
     top = dk.cards(lead + head + white_card(mk_rows))
 
-    # 누적 = 이번 달 1일부터, 매달 새로 센다 — 끝없이 쌓으면 선이 위로만 가서 요즘 늘었는지 안 보인다 (2026-11-26 사용자 "그렇게 해").
+    # 누적 = 이번 달 1일부터, 매달 새로 센다 — 끝없이 쌓으면 선이 위로만 가서 요즘 늘었는지 안 보인다.
     # 비교 대상 = 지난달 같은 날까지의 누적(모두). 지난달이 기록 시작(START) 전이면 비교 대상 없음. 날마다 판정 기록은 그대로 둔다 — 그래프 기간만 바꿈.
     m0 = now.date().replace(day=1)
     days = [m0 + dt.timedelta(days=i) for i in range((now.date() - m0).days + 1)]
@@ -673,7 +673,7 @@ def page_body(res, reasons, now, in_tab=False):
         cmp_note = "비교 대상 = 지난달 같은 날까지의 누적(모두)"
     else:
         cmp_note = f"비교 대상 없음 — 기록이 {START.month}.{START.day}부터라 지난달이 없습니다"
-    # 가로축 = 카드 폭에 다 넣고(넘겨 보기 X) 날짜는 6개쯤만 — 마지막 날은 꼭, 그 앞 이름이 너무 붙으면 뺀다 (2026-11-26 사용자: 26일째 날짜가 전부 겹침)
+    # 가로축 = 카드 폭에 다 넣고(넘겨 보기 X) 날짜는 6개쯤만 — 마지막 날은 꼭, 그 앞 이름이 너무 붙으면 뺀다
     gap = max(1, -(-len(days) // 6))
     xlab = [_md(d) if (i % gap == 0 and len(days) - 1 - i >= gap / 2) or i == len(days) - 1 else "" for i, d in enumerate(days)]
     title = f"기준 시각을 넘긴 횟수 ({now.month}월 누적, 번)"

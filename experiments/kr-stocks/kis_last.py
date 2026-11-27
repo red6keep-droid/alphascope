@@ -1,8 +1,8 @@
-"""한국투자증권 최근 일봉 받기 — 집 IP(VPN newfact 계정)로, 대조용 (2026-11-23 사용자).
+"""한국투자증권 최근 일봉 받기 — 집 IP(VPN newfact 계정)로, 대조용.
 
     HOME_SOURCE_ADDRESS=<ppp0 주소> python experiments/kr-stocks/kis_last.py --need /tmp/kis_need.json   # 워크플로가 쓰는 길(2026-11-26)
 
-2026-11-26 사용자: 순서 = 야후 → 네이버 → 한국투자증권(맨 뒤, 부를 때마다 폰 알림). 워크플로(kr-stocks · quick-data)는 수집 **뒤**,
+: 순서 = 야후 → 네이버 → 한국투자증권(맨 뒤, 부를 때마다 폰 알림). 워크플로(kr-stocks · quick-data)는 수집 **뒤**,
 collect_kr._fix_last 가 남긴 `네이버도 못 받은 종목` 파일(--need)이 비어 있지 않을 때만 VPN 을 열고 이걸 부른다 — 평소 0번.
 --need 는 그 종목만 받아 야후 마지막 봉이 맞나 틀리나만 로그에 적는다(종목 · 칸 이름만, 한국투자증권 값은 파일 · 로그에 남기지 않음 — 공개 실행 로그).
 

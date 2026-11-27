@@ -1,10 +1,10 @@
-"""댓글 다듬기 목업 (2026-11-21 사용자 — 기획 alphascope-docs doc/기획/댓글-토론방-기획.md).
+"""댓글 다듬기 목업.
 
     python experiments/comments/mock_comments.py   → output/mock_comments_*.html (목업 서버 `comments` 묶음)
 
 증시 시황 글 목업(market-commentary/output/mock_story.html) 아래 버튼 줄에 `댓글` 을 붙이고 댓글 판을 연 채로 그린다.
 
-구조 (2026-11-21 사용자 "네이버처럼" — 화면 구조만 따르고 색 · 글씨 · 버튼은 우리 값):
+구조:
   목록   글마다 이름 + 오른쪽 날짜 → 제목(굵게) → 글 → 말풍선 아이콘 + 답글 수. 최신이 위. 글 · 아이콘을 누르면 글 화면으로.
          쓰기 = 오른쪽 아래 동그란 연필 버튼(누르면 쓰기 창: 제목 + 글). 로그인 전이면 로그인 창.
   글 화면 `댓글 목록` 으로 돌아가기 → 그 사람 글(제목 · 날짜 · 글) → `답글 n` → 입력 칸 → 안내 상자 → 답글들(이름 + 오른쪽 날짜).
@@ -52,9 +52,9 @@ CSS = """<style>
 .comments .cv-head{display:flex;align-items:center;gap:7px;min-height:32px;}
 .comments .cv-head .cm-avatar{flex:none;}
 .comments .cv-head .cm-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-/* P614 숫자 = Inter: 토론 칸 · 화면 전체 창 글꼴 = 테마 --report-font('AS Num' 맨 앞) · 숫자만 있는 자리 = --num (2026-11-22 사용자) */
+/* P614 숫자 = Inter: 토론 칸 · 화면 전체 창 글꼴 = 테마 --report-font('AS Num' 맨 앞) · 숫자만 있는 자리 = --num */
 .comments,.cv-full,.cv-page{font-family:var(--report-font);}
-/* P615 날짜 = 가장 작은 글씨 13/19 (2026-11-22 사용자) */
+/* P615 날짜 = 가장 작은 글씨 13/19 */
 .comments .cm-date,.cv-pmeta,.cv-rtime{font-family:var(--num);font-size:13px;line-height:19px;font-variant-numeric:tabular-nums;}
 .comments .cv-react span,.comments .cv-reply span,.cm-count,.cv-lab small,.cv-frow{font-family:var(--num);}
 .cv-mine small{font-size:13px;line-height:19px;}
@@ -62,9 +62,9 @@ CSS = """<style>
 .comments .cv-menu{flex:none;display:flex;align-items:center;justify-content:center;width:32px;height:32px;margin:0 -8px 0 0;padding:0;background:none;border:0;color:#6B7280;cursor:pointer;-webkit-tap-highlight-color:transparent;}
 .comments .cv-main{display:block;margin:2px 0 0 31px;color:inherit;text-decoration:none;}
 .comments .cv-title{font-size:16px;line-height:24px;font-weight:700;color:#111;word-break:keep-all;overflow-wrap:anywhere;}
-/* 목록 한 칸 = 네이버 토론 목록 느낌(2026-11-21 사용자 캡처): 어디 글인지 꼬리표 → 이름 줄 → 큰 제목 → 내용 3줄 → 좋아요 · 싫어요 · 답글 */
+/* 목록 한 칸 = 네이버 토론 목록 느낌: 어디 글인지 꼬리표 → 이름 줄 → 큰 제목 → 내용 3줄 → 좋아요 · 싫어요 · 답글 */
 .comments .cv-tag{display:inline-block;margin:0 0 10px;padding:4px 10px;border-radius:6px;background:#F1F5F9;font-size:14px;line-height:20px;font-weight:700;color:#333;}
-.comments .cv-list .cv-main .cv-title{margin:4px 0 0;font-size:16px;line-height:24px;}   /* 종목 카드 이름과 같은 16/24 굵게 (2026-11-21 사용자, 옛 19/28) */
+.comments .cv-list .cv-main .cv-title{margin:4px 0 0;font-size:16px;line-height:24px;}   /* 종목 카드 이름과 같은 16/24 굵게 */
 .comments .cv-list .cv-main .cv-text{margin:6px 0 0;color:#6B7280;}
 .comments .cv-foot{gap:16px;}
 .comments .cv-react{display:inline-flex;align-items:center;gap:6px;margin:0;padding:4px 0;background:none;border:0;font:inherit;font-size:14px;line-height:20px;color:#333;font-variant-numeric:tabular-nums;cursor:pointer;-webkit-tap-highlight-color:transparent;}
@@ -81,7 +81,7 @@ CSS = """<style>
 .cv-ptitle{margin:14px 0 0;font-size:22px;line-height:32px;font-weight:700;color:#111;word-break:keep-all;overflow-wrap:anywhere;}
 .cv-pmeta{margin:4px 0 0;color:#7A7A7A;}
 .cv-ptext{margin:18px 0 0;font-size:16px;line-height:26px;color:#333;white-space:pre-wrap;word-break:keep-all;overflow-wrap:anywhere;}
-.cv-big-react{display:flex;gap:12px;margin:16px 0 0;padding:0 0 16px;border-bottom:1px solid #E2E8F0;}   /* P617 목록과 같은 아이콘 꼴(2026-11-22 사용자, 옛 테두리 상자 120 · 16/24) */
+.cv-big-react{display:flex;gap:12px;margin:16px 0 0;padding:0 0 16px;border-bottom:1px solid #E2E8F0;}   /* P617 목록과 같은 아이콘 꼴 */
 .cv-me{display:flex;align-items:center;gap:7px;margin:0 0 10px;}
 .cv-myprof{margin-left:auto;padding:5px 11px;border-radius:8px;background:#fff;border:1px solid #111;color:#111;font-size:13px;line-height:19px;font-weight:700;text-decoration:none;}
 .cv-page .comments .cv-rlist .cv-text{margin:6px 0 0;}
@@ -129,7 +129,7 @@ CSS = """<style>
 .comments [data-rform][hidden]{display:none;}
 .comments .cm-left{font-size:14px;line-height:20px;color:#7A7A7A;}
 .comments .cm-count-row{display:flex;align-items:center;gap:10px;}
-/* 쓰기 동그란 버튼 — 화면 오른쪽 아래 고정. 기본 버튼 꼴(흰 바탕 · 검은 테두리, 검은 바탕 버튼은 목록 버튼만 — 2026-11-21 사용자) */
+/* 쓰기 동그란 버튼 — 화면 오른쪽 아래 고정. 기본 버튼 꼴 */
 .cv-fab{position:fixed;right:16px;bottom:84px;z-index:900;display:flex;align-items:center;justify-content:center;width:56px;height:56px;padding:0;border:1px solid #111;border-radius:50%;background:#fff;color:#111;box-shadow:0 2px 10px rgba(0,0,0,.16);cursor:pointer;-webkit-tap-highlight-color:transparent;}
 .cv-fab[hidden]{display:none;}
 .cv-fab svg{width:24px;height:24px;}
@@ -272,7 +272,7 @@ SIREN = f'<svg viewBox="0 0 16 16" {_SVG} stroke-width="1.6"><path d="M4.5 12.5V
 WARN = f'<svg viewBox="0 0 16 16" {_SVG} stroke-width="1.6"><path d="M8 2 14.5 13.5h-13z"/><path d="M8 6.5v3.2M8 11.6v.1"/></svg>'
 REASONS = ("리딩방 · 광고", "욕설 · 비방", "개인정보", "거짓 정보 · 시세 조종 의심", "기타")
 ME = "주린이탈출"
-# 프로필 그림 24종(2026-11-22 사용자 그림, 수정 모음 P631) — cut_avatars.py 가 output/avatars/ 에 자른다.
+# 프로필 그림 24종 — cut_avatars.py 가 output/avatars/ 에 자른다.
 # 처음엔 회원마다 자동 배정(목록이 한 그림으로 도배되지 않게) · 내 프로필에서 바꾼다. 서버엔 번호만(a01 · p07).
 AVA_TABS = [("동물", "a"), ("일반", "p")]
 ME_AVA = "a06"   # 목업: 나 = 곰
@@ -346,7 +346,7 @@ STOCKS = {
     "005930": ("삼성전자", "005930 · 코스피", "98,700원", "+2.81%", True, [28, 29, 26, 27, 24, 22, 23, 20, 21, 18, 17, 15, 14, 12]),
     "NVDA": ("엔비디아", "NVDA · 나스닥", "$125.53", "-14.01%", False, [10, 12, 11, 14, 15, 14, 16, 15, 17, 16, 22, 26, 29, 31]),
 }
-STICKERS = [   # (탭 이름, [컷 …]) — 2026-11-21 사용자 그림 여섯 장(course/sheet_to_webp.py 로 자름) 먼저, 그 뒤 옛 주식 공부 컷
+STICKERS = [   # (탭 이름, [컷 …]) 그림 여섯 장(course/sheet_to_webp.py 로 자름) 먼저, 그 뒤 옛 주식 공부 컷
     ("상승이", ["up_flip", "up_panic", "up_throw", "up_box", "up_flat", "up_cheer", "up_chicken", "up_night",
                 "up_pray", "up_treadmill", "up_recheck", "up_flowers",
                 "up_laptop", "up_search", "up_book", "up_coffee", "up_walk", "up_news", "up_tablet", "up_ponder",
@@ -360,7 +360,7 @@ STICKERS = [   # (탭 이름, [컷 …]) — 2026-11-21 사용자 그림 여섯 
                 "mid_think", "mid_caution", "mid_explain"]),
     ("같이", ["pair_gym", "pair_game", "pair_trip", "pair_race", "pair_study", "pair_wonder", "pair_play", "pair_cheer"]),
 ]
-TITLES = {   # 목업 목록에 보이는 이름 (2026-11-21 사용자: 페이지 이름을 못 찾겠다)
+TITLES = {   # 목업 목록에 보이는 이름
     "mock_comments_member.html": "댓글 목록 (로그인 뒤)",
     "mock_comments_guest.html": "댓글 목록 (로그인 전)",
     "mock_comments_thread.html": "댓글 글 화면 · 답글 · 스티커 붙은 모습 (로그인 뒤)",
@@ -369,7 +369,7 @@ TITLES = {   # 목업 목록에 보이는 이름 (2026-11-21 사용자: 페이�
     "mock_comments_write.html": "댓글 글쓰기 · 스티커 고르기 · 종목 붙이기",
     "mock_comments_profile.html": "댓글 내 프로필",
 }
-REACT_LIMIT = 30   # 좋아요 · 싫어요 하루 상한(2026-11-21 사용자). 누른 걸 취소해도 돌려주지 않는다(쓰기 횟수는 이미 쓰였으므로)
+REACT_LIMIT = 30   # 좋아요 · 싫어요 하루 상한. 누른 걸 취소해도 돌려주지 않는다(쓰기 횟수는 이미 쓰였으므로)
 REACT_LEFT = 2     # 목업: 오늘 28번 누른 상태로 시작 — 세 번째 누르면 상한 안내가 뜬다
 NICK_A = ["느긋한", "꾸준한", "침착한", "용감한", "성실한", "든든한", "신중한", "씩씩한"]
 NICK_B = ["개미", "장기투자자", "배당수집가", "분할매수러", "차트탐험가", "적립왕", "가계부장", "공부벌레"]
@@ -483,7 +483,7 @@ def list_view(member, first):
 
 
 def thread_page(member):
-    """글 화면 = 새 페이지(2026-11-21 사용자: 네이버 토론 글 화면처럼). 목록 칸을 누르면 열린다.
+    """글 화면 = 새 페이지. 목록 칸을 누르면 열린다.
     실제는 Blogger 페이지 하나(/p/comment.html?post=…&c=…)가 주소의 번호로 글을 읽어 그린다 — 댓글마다 주소가 생겨 공유도 된다.
     위 줄(뒤로 · 어느 글 › · 공유) → 글쓴이 → 제목 → 날짜 → 본문 → 좋아요 · 싫어요 상자 → 답글 n → 내 이름 · 내 프로필 → 쓰는 칸 → 안내 → 답글들."""
     name, when, title, text, _, replies = THREAD

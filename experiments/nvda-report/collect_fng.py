@@ -1,4 +1,4 @@
-"""CNN 공포·탐욕 지수 (Fear & Greed) — 시장 국면 카드 글머리표용 (2026-10-11 사용자).
+"""CNN 공포·탐욕 지수 (Fear & Greed) — 시장 국면 카드 글머리표용.
 
 엔드포인트는 브라우저 헤더가 없으면 418을 돌려준다. 기준 거래일 행(daily_state.fng_score · fng_rating)에 저장한다.
 실패하면 조용히 None — 카드는 그 항목을 비운다. 등급 한글: extreme fear 극단적 공포 · fear 공포 · neutral 중립 · greed 탐욕 · extreme greed 극단적 탐욕.

@@ -40,7 +40,7 @@ HISTORY_UNIVERSE = {
     "rates": ["^TNX", "^FVX", "^IRX"],
     # 2026-10-18 재설계 (doc/기획/데일리-리포트-기획.md 6절): 대형주 10개 평소 범위(D4) · 한국 짝의 미국 쪽(K2) · 원/달러(K3)
     "mega": ["NVDA", "AAPL", "MSFT", "GOOGL", "AMZN", "META", "AVGO", "TSLA", "BRK-B", "LLY"],
-    "link": ["^SOX", "EWY"],   # EWY = 미국에 상장된 한국 주식 상장지수펀드 — 한국장 탭 매일 바뀌는 값 (2026-11-08 사용자 P407)
+    "link": ["^SOX", "EWY"],   # EWY = 미국에 상장된 한국 주식 상장지수펀드 — 한국장 탭 매일 바뀌는 값
     "fx": ["KRW=X"],
 }
 OPEN_SYMBOLS = ("^GSPC", "^IXIC", "^DJI", "^RUT")   # 시가 · 고가 · 저가도 남기는 심볼 (2026-11-07)
@@ -275,7 +275,7 @@ def collect_history():
             "dates": [d.strftime("%Y-%m-%d") for d in s.index],
             "close": [round(float(v), 4) for v in s.values],
         }
-        if symbol in OPEN_SYMBOLS:   # 시가 · 고가 · 저가 — 지수 4개만(시가 갭 그래프 · 지수 기술지표 카드, 2026-11-07 사용자). 같은 응답에 이미 있다, 새 요청 없음
+        if symbol in OPEN_SYMBOLS:   # 시가 · 고가 · 저가 — 지수 4개만. 같은 응답에 이미 있다, 새 요청 없음
             for col, key in (("Open", "open"), ("High", "high"), ("Low", "low")):
                 try:
                     o = df[symbol][col].reindex(s.index)
@@ -294,7 +294,7 @@ def collect_history():
 
 
 def add_sectors(*quote_lists):
-    """종목마다 섹터(yfinance info.sector, 영문)를 붙인다 — 급등주 · 관심 종목 섹터 라벨 (2026-10-13 사용자).
+    """종목마다 섹터(yfinance info.sector, 영문)를 붙인다 — 급등주 · 관심 종목 섹터 라벨.
     못 받으면 sector 없이 둔다. 리포트를 막지 않는다."""
     cache = {}
     for quotes in quote_lists:

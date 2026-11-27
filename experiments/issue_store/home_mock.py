@@ -1,4 +1,4 @@
-"""홈 목업 — `증시 전망` 카드가 네 번째로 들어간 홈 (2026-11-06 사용자: 이름 `증시 전망` · 메뉴에 넣기 · 질문마다 페이지).
+"""홈 목업 — `증시 전망` 카드가 네 번째로 들어간 홈.
 
     python experiments/issue_store/home_mock.py     # output/mock_home_hypo.html
 
@@ -20,7 +20,7 @@ LIST_URL = "https://www.newfact.app/p/forecast-list.html"
 
 # 홈 카드 전용 CSS — 적용 때 alphaflow-home.html 의 #radar-col 블록 옆에 옮긴다
 HYPO_CSS = """
-/* ===== 증시 전망 카드 (2026-11-06 사용자, 홈 수정 H34) — 네 번째 카드, 인물 발언과 아래 줄 좌우(2×2 복귀: #radar-col 전폭 규칙 삭제).
+/* ===== 증시 전망 카드 — 네 번째 카드, 인물 발언과 아래 줄 좌우(2×2 복귀: #radar-col 전폭 규칙 삭제).
    줄 모양 = 인물 발언 카드(= 주요 뉴스 기사 모양, 가이드 10절): 제목 18px 굵게 행간 34 · 라벨 줄(.news-tag + 14px 보조) · 소개 줄(.news-sum 16px). 새 클래스 없음 — 적용 때 #radar-card 선택자에 #hypo-card 를 덧붙인다 */
 #radar-col { grid-column: auto; }
 #hypo-card { padding: 0 16px; gap: 0; }
@@ -55,7 +55,7 @@ def chart_card(src, alt, line):
 
 
 def hypo_card(card):
-    """줄 = 전망 내용 + 분류 라벨(선거 · 반도체) + 게시일 — 국면 · 문장은 페이지에서 (2026-11-06 사용자)."""
+    """줄 = 전망 내용 + 분류 라벨(선거 · 반도체) + 게시일 — 국면 · 문장은 페이지에서."""
     rows = ""
     for q in card["open"]:
         tags = "".join(f'<span class="news-tag">{dk.esc(t)}</span>' for t in q["tags"])

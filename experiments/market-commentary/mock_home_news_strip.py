@@ -1,4 +1,4 @@
-"""홈 실적 한 줄 자리 — 실적 일정이 없는 날 주요 뉴스 롤링 목업 (2026-11-19 사용자 "실적 날짜가 없으면 주요 뉴스를 롤링, 미국도 같은 규칙, 목업 먼저").
+"""홈 실적 한 줄 자리 — 실적 일정이 없는 날 주요 뉴스 롤링 목업.
 
     python experiments/market-commentary/mock_home_news_strip.py   # → output/mock_home_news_strip_us.html · _kr.html
 
@@ -20,7 +20,7 @@ OUT = os.path.join(HERE, "output")
 KR_SAMPLE = os.path.join(HERE, "samples", "kr_news_2026-11-19.json")
 
 STRIP_CSS = """<style>
-/* 실적 한 줄 자리 — 일정이 없는 날 주요 뉴스 줄 (2026-11-19 사용자). 같은 한 줄 칸(높이 47) · 같은 바탕색 돌림 · 같은 점 */
+/* 실적 한 줄 자리 — 일정이 없는 날 주요 뉴스 줄. 같은 한 줄 칸(높이 47) · 같은 바탕색 돌림 · 같은 점 */
 #event-banner .eb-news { gap: 8px; }
 #event-banner .eb-news .eb-tag { flex: none; font-size: 12px; line-height: 19px; padding: 0 6px; border-radius: 4px; background: rgba(255, 255, 255, .2); color: #fff; font-weight: 700; }
 #event-banner .eb-news .eb-headline { flex: 1 1 auto; min-width: 0; font-size: 15px; line-height: 24px; font-weight: 700; color: #fff;
@@ -31,7 +31,7 @@ STRIP_CSS = """<style>
 STUDY_LINE = "if (ready) { box.style.setProperty('--eb-bg', STUDY_BG); track.appendChild(studySlide()); dotBox.hidden = true; }"
 NEWS_LINE = "if (ready) newsStrip(box, track, dotBox);"
 STRIP_JS = r"""
-  /* 일정이 없는 날 = 주요 뉴스 줄 롤링 (2026-11-19 사용자 "실적 날짜가 없으면 주요 뉴스를 롤링, 미국도 같은 규칙").
+  /* 일정이 없는 날 = 주요 뉴스 줄 롤링.
      미국 = 홈 주요 뉴스와 같은 news.json · 한국 = 한국 증시 리포트 뉴스 탭과 같은 재료(한국 증시 방송 이슈, kr-news.json).
      최근 24시간 · 최신 5줄. 줄을 누르면 미국 = 홈 아래 주요 뉴스로 · 한국 = 한국 증시 리포트(최신 글). 줄이 없으면 칸을 숨긴다 */
   var NEWS_STRIP_N = 5, KR_NEWS_URL = GH + 'kr-news.json', stripNewsCache = {};
@@ -55,7 +55,7 @@ STRIP_JS = r"""
           a.href = '#news-list';
           a.addEventListener('click', function (e) { var n = document.querySelector('.news-section'); if (n) { e.preventDefault(); n.scrollIntoView({ behavior: 'smooth', block: 'start' }); } });
         }
-        a.appendChild(el('span', 'eb-tag', 'News'));   /* 라벨 = 미국 · 한국 모두 영어 `News`, 한국 `방송` 라벨 따로 두지 않음 (2026-11-19 사용자) */
+        a.appendChild(el('span', 'eb-tag', 'News'));   /* 라벨 = 미국 · 한국 모두 영어 `News`, 한국 `방송` 라벨 따로 두지 않음 */
         a.appendChild(el('span', 'eb-headline', it.title_ko || it.title));
         track.appendChild(a);
         var d = el('button', 'eb-dot'); d.type = 'button'; d.setAttribute('aria-label', (i + 1) + '번째 뉴스');

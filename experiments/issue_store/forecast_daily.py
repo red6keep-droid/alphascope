@@ -91,7 +91,7 @@ PRIOR_DAYS = 5   # 감지일 앞 몇 거래일 안의 충격을 보나
 
 def prior_shock(px, fc, sub, mkt):
     """사건 전 전망(감지일 있는 틀 S)의 감지일 앞 PRIOR_DAYS 거래일 안에 같은 계열이 하루에 금(fc["line"], 20거래일 1σ) 넘게 움직인 날 → {"day", "move"}.
-    한 달 치 움직임이 하루에 난 날 바로 뒤를 0 으로 재면 그 뒤 되돌림이 선반영처럼 읽힌다 (2026-11-12 사용자: 11.05 반도체 −12% → 11.06 기준 엔비디아 실적 타임라인이 전부 ▲).
+    한 달 치 움직임이 하루에 난 날 바로 뒤를 0 으로 재면 그 뒤 되돌림이 선반영처럼 읽힌다.
     가장 큰 하루 하나만. 없으면 None. 새 수집 없음 — 이미 받은 종가."""
     det = fc.get("detect_day")
     if fc["kind"] != "pre" or not det or sub not in px:
@@ -174,7 +174,7 @@ def attach_why(fc, st, state_dir=None):
         if d < cut:
             continue
         prev = days[i - 1] if i else fc.get("registered")
-        if R.is_kr((fc.get("series") or {}).get("sub") or ""):   # 한국 = kr_why (2026-11-12 사용자)
+        if R.is_kr((fc.get("series") or {}).get("sub") or ""):   # 한국 = kr_why
             import kr_why as K
             rec = K.day_why(fc, d, prev, K.CTX, prev_sigs) if K.CTX is not None else None
         else:
@@ -213,7 +213,7 @@ def run(state_dir=None):
     for r, fc in pub:
         if fc["kind"] == "pre" and not fc.get("base_day"):   # 결과 직전 종가 (2026-11-08) — 장 마감 뒤 발표만 발표 날 종가
             fc["base_day"] = H.pre_base_day(fc["event_day"], fc.get("release_et"), tdays_all)
-    # 사건 전 전망의 결과 칸 — 사건 날이 지나면 미리 적은 규칙(실적 = 주당순이익 서프라이즈 5% 이상)으로 코드가 정해 상태에 고정 (2026-11-22 사용자:
+    # 사건 전 전망의 결과 칸 — 사건 날이 지나면 미리 적은 규칙(실적 = 주당순이익 서프라이즈 5% 이상)으로 코드가 정해 상태에 고정 (:
     # 엔비디아 실적 11.17 뒤 결과 칸을 채우는 코드가 없어 판정이 11.16 에서 멈췄다). 못 채운 것은 run.pending → 운영 알림
     import event_results as ER
     try:
@@ -230,17 +230,17 @@ def run(state_dir=None):
             vix = [px["vix"].get(d) for d in days] if px["vix"] else None
             cond = fc.get("cond_known")   # 결과가 난 사건 전 전망 — 결과 칸은 사건 날 코드(실적 · FOMC)가 채운다
             st = H.judge(fc, days, rel, cond=cond, vix=vix if vix and all(v is not None for v in vix) else None)
-            try:   # 판정 난 날이 다른 사건(관련 Hot Issue)과 겹쳤으면 겹침 표시 · 이유 문장 · 성적표 따로 (2026-11-22 사용자)
+            try:   # 판정 난 날이 다른 사건(관련 Hot Issue)과 겹쳤으면 겹침 표시 · 이유 문장 · 성적표 따로
                 ER.mark_overlap(fc, st, state_dir, sub)
             except Exception as e:  # noqa: BLE001
                 print(f"[forecast] 판정 날 겹침 검사 실패 {fc['slug']}: {type(e).__name__}")
             for e in st["log"]:   # 오늘 나온 것 — 판정엔 안 쓰고 보이기만 (기획 9-2)
                 e["today"] = H.today_line(today_info(e["day"]))
-            if H.is_stock_fc(fc):   # 현재 증시는? 맨 위 종목 줄 — 판정용으로 이미 받은 종가에서 (새 수집 없음, 2026-11-11 사용자)
+            if H.is_stock_fc(fc):   # 현재 증시는? 맨 위 종목 줄 — 판정용으로 이미 받은 종가에서
                 st["quote"] = H.quote_of(px.get(sub))
-            if fc["kind"] == "after":   # 현재 증시는? 비교 그래프 — 종목 · 업종 · S&P 500 (이미 받은 종가, 2026-11-11 사용자)
+            if fc["kind"] == "after":   # 현재 증시는? 비교 그래프 — 종목 · 업종 · S&P 500
                 st["compare"] = H.compare_of(px, fc.get("base_day") or base_of(fc), H.compare_lines(fc))
-            if fc["kind"] == "after":   # 타임라인 날마다 근거 (2026-11-11 사용자) — 실패해도 판정 · 렌더는 그대로
+            if fc["kind"] == "after":   # 타임라인 날마다 근거 — 실패해도 판정 · 렌더는 그대로
                 try:
                     attach_why(fc, st, state_dir)
                 except Exception as e:  # noqa: BLE001
@@ -268,7 +268,7 @@ def run(state_dir=None):
             judge(r, fc)
     except Exception as e:  # noqa: BLE001
         FA.judge_failed("자동 등록", e)
-    # 멈춘 전망 (2026-11-22 사용자 2번) — Slack 바로 + hypo.json ops(운영 페이지 전망 탭)
+    # 멈춘 전망 — Slack 바로 + hypo.json ops(운영 페이지 전망 탭)
     try:
         run.stalled = ER.stalled(pub, states, run.pending)
     except Exception as e:  # noqa: BLE001
@@ -287,7 +287,7 @@ def run(state_dir=None):
         except Exception as e:  # noqa: BLE001
             FA.save_failed("상태 저장소", e)
     # 렌더 나중
-    groups = {m: H.split_done([(r, fc) for r, fc in pub if H.mkt_of(fc) == m], states) for m, _ in H.MKT_TABS}   # 판정 난 전망 = `끝난 전망` · 나라별 탭 (2026-11-12 사용자) — 끝 줄 문구 · 다음 전망(같은 나라 안)도 여기서 붙는다
+    groups = {m: H.split_done([(r, fc) for r, fc in pub if H.mkt_of(fc) == m], states) for m, _ in H.MKT_TABS}   # 판정 난 전망 = `끝난 전망` · 나라별 탭 — 끝 줄 문구 · 다음 전망(같은 나라 안)도 여기서 붙는다
     opened = [x for m, _ in H.MKT_TABS for x in groups[m][0]]
     done_n = {m: len(groups[m][1]) for m, _ in H.MKT_TABS}
     others = [(fc["no"], fc["title"], fc["slug"]) for _, fc in pub]

@@ -1,4 +1,4 @@
-"""한국 종목 손익 · 현금흐름 분기 표 — 금융감독원 OpenDART 단일회사 전체 재무제표(fnlttSinglAcntAll). 미국 collect_capex 표와 같은 줄 모양 (2026-11-04 사용자: 매출 · 이익 · 현금 · 잉여현금흐름 · 주주환원을 한국 종목에도).
+"""한국 종목 손익 · 현금흐름 분기 표 — 금융감독원 OpenDART 단일회사 전체 재무제표(fnlttSinglAcntAll). 미국 collect_capex 표와 같은 줄 모양.
 
 미국 표(stock-radar/collect_capex.py)는 SEC companyfacts 한 JSON 에서 뽑지만, 한국은 보고서마다 한 번 부른다 — 주요계정 API(collect_kr_dart, 매출)에는 현금흐름표가 없다.
 - 손익계산서(IS · 없으면 CIS) : thstrm_amount = 그 석 달(분기 · 반기 보고서) · 1년치(사업보고서), thstrm_add_amount = 누적 → 4분기 = 1년치 − 3분기 누적 (매출 수집기와 같은 셈).
@@ -44,7 +44,7 @@ ITEMS = {
     "stock_in": (("CF",), ("ifrs-full_ProceedsFromIssuingShares",), r"^(주식의?발행|유상증자)", "cum"),
     "lease": (("CF",), ("ifrs-full_PaymentsOfLeaseLiabilitiesClassifiedAsFinancingActivities",), r"^리스부채의?(상환|지급)", "cum"),
     "cash": (("BS",), ("ifrs-full_CashAndCashEquivalents",), r"^현금및현금성자산", "inst"),
-    # 재무상태표 잔액 — `회사 살림은 튼튼한가?` (2026-11-16 사용자: 분기보고서에서 쓸 만한 것을 카드로). 같은 응답이라 호출 0
+    # 재무상태표 잔액 — `회사 살림은 튼튼한가?`. 같은 응답이라 호출 0
     "liab": (("BS",), ("ifrs-full_Liabilities",), r"^부채총계$", "inst"),
     "equity": (("BS",), ("ifrs-full_Equity",), r"^자본총계$", "inst"),
     "inv": (("BS",), ("ifrs-full_Inventories",), r"^재고자산$", "inst"),

@@ -1,4 +1,4 @@
-"""한국 종목 실적 발표일 = DART 영업(잠정)실적(공정공시) 접수일 (2026-10-31 사용자: 실적 발표는 중요 — 미루지 말고).
+"""한국 종목 실적 발표일 = DART 영업(잠정)실적(공정공시) 접수일.
 
 야후 한국 실적일은 확정실적 · 컨퍼런스콜 날이라 주가 반응과 맞지 않았다(K26, 10-25 검증). 주가가 움직이는 날은 잠정실적 공시다.
 - OpenDART 공시검색(list.json, 공시 유형 I = 거래소공시) 에서 보고서 이름에 `영업(잠정)실적` 이 든 것, 정정(`[기재정정]`)은 뺀다.
@@ -110,7 +110,7 @@ def next_date(code, ynext, day):
     est = next((e for e in ((datetime.date.fromisoformat(d) + datetime.timedelta(days=364)).isoformat() for d in past(code)) if e > day), None)
     if est and (datetime.date.fromisoformat(est) - datetime.date.fromisoformat(day)).days > SKIP_DAYS:
         # 어림이 한 분기를 건너뛰었다 = 지난해 그 분기엔 잠정실적을 안 냈다(4분기를 3월 사업보고서로 대신하는 회사가 많다).
-        # 삼성중공업 화면이 `4월 29일 무렵으로 164일` 이었다 (2026-11-17 사용자). 야후 날짜가 있으면 그것, 없으면 None — 화면 카드는 법정 기한(deadline)으로.
+        # 삼성중공업 화면이 `4월 29일 무렵으로 164일` 이었다. 야후 날짜가 있으면 그것, 없으면 None — 화면 카드는 법정 기한(deadline)으로.
         est = None
     if ynext and (not est or abs((datetime.date.fromisoformat(ynext) - datetime.date.fromisoformat(est)).days) <= 7):
         return ynext, False

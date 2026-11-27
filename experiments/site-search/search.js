@@ -1,4 +1,4 @@
-/* AlphaScope 검색 즉답 · 질문하기 (2026-11-10 사용자 목업).
+/* AlphaScope 검색 즉답 · 질문하기.
  * AI 호출 0 — 질문에서 종목(별명표) · 질문 종류(낱말표)를 코드로 찾고, 색인 값으로 정해진 문장을 만든다.
  * 색인: 목업은 window.AS_SEARCH_INDEX(파일에 넣어 둠), 블로그는 INDEX_BASE(jsDelivr gh-pages search/us.json · kr.json)를 처음 열 때 한 번만 읽는다.
  * 블로그 테마에는 build_theme.py 가 이 파일과 search.css 를 그대로 넣는다 — 고치면 build_theme.py 다시.
@@ -49,7 +49,7 @@
     return doc;
   }
 
-  /* ---------- 검색어 미리보기 (2026-11-16 사용자: "삼" 한 글자만 써도 종목이 미리 뜨게 — 종목 검색 입력창 전부) ----------
+  /* ---------- 검색어 미리보기 ----------
      목록 = 정식 · 간단 종목 전부의 이름 · 티커 · 주소(names.json, 간단 실행이 매일 Cloudflare Pages 에). 값은 없다 — 즉답은 위 색인.
      못 받으면 즉답 색인의 정식 종목만으로 띄운다. 맞는 것 전부 — 목록 칸 안에서 스크롤(상한으로 버리지 않기) */
   var NAMES_URL = 'https://alpha-scope.pages.dev/names.json';
@@ -218,7 +218,7 @@
   function bigMoney(s, v) { return v == null ? '—' : big(v) + (s.m === 'us' ? ' 달러' : ' 원'); }
   function pct(v, plain) {
     if (v == null) return '—';
-    /* 증감 = ▲ · ▼ + 절댓값 + 증감 색, 0 은 부호 없이 (2026-11-12 사용자: "증감 표시는 삼각형으로" — 옛 + · −). 삼각형 = 숫자의 80% · 위로 1 (.as-tri) */
+    /* 증감 = ▲ · ▼ + 절댓값 + 증감 색, 0 은 부호 없이. 삼각형 = 숫자의 80% · 위로 1 (.as-tri) */
     var n = Math.abs(v).toFixed(Math.abs(v) >= 100 ? 0 : 1) + '%';
     if (plain) return (v > 0 ? '▲\u00a0' : v < 0 ? '▼\u00a0' : '') + n;
     return '<span class="' + (v > 0 ? 'as-up' : v < 0 ? 'as-dn' : '') + '">' + (v ? '<span class="as-tri">' + (v > 0 ? '▲' : '▼') + '</span>\u00a0' : '') + n + '</span>';
@@ -233,9 +233,9 @@
     return n >= 1e12 ? (n / 1e12).toFixed(n >= 1e13 ? 0 : 1) + '조' : Math.round(n / 1e8).toLocaleString('ko-KR') + '억';
   }
   function moveWord(v) { return v > 0 ? '올랐습니다' : v < 0 ? '내렸습니다' : '같았습니다'; }
-  /* 카드 머리 = 시장 라벨(한국 · 미국) 대신 종목 로고 28px (2026-11-19 사용자 "티커 로고를 조금 크게"). 우리 gh-pages 로고(색인 lg),
+  /* 카드 머리 = 시장 라벨(한국 · 미국) 대신 종목 로고 28px. 우리 gh-pages 로고(색인 lg),
      없으면 dk.name_logo 와 같은 원 배지 — 미국 = 티커 두 글자 · 한국 = 이름 첫 글자, 바탕 = dk.BADGE_COLORS(코드 글자 합 % 3) */
-  var GO_ICON = '<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 3.5H4a1.5 1.5 0 0 0-1.5 1.5v7A1.5 1.5 0 0 0 4 13.5h7a1.5 1.5 0 0 0 1.5-1.5V9.5"/><path d="M9.5 2.5h4v4"/><path d="M13.5 2.5 8 8"/></svg>';   // 페이지 이동 아이콘 = dk.OUT_ICON (시황 `전체 보기` 버튼과 같은 그림, 2026-11-19 사용자)
+  var GO_ICON = '<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 3.5H4a1.5 1.5 0 0 0-1.5 1.5v7A1.5 1.5 0 0 0 4 13.5h7a1.5 1.5 0 0 0 1.5-1.5V9.5"/><path d="M9.5 2.5h4v4"/><path d="M13.5 2.5 8 8"/></svg>';   // 페이지 이동 아이콘 = dk.OUT_ICON
   var LOGO_BASE = 'https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/', LOGO_VER = '2';
   var BADGE_BG = ['#2F6F68', '#5B6B3A', '#86683A'];
   function logoOf(lg, key, m, name, cls) {   // cls = 'as-logo'(카드 28) · 'as-sg-lg'(미리보기 20)
@@ -250,7 +250,7 @@
   function row(k, v) { return '<div class="as-row"><span class="as-k">' + k + '</span><span class="as-v">' + v + '</span></div>'; }
   function cur(s) { return s.m === 'us' ? '달러' : '원'; }
 
-  /* 분기 매출 = 시간 순서 값 → 선 그래프 (가이드라인 9절 `선 그래프` · dk.trend_card 점이 적을 때와 같은 모양, 2026-11-12 사용자: "우리가 쓰는 그래프 스타일").
+  /* 분기 매출 = 시간 순서 값 → 선 그래프.
      주인공 주황 #F59E0B 선 2 · 속 빈 점 3/2 · 최신 점 5/4 · 값 글자 모두 #111(최신만 13 굵게) · 최신 가로축 이름 진한 주황 #D97706 (2026-11-14 그래프 통일) · 세로축 = 오른쪽 12px · 가로 눈금선 #ECF0F5.
      점이 적으면(250px 아래) 카드 폭에 고르게 편다 — 선은 SVG(굵기 고정), 점 · 숫자 · 이름은 % 위치 */
   var CHART_MAIN = '#F59E0B', GRID_LINE = '#ECF0F5', NOTE = '#6B7280';
@@ -281,7 +281,7 @@
     var marks = vals.map(function (v, i) {
       var last = i === n - 1, r = last ? 5 : 3, b = last ? 4 : 2;
       return '<span class="as-dot" style="left:calc(' + P(i).toFixed(2) + '% - ' + r + 'px);top:' + (Y(v) - r).toFixed(1) + 'px;width:' + 2 * r + 'px;height:' + 2 * r + 'px;border-width:' + b + 'px"></span>'
-        /* 마지막 날 값 = 점 오른쪽(점 ~ 숫자 8, 점과 같은 높이) — 선 그래프 규칙 (2026-11-12 사용자, 가이드라인 9절). 나머지는 점 위 가운데 */
+        /* 마지막 날 값 = 점 오른쪽(점 ~ 숫자 8, 점과 같은 높이) — 선 그래프 규칙. 나머지는 점 위 가운데 */
         + (last ? '<span class="as-val as-last as-end" style="left:calc(' + P(i).toFixed(2) + '% + ' + (r + 8) + 'px);top:' + (Y(v) - 7).toFixed(1) + 'px">' + num(v) + '</span>'
           : '<span class="as-val" style="left:' + P(i).toFixed(2) + '%;top:' + (Y(v) - 8 - r - 14).toFixed(1) + 'px">' + num(v) + '</span>');
     }).join('');
@@ -329,7 +329,7 @@
     },
     valuation: function (s) {
       var out = '';
-      /* ef = [다음 회계연도 예상 EPS, 30일 전, 결산월 'YYYY-MM'] — 올해 것이 아니다 (2026-11-12 사용자: `올해 예상 EPS` 라벨 오류).
+      /* ef = [다음 회계연도 예상 EPS, 30일 전, 결산월 'YYYY-MM'] — 올해 것이 아니다.
          종목 페이지 card_eps 와 같은 말: `다음 회계연도(2027년 12월 결산)` */
       if (s.ef) {
         var fy = s.ef[2] ? (+s.ef[2].slice(0, 4)) + '년 ' + (+s.ef[2].slice(5, 7)) + '월 결산' : '';
@@ -360,7 +360,7 @@
       return '<ul class="as-news">' + s.news.map(function (n) { return '<li><span>' + md(n[0]) + '</span>' + esc(n[1]) + ' <small>' + esc(n[2]) + '</small></li>'; }).join('') + '</ul>';
     },
   };
-  /* 구획 제목 아이콘 = 기본형(회색 면 원 22 · #E5E7EB, 그림 #4B5563 = 원의 0.55) — 가이드라인 8절 `아이콘`, 그림 원본 = design_kit.ICON_GLYPHS (2026-11-12 사용자) */
+  /* 구획 제목 아이콘 = 기본형(회색 면 원 22 · #E5E7EB, 그림 #4B5563 = 원의 0.55) — 가이드라인 8절 `아이콘`, 그림 원본 = design_kit.ICON_GLYPHS */
   var ICONS = {
     price: '<path d="M1.5 8.5h3l1.5-4 3 8 1.5-4h4"/>',
     change: '<path d="M2 11.5l4-4 3 3 5-6"/><path d="M10.5 4.5H14v3.5"/>',
@@ -378,7 +378,7 @@
     return ICONS[k] ? '<span class="as-ico" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">' + ICONS[k] + '</svg></span>' : '';
   }
   var EXCL = '<svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="8" r="6.5"/><path d="M8 4.6v4.4" stroke-linecap="round"/><circle cx="8" cy="11.2" r=".9" fill="currentColor" stroke="none"/></svg>';
-  /* ---------- 왜 떨어졌어 · 왜 올랐어 (2026-11-12 사용자: "엔비디아 왜 떨어졌어? 답변 가능해? 샘플 목업").
+  /* ---------- 왜 떨어졌어 · 왜 올랐어.
      이유는 짐작하지 않는다(가이드라인 1절 4-2 단일 변수 단언 금지). 대신 독자가 스스로 판단할 세 가지:
      ① 전제 확인 — 그날 정말 내렸나, 아니면 내린 건 어느 기간인가  ② 같은 기간 시장 · 같은 업종과 비교 — 혼자 내렸나, 다 같이 내렸나
      ③ 그 기간 안에 나온 소식만 — 기간 밖의 옛 소식은 이유처럼 읽혀 보이지 않는다 ---------- */
@@ -415,7 +415,7 @@
       out += '<p class="as-say">최근 3달 안에 ' + (dir < 0 ? '내린' : '오른') + ' 기간이 없습니다. ' + md(p.d) + ' 종가는 전날보다 ' + pct(d1) + ' ' + word(d1) + '.</p>';
       w = WIN[0];
     }
-    /* 칸 이름 = 이유를 좁히는 질문 (2026-11-12 사용자: "같은 기간 소식 · 같은 기간 비교가 무슨 얘기인지 모르겠다, 왜 떨어졌는지의 근거를 설명해야").
+    /* 칸 이름 = 이유를 좁히는 질문.
        이유를 단정하지 않는다(가이드라인 1절 4-2). 대신 ② 시장 · 업종 탓인지 이 종목만의 일인지 ③ 그때 무슨 일이 있었는지 ④ 어디까지 움직인 자리인지 — 근거를 보이고 답은 사실 문장으로 */
     var down = (dir || me0(p, w)) < 0, mv = down ? '내렸' : '올랐';
     var me = moveOf(p, w[0]), peers = peerEtfs(doc, s);
@@ -486,19 +486,19 @@
 
   function card(s, c, compact, doc) {
     var list = c.intents.slice();
-    /* 맨 위 = 검색한 내용 (2026-11-10 사용자: "엔비디아 실적을 검색했는데 실적이 먼저 안 나온다 — 첫 번째는 검색한 내용, 부가 정보는 그 아래").
+    /* 맨 위 = 검색한 내용.
        묻은 칸(실적 · EPS …)을 먼저, 주가 한 줄은 그 아래 '오늘 주가'. 종목 이름만 · 주가를 물으면 주가가 곧 답이라 맨 위 */
     var asked = list.filter(function (x) { return x !== 'price'; });
     if (asked.indexOf('earnings') >= 0) asked = asked.filter(function (x) { return x !== 'earnDate'; });
     var priceFirst = !asked.length;
-    /* 종목 이름만 → 요약 = 주가 한 문장 · 기간별 등락 · 다음 실적 발표 (2026-11-12 사용자: "요약이 독자가 원하는 내용이 맞아?").
+    /* 종목 이름만 → 요약 = 주가 한 문장 · 기간별 등락 · 다음 실적 발표.
        EPS · PER · 목표가는 물을 때만 — 이름만 친 독자에게는 어려운 숫자이고 목표가는 사라는 말처럼 읽힌다. 자세한 것은 종목 페이지로 */
     var extra = priceFirst ? (compact ? ['change'] : ['change', 'earnDate']) : [];
     var body = '';
     if (c.why) {   // 왜 떨어졌어 → 전제 확인 · 같은 기간 비교 · 같은 기간 소식 (오늘 주가 칸은 첫 문장과 겹쳐 두지 않는다)
       body += '<p class="as-note as-why-note">Newfact는 등락 이유를 짐작해서 답하지 않습니다. 증시 전망과 같은 기준으로 꼽힌 이유와 숫자를 모았습니다.</p>' + whyPart(s, c, doc);
     } else {
-    /* 검색어가 가리킨 구획 = .as-hit — 기본 글자 · 구분명 보라, 값 보라 굵게, 굵은 값 검정 · 증감 색 그대로 (2026-11-19 사용자). 이름만 친 요약에는 칠하지 않는다 */
+    /* 검색어가 가리킨 구획 = .as-hit — 기본 글자 · 구분명 보라, 값 보라 굵게, 굵은 값 검정 · 증감 색 그대로. 이름만 친 요약에는 칠하지 않는다 */
     var askPrice = list.indexOf('price') >= 0;
     if (priceFirst) body += askPrice ? '<div class="as-hit">' + PART.price(s, compact) + '</div>' : PART.price(s, compact);
     asked.concat(extra).forEach(function (k, i) {
@@ -507,10 +507,10 @@
     if (!priceFirst) body += '<div class="as-sec as-today' + (askPrice ? ' as-hit' : '') + '"><h4>' + ico('price') + '오늘 주가</h4>' + PART.price(s, compact) + '</div>';
     }
     return '<article class="as-card">'
-      /* 질문하기(compact) = 시장 라벨 · 티커 · 종목 코드 없이 이름만 (2026-11-12 사용자: "한국 라벨 빼 · 옆에 숫자 빼") */
+      /* 질문하기(compact) = 시장 라벨 · 티커 · 종목 코드 없이 이름만 */
       + '<header>' + (compact ? '' : logoBadge(s)) + '<h3>' + (compact ? esc(s.n) : label(s)) + '</h3><span class="as-day">' + md(s.p.d) + ' 종가 기준</span></header>'
       + body
-      /* 독자가 실제로 가야 할 곳 = 종목 페이지 → 카드 끝 흰 버튼(가이드라인 10절 흰 버튼: 외곽선 · 검은 글씨, 2026-11-12 사용자 — 처음 검은 버튼에서 바꿈) */
+      /* 독자가 실제로 가야 할 곳 = 종목 페이지 → 카드 끝 흰 버튼 */
       + '<a class="as-go" href="' + esc(s.u) + '"><span>' + esc(s.n) + ' 종목 페이지 보기</span>' + GO_ICON + '</a>'
       + '<p class="as-go-note"><span>' + EXCL + '</span><span>주가 차트 · 실적 · 애널리스트 의견 · 기술 지표 · 뉴스를 한 페이지에 모았습니다.</span></p></article>';
   }
@@ -525,7 +525,7 @@
     } else {
       html += '<div class="as-empty">질문에서 Newfact가 다루는 종목을 찾지 못했습니다. 미국 주요 ' + doc.stocks.filter(function (s) { return s.m === 'us'; }).length
         + '종목 · 한국 주요 ' + doc.stocks.filter(function (s) { return s.m === 'kr'; }).length + '종목의 주가 · 등락 · 실적 · EPS · 기술 지표 · 회사 정보를 답할 수 있어요.'
-        // 선정 기준 — stock-radar/universe.py · kr-stocks/universe_kr.py (2026-11-10 사용자: "주요" 표시 + 기준 짧게)
+        // 선정 기준 — stock-radar/universe.py · kr-stocks/universe_kr.py
         + '<p class="as-basis"><span aria-hidden="true">ⓘ</span>주요 종목 = 미국은 S&amp;P 500 시가총액 상위 · 섹터 대표 · 이슈 종목, 한국은 시가총액 상위 · 반도체 · 2차전지 · 바이오 · 방산 테마 대표 종목입니다.</p></div>';
     }
     return { html: html, stocks: stocks, c: c };
@@ -550,7 +550,7 @@
       document.head.appendChild(sc);
     });
   }
-  /* 함께 보는 페이지 (2026-11-12 사용자: "관련 글이 삼성전자와 어떤 관련인지 모르겠다 · 블로그에서 더 찾기가 옛 리포트로 간다").
+  /* 함께 보는 페이지.
      Blogger 피드 검색은 고정 페이지(종목 페이지)를 못 찾고, 종목 이름이 한 번 나온 날짜별 리포트만 돌려준다 → 종목을 찾았으면 쓰지 않는다.
      종목을 찾았으면 = 그 시장 시총 TOP 10 · 그 시장 증시 리포트(이름 · 주소 = design_kit.REPORT_LINKS).
      못 찾았으면 = 그 말이 나온 글(피드 검색, 최대 3) + 두 시장 리포트. `블로그에서 더 찾기`(Blogger /search)는 없앤다 — 그 화면이 옛 글 하나만 보인다 */
@@ -571,7 +571,7 @@
     var head = '<h4>함께 보는 페이지</h4>';
     if (stocks.length) {
       var m = stocks[0].m;
-      box.innerHTML = head + outBtn(LINKS[m][0], LINKS[m][1]) + outBtn(LINKS[m + '_top'][0], LINKS[m + '_top'][1]);   // 증시 리포트 → 시총 TOP 10 (2026-11-12 사용자)
+      box.innerHTML = head + outBtn(LINKS[m][0], LINKS[m][1]) + outBtn(LINKS[m + '_top'][0], LINKS[m + '_top'][1]);   // 증시 리포트 → 시총 TOP 10
       return;
     }
     var fixed = outBtn(LINKS.us[0], LINKS.us[1]) + outBtn(LINKS.kr[0], LINKS.kr[1]);
@@ -608,8 +608,8 @@
         else location.href = r.u;
       }, function () { location.href = r.u; });
     });
-    input.addEventListener('input', function () { syncClear(); if (!input.value) out.innerHTML = out0; });   // 키보드로 검색어를 다 지워도 ⓧ 와 같게 = 결과 지우고 처음 화면 (2026-11-19 사용자)
-    var out0 = out.innerHTML;   // 처음 화면(예시 검색어 · 안내) — 검색어 지우기를 누르면 결과도 이것으로 되돌린다 (2026-11-19 사용자)
+    input.addEventListener('input', function () { syncClear(); if (!input.value) out.innerHTML = out0; });   // 키보드로 검색어를 다 지워도 ⓧ 와 같게 = 결과 지우고 처음 화면
+    var out0 = out.innerHTML;   // 처음 화면(예시 검색어 · 안내) — 검색어 지우기를 누르면 결과도 이것으로 되돌린다
     clr.addEventListener('click', function () { input.value = ''; syncClear(); sg.close(); out.innerHTML = out0; input.focus(); });
 
     function run(q) {
@@ -658,13 +658,13 @@
     var fab = document.createElement('button');
     fab.type = 'button';
     fab.className = 'as-chat-fab';
-    /* 반짝임 아이콘(큰 별 + 작은 별, 선 1.5) — 포인트 색 C5 (2026-11-12 사용자) */
+    /* 반짝임 아이콘(큰 별 + 작은 별, 선 1.5) — 포인트 색 C5 */
     fab.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 3l1.8 5.2L18 10l-5.2 1.8L11 17l-1.8-5.2L4 10l5.2-1.8z"/><path d="M18.5 14.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z"/></svg><span>질문하기</span>';
     var pane = document.createElement('section');
     pane.className = 'as-chat';
     pane.hidden = true;
     pane.setAttribute('aria-label', '질문하기');
-    /* 머리 = 블로그 로고(그림 + 로고 글꼴 900) + `에 물어보기` 보통 굵기 (2026-11-12 사용자) */
+    /* 머리 = 블로그 로고(그림 + 로고 글꼴 900) + `에 물어보기` 보통 굵기 */
     pane.innerHTML = '<header><span class="as-chat-title"><svg class="as-chat-logo" viewBox="0 0 313 286" aria-hidden="true"><path d="M313 134L164.968 286H35L189.03 134H313Z" fill="#DD0000"/><path d="M164.519 0H287L128.954 147H0L164.519 0Z" fill="#000"/></svg><span><span class="as-chat-word">Newfact</span>에 물어보기</span></span><button type="button" class="as-x" aria-label="닫기"><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="16"/><path d="M11.5 11.5l9 9M20.5 11.5l-9 9"/></svg></button></header>'
       + '<div class="as-log" aria-live="polite"></div>'
       + '<form><input name="q" placeholder="예: 삼성전자 실적 알려줘" autocomplete="off" enterkeyhint="send"><button type="submit">보내기</button></form>'
@@ -682,7 +682,7 @@
       log.scrollTop = log.scrollHeight;
       return b;
     }
-    say('bot', '<p>궁금한 종목을 물어보세요. 주가 · 등락 · 실적 · 기술 지표 · 회사 정보를 바로 답해 드립니다.</p>' + chips('as-chips'));   // 옛 `종목 숫자를 물어보세요` — 숫자를 아는 독자는 없다 (2026-11-12 사용자)
+    say('bot', '<p>궁금한 종목을 물어보세요. 주가 · 등락 · 실적 · 기술 지표 · 회사 정보를 바로 답해 드립니다.</p>' + chips('as-chips'));   // 옛 `종목 숫자를 물어보세요` — 숫자를 아는 독자는 없다
 
     function ask(q) {
       q = q.trim();
@@ -705,7 +705,7 @@
       if (chip) ask(chip.getAttribute('data-q'));
       if (e.target.closest('.as-x')) { pane.hidden = true; fab.hidden = false; }
     });
-    /* 폰: 키보드가 올라오면 창을 보이는 영역(visualViewport)에 맞춘다 — inset:0 만으로는 키보드 뒤로 보내기 줄이 숨거나 밀렸다 (2026-11-15 사용자) */
+    /* 폰: 키보드가 올라오면 창을 보이는 영역(visualViewport)에 맞춘다 — inset:0 만으로는 키보드 뒤로 보내기 줄이 숨거나 밀렸다 */
     var vv = window.visualViewport;
     function fit() {
       if (pane.hidden || !vv || window.innerWidth > 680) { pane.style.top = pane.style.height = pane.style.bottom = ''; return; }
@@ -733,7 +733,7 @@
 
   function init() {
     var s = buildSearch();
-    /* 검색 아이콘 = 국기 스위치 왼쪽 (2026-11-10 사용자). 스위치 줄(.menu-quick)은 테마 JS 가 만든다 — 그 맨 앞으로 옮긴다 */
+    /* 검색 아이콘 = 국기 스위치 왼쪽. 스위치 줄(.menu-quick)은 테마 JS 가 만든다 — 그 맨 앞으로 옮긴다 */
     var quick = document.querySelector('.menu-quick'), sbtn = document.querySelector('.as-search-btn');
     if (quick && sbtn) quick.insertBefore(sbtn, quick.firstChild);
     document.querySelectorAll('[data-as-search]').forEach(function (b) { b.addEventListener('click', function () { s.open(); }); });

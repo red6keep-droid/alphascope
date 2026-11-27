@@ -20,7 +20,7 @@ import universe as U  # noqa: E402
 import universe_kr as K  # noqa: E402
 import candle_chart as CC  # noqa: E402
 
-KEY = "stock"        # 주소 /p/stock.html?s=코드 — 독자 주소창에 내부 말(quick)이 보이지 않게 (2026-11-14 사용자: 독자 화면에 `간단 정보` 말 금지)
+KEY = "stock"        # 주소 /p/stock.html?s=코드 — 독자 주소창에 내부 말(quick)이 보이지 않게
 TITLE = "종목 주가"   # 종목을 불러오면 JS 가 `스타벅스 SBUX 주가` 로 바꾼다 — 이 이름은 불러오기 전 · 못 불러왔을 때만
 URL = f"{U.BLOG}/p/{KEY}.html"
 DATA = os.path.join(HERE, "data")

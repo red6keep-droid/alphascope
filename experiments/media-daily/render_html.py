@@ -3,10 +3,10 @@
 틀 (기획 11절 초안 — 발행하며 고친다):
     맨 앞 요약 한 줄(data-seo-lead)
     → 방송이 가장 많이 다룬 이슈 순위 (공용 카드: n. 주제 / 설명 / 관련 페이지 / 라벨 · 관심도 · 방송 n곳 — 2026-10-25 짧은 순위 글로)
-    → 끝   — 2026-10-23 사용자 정리 · 한국장 소식은 미국 데일리 `한국장` 탭으로 옮겼다 (2026-10-25)
-    `방송에서 언급된 종목` · `장 초반에 이어 볼 것` 은 뺐다 (2026-10-25 사용자 '나' 안 — 이슈 줄은 종목 페이지 · 데일리 · 홈으로 흩어 보낸다, media_feed)
-    맨 아래 출처(영상 목록, 접기)는 뺐다 (2026-10-25 사용자: 제목 · 채널 글자가 이미 그 영상 링크라 같은 링크의 반복)
-쓰지 않는 것: 요약 문장 · 자막 수치 · 가격 · 추천 어투. 종목은 상세 페이지가 있으면 링크(색 그대로, 2026-10-25 사용자 — 10-23 의 '종목 링크 없음'을 바꿈). 영문 원문 제목은 쓰지 않는다.
+    → 끝 정리 · 한국장 소식은 미국 데일리 `한국장` 탭으로 옮겼다 (2026-10-25)
+    `방송에서 언급된 종목` · `장 초반에 이어 볼 것` 은 뺐다
+    맨 아래 출처(영상 목록, 접기)는 뺐다
+쓰지 않는 것: 요약 문장 · 자막 수치 · 가격 · 추천 어투. 종목은 상세 페이지가 있으면 링크. 영문 원문 제목은 쓰지 않는다.
 """
 
 import json
@@ -34,7 +34,7 @@ def _py_detail(c):
     return f"{c['category_ko']} 이슈 '{c['topic']}' 를 방송 {c['n_channels']}곳 · 영상 {c['n_videos']}개가 {verb}."
 
 
-# 이슈 카드 (2026-10-23 사용자: "제목 · 설명 문장 · 종목 · 영상 수가 중요, 시각은 그래프, 나머지는 불필요"):
+# 이슈 카드:
 #   제목 + 라벨(분야 · 예상 밖 · 데일리 다룸) / 설명 문장 16px / 시각 비율 막대(F) / `영상 n개 ↗ · 방송 n곳 · 종목 : …` 14px
 #   발언자 · 채널 이름 나열 · 영상 링크 다섯 줄은 뺐다 — 여러 방송을 모은 결과라 카드의 방송 · 영상 수로 충분 (2026-10-25)
 STANCE_PILL = {"bullish": "positive", "bearish": "negative", "neutral": "neutral"}
@@ -56,7 +56,7 @@ def _obj(word):
 
 
 def interest(c, n_channels_today):
-    """관심도 1~10 — config.INTEREST_* 의 식 (2026-10-23 사용자). 파이썬 계산."""
+    """관심도 1~10 — config.INTEREST_* 의 식. 파이썬 계산."""
     ch = c["n_channels"] / max(1, n_channels_today)
     vid = min(1.0, c["n_videos"] / config.INTEREST_FULL_VIDEOS)
     return max(1, min(10, round(10 * (config.INTEREST_W_CH * ch + (1 - config.INTEREST_W_CH) * vid))))
@@ -73,27 +73,27 @@ def _names(c):
 
 
 def _cluster_item(i, c, narrative, n_today):
-    """순위 한 줄 (2026-10-25 사용자 '나' 안: 미디어 데일리 = 오늘 방송이 가장 많이 다룬 이슈 순위). 공용 뉴스 카드(news_item) 모양:
+    """순위 한 줄. 공용 뉴스 카드(news_item) 모양:
         n. 주제 / 설명 문장(AI 서술) / 관련 페이지 : 종목 링크 / [분야] [방향] [예상 밖] [관심도 n] (데일리 다룸)  방송 n곳 · 영상 n개
     이슈마다의 줄은 종목 페이지 · 데일리 · 홈으로 흩어 보내고(media_feed), 여기는 모아 보는 순위만 — 시각 막대 · 종목 수 줄은 뺐다."""
     detail = (narrative or {}).get("items", {}).get(f"c{i}") or _py_detail(c)
     st = c["stances"]
     view = "불확실" if c["split"] else config.STANCE_KO.get(max(st, key=st.get), "중립")
-    kind = "uncertain" if c["split"] else STANCE_PILL.get(max(st, key=st.get), "neutral")   # 방향 라벨 = 막대와 같은 네 단어 중 하나, 섞이면 `불확실` (2026-11-07 사용자 P335) — 옛 `엇갈림`
+    kind = "uncertain" if c["split"] else STANCE_PILL.get(max(st, key=st.get), "neutral")   # 방향 라벨 = 막대와 같은 네 단어 중 하나, 섞이면 `불확실` — 옛 `엇갈림`
     pills = [dk.pill(c["category_ko"], bare=True), dk.pill(view, kind, bare=True)] + ([dk.pill("예상 밖", "uncertain", bare=True)] if c["surprise"] else [])
     pills.append(dk.pill(f"관심도 {interest(c, n_today)}", bare=True))
     if c.get("daily"):
         pills.append(_link_pill("데일리 다룸", DAILY_LIST_URL, "데일리 리포트에서 자세히"))
     names = _names(c)
-    subs = [f'<span style="{SUB_STYLE}">관련 페이지 : {" · ".join(names)}</span>'] if names else []   # 상세 페이지 링크 (2026-10-25 사용자)
+    subs = [f'<span style="{SUB_STYLE}">관련 페이지 : {" · ".join(names)}</span>'] if names else []   # 상세 페이지 링크
     return dk.news_item(f"{i + 1}. {_esc(c['topic'])}", None, detail, subs, " ".join(pills), [f"방송 {c['n_channels']}곳 · 영상 {c['n_videos']}개"])
 
 
 def sec_lead(m, narrative, d):
-    """맨 앞 요약 한 줄 (검색 결과 설명문 자리 — data-seo-lead). 2026-10-23 사용자: 두 줄 → 한 줄, 영상 수 · 묶음 수 같은 내부 숫자는 뺐다."""
+    """맨 앞 요약 한 줄 (검색 결과 설명문 자리 — data-seo-lead).: 두 줄 → 한 줄, 영상 수 · 묶음 수 같은 내부 숫자는 뺐다."""
     top = m["clusters"][0] if m["clusters"] else None
     _, mo, dd = d.split("-")
-    md = f"{int(mo)}월 {int(dd)}일 "   # 날짜는 제목 오른쪽이 아니라 요약 맨 앞 (2026-10-23 사용자: 상세 화면의 제목 날짜 삭제 · 요약에 연도 없이)
+    md = f"{int(mo)}월 {int(dd)}일 "   # 날짜는 제목 오른쪽이 아니라 요약 맨 앞
     # 머리 한 줄은 파이썬이 센 숫자로 — 모델이 "방송 5곳" 처럼 수를 지어냈다 (2026-10-22 세 번째 CI, 100 미만 정수는 fact_check 가 보지 않는다)
     if top:
         view = "엇갈립니다" if top["split"] else {"bullish": "긍정 쪽입니다", "bearish": "부정 쪽입니다"}.get(max(top["stances"], key=top["stances"].get), "중립입니다")
@@ -101,7 +101,7 @@ def sec_lead(m, narrative, d):
     else:
         first = f"{md}밤사이 미국 방송이 다룬 이슈입니다."
     # data-lead: 홈 카드가 이 머리 구획(다음 h2 전까지 — 이슈 카드 포함)을 읽는다. 이슈 구획 제목을 없앴기 때문 (2026-10-23)
-    # data-title-back: 테마가 글 제목 왼쪽에 홈으로 가는 네모 화살표를 붙인다 (인물 발언 상세와 같은 모양, 2026-10-23 사용자)
+    # data-title-back: 테마가 글 제목 왼쪽에 홈으로 가는 네모 화살표를 붙인다
     out = f'<p data-seo-lead="1" data-lead="1" data-title-back="/" data-title-back-label="홈" style="{dk.SEO_LEAD}">{_esc(first)}</p>'
     if m["phase"] == 1:
         out += dk.muted("10시 15분에 Mad Money · 증시각도기를 더해 갱신합니다.")
@@ -113,19 +113,19 @@ def sec_issues(m, narrative):
     return dk.item_cards(items, sub=True) if items else ""
 
 
-ALIGN_PX = dk.ALIGN_PX   # 구획 제목 · 목록 · 종목 글 · 출처의 왼쪽 시작선 = 공통 좌측 기준선 (2026-10-24 사용자: 홈 실시간 뉴스에 맞춤)
+ALIGN_PX = dk.ALIGN_PX   # 구획 제목 · 목록 · 종목 글 · 출처의 왼쪽 시작선 = 공통 좌측 기준선
 
 
 def build_body(m, narrative, d):
     parts = [dk.WRAP_OPEN, sec_lead(m, narrative, d)]
     issues = sec_issues(m, narrative)
     if issues:
-        parts.append(issues)   # 구획 제목 · 안내 없이 요약 바로 아래 (2026-10-23 사용자: "방송이 본 이슈 · 방송 · 영상 수가 많은 순" 삭제)
-    # `방송에서 언급된 종목` · `장 초반에 이어 볼 것` 은 뺐다 (2026-10-25 사용자 '나' 안) — 종목 이야기는 종목 페이지 뉴스로, 짧은 순위 글만 남긴다.
-    # `한국장에 영향을 줄 만한 소식` 은 미국 데일리 `한국장` 탭으로 옮겼다 (2026-10-25 사용자, daily-report sec_korea_news)
+        parts.append(issues)   # 구획 제목 · 안내 없이 요약 바로 아래
+    # `방송에서 언급된 종목` · `장 초반에 이어 볼 것` 은 뺐다 — 종목 이야기는 종목 페이지 뉴스로, 짧은 순위 글만 남긴다.
+    # `한국장에 영향을 줄 만한 소식` 은 미국 데일리 `한국장` 탭으로 옮겼다
     parts.append(dk.WRAP_CLOSE)
     html = dk.align_titles("\n".join(parts), ALIGN_PX)   # 구획 제목도 같은 시작선
-    return dk.fix_colons(dk.formal(html))   # 글 끝 "AI 서술" 줄 없음 — 공통 푸터의 AI 고지와 중복 (2026-10-25 사용자)
+    return dk.fix_colons(dk.formal(html))   # 글 끝 "AI 서술" 줄 없음 — 공통 푸터의 AI 고지와 중복
 
 
 def render(media_path=None, narrative_path=None, output_dir=None):

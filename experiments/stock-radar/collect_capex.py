@@ -1,13 +1,13 @@
 """돈을 어디에 쓰나 — 설비 투자(자본 지출) · 연구개발 · 영업현금흐름 · 자금 조달(부채 발행 · 상환 · 자사주 · 배당 · 증자) 분기 표, SEC XBRL companyfacts 로. AI 없음.
 
-2026-10-30 사용자: "각 기업의 자본 지출 현황 · 채권 발행 같은 자금 조달도" → 미국 후보 전부(한국은 미국 뒤, OpenDART).
+ → 미국 후보 전부(한국은 미국 뒤, OpenDART).
 재료 = collect_extra.revenue() 가 분기 매출 때 이미 받는 companyfacts JSON 하나 — 같은 JSON 에서 아래 항목을 더 뽑는다 (SEC 호출 수 그대로).
 
 현금흐름표 값은 10-Q 에 누적(연초부터)으로 적히는 회사가 많다 → 같은 회계연도 시작일끼리 이어 붙여 차분해 분기 값으로 만든다(_quarters_cf).
 손익 항목(연구개발비 · 매출총이익 · 영업이익 · 순이익)은 3개월 값이 있으면 그대로, 누적만 있으면 같은 차분. 잔액(현금 · 장기 부채)은 분기 말 값 그대로.
 회사마다 항목 이름이 다르다(설비 투자 = PaymentsToAcquirePropertyPlantAndEquipment 또는 PaymentsToAcquireProductiveAssets(리츠)) → 후보 가운데 최근 4년 분기가 가장 많은 것 하나.
 없는 항목은 None(화면에 '미수집', 0 아님). 외국 회사(TSM · ASML, 20-F · IFRS)는 us-gaap 이 없어 표 자체가 없다.
-잉여현금흐름(fcf) = 영업현금흐름 − 설비 투자 — 둘 다 있는 분기만 (2026-11-03 사용자: 매출 흐름과 현금 창출력을 따로 보자).
+잉여현금흐름(fcf) = 영업현금흐름 − 설비 투자 — 둘 다 있는 분기만.
 결과 한 줄 = {start, end, cq, capex, rnd, ocf, gp, opinc, ni, debt_in, debt_out, buyback, div, stock_in, lease, fcf, cash, debt, src(그 분기 공시 색인 URL), form}.
 """
 
@@ -21,7 +21,7 @@ TAGS = {
               "PaymentsToDevelopRealEstateAssets"),   # 물류 · 부동산 리츠의 개발 투자 (PLD, 2026-11-02 P280)
     "rnd": ("ResearchAndDevelopmentExpense", "ResearchAndDevelopmentExpenseExcludingAcquiredInProcessCost"),
     "ocf": ("NetCashProvidedByUsedInOperatingActivities", "NetCashProvidedByUsedInOperatingActivitiesContinuingOperations"),
-    # 이익 흐름 (2026-11-03 사용자) — 매출총이익은 안 적는 회사가 많다(AMZN · 은행 · 보험). 순이익은 지배주주 몫(NetIncomeLoss) 먼저, 없으면 전체(ProfitLoss)
+    # 이익 흐름 — 매출총이익은 안 적는 회사가 많다(AMZN · 은행 · 보험). 순이익은 지배주주 몫(NetIncomeLoss) 먼저, 없으면 전체(ProfitLoss)
     "gp": ("GrossProfit",),
     "opinc": ("OperatingIncomeLoss",),
     "ni": ("NetIncomeLoss", "ProfitLoss", "NetIncomeLossAvailableToCommonStockholdersBasic"),
@@ -165,7 +165,7 @@ def _yoy(rows):
 
 
 def fill_yahoo(rows, t):
-    """SEC 공용 항목에 설비 투자 · 영업현금흐름이 없거나 모자란 회사 → Yahoo 분기 현금흐름(최근 5분기 안팎)으로 빈 칸만 채운다 (2026-11-02 사용자 P280).
+    """SEC 공용 항목에 설비 투자 · 영업현금흐름이 없거나 모자란 회사 → Yahoo 분기 현금흐름(최근 5분기 안팎)으로 빈 칸만 채운다.
     NEE · COP 는 설비 투자를 회사 고유 항목으로 적어 companyfacts 에 없고, XOM 은 분기 값이 둘뿐이다. SEC 값이 있는 칸은 건드리지 않는다.
     SEC 표보다 새 분기(NEE — SEC 공용 자료가 2026년 1분기에서 멈춤)는 Yahoo 분기로 줄을 더하고, SEC 표가 4분기도 안 되면(XOM) Yahoo 분기로만 만든다 — 그 줄은 yahoo_only,
     다른 항목(배당 · 발행 …)은 미수집이라 summary 가 0 으로 더하지 않는다. 달러로 적지 않는 회사(TSM · ASML)는 하지 않는다."""

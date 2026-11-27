@@ -1,4 +1,4 @@
-"""봉차트 카드 — 페이지 안에서 직접 그리는 실제 차트(candle_chart.js) 의 Python 쪽 (2026-11-13 사용자: "그림 말고 실제 차트").
+"""봉차트 카드 — 페이지 안에서 직접 그리는 실제 차트(candle_chart.js) 의 Python 쪽.
 
     card(name, bars, dec=0, avg=None) → 제목 + 흰 카드 + [data-candle] (자료 = 최근 2년 일봉, 주봉 · 월봉 · 지표는 브라우저 계산)
     SCRIPT → <script>…</script> (한 페이지에 한 번 — 스크립트가 스스로 한 번만 돈다). 나중에 테마(index.html)로 옮기면 SCRIPT 는 빼도 된다.
@@ -43,14 +43,14 @@ def card(name, bars, dec=0, avg=None, title="가격 흐름"):
 
 
 MOCK_AVG = 0.97   # 목업에만 보이는 `내 평단` 예시 = 마지막 종가의 97% (실제 페이지엔 없다 — 회원 본인 화면에서만, 회원 기능 때)
-GAP = '<div style="height:20px;"></div>'   # 차트와 탭 사이 20 (2026-11-14 사용자)
+GAP = '<div style="height:20px;"></div>'   # 차트와 탭 사이 20
 NAVER_KR = "https://m.stock.naver.com/domestic/stock/{code}/total"
 NAVER_KOSPI = "https://m.stock.naver.com/domestic/index/KOSPI/total"
 
 
 def kr_live(code, always=False, url=None):
     """한국 종목 봉차트 오른쪽 아래(탭 위) `실시간 가격은 네이버 증권에서 보기 ↗` — 장중(평일 9:00~15:30 한국 시간)에만 보이고 장이 끝나면 사라진다
-    (2026-11-23 사용자: 종가 리포트라 실시간은 네이버로 보낸다). 켜고 끄기 = candle_chart.js krLive(1분마다). always = 목업용(시각과 상관없이 보임).
+. 켜고 끄기 = candle_chart.js krLive(1분마다). always = 목업용(시각과 상관없이 보임).
     url = 종목 페이지가 아닌 곳(한국 증시 리포트 코스피 = NAVER_KOSPI). 새 호출 0 — 링크만."""
     if not (code or url):
         return ""
@@ -62,7 +62,7 @@ def kr_live(code, always=False, url=None):
 
 
 def page_block(name, bars, dec=0, kr_code=None):
-    """종목 페이지 맨 위 봉차트 한 덩이 (2026-11-14 사용자: ETF 에서 다듬은 차트를 모든 종목 페이지에 일괄).
+    """종목 페이지 맨 위 봉차트 한 덩이.
     목업 = `내 평단` 예시가 있는 차트, 발행 본문 = 없는 차트 — render_pages · render_kr 의 mock-only / real-only 표시로 가른다. 자료가 모자라면 "".
     kr_code = 한국 종목 코드 → 차트 아래 장중 네이버 링크(kr_live, 목업은 늘 보임)."""
     real = card(name, bars, dec, title="")

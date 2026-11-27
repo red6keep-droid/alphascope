@@ -4,7 +4,7 @@
     python experiments/issue_store/bollinger_by_stock.py --check   # 종목별 진입 수 · 묶음 수만 (수익률 안 봄)
     python experiments/issue_store/bollinger_by_stock.py --hyp2    # 가설 2차 H4 · H6 · H7 · H8 만 (계획 4-8) → bollinger_15_h2.md
 
-엔비디아 단독 판(bollinger_by_issue.py)과 같은 신호 · 묶음 · 비교 · 판정. 바뀐 것 (2026-10-17 사용자 확정, 계획 4-1):
+엔비디아 단독 판(bollinger_by_issue.py)과 같은 신호 · 묶음 · 비교 · 판정. 바뀐 것:
 - 층 셋: **종목별** 15 (리포트 문장은 여기서) · **업종 묶음** 4 (CSCO 는 묶지 않음) · **15 전체** (참고만, 근거 없는 혼합)
 - 엔비디아 전용 구간은 **그 종목의 값** (1년 수익률 · 200일선 기울기 · 횡보 · 하루 변동성 · H2 · H3 · H5), 경계값 그대로.
   "회사 시기" 는 NVDA 만. H1 비교 지수는 반도체 = ^SOX, 플랫폼 · CSCO = ^IXIC. 실적은 그 종목의 실적 (장 마감 뒤 발표로 봄)
@@ -34,7 +34,7 @@ MAIN_HZ = [1, 5, 10]   # 판정은 단기, 20일은 참고
 SPLIT = pd.Timestamp("2013-01-01")
 START = pd.Timestamp("1999-01-01")   # 엔비디아 판과 같은 두 기간 — 그 전 일봉은 지표 계산(200 · 252일)에만 쓴다
 N_MIN, Q_MAX, BOOT, N_PERIOD, N_MEMBER = 30, 0.10, 2000, 10, 10
-SECTORS = {   # 2026-10-17 사용자 확정 (계획 4-1)
+SECTORS = {   # (계획 4-1)
     "반도체 설계": ["NVDA", "AMD", "QCOM", "AVGO"],
     "반도체 장비": ["AMAT", "LRCX", "KLAC"],
     "메모리 · 제조 · 아날로그": ["MU", "INTC", "TXN"],
@@ -133,7 +133,7 @@ def build(sym, shared):
     pos200 = (c > ma200).shift(1)
     g["H5 200일선 위치 · 위"] = pos200 == True   # noqa: E712 — NaN 은 어느 쪽도 아님
     g["H5 200일선 위치 · 아래"] = pos200 == False   # noqa: E712
-    # 가설 2차 H4 · H6 · H7 · H8 (2026-10-17 밤 사용자 확정, 계획 4-8, 결과 보기 전 고정)
+    # 가설 2차 H4 · H6 · H7 · H8
     vr = px["volume"] / px["volume"].rolling(20).mean().shift(1)
     g["H4 거래량 · 20일 평균 2배 이상 (투매)"] = vr >= 2
     g["H4 거래량 · 20일 평균 1.2배 아래"] = vr < 1.2

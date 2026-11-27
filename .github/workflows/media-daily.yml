@@ -72,7 +72,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      # 상태 · 기록 브랜치는 비공개 저장소 alphascope-state 에 둔다 (2026-11-04 사용자: 기록은 우리 자산 — 공개 저장소에 두지 않는다). 쓰기 배포 키 = Secret STATE_DEPLOY_KEY
+      # 상태 · 기록 브랜치는 비공개 저장소 alphascope-state 에 둔다. 쓰기 배포 키 = Secret STATE_DEPLOY_KEY
       - name: State repo (private alphascope-state)
         env:
           STATE_DEPLOY_KEY: ${{ secrets.STATE_DEPLOY_KEY }}
@@ -114,13 +114,13 @@ jobs:
           ED_ARG=""
           if [ -n "$EDITION" ]; then ED_ARG="--edition $EDITION"; fi
           echo "phase=$PHASE publish=$DO_PUBLISH edition=${EDITION:-today}"
-          # 미디어 데일리 글은 2026-10-30 부터 내지 않는다 (사용자: 방송 이슈는 종목 페이지 · 미국 데일리 · 한국 증시 리포트로 전부 나눈다 — 상한 없이 48시간 · 5건 펼침 + 접기).
+          # 미디어 데일리 글은 2026-10-30 부터 내지 않는다.
           # 파이프라인은 그림자로 계속 돌린다 — 기록(records/issues · verdicts, media-state)과 artifact 는 남긴다. 아래 '한국장 칸 갱신' 은 그대로 DO_PUBLISH 를 따른다.
           LLM_ARG=""
           if [ "${{ inputs.records_only }}" = "true" ]; then LLM_ARG="--no-llm"; fi   # 글을 내지 않으므로 서술 AI 가 필요 없다
           python main.py --phase "$PHASE" --state output/state $ED_ARG $LLM_ARG
 
-      # 오늘 데일리 글의 한국장 탭 `한국장에 영향을 줄 만한 소식` 만 갱신 (2026-10-25 사용자) — 한국 아침 방송은 데일리(07:00)보다 늦게 올라온다.
+      # 오늘 데일리 글의 한국장 탭 `한국장에 영향을 줄 만한 소식` 만 갱신 — 한국 아침 방송은 데일리(07:00)보다 늦게 올라온다.
       # 게시 실행일 때만 · 지난 날짜(edition 입력)는 건너뜀 · 실패해도 미디어 데일리는 그대로 (continue-on-error)
       - name: Update daily Korea news
         if: env.DO_PUBLISH == 'true' && inputs.edition == '' && inputs.records_only != true
@@ -146,7 +146,7 @@ jobs:
           fi
           git push state "$COMMIT:refs/heads/media-state"   # force 없음
 
-      # 그날(KST) 매드머니 회차를 이번 실행에서 처음 기록했으면 인물 발언 갱신을 건다 (2026-11-20 사용자: 그날 회차는 그날 글에).
+      # 그날(KST) 매드머니 회차를 이번 실행에서 처음 기록했으면 인물 발언 갱신을 건다.
       # 매드머니는 KST 09:30 ~ 10:30 게시 → 10:15 · 11:50(예비) · 수집기 알림(News-doc 39절 Q36) 실행 가운데 처음 기록한 실행이 한 번 건다.
       # 인물 발언 쪽도 오늘 아침 글이 없거나 이미 실렸으면 스스로 끝난다. GITHUB_TOKEN 으로 건 workflow_dispatch 는 새 실행을 만든다.
       - name: Chain people-radar (Mad Money)

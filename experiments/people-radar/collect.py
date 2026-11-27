@@ -207,7 +207,7 @@ def c_ark_trades(speaker, _arg, attribution):
 
 
 def c_madmoney(speaker, _arg, attribution):
-    # 매드머니 방송 기록(media-state) — 영상 × 이슈 한 줄 = 한 행. 같은 영상의 이슈들이 (인물, 주소) 유일 키에 막히지 않게 주소 끝에 #이슈번호 (2026-11-11 사용자)
+    # 매드머니 방송 기록(media-state) — 영상 × 이슈 한 줄 = 한 행. 같은 영상의 이슈들이 (인물, 주소) 유일 키에 막히지 않게 주소 끝에 #이슈번호
     import madmoney
     year = datetime.datetime.now(datetime.timezone.utc).year
     out = []
@@ -264,7 +264,7 @@ def collect(conn, only=None, sources=None):
     since = (datetime.datetime.now(datetime.timezone.utc)
              - datetime.timedelta(hours=config.COLLECT_SINCE_HOURS)).strftime("%Y-%m-%dT%H:%M:%SZ")
     summary = []   # (인물, 소스, 받은 수, 창 안, 신규 | 오류)
-    busy = []      # 429(요청이 너무 많음) 받은 일 — 끝에 RETRY_WAIT 초 쉬고 한 번 더 (2026-11-21 사용자: 구글 뉴스가 날마다 2~4명 0건)
+    busy = []      # 429(요청이 너무 많음) 받은 일 — 끝에 RETRY_WAIT 초 쉬고 한 번 더
     for key, p in config.PEOPLE.items():
         if only and key not in only:
             continue

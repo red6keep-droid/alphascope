@@ -427,7 +427,7 @@ def status_board(s, rank, rank_n):
 
 
 def market_regime(conn, day):
-    """시장 국면 — S&P 500(SPY) 종가 기준 규칙 네 구간 (config.REGIME_*, 기획서 7절). 상태만 적는다 — 매수·매도·비중·관망 어휘 없음 (2026-10-11 사용자).
+    """시장 국면 — S&P 500(SPY) 종가 기준 규칙 네 구간 (config.REGIME_*, 기획서 7절). 상태만 적는다 — 매수·매도·비중·관망 어휘 없음.
     전환 판정은 meta `market_regime`에 둔 전 거래일 국면과 비교한다. 같은 날 재실행은 멱등(prev_regime 유지)."""
     bars = [b for b in collect_market.bars(conn, config.REGIME_BENCHMARK) if b["day"] <= day]
     if len(bars) < config.REGIME_MA_DAYS:
@@ -498,7 +498,7 @@ def _prev_from_meta(conn, key, day, cur):
 
 
 def sector_flow(conn, day, s):
-    """반도체 자금 방향 — SMH가 20거래일 동안 S&P 500보다 ±SECTOR_FLOW_PP 이상 앞서면 '모이는 중', 뒤지면 '빠져나가는 중' (2026-10-11 사용자 승인).
+    """반도체 자금 방향 — SMH가 20거래일 동안 S&P 500보다 ±SECTOR_FLOW_PP 이상 앞서면 '모이는 중', 뒤지면 '빠져나가는 중'.
     SMH 발행주식수 5일 변화가 있고 방향이 반대면 '뚜렷하지 않음'으로 내린다. 같은 창에서 앞선 섹터·뒤처진 섹터 둘씩을 이름으로 돌려준다."""
     n = config.SECTOR_FLOW_DAYS
     spy = [b["close"] for b in collect_market.bars(conn, config.BENCHMARK) if b["day"] <= day]
@@ -521,7 +521,7 @@ def sector_flow(conn, day, s):
     sectors.sort(key=lambda x: x["rel"], reverse=True)
     for i, x in enumerate(sectors, 1):
         x["rank"] = i
-    smh_rank = 1 + sum(1 for x in sectors if x["rel"] > rel)   # 반도체를 11개 섹터와 같이 세웠을 때 순위 (2026-10-11 사용자: 순위를 알려주기)
+    smh_rank = 1 + sum(1 for x in sectors if x["rel"] > rel)   # 반도체를 11개 섹터와 같이 세웠을 때 순위
     prev = _prev_from_meta(conn, "sector_flow", day, state)
     return {"state": state, "prev": prev, "changed": bool(prev and prev != state), "rel_pp": rel, "days": n,
             "shares_5d": shares_5d, "sectors": sectors, "smh_rank": smh_rank, "n_sectors": len(sectors),
@@ -538,7 +538,7 @@ def sector_flow_events(sf):
 
 
 def bollinger(conn, day, stats_path=None):
-    """볼린저 밴드(20, 2σ) 위치 — %B, 하단·상단 도달, 연속 일수, 진입일 여부, 상장 이후 통계 (2026-10-11 사용자: 하단 도달 카드)."""
+    """볼린저 밴드(20, 2σ) 위치 — %B, 하단·상단 도달, 연속 일수, 진입일 여부, 상장 이후 통계."""
     closes = [b["close"] for b in collect_market.bars(conn, config.SYMBOL) if b["day"] <= day]
     w = config.BOLL_WINDOW
     if len(closes) < w + 1:
@@ -582,7 +582,7 @@ def bollinger_events(bb):
 
 
 def overheat(conn, day, s, stats=None):
-    """과열 지표 — RSI14 ≥ 80 · 200일 평균 대비 +40% · 20일 +25% 중 해당하는 조건과 상장 이후 진입일 통계 (2026-10-11 사용자: "이익 실현 구간").
+    """과열 지표 — RSI14 ≥ 80 · 200일 평균 대비 +40% · 20일 +25% 중 해당하는 조건과 상장 이후 진입일 통계.
     구간을 지시하지 않는다 — 조건에 닿은 날 과거 빈도만. 새로 들어간 조건은 meta `overheat`(전 거래일 집합)과 비교해 이벤트."""
     closes = [b["close"] for b in collect_market.bars(conn, config.SYMBOL) if b["day"] <= day]
     if len(closes) < 21:
@@ -634,7 +634,7 @@ def regime_events(mr):
                 direction=config.REGIME_DIRECTION.get(mr["regime"], "neutral"), source="calendar")]
 
 
-# "N" 라벨 (2026-10-11 사용자: 새로운 데이터에 N) — 가끔 바뀌는 칸만, 전 리포트와 값이 다른 그날만. 매일 바뀌는 칸(가격·옵션·비율)은 대상이 아니다
+# "N" 라벨 — 가끔 바뀌는 칸만, 전 리포트와 값이 다른 그날만. 매일 바뀌는 칸(가격·옵션·비율)은 대상이 아니다
 OCCASIONAL_STATUS_KEYS = ("ma_cross", "revisions_up_30d", "revisions_down_30d", "shares_short", "short_asof", "short_pct_float",
                           "smh_shares_out", "soxx_shares_out", "pt_mean", "pt_median", "pt_high", "pt_low", "rating_counts")
 
@@ -685,7 +685,7 @@ def _direction_counts(evs):
     return out
 
 
-PERIODS = (("1주", 5), ("1개월", 21), ("3개월", 63), ("6개월", 126), ("1년", 252))   # 거래일 수 (2026-10-17 사용자: 쉬운 정보로)
+PERIODS = (("1주", 5), ("1개월", 21), ("3개월", 63), ("6개월", 126), ("1년", 252))   # 거래일 수
 
 
 def period_returns(conn, day):
@@ -744,7 +744,7 @@ def drawdown_now(conn, day, yr=None):
     return {"stats": st, "days_since_high": since, "pct_from_high": yr["pct_from_high"], "high_day": yr["high_day"]}
 
 
-MAX_MEDIA = 3   # 방송 줄 최대 수 (2026-10-25 사용자: 미디어 데일리의 엔비디아 이야기를 엔비디아 리포트로)
+MAX_MEDIA = 3   # 방송 줄 최대 수
 
 
 def media_feed_n(iss):
@@ -810,7 +810,7 @@ def build(conn, day, run_date):
         "bollinger": bb,       # 볼린저 밴드 (2026-10-11): 하단·상단 도달 때만 카드
         "overheat": oh,        # 과열 지표 (2026-10-11): 조건 하나라도 해당하면 카드
         "events": body, "events_overflow": overflow, "events_total": len(events),
-        # 뉴스 구획 막대 (2026-10-11 사용자): 오늘 = 이 리포트의 이벤트 전체, 7일 = 문서 이벤트(items.is_event) 최근 7일
+        # 뉴스 구획 막대: 오늘 = 이 리포트의 이벤트 전체, 7일 = 문서 이벤트(items.is_event) 최근 7일
         "direction_counts": {
             "today": _direction_counts(events),
             "week": _direction_counts([dict(r) for r in conn.execute(

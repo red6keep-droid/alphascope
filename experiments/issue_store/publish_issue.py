@@ -1,4 +1,4 @@
-"""이슈 모니터링 고정 페이지 게시 — 이슈마다 1장 (2026-11-13 사용자: 운영 연결 + 바로 공개).
+"""이슈 모니터링 고정 페이지 게시 — 이슈마다 1장.
 
     python experiments/issue_store/publish_issue.py --state "$STATE_DIR"          # 실제 게시
     python experiments/issue_store/publish_issue.py --state "$STATE_DIR" --dry    # 무엇을 만들고 / 갱신할지만
@@ -21,7 +21,7 @@ OUT = os.path.join(HERE, "output", "issue")
 
 def targets():
     out = []
-    import mock_stock_issue as MS   # 종목 이슈(젠슨 황 사임) — CFG 를 IW 에 끼운다 (2026-11-16 사용자)
+    import mock_stock_issue as MS   # 종목 이슈(젠슨 황 사임) — CFG 를 IW 에 끼운다
     for iss in list(IW.ISSUES) + [MS.ISS]:
         slug = IW.CFG[iss["id"]]["slug"]
         path = os.path.join(OUT, f"{slug}.html")

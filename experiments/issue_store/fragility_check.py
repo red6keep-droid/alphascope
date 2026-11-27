@@ -1,4 +1,4 @@
-"""취약 상태 경고 검증 — "취약 상태 뒤 하락 꼬리가 아무 날보다 두꺼운가" (2026-11-06 사용자 "검증해").
+"""취약 상태 경고 검증 — "취약 상태 뒤 하락 꼬리가 아무 날보다 두꺼운가".
 
     .venv/bin/python experiments/issue_store/fragility_check.py
 

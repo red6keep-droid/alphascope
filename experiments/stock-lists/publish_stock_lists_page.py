@@ -1,4 +1,4 @@
-"""하단 메뉴 `종목` 고정 페이지 /p/stock-lists.html 하나 만들기 · 고치기 (2026-11-17 사용자 "1단계 구현 진행해").
+"""하단 메뉴 `종목` 고정 페이지 /p/stock-lists.html 하나 만들기 · 고치기.
 
     python experiments/stock-lists/publish_stock_lists_page.py --dry     # 본문만 만들어 보기 (output/stock_lists_page.html)
     python experiments/stock-lists/publish_stock_lists_page.py           # Blogger 에 올리기 (처음 한 번 + stock_lists.js 를 고칠 때만)
@@ -18,7 +18,7 @@ EXP = os.path.dirname(HERE)
 sys.path[:0] = [HERE, EXP, os.path.join(EXP, "stock-radar")]
 
 KEY = "stock-lists"   # 주소 /p/stock-lists.html — 처음 만들 때 제목 = 이 글자(Blogger 가 제목으로 주소를 정한다), 바로 TITLE 로 바꾼다
-TITLE = "종목 모아보기"   # 옛 `종목` (2026-11-18 사용자 "제목을 좀 더", 목업 mock_stock_lists.write 와 같게)
+TITLE = "종목 모아보기"   # 옛 `종목`
 OUT = os.path.join(HERE, "output")
 BODY = os.path.join(OUT, "stock_lists_page.html")
 TABS = [("watch", "관심"), ("move", "오늘 움직임"), ("theme", "테마"), ("sector", "업종"), ("cap", "시가총액"), ("etf", "ETF")]
@@ -31,10 +31,10 @@ CSS = ("<style>[data-sl-panel][hidden]{display:none !important;}"
        ".sl-joined .seg+.seg{border-left:0;}.sl-joined .seg:first-child{border-radius:7px 0 0 7px;}.sl-joined .seg:last-child{border-radius:0 7px 7px 0;}"
        ".sl-joined .seg:only-child{border-radius:7px;}"
        ".sl-joined .seg[aria-selected=\"true\"]{background:#fff;color:#111;font-weight:700;box-shadow:inset 0 0 0 1px #111;}"
-       ".post-body .rt-tab .sl-tab-star{display:inline-block;width:16px;height:16px;margin:0 4px 0 0;vertical-align:-2px;}"   # 관심 탭 앞 별 (2026-11-19 사용자) — 채운 노랑 = 종목 제목 옆 담긴 별과 같은 색
+       ".post-body .rt-tab .sl-tab-star{display:inline-block;width:16px;height:16px;margin:0 4px 0 0;vertical-align:-2px;}"   # 관심 탭 앞 별 — 채운 노랑 = 종목 제목 옆 담긴 별과 같은 색
        ".sl-title-day{flex:none;font-size:13px;line-height:19px;font-weight:400;color:#6B7280;white-space:nowrap;letter-spacing:0;}"
        "#sl-day{margin:0 0 8px;padding-left:6px;text-align:right;}"
-       # 히트맵(테마 · 업종 묶음 고르기) — mock_stock_lists.PAGE_CSS 의 .hm 과 같게 (2026-11-18 사용자)
+       # 히트맵(테마 · 업종 묶음 고르기) — mock_stock_lists.PAGE_CSS 의 .hm 과 같게
        ".hm{position:relative;margin:0 0 14px;background:#fff;}"
        ".hm-c{position:absolute;box-sizing:border-box;margin:0;padding:4px;border:2px solid #fff;border-radius:6px;font:inherit;cursor:pointer;"
        "display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;overflow:hidden;text-align:center;-webkit-tap-highlight-color:transparent;}"
@@ -42,7 +42,7 @@ CSS = ("<style>[data-sl-panel][hidden]{display:none !important;}"
        ".hm-p{display:block;font-weight:400;white-space:nowrap;}"
        ".hm-c[aria-selected=\"true\"]{box-shadow:inset 0 0 0 1.5px var(--hm-fg);}"
        ".hm-c:active{filter:brightness(.94);}"
-       # 관심 탭 편집 모드 · 검색 팝업 · 알림 — mock_stock_lists.PAGE_CSS · TOAST_CSS 와 같게 (2026-11-19 사용자 "적용해")
+       # 관심 탭 편집 모드 · 검색 팝업 · 알림 — mock_stock_lists.PAGE_CSS · TOAST_CSS 와 같게
        "[data-sl-watch] [data-row-link]{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;}"
             "[data-sl-editing] [data-sl-watch] [data-sl-rm]{display:inline-block !important;}"
             "[data-sl-editing] [data-sl-watch] [data-sl-grip]{display:inline-flex !important;}"

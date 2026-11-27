@@ -1,10 +1,10 @@
-"""r09 A안 검증 — 언론 언급 급증(GDELT) 다음 날 시가 매수 → 1 · 5 · 20일, SPY 대비 (2026-11-17 사용자 "그 지표로 진행해").
+"""r09 A안 검증 — 언론 언급 급증(GDELT) 다음 날 시가 매수 → 1 · 5 · 20일, SPY 대비.
 
     python experiments/signal-study/news_r09_validate.py            # → output/r09_news_gdelt.md
     python experiments/signal-study/news_r09_validate.py --titles   # 흔한 이름 4종목 급증일 기사 제목 받기(GDELT 요청 8번) → 같은 표에 붙음
 
 재료: data/store/gdelt_stock/{sym}.csv(news_gdelt_stock.py) · open.csv · close.csv · earnings.csv(yfinance 실적일).
-신호 (사용자 확정 2026-11-17, 미리 고정):
+신호:
 - 언급 급증 = 그날 기사 비중(그 회사 기사 ÷ 그날 전체 감시 기사)이 직전 60일 중앙값의 3배 이상, 그 회사 기사 5건 이상.
 - 호재 급증 / 악재 급증 = 급증한 날 어조가 직전 60일 평균 ± 1 표준편차 밖. 사이는 `어조 보통`.
 - 매수 = GDELT 날짜(세계 표준시) 다음 거래일 시가. 보유 h 일 = 그날 시가 → h 번째 거래일 종가. 성과 = 종목 − SPY(같은 창).

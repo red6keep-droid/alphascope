@@ -1,4 +1,4 @@
-"""종목 주가(간단 종목) 기업 소개 두 문장 — 한 번 만들어 저장, 다시 부르지 않는다 (2026-11-15 사용자).
+"""종목 주가(간단 종목) 기업 소개 두 문장 — 한 번 만들어 저장, 다시 부르지 않는다.
 
 왜: 종목마다 고정 페이지(전용 주소)를 만들면, 같은 틀로 찍은 853개가 서로 닮아 구글이 색인하지 않을 수 있다
     (11-10 정식 미국 종목 `크롤링됨 - 현재 색인 생성되지 않음` → 맨 앞 요약 닮음 87% → 74% 로 낮춘 일). 회사마다 다른 소개 문장이 가장 큰 차이.
@@ -6,7 +6,7 @@
       첫 문장 = 맨 앞 요약 아래 10px ※ 줄(lead_note), 전체 = `기업` 탭 소개. 정식 렌더러가 ABOUT 표를 읽으므로 apply() 가 표에 넣기만 한다.
 
 재료: 야후 회사 설명(info.longBusinessSummary, 영어) — 하루 FETCH_CAP 종목까지 받아 저장(받은 날짜와 함께, 빈 설명도 저장해 다시 안 받음).
-AI: Gemini lite 만(사슬 json-lite-only), 20종목 묶음, 하루 CALL_CAP 번까지 (2026-11-15 사용자: 급하지 않으니 lite 남는 몫으로).
+AI: Gemini lite 만(사슬 json-lite-only), 20종목 묶음, 하루 CALL_CAP 번까지.
     하루 한도(429 PerDay)면 사슬이 그 모델을 버리고 RuntimeError → 즉시 멈추고 다음 날 이어서. flash · Groq 로 넘기지 않는다.
     검사 통과 못 한 문장은 버린다(다음 날 다시). 야후 설명이 없는 종목 = 업종 문장(파이썬, AI 0).
 저장: --cache(비공개 quick-state)/intro.json {sym: {"ko", "src": "yahoo"|"sector", "at", "model"}} · intro_src.json {sym: {"en", "at"}}
@@ -28,7 +28,7 @@ sys.path[:0] = [EXP, os.path.join(EXP, "stock-radar"), os.path.join(EXP, "kr-sto
 import design_kit as dk  # noqa: E402
 
 FETCH_CAP = 200   # 하루 야후 회사 설명 받기 상한 — 상세 값(미국 90 · 한국 60)과 합쳐도 야후 요청이 몰리지 않게. 768종목이면 약 4거래일
-CALL_CAP = 25     # 하루 Gemini lite 호출 상한 = 하루 500회의 5% (2026-11-15 사용자 합의)
+CALL_CAP = 25     # 하루 Gemini lite 호출 상한 = 하루 500회의 5%
 BATCH = 20
 SRC_CHARS = 700   # 설명 앞부분만 — 첫 몇 문장에 무엇을 하는 회사인지가 있다
 

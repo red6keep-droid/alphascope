@@ -13,7 +13,7 @@ import requests
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "experiments"))
 
-# 두 피드를 합친다 (2026-10-25 사용자): Top News 가 먼저 — Investing 피드만으로는 며칠에 몇 개라 홈에 최대 2주 전 기사가 걸려 있었다
+# 두 피드를 합친다: Top News 가 먼저 — Investing 피드만으로는 며칠에 몇 개라 홈에 최대 2주 전 기사가 걸려 있었다
 # (10-22 ~ 10-24 2시간 실행 33번 모두 새 기사 0). 합친 뒤 발행 시각 최신 순 12개
 RSS_URLS = ["https://www.cnbc.com/id/100003114/device/rss/rss.html",   # Top News
             "https://www.cnbc.com/id/15839069/device/rss/rss.html"]    # Investing
@@ -107,7 +107,7 @@ SUM_MAX = 12   # 한 실행에 새로 요약하는 기사 상한 (Groq 하루 �
 
 
 def summarize(items):
-    """홈 주요 뉴스 팝업 (2026-11-07 사용자 P342) — CNBC 기사마다 요약 다섯 줄(experiments/news_summary.py, 데일리 뉴스 탭과 같은 규칙 · 사슬).
+    """홈 주요 뉴스 팝업 — CNBC 기사마다 요약 다섯 줄(experiments/news_summary.py, 데일리 뉴스 탭과 같은 규칙 · 사슬).
     처음 본 기사만 AI, 실패하면 lines 없이(홈은 원문 링크로)."""
     import news_summary
     try:
@@ -129,7 +129,7 @@ def summarize(items):
     print(f"[요약] 팝업 {sum(1 for it in items if it.get('lines'))}/{len(items)}")
 
 
-MEDIA_MAX = 3   # 홈 주요 뉴스에 섞는 방송 줄 — 방송 여러 곳이 같이 다룬 시장 · 업종 이슈 (2026-10-25 사용자)
+MEDIA_MAX = 3   # 홈 주요 뉴스에 섞는 방송 줄 — 방송 여러 곳이 같이 다룬 시장 · 업종 이슈
 
 
 def media_items():
@@ -196,13 +196,13 @@ def main():
 
     items.sort(key=lambda it: it["published"], reverse=True)   # 두 피드를 섞어 최신 순
     media = media_items()
-    media = [m for m in media if len(m.get("lines") or []) >= 2]   # 요약 두 줄 못 되는 방송 줄은 싣지 않는다 (2026-11-10 사용자)
+    media = [m for m in media if len(m.get("lines") or []) >= 2]   # 요약 두 줄 못 되는 방송 줄은 싣지 않는다
     need = MAX_ITEMS - len(media)
     results = items[:min(need + SPARE, SUM_MAX)]   # 한 줄 요약으로 빠질 자리를 다음 기사로 채우려고 몇 건 더 (요약 상한 SUM_MAX 안)
     process(results)
     summarize(results)
     thin = [it for it in results if len(it.get("lines") or []) < 2]
-    results = [it for it in results if len(it.get("lines") or []) >= 2][:need]   # 요약 두 줄 못 되는 기사는 홈에 싣지 않는다 — 옛: 원문 링크 줄 (2026-11-10 사용자)
+    results = [it for it in results if len(it.get("lines") or []) >= 2][:need]   # 요약 두 줄 못 되는 기사는 홈에 싣지 않는다 — 옛: 원문 링크 줄
     print(f"[요약] 두 줄 못 된 기사 {len(thin)}건 뺌 · 홈 기사 {len(results)}/{need}")
     results = sorted(results + media, key=lambda it: it["published"], reverse=True)   # 방송 줄도 시각 순으로 섞는다
     # 영문 RSS 요약은 번역 입력으로만 쓰고 공개 파일(gh-pages, PUBLIC 저장소 = 배포)에는 남기지 않는다 (2026-10-21, 운영지침 4-2 · D4-2).

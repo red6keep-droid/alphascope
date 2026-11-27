@@ -1,8 +1,8 @@
-"""간단 종목 정보 목업 — 정식 종목(종목 분석 페이지)이 아닌 종목을 가격 자료만으로 보여 주는 화면 (2026-11-12 사용자 "목업 적용해", 기획 = 비공개 기획/회원-내-종목-기획.md 6-6).
+"""간단 종목 정보 목업 — 정식 종목(종목 분석 페이지)이 아닌 종목을 가격 자료만으로 보여 주는 화면.
 
     python experiments/stock-quick/mock_quick.py      # output/mock_quick_<종목>.html · output/mock_all_stocks.html
 
-**목업 화면은 2026-11-14 지웠다** (사용자 "실제 운영 방식 목업만 남기고 나머지 삭제") — 지금 목업 = mock_quick_page.py(mock_qpage_*, 운영과 같은 고정 페이지 + 조각).
+**목업 화면은 2026-11-14 지웠다** — 지금 목업 = mock_quick_page.py(mock_qpage_*, 운영과 같은 고정 페이지 + 조각).
 이 파일은 ETF 목업(stock-etf/mock_etf.py)이 page_us_full · page_kr_full 을 빌려 쓰므로 남긴다. 직접 돌리지 말 것(옛 시안이 다시 생긴다).
 
 실제 적용 때는 고정 페이지 하나(stock-quick?s=코드)를 테마 JS 가 search/<시장>-lite.json 으로 그린다.
@@ -177,7 +177,7 @@ def page(s, df, bdf):
 
 
 def page_us_full(smp):
-    """정식 종목과 같은 계산(stock-radar/analyze) · 같은 카드(stock-radar/render_pages)를 간단 정보 종목에 그대로 — 가격 · 공용 시장 자료로 되는 것만 (2026-11-12 사용자).
+    """정식 종목과 같은 계산(stock-radar/analyze) · 같은 카드(stock-radar/render_pages)를 간단 정보 종목에 그대로 — 가격 · 공용 시장 자료로 되는 것만.
     빠지는 것 = 종목별 상세 호출 · 다른 수집 · AI 가 필요한 카드(의견 · 실적 · 기업 · 뉴스 · 방송 · 소송), 가격 그래프 PNG(브라우저가 그리는 1년 선 그래프로)."""
     rd = os.path.join(EXP, "stock-radar")
     sys.path.insert(0, rd)
@@ -213,11 +213,11 @@ def page_us_full(smp):
     series = [(smp["name"], [(x / c[0] - 1) * 100 for x in c], dk.CHART_MAIN, "solid"),   # 그래프 색 = 주인공 주황 (2026-11-14 그래프 통일, 옛 오름 · 내림 색)
               ("S&P 500", [(x / bc[0] - 1) * 100 for x in bc], dk.CHART_CMP, "dash")]
     line = dk.trend_card("1년 전 대비 등락", dk.month_ticks(days[-252:]), series, pct)
-    # 상세 칸 — 정식 종목과 같은 카드, 받는 주기만 드물게(detail_cache 주기: 의견 · 이익 예상 주 1회 · 실적 뒤, 기업 90일). 공매도 · 옵션은 간단 종목에서 뺀다 (2026-11-12 사용자)
+    # 상세 칸 — 정식 종목과 같은 카드, 받는 주기만 드물게(detail_cache 주기: 의견 · 이익 예상 주 1회 · 실적 뒤, 기업 90일). 공매도 · 옵션은 간단 종목에서 뺀다
     import collect_extra as CE
     import analyze_tabs
     nxt = next((x["day"] for x in snap["earnings"][sym] if x["day"] >= s["day"]), None)
-    _, st = CE._one((sym, s["close"], s["day"], nxt), only=("analysts", "eps", "company", "short"))   # 공매도 = 2주 1회 (2026-11-12 사용자 "공매도를 넣어서")
+    _, st = CE._one((sym, s["close"], s["day"], nxt), only=("analysts", "eps", "company", "short"))   # 공매도 = 2주 1회
     rev, cash = sec_tables(sym)
     extra = {"stocks": {sym: st}, "revenue": {"series": {sym: rev} if rev else {}}, "capex": {sym: cash} if cash else {}, "peer_earnings": {}, "edgar": {}}
     analyze_tabs.build(s, snap, extra)
@@ -236,7 +236,7 @@ def page_us_full(smp):
 
 
 def page_kr_full(smp):
-    """한국 간단 종목 — 한국 정식 종목과 같은 계산(kr-stocks/analyze_kr) · 같은 카드(render_kr). 미국과 같은 원칙(2026-11-12 사용자 "한국 거도 동일"):
+    """한국 간단 종목 — 한국 정식 종목과 같은 계산(kr-stocks/analyze_kr) · 같은 카드(render_kr). 미국과 같은 원칙:
     가격 · 공용 시장 자료 카드 + 드물게 받는 상세(이익 예상 · 애널리스트 · 실적일 · 분기 매출). 뉴스 · 방송 의견 · 공매도는 뺀다. 기업 정보는 DART 기업개황(실제는 등록 때 한 번)."""
     kd = os.path.join(EXP, "kr-stocks")
     sys.path.insert(0, kd)
@@ -379,7 +379,7 @@ def all_stocks(data):
 
 
 def _no_media_opinions():
-    """간단 정보 = 방송 · 뉴스 의견 카드 없음 (2026-11-12 사용자 · 기획 6-6: 한 목소리만 남는 화면 위험). 공용 의견 카드 함수에서 두 카드만 끈다 — 목업 안에서만."""
+    """간단 정보 = 방송 · 뉴스 의견 카드 없음. 공용 의견 카드 함수에서 두 카드만 끈다 — 목업 안에서만."""
     sys.path.insert(0, os.path.join(EXP, "nvda-report"))
     import render_html as RH
     RH.picks_card = lambda *a, **k: ""
@@ -401,7 +401,7 @@ def main():
     page = all_stocks(data)
     p = dk.write_mock(page, os.path.join(OUT, "mock_all_stocks.html"), "전체 종목")
     print("만듦:", p)
-    kr = (page.replace('data-mk-pane="US">', 'data-mk-pane="US" hidden>', 1).replace('data-mk-pane="KR" hidden>', 'data-mk-pane="KR">', 1)   # 한국을 먼저 연 같은 목록 (2026-11-12 사용자: 한국 목록이 어디 있나)
+    kr = (page.replace('data-mk-pane="US">', 'data-mk-pane="US" hidden>', 1).replace('data-mk-pane="KR" hidden>', 'data-mk-pane="KR">', 1)   # 한국을 먼저 연 같은 목록
           .replace("font-weight:700;color:#111;\">미국", "font-weight:400;color:#6B7280;\">미국", 1).replace("font-weight:400;color:#6B7280;\">한국", "font-weight:700;color:#111;\">한국", 1))
     p = dk.write_mock(kr, os.path.join(OUT, "mock_all_stocks_kr.html"), "전체 종목 (한국)")
     print("만듦:", p)

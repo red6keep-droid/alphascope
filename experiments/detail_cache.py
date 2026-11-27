@@ -1,4 +1,4 @@
-"""상세 값 저장 (detail_cache) — 잘 안 바뀌는 값은 바뀌는 주기에 맞춰 드물게 받고, 그 사이에는 저장해 둔 값을 쓴다 (2026-11-12 사용자 "기업 정보는 한 번만 받으면 유지되는 것 아니냐" → "정식 종목에도").
+"""상세 값 저장 (detail_cache) — 잘 안 바뀌는 값은 바뀌는 주기에 맞춰 드물게 받고, 그 사이에는 저장해 둔 값을 쓴다.
 
 왜: 정식 종목은 하루 네 번 실행마다 종목당 약 10번 야후를 불렀다(64종목 하루 약 2,500회). 같은 날 같은 값이 대부분이고,
     호출이 많을수록 야후가 빈 값으로 조이는 일이 잦아진다. 또 extra.json 이 실행 사이에 남지 않아 '주 1회'라고 적힌 매출 · 함께 보는 회사 실적일도 매번 받았다.
@@ -50,7 +50,7 @@ class DetailCache:
     # ---------------------------------------------------------------- 칸 값
     def get(self, sym, field):
         x = (self.stocks.get(sym) or {}).get(field)
-        if x and field == "analysts" and isinstance(x["v"], dict):   # 애널리스트 등급 = 받은 날 기준 — 화면이 `11.10 기준`으로 적는다 (2026-11-16 사용자)
+        if x and field == "analysts" and isinstance(x["v"], dict):   # 애널리스트 등급 = 받은 날 기준 — 화면이 `11.10 기준`으로 적는다
             return dict(x["v"], asof=x["day"])
         return x["v"] if x else None
 
@@ -69,7 +69,7 @@ class DetailCache:
 
     def due(self, sym, field, bar=None, earn_days=(), next_earn=None, daily=()):
         """이번 실행에 새로 받아야 하나. bar = 이번 마지막 거래일, earn_days = 지난 실적 발표일들, next_earn = 다음 실적일.
-        daily = 이 실행에서 새 거래일마다 받을 칸 — 미국 정식의 의견 · 이익 예상(증권사 등급 · 목표가 변경은 거의 매일 나온다, 2026-11-16 사용자).
+        daily = 이 실행에서 새 거래일마다 받을 칸 — 미국 정식의 의견 · 이익 예상.
         간단 종목 · 한국 정식은 넘기지 않아 옛 주기 그대로(야후 호출 수 — 정식 빈 값 비율을 본 뒤 정한다)."""
         x = (self.stocks.get(sym) or {}).get(field)
         if not x:

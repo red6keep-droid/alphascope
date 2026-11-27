@@ -32,7 +32,7 @@ def record(a, news):
 
 
 def record_broker(a, today):
-    """증권사별 등급 · 목표가 변경 → radar/records/broker (2026-11-25 사용자 "기록부터 쌓아", 비공개 증권사-의견-글-기획.md 5절).
+    """증권사별 등급 · 목표가 변경 → radar/records/broker.
     날마다 = 이미 받은 30일 창(s["broker"])에서 처음 보는 줄만. 종목마다 한 번 = 야후 이력 전부를 담는다(첫 담기 — 종목이 새로 들어와도 그 종목만).
     담은 종목은 records/broker/_backfill.json 에 적는다. 첫 담기가 실패한 종목은 적지 않아 다음 실행에 다시."""
     import json
@@ -74,7 +74,7 @@ if __name__ == "__main__":
     cached = "--cached" in sys.argv
     snap = collect.load() if cached else collect.run()
     extra = (collect_extra.load() if cached else collect_extra.run(snap)) or {}
-    if not cached:   # 빈 값 막기 — 야후가 오류 없이 빈 값을 줄 때 (2026-11-12 사용자). 실패해도 페이지는 만든다
+    if not cached:   # 빈 값 막기 — 야후가 오류 없이 빈 값을 줄 때. 실패해도 페이지는 만든다
         try:
             import data_guard
             import universe as U
@@ -83,7 +83,7 @@ if __name__ == "__main__":
         except Exception as e:  # noqa: BLE001
             print(f"::warning::[radar] 빈 값 검사 실패 (예전처럼 계속): {e!r}")
     news = collect_news.load() if cached else collect_news.run()
-    import peer_cards   # 같은 업종 S&P 500 과 견주는 카드 넷 (2026-11-22 사용자 "전부 발행") — 실패해도 지난 값 · 없으면 카드 없이
+    import peer_cards   # 같은 업종 S&P 500 과 견주는 카드 넷 — 실패해도 지난 값 · 없으면 카드 없이
     try:
         peer_cards.DATA = peer_cards.load() if cached else peer_cards.collect(snap)
     except Exception as e:  # noqa: BLE001
@@ -91,7 +91,7 @@ if __name__ == "__main__":
         peer_cards.DATA = peer_cards.load()
     peer_cards.REV = (extra.get("revenue") or {}).get("series") or {}
     a = analyze.run(snap)
-    import industry_us   # 업계 카드 — FRED (2026-11-01 사용자 P268, 실패해도 페이지는 만든다)
+    import industry_us   # 업계 카드 — FRED
     try:
         fred = industry_us.load() if cached else industry_us.fetch()
     except Exception as e:  # noqa: BLE001

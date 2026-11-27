@@ -1,4 +1,4 @@
-"""여러 컷이 한 장에 든 그림(흰 바탕 + 컷 아래 설명 글자) → 컷마다 투명 바탕 320×320 WebP (2026-11-21 사용자: 스티커 12장을 한 장으로 줌).
+"""여러 컷이 한 장에 든 그림(흰 바탕 + 컷 아래 설명 글자) → 컷마다 투명 바탕 320×320 WebP.
 
     python experiments/course/sheet_to_webp.py <한 장.png> <접두> <이름,이름,…> [--out 폴더]
     예) … sheet.png c_mid whistle,balance,chalk,…   → chars/c_mid_whistle.webp …

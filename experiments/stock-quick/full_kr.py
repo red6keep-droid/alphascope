@@ -1,9 +1,9 @@
-"""간단 정보(한국) = 한국 정식 종목 렌더러 그대로 (2026-11-14 사용자 "TIGER 2차전지 테마처럼 · 정식 종목과 거의 차이 없게").
+"""간단 정보(한국) = 한국 정식 종목 렌더러 그대로.
 
 full_us.py 와 같은 원칙 — 정식 계산(analyze_kr) · 정식 카드(render_kr)를 그대로 부르고, 막히는 줄(방송 뉴스 · 방송 의견 · 미국과 연결 짝)만 뺀다.
 11-12 목업(mock_quick.page_kr_full)과 같은 화면을 853종목 매일 실행으로.
   - 탭 = 오늘 · 매수의견(애널리스트 — 값이 있을 때만) · 실적(분기 매출 · 이익 예상 · 돈을 어디에 쓰나 + 시장 일정) · 업계상황 · 기업.
-  - 실적 탭 일정 = 정식과 같은 세 카드(2026-11-16 사용자): 다음 실적 발표는?(DART 잠정실적 1년 전 같은 분기로 어림 `무렵` — 예정일을 미리 알리는 회사가 드물다, 기획 6-3-2 ⑥)
+  - 실적 탭 일정 = 정식과 같은 세 카드: 다음 실적 발표는?(DART 잠정실적 1년 전 같은 분기로 어림 `무렵` — 예정일을 미리 알리는 회사가 드물다, 기획 6-3-2 ⑥)
     · 미국 연관 종목 일정은?(검증 통과 짝만, Finnhub 달력은 미국 간단 실행 것) · 시장 전체를 흔들 일정은?.
   - 함께 움직이는 종목 = 같은 업종에서 1년 등락이 가장 비슷하게 움직인 3곳(상관 계산, full_us.corr_peers). 정식의 `미국과 연결`(검증한 짝)은 빌려 오지 않는다.
   - 업계 카드 = 업종 원자료(로고 메타데이터 industry_en)가 분명한 업종만 정식 대표 종목의 업계 자료로 잇는다(IND_REP). 원자료가 틀린 종목은 KR_FIX.
@@ -41,7 +41,7 @@ WHEN = full_us.WHEN_KR   # 시장마다 따로 (2026-11-24 — 옛 미국 · 한
 LATE_DAY = None   # full_us.LATE_DAY 와 같은 뜻 — 한국 종목 날짜 (collect_quick 이 넣는다)
 BUDGET = {"detail": 60, "dart": int(os.environ.get("QUICK_DART_BUDGET") or 40), "company": 60, "hist": 100}
 DART_MINUTES = int(os.environ.get("QUICK_DART_MINUTES") or 20)   # 매출 · 손익 받기 시간 상한 — DART 가 느린 날에도 실행이 끝나 저장값을 남기게 (2026-11-16)
-# 화면 실행(장 마감 뒤)은 DART 를 새로 받지 않고 저장값만 (2026-11-20 사용자: 한국 간단 종목이 DART 21~30분 때문에 18시께 바뀜).
+# 화면 실행(장 마감 뒤)은 DART 를 새로 받지 않고 저장값만.
 # 받기는 새벽 실행(quick-dart.yml → dart_fill.py)이 하고 같은 quick-state 에 남긴다. QUICK_DART_FETCH=0 = 받지 않음
 DART_FETCH = os.environ.get("QUICK_DART_FETCH", "1") != "0"
 DETAIL_FIELDS = ("analysts", "eps")
@@ -49,7 +49,7 @@ MARKET = sorted({K.BENCH, K.KOSDAQ, *K.SECTOR_ETF_LIST})
 
 
 def _links():
-    """미국 연결 종목 — AI 후보 · 짝 하나씩 검증 통과만 (ref/kr_us_links.json, kr_us_links.py --each, 2026-11-15 사용자). {한국 코드: [기록]}, 차이 큰 순."""
+    """미국 연결 종목 — AI 후보 · 짝 하나씩 검증 통과만. {한국 코드: [기록]}, 차이 큰 순."""
     try:
         d = json.load(open(os.path.join(EXP, "ref", "kr_us_links.json"), encoding="utf-8"))["links"]
     except (OSError, ValueError, KeyError):
@@ -85,14 +85,14 @@ KR_FIX = {
 }
 
 
-# 업계 카드가 실제 사업과 맞지 않는 종목 — 대표 종목도 큰 업종 대체도 쓰지 않는다 (2026-11-25 사용자 `하림지주가 왜 건설` → 316개 점검).
+# 업계 카드가 실제 사업과 맞지 않는 종목 — 대표 종목도 큰 업종 대체도 쓰지 않는다.
 # 업종 고침(큰 업종 · 세부 업종)은 build_ref.py 가 같은 파일로 quick_ref.json 에 넣는다
 try:
     _FIX = json.load(open(os.path.join(EXP, "ref", "kr_industry_fix.json"), encoding="utf-8"))
 except (OSError, ValueError):
     _FIX = {}
 CARD_OFF = set(_FIX.get("card_off") or {})
-# 종목마다 고른 사업 묶음(2026-11-25 사용자 "2번 진행") → 그 묶음의 업계 자료를 빌려 올 정식 종목. 원자료 업종의 대표 종목이 같은 묶음이면 그것을 그대로(생보 · 손보 구분 등)
+# 종목마다 고른 사업 묶음 → 그 묶음의 업계 자료를 빌려 올 정식 종목. 원자료 업종의 대표 종목이 같은 묶음이면 그것을 그대로(생보 · 손보 구분 등)
 CARD = {c: x["group"] for c, x in (_FIX.get("card") or {}).items()}
 GROUP_REP = {"반도체": "000660.KS", "가전": "066570.KS", "2차전지": "373220.KS", "자동차": "005380.KS", "바이오": "068270.KS",
              "은행": "105560.KS", "보험": "000810.KS", "플랫폼": "035420.KS", "통신": "017670.KS", "조선": "009540.KS",
@@ -143,7 +143,7 @@ def bars(syms):
             print(f"[quick-kr] 일봉 묶음 {i} 실패: {str(e)[:120]}")
         time.sleep(2)
     # 마지막 봉 대조 겸 값 = 네이버 — 정식 한국 종목과 같은 함수 (2026-11-23). 네이버도 못 받은 종목만 KIS_NEED_OUT 파일로 →
-    # quick-data.yml 이 수집 뒤 그 종목만 한국투자증권으로 확인(맨 뒤 · 평소 0번, 2026-11-26 사용자)
+    # quick-data.yml 이 수집 뒤 그 종목만 한국투자증권으로 확인
     return collect_kr._fix_last(out)
 
 
@@ -309,7 +309,7 @@ def history(cache_dir, syms):
 
 
 def earn_kr(cache_dir, ref_kr, syms, key=None):
-    """한국 실적 발표일 = DART 잠정실적 첫 공시일 — 정식(collect_kr_earn_dart)과 같은 판정, 간단 종목 몫은 cache_dir/kr/dart_earn.json (2026-11-16 사용자).
+    """한국 실적 발표일 = DART 잠정실적 첫 공시일 — 정식(collect_kr_earn_dart)과 같은 판정, 간단 종목 몫은 cache_dir/kr/dart_earn.json.
     처음 = 최근 3년(카드는 2년 움직임 · 1년 전 같은 분기로 다음 날짜 어림), 그 뒤 = 회사마다 7일에 한 번, 어림한 다음 발표일 앞 14일 ~ 뒤 3일 안이면 매일.
     정식 종목 몫(kr-state data/dart_earn.json)과 합쳐 렌더러가 쓰는 표(collect_kr_earn_dart._cache)에 넣는다. → 이번에 살핀 회사 수"""
     import collect_kr_earn_dart as KE
@@ -402,13 +402,13 @@ def pairs_card(s, peers, by):
     if moves:
         rows = [(K.name(p), "", r, "us") for p, r in moves] + ([] if links else [(s["name"], "", s["ret_1d"], "me")] + ([("KOSPI", "", s["ret_1d"] - vb, "bench")] if vb is not None else []))
         lines.append((R.pair_bars([(f"함께 움직여 온 한국 종목 ({day})" if links else f"함께 움직여 온 종목 ({day})", rows)]), "html"))
-    if links:   # 연관 종목 기록(고정값) = 미국 페이지와 같은 작은 표 (2026-11-15 사용자)
+    if links:   # 연관 종목 기록(고정값) = 미국 페이지와 같은 작은 표
         recs = [(r["t"], US_KO.get(r["t"], r["t"]), ", ".join(x for x in (r.get("why") or "", render_kr.RP.rec_years(r.get("n"))) if x), r["spread1"])
                 for r in LINKS.get(s["sym"]) or [] if r["t"] in {m["sym"] for m, _ in links}]
         lines.append((render_kr.RP.link_record_table("미국 연관 종목 기록", recs, theme), "html"))
     R.add_small_note(lines, ("함께 움직여 온 종목은 같은 업종에서 최근 1년 하루 등락률이 가장 비슷한 종목입니다. " if moves else "")
                      + "±0.5% 넘게 움직인 종목만 오른 곳 · 내린 곳으로 셉니다.")
-    tip = "미국 연관 종목은 사업으로 이어진 미국 종목 가운데, 그 종목이 크게 움직인 밤 다음 날 이 종목도 같은 쪽으로 열려 온 것만 골랐습니다." if links else ""   # 카드 작은 글씨 → 툴팁 (2026-11-15 사용자)
+    tip = "미국 연관 종목은 사업으로 이어진 미국 종목 가운데, 그 종목이 크게 움직인 밤 다음 날 이 종목도 같은 쪽으로 열려 온 것만 골랐습니다." if links else ""   # 카드 작은 글씨 → 툴팁
     card = R._state_card("함께 움직이는 종목은?", state, theme, col, lines, "", tip=tip, fold=True)
     return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{card}</div>'
 
@@ -426,13 +426,13 @@ def sec_expect(s):
         lines, tip = render_kr._rename(fn(c), s["name"])
         tip = tip.replace("SEC EDGAR", "금융감독원 전자공시(OpenDART)").replace("(억 달러)", "(억 원)")
         theme, col = R.EXPECT_THEME.get(c["state"], ("neutral", R.MUTED))
-        lines = render_kr.report_head(s, list(lines)) if key == "revenue" else list(lines)   # 잠정실적 숫자 — 정식과 같은 줄 (2026-11-16 사용자)
+        lines = render_kr.report_head(s, list(lines)) if key == "revenue" else list(lines)   # 잠정실적 숫자 — 정식과 같은 줄
         out += R._state_card(title, c["state"], theme, col, lines, "", tip=tip, fold=True, opened=not out)
     out += render_kr.report_balance_card(s) if out else ""   # 회사 살림은 튼튼한가? — 정식과 같은 카드. 사업 부문 · 수주(AI)는 정식만
     return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{out}</div>' if out else ""
 
 
-MEDIA_OK = False   # 방송 자료를 실제로 읽었나 — 읽었을 때만 방송 줄 · 방송 의견(없으면 `없음` 카드). 못 읽었으면 그 칸 없이 (2026-11-16 사용자: 한국 간단에도 방송)
+MEDIA_OK = False   # 방송 자료를 실제로 읽었나 — 읽었을 때만 방송 줄 · 방송 의견(없으면 `없음` 카드). 못 읽었으면 그 칸 없이
 
 
 def media_inputs():
@@ -477,7 +477,7 @@ def body(s, a, peers, by, related_links, extra_today=""):
     today = (R.day_path_chart(s["tech"].get("path"), s["tech"].get("bench_path"), s["name"], "KOSPI") + render_kr.price_card(s) + render_kr.sec_regime(s)
              + render_kr.sec_tech(s) + pairs_card(s, peers, by) + render_kr.sec_states(s) + extra_today)
     op = opinions_tab(s)
-    cal = render_kr.sec_calendar(s, ("earnings", "peers", "macro"), open_first=False)   # 정식과 같은 세 카드 (2026-11-16 사용자 — 옛: 시장 일정만)
+    cal = render_kr.sec_calendar(s, ("earnings", "peers", "macro"), open_first=False)   # 정식과 같은 세 카드
     ex = sec_expect(s)
     ea = ex + (R.group_title("주요 일정") + cal if cal else "")
     title = f"{s['name']} 주가"
@@ -485,11 +485,11 @@ def body(s, a, peers, by, related_links, extra_today=""):
             + dk.report_stamp(dk.kst_close_day(s["day"], "KR"), WHEN, late=bool(LATE_DAY) and str(s["day"])[:10] < LATE_DAY)
             + render_kr.lead(s) + CC.card(s["name"], render_kr.BARS.get(s["sym"]) or [], 0, title="") + CC.kr_live(s.get("code")) + '<div style="height:20px;"></div>'   # 봉차트 하나만 — 정식 page_block 은 목업 · 발행 두 벌 + 스크립트(조각엔 페이지 본문 스크립트 하나로)
             + R._section("오늘", today, line=False, tab="오늘") + render_kr.RP.sec_crash(s)   # 급락일에 버텼을 때만
-            + ((lambda n: dk.keep_tone(R._section("뉴스", n, tab="오늘")) if n else "")(render_kr.sec_today(s) if MEDIA_OK else render_kr.sec_facts_only(s)))   # 방송 뉴스 + 한국 기사 사건 — 정식과 같은 구획, 최근 7일 0건이면 숨김 · 방송을 못 읽으면 기사 사건만 (2026-11-24 사용자)
+            + ((lambda n: dk.keep_tone(R._section("뉴스", n, tab="오늘")) if n else "")(render_kr.sec_today(s) if MEDIA_OK else render_kr.sec_facts_only(s)))   # 방송 뉴스 + 한국 기사 사건 — 정식과 같은 구획, 최근 7일 0건이면 숨김 · 방송을 못 읽으면 기사 사건만
             + (R._section("매수의견", op, tab="매수의견") if op else "")
             + (R._section("실적", ea, tab="실적") if ea else "")
             + R._section("업계상황", render_kr.sec_industry_tab(s), tab="업계상황")
-            + R._section("기업", render_kr.sec_company(s), tab="기업")   # `최근 공시는?` 뺐다 — 정식과 같게 (2026-11-16 사용자)
+            + R._section("기업", render_kr.sec_company(s), tab="기업")   # `최근 공시는?` 뺐다 — 정식과 같게
             + R.related_buttons(related_links) + "</div>")
 
 
@@ -529,11 +529,11 @@ def build(ref_kr, bars_all, flows, hist_full, det, dart_data, hist_quick, only=N
     day = max(x["day"] for x in stocks)
     market = analyze_kr.flows(flows, bars_all.get(K.BENCH)) or {}
     mr = analyze_kr.A.market_regime({"bars": {analyze_kr.NC.REGIME_BENCHMARK: bars_all.get(K.BENCH) or []}})
-    crash = render_kr.RP.CW.compute(bars_all, "kr", quick)   # 급락장에서 어땠나? — 정식과 같은 계산, 일봉만 (2026-11-14 사용자)
+    crash = render_kr.RP.CW.compute(bars_all, "kr", quick)   # 급락장에서 어땠나? — 정식과 같은 계산, 일봉만
     for x in stocks:
         x.update(market_regime=mr, sector_flow=analyze_kr.sector_flow(snap, x["sym"]), fx=market.get("fx"), crash=render_kr.RP.CW.for_stock(crash, x["sym"]),
                  rank=None, in_top=False, pairs={},
-                 cap=((caps or {}).get(x["sym"]) or {}).get("cap"), cap_rank=((caps or {}).get(x["sym"]) or {}).get("rank"))   # 기업 탭 시가총액 줄 (2026-11-16 사용자, collect_quick.kr_caps)
+                 cap=((caps or {}).get(x["sym"]) or {}).get("cap"), cap_rank=((caps or {}).get(x["sym"]) or {}).get("rank"))   # 기업 탭 시가총액 줄
     a = {"day": day, "stocks": stocks, "market": market, "crash": {}}
     # render_kr.write_all 의 준비 부분 그대로 (파일 쓰기 · 목록 페이지 · 방송 읽기 빼고)
     render_kr.KR_PRICES.clear()
@@ -555,7 +555,7 @@ def build(ref_kr, bars_all, flows, hist_full, det, dart_data, hist_quick, only=N
     render_kr.NOW = datetime.datetime.now(datetime.timezone.utc)
     render_kr.BARS = bars_all
     render_kr.PICK_SINCE = R.pick_window(bars_all.get(K.BENCH) or [], render_kr.media_feed.KST, now=render_kr.NOW)[1]
-    media_inputs()   # 방송 줄 · 방송 의견 — 그 종목 자료가 있을 때 줄, 의견은 없으면 `없음` 카드 (2026-11-16 사용자)
+    media_inputs()   # 방송 줄 · 방송 의견 — 그 종목 자료가 있을 때 줄, 의견은 없으면 `없음` 카드
     snap_us = {"us_bars": {t: bars_all[t] for t in LINK_US if bars_all.get(t)}}
     for x in stocks:   # 밤사이 미국 연결 종목 — 정식 analyze_kr.us_move 그대로(한국 날짜보다 앞선 마지막 미국 종가)
         x["us_links"] = [(m, r.get("why") or "") for r in LINKS.get(x["sym"]) or [] for m in [analyze_kr.us_move(r["t"], snap_us, x["day"])[0]] if m]

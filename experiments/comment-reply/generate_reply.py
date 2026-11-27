@@ -31,7 +31,7 @@ def _reply_of(value):
 
 
 def generate_reply(post_title, comment_content):
-    """작성자 이름 · 사진 · 이메일은 넣지 않는다 — 글 제목 · 댓글 본문만 (2026-11-16 사용자, 개인정보처리방침 3절 · 운영지침 D8-6)."""
+    """작성자 이름 · 사진 · 이메일은 넣지 않는다 — 글 제목 · 댓글 본문만."""
     prompt = _load_prompt() + "\n\n" + json.dumps(
         {"post_title": post_title, "comment": comment_content},
         ensure_ascii=False,

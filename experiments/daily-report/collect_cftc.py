@@ -1,4 +1,4 @@
-"""CFTC 선물 포지션 — 헤지펀드(레버리지 펀드) S&P 500 · 나스닥 100 선물 순포지션 (2026-11-09 사용자).
+"""CFTC 선물 포지션 — 헤지펀드(레버리지 펀드) S&P 500 · 나스닥 100 선물 순포지션.
 
 - 출처: CFTC Traders in Financial Futures (선물만), 공개 API publicreporting.cftc.gov 데이터셋 gpe5-46if. 키 없음.
 - 기준일 = 화요일 장 마감 포지션, 발표 = 그 주 금요일 15:30 ET. 그래서 날마다 같은 값이 며칠 이어진다.
@@ -49,11 +49,11 @@ def _summary(rows, name):
     nets = [lg - sh for _d, lg, sh, _oi, _am in rows]
     lo, hi, net = min(nets), max(nets), nets[-1]
     d, lg, sh, oi, _am = rows[-1]
-    am = [r[4] for r in rows]   # 자산운용사 · 연기금 순포지션 — 급락한 주에 거의 늘 판 쪽 (2026-11-09 사용자, 46번 중 45번)
+    am = [r[4] for r in rows]   # 자산운용사 · 연기금 순포지션 — 급락한 주에 거의 늘 판 쪽
     alo, ahi = min(am), max(am)
     return {"name": name, "date": d, "net": net, "prev": nets[-2], "prev_date": rows[-2][0], "long": lg, "short": sh, "oi": oi,
             "prev_long": rows[-2][1], "prev_short": rows[-2][2],
-            "hist": [[r[0], r[1] - r[2], r[4]] for r in rows[-HIST - 1:]],   # 최근 13주 [기준일, 헤지펀드 순, 자산운용사 순] → 카드의 12주 주간 순매수 · 순매도 막대 (2026-11-11 사용자 "기간에 따라 늘고 있는지")   # 산 물량 · 판 물량 각각 지난주 대비 (2026-11-11 사용자 "매수가 늘어난 건지 매도가 늘어난 건지")
+            "hist": [[r[0], r[1] - r[2], r[4]] for r in rows[-HIST - 1:]],   # 최근 13주 [기준일, 헤지펀드 순, 자산운용사 순] → 카드의 12주 주간 순매수 · 순매도 막대   # 산 물량 · 판 물량 각각 지난주 대비
             "lo": lo, "hi": hi, "pos_pct": round((net - lo) / (hi - lo) * 100) if hi > lo else 50, "weeks": len(rows),
             "from": rows[0][0],
             "am": {"net": am[-1], "prev": am[-2], "lo": alo, "hi": ahi, "pos_pct": round((am[-1] - alo) / (ahi - alo) * 100) if ahi > alo else 50}}

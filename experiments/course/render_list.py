@@ -1,7 +1,7 @@
-"""주식 공부 목록 페이지(/p/study.html) — 과정별 편 목록 (2026-11-15 사용자: 목록 페이지도 목업에).
+"""주식 공부 목록 페이지(/p/study.html) — 과정별 편 목록.
 
     .venv/bin/python experiments/course/render_list.py              # output/mock_study_list.html
-    .venv/bin/python experiments/course/render_list.py --publish    # Blogger 고정 페이지 /p/study.html 만들기 · 고치기 (바뀐 것만, 2026-11-15 사용자)
+    .venv/bin/python experiments/course/render_list.py --publish    # Blogger 고정 페이지 /p/study.html 만들기 · 고치기
 
 - 커리큘럼 문서 4절: 맨 위 캐릭터 그림(banner/study_head.webp, 사용자 그림) + 한 줄 소개 → 과정 카드 → 편 목록. 나온 편 = 줄 전체 링크, 안 나온 편 = 회색 `준비 중`.
 - 나온 편 주소 = published.json (publish_course.py 가 발행 때 씀). 편 목록 = 아래 COURSES (커리큘럼 문서 2절). 편이 나올 때만 갱신.
@@ -19,15 +19,15 @@ import render_course as RC  # noqa: E402
 dk = RC.dk
 OUT = os.path.join(HERE, "output", "mock_study_list.html")
 INTRO = "주식에서 흔히 듣는 말, 데이터로 확인해 봤습니다"
-INTRO_NEW = "처음 배우는 기본부터, 흔히 듣는 말을 데이터로 확인하기까지"   # 입문 과정이 생겨 소개 줄을 넓힘 (2026-11-22 사용자: 지금 줄은 입문과 안 맞음) — 시안(--variant)에서만
-# 시안 (2026-11-22 사용자): 펼친 카드만 색 · 들어오면 첫 카드만 펼침 · 오름 빨강 · 내림 파랑은 안 씀 → 녹색 · 노랑 두 가지
+INTRO_NEW = "처음 배우는 기본부터, 흔히 듣는 말을 데이터로 확인하기까지"   # 입문 과정이 생겨 소개 줄을 넓힘 — 시안(--variant)에서만
+# 시안: 펼친 카드만 색 · 들어오면 첫 카드만 펼침 · 오름 빨강 · 내림 파랑은 안 씀 → 녹색 · 노랑 두 가지
 VARIANTS = {   # 이름 → (펼친 카드 바탕, 테두리 · 줄, 과정 이름표 글자)
-    "green": ("#F0FDF4", "#E4F0E8", "#0F766E"),    # 테두리 · 구분선 = 바탕을 5% 진하게(240·253·244 × 0.95) (2026-11-22 사용자)
+    "green": ("#F0FDF4", "#E4F0E8", "#0F766E"),    # 테두리 · 구분선 = 바탕을 5% 진하게(240·253·244 × 0.95)
     "yellow": ("#FEF9E7", "#F1EDDB", "#92400E"),   # 같은 규칙(254·249·231 × 0.95)
 }
-CARD_THEME = {0: "green", 1: "yellow"}   # 시안: 과정 카드마다 펼친 색 — 입문 녹색 · 1과정(착각) 노랑, 나머지 흰색 (2026-11-22 사용자)
-ICON_PX = 40   # 32 → 40 (2026-11-22 사용자: 키워) · 입문 편 줄 앞 아이콘(사용자 그림 icons/ep_입문-NN.webp, 없으면 점선 자리) — 장면 그림 조각은 뺌 (2026-11-22 사용자)
-TWO_LINE = {   # 입문 편 제목 두 줄 — 끊는 자리 (2026-11-22 사용자: 문장이 길어 두 줄로)
+CARD_THEME = {0: "green", 1: "yellow"}   # 시안: 과정 카드마다 펼친 색 — 입문 녹색 · 1과정(착각) 노랑, 나머지 흰색
+ICON_PX = 40   # 32 → 40 · 입문 편 줄 앞 아이콘(사용자 그림 icons/ep_입문-NN.webp, 없으면 점선 자리) — 장면 그림 조각은 뺌
+TWO_LINE = {   # 입문 편 제목 두 줄 — 끊는 자리
     "입문-01-주식이란.md": ("주식이 뭔가요?", "주가는 왜 날마다 바뀌나요?"),
     "입문-02-얼마로-시작.md": ("얼마가 있어야 시작하나요?", "잃으면 어떻게 되나요?"),
     "입문-03-계좌와-주문.md": ("계좌는 어디서 만들고", "주문은 어떻게 넣나요?"),
@@ -40,7 +40,7 @@ TWO_LINE = {   # 입문 편 제목 두 줄 — 끊는 자리 (2026-11-22 사용�
     "입문-10-비싼가-싼가.md": ("이 주식,", "비싼 건가요 싼 건가요?"),
     "입문-11-차트와-지표.md": ("차트의 선과 지표는", "무엇을 알려 주나요?"),
     "입문-12-정보와-리딩방.md": ("정보는 어디서 얻고,", "누구 말을 믿어야 하나요?"),
-    # 1과정도 같은 꼴 — 아이콘 · 두 줄 · 번호 없음 (2026-11-22 사용자 "동일한 거야")
+    # 1과정도 같은 꼴 — 아이콘 · 두 줄 · 번호 없음
     "착각-기준.md": ("이 연재는", "이렇게 확인합니다"),
     "착각-01-실적.md": ("실적이 좋다는데", "왜 주가는 떨어질까?"),
     "착각-02-물림.md": ("고점에 물리면", "얼마나 오래 가나?"),
@@ -53,7 +53,7 @@ TWO_LINE = {   # 입문 편 제목 두 줄 — 끊는 자리 (2026-11-22 사용�
     "착각-09-파동.md": ("동전 던지기에도", "파동은 생긴다"),
     "착각-10-마치며.md": ("마치며,", "지표는 방향이 아니라 크기를 잰다"),
 }
-VARIANT = "green"   # 2026-11-22 사용자 시안 확정 → 기본 모양(과정별 펼친 색 · 아이콘 · 두 줄 · 첫 카드만 펼침). None = 옛 모양
+VARIANT = "green"   # 시안 확정 → 기본 모양(과정별 펼친 색 · 아이콘 · 두 줄 · 첫 카드만 펼침). None = 옛 모양
 THUMB_PX = 44   # 입문 편 줄 앞 작은 그림 = 그 편 장면 그림 가운데 정사각(chars/thumb_입문-NN.webp 96px, 화면 44)
 
 # (과정 이름, 한 줄 소개, [(번호, 편 제목, 초안 파일 이름 또는 None)])
@@ -114,7 +114,7 @@ def course_card(k, name, intro, eps, urls):
     for n, t, f in eps:
         url = urls.get(f) if f else None
         num = f'<span style="flex:none;width:32px;font-size:15px;line-height:24px;color:{(th_[2] if th_ else "#0F766E") if url else "#9CA3AF"};font-weight:700;">{n}</span>'
-        if th_ and f:   # 시안: 번호 대신 아이콘 · 제목 두 줄 (2026-11-22 사용자)
+        if th_ and f:   # 시안: 번호 대신 아이콘 · 제목 두 줄
             ic = os.path.join(HERE, "icons", f"ep_{f[:5]}.webp")
             num = (f'<img src="{RC.img_src(os.path.join(HERE, "icons"), "ep_" + f[:5])}" alt="" width="{ICON_PX}" height="{ICON_PX}" style="flex:none;display:block;width:{ICON_PX}px;height:{ICON_PX}px;margin:0 20px 0 5px;max-width:none;border-radius:0;">'
                    if os.path.exists(ic) else
@@ -130,13 +130,13 @@ def course_card(k, name, intro, eps, urls):
                         f'{num}<span style="flex:1 1 auto;min-width:0;font-size:17px;line-height:26px;color:#9CA3AF;word-break:keep-all;">{html.escape(t)}</span>'
                         '<span style="flex:none;margin-left:8px;font-size:13px;line-height:18px;font-weight:700;color:#9CA3AF;white-space:nowrap;">준비 중</span></div>')
     state = f"{total}편 중 {done}편" if done else f"{total}편 준비 중"
-    # 접기 (2026-11-15 사용자): 과정 이름 줄 오른쪽 접기 버튼 · 0편(들어가며)부터 편 목록 전체가 접힌다. details 라 JS 없이 접히고 접힌 글도 검색엔진이 읽는다.
+    # 접기: 과정 이름 줄 오른쪽 접기 버튼 · 0편(들어가며)부터 편 목록 전체가 접힌다. details 라 JS 없이 접히고 접힌 글도 검색엔진이 읽는다.
     # 처음 상태 = 나온 편이 있는 과정만 펼침(지금 1과정), 준비 중뿐인 과정은 접힘. 카드 머리(과정 · 제목 · 소개) 전체가 누르는 자리
     btn0 = ('<span class="study-fold" aria-hidden="true" style="flex:none;display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;'
            'border:1px solid #E2E8F0;border-radius:6px;background:#fff;color:#111;box-sizing:border-box;">'
            '<svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
            '<path d="M4 6l4 4 4-4"/></svg></span>')
-    # 시안: 접기 버튼 = 강조 카드 접기 버튼(dk.emph_fold_btn, 31 네모 · 둥글기 7) — 펼친 카드에선 CSS 로 바탕 = 카드 바탕 20% 밝게 · 테두리 = 카드 테두리 (2026-11-22 사용자)
+    # 시안: 접기 버튼 = 강조 카드 접기 버튼(dk.emph_fold_btn, 31 네모 · 둥글기 7) — 펼친 카드에선 CSS 로 바탕 = 카드 바탕 20% 밝게 · 테두리 = 카드 테두리
     btn = dk.emph_fold_btn("#fff", "#E2E8F0", 0).replace('<span style=', '<span class="study-fold" aria-hidden="true" style=', 1) if VARIANT else btn0
     return (f'<details data-course="{k + 1}"{" open" if (k == 0 if VARIANT else done) else ""} style="margin:0 0 20px;background:#fff;border:1px solid #E2E8F0;border-radius:12px;overflow:hidden;">'
             f'<summary style="display:block;list-style:none;cursor:pointer;padding:16px {dk.ALIGN_PX + 10}px 14px;">'
@@ -151,12 +151,12 @@ def course_card(k, name, intro, eps, urls):
 
 def page(urls):
     # 맨 위 그림 = 사용자 그림 한 장(분석이 음악 · 상승이 · 하락이 책 읽기, 2026-11-15) — 요청 1회.
-    # 크기 252 × 132 (11-15 사용자: 30% 작게 — 폰 약 360 → 252, 정수 px 라 높이 132 · 비율 차이는 contain 으로)
+    # 크기 252 × 132
     art = (f'<img src="{RC.img_src(os.path.join(HERE, "banner"), "study_head")}" alt="" width="252" height="132" '
            'style="display:block;width:252px;height:132px;max-width:100%;object-fit:contain;margin:0 auto;border-radius:0;">')
     head = (f'<div data-study-head="1" style="padding:19px {dk.ALIGN_PX}px 8px;margin:0 0 16px;text-align:center;">'
             f'<div aria-hidden="true" style="margin:0 0 12px;">{art}</div>'
-            # 2026-11-20 사용자: `- 주식공부` 는 큰 제목이 아니라 머리 줄 옆 아주 작은 글씨(data-head-sub)
+            #: `- 주식공부` 는 큰 제목이 아니라 머리 줄 옆 아주 작은 글씨(data-head-sub)
             '<h1 style="margin:0 0 6px;font-size:26px;line-height:36px;font-weight:800;color:#111;">주식 제대로 알기</h1>'
             f'<p data-seo-lead="1" style="margin:0;font-size:17px;line-height:26px;color:#333;word-break:keep-all;">{INTRO_NEW if VARIANT else INTRO}</p></div>')
     cards = "".join(course_card(k, *c, urls) for k, c in enumerate(COURSES))
@@ -203,8 +203,8 @@ def main():
         VARIANT = sys.argv[sys.argv.index("--variant") + 1]
         OUT = OUT.replace(".html", f"_{VARIANT}.html")
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
-    # 목업 안 편 링크 = 같은 폴더의 글 목업(지금 렌더러 기준) — 블로그 주소면 고치기 전 발행본이 열린다 (2026-11-20 사용자: 목업에서 확인)
-    # 발행 전 초안도 글 목업이 있으면 링크 (2026-11-20 사용자: 목업에서 빠지지 않게)
+    # 목업 안 편 링크 = 같은 폴더의 글 목업(지금 렌더러 기준) — 블로그 주소면 고치기 전 발행본이 열린다
+    # 발행 전 초안도 글 목업이 있으면 링크
     files = {f for c in COURSES for _, _, f in c[2] if f} | set(urls)
     urls = {k: f"mock_{os.path.splitext(k)[0]}.html" for k in files if os.path.exists(os.path.join(HERE, "output", f"mock_{os.path.splitext(k)[0]}.html"))}
     path = dk.write_mock(page(urls), OUT, TITLE)

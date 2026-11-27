@@ -111,7 +111,7 @@ SPLIT_SYMBOLS = ("^GSPC", "^IXIC", "^DJI", "^RUT")
 
 
 def day_split(raw_series):
-    """지수 4개의 마지막 날 하루를 시가 갭(전일 종가 → 시가) · 장중(시가 → 종가) · 하루(전일 종가 → 종가)로, % (2026-11-07 사용자: 한국 증시 리포트 `시가 갭 · 장중 · 하루` 처럼).
+    """지수 4개의 마지막 날 하루를 시가 갭(전일 종가 → 시가) · 장중(시가 → 종가) · 하루(전일 종가 → 종가)로, %.
     prices.json 의 open 칸(collect_yahoo OPEN_SYMBOLS)이 없거나 마지막 날 시가가 비면 그 지수는 뺀다."""
     out = {}
     for sym in SPLIT_SYMBOLS:
@@ -149,7 +149,7 @@ def _nvda_config():
 
 
 def index_rs(closes, n=5):
-    """지수 기준 상대강도 — 나스닥 종합 · 러셀 2000 의 5거래일 등락 − S&P 500(%p) + 나스닥이 S&P 500 을 웃돈 연속 일수 (2026-11-07 사용자: 상장지수펀드 대신 지수로 맞춤 —
+    """지수 기준 상대강도 — 나스닥 종합 · 러셀 2000 의 5거래일 등락 − S&P 500(%p) + 나스닥이 S&P 500 을 웃돈 연속 일수 (: 상장지수펀드 대신 지수로 맞춤 —
     `지수 기술지표의 방향은?` 의 S&P 500 대비와 같은 값). 옛 rs(QQQ · IWM · SPY)는 다른 곳이 쓰므로 그대로 둔다."""
     g, q, r = closes.get("^GSPC") or [], closes.get("^IXIC") or [], closes.get("^RUT") or []
     if len(g) <= n:
@@ -171,10 +171,10 @@ def index_rs(closes, n=5):
 
 
 def market_mood(closes):
-    """미국 증시 분위기 — 종목 페이지 `미국 증시 분위기는?`(stock-radar analyze.market_regime)과 같은 규칙 · 같은 기준값, 값은 S&P 500 지수 (2026-11-07 사용자: 데일리 세 카드를 한 카드로).
+    """미국 증시 분위기 — 종목 페이지 `미국 증시 분위기는?`(stock-radar analyze.market_regime)과 같은 규칙 · 같은 기준값, 값은 S&P 500 지수.
     VIX ≥ 30 → 불안 국면, 1년 고점 대비 −10% 이하 또는 200일 평균 아래 → 조정장, −3% 이하 → 단기 조정, 그 밖 상승 추세. 판정은 보이는 소수 한 자리 값(P275)."""
     NC = _nvda_config()
-    c = closes.get("^GSPC") or []   # 지수 기준 (2026-11-07 사용자: 데일리는 지수로 맞춤 — 옛 SPY, 종목 페이지는 아직 SPY)
+    c = closes.get("^GSPC") or []   # 지수 기준
     if len(c) < NC.REGIME_MA_DAYS:
         return None
     vix = (closes.get("^VIX") or [None])[-1]
@@ -618,7 +618,7 @@ def analyze(input_path, prices_path, output_path, state_dir=STATE_DIR):
     split = day_split(prices.get("series") or {})
     tech_idx = index_tech(prices.get("series") or {})
     mood = market_mood(closes)
-    rs_idx = index_rs(closes)   # 지수 기준 상대강도 (2026-11-07)   # 미국 증시 분위기 (종목 페이지와 같은 규칙, 2026-11-07)   # 지수 4개 기술지표 — 종목 페이지 `기술지표의 방향은?` 과 같은 계산 (2026-11-07 사용자 P392)   # 지수 4개 하루 = 시가 갭 + 장중 (2026-11-07 사용자: 한국 증시 리포트처럼)
+    rs_idx = index_rs(closes)   # 지수 기준 상대강도 (2026-11-07)   # 미국 증시 분위기 (종목 페이지와 같은 규칙, 2026-11-07)   # 지수 4개 기술지표 — 종목 페이지 `기술지표의 방향은?` 과 같은 계산   # 지수 4개 하루 = 시가 갭 + 장중
 
     position = {}
     for key, sym in INDEX_SYMBOL.items():
@@ -638,7 +638,7 @@ def analyze(input_path, prices_path, output_path, state_dir=STATE_DIR):
         "prev_5d": round(vix_close[-6], 2) if len(vix_close) >= 6 else None,
         "change_5d": round(vix_close[-1] - vix_close[-6], 2) if len(vix_close) >= 6 else None,
     }
-    if len(vix_close) >= 60:   # 1년 범위(최근 252거래일) — 시장 탭 `시장은 얼마나 긴장했나?` 범위 막대 (2026-11-07 사용자)
+    if len(vix_close) >= 60:   # 1년 범위(최근 252거래일) — 시장 탭 `시장은 얼마나 긴장했나?` 범위 막대
         yr = vix_close[-252:]
         lo, hi = min(yr), max(yr)
         vix.update({"low_1y": round(lo, 2), "high_1y": round(hi, 2),

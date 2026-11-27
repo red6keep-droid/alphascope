@@ -1,4 +1,4 @@
-"""뉴스 분류 기록 — 8일 창으로 덮어쓰는 뉴스 처리 결과를 날짜별로 쌓는다 (2026-11-24 사용자 기록 점검, 헌법 제4조 4항 "그날의 뉴스 분류").
+"""뉴스 분류 기록 — 8일 창으로 덮어쓰는 뉴스 처리 결과를 날짜별로 쌓는다.
 
     python experiments/news_records.py --source quick --store /tmp/qn/news.json --out <news-records 꺼낸 폴더>
     python experiments/news_records.py --source home  --store news_store_home.json --out <…>

@@ -1,4 +1,4 @@
-"""홈 Hot Issue · 증시 전망 카드 = 좌우로 넘어가는 배너 (2026-11-18 사용자).
+"""홈 Hot Issue · 증시 전망 카드 = 좌우로 넘어가는 배너.
 
 ** 적용 끝 (11-18) — 테마(alphaflow-home.html · index.html)에 들어가 이 스크립트는 더 돌리지 않는다(고리 코드가 바뀌어 돌면 멈춤). 홈 모습 = mock_home_commentary.py C안 · home-split. 시안 기록용. **
 
@@ -8,7 +8,7 @@
 한 건 = 한 장. 4초마다 왼쪽으로 넘어가고(마지막 → 첫 장도 왼쪽으로 이어짐), 손가락으로 밀면 넘어가며 누르는 동안은 멈춘다.
 자료 = issues.json · hypo.json 칸 그대로 — 새 수집 · AI 0.
 
-결정 이력 (11-18 사용자)
+결정 이력
   Hot Issue = 흰색 + 빨강 상자(옅은 톤 · 진한 색 면 · 사진 시안 모두 버림). 카드 틀 · 여백 = 다른 홈 카드와 같음.
   6차: 미국 증시 카드 — 제목 ↔ 그래프 −5 · 그래프 ↔ 요약 −5 · 요약 아래 −5.
        머리 줄 = 라벨 상자 + 점(바로 옆) … 날짜(공통 날짜 자리, 오른쪽). 라벨 ↔ 질문 6 → 16(+10).
@@ -34,12 +34,12 @@ OUT = os.path.join(HERE, "output")
 sys.path.insert(0, HERE)
 import mock_home_commentary as MC  # noqa: E402
 
-VARIANTS = {   # 11차 (11-18 사용자 확정): 가파름 1 · 안쪽 점. 횡보(회색)만 가로 +10% (62 → 68). 나머지 시안 삭제
+VARIANTS = {   # 11차: 가파름 1 · 안쪽 점. 횡보(회색)만 가로 +10% (62 → 68). 나머지 시안 삭제
     "h1": ("확정 · 가파름 1 · 안쪽 점", "연한 선(굵기 8) + 끝 안쪽 점(지름 8, 계기판 반원 위 점과 같음). 상승 · 하락 가로 62 · 횡보 71."),
 }
 
 CSS = """<style>
-/* ===== 미국 증시 카드 여백 (6차, 11-18 사용자) — 제목 ↔ 그래프 16 → 11 · 그래프 ↔ 요약 18 → 13 · 요약 아래 33 → 28 ===== */
+/* ===== 미국 증시 카드 여백 — 제목 ↔ 그래프 16 → 11 · 그래프 ↔ 요약 18 → 13 · 요약 아래 33 → 28 ===== */
 #report-card { padding-top: 11px; padding-bottom: 11px; gap: 13px; }
 
 /* ===== 배너 카드 (Hot Issue · 증시 전망) — 카드 틀 = 홈 카드 기본(.home-cards .report-col) 그대로 =====
@@ -74,7 +74,7 @@ function ibSplit(t,lead){t=String(t||'');var n=0;if(lead&&t.indexOf(lead)===0)n=
  if(!n)return '<span class="ib-rest">'+e(t)+'</span>';return '<span class="ib-em">'+e(t.slice(0,n))+'</span> <span class="ib-rest">'+e(t.slice(n).trim())+'</span>';}
 /* Hot Issue 반원 바늘 — 이슈 페이지 게이지를 줄인 그림. 왼쪽 나쁜 쪽 · 오른쪽 좋은 쪽, 뚜렷이면 끝까지 */
 function ibNet(q){var k=q.kind||'neutral',g=q.gauge||'';var s=/뚜렷/.test(g)?0.8:0.45;return k==='negative'?-s:(k==='positive'?s:0);}
-function ibGauge(q){var a=Math.PI*(1-(ibNet(q)+1)/2),x=50+29.8*Math.cos(a),y=50-29.8*Math.sin(a);   /* 바늘 길이 29.8 — 반원 안쪽 끝(36)과 여백 3 더 (7차, 11-18 사용자) */
+function ibGauge(q){var a=Math.PI*(1-(ibNet(q)+1)/2),x=50+29.8*Math.cos(a),y=50-29.8*Math.sin(a);   /* 바늘 길이 29.8 — 반원 안쪽 끝(36)과 여백 3 더 */
  return '<svg class="ib-art" viewBox="0 0 100 56" aria-hidden="true"><path d="M10 50a40 40 0 0 1 80 0" fill="none" stroke="currentColor" stroke-opacity=".3" stroke-width="8" stroke-linecap="round"/>'+
  '<path d="M10 50a40 40 0 0 1 80 0" fill="none" stroke="currentColor" stroke-width="8" stroke-linecap="round" stroke-dasharray="1 200" stroke-dashoffset="'+(-((ibNet(q)+1)/2*125.7))+'"/>'+
  '<line x1="50" y1="50" x2="'+x.toFixed(1)+'" y2="'+y.toFixed(1)+'" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><circle cx="50" cy="50" r="5" fill="currentColor"/></svg>';}
@@ -184,7 +184,7 @@ def chart_icon(v, lean):
     return f'<svg class="ib-art" viewBox="0 0 100 56" aria-hidden="true">{body}</svg>'
 
 
-# 목업 더미 — 증시 전망 세 장이 상승 · 하락 · 횡보 그림을 차례로 보이게 (11-18 사용자: "시뮬레이션으로 예시 세 개"). 제목 = hypo.json 실제 제목, 기울기만 더미.
+# 목업 더미 — 증시 전망 세 장이 상승 · 하락 · 횡보 그림을 차례로 보이게. 제목 = hypo.json 실제 제목, 기울기만 더미.
 DUMMY = [{"title": "엔비디아 실적 뒤 반도체는?", "event": "11.17 엔비디아 실적", "lean": 1, "url": "#"},
          {"title": "브로드컴 급등, 조정 올까 더 오를까?", "event": "11.12 브로드컴 급등", "lean": -1, "url": "#"},
          {"title": "기아 급락, 반등할까 더 빠질까?", "event": "11.10 기아 급락", "lean": 0, "url": "#"}]

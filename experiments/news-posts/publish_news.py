@@ -1,4 +1,4 @@
-"""Newfact 뉴스 발행기 — 뉴스 수집기 글(블로그 저장소 news-text-blog posts)을 블로그 새 글로 (2026-11-24 사용자 "그렇게 해").
+"""Newfact 뉴스 발행기 — 뉴스 수집기 글(블로그 저장소 news-text-blog posts)을 블로그 새 글로.
 
 블로그 AI 0 — 글은 수집기가 쓰고, 여기서는 읽기 · 검사 · 그리기(news_render) · 발행 · 기준일 고치기만.
 기획 = 비공개 doc/기획/뉴스-글-발행-기획.md (3절 발행기 · 2절 비교 칸), 요청 문서 = News-text-doc/요청-알파스코프-뉴스-글-발행.md.
@@ -8,7 +8,7 @@
     python experiments/news-posts/publish_news.py refresh [--draft]      # 장 마감 뒤: 아침 글의 관련 종목 표를 그날 값으로 고쳐 씀
     python experiments/news-posts/publish_news.py publish --dry --gcloud <계정>   # Blogger 없이 output/publish/ 에 HTML 만 (로컬 확인)
 
-기준일 (2026-11-24 사용자 "오전 기사는 우측에 기준일 표시하고 나가, 오후 때 기준일 다시 갱신하고 새로 고쳐"):
+기준일:
 - 관련 종목 표 = 한국 장이 끝난(15:40 KST 뒤) 마지막 날 값. 아침 글은 전 거래일 값으로 나가고, 표 제목 줄 오른쪽에 `11.23 종가 기준`.
 - refresh 가 기준일 < 글 날짜인 글을 다시 그려 같은 주소에 고쳐 쓴다(PUT 1회). 고치기 전 · 뒤 값은 records.jsonl 에 둘 다 남긴다.
 - 방문자 요청 0 — 값은 글 HTML 에 박힌다.
@@ -38,7 +38,7 @@ import news_render as NR  # noqa: E402
 KST = datetime.timezone(datetime.timedelta(hours=9))
 OUT = os.path.join(BASE, "output", "publish")
 RAW = "https://raw.githubusercontent.com/red6keep-droid/alphascope/gh-pages"
-MAX_AGE_DAYS = 0   # 오늘 날짜(한국 시간) 기사만 발행 · 고쳐 씀 — 어제 이전 기사는 내지 않는다 (2026-11-24 사용자 "Newfact 에는 오늘 날짜 기사만")
+MAX_AGE_DAYS = 0   # 오늘 날짜(한국 시간) 기사만 발행 · 고쳐 씀 — 어제 이전 기사는 내지 않는다
 GAP_LIVE, GAP_DRAFT = 600, 3   # 새 글 사이 — 공개는 10분(기획 3절, 11-20 새 글 거절 1회 사례), 초안은 짧게
 ADVICE = re.compile(r"(?:매수|매도|사|팔|담으)세요|(?:매수|매도|투자|손절)하(?:세요|십시오|라)|비중을? ?(?:늘리|줄이)(?:세요|십시오)|추천합니다|권합니다|권유합니다|지금이 기회")
 BAD_TITLE = re.compile(r"(폭망|대폭락 임박|무조건|100% 확실|확정적 상승|떡상|떡락)")   # 시황 해설 발행기와 같은 낱말
@@ -116,7 +116,7 @@ def _naver_closes(sym, days=20):
 
 
 def closes_of(sym):
-    """[(날짜, 종가)] 1년. 사슬 = 블로그 시세 규칙과 같게 (2026-11-26 사용자 "예비 2개 있다"):
+    """[(날짜, 종가)] 1년. 사슬 = 블로그 시세 규칙과 같게:
     한국 지수 · 종목 = 야후 → 네이버(최근 20일 — 빈 날짜를 메우고 다른 종가는 네이버 값으로, collect_kr._fix_last 와 같은 규칙.
     한국투자증권 대조 파일은 집 IP 실행에만 있어 여기선 없음) · 미국 = 야후 → 실패하면 price_source 예비 사슬(FRED · Polygon · Twelve Data …).
     11-26 아침 야후 코스피 · 코스닥에 11-25 가 빠져 뉴스 기준일이 11-24 로 밀렸던 것. 못 받으면 빈 목록(그 종목만 빠진다)."""
@@ -308,7 +308,7 @@ def _text(html, attr):
 
 
 def write_card(blog):
-    """홈 카드 `Newfact 주요 기사` 자료 = 오늘(한국 시간) 공개 글 전부 (2026-11-24 사용자 "홈 카드는 무조건 오늘 날짜 기사" — 7일 → 오늘)(제목 · 요약 한 줄 · 주소 · 발행 시각) → output/publish/news-posts.json.
+    """홈 카드 `Newfact 주요 기사` 자료 = 오늘(한국 시간) 공개 글 전부(제목 · 요약 한 줄 · 주소 · 발행 시각) → output/publish/news-posts.json.
     워크플로가 gh-pages news-posts.json 으로 올린다 — 방문자는 이 파일 하나만 읽는다(jsDelivr, 다른 홈 카드와 같은 방식). 자르지 않는다(화면이 5개 + 접기)."""
     import html as H
     live = blog.existing(drafts=False)
@@ -321,13 +321,13 @@ def write_card(blog):
         except ValueError:
             continue
         nd = re.search(r'data-news-date="([\d-]+)"', bp.get("content") or "")
-        if pday != today or not nd or nd.group(1) != today:   # 기사 날짜도 오늘 — 11-23 기사를 11-24 에 공개해도 홈 카드엔 안 싣는다 (2026-11-24 사용자)
+        if pday != today or not nd or nd.group(1) != today:   # 기사 날짜도 오늘 — 11-23 기사를 11-24 에 공개해도 홈 카드엔 안 싣는다
             continue
         title = re.sub(r"^" + re.escape(NR.NAME) + r"\s*:\s*", "", bp.get("title") or "")
         items.append({"slug": slug, "title": H.unescape(title), "summary": H.unescape(_text(bp.get("content"), "data-seo-lead")),
                       "url": bp.get("url"), "published": pub, "date": nd.group(1)})
     items.sort(key=lambda x: x["published"], reverse=True)
-    # recent = 최근 48시간 공개 글 + 관련 정보에 나온 한국 종목 코드 — 종목 페이지 · 한국 리포트 뉴스에 Newfact 글 줄로 (2026-11-26 사용자). 홈은 items 만 읽는다(그대로)
+    # recent = 최근 48시간 공개 글 + 관련 정보에 나온 한국 종목 코드 — 종목 페이지 · 한국 리포트 뉴스에 Newfact 글 줄로. 홈은 items 만 읽는다(그대로)
     recent, cut = [], datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(hours=48)
     for slug, bp in live.items():
         try:

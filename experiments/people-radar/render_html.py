@@ -2,7 +2,7 @@
 
 구획: 맨 앞 요약(p[data-seo-lead]) → 인물 목록(이름 · 오늘 가장 강한 발언 · 닿는 곳) → (숨김) h2 발언 + 인물별 발언 묶음 + 읽는 법 카드.
 발언 카드 = 헤드라인 → 인물 · 시각 · 출처 → 설명 → 닿는 곳(경로 → 자산 + 한 문장) → 그날 시장(D 일 등락 · 평소 대비) → 새로운가 → 다음 날짜 → 라벨.
-인물 페이지 끝의 말과 행동 · 신뢰 기록 카드는 뺐다 (2026-11-08 사용자). _collecting_card 는 90일 뒤 다시 쓸 때를 위해 남김.
+인물 페이지 끝의 말과 행동 · 신뢰 기록 카드는 뺐다. _collecting_card 는 90일 뒤 다시 쓸 때를 위해 남김.
 문체: 헤드라인 = 명사형(keep_tone), 그 밖 = 합니다체(dk.formal). 출처 · 면책 꼬리말 없음 — 블로그 공통 푸터.
 출력: output/radar_body.html · output/radar.html(미리보기) · output/title.txt · output/radar_mock.html(테마 목업, 로컬만)
 """
@@ -27,13 +27,13 @@ sys.path.insert(0, os.path.join(config.BASE_DIR, ".."))
 import design_kit as dk  # noqa: E402
 
 KST = datetime.timezone(datetime.timedelta(hours=9))
-TITLE_NAME = "주요 인물 발언"   # 2026-10-21 사용자: "트럼프 · 연준 · 월가 인물 발언"은 너무 길다 — 짧게, 제목에 날짜 없음(날짜는 본문 글자)
+TITLE_NAME = "주요 인물 발언"   #은 너무 길다 — 짧게, 제목에 날짜 없음(날짜는 본문 글자)
 SLUG_NAME = "market moving remarks"
-LABELS = ["인물 발언", "자동 리포트"]   # `미국 증시` 라벨 뗌 (2026-11-07 사용자)
+LABELS = ["인물 발언", "자동 리포트"]   # `미국 증시` 라벨 뗌
 MAX_SIGNALS_PER_PERSON = 3
 SEO_LEAD_MAX = 120
 COLLECT_SINCE = "2026-10-22"   # record_store 가 발언 · 신호를 쌓기 시작한 날 (데이터-기록-계획 A3-1 2번)
-COLLECT_OPEN = "2027-01-20"    # 90일 뒤 — 말 대 행동 · 신뢰 기록을 여는 날 (기획 9-1, 2026-10-25 사용자: 영역은 두고 "정보 수집 중")
+COLLECT_OPEN = "2027-01-20"    # 90일 뒤 — 말 대 행동 · 신뢰 기록을 여는 날
 REF_DIFF = 1.15   # 과거 참고: 발언 날 중앙값이 아무 날의 이 배수 이상일 때만 "더 움직였다", 아니면 "차이 없음" (판단 유보 규칙)
 REL_BIG = 1.5     # 그날 시장: 평소의 이 배수 이상이면 "평소의 n배" 를 쓴다
 
@@ -59,13 +59,13 @@ def korean_md(d):
 
 
 def post_title(d):
-    return TITLE_NAME   # 날짜는 제목이 아니라 본문 첫 줄 글자로 (2026-10-21 사용자). 발행 쪽 '같은 글 찾기'는 제목 대신 주소 날짜로 (publish.py)
+    return TITLE_NAME   # 날짜는 제목이 아니라 본문 첫 줄 글자로. 발행 쪽 '같은 글 찾기'는 제목 대신 주소 날짜로 (publish.py)
 
 
 GROUP_COLOR = {"policy": "#1D4ED8", "investor": "#B45309", "commentator": "#7C3AED", "ceo": "#0F766E"}   # 인물군 색 — 동그라미 배지
 PHOTOS_PATH = os.path.join(config.BASE_DIR, "ref", "people_photos.json")   # speaker → {file, license, author, page} (위키미디어 공용 자유 라이선스)
 PHOTO_BASE = "https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/people/"   # 우리 gh-pages 에 복사해 둔 사진 (핫링크 아님). 목업은 로컬 images/people
-# 사진 쓰는 인물 — 2026-10-21 공직자만 → 2026-11-08 사용자 결정으로 민간인도 위키미디어 공용 자유 라이선스 사진(fetch_photos.py). 버리 · 티미라오스는 사용자 제공 사진(manual, CC 아님 → 출처 줄 없음)
+# 사진 쓰는 인물 — 2026-10-21 공직자만 →으로 민간인도 위키미디어 공용 자유 라이선스 사진(fetch_photos.py). 버리 · 티미라오스는 사용자 제공 사진(manual, CC 아님 → 출처 줄 없음)
 PHOTO_PUBLIC = {"trump", "bessent", "lutnick", "greer", "fed", "wood", "ackman", "cramer", "musk", "altman", "huang", "burry", "timiraos"}
 REFS_PATH = os.path.join(config.BASE_DIR, "ref", "reaction_refs.json")   # 과거 참고치 (reaction_refs.py) — 인물 × 주제, 지금은 트럼프 × 무역 · 연준 × Fed 둘
 PATH_KO = {"self": "본인 글", "office": "기관 발표", "trade": "매매 공시", "report": "보도"}
@@ -105,7 +105,7 @@ def _refs():
 
 
 def _avatar(p, size=40):
-    """이름 앞 동그라미 — 얼굴 사진(2026-10-21 사용자: "조그맣게라도 얼굴을"; 운영지침 4-6 의 인물 사진 금지는 사용자 결정으로 예외, 자유 라이선스 사진만 · CC 사진 출처는 photo_credit 줄 + 이미지 title).
+    """이름 앞 동그라미 — 얼굴 사진.
     사진이 없는 인물은 성(姓) 첫 글자 · 인물군 색."""
     ph = _photos().get(p["speaker"])
     if ph:
@@ -136,7 +136,7 @@ def _card(s, cards):
 
 
 def _names(p):
-    """그 인물을 부르는 말 — 긴 것부터 (2026-10-25 사용자: 인물 페이지 안에서는 이름을 되풀이하지 않는다)."""
+    """그 인물을 부르는 말 — 긴 것부터."""
     full = p["name_ko"]
     last = full.split()[-1]
     extra = {"trump": ["트럼프 대통령", "도널드 트럼프"], "fed": ["연준", "연방준비제도", "워시 의장", "케빈 워시"], "wood": ["캐시 우드", "ARK"],
@@ -182,15 +182,15 @@ def _asset_name(sym):
 
 
 def _path_line(s, card):
-    """`테슬라(TSLA) : 장기 인도량 목표 상향, 생산 규모 · 점유율 기대 자극` (2026-10-25 사용자: 자산 이름을 앞에, 뉴스 문체).
+    """`테슬라(TSLA) : 장기 인도량 목표 상향, 생산 규모 · 점유율 기대 자극`.
     AI 구절이 없으면 `자산 : 경로 이름`."""
     pth = s.get("path")
     if not pth:
         return []
-    # 종목은 상세 페이지가 있으면 파란색 링크 · 없으면 검정, 굵게 없음 (2026-10-25 사용자). ETF · 지수 · 유가 · 환율은 검정
+    # 종목은 상세 페이지가 있으면 파란색 링크 · 없으면 검정, 굵게 없음. ETF · 지수 · 유가 · 환율은 검정
     names = " · ".join(dk.stock_link(a, _esc(_asset_name(a))) for a in pth["assets"])
     why = dk.headline((card or {}).get("path") or "")
-    if not why:   # AI 구절이 없으면 `관련 종목 : 로켓랩(RKLB)` — 옛 `로켓랩(RKLB) : 관심 경로` (2026-11-12 사용자: `○○ 경로` 말 쓰지 말 것, 이름표를 앞에)
+    if not why:   # AI 구절이 없으면 `관련 종목 : 로켓랩(RKLB)` — 옛 `로켓랩(RKLB) : 관심 경로`
         return [_sub(dk.keep_tone(f'{paths.related_label(pth["assets"])} : {names}'), "#111")]
     return [_sub(dk.keep_tone(f'{names} : {_esc(why)}'), "#111")]
 
@@ -221,7 +221,7 @@ def _novelty_line(s):
     n = s.get("novelty")
     if not n:
         return []
-    # 라벨 없이 보조 줄 글자(시각 · 출처와 같은 회색 14px) — 2026-10-25 사용자
+    # 라벨 없이 보조 줄 글자(시각 · 출처와 같은 회색 14px)
     if n.get("first30"):
         return [_sub("30일 만에 처음 나온 주제")]
     if n.get("streak", 0) >= 2:
@@ -246,7 +246,7 @@ def _signal_item(p, s, cards):
     h_html = (f'<span style="display:none;">{_esc(who_h)}</span>' if who_h else "") + _esc(rest_h)
     url = s["lead"]["url"] if (s["lead"]["url"] or "").startswith("http") else None
     who = s["lead"]["sub_speaker"].title() if p["speaker"] == "fed" and s["lead"]["sub_speaker"] not in (None, "fomc") else ""
-    meta = [kst_hm(s["first_at"])] + ([who] if who else [])   # 시각 먼저 — 종목 페이지 뉴스 `시각 · 매체 · n곳` 순서 (2026-11-07 0-6)   # 인물 이름은 뺀다 — 인물 페이지 제목과 겹친다 (2026-10-25 사용자). 연준은 연설자만
+    meta = [kst_hm(s["first_at"])] + ([who] if who else [])   # 시각 먼저 — 종목 페이지 뉴스 `시각 · 매체 · n곳` 순서 (2026-11-07 0-6)   # 인물 이름은 뺀다 — 인물 페이지 제목과 겹친다. 연준은 연설자만
     if s["source_kind"] == "primary":
         meta.append(PATH_KO.get(s["attribution"], "원문"))
     pub = (s["lead"].get("publisher") or "").strip()   # 매체명을 보이는 글자로 (2026-10-21, 운영지침 D4-3)
@@ -254,13 +254,13 @@ def _signal_item(p, s, cards):
         meta.append(pub)
     if s["n_reports"]:   # 곳 수는 맨 끝 (종목 `방송 n곳` 과 같은 자리)
         meta.append(f"보도 {s['n_reports']}곳")
-    subs = _path_line(s, c) + _novelty_line(s) + _next_line(s)   # 요약 줄(detail)은 공용 카드가 헤드라인 바로 아래 검정으로 (2026-10-25 사용자)   # 그날 시장 줄은 뺐다 (2026-10-25 사용자: 발언 효과로 오해 · 카드마다 반복 · 해석 어려움) — 값은 기록(record_store)에만 쌓아 90일 뒤 통계로
+    subs = _path_line(s, c) + _novelty_line(s) + _next_line(s)   # 요약 줄(detail)은 공용 카드가 헤드라인 바로 아래 검정으로   # 그날 시장 줄은 뺐다 — 값은 기록(record_store)에만 쌓아 90일 뒤 통계로
     if not s.get("path"):   # 닿는 곳이 없는 발언만 대상 줄 (닿는 곳이 있으면 자산 이름이 대상이다)
         targets = [x for x in s["companies"][:4]] + [config.SECTOR_KO.get(x, x) for x in s["sectors"][:2]]
         if targets:
             subs.append(_sub("대상 : " + _esc(" · ".join(targets))))
-    pills = [dk.pill(dk.ISSUE_KO.get(s.get("issue") or "OTHER", "그 밖"), bare=True), _dir_pill(s["direction"]), dk.pill(f"강도 {s['intensity']}", bare=True)]   # 분야 라벨 = 기록 이슈 코드 이름 (2026-11-07 사용자 P339, 옛: 인물 주제)
-    # 누르면 요약 팝업 — 종목 페이지 인물 발언(people_section)과 같은 재료 · 같은 팝업 (2026-11-15 사용자: 인물 발언 목록만 원문으로 바로 넘어가던 것).
+    pills = [dk.pill(dk.ISSUE_KO.get(s.get("issue") or "OTHER", "그 밖"), bare=True), _dir_pill(s["direction"]), dk.pill(f"강도 {s['intensity']}", bare=True)]   # 분야 라벨 = 기록 이슈 코드 이름
+    # 누르면 요약 팝업 — 종목 페이지 인물 발언(people_section)과 같은 재료 · 같은 팝업.
     # 한 줄(요약만)이면 싣지 않는다 — 뉴스와 같은 규칙(11-10). 수집 · 기록은 그대로.
     import stock_mentions
     lines = stock_mentions._pop_lines(s, c)
@@ -269,7 +269,7 @@ def _signal_item(p, s, cards):
     pid = dk.news_pop_id("rp", s["lead"]["id"])
     src = pub if pub and pub != "googlenews" and s["source_kind"] != "primary" else ""
     body = dk.news_pop_body(pid, h, lines, source=src, kind="발언", url=url)   # 원문은 팝업 안 작은 `원문 보기 (매체)` 링크로만
-    # 공용 뉴스 카드 (design_kit.news_item) — 라벨 줄 오른쪽에 시각 · 출처 · 보도 수 (2026-10-25 사용자)
+    # 공용 뉴스 카드 (design_kit.news_item) — 라벨 줄 오른쪽에 시각 · 출처 · 보도 수
     # 팝업 표시는 li 에 단다(_pop_li) — 홈 인물 발언 카드(index.html radarRows)가 li 첫 칸을 헤드라인으로 읽으므로 감싸지 않는다
     return f"<!--pop:{pid}-->" + dk.news_item(h_html, url, detail, subs, " ".join(pills), meta) + body
 
@@ -285,7 +285,7 @@ def _pop_li(html):
 # ── 구획 ────────────────────────────────────────────────────────────────
 
 def sec_seo_lead(r, d, cards):
-    """글 맨 앞 한 줄 = 작은 회색 안내(ⓘ) `날짜 기준 최근 24시간 시장 발언 n건 · n명` (2026-11-08 사용자: `가장 강한 발언` 줄 삭제, 작은 글씨 + 아이콘)."""
+    """글 맨 앞 한 줄 = 작은 회색 안내(ⓘ) `날짜 기준 최근 24시간 시장 발언 n건 · n명`."""
     _, m, dd = d.split("-")
     line = f"{int(m)}월 {int(dd)}일 기준 최근 24시간 시장 발언 {r['event_count']}건 · {r['people_count']}명"
     if r.get("only_reports"):
@@ -294,7 +294,7 @@ def sec_seo_lead(r, d, cards):
 
 
 def _collecting_card():
-    """말 대 행동 · 신뢰 기록 — 영역은 두고 "정보 수집 중" (2026-10-25 사용자). 90일 뒤 record_store 기록으로 채운다."""
+    """말 대 행동 · 신뢰 기록 — 영역은 두고 "정보 수집 중". 90일 뒤 record_store 기록으로 채운다."""
     sub = (f"{korean_date(COLLECT_SINCE)}부터 발언과 그 뒤 행동(행정명령 · 관세 발효 · 매매 · 실적 발표)을 기록하고 있습니다. "
            f"90일이 쌓이는 {korean_date(COLLECT_OPEN)} 뒤에 이 자리에서 보여 드립니다.")
     return dk.state_card("말과 행동 · 신뢰 기록", kind="neutral", right_html=dk.pill("정보 수집 중", "neutral", bare=True), sub_html=_esc(sub))
@@ -311,7 +311,7 @@ def sec_people(r, cards):
         shown, more = items[:MAX_SIGNALS_PER_PERSON], items[MAX_SIGNALS_PER_PERSON:]
         page = [dk.sub_label(f"{p['name_ko']} ({p['title_ko']})"), dk.item_rules(shown, indent=dk.ALIGN_PX)]
         if more:
-            # 펼친 목록의 첫 기사 위에도 구분선 (2026-10-21 사용자: 기사 영역은 더 보기를 펼쳐도 선이 이어져야 한다)
+            # 펼친 목록의 첫 기사 위에도 구분선
             ml = dk.item_rules(more, indent=dk.ALIGN_PX).replace(f"padding:2px {dk.ALIGN_PX}px ", f"padding:{dk.RULE_GAP - dk.NEWS_VP}px {dk.ALIGN_PX}px ", 1).replace("line-height:" + dk.LH_BODY + ";", "line-height:" + dk.LH_BODY + ";box-shadow:inset 0 1px 0 #E2E8F0;", 1)
             page.append(dk.fold(f"{p['name_ko']} 발언 {len(more)}건 더 보기", ml).replace("margin-top:8px;margin-bottom:8px;", "margin:0 0 8px;", 1))
         out.append(f'<div data-person-page="{p["speaker"]}">{_pop_li("".join(page))}</div>')
@@ -341,7 +341,7 @@ def _list_row(p, cards, first):
 
 
 def sec_summary_cards(r):
-    """맨 위 질문 카드 3개 — 미국 증시 리포트 `인물 발언` 탭 맨 위와 같은 카드 (2026-11-08 사용자: "주요 인물 발언에도 동일하게").
+    """맨 위 질문 카드 3개 — 미국 증시 리포트 `인물 발언` 탭 맨 위와 같은 카드.
     셈 = stock_mentions.summary(오늘 레이더), 모양 = people_section.summary_card + daily-report/cards.question_card. 파이썬 셈만, AI 없음.
     목록과 같은 부모 아래 두므로 인물을 누르면 테마 JS 가 목록과 함께 숨긴다. 실패하면 카드 없이 (글은 그대로)."""
     try:
@@ -365,7 +365,7 @@ def sec_people_list(r, cards):
 
 
 def _ref_text(sp, prof, refs):
-    """과거 참고 — 참고치가 있는 인물 × 주제면 한 줄, 없으면 "정보 수집 중" (영역 유지, 2026-10-25 사용자)."""
+    """과거 참고 — 참고치가 있는 인물 × 주제면 한 줄, 없으면 "정보 수집 중"."""
     have = refs.get(sp) or {}
     topic = next((t["name"] for t in prof["topics"] if t["name"] in have), None)
     if not topic:
@@ -411,7 +411,7 @@ def _person_cards(r):
 
 def sec_person_head(r):
     """인물 페이지 맨 위 (테마 JS 가 이름 제목 아래로 옮긴다, data-person-strip 이름은 테마 JS 호환용) = 요약 강조 카드(오늘 · 7일 이슈 · 7일 종목)
-    + 일정이 있으면 `다음 일정은?` 카드. 옛 `이 사람 말 읽는 법` 카드(발언 경로 · 과거 참고 · 다음 날짜)는 뺐다 — 안내 · `정보 수집 중` 빈 답이 대부분 (2026-11-11 사용자).
+    + 일정이 있으면 `다음 일정은?` 카드. 옛 `이 사람 말 읽는 법` 카드(발언 경로 · 과거 참고 · 다음 날짜)는 뺐다 — 안내 · `정보 수집 중` 빈 답이 대부분.
     발언이 모두 보도(언론이 옮긴 말)인 인물은 7일 이슈 카드 안내 줄에 한 줄. 과거 참고 계산(_ref_text)은 90일 기록이 쌓이면 다시 쓴다."""
     out = []
     pc = _person_cards(r)
@@ -433,15 +433,15 @@ def build_body(r, n, d):
     body = "\n".join([
         dk.WRAP_OPEN,
         sec_seo_lead(r, d, cards),
-        sec_summary_cards(r),   # 맨 위 질문 카드 (미국 증시 리포트 인물 발언 탭과 같게, 2026-11-08 사용자)
+        sec_summary_cards(r),   # 맨 위 질문 카드
         sec_people_list(r, cards),
         dk.h2("발언", line=True).replace("<h2 ", '<h2 data-person-pages="1" ', 1),   # 홈 카드가 읽는 구획 제목 — 화면에서는 JS 가 숨긴다
         sec_people(r, cards),
         sec_person_head(r),
-        dk.related_buttons(dk.report_links("us", "kr", "forecast", "us_top")),   # 함께 보는 페이지 — 모든 리포트 공통 (2026-11-09 사용자)
+        dk.related_buttons(dk.report_links("us", "kr", "forecast", "us_top")),   # 함께 보는 페이지 — 모든 리포트 공통
         dk.WRAP_CLOSE,
     ])
-    return dk.fix_colons(dk.formal(dk.align_titles(body)))   # 카드 밖 구획 제목은 좌측 기준선(ALIGN_PX) (2026-10-23 사용자)
+    return dk.fix_colons(dk.formal(dk.align_titles(body)))   # 카드 밖 구획 제목은 좌측 기준선(ALIGN_PX)
 
 
 def render(radar_path=None, narrative_path=None, output_dir=None):
@@ -458,7 +458,7 @@ def render(radar_path=None, narrative_path=None, output_dir=None):
         return None
     d = today_kst()
     title = post_title(d)
-    body = build_body(r, n, d)   # 글 끝 "AI 서술" 줄 없음 — 공통 푸터의 AI 고지와 중복 (2026-10-25 사용자)
+    body = build_body(r, n, d)   # 글 끝 "AI 서술" 줄 없음 — 공통 푸터의 AI 고지와 중복
     body_path = os.path.join(output_dir, "radar_body.html")
     with open(body_path, "w", encoding="utf-8") as f:
         f.write(body)

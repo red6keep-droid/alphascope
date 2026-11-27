@@ -66,7 +66,7 @@ def main():
         narrate.narrate()
     print("[6/7] 렌더"); render_html.render()
     print("[7/7] 게시" + ("" if a.publish else " — dry-run")); publish.publish(do_publish=a.publish)
-    import stock_mentions   # 종목 페이지 · 미국 증시 리포트용 발언 (2026-11-07 사용자 P324) — 게시 뒤(그 글 주소를 `○○ 발언 더 보기` 에 쓴다, P371). 상태 폴더 → radar-state
+    import stock_mentions   # 종목 페이지 · 미국 증시 리포트용 발언 — 게시 뒤(그 글 주소를 `○○ 발언 더 보기` 에 쓴다, P371). 상태 폴더 → radar-state
     stock_mentions.update(os.path.join(config.OUTPUT_DIR, "radar.json"), narrative_path, os.path.join(a.state, "people_mentions.json") if a.state else stock_mentions.OUT,
                           post_url_path=os.path.join(config.OUTPUT_DIR, "post_url.txt") if a.publish else None)
 
@@ -77,7 +77,7 @@ def _madmoney_ids(radar):
 
 
 def madmoney_update(conn, a, state_file):
-    """매드머니 갱신 (2026-11-20 사용자: 그날 회차는 그날 글에). 매드머니는 KST 09:30 ~ 10:30 에 유튜브에 올라와 08:00 아침 글엔 없다.
+    """매드머니 갱신. 매드머니는 KST 09:30 ~ 10:30 에 유튜브에 올라와 08:00 아침 글엔 없다.
     방송 분배(media-daily)가 기록하면 여기서 그 줄만 받아 **아침 글과 같은 기준 시각**으로 다시 집계 → 새 카드만 서술 → 같은 글 고쳐 쓰기.
     구글 뉴스 · 인용 추출 · 분류 AI 는 부르지 않는다. 아침 상태(radar.json · narrative.json)가 없거나, 그날 회차가 없거나, 이미 실렸으면 그대로 끝낸다."""
     sd = a.state or config.OUTPUT_DIR

@@ -50,13 +50,13 @@ TABLE = {
                       direction={"오르는 중": UP, "내리는 중": DOWN, "늘고 있음": UP, "줄고 있음": DOWN}),
     "biz_money": dict(name="{biz} 업계 수익성", tab="업계상황", card="{biz} 업계 수익성은?", horizon=QUARTER, family=INDUSTRY,
                       direction={"나아짐": UP, "나빠짐": DOWN}),
-    "sector_flow": dict(name="{sector} 업계 자금", tab="업계상황", card="{sector} 업계 자금 흐름은?", horizon=DAYS, family=FLOW,   # 옛 `○○ 업종으로 돈이 올까?` (2026-11-01 사용자 P198) — 한국은 `반도체 업계 경기는?` 도 `반도체` 로 시작해 제목 전체로 찾는다
+    "sector_flow": dict(name="{sector} 업계 자금", tab="업계상황", card="{sector} 업계 자금 흐름은?", horizon=DAYS, family=FLOW,   # 옛 `○○ 업종으로 돈이 올까?` — 한국은 `반도체 업계 경기는?` 도 `반도체` 로 시작해 제목 전체로 찾는다
                         direction={"모이는 중": UP, "빠져나가는 중": DOWN}),
-    "regime":    dict(name="{mkt} 증시 분위기", tab="오늘", card="{mkt} 증시 분위기는?", horizon=DAYS, family=MARKET,   # 종목이 아닌 시장 — 옛 `시장 분위기는?` (2026-11-01 사용자 P214: 한국 · 미국)
+    "regime":    dict(name="{mkt} 증시 분위기", tab="오늘", card="{mkt} 증시 분위기는?", horizon=DAYS, family=MARKET,   # 종목이 아닌 시장 — 옛 `시장 분위기는?`
                       direction={"상승 추세": UP, "조정장": DOWN}),
     "shock":     dict(name="시장 충격 국면", tab="오늘", card="시장 충격 국면은?", horizon=DAYS, family=MARKET,
                       direction={"충격 국면 중": DOWN}),
-    # 전망 카드에 더한 분류 (2026-11-01 사용자 P218) — 뉴스 · 방송 = 최근 7일 이 종목 기사 · 방송의 긍정 / 부정 건수, 의견 = 바깥 의견 그대로
+    # 전망 카드에 더한 분류 — 뉴스 · 방송 = 최근 7일 이 종목 기사 · 방송의 긍정 / 부정 건수, 의견 = 바깥 의견 그대로
     "news":      dict(name="뉴스 · 방송 분위기", tab="오늘", card="뉴스", horizon=DAYS, family=NEWS,
                       direction={"긍정 많음": UP, "부정 많음": DOWN}),
     "analysts":  dict(name="애널리스트 의견", tab="매수의견", card="애널리스트 의견은?", horizon=MONTH, family=OUTSIDE,
@@ -69,8 +69,8 @@ TABLE = {
                       direction={"긍정": UP, "부정": DOWN}),
 }
 
-# 전망 카드 분류 제목 — 줄을 이 묶음으로 나눠 놓는다 (2026-11-01 사용자 P210 · P218: "알파스코프가 체계적으로 보이게"). 이름 · 순서는 Claude
-# 2026-11-03 사용자 결정 (알파스코프-신호-재설계.md 3-1 · 3-3): 단기(며칠) · 중기(한 달~분기) 두 답, 업계 현황은 세지 않는 배경
+# 전망 카드 분류 제목 — 줄을 이 묶음으로 나눠 놓는다. 이름 · 순서는 Claude
+# (알파스코프-신호-재설계.md 3-1 · 3-3): 단기(며칠) · 중기(한 달~분기) 두 답, 업계 현황은 세지 않는 배경
 SHORT = [("주가 흐름", ("tech", "overheat")),
          ("자금 흐름", ("sector_flow",)),
          ("증시", ("regime", "shock", "pairs")),

@@ -47,7 +47,7 @@ def _bars(symbols):
             continue
         out[s] = [{"day": i.strftime("%Y-%m-%d"), "open": float(r["Open"]) if r["Open"] == r["Open"] else None, "high": float(r["High"]), "low": float(r["Low"]), "close": float(r["Close"]),
                    "adj": float(r["Adj Close"]), "volume": float(r["Volume"] or 0)} for i, r in sub.iterrows()]
-    # 늦은 봉도 예비로 (2026-11-12 사용자 "예비는 왜 안 도나") — 야후는 막을 때 빈 표만이 아니라 마지막 날이 빠진 표도 준다.
+    # 늦은 봉도 예비로 — 야후는 막을 때 빈 표만이 아니라 마지막 날이 빠진 표도 준다.
     # 다수결 마지막 날보다 늦은 종목은 예비 사슬에서 빠진 날만 받아 붙인다 (조정 종가 adj 는 예비에 없어 종가로)
     from collections import Counter
     days = Counter(v[-1]["day"] for v in out.values() if v)
@@ -65,7 +65,7 @@ def _bars(symbols):
             if fb:
                 v += [{"day": b["day"], "open": b["open"], "high": b["high"], "low": b["low"], "close": b["close"], "adj": b.get("adj", b["close"]), "volume": float(b["volume"] or 0)} for b in fb]
                 print(f"[collect] {s}: 늦은 봉 {len(fb)}일 {src}로 채움")
-            else:   # 조용히 넘어가지 않기 — 무엇이 왜 못 받았나 (2026-11-22 사용자)
+            else:   # 조용히 넘어가지 않기 — 무엇이 왜 못 받았나
                 print(f"::warning::[collect] {s}: 늦은 봉 못 채움 ({v[-1]['day']}까지) — 야후 한 종목 다시 빈 값 · {' · '.join(why) or '예비 공급자 없음'}")
     return out
 
@@ -107,7 +107,7 @@ def _earnings(s):
         t = t.tz_convert(NY) if t.tzinfo else t.tz_localize(NY)
         out.append({"day": t.strftime("%Y-%m-%d"), "when": "bmo" if t.hour < 12 else "amc"})
     # 회사 캘린더(Ticker.calendar) 날짜를 먼저 믿는다 — earnings_dates 의 미래 추정일은 하루씩 어긋난다(엔비디아 11-17 vs 11-18).
-    # 엔비디아 리포트 collect_calendar 와 같은 규칙, 모든 종목으로 (2026-11-01 사용자)
+    # 엔비디아 리포트 collect_calendar 와 같은 규칙, 모든 종목으로
     try:
         ds = (yf.Ticker(s).calendar or {}).get("Earnings Date") or []
         cal = min(str(d)[:10] for d in ds) if ds else None
@@ -124,7 +124,7 @@ def _earnings(s):
 def run():
     syms = [c[0] for c in U.CANDIDATES]
     extra = sorted({U.BENCH, "^VIX", "SMH", *SECTOR_ETFS})
-    peers = sorted({p for v in U.PEERS.values() for p in v} - set(syms))   # 함께 보는 회사 중 64종목 밖 — `함께 움직이는 종목은?` 오늘 등락 (2026-11-01 사용자 P263). 페이지는 만들지 않는다
+    peers = sorted({p for v in U.PEERS.values() for p in v} - set(syms))   # 함께 보는 회사 중 64종목 밖 — `함께 움직이는 종목은?` 오늘 등락. 페이지는 만들지 않는다
     etfs = sorted((set(etf_universe.US_SYMS) | set(taxonomy.RECORD_SUBS)) - set(syms) - set(extra) - set(peers))   # 세부 업종 ETF(2026-11-20 돈의 흐름 기록, 페이지 없음)도 같은 묶음 요청에 · 맨 뒤 — 늦은 봉 예비(15개) 자리를 종목이 먼저 쓰게
     try:   # ETF 비중 1위 종목 — ETF 페이지 `함께 움직이는 종목은?` 비교 선 (2026-11-14, 같은 묶음 요청에 얹음 · 페이지는 만들지 않는다)
         with open(os.path.join(BASE, "data", "etf_fund.json"), encoding="utf-8") as f:
@@ -135,7 +135,7 @@ def run():
     except (OSError, ValueError, KeyError, IndexError, TypeError):
         pass
     bars = _bars(syms + extra + peers + etfs)
-    # 시총 · 실적일은 바뀌는 주기에 맞춰서만 (detail_cache, 2026-11-12 사용자) — 시총 = 새 거래일마다, 실적일 = 주 1회 · 발표 14일 안이면 매일 · 발표 지난 뒤 처음.
+    # 시총 · 실적일은 바뀌는 주기에 맞춰서만 — 시총 = 새 거래일마다, 실적일 = 주 1회 · 발표 14일 안이면 매일 · 발표 지난 뒤 처음.
     # 하루 네 번 실행이 같은 날 값을 다시 받던 것 (64종목 × 2 × 4)
     import detail_cache as DC
     cache = DC.shared(os.path.join(BASE, "data"))

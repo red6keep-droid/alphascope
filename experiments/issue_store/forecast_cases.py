@@ -1,4 +1,4 @@
-"""증시 전망 — 경우의 수 목업 (2026-11-07 사용자: "A 거시 · B 섹터 · C 개별 종목, 단일 · 겹침 · 맞음 · 틀림 · 이어가기까지 모든 시나리오를 탭으로").
+"""증시 전망 — 경우의 수 목업.
 
     python experiments/issue_store/forecast_cases.py   → output/mock_forecast-cases.html (목업 서버 '증시 전망' 줄)
 
@@ -54,7 +54,7 @@ def path(keys, n, wig=0.0):
 # ---------------------------------------------------------------- 대상 셋 (A 거시 · B 업종 · C 종목)
 TIERS = {
     "A": {"name": "거시", "subject": "S&P 500", "subj_ga": "S&P 500 이", "subj_eun": "S&P 500 은", "cmp": None, "unit": "%", "line": 4.0,
-          # 기본 사례 = 물가 발표(CPI) — 결과를 미리 모르는 사건 (2026-11-08 사용자: FOMC 는 거의 다 선반영이라 기본 화면 예시가 아니다 → 상황 13 으로)
+          # 기본 사례 = 물가 발표(CPI) — 결과를 미리 모르는 사건
           "ruler_short": "S&P 500 수익률", "event": "12.10 물가 발표(CPI)", "event_short": "물가 발표", "event_day": "2026-12-10", "registered": "2026-12-07",
           "outcomes": ["예상보다 낮음", "예상보다 높음"], "conds": ["물가가 예상보다 낮으면", "물가가 예상보다 높으면"], "dirs": [1, -1],
           "middle": ["금리 인하 기대가 커짐", "금리 인하가 늦어질 거란 걱정"], "tags": ["물가", "S&P 500"], "vix": True,
@@ -89,7 +89,7 @@ TIERS = {
 }
 
 
-# 업종 기본 사례 = OPEC+ 회의 → 에너지 업종 (P460, 2026-11-08 사용자: B 업종 · C 종목이 같은 엔비디아 실적 질문이라 다른 일정 사건으로 — Claude 선택).
+# 업종 기본 사례 = OPEC+ 회의 → 에너지 업종.
 # 업종 질문 = 업종 전체에 걸린 일정 사건, 종목 질문 = 그 회사 실적. 옛 반도체 B(엔비디아 실적)는 SEMI_B 로 남겨 파급(시장 → 업종 → 종목) 탭에서 쓴다 — 종목(엔비디아 vs 반도체)과 층이 이어져야 해서.
 # 숫자는 가상 — 실측 전 (alike 의 회의 이름은 실제, 그 뒤 %p 는 가상)
 SEMI_B = TIERS["B"]
@@ -179,7 +179,7 @@ def after_fc(t, no, gap, registered, shock_day, base_day, pick=1, title_event=No
            "chain": [{"step": f"{H.SHOCK[s]} 뒤 {L / 3:.0f}{u} 더 {more}", "state": "wait", "ev": "", "date": ""},
                      {"step": f"{H.SHOCK[s]} 뒤 {L:g}{u} 더 {more}", "state": "wait", "ev": "", "date": ""}],
            "win": f'{T["subj_ga"]} {H.SHOCK[s]} 뒤 {L:g}{u} 더 {"오른다" if s > 0 else "빠진다"}'}]
-    # 우리 전망 = 같은 종류 기록 비율만 (2026-11-10 사용자: 뉴스 유무 10%p 가중 폐지). hist_after 20거래일 줄의 "오른 횟수" 가 반등(급락 뒤) 또는 지속(급등 뒤)의 횟수
+    # 우리 전망 = 같은 종류 기록 비율만. hist_after 20거래일 줄의 "오른 횟수" 가 반등(급락 뒤) 또는 지속(급등 뒤)의 횟수
     h = T.get("hist_after")
     strong = None
     if h and len(h["rows"][1]) == 3:
@@ -455,11 +455,11 @@ def case_cascade(t):
     return expl, pages
 
 
-# ---------------------------------------------------------------- 상황 13 선반영 · 14 느린 누적 (2026-11-07 사용자: 뻔한 결과는 먼저 반영되고, 하루 1%씩 쌓이는 하락은 하루 기준에 안 걸린다)
+# ---------------------------------------------------------------- 상황 13 선반영 · 14 느린 누적
 def case_priced(t):
     """뻔한 결과 — 시장 확률 ≥ 70% 사흘 + 뉴스 묶음 집중 → 감지일에 등록(결과 10거래일 전). 감지일 종가부터 선반영을 재고, 결과일 종가에서 자를 다시 놓는다.
     예상대로 쪽 갈래 = `이미 반영`(priced): 결과 뒤 기준 넘게 더 가면 틀림, 반대로 가거나 20거래일 기준 안이면 맞음."""
-    if t == "A":   # 거시 선반영 사례 = FOMC (시장이 결과를 거의 아는 사건, 실측 기록 — 2026-11-08 사용자)
+    if t == "A":   # 거시 선반영 사례 = FOMC
         T = dict(TIERS[t], **FOMC_A, market_prob={"probs": [82, 18], "src": "CME FedWatch · Kalshi, 감지일"})
     else:
         T = dict(TIERS[t], market_prob={"probs": [82, 18], "src": "회의 전 보도 · 산유국 장관 발언 집계, 감지일" if t == "B" else "예상치 상향 비율 · 옵션 예상 폭, 감지일"},
@@ -537,7 +537,7 @@ def case_slow(t):
     return expl, [("전망 페이지 (느린 누적 → 지속 우세)", H.forecast_body({"id": f"EH-{t}-slow"}, st, fc, others=[], op=op_for(t, fc, st, extra=extra)))]
 
 
-# ---------------------------------------------------------------- 앞으로 올 수 있는 일 — 경고 · 대비 카드 (2026-11-07 사용자: 묘사가 아니라 "이렇게 되면 이런 일이 올 수 있으니 미리 생각해 두자"). 숫자는 가상
+# ---------------------------------------------------------------- 앞으로 올 수 있는 일 — 경고 · 대비 카드. 숫자는 가상
 def prepare_for(t, fc, st, mood):
     """사건 × 지금 분위기 × 기록 → 조건부 경고 둘셋 + 볼 것 + 사슬 한 줄. 결과가 이미 난 전망은 ‘다음에 올 수 있는 일’(세부 전망 · 사슬 다음 고리)."""
     T, L, u = TIERS[t], TIERS[t]["line"], TIERS[t]["unit"]
@@ -606,7 +606,7 @@ def case_dday(t):
     return expl, [("전망 페이지 (D-day 열흘 전 · 경고)", H.forecast_body({"id": f"EH-{t}-dday"}, st, fc, others=[], op=op_for(tt, fc, st, extra=extra)))]
 
 
-# ---------------------------------------------------------------- 지도 13-5 순서대로: ① 한국은 어떻게? ② 보류 · 무효 ③ 번복 · 연속 (2026-11-07 사용자 "순서대로 넣어줘")
+# ---------------------------------------------------------------- 지도 13-5 순서대로: ① 한국은 어떻게? ② 보류 · 무효 ③ 번복 · 연속
 def korea_for(t, fc=None):
     """미국 사건 → 한국 다음 날. 비율 · 배수는 2016~ 실측(hypo_pages 머리말), 그 밖은 가상."""
     if t == "A":
@@ -752,7 +752,7 @@ def case(t, k):
         fc.setdefault("korea", korea_for(t))
         return H.forecast_body({"id": f"EH-{t}", "forecasts": [fc]}, st, fc, others=oth if oth is not None else others, op=op or op_for(t, fc, st))
 
-    if k == "19":   # 겹침이 쌓일 때 (2026-11-08 사용자 · Claude 제안): 세부 전망은 처음 전망 아래 둘까지, 셋째부터 표시만, 셋 이상이면 성적표 따로
+    if k == "19":   # 겹침이 쌓일 때: 세부 전망은 처음 전망 아래 둘까지, 셋째부터 표시만, 셋 이상이면 성적표 따로
         rel = path([(0, 0), (6, L * 0.3), (12, L * 0.55), (18, L * 0.6)], 24, wig=L * 0.06)
         dd = days[:24]
         fc = pre_fc(t, cond=1)
@@ -824,14 +824,14 @@ def case(t, k):
                {"releases": ["고용 보고서"], "rate10": 0.16, "hy": 0.12, "news": ("경기 걱정", "나쁜 이야기가 많았습니다")}, {"news": ("유가 상승" if t == "B" else "AI 투자", "좋은 이야기가 많았습니다")}]
         for i, e in enumerate(st["log"][1:]):   # 가상 — 날마다 오늘 나온 것 (기획 9-2)
             e["today"] = H.today_line(sim[i % len(sim)])
-        if k == "4":   # 틀림의 가치 — 어디서 끊겼나 (2026-11-07 사용자)
+        if k == "4":   # 틀림의 가치 — 어디서 끊겼나
             a = fc["scenarios"][0]
             a["chain"][1].update(state="broken", ev={"A": "10년 금리가 내리지 않고 0.18%p 올랐음 (근원 물가는 높았음)", "B": "유가가 오르지 않고 내림 (수요 둔화 걱정이 뉴스 1위)", "C": "데이터센터 매출은 넘었지만 마진 하락이 뉴스 1위"}[t])
             a["chain"][2].update(state="broken", ev="반대로 움직임")
             fork = {"A": ("전체 물가만 낮으면 잠깐 / 근원 물가까지 낮으면 이어짐", "전체 물가만 낮은 쪽 — 근원 물가가 높아 금리가 다시 올랐습니다"),
                     "B": ("회원국이 감산을 지키면 유가 상승 / 초과 생산이 이어지면 효과 약함", "초과 생산 쪽 — 몇몇 회원국이 정한 양보다 더 생산한다는 보도로 감산 효과가 의심받았습니다"),
                     "C": ("업계 전체 수요 이야기면 업종 동반 / 한 회사 이야기면 경쟁사는 반대", "기대가 이미 가격에 있던 쪽 — 넘었지만 ‘충분히 넘지 못했다’ 로 읽혔습니다")}[t]
-            # 왜 끊겼는지만 (2026-11-12 사용자: 안내글이 너무 많다 — `고치지 않고 그대로 두며` 첫 문장 · `대리 지표로 코드가 매김` · 갈림 사전 메모 · `등록 때 경고` · `다음` 줄 삭제)
+            # 왜 끊겼는지만
             fc["broke"] = {"lead": f'‘{a["chain"][1]["step"]}’ 고리에서 끊겼습니다.',
                            "items": [("실제로는", a["chain"][1]["ev"], ""),
                                      ("왜", fork[1].split(" — ")[-1], "")]}
@@ -929,7 +929,7 @@ TAB_CSS = """
 .fc-sub{font-size:15px;line-height:23px;font-weight:700;color:#64748B;margin:28px 0 10px;padding:6px 0 0;border-top:2px dashed #CBD5E1;}
 .fc-terms{border:1px solid #E2E8F0;border-radius:8px;padding:0 14px;margin:0 0 16px;font-size:15px;line-height:25px;}
 .fc-terms summary{padding:10px 0;font-weight:700;cursor:pointer;} .fc-terms .body{padding:0 0 12px;}
-/* 설명 보기 버튼(제목 옆) — 누르기 전엔 용어 · 경우 설명 · 운영자 확인용 상자를 숨긴다 (2026-11-07 사용자) */
+/* 설명 보기 버튼(제목 옆) — 누르기 전엔 용어 · 경우 설명 · 운영자 확인용 상자를 숨긴다 */
 body:not(.fc-help-on) .fc-terms, body:not(.fc-help-on) .fc-ex, body:not(.fc-help-on) [data-op]{display:none;}
 .post-title{display:flex;align-items:center;gap:8px;}
 #fc-help{display:inline-flex;flex:none;align-items:center;justify-content:center;width:31px;height:31px;box-sizing:border-box;margin-left:4px;padding:0;border:1px solid #E2E8F0;border-radius:7px;background:#fff;color:#111;cursor:pointer;}
@@ -1005,7 +1005,7 @@ def build():
                   + '<button type="button" class="fc-fold" onclick="this.closest(\'details\').removeAttribute(\'open\')">접기</button></div></details>')
             if len(pages) == 1:
                 body = pages[0][1]
-            else:   # 블로그 페이지가 여럿이면 하위 탭 — 한 번에 한 페이지 = 한 화면에 타임라인 하나 (P451, 2026-11-08 사용자)
+            else:   # 블로그 페이지가 여럿이면 하위 탭 — 한 번에 한 페이지 = 한 화면에 타임라인 하나
                 on = next((i for i, (nm, _) in enumerate(pages) if nm.endswith("*")), 0)
                 body = ('<div class="fc-subtabs">' + "".join(f'<button type="button" class="sub{" on" if i == on else ""}" data-s="{i}">{dk.esc(nm.rstrip("*"))}</button>' for i, (nm, _) in enumerate(pages)) + '</div>'
                         + "".join(f'<div data-sp="{i}"{"" if i == on else " hidden"}>{h}</div>' for i, (_, h) in enumerate(pages)))
@@ -1020,7 +1020,7 @@ def build():
           "var ti=document.querySelector('.post-title');if(ti){var hb=document.createElement('button');hb.type='button';hb.id='fc-help';hb.setAttribute('aria-label','설명 보기');hb.setAttribute('aria-pressed','false');hb.innerHTML='<svg viewBox=\"0 0 18 18\" width=\"18\" height=\"18\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" aria-hidden=\"true\"><circle cx=\"9\" cy=\"9\" r=\"7.5\"/><path d=\"M9 8v5\"/><path d=\"M9 5.2v.1\"/></svg>';hb.addEventListener('click',function(){var on=document.body.classList.toggle('fc-help-on');hb.setAttribute('aria-pressed',on?'true':'false');});ti.appendChild(hb);}"
           "document.querySelectorAll('.fc-subtabs button.sub').forEach(function(b){b.addEventListener('click',function(){var w=b.closest('[data-pane]');w.querySelectorAll('.fc-subtabs button.sub').forEach(function(x){x.classList.toggle('on',x===b);});w.querySelectorAll('[data-sp]').forEach(function(p){p.hidden=p.dataset.sp!==b.dataset.s;});});});"
           "document.querySelectorAll('#fc-tabs button.tab').forEach(function(b){b.addEventListener('click',function(){if(b.dataset.t)t=b.dataset.t;if(b.dataset.k)k=b.dataset.k;show();window.scrollTo(0,0);});});show();})();</script>")
-    body, rel = _strip_related("".join(panes))   # 탭마다 든 `함께 보는 페이지` 를 하나만 — 테마가 숨은 탭 것까지 글 끝으로 옮겨 수십 번 겹쳤다 (2026-11-11 사용자)
+    body, rel = _strip_related("".join(panes))   # 탭마다 든 `함께 보는 페이지` 를 하나만 — 테마가 숨은 탭 것까지 글 끝으로 옮겨 수십 번 겹쳤다
     return TAB_CSS + tabs + terms + body + rel + js
 
 
@@ -1029,7 +1029,7 @@ TYPICAL_DONE = 12                    # 끝난 전망 1년 치 안팎(연 15~25�
 
 
 def build_list(typical=False):
-    """목록 페이지 목업 — 상황 탭(A · B · C × 1~19)에서 그린 전망을 전부 모아 한 목록으로 (2026-11-08 사용자: "리스트 페이지에 다 적용").
+    """목록 페이지 목업 — 상황 탭(A · B · C × 1~19)에서 그린 전망을 전부 모아 한 목록으로.
     지켜보는 중 = 카드, 판정 난 것 = `끝난 전망` 표. 같은 제목 · 같은 상태는 하나만. 줄을 누르면 그 상황 탭으로. 성적표 숫자는 모은 것으로 센다."""
     seen, opened, done, states = set(), [], [], {}
     real = H.forecast_body
@@ -1079,7 +1079,7 @@ def build_list(typical=False):
     return _re.sub(rf"{_re.escape(H.BLOG)}p/LINK-([ABC]\d+)\.html", r"mock_forecast-cases.html#\1", html)
 
 
-# ---------------------------------------------------------------- 표본 근거 (2026-11-11 사용자: 경우의 수 18가지에도 `관련 주식 정보` · 향방미정 · 날마다 근거 줄 · 기사 팝업)
+# ---------------------------------------------------------------- 표본 근거
 # 사례 자료에는 근거 재료가 없어 오늘 다듬은 칸이 안 그려진다 → 목업을 만들 때만 사례마다 지어낸 기사 · 신호를 끼운다(발행 코드 · 상태 자료는 그대로).
 _FAKE2 = ["가상 기사 요약 둘째 줄 — 목업 확인용으로 지어낸 문장입니다.", "가상 기사 요약 셋째 줄 — 실제 화면은 뉴스 요약 줄이 들어갑니다."]
 _SRC = ["Reuters", "Bloomberg", "CNBC", "WSJ", "FT", "Axios", "MarketWatch"]
@@ -1134,5 +1134,5 @@ if __name__ == "__main__":
     print(dk.write_mock(html, out, H.CARD_NAME))   # 머리 줄 = `증시 전망` (P454)
     lst = build_list().replace(f"{H.BLOG}p/", "mock_")   # 목록 목업 = 상황 탭 전부 (2026-11-08). 실제 등록(EH) 목록 목업은 hypo_pages.py → mock_forecast-list-eh.html
     print(dk.write_mock(lst, os.path.join(_HERE, "output", "mock_forecast-list.html"), H.CARD_NAME))
-    typ = build_list(typical=True).replace(f"{H.BLOG}p/", "mock_")   # 실제에 가까운 양 (2026-11-08 사용자)
+    typ = build_list(typical=True).replace(f"{H.BLOG}p/", "mock_")   # 실제에 가까운 양
     print(dk.write_mock(typ, os.path.join(_HERE, "output", "mock_forecast-list-typical.html"), H.CARD_NAME))

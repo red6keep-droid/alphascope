@@ -16,11 +16,11 @@ import sys
 import config
 import report_title
 
-# 시각 규칙은 디자인-가이드라인.md — 공통 조각 experiments/design_kit.py (2026-10-11 사용자: 데일리·트럼프도 새 디자인 규칙으로)
+# 시각 규칙은 디자인-가이드라인.md — 공통 조각 experiments/design_kit.py
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 import design_kit as dk  # noqa: E402
 
-dk.TIP_SRC = "CNN · Yahoo Finance"   # 툴팁 기본 데이터 출처 — 게시물(CNN Truth Social 아카이브) · 가격. 게시물만 세는 툴팁은 CNN (2026-10-20 사용자)
+dk.TIP_SRC = "CNN · Yahoo Finance"   # 툴팁 기본 데이터 출처 — 게시물(CNN Truth Social 아카이브) · 가격. 게시물만 세는 툴팁은 CNN
 
 UP, DOWN, MUTED = dk.UP, dk.DOWN, dk.MUTED
 DIR_KO = {"positive": "긍정", "negative": "부정", "neutral": "중립"}
@@ -31,7 +31,7 @@ PREVIEW = """<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8">
 <body style="max-width:900px;margin:0 auto;padding:16px;background:#fff;"><h1 style="font-size:26px;">__TITLE__</h1>__BODY__</body></html>"""
 
 _esc = dk.esc
-TAB_TODAY, TAB_FLOW, TAB_REACT = "오늘", "흐름", "시장 반응"   # 탭 이름 = 구획 이름이면 테마 JS가 구획 제목을 숨긴다 (2026-10-11 사용자: 과거 반응 타이틀 삭제)   # 탭 셋 (가이드라인 11절)
+TAB_TODAY, TAB_FLOW, TAB_REACT = "오늘", "흐름", "시장 반응"   # 탭 이름 = 구획 이름이면 테마 JS가 구획 제목을 숨긴다   # 탭 셋 (가이드라인 11절)
 
 
 def _k(text):
@@ -50,7 +50,7 @@ def _dir_pill(d):
 # ── 구획 ────────────────────────────────────────────────────────────────
 
 def sec_counts(a):
-    """지난 24시간 집계 — 14px 캡슐 줄을 발언 제목 오른쪽에 (2026-10-11 사용자). 글 머리 카드는 없앴다. → (제목 옆 캡슐, 미분류 안내 줄)"""
+    """지난 24시간 집계 — 14px 캡슐 줄을 발언 제목 오른쪽에. 글 머리 카드는 없앴다. → (제목 옆 캡슐, 미분류 안내 줄)"""
     v = a["post_volume"]["last_24h"]
     ev = a["recent_events"]
     top = ev[0] if ev else None
@@ -123,8 +123,8 @@ def sec_trends(a):
         rows.append((name, f"{t['score']:.0f}점", _esc(f"7일 이벤트 {t['events_7d']} (직전 {t['events_prev_7d']}) · 평균 강도 {t['avg_intensity']:.1f}")))
     if not rows:
         return dk.muted("최근 7일 이벤트가 없어 점수를 내지 않습니다.")
-    out = dk.ccard(rows, emph=True)   # 읽는 법 · 용어는 제목 오른쪽 툴팁 둘 (2026-10-12 사용자: "읽는 법과 나머지를 통합해서 2개만 툴팁으로") — build_body
-    return out   # 처음 등장은 제목 줄 툴팁 (2026-10-13 사용자)
+    out = dk.ccard(rows, emph=True)   # 읽는 법 · 용어는 제목 오른쪽 툴팁 둘 — build_body
+    return out   # 처음 등장은 제목 줄 툴팁
 
 
 # 강도 척도 (prompts/classify.txt) — 툴팁에서 오늘 평균 강도를 쉬운 말로 읽어 준다
@@ -139,7 +139,7 @@ def _inten_word(v):
 
 def _trend_tips(a):
     """급상승 주제 툴팁 — 계산은 aggregate.trend_scores(), 강도 척도는 prompts/classify.txt.
-    툴팁 글 틀은 디자인-가이드라인 2-6 (뜻 · 오늘, 2026-10-18 사용자 · 기록상 11-01 폐지). 점수 = 늘어난 정도 · 강도 · 최근성 · 새로움의
+    툴팁 글 틀은 디자인-가이드라인 2-6. 점수 = 늘어난 정도 · 강도 · 최근성 · 새로움의
     주제 사이 순위를 config.TREND_WEIGHTS 비중대로 더한 값 — 공식은 툴팁에 두지 않는다."""
     t = a["trend_scores"][0]
     read = ("최근 7일 동안 갑자기 많이 말하기 시작한 세부 주제를 점수 순으로 줄 세운 것\n"
@@ -153,14 +153,14 @@ def _trend_tips(a):
     names = ne["target"] + ne["symbol"]
     first = ("그 앞 90일 동안 없다가 최근 7일에 처음 이름이 나온 나라 · 종목\n"
              f"· 오늘 {len(names)}개 : {', '.join(names)}") if names else ""
-    return [(k, dk.with_src(v, "CNN")) for k, v in [("읽는 법", read), ("용어", terms)] + ([("처음 등장", first)] if first else [])]   # 처음 등장도 툴팁 (2026-10-13 사용자)
+    return [(k, dk.with_src(v, "CNN")) for k, v in [("읽는 법", read), ("용어", terms)] + ([("처음 등장", first)] if first else [])]   # 처음 등장도 툴팁
 
 
 FLOW_FLAT_PCT = 10   # 직전 30일 대비 전체 건수 변화가 이 % 미만이면 "비슷함"
 
 
 def _flow_card(blk):
-    """30일 흐름 요약 — 강조 카드 (2026-10-11 사용자: "결과 건수를 자료를 바탕으로 요약, 강조 카드 형식, 타이틀과 설명으로").
+    """30일 흐름 요약 — 강조 카드.
     첫 줄 `발언 흐름 : 늘어남 / 줄어듦 / 비슷함`(증감 색), 얇은 선 아래 3px 점 글머리표 — 설명 문장, `**라벨** : 내용`.
     사실만: 건수·차이·비율. 평가어·전망은 쓰지 않는다."""
     rows = [x for x in blk.get("dims", {}).get("topic", []) if x["events"] > 0]
@@ -205,16 +205,16 @@ def _flow_card(blk):
         head = f'<b>{_esc(t)}</b> : ' if t else ""
         return dk.dot_li(head + dk.tint(_esc(x)), size=3, lh=dk.LH_EMPH)   # 강조 카드 18px 글 → 행간 32
     lis = "".join(li(t, x) for t, x in items)
-    return (f'<div style="background:{bg};border:1px solid {bd};border-radius:10px;padding:{dk.EMPH_PAD - dk.VP_EMPH}px 14px;margin:8px 0;line-height:{dk.LH_EMPH};">'   # 강조 카드: 위아래 24 · 행간 32 (2026-10-12 사용자)
+    return (f'<div style="background:{bg};border:1px solid {bd};border-radius:10px;padding:{dk.EMPH_PAD - dk.VP_EMPH}px 14px;margin:8px 0;line-height:{dk.LH_EMPH};">'   # 강조 카드: 위아래 24 · 행간 32
             f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;">'
             f'<span style="font-weight:700;color:#111;font-size:{dk.EMPH_NAME};">발언 흐름 : <span style="color:{color};">{_esc(state)}</span></span></span> '
-            f'<div style="margin-top:{14 - dk.VP_EMPH + 3}px;padding-top:{14 - dk.VP_EMPH}px;border-top:1px solid {bd};font-size:{dk.SMALL};">'   # 제목 ~ 구분선 14px (2026-10-12 사용자: 4 → 14)
+            f'<div style="margin-top:{14 - dk.VP_EMPH + 3}px;padding-top:{14 - dk.VP_EMPH}px;border-top:1px solid {bd};font-size:{dk.SMALL};">'   # 제목 ~ 구분선 14px
             f"<ul style='margin:-9px 0;padding:0;list-style:none;'>{lis}</ul></div></div>")
 
 
 def _windows_tip(blk):
     """주제별 30일 읽는 법 툴팁 — 가이드라인 2-6 틀. 맨 위 주제의 건수 · 직전 30일 차이 · 평균 강도를 읽어 준다.
-    부정 발언 비율 줄은 툴팁에 두지 않는다 (2026-10-11 사용자)."""
+    부정 발언 비율 줄은 툴팁에 두지 않는다."""
     top = next(x for x in blk["dims"]["topic"] if x["events"] > 0)
     if blk.get("compare_to_previous") and top["delta_events"] is not None:
         d = top["delta_events"]
@@ -239,7 +239,7 @@ def sec_windows(a):
                      _esc(f"평균 강도 {r['avg_intensity']:.1f} · 부정 발언 비율 {int((r['neg_ratio'] or 0) * 100)}% · {delta}" if r["avg_intensity"] else delta)))
     if not rows:
         return dk.muted("30일 데이터가 아직 없습니다.")
-    return _flow_card(blk) + dk.section("주제별 30일", dk.ccard(rows), tab=TAB_FLOW, one_line=True, aside=dk.tips_right([("읽는 법", dk.with_src(_windows_tip(blk), "CNN"))]))   # 일반 구획 제목 + 읽는 법 ? 오른쪽 (2026-10-13 사용자)   # 읽는 법은 소제목 옆 ? (2026-10-12 사용자)   # 요약 강조 카드는 맨 위 (2026-10-11 사용자)   # 기준(최근 30일)은 읽는 법 카드 안으로 (2026-10-11 사용자: 건수·차이를 안내 글에 자세히)
+    return _flow_card(blk) + dk.section("주제별 30일", dk.ccard(rows), tab=TAB_FLOW, one_line=True, aside=dk.tips_right([("읽는 법", dk.with_src(_windows_tip(blk), "CNN"))]))   # 일반 구획 제목 + 읽는 법 ? 오른쪽   # 읽는 법은 소제목 옆 ?   # 요약 강조 카드는 맨 위   # 기준(최근 30일)은 읽는 법 카드 안으로
 
 
 def _x(v):
@@ -266,7 +266,7 @@ ASSET_KO = {"SPY": "S&P 500", "QQQ": "나스닥 100", "SMH": "반도체", "XLK":
             "XLI": "산업재", "XLY": "경기소비재", "XLP": "필수소비재", "XLU": "유틸리티", "XLB": "소재", "XLRE": "부동산", "XLC": "통신",
             "NVDA": "엔비디아", "TSLA": "테슬라", "AAPL": "애플", "MSFT": "마이크로소프트", "AMZN": "아마존", "GOOGL": "알파벳", "META": "메타",
             "TLT": "장기 국채", "GLD": "금", "USO": "원유", "UUP": "달러"}
-HORIZON_KO = {"close": "오늘", "d5": "5일"}   # 전환 버튼 이름 (2026-10-11 사용자)
+HORIZON_KO = {"close": "오늘", "d5": "5일"}   # 전환 버튼 이름
 
 
 def _asset(sym):
@@ -277,15 +277,15 @@ ACC_CHEV = ('<svg class="acc-chev" viewBox="0 0 16 16" width="16" height="16" ar
             'stroke-linecap="round" stroke-linejoin="round" style="flex:none;transition:transform .15s;"><path d="M4 6l4 4 4-4"/></svg>')
 
 
-def _chart_card(rows, horizon, read=""):   # read = 그래프 읽는 법 — 제목 줄 오른쪽 `읽는 법 ?` (2026-10-12 사용자)
-    """결론 카드 — 엔비디아 상태 카드(시장 국면) 형식 (2026-10-11 사용자: "배치·컬러·스타일 참고, 회색 배경 / 강조 컬러 배경").
+def _chart_card(rows, horizon, read=""):   # read = 그래프 읽는 법 — 제목 줄 오른쪽 `읽는 법 ?`
+    """결론 카드 — 엔비디아 상태 카드(시장 국면) 형식.
     첫 줄 왼쪽 `자산 n개`(굵게) · 오른쪽 상태(굵게: 모두 범위 안 = 회색 / k개 범위 밖 = 주황), 얇은 선 아래 3px 점 글머리표 16px 검정,
     맨 아래 ⓘ 주의(5일). 배경: 남은 반응 없음 = 회색 #F8FAFC, 있음 = 강조 오렌지 #FFF7EE."""
     span = "당일" if horizon == "close" else "5거래일 동안"
     robust = [r for r in rows if r["robust"]]
     loose = [r for r in rows if not r["robust"] and r["lo"] is not None and not (r["lo"] <= r["mean"] <= r["hi"])]
     n = len(rows)
-    # 쉬운 말 (2026-10-11 사용자: "범위 밖 · 모두 범위 안은 어렵다, 자세히") — "보통 날" = 발언이 없던 날
+    # 쉬운 말 — "보통 날" = 발언이 없던 날
     if robust:
         state, color, (bg, bd) = f"평소와 다른 자산 {len(robust)}개", dk.WARN, dk.CARD_DIR["positive"]
         names = " · ".join(f"{_asset(r['sym'])} {r['mean']:+.2f}%" for r in robust)
@@ -306,20 +306,20 @@ def _chart_card(rows, horizon, read=""):   # read = 그래프 읽는 법 — 제
         items.append(("가장 크게 움직인 자산", f"{_asset(big['sym'])} {big['mean']:+.2f}%. 그래도 발언이 없던 날에 흔히 나오는 크기입니다 (p {big['p']:.2f})"))
 
     def li(t, x):
-        head = f'<b>{_esc(t)}</b> : ' if t else ""   # 라벨 글머리표 "**라벨** : 내용", 증감 색 (가이드라인 3-3, 2026-10-11 사용자)
+        head = f'<b>{_esc(t)}</b> : ' if t else ""   # 라벨 글머리표 "**라벨** : 내용", 증감 색
         return dk.dot_li(head + dk.tint(_esc(x)), size=3, lh=dk.LH_EMPH)   # 강조 카드 18px 글 → 행간 32
     lis = "".join(li(t, x) for t, x in items)
-    note = ""   # 주의는 제목 줄의 주의 ? 툴팁 (_read_text) — 2026-10-13 사용자
-    return (f'<div style="background:{bg};border:1px solid {bd};border-radius:10px;padding:{dk.EMPH_PAD - dk.VP_EMPH}px 14px;margin:8px 0;line-height:{dk.LH_EMPH};">'   # 강조 카드: 위아래 24 · 행간 32 (2026-10-12 사용자)
+    note = ""   # 주의는 제목 줄의 주의 ? 툴팁 (_read_text)
+    return (f'<div style="background:{bg};border:1px solid {bd};border-radius:10px;padding:{dk.EMPH_PAD - dk.VP_EMPH}px 14px;margin:8px 0;line-height:{dk.LH_EMPH};">'   # 강조 카드: 위아래 24 · 행간 32
             f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;">'
             f'<span style="font-weight:700;color:#111;font-size:{dk.EMPH_NAME};">시장의 반응 : <span style="color:{color};">{_esc(state)}</span></span>'
-            f'{dk.tips_right(read) if read else ""}</span> '   # "시장의 반응: 평소와 같음" (2026-10-11 사용자). 자산 수는 설명 문장에
-            f'<div style="margin-top:{14 - dk.VP_EMPH + 3}px;padding-top:{14 - dk.VP_EMPH}px;border-top:1px solid {bd};font-size:{dk.SMALL};">'   # 제목 ~ 구분선 14px (2026-10-12 사용자: 4 → 14)
+            f'{dk.tips_right(read) if read else ""}</span> '   # "시장의 반응: 평소와 같음". 자산 수는 설명 문장에
+            f'<div style="margin-top:{14 - dk.VP_EMPH + 3}px;padding-top:{14 - dk.VP_EMPH}px;border-top:1px solid {bd};font-size:{dk.SMALL};">'   # 제목 ~ 구분선 14px
             f"<ul style='margin:-9px 0;padding:0;list-style:none;'>{lis}</ul>{note}</div></div>")
 
 
 def _read_text(rows, horizon):
-    """그래프 읽는 법 · 주의 — 결론 카드 제목 줄 오른쪽 툴팁 (2026-10-12 사용자: 읽는 법 카드 대신 제목 옆 툴팁).
+    """그래프 읽는 법 · 주의 — 결론 카드 제목 줄 오른쪽 툴팁.
     가이드라인 2-6 틀. 진한 막대 = placebo.robust (다중 검정 보정 q < PLACEBO_NOISE_P), 회색 띠 = 발언 없는 날 평균의 95% 범위."""
     span = "당일" if horizon == "close" else "5거래일 동안"
     robust = [r for r in rows if r["robust"]]
@@ -331,17 +331,17 @@ def _read_text(rows, horizon):
             "· 나누는 법 : 막대가 회색 띠(발언 없던 날에 흔한 범위) 밖이고, 여러 자산을 함께 따져도 남으면 진하게")
     caution = ("5일 동안의 움직임은 발언이 몰린 시기에 기간이 겹쳐 실제보다 강해 보일 수 있다\n"
                "· 참고 : 발언 뒤에 관찰된 움직임일 뿐, 발언이 원인이라는 뜻은 아니다") if horizon == "d5" else ""
-    return [("읽는 법", read), ("주의", caution)]   # 주의도 툴팁, 둘 다 제목 줄 오른쪽 (2026-10-13 사용자)
+    return [("읽는 법", read), ("주의", caution)]   # 주의도 툴팁, 둘 다 제목 줄 오른쪽
 
 
 def _table_fold(inner_html):
-    """표 접기 — '표 보기' 버튼을 누르면 펼친다 (details data-acc). 버튼에 툴팁을 두지 않는다 — 읽는 법은 펼친 표 아래 본문에 (2026-10-13 사용자)."""
+    """표 접기 — '표 보기' 버튼을 누르면 펼친다 (details data-acc). 버튼에 툴팁을 두지 않는다 — 읽는 법은 펼친 표 아래 본문에."""
     return (f'<details data-acc="1" style="margin:4px 0 8px;"><summary style="{dk.FOLD_BTN}">표 보기 {ACC_CHEV}</summary>'
             f'<div style="margin-top:8px;">{inner_html}</div></details>')
 
 
 EMPTY_ATTR = ' data-empty="1"'   # f-string 안에 \" 를 쓰면 파이썬 3.10(CI)에서 문법 오류
-DIR_TABS = (("negative", "부정 발언"), ("positive", "긍정 발언"), ("", "전체"))   # 하위탭 (2026-10-11 사용자)
+DIR_TABS = (("negative", "부정 발언"), ("positive", "긍정 발언"), ("", "전체"))   # 하위탭
 
 
 def _charts():
@@ -366,7 +366,7 @@ def _table_rows(blk):
 
 
 def _table_legend(noise_p):
-    """펼친 표 아래 본문 안내 — ⓘ 읽는 법 글머리표 + ⓘ 주의 한 줄 (2026-10-13 사용자: 버튼 툴팁 대신 표 아래 본문에)."""
+    """펼친 표 아래 본문 안내 — ⓘ 읽는 법 글머리표 + ⓘ 주의 한 줄."""
     return (dk.guide("읽는 법", [("수치", f"{config.BENCHMARK} 대비 초과 반응(%), {config.BENCHMARK} 행만 원수익률"),
                              ("즉각", "장외 발언은 다음 개장 갭, 정규장 발언은 시가 → 종가"),
                              ("변동폭 · 거래량", f"직전 {config.REL_LOOKBACK_DAYS}거래일 평소 대비 배수, 1.00× = 보통"),
@@ -423,7 +423,7 @@ def _dir_switch(topic, a, charts, noise_p):
 
 def sec_reactions(a):
     """시장 반응 — 주제 서브탭(data-sub) × 방향 하위탭(부정·긍정·전체) × 오늘·5일 버튼(data-hz-control, 테마 JS가 서브탭 줄 오른쪽으로 옮긴다).
-    각 화면: 설명 카드(강조) → 그래프 → 표 접기 (2026-10-11 사용자)."""
+    각 화면: 설명 카드(강조) → 그래프 → 표 접기."""
     import chart_reaction
     keys = chart_reaction.topics_for(a)
     noise_p = a.get("config", {}).get("placebo_noise_p", config.PLACEBO_NOISE_P)
@@ -481,21 +481,21 @@ def sec_narrative(n, key):
 
 def build_body(a, n):
     counts_aside, counts_note = sec_counts(a)
-    return dk.fix_colons(dk.align_titles("\n".join([   # ":" 앞뒤 띄우기 (2026-10-11 사용자: 꼭 반드시, 모든 페이지) · 카드 밖 제목은 좌측 기준선(ALIGN_PX) (2026-10-23 사용자)
+    return dk.fix_colons(dk.align_titles("\n".join([   # ":" 앞뒤 띄우기 · 카드 밖 제목은 좌측 기준선(ALIGN_PX)
         dk.WRAP_OPEN,
         sec_seo_lead(a, report_title.today_kst()),   # 본문 첫 요소 = 검색 결과 요약 문단 (2026-10-18 검색 노출). 날짜는 글 제목과 같은 today_kst
         dk.section("급상승 주제", sec_trends(a), tab=TAB_TODAY, one_line=True,
-                   aside=dk.tips_right(_trend_tips(a)) if a["trend_scores"] else ""),   # ? 툴팁은 제목 오른쪽, 폰에서도 한 줄 · "최근 7일"은 카드 아래 (2026-10-11 사용자)
-        dk.section("발언", counts_note + sec_recent(a), tab=TAB_TODAY, aside=counts_aside),   # 급상승 주제 아래로 (2026-10-14 사용자) · 24시간 집계 캡슐은 발언 제목 오른쪽 (2026-10-11 사용자)
-        # 서술이 없거나 "없다" 고정 문장뿐이면 구획을 통째로 뺀다 — 매일 같은 문장이 반복되는 글은 비슷한 글로 분류된다 (2026-10-16 사용자, 인물-발언-레이더-기획 5절)
+                   aside=dk.tips_right(_trend_tips(a)) if a["trend_scores"] else ""),   # ? 툴팁은 제목 오른쪽, 폰에서도 한 줄 · "최근 7일"은 카드 아래
+        dk.section("발언", counts_note + sec_recent(a), tab=TAB_TODAY, aside=counts_aside),   # 급상승 주제 아래로 · 24시간 집계 캡슐은 발언 제목 오른쪽
+        # 서술이 없거나 "없다" 고정 문장뿐이면 구획을 통째로 뺀다 — 매일 같은 문장이 반복되는 글은 비슷한 글로 분류된다
         dk.section("달라진 것", sec_narrative(n, "what_changed"), tab=TAB_TODAY) if (n or {}).get("what_changed") else "",
-        dk.section("내일 볼 것", sec_narrative(n, "watch_tomorrow"), tab=TAB_TODAY, one_line=True,   # 주의는 제목 줄 오른쪽 툴팁 (2026-10-13 사용자)
+        dk.section("내일 볼 것", sec_narrative(n, "watch_tomorrow"), tab=TAB_TODAY, one_line=True,   # 주의는 제목 줄 오른쪽 툴팁
                    aside=dk.tips_right([("주의", WATCH_TIP)]))
         if _has_watch(n) else "",
-        dk.section(TAB_FLOW, sec_windows(a), tab=TAB_FLOW),   # 탭 이름과 같은 제목 → 테마가 숨긴다 (2026-10-11 사용자: 30일 흐름 타이틀 삭제)
-        dk.section("시장 반응", sec_reactions(a), tab=TAB_REACT),   # 탭 이름과 같아 제목은 숨고, 탭 아래 안내 문구는 두지 않는다 (2026-10-11 사용자)
+        dk.section(TAB_FLOW, sec_windows(a), tab=TAB_FLOW),   # 탭 이름과 같은 제목 → 테마가 숨긴다
+        dk.section("시장 반응", sec_reactions(a), tab=TAB_REACT),   # 탭 이름과 같아 제목은 숨고, 탭 아래 안내 문구는 두지 않는다
         dk.section("관찰 종목", sec_why(a), tab=TAB_REACT),
-        # 출처 · 면책 꼬리말 없음 — 블로그 공통 푸터가 맡는다 (2026-10-18 사용자: 중복 안내 금지)
+        # 출처 · 면책 꼬리말 없음 — 블로그 공통 푸터가 맡는다
         dk.WRAP_CLOSE,
     ])))
 
@@ -512,7 +512,7 @@ def render(analysis_path=None, narrative_path=None, output_dir=None):
             n = json.load(f)
 
     title = report_title.post_title(report_title.today_kst())
-    body = build_body(a, n)   # 글 끝 "AI 서술" 줄 없음 — 공통 푸터의 AI 고지와 중복 (2026-10-25 사용자)
+    body = build_body(a, n)   # 글 끝 "AI 서술" 줄 없음 — 공통 푸터의 AI 고지와 중복
     body_path = os.path.join(output_dir, "trump_report_body.html")
     preview_path = os.path.join(output_dir, "trump_report.html")
     with open(body_path, "w", encoding="utf-8") as f:
@@ -521,7 +521,7 @@ def render(analysis_path=None, narrative_path=None, output_dir=None):
         f.write(PREVIEW.replace("__TITLE__", _esc(title)).replace("__BODY__", body))
     with open(os.path.join(output_dir, "title.txt"), "w", encoding="utf-8") as f:
         f.write(title)
-    mock = dk.write_mock(body, os.path.join(output_dir, "trump_mock.html"), title)   # 테마 입힌 목업 (2026-10-11 사용자)
+    mock = dk.write_mock(body, os.path.join(output_dir, "trump_mock.html"), title)   # 테마 입힌 목업
     print(f"[html] {len(body):,}자 → {body_path} · 미리보기 {preview_path}" + (f" · 목업 {mock}" if mock else ""))
     return body_path, preview_path, title
 

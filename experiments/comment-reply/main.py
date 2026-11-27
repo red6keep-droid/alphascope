@@ -1,6 +1,6 @@
 """댓글 자동 답글 — 완전 자동 (감지 → Gemini 답글 → Firestore 에 직접 게시 → Slack 알림)
 
-2026-10-14 댓글이 블로거에서 우리 것(Firebase)으로 옮겨 가면서 바뀌었다 (사용자: "완전자동으로 해").
+2026-10-14 댓글이 블로거에서 우리 것(Firebase)으로 옮겨 가면서 바뀌었다.
 예전에는 블로거 API 에 댓글 쓰기가 없어 Slack 으로 답글을 보내고 사람이 붙여넣었다.
 
 흐름:
@@ -165,7 +165,7 @@ def main():
             if c["post_id"] not in posts:
                 posts[c["post_id"]] = blogger.get_post(c["post_id"])
             post = posts[c["post_id"]]
-            reply = generate_reply.generate_reply(post.get("title", ""), c["text"])   # 작성자 이름은 AI 로 보내지 않는다 (2026-11-16 사용자, 개인정보처리방침 · 운영지침 D8-6)
+            reply = generate_reply.generate_reply(post.get("title", ""), c["text"])   # 작성자 이름은 AI 로 보내지 않는다
             spam = reply.strip().upper() == "SPAM"
             if not args.send:
                 print("=" * 60)

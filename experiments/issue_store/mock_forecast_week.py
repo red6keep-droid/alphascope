@@ -1,4 +1,4 @@
-"""디자인 확인용 가상 목업 — 메타 급락 뒤 일주일 타임라인 · 날마다 근거 (2026-11-11 사용자). 기사 · 수치 · 신호 전부 지어낸 예시, 블로그에 나가지 않는다.
+"""디자인 확인용 가상 목업 — 메타 급락 뒤 일주일 타임라인 · 날마다 근거. 기사 · 수치 · 신호 전부 지어낸 예시, 블로그에 나가지 않는다.
     python experiments/issue_store/mock_forecast_week.py   → output/mock_forecast-why-week.html (목업 서버 `증시 전망` 묶음)"""
 import json, os, sys
 HERE = os.path.dirname(os.path.abspath(__file__))

@@ -1,4 +1,4 @@
-"""시황 글 장 분위기 색 시안 (2026-11-20 사용자 "상승 주황 · 하락 파랑 · 보합 보라, 업종과 주요 종목까지 vs 제외 시안").
+"""시황 글 장 분위기 색 시안.
 
     python experiments/market-commentary/mock_story_theme.py
 

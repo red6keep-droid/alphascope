@@ -1,4 +1,4 @@
-"""인물 발언 구획 — 미국 종목 페이지 `오늘` 탭(뉴스 아래) · 미국 증시 리포트 `오늘` 탭(뉴스 아래) (2026-11-07 사용자, 목업).
+"""인물 발언 구획 — 미국 종목 페이지 `오늘` 탭(뉴스 아래) · 미국 증시 리포트 `오늘` 탭(뉴스 아래).
 
 재료 = 인물 레이더가 쓰는 people_mentions.json (people-radar/stock_mentions.py). 모양 = 공용 뉴스 카드(news_item, 인물 발언 글과 같음).
 3줄 보이고 나머지는 접기, 맨 아래 `주요 인물 발언 전체 보기` 링크. 발언이 없으면 구획을 통째로 뺀다(빈 답 금지).
@@ -14,13 +14,13 @@ import design_kit as dk
 KST = datetime.timezone(datetime.timedelta(hours=9))
 PATH = os.environ.get("PEOPLE_MENTIONS_JSON") or os.path.join(os.path.dirname(os.path.abspath(__file__)), "people-radar", "output", "state", "people_mentions.json")
 ALL_URL = "https://www.newfact.app/search/label/%EC%9D%B8%EB%AC%BC%20%EB%B0%9C%EC%96%B8"   # 라벨 `인물 발언` 목록 — 발행 때 최신 글 주소로
-SHOWN = 3   # 3건 + 더 보기 (2026-11-15 사용자 "세 개까지만", 옛 5 — P340)
+SHOWN = 3   # 3건 + 더 보기
 TOPIC_KO = {"Trade": "무역", "Fed": "연준 · 금리", "Tax": "세금", "Energy": "에너지", "Immigration": "이민", "Regulation": "규제",
             "Geopolitics": "지정학", "Company": "기업", "Stock Call": "종목 의견", "Position": "매매", "Sector Call": "업종 의견",
             "Macro Warning": "거시 경고", "Market Outlook": "시장 전망", "Policy": "정책 의견", "Product": "제품", "Investment": "투자",
             "Earnings": "실적", "Deal": "거래 · 제휴", "Industry View": "업계 평가", "Politics": "정치"}   # people-radar/config.TOPIC_KO 와 같게
 DIR_KO = {"positive": "긍정", "negative": "부정", "neutral": "중립"}
-DIR_NOTE = "▲ 상승 의견 = 주가에 유리하게 본 발언, ▼ 하락 의견 = 불리하게 본(경고한) 발언"   # 카드 안내 줄은 뺐다(2026-11-11 사용자) — 문장이 이미 `주가에 유리 · 불리하게 본` 으로 풀어 쓴다. 요약 카드 안내 (2026-11-11 사용자: `AI 거품 · 부정` 은 부정의 부정으로 읽힌다)
+DIR_NOTE = "▲ 상승 의견 = 주가에 유리하게 본 발언, ▼ 하락 의견 = 불리하게 본(경고한) 발언"   # 카드 안내 줄은 뺐다 — 문장이 이미 `주가에 유리 · 불리하게 본` 으로 풀어 쓴다. 요약 카드 안내
 _data = None
 
 
@@ -53,21 +53,21 @@ def _row(it):
     if it["publisher"] and it["publisher"] != "googlenews" and not it["primary"] and re.fullmatch(r"[\x20-\x7E가-힣·]+", it["publisher"]):   # 아랍어 등 못 읽는 매체명은 뺀다
         meta.append(it["publisher"])
     d = it["direction"]
-    pills = [dk.pill(dk.ISSUE_KO.get(it.get("issue") or "OTHER", "그 밖"), bare=True),   # 분야 라벨 = 기록 이슈 코드 이름 (2026-11-07 사용자 P339, 옛: 인물 주제)
-             dk.pill(DIR_KO.get(d, d), d if d in ("positive", "negative") else "neutral", bare=True),   # 기사 줄 라벨은 옛 모양 그대로 (2026-11-08 사용자: 삼각형 라벨은 카드 안만)
+    pills = [dk.pill(dk.ISSUE_KO.get(it.get("issue") or "OTHER", "그 밖"), bare=True),   # 분야 라벨 = 기록 이슈 코드 이름
+             dk.pill(DIR_KO.get(d, d), d if d in ("positive", "negative") else "neutral", bare=True),   # 기사 줄 라벨은 옛 모양 그대로
              dk.pill(f"강도 {it['intensity']}", bare=True)]
     row = dk.news_item(dk.esc(it["headline"]), it["url"], it["detail"], (), " ".join(pills), meta)
-    if it.get("avatar"):   # 왼쪽 얼굴 동그라미 (2026-11-07 사용자 P368)
+    if it.get("avatar"):   # 왼쪽 얼굴 동그라미
         row = f'<div style="display:flex;gap:12px;align-items:flex-start;">{it["avatar"]}<div style="flex:1 1 auto;min-width:0;">{row}</div></div>'
     lines = it.get("pop") or []
-    if len(lines) < 2:   # 한 줄(요약만)은 싣지 않는다 — 뉴스와 같은 규칙(11-10), 원문으로 바로 가는 줄을 없앤다 (2026-11-15 사용자)
+    if len(lines) < 2:   # 한 줄(요약만)은 싣지 않는다 — 뉴스와 같은 규칙(11-10), 원문으로 바로 가는 줄을 없앤다
         return ""
     if len(lines) >= 2:   # 누르면 짧은 팝업 (P366): 발언 요약 · 닿는 곳 · 새로운가 · 다음 날짜
         pid = dk.news_pop_id("pp", it["id"])
         body = dk.news_pop_body(pid, it["headline"], lines)   # 링크는 아래 버튼 줄이 맡는다
         src = it.get("publisher") if not it.get("primary") and it.get("publisher") != "googlenews" else ""
         # 버튼 줄 = 양쪽 (P372): 왼쪽 `빌 애크먼 발언 더 보기` = 공식 더 보기 버튼(흰 바탕 · 회색 외곽선), 오른쪽 `원문 보기` 작은 글자 링크
-        btns = (f'<span style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px 12px;margin:16px 0 0;">'   # 좁으면 `원문 보기`가 다음 줄 오른쪽으로 — 버튼 글자는 한 줄 (2026-11-14 사용자: 폰에서 두 줄로 꺾이던 것)
+        btns = (f'<span style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px 12px;margin:16px 0 0;">'   # 좁으면 `원문 보기`가 다음 줄 오른쪽으로 — 버튼 글자는 한 줄
                 f'<a href="{dk.esc(_person_url(it))}" style="{dk.FOLD_BTN}display:inline-flex;text-decoration:none;white-space:nowrap;">{dk.esc(it["name_ko"])} 발언 더 보기</a>'
                 + (f'<a href="{dk.esc(it["url"])}" target="_blank" rel="noopener" data-trhelp="skip" style="margin-left:auto;font-size:13px;line-height:19px;color:{dk.SUB};text-decoration:underline;text-underline-offset:3px;white-space:nowrap;">'
                    f'원문 보기{f" ({dk.esc(src)})" if src else ""} {dk.LINK_ICON}</a>' if it.get("url") else "") + "</span>")
@@ -81,7 +81,7 @@ def _list(ids, items):
         return ""
     out = dk.more_list(rows, "인물 발언", SHOWN, indent=dk.ALIGN_PX)
     out += _credit([items[i] for i in ids if i in items and items[i].get("avatar")])   # CC 사진 출처 표기 의무 (2026-11-08 민간인 사진)
-    # 더 보기 아래 `주요 인물 발언 전체 보기 ›` 링크는 뺐다 — 글 끝 `함께 보는 페이지` 의 같은 링크와 겹친다 (2026-11-15 사용자)
+    # 더 보기 아래 `주요 인물 발언 전체 보기 ›` 링크는 뺐다 — 글 끝 `함께 보는 페이지` 의 같은 링크와 겹친다
     return out
 
 
@@ -129,7 +129,7 @@ def _issue(k):
 
 
 def _box(kind, text):
-    """긍정 · 부정 라벨 = 기술지표 상승 · 하락 라벨과 같은 상자(삼각형 + 글자, tech_signals.box) — 긍정 = 상승 색 ▲, 부정 = 하락 색 ▼, 중립 = 가로 막대 (2026-11-08 사용자)."""
+    """긍정 · 부정 라벨 = 기술지표 상승 · 하락 라벨과 같은 상자(삼각형 + 글자, tech_signals.box) — 긍정 = 상승 색 ▲, 부정 = 하락 색 ▼, 중립 = 가로 막대."""
     import tech_signals as TS
     return TS.box(kind, text, dk.esc, fit=True)
 
@@ -139,10 +139,10 @@ PILL_STACK_GAP = dk.PILL_PAIR_GAP   # 위아래로 쌓은 상승 · 하락 라�
 
 def _dir_val(d):
     """근거 줄 값 = 라벨 `▲ 긍정 4` `▼ 부정 2` (라벨끼리 2px, dk.PILL_PAIR_GAP). 둘 다 없으면 `— 중립`."""
-    parts = [_box(kind, f"{k} {d[key]}건") for key, k, kind in (("positive", "상승 의견", "up"), ("negative", "하락 의견", "down")) if d.get(key)]   # `상승 의견 1건` · `하락 의견 5건` — 1건도 보인다 (2026-11-12 사용자 P537: P536 `상승 1건` 다시 되돌림 · 그 전 P535 같은 꼴 · `상승 쪽 2`) — 옛 `긍정` · `부정` 은 `AI 거품 · 부정` 이 "거품이 아니다"로 읽혀 (2026-11-11 사용자)
+    parts = [_box(kind, f"{k} {d[key]}건") for key, k, kind in (("positive", "상승 의견", "up"), ("negative", "하락 의견", "down")) if d.get(key)]   # `상승 의견 1건` · `하락 의견 5건` — 1건도 보인다 — 옛 `긍정` · `부정` 은 `AI 거품 · 부정` 이 "거품이 아니다"로 읽혀
     if not parts:
         parts = [_box("flat", "중립")]
-    if len(parts) == 2:   # 상승 · 하락 둘 다 = 위아래로 (2026-11-12 사용자 P533), 오른쪽 끝 맞춤
+    if len(parts) == 2:   # 상승 · 하락 둘 다 = 위아래로, 오른쪽 끝 맞춤
         return f'<span style="display:inline-flex;flex-direction:column;align-items:flex-end;gap:{PILL_STACK_GAP}px;vertical-align:middle;">{"".join(parts)}</span>'
     return f'<span style="display:inline-flex;gap:{dk.PILL_PAIR_GAP}px;vertical-align:middle;">{"".join(parts)}</span>'
 
@@ -161,10 +161,10 @@ NOTE_GRAY = "#6B7280"   # 기술지표 괄호 글 · 근거 줄 뜻과 같은 �
 
 
 def summary_card(qcard, sm=None, faces=None):
-    """데일리 `인물 발언` 탭 맨 위 = 질문 카드 (2026-11-07 사용자 P380: "독자 질문하고 답하는 형식으로", 옛 P376 요약 상자).
-    2026-11-08 사용자 P406: 큰 분야 → 좁은 이슈(세부 주제) — `인물들이 많이 말한 이슈는?` · `의견이 갈린 이슈는?` · `많이 언급된 종목은?`.
+    """데일리 `인물 발언` 탭 맨 위 = 질문 카드.
+ P406: 큰 분야 → 좁은 이슈(세부 주제) — `인물들이 많이 말한 이슈는?` · `의견이 갈린 이슈는?` · `많이 언급된 종목은?`.
     qcard = daily-report/cards.question_card. 파이썬 셈만, AI 없음. 재료 없는 카드는 뺀다(빈 답 금지): 두 명 이상 말한 이슈가 없으면 ①, 맞선 이슈 · 종목이 없으면 ②."""
-    # sm · faces 를 넘기면 그것으로 — 인물 발언 글(people-radar/render_html.sec_summary_cards)이 같은 카드를 맨 위에 쓴다 (2026-11-08 사용자). 없으면 상태 파일
+    # sm · faces 를 넘기면 그것으로 — 인물 발언 글(people-radar/render_html.sec_summary_cards)이 같은 카드를 맨 위에 쓴다. 없으면 상태 파일
     sm = sm if sm is not None else (load().get("summary") or {})
     out = []
     # ① 많이 말한 이슈 — 동점(인물 수 · 건수 같음)이면 `외 n개`
@@ -179,19 +179,19 @@ def summary_card(qcard, sm=None, faces=None):
             first += f" 다음은 {' · '.join(t['name'] for t in iss[1:])} 순입니다." if not ties else f" {' · '.join(t['name'] for t in ties)}도 비슷하게 많이 나왔습니다."
         lines = [(first, "plain")] + [("row", t["name"], _dir_val(t["dirs"]), " · ".join(t["who"])) for t in iss]
         lines.append((f"오늘 인물 {sm.get('n_people', 0)}명 · 발언 {sm.get('n', 0)}건 기준, 두 명 이상이 말한 이슈만", "note"))
-        out.append(qcard("인물들이 많이 말한 이슈는?", state, theme, ink, lines))   # 닫힌 채로 — 데일리 인물 발언 탭 카드 모두 닫힘 (2026-11-07 사용자)
+        out.append(qcard("인물들이 많이 말한 이슈는?", state, theme, ink, lines))   # 닫힌 채로 — 데일리 인물 발언 탭 카드 모두 닫힘
     # ② 의견이 갈린 이슈 — 같은 이슈 · 같은 종목을 두고 다른 사람이 긍정 · 부정. 회색 (갈림 = 방향 없음)
     sp = sm.get("split") or []
     if sp:
         x = sp[0]
-        first = f"{dk.josa(x['name'], '을')} 두고 {dk.josa(x['neg'][0], '은')} 하락 의견을, {dk.josa(x['pos'][0], '은')} 상승 의견을 냈습니다."   # `쪽` 말 빼기 (2026-11-12 사용자 P535)
+        first = f"{dk.josa(x['name'], '을')} 두고 {dk.josa(x['neg'][0], '은')} 하락 의견을, {dk.josa(x['pos'][0], '은')} 상승 의견을 냈습니다."   # `쪽` 말 빼기
         if len(sp) > 1:
             first += f" {sp[1]['name']}에서도 의견이 갈렸습니다."
         lines = [(first, "plain")]
-        for y in sp:   # 줄 = `반도체 [▼ 부정]` · 오른쪽 얼굴 + 이름 (2026-11-08 사용자: 기술지표 라벨처럼 · 얼굴 아이콘)
-            for side, kind, word in (("neg", "down", "하락 의견"), ("pos", "up", "상승 의견")):   # 옛 `하락 쪽` · `상승 쪽` (2026-11-12 사용자 P534)
+        for y in sp:   # 줄 = `반도체 [▼ 부정]` · 오른쪽 얼굴 + 이름
+            for side, kind, word in (("neg", "down", "하락 의견"), ("pos", "up", "상승 의견")):   # 옛 `하락 쪽` · `상승 쪽`
                 who, n = y[side]
-                # 한 줄 = `[▼ 부정] 발언 1건` (이슈 이름 · 세로 구분선 삭제 — 카드 답 · 첫 문장에 이슈가 있다, 2026-11-08 사용자) · 오른쪽 얼굴 + 이름
+                # 한 줄 = `[▼ 부정] 발언 1건` · 오른쪽 얼굴 + 이름
                 lines.append(("row", f'<span style="display:inline-flex;align-items:center;gap:{dk.PILL_GAP}px;vertical-align:middle;white-space:nowrap;">{_box(kind, word)}'
                                      f'<span style="font-size:{dk.TINY};color:{NOTE_GRAY};">발언 {n}건</span></span>',
                               f'<span style="display:inline-flex;align-items:center;white-space:nowrap;">{_face(who, faces=faces)}{dk.esc(who)}</span>', ""))
@@ -206,16 +206,16 @@ def summary_card(qcard, sm=None, faces=None):
             first += f" 다음은 {' · '.join(y['name'] for y in st[1:])} 순입니다."
         lines = [(first, "plain")] + [("row", y["name"], _dir_val(y.get("dirs") or {}), " · ".join(y["who"])) for y in st]
         out.append(qcard("많이 언급된 종목은?", x["name"], theme, ink, lines))
-    # 질문 카드 ~ 아래 발언 목록 첫 줄(얼굴) 10 → 30 (×3, 2026-11-08 사용자, Chrome 실측). 카드 아래 8 과 겹쳐 PEOPLE_CARDS_GAP 가 된다
+    # 질문 카드 ~ 아래 발언 목록 첫 줄(얼굴) 10 → 30. 카드 아래 8 과 겹쳐 PEOPLE_CARDS_GAP 가 된다
     return f'<div style="margin:0 0 {PEOPLE_CARDS_GAP}px;">{"".join(out)}</div>' if out else ""
 
 
 def person_cards(qcard, ps, name, report_only=False, next_event=None):
     """인물 페이지 맨 위 강조 카드(질문 카드) — `오늘 가장 많이 말한 이슈는?` · `최근 7일 가장 많이 말한 이슈는?` · `최근 7일 많이 언급한 종목은?`
-    (2026-11-11 사용자). ps = stock_mentions.person_summary. 재료가 없는 카드는 뺀다(빈 답 금지): 이슈 · 종목은 2건 이상만. 파이썬 셈만, AI 없음."""
+. ps = stock_mentions.person_summary. 재료가 없는 카드는 뺀다(빈 답 금지): 이슈 · 종목은 2건 이상만. 파이썬 셈만, AI 없음."""
     out = []
 
-    REPORT_NOTE = "이 인물의 발언은 모두 언론 보도로 옮긴 말입니다"   # 옛 읽는 법 카드 `발언 경로` 를 한 줄로 (2026-11-11 사용자)
+    REPORT_NOTE = "이 인물의 발언은 모두 언론 보도로 옮긴 말입니다"   # 옛 읽는 법 카드 `발언 경로` 를 한 줄로
 
     def issue_card(q, part, when, least=PERSON_MIN):
         iss = [x for x in part.get("issues") or [] if x["n"] >= least]
@@ -268,7 +268,7 @@ PERSON_MIN, PERSON_ROWS = 2, 3
 
 
 def _name_n(name, n):
-    """인물 카드 근거 줄 이름 = `브로드컴 – 발언 5건` 한 줄 (2026-11-12 사용자: 건수가 이름 아래로 줄바꿈되지 말고 짧은 막대로 이어서). 건수는 작은 회색."""
+    """인물 카드 근거 줄 이름 = `브로드컴 – 발언 5건` 한 줄. 건수는 작은 회색."""
     return (f'<span style="white-space:nowrap;">{dk.esc(name)} <span style="font-size:{dk.TINY};color:{NOTE_GRAY};">– 발언 {n}건</span></span>')   # 인물 카드: 2건 이상인 이슈 · 종목만 · 줄은 3개까지
 
 

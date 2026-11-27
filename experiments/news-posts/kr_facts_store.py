@@ -1,4 +1,4 @@
-"""한국 기사 공용 저장소 — 수집기 블로그 저장소(news-text-blog)의 사건별 사실(facts) · 기사 제목(headlines)을 날짜별 공개 JSON 으로 (2026-11-24 사용자).
+"""한국 기사 공용 저장소 — 수집기 블로그 저장소(news-text-blog)의 사건별 사실(facts) · 기사 제목(headlines)을 날짜별 공개 JSON 으로.
 
     FIREBASE_SERVICE_ACCOUNT=<블로그 서비스 계정 키> python experiments/news-posts/kr_facts_store.py --out store
     python experiments/news-posts/kr_facts_store.py --out store --gcloud <gcloud 로그인 계정>      # 로컬 시험
@@ -10,7 +10,7 @@
     kr/facts/latest.json        가장 최근 날 파일과 같은 내용 — 한국 홈 · 한국 증시 리포트 뉴스 탭이 읽는다
     kr/facts/index.json         날짜 목록(사건 수 · 제목 수)
     _headers                    CORS(블로그 도메인에서 읽기) · 캐시 10분
-- 싣는 조건(요청 문서 15 · 16절, 사용자 11-23): 2곳 이상이 보도한 사건만 · 사실은 `sources` 2 이상만 · 발언은 verified 이고 익명 아닐 때만 인용.
+- 싣는 조건: 2곳 이상이 보도한 사건만 · 사실은 `sources` 2 이상만 · 발언은 verified 이고 익명 아닐 때만 인용.
   `copied` 사실은 수집기가 이미 뺐다. 언론사 이름 · 주소는 사실에 붙이지 않고, 같은 사건 제목 묶음(headlines)의 원문 보기로만.
   이 조건은 공개 여부 규칙이지 개수 상한이 아니다 — 조건을 넘은 사건 · 사실 · 제목은 전부 싣는다(자르기 없음).
 - 비교 대상(헌법 제1조): 보도한 곳 수(`sourceCount`) · 숫자의 발표/예상(`numbers.kind`) · 숫자가 매체끼리 맞았나(`agreed`).
@@ -47,7 +47,7 @@ def _quote(q):
 
 def fact_parts(f):
     """화면 한 줄 = (글, 출처) — 글 = what + 확인된 발언, 출처 = 말한 사람 직함 · 자리 · 출처 기관(정부 발표 · 공시 …).
-    출처는 글 끝 괄호로 붙이지 않고 따로 넘겨 화면이 작은 회색 `- 출처` 로 그린다(다른 팝업 발언자와 같은 꼴, 2026-11-24 사용자). news_render.fact_parts 와 같은 규칙."""
+    출처는 글 끝 괄호로 붙이지 않고 따로 넘겨 화면이 작은 회색 `- 출처` 로 그린다. news_render.fact_parts 와 같은 규칙."""
     line = (f.get("what") or "").strip()
     by = []
     q = f.get("quote")

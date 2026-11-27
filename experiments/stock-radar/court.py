@@ -1,4 +1,4 @@
-"""소송 일정 — 모든 미국 종목 (2026-11-01 사용자 P270, 엔비디아 리포트 소송 카드를 넓힘).
+"""소송 일정 — 모든 미국 종목.
 
 엔비디아 기준 그대로 : 종결 안 된 증권 소송(주주 집단소송 등) 중 회사가 피고인 사건만 추적한다. 특허 · 계약은 보지 않는다. AI 없음.
   1. 조사 (사람 손) — `python court.py --survey` : 종목마다 CourtListener 검색 → court_survey.md 후보 표(종목마다 바로 저장, 끊기면 이어서).
@@ -23,7 +23,7 @@ import config as NC  # noqa: E402
 
 WATCH_PATH = os.path.join(_HERE, "court_watch.json")
 DATA = os.path.join(_HERE, "data", "court.json")
-SURVEY_MD = os.path.join(_HERE, "court_survey.md")       # 조사 결과 · 진행 기록 — 한 번 하는 일이라 끊겨도 이어 간다 (2026-11-01 사용자)
+SURVEY_MD = os.path.join(_HERE, "court_survey.md")       # 조사 결과 · 진행 기록 — 한 번 하는 일이라 끊겨도 이어 간다
 SURVEY_JSON = os.path.join(_HERE, "court_survey.json")   # 종목마다 끝나는 즉시 저장, 다시 돌리면 끝난 종목은 건너뜀
 SEARCH_URL = "https://www.courtlistener.com/api/rest/v4/search/"
 GAP = 13   # 사건 조회 사이 초 — 한도 1분에 5번(12초에 1번)보다 조금 길게
@@ -185,7 +185,7 @@ def card(sym, day, store):
         nxt = next((x for x in v["dates"] if x["day"] > day), None)
         if nxt:
             out.append({"name": v["name"], "day": nxt["day"], "label": nxt["label"], "left": (datetime.date.fromisoformat(nxt["day"]) - d0).days})
-        elif v.get("status") == "settled":   # 원칙적 합의로 일정이 멈춘 사건 — 날짜 없이 한 줄 (2026-11-10 사용자)
+        elif v.get("status") == "settled":   # 원칙적 합의로 일정이 멈춘 사건 — 날짜 없이 한 줄
             out.append({"name": v["name"], "day": None, "label": "합의 진행 중", "left": None})
     out.sort(key=lambda x: (x["day"] is None, x["day"] or ""))
     return {"cases": out} if out else None

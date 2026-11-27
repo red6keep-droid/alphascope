@@ -118,7 +118,7 @@ KR_FIX_PATH = os.path.join(EXP, "ref", "kr_industry_fix.json")
 
 def apply_kr_fix(kr):
     """한국 업종 고침표(ref/kr_industry_fix.json stocks) — 원자료 업종이 틀렸거나 지주인 종목의 큰 업종 · 세부 업종을 덮어 쓴다.
-    AI 가 옮긴 업종보다 우선 (2026-11-25 사용자: 하림지주 `도매 유통 → 산업재` 라 업계 카드가 건설). 바뀐 수를 돌려준다."""
+    AI 가 옮긴 업종보다 우선. 바뀐 수를 돌려준다."""
     try:
         fix = json.load(open(KR_FIX_PATH, encoding="utf-8")).get("stocks") or {}
     except (OSError, ValueError):

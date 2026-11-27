@@ -1,4 +1,4 @@
-"""그래프 유형 — 통일 뒤 더 합칠 수 없는 그래프 유형만 하나씩 (2026-11-14 사용자: "막대 · 가로 막대 · 선 그래프를 모아 통일, 통일이 안 되는 유형만 목업에").
+"""그래프 유형 — 통일 뒤 더 합칠 수 없는 그래프 유형만 하나씩.
 
     python experiments/design-samples/build_graphs.py           # output/mock_graphs.html (유형 샘플)
     python experiments/design-samples/build_graphs.py --all     # + output/mock_graphs_all.html (모든 그래프 · 잰 값)
@@ -338,7 +338,7 @@ body.only-off article.g:not(.has-off){display:none;}
             f'<title>그래프 모음</title><style>{css}</style></head><body>{head}{nav}{"".join(out)}</body></html>')
 
 
-# ---------- 통일 뒤 유형 샘플 (2026-11-14 사용자: "통일된 샘플만, 통일이 안 되는 유형만 하나씩") ----------
+# ---------- 통일 뒤 유형 샘플 ----------
 def _stub_imports():
     """render_html 이 부르는 pandas 등이 없는 PC 에서도 그림 함수만 쓰게 — 그래프 함수는 이것들을 쓰지 않는다."""
     import sys

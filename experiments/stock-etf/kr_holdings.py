@@ -1,4 +1,4 @@
-"""한국 ETF 구성종목(PDF) — 운용사 상품 페이지가 부르는 공개 자료에서 받는다 (2026-11-13 사용자 결정: 운용사 페이지 수집 = 감수한 위험).
+"""한국 ETF 구성종목(PDF) — 운용사 상품 페이지가 부르는 공개 자료에서 받는다.
 
     python experiments/stock-etf/kr_holdings.py            # etf_universe.KR 전부 받아 표로 찍는다(캐시 안 씀)
 
@@ -130,7 +130,7 @@ def _is_stock(code, name):
 
 
 def _pack(rows, at, source, url, fee=None, since=None, aum=None):
-    """rows = [(코드, 이름, 비중 %)] — 현금 · 선물 빼고 비중 큰 순 전부 (2026-11-16 사용자: 상위 10개 상한 폐지 — 화면은 5개 펼침 + 나머지 접기, CLAUDE.md `상한으로 조용히 버리지 않기`)."""
+    """rows = [(코드, 이름, 비중 %)] — 현금 · 선물 빼고 비중 큰 순 전부."""
     stocks = [(c, n, w) for c, n, w in rows if _is_stock(c, n)]
     stocks.sort(key=lambda r: -(r[2] or 0))
     out = {"at": at, "source": source, "url": url,

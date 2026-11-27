@@ -1,4 +1,4 @@
-"""질문하기 포인트 색 시안 비교 (2026-11-12 사용자: "검은 글씨 주황이 안 어울린다, 어떤 색이 좋은지 시안으로" → "C 를 그라데이션으로 AI 느낌").
+"""질문하기 포인트 색 시안 비교.
 
     python experiments/site-search/mock_point_colors.py   # output/mock_point_*.html + mock_point_colors.html(색 6안) + mock_point_gradient.html(C 그라데이션)
 
@@ -23,7 +23,7 @@ OPTIONS = [
 ]
 
 
-# C 그라데이션 시안 (2026-11-12 사용자: "C 를 그라데이션을 활용해서 약간 AI 느낌으로").
+# C 그라데이션 시안.
 # (키, 이름, 설명, 바탕(그라데이션 가능), 글자, 아이콘 색, 테두리, 반짝임 아이콘, 버튼 그림자)
 # 흰 글자 대비는 그라데이션 양 끝 색마다 잰 값 중 낮은 쪽.
 SHADOW = "0 8px 24px rgba(15,23,42,.25)"

@@ -1,4 +1,4 @@
-"""오늘 달라진 것 — 후보 계산 (기획: 비공개 doc/기획/컨설팅/오늘-달라진-것-기획.md · 헌법 흐름 맨 앞 자리, 2026-11-22 사용자).
+"""오늘 달라진 것 — 후보 계산.
 
 AI 0 · 새 수집 0(목업 단계는 평소 흔들림만 yfinance 로 받는다 — 정식 때는 각 실행이 이미 받은 시세를 쓴다).
 재료 = gh-pages 자료 파일(data.json · stocks.json · kr.json · issues.json · hypo.json) + 상태 기록(records/issues · records/forecasts).

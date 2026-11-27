@@ -4,7 +4,7 @@
   avatars_src/sheet_people.webp  → output/avatars/p01~p12.webp  (일반)
 
 순서 = 왼쪽 위부터 줄마다 왼쪽 → 오른쪽. 원 지름은 가로 폭으로 잡는다(귀 · 뿔 · 왕관이 원 위로 나온 그림이 있어 세로 폭은 믿지 않음).
-2026-11-22 사용자 "동물 캐릭터 · 일반 캐릭터 24개, 탭으로 선택"(수정 모음 P631).
+(수정 모음 P631).
 """
 import os
 from collections import deque

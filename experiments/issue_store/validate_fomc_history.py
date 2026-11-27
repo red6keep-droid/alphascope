@@ -1,4 +1,4 @@
-"""증시 전망 거시 `기록상 비슷한 때는?` 실측 — FOMC 결정 뒤 S&P 500 (2026-11-07 사용자 "검증해").
+"""증시 전망 거시 `기록상 비슷한 때는?` 실측 — FOMC 결정 뒤 S&P 500.
 
     python experiments/issue_store/validate_fomc_history.py      # 표 출력 + output/fomc_history.json
 

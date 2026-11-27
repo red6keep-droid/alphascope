@@ -27,7 +27,7 @@ for _stream in (sys.stdout, sys.stderr):
         _stream.reconfigure(encoding="utf-8", errors="replace")
 
 SOURCE = "alphaflow-home.html"
-# 검색 즉답 (2026-11-11 사용자 "진행해") — 원본은 목업과 같은 파일. 고치면 이 스크립트를 다시 돌린다. 미리보기는 experiments/site-search/mock_search.py
+# 검색 즉답 — 원본은 목업과 같은 파일. 고치면 이 스크립트를 다시 돌린다. 미리보기는 experiments/site-search/mock_search.py
 SEARCH_CSS = "experiments/site-search/search.css"
 SEARCH_JS = "experiments/site-search/search.js"
 TARGET = "index.html"
@@ -116,11 +116,11 @@ BLOGGER_CSS = """
 }
 .post-card-title a:hover { color: var(--accent); }
 .post-card-snippet, .post-card-snippet p { margin: 0; font-size: 16px; line-height: 1.7; color: var(--gray-500); }
-/* 목록 카드 요약 (2026-10-13 사용자): 테마 JS가 홈 카드와 같은 2줄 요약(.report-columns)으로 바꾼다. 바꾸기 전 · 실패 시 블로거 기본 요약은 2줄에서 자른다 */
+/* 목록 카드 요약: 테마 JS가 홈 카드와 같은 2줄 요약(.report-columns)으로 바꾼다. 바꾸기 전 · 실패 시 블로거 기본 요약은 2줄에서 자른다 */
 .post-card-snippet:not(.report-columns) { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
 
 .blog-pager { display: flex; justify-content: center; gap: 12px; padding-top: 4px; }
-/* 글 더 보기 — 목록 버튼과 같은 검은 테마 버튼, 가로 30% 넓게 (2026-10-13 사용자: "모든 하단 버튼은 블랙 테마 버튼") */
+/* 글 더 보기 — 목록 버튼과 같은 검은 테마 버튼, 가로 30% 넓게 */
 .blog-pager a {
   padding: 9px 42px;   /* 글 아래 `목록` 버튼과 같은 크기 14px · 9 42 (2026-11-07 가이드라인 10절) */
   background: #111;
@@ -153,39 +153,39 @@ body.item-view .main-content { max-width: calc(var(--shell) + var(--gutter) * 2)
 .post-title {
   margin: 0 0 10px;
   font-weight: 700;
-  font-size: 34px;   /* 제목 +1 (2026-10-13 사용자: "타이틀 사이즈도 1포인트 크게") → −1 (2026-11-19 사용자: 상단 종목명 한 포인트 작게, 모든 글 공통) */
+  font-size: 34px;   /* 제목 +1 → −1 */
   line-height: 48px;   /* 홀짝 — 줄 높이 − 글자 = 짝수 (2026-11-07 가이드라인 3절) */
   letter-spacing: -.6px;
   color: var(--ink);
 }
 .post-title a { color: inherit; }
-.post-title, .post-card-title { word-break: keep-all; overflow-wrap: break-word; }   /* 글 제목 · 목록 카드 제목도 낱말 단위 줄바꿈 (2026-10-23 사용자) */
-.post-title .title-logo { width: 32px; height: 32px; border-radius: 50%; margin-right: 5px; vertical-align: -5px; background: #F1F5F9; }   /* 엔비디아 리포트 제목 앞 티커 로고 (2026-10-13 사용자) */
+.post-title, .post-card-title { word-break: keep-all; overflow-wrap: break-word; }   /* 글 제목 · 목록 카드 제목도 낱말 단위 줄바꿈 */
+.post-title .title-logo { width: 32px; height: 32px; border-radius: 50%; margin-right: 5px; vertical-align: -5px; background: #F1F5F9; }   /* 엔비디아 리포트 제목 앞 티커 로고 */
 .title-badge { display: inline-flex; align-items: center; justify-content: center; background: #E2E8F0; color: #334155; font-weight: 700; font-size: 13px; line-height: 1; }   /* 2026-10-21: 로고 핫링크 대신 티커 두 글자 배지 (운영지침 4-6) */
 .post-card-title .title-logo { width: 24px; height: 24px; border-radius: 50%; margin-right: 5px; vertical-align: -5px; background: #F1F5F9; }   /* 목록 카드 제목 앞 로고 (2026-10-22) */
 .post-card-title .title-badge { width: 24px; height: 24px; border-radius: 50%; margin-right: 5px; vertical-align: -5px; font-size: 11px; }
 @media (max-width: 680px) { .post-title { --logo-size: 26px; } .post-title .title-logo { width: 26px; height: 26px; vertical-align: -4px; } .post-title .title-badge { font-size: 11px; } }
-/* 글 제목 끝의 날짜는 16px, 볼드 없이 — 모든 리포트·모든 화면 폭 (2026-10-12 사용자). 테마 JS가 span.post-title-date 로 감싼다.
-   날짜는 오른쪽 정렬 (2026-10-18 사용자: "글 제목에 날짜는 우측 정렬하고 기호는 삭제") — 목록 카드는 제목 줄 오른쪽 끝, 좁으면 다음 줄 오른쪽 */
+/* 글 제목 끝의 날짜는 16px, 볼드 없이 — 모든 리포트·모든 화면 폭. 테마 JS가 span.post-title-date 로 감싼다.
+   날짜는 오른쪽 정렬 — 목록 카드는 제목 줄 오른쪽 끝, 좁으면 다음 줄 오른쪽 */
 .post-title .post-title-date, .post-card-title .post-title-date { font-size: 16px; font-weight: 400; white-space: nowrap; }
 .post-card-title a:has(.post-title-date) { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 8px; }
 .post-card-title .post-title-date { margin-left: auto; }
 .post-title .post-title-date { font-size: 14px; line-height: 20px; }   /* 제목 행간(49 · 37 · 33)을 물려받으면 홀짝이 어긋난다 (2026-11-07) */
-.post-title-sub { font-size: 13px; line-height: 19px; font-weight: 400; letter-spacing: 0; color: #6B7280; white-space: nowrap; margin-left: 9px; }   /* 13/19 = 기준 상자 글씨와 같은 가장 작은 글씨 (2026-11-11 사용자, 옛 14/20) · 종목 제목 꼬리 `주가 실적 일정` — 숨기지 않고 작게만 (2026-10-27 사용자 P20) · 14px = `넘겨 보기` 와 같게 (P29) */
-/* 이름 ~ 꼬리 사이 = 띄어쓰기의 1.5배(실측 5.7 · 5.1 · 4.6px → 9 · 8 · 7px), 꼬리는 이름 줄의 세로 가운데 (2026-10-27 사용자 P21). 칸이 flex 라 띄어쓰기는 접히고 여백만 남는다 */
+.post-title-sub { font-size: 13px; line-height: 19px; font-weight: 400; letter-spacing: 0; color: #6B7280; white-space: nowrap; margin-left: 9px; }   /* 13/19 = 기준 상자 글씨와 같은 가장 작은 글씨 · 종목 제목 꼬리 `주가 실적 일정` — 숨기지 않고 작게만 · 14px = `넘겨 보기` 와 같게 (P29) */
+/* 이름 ~ 꼬리 사이 = 띄어쓰기의 1.5배(실측 5.7 · 5.1 · 4.6px → 9 · 8 · 7px), 꼬리는 이름 줄의 세로 가운데. 칸이 flex 라 띄어쓰기는 접히고 여백만 남는다 */
 .post-title-label:has(> .post-title-sub) { display: flex; flex-wrap: wrap; align-items: center; }
 @media (max-width: 900px) { .post-title-sub { margin-left: 8px; } }
 @media (max-width: 680px) { .post-title-sub { margin-left: 7px; } }
-/* 공유 버튼이 없는 화면(초안 미리보기 · 목업)에서도 날짜는 제목 줄 오른쪽 끝 (2026-10-18 사용자) */
+/* 공유 버튼이 없는 화면(초안 미리보기 · 목업)에서도 날짜는 제목 줄 오른쪽 끝 */
 .post-title:has(> .post-title-date), .post-title a:has(> .post-title-date) { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 8px; }
-.post-title > .post-title-date, .post-title a > .post-title-date { margin-left: auto; }   /* 글 보기 제목 옆 날짜 = 홈 리포트 제목 옆 날짜(.report-card-date) 14px (2026-10-13 사용자) */
-/* 글 보기 제목: 날짜 줄 오른쪽 끝에 공유 아이콘 버튼 (2026-10-12 사용자) — 테마 JS가 날짜 + 버튼을 .post-title-meta 로 묶는다.
-   날짜 · 버튼 둘 다 오른쪽 끝 (2026-10-18 사용자: 날짜 우측 정렬) — 제목과 같은 줄에 들어가면 그 줄 오른쪽, 모자라면 다음 줄 오른쪽 */
-.post-title:has(.post-title-meta) { display: flex; flex-wrap: nowrap; align-items: center; column-gap: 8px; }   /* 한 줄 고정 — 긴 제목은 글자 칸 안에서 줄바꿈, 공유 버튼은 오른쪽 끝 (2026-10-23 사용자) */
-.post-title-text { flex: 1 1 auto; min-width: 0; display: flex; align-items: flex-start; gap: 5px; }   /* 로고(왼쪽 따로) + 글자 칸 — 줄바꿈된 둘째 줄은 로고 아래가 아니라 첫 글자 선에 맞는다 (2026-10-23 사용자) */
+.post-title > .post-title-date, .post-title a > .post-title-date { margin-left: auto; }   /* 글 보기 제목 옆 날짜 = 홈 리포트 제목 옆 날짜(.report-card-date) 14px */
+/* 글 보기 제목: 날짜 줄 오른쪽 끝에 공유 아이콘 버튼 — 테마 JS가 날짜 + 버튼을 .post-title-meta 로 묶는다.
+   날짜 · 버튼 둘 다 오른쪽 끝 — 제목과 같은 줄에 들어가면 그 줄 오른쪽, 모자라면 다음 줄 오른쪽 */
+.post-title:has(.post-title-meta) { display: flex; flex-wrap: nowrap; align-items: center; column-gap: 8px; }   /* 한 줄 고정 — 긴 제목은 글자 칸 안에서 줄바꿈, 공유 버튼은 오른쪽 끝 */
+.post-title-text { flex: 1 1 auto; min-width: 0; display: flex; align-items: flex-start; gap: 5px; }   /* 로고(왼쪽 따로) + 글자 칸 — 줄바꿈된 둘째 줄은 로고 아래가 아니라 첫 글자 선에 맞는다 */
 .post-title-label { flex: 1 1 auto; min-width: 0; }
-.post-title-text .title-logo { flex: none; margin-right: 0; vertical-align: top; margin-top: calc((1lh - var(--logo-size, 32px)) / 2); }   /* 로고는 첫 줄 글자 높이의 가운데에 — 가운데 정렬 아님 (2026-10-23 사용자) */
-.post-title-text .title-badge { line-height: inherit; }   /* 글자 배지(한국 종목 · ETF `T`)는 line-height:1 이라 1lh 가 배지 글자 크기가 되어 위로 떴다 → 제목 줄 높이를 물려받아 첫 줄 가운데 (2026-11-13 사용자 P537 "미들 정렬") */
+.post-title-text .title-logo { flex: none; margin-right: 0; vertical-align: top; margin-top: calc((1lh - var(--logo-size, 32px)) / 2); }   /* 로고는 첫 줄 글자 높이의 가운데에 — 가운데 정렬 아님 */
+.post-title-text .title-badge { line-height: inherit; }   /* 글자 배지(한국 종목 · ETF `T`)는 line-height:1 이라 1lh 가 배지 글자 크기가 되어 위로 떴다 → 제목 줄 높이를 물려받아 첫 줄 가운데 */
 .post-title-meta { flex: none; margin-left: auto; display: flex; align-items: center; justify-content: flex-end; gap: 8px; letter-spacing: 0; }
 .post-title-meta .title-share { margin-left: 0; }
 .title-share { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; margin-left: auto; padding: 0;
@@ -193,24 +193,24 @@ body.item-view .main-content { max-width: calc(var(--shell) + var(--gutter) * 2)
 .title-share:hover { border-color: #111; }
 /* 공유 팝업 (툴팁 팝업과 같은 상자) — 플랫폼 버튼은 왼쪽부터 한 줄로, 넘치면 다음 줄 */
 .share-pop .share-buttons { justify-content: flex-start !important; }
-/* 링크 복사 강조 (2026-11-14 사용자): 맨 위 한 줄 가득 · 높이 48 · 16 굵게 · 흰 바탕 · 진한 테두리 */
+/* 링크 복사 강조: 맨 위 한 줄 가득 · 높이 48 · 16 굵게 · 흰 바탕 · 진한 테두리 */
 .share-pop .share-buttons li.share-main { flex: 1 0 100%; }
 .share-pop .share-buttons li.share-main .sharing-platform-button { display: flex; width: 100%; justify-content: center; gap: 8px; padding: 11px 16px; font-size: 16px; line-height: 24px; background: #fff; border-color: #B5BAC0; color: #111; }
-.share-pop .share-buttons { display: grid !important; grid-template-columns: repeat(4, 1fr); gap: 8px; }   /* 채널 = 링크 복사 아래 4칸 격자, 칸 = 로고 22 위 · 이름 12 보통 아래 (2026-11-14 사용자) */
+.share-pop .share-buttons { display: grid !important; grid-template-columns: repeat(4, 1fr); gap: 8px; }   /* 채널 = 링크 복사 아래 4칸 격자, 칸 = 로고 22 위 · 이름 12 보통 아래 */
 .share-pop .share-buttons li.share-main { grid-column: 1 / -1; }
 .share-pop .share-buttons li:not(.share-main) { min-width: 0; }
 .share-pop .share-buttons li:not(.share-main) .sharing-platform-button { display: flex; flex-direction: column; width: 100%; justify-content: center; gap: 4px; padding: 10px 4px 8px; font-size: 12px; line-height: 18px; font-weight: 400; }
 .share-pop .share-buttons li:not(.share-main) svg { width: 22px !important; height: 22px !important; }
-/* 제목 아래 날짜 줄(October 11, 2026) 삭제 (2026-10-12 사용자) */
+/* 제목 아래 날짜 줄(October 11, 2026) 삭제 */
 .post-timestamp { display: none !important; }
-/* 글 보기: 첫 제목 위 여백 70% 줄임 (2026-10-12 사용자) — 위 32+40 → 10+12 */
-body.item-view .main-content, body.item-view.no-dashboard .main-content { padding-top: 25px; }   /* 상세 제목 줄 위 여백 −5 (2026-10-25 사용자) */
-/* 글 제목 위 보이는 여백 30px (2026-10-12 사용자 20 → 2026-10-13 사용자: "상단 타이틀의 위쪽 여백을 10픽셀 추가"). 행간 반쪽만큼 뺀 값 */
+/* 글 보기: 첫 제목 위 여백 70% 줄임 — 위 32+40 → 10+12 */
+body.item-view .main-content, body.item-view.no-dashboard .main-content { padding-top: 25px; }   /* 상세 제목 줄 위 여백 −5 */
+/* 글 제목 위 보이는 여백 30px. 행간 반쪽만큼 뺀 값 */
 body.item-view .post-outer-container { padding-top: 13px; }
 
 /* 리포트 본문은 인라인 스타일을 갖고 있어 컨테이너만 잡아준다 */
-.post-body { font-size: 19px; line-height: 35px; color: #333; overflow-wrap: anywhere; word-break: keep-all; }   /* 줄바꿈은 낱말(띄어쓰기) 단위 — 한 글자씩 떨어지지 않게. 한 낱말이 줄보다 길 때만 글자 사이에서 끊는다 (2026-10-23 사용자: 모든 기사 제목 · 타이틀) */   /* 행간 px 정수 — 리포트 본문과 같은 34px (2026-10-12 사용자) */
-/* 데일리 문단: PC 는 문장마다 한 줄(data-sent 블록), 모바일은 문장이 이어 흐른다(아래 @media) — 좁은 화면에서 "니다." 만 남는 고아 줄 방지 (2026-10-16 사용자).
+.post-body { font-size: 19px; line-height: 35px; color: #333; overflow-wrap: anywhere; word-break: keep-all; }   /* 줄바꿈은 낱말(띄어쓰기) 단위 — 한 글자씩 떨어지지 않게. 한 낱말이 줄보다 길 때만 글자 사이에서 끊는다 */   /* 행간 px 정수 — 리포트 본문과 같은 34px */
+/* 데일리 문단: PC 는 문장마다 한 줄(data-sent 블록), 모바일은 문장이 이어 흐른다(아래 @media) — 좁은 화면에서 "니다." 만 남는 고아 줄 방지.
    keep-all 로 단어 중간에서 끊지 않고, text-wrap: pretty 로 마지막 줄이 너무 짧지 않게 (지원 브라우저만) */
 .post-body [data-para] { word-break: keep-all; text-wrap: pretty; }
 .post-body [data-sent] { display: block; }
@@ -218,75 +218,75 @@ body.item-view .post-outer-container { padding-top: 13px; }
 .post-body table { width: 100%; border-collapse: collapse; }
 /* 셀에 nowrap 이 있는 표(리포트 본문)는 글 폭을 밀어내지 않고 표 안에서만 가로 스크롤한다 */
 .post-body table { display: block; max-width: 100%; overflow-x: auto; }
-/* 표 칸은 글자 중간에서 끊지 않는다 — 좁은 화면에서 칸을 쥐어짜지 말고 표가 옆으로 넘쳐 스크롤되게 (2026-10-11 사용자) */
+/* 표 칸은 글자 중간에서 끊지 않는다 — 좁은 화면에서 칸을 쥐어짜지 말고 표가 옆으로 넘쳐 스크롤되게 */
 .post-body td, .post-body th { word-break: keep-all; overflow-wrap: normal; }
 /* 아코디언 (리포트 details[data-acc]): 기본 삼각형 숨기고 화살표 아이콘을 펼치면 위로 (2026-10-11) */
 .post-body details[data-acc] > summary::-webkit-details-marker { display: none; }
 .post-body details[data-acc][open] > summary .acc-chev { transform: rotate(180deg); }
-/* 가격 정보 강조 카드 펼침 = 가격 범위 (1년)가 카드 안으로 이어진다 — 머리 줄 아래 모서리를 편다 (2026-10-26 사용자, render_html.year_range_in) */
+/* 가격 정보 강조 카드 펼침 = 가격 범위 (1년)가 카드 안으로 이어진다 — 머리 줄 아래 모서리를 편다 */
 .post-body details[data-acc][open] > summary:has(+ [data-in-card]) > span:first-child { border-bottom-left-radius: 0 !important; border-bottom-right-radius: 0 !important; border-bottom-color: transparent !important; }   /* 머리 아래 선은 펼침 맨 위에 좌우 12px 안쪽으로 그린다 (2026-10-27 P22, render_html.price_in) */
-/* 카드 안 펼침 (details[data-fold], 2026-10-13 사용자): 테마 JS가 펼친 줄을 버튼 위로 옮기고 글자를 '접기'로 — .is-open 이면 화살표 위로 */
+/* 카드 안 펼침: 테마 JS가 펼친 줄을 버튼 위로 옮기고 글자를 '접기'로 — .is-open 이면 화살표 위로 */
 .post-body details[data-fold] > summary::-webkit-details-marker { display: none; }
 .post-body details[data-fold].is-open > summary .acc-chev { transform: rotate(180deg); }
 .post-body [data-fold-more][hidden] { display: none !important; }
-/* 툴팁 (리포트 [data-tip]) → 팝업창 (2026-10-12 사용자: "툴팁은 팝업창으로, 내용 18포인트"). ? 아이콘을 누르면(PC 클릭 · 폰 탭 · Enter) 화면 가운데 창이 뜬다.
+/* 툴팁 (리포트 [data-tip]) → 팝업창. ? 아이콘을 누르면(PC 클릭 · 폰 탭 · Enter) 화면 가운데 창이 뜬다.
    테마 JS가 .rt-pop 을 만든다. 닫기: × 버튼 · 바깥 누르기 · Esc. 줄바꿈(&#10;)은 창 안에서 줄을 바꾼다 */
 .post-body [data-tip] { outline: none; cursor: pointer; }
 .post-body [data-tip]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 50%; }
 .rt-pop { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 16px; background: transparent; }
-.rt-pop::before, .as-search-layer::before { content: ""; position: fixed; top: -100px; right: 0; bottom: -100px; left: 0; z-index: -1; background: rgba(15,23,42,.45); pointer-events: none; }   /* 가림막 = 화면보다 위아래 100 더 — 폰 브라우저 아래 주소 줄 · 도구 줄 자리까지 덮는다(inset:0 만으로는 아래가 밝게 남았다, 2026-11-14 사용자). 누르면 팝업 바깥(.rt-pop) 누르기로 닫힌다 */
-html.pop-lock, html.pop-lock body { overflow: hidden !important; }   /* 팝업이 열린 동안 뒤 본문이 스크롤되지 않게 (2026-11-07 사용자 P350) */
+.rt-pop::before, .as-search-layer::before { content: ""; position: fixed; top: -100px; right: 0; bottom: -100px; left: 0; z-index: -1; background: rgba(15,23,42,.45); pointer-events: none; }   /* 가림막 = 화면보다 위아래 100 더 — 폰 브라우저 아래 주소 줄 · 도구 줄 자리까지 덮는다. 누르면 팝업 바깥(.rt-pop) 누르기로 닫힌다 */
+html.pop-lock, html.pop-lock body { overflow: hidden !important; }   /* 팝업이 열린 동안 뒤 본문이 스크롤되지 않게 */
 .rt-pop[hidden] { display: none; }
 .rt-pop-box { position: relative; display: flex; flex-direction: column; width: 100%; max-width: 520px; max-height: 80vh; overflow: hidden; padding: 0; background: #fff; border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,.25); }
-/* 팝업 제목 · 닫기는 위에 고정, 내용만 스크롤 (2026-10-13 사용자) */
+/* 팝업 제목 · 닫기는 위에 고정, 내용만 스크롤 */
 .rt-pop-head { position: relative; flex: none; padding: 20px 60px 12px 20px; }
-.rt-pop-head::after { content: ""; position: absolute; left: 20px; right: 12px; bottom: 0; border-bottom: 1px solid #E2E8F0; }   /* 제목 아래 가로 구분선 = 카드 테두리 색 (2026-10-18 사용자). 폭은 제목 왼쪽 선(20px) ~ 닫기 버튼 오른쪽 선(12px)까지 (같은 날 사용자) */
+.rt-pop-head::after { content: ""; position: absolute; left: 20px; right: 12px; bottom: 0; border-bottom: 1px solid #E2E8F0; }   /* 제목 아래 가로 구분선 = 카드 테두리 색. 폭은 제목 왼쪽 선(20px) ~ 닫기 버튼 오른쪽 선(12px)까지 */
 .rt-pop-body, .share-pop-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 12px 20px 22px; }
-.rt-pop-title { margin: 0; font-size: 19px; font-weight: 700; line-height: 25px; color: #111; word-break: keep-all; overflow-wrap: anywhere; }   /* 줄바꿈 = 띄어쓰기 기준 (2026-11-07 사용자 P375) */
-.rt-pop-body { overscroll-behavior: contain; font-size: 19px; font-weight: 400; line-height: 28px; color: #333; word-break: keep-all; }   /* 팝업 글 = 이슈 날짜 팝업과 같은 19/28, 폰도 같다 (2026-11-14 사용자: 35 → 28) */
-/* 툴팁 내용 행간 = 본문 35px(2026-11-06 34 → 35, 19/35 홀짝 맞춤) (2026-10-12 사용자: "툴팁도 본문 행간으로 동일하게"). 팝업 글머리표: 점 칸(3px, 첫 줄 가운데 = (34 − 3) / 2 → 15px)과 글 칸을 나눠 둘째 줄이 점 아래로 들어가지 않게 (2026-10-12 사용자: 툴팁도 포함) */
-.rt-pop-li { display: flex; align-items: flex-start; gap: 7px; margin: 21px 0 11px; padding-left: 7px; }   /* 줄 사이 보이는 간격 = 이슈 날짜 팝업(행간 28 · 여백 21)과 같게 — 행간 35 라 여백 14 · 들여쓰기 7 (2026-11-14 사용자) */   /* 팝업 글머리표 들여쓰기 8px (2026-10-14 사용자: 14 → 8) */   /* 글머리표 사이 +6 (2026-10-12 사용자) */
-.rt-pop-dot { flex: none; width: 3px; height: 3px; margin-top: 12px; border-radius: 50%; background: #111; }   /* 행간 28 가운데 · 점 색 #111 = 다른 팝업과 같게 (2026-11-14 사용자) */
+.rt-pop-title { margin: 0; font-size: 19px; font-weight: 700; line-height: 25px; color: #111; word-break: keep-all; overflow-wrap: anywhere; }   /* 줄바꿈 = 띄어쓰기 기준 */
+.rt-pop-body { overscroll-behavior: contain; font-size: 19px; font-weight: 400; line-height: 28px; color: #333; word-break: keep-all; }   /* 팝업 글 = 이슈 날짜 팝업과 같은 19/28, 폰도 같다 */
+/* 툴팁 내용 행간 = 본문 35px(2026-11-06 34 → 35, 19/35 홀짝 맞춤). 팝업 글머리표: 점 칸(3px, 첫 줄 가운데 = (34 − 3) / 2 → 15px)과 글 칸을 나눠 둘째 줄이 점 아래로 들어가지 않게 */
+.rt-pop-li { display: flex; align-items: flex-start; gap: 7px; margin: 21px 0 11px; padding-left: 7px; }   /* 줄 사이 보이는 간격 = 이슈 날짜 팝업(행간 28 · 여백 21)과 같게 — 행간 35 라 여백 14 · 들여쓰기 7 */   /* 팝업 글머리표 들여쓰기 8px */   /* 글머리표 사이 +6 */
+.rt-pop-dot { flex: none; width: 3px; height: 3px; margin-top: 12px; border-radius: 50%; background: #111; }   /* 행간 28 가운데 · 점 색 #111 = 다른 팝업과 같게 */
 .rt-pop-li > span:last-child { min-width: 0; }
-.rt-pop-p.has-label:not(:first-child), .rt-pop-li + .rt-pop-p { margin-top: 21px; }   /* 묶음 사이 21 = 이슈 날짜 팝업 기사 사이 (2026-11-14 사용자) */
-.rt-pop-body > .rt-pop-p:first-child, .rt-pop-body > .rt-pop-li:first-child { margin-top: 14px; }   /* 툴팁 내용 시작 = 구분선 아래 26(위 12 + 14), 이슈 날짜 팝업과 같다 (2026-11-14 사용자) */
-.share-pop .share-buttons { margin-top: 14px; }   /* 공유 · 계정 내용 시작 = 구분선 아래 26 (위 12 + 14), 이슈 날짜 팝업 기준 (2026-11-14 사용자) */
+.rt-pop-p.has-label:not(:first-child), .rt-pop-li + .rt-pop-p { margin-top: 21px; }   /* 묶음 사이 21 = 이슈 날짜 팝업 기사 사이 */
+.rt-pop-body > .rt-pop-p:first-child, .rt-pop-body > .rt-pop-li:first-child { margin-top: 14px; }   /* 툴팁 내용 시작 = 구분선 아래 26(위 12 + 14), 이슈 날짜 팝업과 같다 */
+.share-pop .share-buttons { margin-top: 14px; }   /* 공유 · 계정 내용 시작 = 구분선 아래 26 (위 12 + 14), 이슈 날짜 팝업 기준 */
 .as-acct .rt-pop-body > :first-child { margin-top: 14px; }   /* 용어 묶음 사이 · 글머리표 뒤 문단 띄움 (2026-10-12) */
 .rt-pop-p b { color: #111; }
-.rt-pop-src { margin-top: 14px; padding-top: 10px; border-top: 1px solid #E2E8F0; font-size: 13px; line-height: 19px; color: #6B7280; }   /* 팝업 맨 아래 작은 글자 = 원문 보기 링크와 같은 13/19 #6B7280 (2026-11-14 사용자) */   /* 툴팁 맨 아래 데이터 출처 한 줄 — 매번 같은 말이라 작은 회색 (2026-10-20 사용자) */
-/* 기사 번역 안내 (2026-10-19 사용자) — 기사 제목은 원문, 옆 '번역 방법' 14px 회색 밑줄 글자 버튼. 누르면 브라우저 번역법 팝업(툴팁 팝업과 같은 상자).
+.rt-pop-src { margin-top: 14px; padding-top: 10px; border-top: 1px solid #E2E8F0; font-size: 13px; line-height: 19px; color: #6B7280; }   /* 팝업 맨 아래 작은 글자 = 원문 보기 링크와 같은 13/19 #6B7280 */   /* 툴팁 맨 아래 데이터 출처 한 줄 — 매번 같은 말이라 작은 회색 */
+/* 기사 번역 안내 — 기사 제목은 원문, 옆 '번역 방법' 14px 회색 밑줄 글자 버튼. 누르면 브라우저 번역법 팝업(툴팁 팝업과 같은 상자).
    구글 번역 주소로 여는 방식은 한국에서 막혀 있어 뺐다 (같은 날) */
 /* 뉴스 팝업 (2026-11-05 batch 8 ⑤ ⑥ ⑦) — 툴팁 팝업 상자 그대로, 글만 16px · 행간 26. 분야 칩은 눌린 것만 검정 */
 .news-pop-body { font-size: 16px; line-height: 26px; }
 .post-body [data-news-chips] { scrollbar-width: none; }
 .post-body [data-news-chips]::-webkit-scrollbar { display: none; }
-.post-body [data-chip][aria-pressed="true"] { color: #111 !important; font-weight: 700 !important; box-shadow: inset 0 0 0 1px #111; }   /* !important — 버튼 인라인 font:inherit 이 굵기를 덮었다 (2026-11-07 사용자 P344) */   /* 분야 탭 선택 = 홈 테마 종목 묶음 탭과 같게: 굵은 검정 + 1px 검정 외곽선 (2026-11-07 사용자 P332, 옛 검정 알약) */
+.post-body [data-chip][aria-pressed="true"] { color: #111 !important; font-weight: 700 !important; box-shadow: inset 0 0 0 1px #111; }   /* !important — 버튼 인라인 font:inherit 이 굵기를 덮었다 */   /* 분야 탭 선택 = 홈 테마 종목 묶음 탭과 같게: 굵은 검정 + 1px 검정 외곽선 */
 .post-body [data-news-more] .acc-chev { transition: transform .2s; }
-/* 그래프 확대 팝업 (2026-10-16 사용자) — 전체 화면 어두운 배경, 위 제목 줄 + 닫기, 가운데 가로 스크롤 그림, 아래 안내. 가이드 8절 */
-.img-pop { position: fixed; inset: 0; z-index: 1000; display: flex; flex-direction: column; background: rgba(15,23,42,.92); cursor: pointer; }   /* cursor:pointer — 아이폰은 누를 수 있는 모양이 없는 요소의 탭을 click 으로 올리지 않아 바깥 탭이 두 번째에야 닫혔다 (2026-10-21 사용자) */
+/* 그래프 확대 팝업 — 전체 화면 어두운 배경, 위 제목 줄 + 닫기, 가운데 가로 스크롤 그림, 아래 안내. 가이드 8절 */
+.img-pop { position: fixed; inset: 0; z-index: 1000; display: flex; flex-direction: column; background: rgba(15,23,42,.92); cursor: pointer; }   /* cursor:pointer — 아이폰은 누를 수 있는 모양이 없는 요소의 탭을 click 으로 올리지 않아 바깥 탭이 두 번째에야 닫혔다 */
 .img-pop-scroll img { cursor: default; }
-/* 인물 발언 — 추이 탭 인물 목록 · 인물 상세 (2026-10-21 사용자). 줄 눌림 표시, 상세 맨 위 '목록으로' 버튼 */
+/* 인물 발언 — 추이 탭 인물 목록 · 인물 상세. 줄 눌림 표시, 상세 맨 위 '목록으로' 버튼 */
 .post-body [data-person].is-pressed, .post-body [data-person]:active { background-color: #EEF2F7; }
-/* 인물 발언 고정 머리 (2026-10-21 사용자): 글 제목을 네모 화살표와 함께 헤더 바로 아래 붙인다(top 은 JS 가 헤더 높이로), 아래 구분선, 본문만 스크롤.
+/* 인물 발언 고정 머리: 글 제목을 네모 화살표와 함께 헤더 바로 아래 붙인다(top 은 JS 가 헤더 높이로), 아래 구분선, 본문만 스크롤.
    목록 화면 = 글 제목 · 화살표는 글 목록, 인물 화면 = 이름 · 직함 · 화살표는 목록으로. 글자 크기는 글 제목(.post-title) 그대로 */
-/* 외부 링크 표시 (2026-10-23 사용자: 링크가 있으면 블로그 전체에 — 화살표만 있는 연하고 얇은 아이콘). 새 창 링크(target=_blank)의 글자 끝에 자동으로 붙는다.
-   그림 링크(확대) · 이미 아이콘이 든 링크 · 굵은 제목 링크(기사 · 영상 제목 — 제목 자체가 링크, 2026-10-23 사용자)는 제외. 색은 링크 글자색을 따라가되 연하게 */
+/* 외부 링크 표시. 새 창 링크(target=_blank)의 글자 끝에 자동으로 붙는다.
+   그림 링크(확대) · 이미 아이콘이 든 링크 · 굵은 제목 링크는 제외. 색은 링크 글자색을 따라가되 연하게 */
 .post-body a[target="_blank"]:not([data-zoom]):not([style*="font-weight:700"]):not(:has(img, svg))::after {
   content: ""; display: inline-block; width: 11px; height: 11px; margin-left: 1px; vertical-align: 0; background: currentColor; opacity: .45;
   -webkit-mask: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='1.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4.5 11.5 11.5 4.5'/%3E%3Cpath d='M6 4.5h5.5V10'/%3E%3C/svg%3E") center / contain no-repeat; mask: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='1.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4.500 11.500 11.500 4.500'/%3E%3Cpath d='M6 4.500h5.500V10'/%3E%3C/svg%3E") center / contain no-repeat;
 }
-/* 글 보기: 제목 오른쪽 날짜는 숨긴다 — 날짜는 요약글 맨 앞 (2026-10-23 사용자). 글 제목 자체(검색 결과 · 목록 · 탭 이름)에는 날짜가 그대로 있다 */
+/* 글 보기: 제목 오른쪽 날짜는 숨긴다 — 날짜는 요약글 맨 앞. 글 제목 자체(검색 결과 · 목록 · 탭 이름)에는 날짜가 그대로 있다 */
 body.item-view .post-title .post-title-date { display: none; }
 body.item-view .navbar { position: static; }
-/* 상세 페이지(폰 680px 이하) = 로고 줄 없음, 메뉴 버튼은 제목 줄 공유 버튼 뒤, 공유 버튼 32 → 36 = 메뉴 · 뒤로 버튼과 같은 상자 (2026-11-10 사용자, PC 는 그대로).
+/* 상세 페이지(폰 680px 이하) = 로고 줄 없음, 메뉴 버튼은 제목 줄 공유 버튼 뒤, 공유 버튼 32 → 36 = 메뉴 · 뒤로 버튼과 같은 상자.
    body.detail-nav 는 테마 JS 가 폰 폭 + 고정 제목 줄일 때만 붙인다 */
 @media (max-width: 680px) { body.item-view .title-share { width: 36px; height: 36px; } }
-/* 종목 페이지 공유 버튼 = 제목 아래 회색 기준 상자 오른쪽 (2026-11-11 사용자) — 31 상자 · 아이콘 19(28 · 16 → 10% 30 · 18 → 2% 더, 같은 날 사용자), 위아래 −6 · 오른쪽 −6 이라 상자(위아래 10 + 글 19 = 39) 높이는 그대로, 상자 세로 가운데 */
+/* 종목 페이지 공유 버튼 = 제목 아래 회색 기준 상자 오른쪽 — 31 상자 · 아이콘 19, 위아래 −6 · 오른쪽 −6 이라 상자(위아래 10 + 글 19 = 39) 높이는 그대로, 상자 세로 가운데 */
 body.item-view .post-body [data-report-stamp].has-share .title-share { width: 31px; height: 31px; margin: -6px -6px -6px auto; align-self: center; }
 body.item-view .post-body [data-report-stamp].has-share .title-share svg { width: 19px; height: 19px; }
-body.item-view .post-title-meta .post-title-basis { font-size: 13px; line-height: 19px; font-weight: 400; letter-spacing: 0; color: #6B7280; white-space: nowrap; }   /* 시황 해설 기준 날짜 = 제목 줄 오른쪽 · 공유 버튼 앞, 13/19 = 기준 상자 글씨 (2026-11-19 사용자) */
+body.item-view .post-title-meta .post-title-basis { font-size: 13px; line-height: 19px; font-weight: 400; letter-spacing: 0; color: #6B7280; white-space: nowrap; }   /* 시황 해설 기준 날짜 = 제목 줄 오른쪽 · 공유 버튼 앞, 13/19 = 기준 상자 글씨 */
 body.detail-nav .navbar { display: none; }
-body.detail-nav .pr-sticky .nav-toggle { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; flex: none; padding: 0; background: #fff; border: 1px solid var(--border-strong); border-radius: 8px; color: var(--gray-600); }   /* 글 보기: 로고 줄은 스크롤되어 사라지고 제목 줄(.pr-sticky)만 맨 위에 고정 (2026-10-23 사용자, 모든 상세 페이지) */
+body.detail-nav .pr-sticky .nav-toggle { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; flex: none; padding: 0; background: #fff; border: 1px solid var(--border-strong); border-radius: 8px; color: var(--gray-600); }   /* 글 보기: 로고 줄은 스크롤되어 사라지고 제목 줄(.pr-sticky)만 맨 위에 고정 */
 .pr-sticky { position: sticky; top: 0; z-index: 40; display: flex; align-items: center; gap: 12px; margin: 0 0 14px; padding: 4px 0 12px; background: var(--surface, #fff); border-bottom: 1px solid #E2E8F0; }
 .pr-sticky .post-title { margin: 0; min-width: 0; }
 .pr-sticky .post-title .pr-role { margin-left: 10px; font-size: 16px; line-height: 24px; font-weight: 400; letter-spacing: 0; color: #7A7A7A; white-space: nowrap; }
@@ -300,37 +300,37 @@ body.detail-nav .pr-sticky .nav-toggle { display: flex; align-items: center; jus
 .img-pop[hidden] { display: none; }
 .img-pop-head { position: relative; flex: none; display: flex; align-items: center; min-height: 56px; padding: 12px 60px 12px 16px; color: #fff; }
 .img-pop-title { font-size: 16px; line-height: 24px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.img-pop .rt-pop-close { top: 8px; width: 40px; height: 40px; line-height: 36px; touch-action: manipulation; }   /* 손가락 크기 — 폰에서 한 번에 닫히게 (2026-10-19 사용자) */
+.img-pop .rt-pop-close { top: 8px; width: 40px; height: 40px; line-height: 36px; touch-action: manipulation; }   /* 손가락 크기 — 폰에서 한 번에 닫히게 */
 .img-pop-scroll { flex: 1 1 auto; min-height: 0; display: flex; align-items: center; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; padding: 0 16px; }
 .img-pop-scroll img { display: block; flex: none; max-width: none; height: auto; border-radius: 8px; background: #fff; }
 .img-pop-hint { flex: none; padding: 10px 16px calc(12px + env(safe-area-inset-bottom)); font-size: 14px; line-height: 20px; color: rgba(255,255,255,.8); text-align: center; }
 .rt-pop-close { position: absolute; top: 12px; right: 12px; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; padding: 0; border: 1px solid #E2E8F0; border-radius: 8px; background: #fff; color: #111; font-size: 0; cursor: pointer; }
 .rt-pop-close::before { content: ""; width: 14px; height: 14px; background: currentColor; -webkit-mask: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M3 3l8 8M11 3l-8 8'/%3E%3C/svg%3E") center / contain no-repeat; mask: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M3 3l8 8M11 3l-8 8'/%3E%3C/svg%3E") center / contain no-repeat; }
-.rt-pop-close:hover { border-color: #111; }   /* 닫기 = 테두리 네모 32 · #E2E8F0 · 모서리 8 · 흰 바탕 · #111 × 선 2 — 모든 닫기 통일(2026-11-14 사용자: "닫기 버튼은 네모 박스", 11-12 회색 원 폐지). 글자 × 는 font-size 0 으로 숨기고 그림만 */
+.rt-pop-close:hover { border-color: #111; }   /* 닫기 = 테두리 네모 32 · #E2E8F0 · 모서리 8 · 흰 바탕 · #111 × 선 2 — 모든 닫기 통일. 글자 × 는 font-size 0 으로 숨기고 그림만 */
 /* 리포트 탭 (엔비디아 글 보기, 가이드라인 11절): 상단 탭은 액센트 빨강 밑줄 3px, 서브탭은 밑줄형 14px 회색 (2026-10-11) */
 .post-body .rt-tabs { display: flex; gap: 7px; overflow-x: auto; scrollbar-width: none; margin: 12px 0 14px; padding-bottom: 2px; border-bottom: 2px solid #eee; }
 .post-body .rt-tabs::-webkit-scrollbar { display: none; }
-/* 탭이 폭을 넘으면 가로로 넘겨 본다 — 넘길 것이 남은 쪽에 흐린 그림자 32px (2026-10-31 사용자 P167, JS 가 data-more 에 l · r) */
-/* 탭 줄 위 고정 (2026-11-01 사용자 P257: 스크롤하면 탭 · 밑줄까지 제목 줄 아래에 붙는다) — top = 제목 줄(.pr-sticky) 높이, JS 가 정수 px 로 넣는다.
+/* 탭이 폭을 넘으면 가로로 넘겨 본다 — 넘길 것이 남은 쪽에 흐린 그림자 32px */
+/* 탭 줄 위 고정 — top = 제목 줄(.pr-sticky) 높이, JS 가 정수 px 로 넣는다.
    위 여백 12 는 고정 띠 안(padding)으로 옮겨 붙었을 때 제목 줄과 띄우고, 아래 14 는 밑줄 밖(margin)이라 고정 띠는 밑줄에서 끝난다 */
 .post-body .rt-tabs-wrap { position: sticky; top: 0; z-index: 30; padding-top: 12px; margin-bottom: 14px; background: var(--bg, #fff); }
 .post-body .rt-tabs-wrap > .rt-tabs { margin: 0; }
-/* 전망 카드 호재 · 리스크 줄로 찾아간 기사 줄 — 연한 노랑 강조 3초 (2026-11-01 사용자 P264 1.6초 → P266 3초) */
+/* 전망 카드 호재 · 리스크 줄로 찾아간 기사 줄 — 연한 노랑 강조 3초 */
 .post-body .goto-flash { animation: goto-flash 3s ease-out; border-radius: 6px; }
 @keyframes goto-flash { 0%, 30% { background: #FEF3C7; } 100% { background: transparent; } }
 .post-body .rt-tabs-wrap::before, .post-body .rt-tabs-wrap::after { content: ""; position: absolute; top: 12px; bottom: 2px; width: 32px; pointer-events: none; opacity: 0; transition: opacity .15s; }
 .post-body .rt-tabs-wrap::before { left: 0; background: linear-gradient(to right, var(--bg), rgba(255,255,255,0)); }
 .post-body .rt-tabs-wrap::after { right: 0; background: linear-gradient(to left, var(--bg), rgba(255,255,255,0)); }
 .post-body .rt-tabs-wrap[data-more*="l"]::before, .post-body .rt-tabs-wrap[data-more*="r"]::after { opacity: 1; }
-/* 탭 이름 사이 간격 +10% (2026-10-13 사용자: "모든 탭메뉴명과 메뉴명 사이 여백을 10% 늘려") — 탭 30 → 33, 서브탭 22 → 24, 전환 30 → 32, 하위탭 20 → 22 */
-.post-body .rt-tab { flex: none; padding: 8px 13px; font: inherit; font-size: 18px; line-height: 24px; font-weight: 700; color: #6B7280; border: 0; background: none; border-bottom: 3px solid transparent; margin-bottom: -2px; white-space: nowrap; cursor: pointer; }   /* 탭 18px (2026-10-12 사용자) → 19 → 18 한 단계 작게 (2026-11-01 사용자 P259) */
+/* 탭 이름 사이 간격 +10% — 탭 30 → 33, 서브탭 22 → 24, 전환 30 → 32, 하위탭 20 → 22 */
+.post-body .rt-tab { flex: none; padding: 8px 13px; font: inherit; font-size: 18px; line-height: 24px; font-weight: 700; color: #6B7280; border: 0; background: none; border-bottom: 3px solid transparent; margin-bottom: -2px; white-space: nowrap; cursor: pointer; }   /* 탭 18px → 19 → 18 한 단계 작게 */
 .post-body .rt-tab[aria-selected="true"] { color: var(--accent); border-bottom-color: var(--accent); }
 .post-body .rt-panel[hidden] { display: none; }
 .post-body .rt-sub { display: flex; align-items: center; gap: 2px; overflow-x: auto; scrollbar-width: none; margin: 0 0 12px; border-bottom: 1px solid #E2E8F0; }
-.post-body .rt-sub[data-mid] { margin: 20px 0 22px; }   /* 중간 서브탭(앞에 보이는 내용이 있을 때) = 위 +20 · 아래 +10 (2026-11-13 사용자, 공통) */
+.post-body .rt-sub[data-mid] { margin: 20px 0 22px; }   /* 중간 서브탭(앞에 보이는 내용이 있을 때) = 위 +20 · 아래 +10 */
 .post-body .rt-subtab { flex: none; padding: 6px 11px; font: inherit; font-size: 19px; line-height: 25px; font-weight: 400; color: #6B7280; background: none; border: 0; border-bottom: 3px solid transparent; margin-bottom: -1px; white-space: nowrap; cursor: pointer; }
 .post-body .rt-subtab[aria-selected="true"] { color: #111; font-weight: 700; border-bottom-color: var(--accent); }
-/* 데스크톱 2열 (2026-10-11 사용자: "모바일이 아닐 때 카드를 중간 구분선 있는 2열로"): 렌더러가 단 data-grid 표시를 테마가 그린다.
+/* 데스크톱 2열: 렌더러가 단 data-grid 표시를 테마가 그린다.
    data-grid=2 (C 카드 줄 묶음) → 2열 그리드 + 짝수 칸 왼쪽 세로 구분선. 둘째 칸의 인라인 border-top 은 지운다(첫 줄에 선이 생기지 않게).
    data-grid=cards (상태 카드 묶음) → 카드 둘씩 나란히. 모바일(680px 이하)은 그대로 한 줄 */
 @media (min-width: 681px) {
@@ -339,7 +339,7 @@ body.detail-nav .pr-sticky .nav-toggle { display: flex; align-items: center; jus
   .post-body [data-grid="2"] > span:nth-child(2) { border-top: 0 !important; }
   .post-body [data-grid="cards"] { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; align-items: stretch; }
   .post-body [data-grid="cards"] > div { margin: 0 !important; }
-  /* 읽는 법 카드의 글머리표 2열 (data-guide-grid, 2026-10-11 사용자) */
+  /* 읽는 법 카드의 글머리표 2열 */
   .post-body ul[data-guide-grid] { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 28px; }
 }
 /* 전환 버튼 (data-switch, 당일 · 5일 그래프): 회색 바탕 알약 둘, 선택은 흰 바탕 · 검정 굵게 (2026-10-11) */
@@ -355,13 +355,13 @@ body.detail-nav .pr-sticky .nav-toggle { display: flex; align-items: center; jus
 .post-body .rt-dir { flex: none; padding: 4px 9px; font: inherit; font-size: 19px; line-height: 25px; font-weight: 400; color: #6B7280; background: none; border: 0; border-bottom: 2px solid transparent; white-space: nowrap; cursor: pointer; }
 .post-body .rt-dir[aria-selected="true"] { color: #111; font-weight: 700; border-bottom-color: #111; }
 .post-body .rt-dir[data-empty] { color: #CBD5E1; }
-/* E 2열 카드는 폰에서도 2열 (2026-10-12 사용자: "왜 2열로 적용 안 했냐") — 예전의 폰 한 칸 쌓기 규칙 삭제.
+/* E 2열 카드는 폰에서도 2열 — 예전의 폰 한 칸 쌓기 규칙 삭제.
    반 폭 칸에는 이름과 값이 한 줄에 들었다 안 들었다 해서, 폰에서는 칸마다 이름 위 · 값 아래 오른쪽으로 고르게 둔다 */
 @media (max-width: 680px) {
   .post-body [data-pair] > span > span:last-child { flex-basis: 100% !important; text-align: right; }
 }
 /* 테마가 ul 을 전역 초기화(list-style:none, padding 0)하므로 글 본문의 목록은 글머리표를 되살린다 (2026-10-11).
-   글머리표는 글 바깥 칸에(outside) — 줄이 바뀌어도 글이 글머리표 아래로 들어가지 않는다 (2026-10-12 사용자: "블릿과 글을 분리, 모든 블로그 글").
+   글머리표는 글 바깥 칸에(outside) — 줄이 바뀌어도 글이 글머리표 아래로 들어가지 않는다.
    리포트 목록은 인라인 padding:0 · list-style:none + 점 칸(dot_li)이라 이 규칙을 받지 않는다 — 옛 글 목록용 */
 .post-body ul { list-style: disc outside; padding-left: 20px; }
 .post-body ol { list-style: decimal outside; padding-left: 24px; }
@@ -371,10 +371,10 @@ body.detail-nav .pr-sticky .nav-toggle { display: flex; align-items: center; jus
   font-size: 14px;
   color: var(--gray-400);
 }
-/* 글 아래 라벨(데일리 브리핑 · 미국 증시 · 자동 리포트 …)은 보이지 않게 (2026-10-12 사용자: "이런 태그는 삭제").
+/* 글 아래 라벨(데일리 브리핑 · 미국 증시 · 자동 리포트 …)은 보이지 않게.
    라벨 자체는 글에 남긴다 — 홈 카드 · 목록 · 메뉴가 라벨 피드로 글을 찾는다 */
 .post-labels { display: none !important; }
-/* 헤더 아래 빈 띠는 두지 않는다 — 제목 위 여백은 본문 영역이 갖는다(홈 · 글 보기 모두 보이는 20px, 2026-10-12 사용자) */
+/* 헤더 아래 빈 띠는 두지 않는다 — 제목 위 여백은 본문 영역이 갖는다 */
 .header-bar { height: 0 !important; padding: 0 !important; }
 .post-labels a {
   display: inline-block;
@@ -395,7 +395,7 @@ body.detail-nav .pr-sticky .nav-toggle { display: flex; align-items: center; jus
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 9px clamp(42px, calc((100vw - 238px) / 2), 70px);   /* 가로 50% 넓게 42 → 70(목록 114 → 170px, 2026-11-11 사용자). 폰이 좁으면 양옆 댓글 · TOP 자리를 남기고 줄어든다 — 375 폭 ≈ 167 · 360 ≈ 152 · 320 이하 = 옛 42. 높이 −6(위아래 3씩, 홀수면 글자가 반 px 치우침) (2026-11-01 사용자 P213) */
+  padding: 9px clamp(42px, calc((100vw - 238px) / 2), 70px);   /* 가로 50% 넓게 42 → 70. 폰이 좁으면 양옆 댓글 · TOP 자리를 남기고 줄어든다 — 375 폭 ≈ 167 · 360 ≈ 152 · 320 이하 = 옛 42. 높이 −6(위아래 3씩, 홀수면 글자가 반 px 치우침) */
   background: #111;
   border: 1px solid #111;
   border-radius: 8px;
@@ -404,27 +404,27 @@ body.detail-nav .pr-sticky .nav-toggle { display: flex; align-items: center; jus
   font-weight: 700;
   color: #fff;
 }
-.post-nav-list:hover { background: #000; color: #fff; }   /* 검은 테마 버튼 (2026-10-12 사용자) */
-/* 글 아래 줄: 목록(검은 버튼)은 가운데, 오른쪽 끝에 TOP 글자 버튼 16px (2026-10-13 사용자) */
+.post-nav-list:hover { background: #000; color: #fff; }   /* 검은 테마 버튼 */
+/* 글 아래 줄: 목록(검은 버튼)은 가운데, 오른쪽 끝에 TOP 글자 버튼 16px */
 .post-nav { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 8px; }
 .post-nav .post-nav-list { grid-column: 2; }
 .post-nav-top { grid-column: 3; justify-self: end; display: inline-flex; align-items: center; gap: 4px; padding: 8px 0; background: none; border: 0;
-  font: inherit; font-size: 14px; line-height: 24px; font-weight: 700; color: #111; cursor: pointer; -webkit-tap-highlight-color: transparent; }   /* `TOP` 글자 16 → 14 (P517, 2026-11-11 사용자) — 화살표 원 22 그대로 */
+  font: inherit; font-size: 14px; line-height: 24px; font-weight: 700; color: #111; cursor: pointer; -webkit-tap-highlight-color: transparent; }   /* `TOP` 글자 16 → 14 — 화살표 원 22 그대로 */
 .post-nav-top:hover { color: var(--accent); }
-.as-star { display: inline-flex; flex: none; align-items: center; justify-content: center; width: 22px; height: 22px; margin: 0 0 0 5px; position: relative; top: 1px; vertical-align: middle; padding: 0; border: 0; background: none; cursor: pointer; color: #9CA3AF; -webkit-tap-highlight-color: transparent; }   /* 종목 제목 옆 관심 종목 ☆ 22 · 이름과 5 · 아래선 = 글자 아래선(+1, 2026-11-19 사용자) — 담기면 채운 노랑 */
+.as-star { display: inline-flex; flex: none; align-items: center; justify-content: center; width: 22px; height: 22px; margin: 0 0 0 5px; position: relative; top: 1px; vertical-align: middle; padding: 0; border: 0; background: none; cursor: pointer; color: #9CA3AF; -webkit-tap-highlight-color: transparent; }   /* 종목 제목 옆 관심 종목 ☆ 22 · 이름과 5 · 아래선 = 글자 아래선 — 담기면 채운 노랑 */
 .as-star svg { width: 22px; height: 22px; display: block; }
 .as-star[aria-pressed="true"] { color: #F5B400; }
 .as-toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: 24px; z-index: 60; display: flex; gap: 14px; align-items: center; padding: 12px 16px; background: #111; color: #fff; border-radius: 10px; font-size: 15px; line-height: 22px; box-shadow: 0 6px 20px rgba(0,0,0,.2); white-space: nowrap; }
 .as-toast a { color: #FCD34D; font-weight: 700; text-decoration: none; }
 @media (max-width: 900px) { .as-toast { bottom: calc(85px + env(safe-area-inset-bottom)); } }   /* 하단 메뉴 위 */
-.post-nav-top.is-short { visibility: hidden; }   /* 페이지가 화면 2배보다 짧으면 숨김 — 자리는 남긴다 (테마 JS, 2026-11-19 사용자) */
-.post-nav-top { gap: 6px; }   /* 화살표는 원형 외곽선 22px 안 (2026-10-14 사용자: "top 버튼 우측의 화살표 아이콘에 원형 외각선") */
-.post-nav .post-nav-top { margin-right: 10px; }   /* 오른쪽 끝에서 10px 안쪽 (2026-10-13 사용자) */
+.post-nav-top.is-short { visibility: hidden; }   /* 페이지가 화면 2배보다 짧으면 숨김 — 자리는 남긴다 */
+.post-nav-top { gap: 6px; }   /* 화살표는 원형 외곽선 22px 안 */
+.post-nav .post-nav-top { margin-right: 10px; }   /* 오른쪽 끝에서 10px 안쪽 */
 .post-nav-cm { grid-column: 1; grid-row: 1; justify-self: start; display: inline-flex; align-items: center; gap: 6px; margin-left: 10px; padding: 8px 0; background: none; border: 0;
-  font: inherit; font-size: 14px; line-height: 24px; font-weight: 700; color: #111; cursor: pointer; -webkit-tap-highlight-color: transparent; }   /* 글자 16 → 14 = TOP 과 같게 (2026-11-11 사용자) · 댓글 = 왼쪽 끝 글자 버튼, 말풍선 · 댓글 — TOP 과 거울 (2026-11-10 사용자) */
+  font: inherit; font-size: 14px; line-height: 24px; font-weight: 700; color: #111; cursor: pointer; -webkit-tap-highlight-color: transparent; }   /* 글자 16 → 14 = TOP 과 같게 · 댓글 = 왼쪽 끝 글자 버튼, 말풍선 · 댓글 — TOP 과 거울 */
 .post-nav-cm:hover { color: var(--accent); }   /* TOP 과 같은 규칙 — 열린 상태 색은 두지 않는다(빨강 = ▲상승과 겹침) */
 .post-nav .post-nav-list, .post-nav .post-nav-top { grid-row: 1; }
-/* 목록 버튼 위: 본문과 40px. 본문이 카드 밖 글로 끝나면 20px · 구분선 · 20px (테마 JS .ends-text, 2026-10-12 사용자) */
+/* 목록 버튼 위: 본문과 40px. 본문이 카드 밖 글로 끝나면 20px · 구분선 · 20px */
 body.item-view .post-outer-container { padding-bottom: 0 !important; }
 body.item-view .post-bottom, body.item-view .post-footer { margin: 0; padding: 0; }
 .post-shell .post-nav { margin: 40px 0 0; }
@@ -443,13 +443,13 @@ body.item-view .post-bottom, body.item-view .post-footer { margin: 0; padding: 0
 .post-body [data-design="2"] table[style*="font-size:14px"] { font-size: 14px !important; }
 .post-body [data-design="2"] > div[style*="font-size:15px"] { font-size: 15px !important; }
 
-/* 공유 버튼 (2026-10-12 사용자: 공유 아이콘을 누르면 소셜 아이콘이 보이게) — b:css='false' 라 블로거 위젯 CSS 가 없다.
+/* 공유 버튼 — b:css='false' 라 블로거 위젯 CSS 가 없다.
    기본은 "공유" 버튼 하나, 누르면(.is-open, 테마 JS) 플랫폼 버튼 줄이 아래에 펼쳐진다. 창을 여는 JS 도 테마가 직접 단다 */
 .post-share-buttons { margin: 20px 0 0; }
-.post-share-buttons-bottom { display: flex; justify-content: flex-end; margin: 28px 0 0; padding-top: 16px; border-top: 1px solid var(--border); }   /* 공유는 콘텐츠 오른쪽 (2026-10-12 사용자) */
+.post-share-buttons-bottom { display: flex; justify-content: flex-end; margin: 28px 0 0; padding-top: 16px; border-top: 1px solid var(--border); }   /* 공유는 콘텐츠 오른쪽 */
 .goog-inline-block { display: inline-block; }
 .sharing { position: relative; display: flex; flex-direction: column; align-items: flex-end; }
-/* 공유 버튼은 16px 작은 버튼 (2026-10-12 사용자: "16포인트의 작은 버튼으로 콘텐츠 우측에 정렬") */
+/* 공유 버튼은 16px 작은 버튼 */
 .sharing-button {
   display: inline-flex; align-items: center; gap: 6px;
   padding: 6px 12px; line-height: 24px;
@@ -473,49 +473,49 @@ body.item-view .post-bottom, body.item-view .post-footer { margin: 0; padding: 0
 .post-share-buttons svg, .sharing svg, svg.svg-icon-24, .touch-icon { width: 20px; height: 20px; flex: none; fill: currentColor; }
 .sharing-button svg, .sharing-button .touch-icon { width: 16px; height: 16px; }
 
-/* 댓글 — 우리 것 (2026-10-14 사용자: "우리가 댓글 프로그램을 만드는 건 어때?" — 폰에서 블로거 댓글 입력창이 좁다. 디자인 가이드 10-2).
+/* 댓글 — 우리 것.
    블로거 댓글(blogger.com iframe · 전체 페이지)을 버리고 테마 JS 가 Firebase(Firestore REST + Google 로그인)로 그린다.
    마크업은 테마 JS "댓글" IIFE 가 만든다 — 열기 버튼만 카드, 펼친 목록 · 쓰기 칸은 카드 밖 본문 폭 전체, 댓글 사이 1px 구분선.
    글자: 이름 16px 굵게, 글 19px · 행간 25, 날짜 · 안내 · 버튼 14px. 사진 24px. 입력창은 본문 폭 전체(폰 화면 − 28px). */
 .comments {
-  width: 100%; max-width: var(--shell); margin: 0 auto;   /* 열기 버튼이 버튼 줄로 올라가 닫히면 빈 자리 (2026-11-10 사용자, 옛 40px) */
+  width: 100%; max-width: var(--shell); margin: 0 auto;   /* 열기 버튼이 버튼 줄로 올라가 닫히면 빈 자리 */
   font-size: 19px; line-height: 25px; color: #333; word-break: keep-all;
 }
 .comments .comments-title { margin: 0; padding: 0; border: 0; font-size: 16px; line-height: 24px; }
-/* 열기 버튼 = 흰 카드, `댓글 n` 16px 굵게 · 오른쪽 공식 접기 화살표(테두리 없이). 기본 닫힘, 주소가 #comments · #c… 면 열린 채로 (2026-10-12 · 13 사용자) */
+/* 열기 버튼 = 흰 카드, `댓글 n` 16px 굵게 · 오른쪽 공식 접기 화살표(테두리 없이). 기본 닫힘, 주소가 #comments · #c… 면 열린 채로 */
 .comments-toggle { display: flex; width: 100%; align-items: center; justify-content: space-between; gap: 12px; margin: 0; padding: 8px 8px 8px 16px; background: #fff; border: 1px solid #E2E8F0; border-radius: 8px; font: inherit; font-size: 16px; font-weight: 700; line-height: 24px; color: #111; text-align: left; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .comments-panel[hidden] { display: none; }
 .comments .comments-title[hidden] { display: none; }
-.post-nav ~ .comments .comments-panel { padding-top: 2px; }   /* 버튼 줄 바로 아래에 열린다 — 첫 댓글(위 18) · 로그인 버튼(위 14)까지 20px대 (2026-11-10 사용자) */
-.post-shell .post-nav { padding-bottom: 20px; border-bottom: 1px solid #E2E8F0; }   /* 목록 · 홈으로 버튼 줄 아래 구분선 — 버튼 → 20 · 선 · 20 → 다음(함께 보는 페이지 · 열린 댓글), 위쪽 `20 · 구분선 · 20`(.ends-text)과 같은 모양 (2026-11-10 사용자: 모든 목록으로 가는 버튼 아래) */
-.post-shell > [data-related].is-moved { margin-top: 65px !important; }   /* 버튼 줄(+ 댓글 판) 아래 `함께 보는 페이지` — 40 → 55 → 65 (2026-11-11 사용자: 15 더 · 10 더, 옛 2026-11-10 본문 → 버튼 줄과 같은 40) */
-.post-shell > [data-related].is-moved > div:first-child { font-size: 14px !important; line-height: 20px !important; padding-bottom: 8px !important; color: #6B7280 !important; }   /* 제목 = 푸터 제목과 같은 14/20 굵게 (2026-11-11 사용자, 옛 16/26) */
-.post-shell > [data-related].is-moved > a { font-size: 14px !important; line-height: 20px !important; padding-top: 9px !important; padding-bottom: 9px !important; }   /* 줄 = 14/20 · 위아래 9 (옛 16/26 · 12) — 이미 게시된 글의 인라인 값을 덮는다 (2026-11-11 사용자) */
-body.item-view .main-content { padding-bottom: 0; }   /* 글 끝 → 푸터 제목 76 → 38 (2026-11-10 사용자: 50% 줄여) = 본문 아래 40 → 0 · 푸터 위 36 → 38. 홈 · 목록은 그대로 */
-body.item-view .site-footer { padding-top: 19px; }   /* 38 → 19 (50%, 2026-11-11 사용자) */   /* 제목 = 아래 줄 글씨(16)와 같은 크기 · 굵게 (2026-11-10 사용자, 옛 19) — 게시된 글 인라인 값을 덮는다 */
+.post-nav ~ .comments .comments-panel { padding-top: 2px; }   /* 버튼 줄 바로 아래에 열린다 — 첫 댓글(위 18) · 로그인 버튼(위 14)까지 20px대 */
+.post-shell .post-nav { padding-bottom: 20px; border-bottom: 1px solid #E2E8F0; }   /* 목록 · 홈으로 버튼 줄 아래 구분선 — 버튼 → 20 · 선 · 20 → 다음(함께 보는 페이지 · 열린 댓글), 위쪽 `20 · 구분선 · 20`(.ends-text)과 같은 모양 */
+.post-shell > [data-related].is-moved { margin-top: 65px !important; }   /* 버튼 줄(+ 댓글 판) 아래 `함께 보는 페이지` — 40 → 55 → 65 */
+.post-shell > [data-related].is-moved > div:first-child { font-size: 14px !important; line-height: 20px !important; padding-bottom: 8px !important; color: #6B7280 !important; }   /* 제목 = 푸터 제목과 같은 14/20 굵게 */
+.post-shell > [data-related].is-moved > a { font-size: 14px !important; line-height: 20px !important; padding-top: 9px !important; padding-bottom: 9px !important; }   /* 줄 = 14/20 · 위아래 9 (옛 16/26 · 12) — 이미 게시된 글의 인라인 값을 덮는다 */
+body.item-view .main-content { padding-bottom: 0; }   /* 글 끝 → 푸터 제목 76 → 38 = 본문 아래 40 → 0 · 푸터 위 36 → 38. 홈 · 목록은 그대로 */
+body.item-view .site-footer { padding-top: 19px; }   /* 38 → 19 */   /* 제목 = 아래 줄 글씨(16)와 같은 크기 · 굵게 — 게시된 글 인라인 값을 덮는다 */
 /* 공식 접기 버튼 (가이드 10-6) — 31px 네모 · 모서리 7 · 화살표 18 · 왼쪽 4 */
 .fold-box { display: inline-flex; flex: none; align-items: center; justify-content: center; width: 31px; height: 31px; box-sizing: border-box; margin-left: 4px; border: 1px solid #E2E8F0; border-radius: 7px; background: #fff; color: #111; }
-.comments-toggle .fold-box { border: 0; }   /* 댓글 열기 화살표는 테두리 없이 (2026-10-13 사용자) */
+.comments-toggle .fold-box { border: 0; }   /* 댓글 열기 화살표는 테두리 없이 */
 .comments-toggle .fold-box .acc-chev { transition: transform .15s; }
 .comments.is-open .comments-toggle .fold-box .acc-chev { transform: rotate(180deg); }
 /* 댓글 목록 — 댓글 사이 1px 구분선(위아래 14), 첫 댓글은 선 없이 위 18 */
 .comments .cm-list, .comments .cm-replies { list-style: none; margin: 0; padding: 0; }
-.comments .cm-list > .cm-item { padding: 18px 0; border-top: 1px solid #E2E8F0; }   /* 댓글 사이 위아래 14 → 18 (+30%, 2026-10-14 사용자) */
+.comments .cm-list > .cm-item { padding: 18px 0; border-top: 1px solid #E2E8F0; }   /* 댓글 사이 위아래 14 → 18 */
 .comments .cm-list > .cm-item:first-child { border-top: 0; padding-top: 18px; }
-/* 댓글 한 개 = 두 칸 grid(사진 | 글). 답글 묶음 · 답글 쓰기 칸은 글 칸 아래 줄 (2026-10-13 사용자: "댓글에 댓글은 레이아웃이 깨진다") */
-.comments .cm-item { display: grid; grid-template-columns: 24px minmax(0, 1fr); column-gap: 7px; align-items: start; }   /* 사진 · 이름 10 → 7 (−30%, 2026-10-14 사용자) */
-.comments .cm-avatar { grid-column: 1; grid-row: 1; display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; margin-top: 0; border-radius: 50%; overflow: hidden; background: #94A3B8; color: #fff; font-family: var(--num); font-weight: 700; font-size: 12px; line-height: 24px; }   /* 사진 24px (2026-10-13 사용자) — 사진이 없으면 머리글자 원 */
+/* 댓글 한 개 = 두 칸 grid(사진 | 글). 답글 묶음 · 답글 쓰기 칸은 글 칸 아래 줄 */
+.comments .cm-item { display: grid; grid-template-columns: 24px minmax(0, 1fr); column-gap: 7px; align-items: start; }   /* 사진 · 이름 10 → 7 */
+.comments .cm-avatar { grid-column: 1; grid-row: 1; display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; margin-top: 0; border-radius: 50%; overflow: hidden; background: #94A3B8; color: #fff; font-family: var(--num); font-weight: 700; font-size: 12px; line-height: 24px; }   /* 사진 24px — 사진이 없으면 머리글자 원 */
 .comments .cm-avatar img { width: 24px; height: 24px; display: block; }
-.comments .cm-avatar.is-owner { background: #fff; border: 1px solid #E2E8F0; box-sizing: border-box; }   /* 운영자 = AlphaScope 로고 (2026-10-14 사용자) */
+.comments .cm-avatar.is-owner { background: #fff; border: 1px solid #E2E8F0; box-sizing: border-box; }   /* 운영자 = AlphaScope 로고 */
 .comments .cm-avatar.is-owner svg { width: 14px; height: 13px; display: block; }
 .comments .cm-body { grid-column: 2; grid-row: 1; min-width: 0; }
 .comments .cm-head { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 10px; margin: 0; line-height: 24px; }
-.comments .cm-name { font-size: 14px; line-height: 20px; font-weight: 400; color: #111; }   /* 작성자 이름 = 가장 작은 글씨 14/20 보통 (2026-11-10 사용자, 옛 16 굵게) */
+.comments .cm-name { font-size: 14px; line-height: 20px; font-weight: 400; color: #111; }   /* 작성자 이름 = 가장 작은 글씨 14/20 보통 */
 .comments .cm-tag { display: inline-block; margin: 0; padding: 3px 5px 2px; border: 1px solid #CBD5E1; border-radius: 4px; background: #fff; font-size: 14px; font-weight: 400; line-height: 1; color: #334155; vertical-align: middle; position: relative; top: -1px; }   /* 운영자 라벨 — 영역 라벨 모양 (가이드 5절) */
 .comments .cm-date { font-family: var(--num); font-size: 14px; line-height: 20px; color: #7A7A7A; white-space: nowrap; }
-.comments .cm-text { margin: 4px 0 0; font-size: 16px; line-height: 26px; color: #333; white-space: pre-wrap; overflow-wrap: anywhere; }   /* 댓글 글 16/26 어디서나 (2026-11-10 사용자: 16 · 행간 20% — 옛 폰 19/25 · PC 16/21) */
+.comments .cm-text { margin: 4px 0 0; font-size: 16px; line-height: 26px; color: #333; white-space: pre-wrap; overflow-wrap: anywhere; }   /* 댓글 글 16/26 어디서나 */
 .comments .cm-text.is-deleted { color: #94A3B8; font-size: 14px; line-height: 20px; }   /* 원 댓글이 지워진 답글 묶음의 자리 */
-/* 동작 버튼(답글 · 삭제)은 할 수 있는 사람에게만 — 로그인 전에는 보이지 않는다 (2026-10-13 사용자: "로그인 전에는 기능이 안 되는 버튼은 노출하지 마라") */
+/* 동작 버튼(답글 · 삭제)은 할 수 있는 사람에게만 — 로그인 전에는 보이지 않는다 */
 .comments .cm-actions { display: flex; flex-wrap: wrap; justify-content: flex-start; gap: 6px; margin-top: 8px; }
 .comments .cm-actions:empty { display: none; }
 .comments .cm-btn { display: inline-flex; align-items: center; margin: 0; padding: 5px 12px; background: #fff; border: 1px solid #E2E8F0; border-radius: 8px; font: inherit; font-size: 14px; line-height: 22px; font-weight: 700; color: #111; cursor: pointer; -webkit-tap-highlight-color: transparent; }
@@ -529,16 +529,16 @@ body.item-view .site-footer { padding-top: 19px; }   /* 38 → 19 (50%, 2026-11-
 .comments .cm-more:hover { border-color: #111; }
 .comments .cm-more[disabled] { opacity: .5; cursor: default; }
 .comments .cm-more[hidden] { display: none; }
-.comments .cm-status { padding: 14px 0; font-size: 14px; line-height: 20px; color: #7A7A7A; text-align: center; }   /* 불러오는 중 · 못 불러옴 · 첫 댓글 안내도 가운데 (2026-10-14 사용자) */
+.comments .cm-status { padding: 14px 0; font-size: 14px; line-height: 20px; color: #7A7A7A; text-align: center; }   /* 불러오는 중 · 못 불러옴 · 첫 댓글 안내도 가운데 */
 .comments .cm-status[hidden] { display: none; }
-/* 쓰기 칸 — 윗선 아래. 댓글이 없으면 선 없이 (댓글 목록 바로 아래 흰 버튼 하나였던 자리, 2026-10-13 사용자) */
+/* 쓰기 칸 — 윗선 아래. 댓글이 없으면 선 없이 */
 .comments .cm-write { margin-top: 0; padding-top: 14px; border-top: 1px solid #E2E8F0; }
 .comments .cm-write.is-first { border-top: 0; }
-/* `댓글 쓰기` 작은 버튼 — 댓글이 있을 때만, 목록 아래 오른쪽. 답글 · 삭제(.cm-btn)와 같은 14 외곽선 + 연필 14 (2026-11-10 사용자: 보기만 할 때 입력창 X) */
+/* `댓글 쓰기` 작은 버튼 — 댓글이 있을 때만, 목록 아래 오른쪽. 답글 · 삭제(.cm-btn)와 같은 14 외곽선 + 연필 14 */
 .comments .cm-write-row { display: flex; justify-content: flex-end; }
 .comments .cm-write-btn { display: inline-flex; align-items: center; gap: 4px; margin: 0; padding: 5px 12px; background: #fff; border: 1px solid #E2E8F0; border-radius: 8px; font: inherit; font-size: 14px; line-height: 22px; font-weight: 700; color: #111; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .comments .cm-write-btn:hover { border-color: #111; }
-.comments .cm-login { display: block; width: 100%; padding: 11px 12px; background: #fff; border: 1px solid #B5BAC0; border-radius: 8px; color: #111; font: inherit; font-size: 16px; line-height: 24px; font-weight: 700; text-align: center; cursor: pointer; -webkit-tap-highlight-color: transparent; }   /* 공식 흰 버튼 — 외곽선 #E2E8F0 → 20% 진하게 #B5BAC0 (2026-10-14 사용자, 가이드 2-3 흰 버튼) */
+.comments .cm-login { display: block; width: 100%; padding: 11px 12px; background: #fff; border: 1px solid #B5BAC0; border-radius: 8px; color: #111; font: inherit; font-size: 16px; line-height: 24px; font-weight: 700; text-align: center; cursor: pointer; -webkit-tap-highlight-color: transparent; }   /* 공식 흰 버튼 — 외곽선 #E2E8F0 → 20% 진하게 #B5BAC0 */
 .comments .cm-login:hover { border-color: #111; }
 .comments .cm-login[disabled] { opacity: .5; cursor: default; }
 .comments .cm-me { display: flex; align-items: center; gap: 7px; margin-bottom: 10px; line-height: 24px; }
@@ -546,16 +546,16 @@ body.item-view .site-footer { padding-top: 19px; }   /* 38 → 19 (50%, 2026-11-
 .comments .cm-link { margin-left: auto; padding: 0; background: none; border: 0; font: inherit; font-size: 14px; line-height: 20px; color: #7A7A7A; cursor: pointer; }
 .comments .cm-link:hover { color: #111; }
 /* 입력창 — 본문 폭 전체, 테두리 #E2E8F0 · 모서리 8, 안쪽 11 · 12, 글 19px · 행간 24, 처음 4줄 높이. 글을 쓰면 아래로 늘어난다 */
-.comments .cm-input { display: block; width: 100%; min-height: 128px; margin: 0; padding: 11px 12px; box-sizing: border-box; background: #fff; border: 1px solid #E2E8F0; border-radius: 8px; font: inherit; font-size: 16px; line-height: 26px; color: #333; resize: none; overflow: hidden; }   /* 입력창 16/26 = 댓글 글과 같게 · 처음 4줄 높이 128 = 26 × 4 + 위아래 22 + 테두리 2 (2026-11-10 사용자, 옛 19/25 · 118) */
+.comments .cm-input { display: block; width: 100%; min-height: 128px; margin: 0; padding: 11px 12px; box-sizing: border-box; background: #fff; border: 1px solid #E2E8F0; border-radius: 8px; font: inherit; font-size: 16px; line-height: 26px; color: #333; resize: none; overflow: hidden; }   /* 입력창 16/26 = 댓글 글과 같게 · 처음 4줄 높이 128 = 26 × 4 + 위아래 22 + 테두리 2 */
 .comments .cm-input:focus { outline: none; border-color: #111; }
 .comments .cm-input::placeholder { color: #94A3B8; }
 .comments .cm-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 8px; }
 .comments .cm-count { font-family: var(--num); font-size: 14px; line-height: 20px; color: #7A7A7A; font-variant-numeric: tabular-nums; }
 .comments .cm-foot-btns { display: flex; align-items: center; gap: 6px; }
-.comments .cm-submit { display: inline-flex; align-items: center; margin: 0; padding: 8px 24px; background: #111; border: 1px solid #111; border-radius: 8px; font: inherit; font-size: 16px; line-height: 24px; font-weight: 700; color: #fff; cursor: pointer; -webkit-tap-highlight-color: transparent; }   /* 등록 — 검은 테마 버튼 (2026-10-13 사용자: "모든 하단 버튼은 블랙 테마 버튼") */
+.comments .cm-submit { display: inline-flex; align-items: center; margin: 0; padding: 8px 24px; background: #111; border: 1px solid #111; border-radius: 8px; font: inherit; font-size: 16px; line-height: 24px; font-weight: 700; color: #fff; cursor: pointer; -webkit-tap-highlight-color: transparent; }   /* 등록 — 검은 테마 버튼 */
 .comments .cm-submit:hover { background: #000; }
 .comments .cm-submit[disabled] { opacity: .4; cursor: default; }
-.comments .cm-error { margin-top: 8px; font-size: 14px; line-height: 20px; color: #B91C1C; text-align: center; }   /* 오류 안내는 가운데 (2026-10-14 사용자) */
+.comments .cm-error { margin-top: 8px; font-size: 14px; line-height: 20px; color: #B91C1C; text-align: center; }   /* 오류 안내는 가운데 */
 .comments .cm-error:empty { display: none; }
 
 /* 레이아웃 모드에서만 보이는 보관용 위젯 */
@@ -567,20 +567,20 @@ body.no-dashboard .main-content { padding-top: 32px; }
 @media (max-width: 900px) {
   .post-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .post-outer-container { padding: 24px; }
-  body.item-view .post-outer-container { padding-top: 13px; }   /* 카드 위 → 제목 글자 보이는 20 (2026-10-12 사용자) */
-  .post-title { font-size: 26px; line-height: 36px; }   /* −1 (2026-11-19 사용자) */
+  body.item-view .post-outer-container { padding-top: 13px; }   /* 카드 위 → 제목 글자 보이는 20 */
+  .post-title { font-size: 26px; line-height: 36px; }   /* −1 */
 }
 @media (max-width: 680px) {
   .post-grid { grid-template-columns: minmax(0, 1fr); }
   /* 글 보기(모바일): 화면 가장자리에서 본문까지 정확히 20px. 카드 테두리·안쪽 패딩은 없앤다 (2026-10-10) */
-  body.item-view .main-content { padding-left: 14px; padding-right: 14px; }   /* 2026-10-11 사용자: 콘텐츠 영역 좌우 14px — 인물 발언의 기사 목록만 +6 (렌더러, 2026-10-21 사용자) */
+  body.item-view .main-content { padding-left: 14px; padding-right: 14px; }   /*: 콘텐츠 영역 좌우 14px — 인물 발언의 기사 목록만 +6 */
   .post-outer-container { padding: 16px 0 24px; border: 0; border-radius: 0; background: transparent; }
   body.item-view .post-outer-container { padding-top: 0; }
-  body.item-view .main-content, body.item-view.no-dashboard .main-content { padding-top: 26px; }   /* 헤더 → 제목 글자 보이는 30 (2026-10-13 사용자: +10) → −5 (2026-10-25 사용자: 상세 제목 줄 위 여백) */
-  .post-title { font-size: 22px; line-height: 32px; letter-spacing: -.3px; }   /* 22 → 23 (+1, 2026-10-13) → 22 (−1, 2026-11-19 사용자: 상단 종목명 한 포인트 작게) */   /* 폰 제목 2px 작게 24 → 22 (2026-10-13 사용자) */
-  .post-body h2 { font-size: 20px !important; line-height: 26px !important; }   /* 폰 구획 제목 20 (공식 22 − 2, 2026-10-13) */   /* 리포트 구획 제목 21 → 19 — 렌더러 인라인 크기를 덮는다 (2026-10-13 사용자) */
-  .post-body { font-size: 19px; line-height: 35px; }   /* 본문 19 (2026-10-13 사용자: 블로그 전체 본문 19포인트) */
-  .post-body [data-sent] { display: inline; }   /* 모바일: 문장 줄바꿈 없이 이어 흐른다 — 문단(빈 줄)만 남는다 (2026-10-16 사용자) */
+  body.item-view .main-content, body.item-view.no-dashboard .main-content { padding-top: 26px; }   /* 헤더 → 제목 글자 보이는 30 → −5 */
+  .post-title { font-size: 22px; line-height: 32px; letter-spacing: -.3px; }   /* 22 → 23 (+1, 2026-10-13) → 22 */   /* 폰 제목 2px 작게 24 → 22 */
+  .post-body h2 { font-size: 20px !important; line-height: 26px !important; }   /* 폰 구획 제목 20 (공식 22 − 2, 2026-10-13) */   /* 리포트 구획 제목 21 → 19 — 렌더러 인라인 크기를 덮는다 */
+  .post-body { font-size: 19px; line-height: 35px; }   /* 본문 19 */
+  .post-body [data-sent] { display: inline; }   /* 모바일: 문장 줄바꿈 없이 이어 흐른다 — 문단(빈 줄)만 남는다 */
   /* 데스크톱용 커버 이미지 확대 규칙(1024px !important)이 모바일에서 글 폭을 벌리지 않게 */
   .post-body img, .post-body img[style*="max-width"] { max-width: 100% !important; }
 }
@@ -601,28 +601,28 @@ TEMPLATE = """<?xml version="1.0" encoding="UTF-8" ?>
       <meta content='600' property='og:image:height'/>
     </b:if>
     <b:include data='blog' name='all-head-content'/>
-    <!-- 공유 썸네일 (2026-11-15 사용자): 본문에 그림이 없는 페이지는 공통 로고. 그림이 있으면 Blogger 가 첫 그림을 og:image 로 단다(주식 공부 = 본문 맨 앞 숨은 썸네일 data-share-img) -->
+    <!-- 공유 썸네일: 본문에 그림이 없는 페이지는 공통 로고. 그림이 있으면 Blogger 가 첫 그림을 og:image 로 단다(주식 공부 = 본문 맨 앞 숨은 썸네일 data-share-img) -->
     <b:if cond='!data:view.featuredImage and !data:view.isMultipleItems'>
       <meta content='https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/share/share_logo.png' property='og:image'/>
       <meta content='1200' property='og:image:width'/>
       <meta content='600' property='og:image:height'/>
       <meta content='summary_large_image' name='twitter:card'/>
     </b:if>
-    <!-- 검색 (2026-10-13 사용자): Google Search Console 소유 확인. 블로거 설정의 검색 설명이 비어 있으면 홈 · 목록에 기본 설명을 단다. 글 · 페이지에는 블로거가 설명을 달지 않는다(2026-11-10 확인) -->
+    <!-- 검색: Google Search Console 소유 확인. 블로거 설정의 검색 설명이 비어 있으면 홈 · 목록에 기본 설명을 단다. 글 · 페이지에는 블로거가 설명을 달지 않는다(2026-11-10 확인) -->
     <meta content='GWtZLHo2CgnmBBgSxQQg0BKY_xKZJTSba7BBOZ6e4Ts' name='google-site-verification'/>
     <meta content='D33-RszxUaQWbaIA-4TzFNhG75Al749JcPqbuCeDY8w' name='google-site-verification'/>
     <meta content='17c1be0804f8668af1284f87d0cce9f3f48982e1' name='naver-site-verification'/>
-    <!-- 네이버 서치어드바이저 소유 확인 (2026-10-15 사용자). 블로거는 루트에 HTML 파일을 못 올려 메타 태그 방식 -->
+    <!-- 네이버 서치어드바이저 소유 확인. 블로거는 루트에 HTML 파일을 못 올려 메타 태그 방식 -->
     <meta content='4b16f0e43da3e199130fd61a86cb96dff343fb9d' name='naver-site-verification'/>
     <b:if cond='!data:view.isSingleItem and data:blog.metaDescription == &quot;&quot;'>
       <meta content='__SITE_DESC__' name='description'/>
     </b:if>
-    <!-- 고정 페이지(종목 · 목록 · 전망) 검색 설명 = 페이지 제목 + 공통 꼬리 (2026-11-10 사용자: Search Console 크롤링됨-색인 안 됨 · 페이지에 검색 설명이 없었다).
+    <!-- 고정 페이지(종목 · 목록 · 전망) 검색 설명 = 페이지 제목 + 공통 꼬리.
          Blogger API 의 Page 에는 설명 칸이 없어 테마가 만든다. 글(날짜별 리포트)은 맨 위 요약이 있어 그대로 -->
     <b:if cond='data:view.isPage'>
       <meta expr:content='data:view.title + &quot; — 매 거래일 장 마감 뒤 종가와 그날 눈에 띄는 사실, 실적 일정을 정리합니다&quot;' name='description'/>
     </b:if>
-    <!-- 홈 화면 아이콘 (2026-10-13 사용자, 디자인 가이드 10-4). 블로거에는 파일을 못 올리므로 리포 pwa/ 를 jsDelivr 로 쓴다 -->
+    <!-- 홈 화면 아이콘. 블로거에는 파일을 못 올리므로 리포 pwa/ 를 jsDelivr 로 쓴다 -->
     <link href='https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@main/pwa/manifest.json' rel='manifest'/>
     <link href='https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@main/pwa/apple-touch-icon.png' rel='apple-touch-icon'/>
     <meta content='#FFFFFF' name='theme-color'/>
@@ -652,7 +652,7 @@ __BLOGGER_CSS__
 
 __SEARCH_CSS__
 /* ==========================================================================
-   하단 고정 메뉴 · 전체 메뉴 · 글 끝 순서 (2026-11-12 사용자 여정 테스트 → 확정. 목업 = experiments/mock_server.py /j · /icons, 가이드라인 2절)
+   하단 고정 메뉴 · 전체 메뉴 · 글 끝 순서
    ========================================================================== */
 /* 전체 메뉴(서랍) — 미국 · 한국 홈 두 버튼, 메뉴 줄 = 이름(오늘) + 오른쪽 작은 `지난 …`, 테마 묶음만 타이틀 */
 .menu-items .menu-mk { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 14px 20px; border-bottom: 1px solid var(--border); }
@@ -668,14 +668,14 @@ __SEARCH_CSS__
 .menu-items .menu-row .nav-item:active, .menu-items .menu-grp .nav-item:active, .menu-items .menu-past:active { background: #F1F5F9; }
 .menu-items .nav-item.is-here { background: #F8FAFC; box-shadow: inset 3px 0 0 #111; font-weight: 700; }   /* 지금 보는 메뉴 — 빨강은 ▲상승과 겹쳐 안 씀 */
 .menu-items .menu-admin[hidden] { display: none; }   /* 관리자 줄 — .menu-row 의 flex 가 hidden 을 이기지 않게 (2026-11-13) */
-/* 로그인 · 계정 (2026-11-13 사용자) — 헤더 메뉴 버튼 앞, 메뉴 버튼과 같은 36 상자. 로그인 뒤엔 상자 안에 내 사진 26 원 */
+/* 로그인 · 계정 — 헤더 메뉴 버튼 앞, 메뉴 버튼과 같은 36 상자. 로그인 뒤엔 상자 안에 내 사진 26 원 */
 .as-login-btn { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; flex: none; padding: 0; border: 1px solid var(--border-strong); border-radius: 8px; background: #fff; color: var(--gray-600); cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .as-login-btn svg { width: 20px; height: 20px; display: block; }
 .as-login-btn img, .as-login-btn .as-ini { width: 26px; height: 26px; border-radius: 50%; display: block; object-fit: cover; }
 .as-login-btn .as-ini { display: flex; align-items: center; justify-content: center; background: #94A3B8; color: #fff; font-family: var(--num); font-size: 13px; font-weight: 700; line-height: 26px; }
 .as-login-btn:hover { border-color: #94A3B8; }
-.as-acct .rt-pop-box, .share-pop .rt-pop-box { max-width: 400px; }   /* 짧은 창(계정 · 공유) = 400 (2026-11-14 사용자) */
-.as-acct-x { position: absolute; top: 12px; right: 12px; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; padding: 0; border: 1px solid #E2E8F0; border-radius: 8px; background: #fff; color: #111; cursor: pointer; }   /* 계정 닫기 = 다른 팝업과 같은 테두리 네모 32 (2026-11-14 사용자) */
+.as-acct .rt-pop-box, .share-pop .rt-pop-box { max-width: 400px; }   /* 짧은 창(계정 · 공유) = 400 */
+.as-acct-x { position: absolute; top: 12px; right: 12px; display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; padding: 0; border: 1px solid #E2E8F0; border-radius: 8px; background: #fff; color: #111; cursor: pointer; }   /* 계정 닫기 = 다른 팝업과 같은 테두리 네모 32 */
 .as-acct-x:hover { border-color: #111; }
 .as-acct-x svg { width: 14px; height: 14px; display: block; }
 .as-acct-note { margin: 0 0 14px; font-size: 14px; line-height: 20px; color: #6B7280; word-break: keep-all; }
@@ -704,10 +704,10 @@ __SEARCH_CSS__
 
 /* 글 끝 — 본문 → 함께 보는 페이지 → [댓글 · TOP] → 푸터. 검은 `목록` · `홈으로` 버튼은 숨김(주소는 위쪽 뒤로 가기가 읽는다), 버튼 줄 위아래 구분선 없음 */
 .post-shell .post-nav .post-nav-list { display: none !important; }
-.post-shell .post-nav .post-nav-list.post-nav-study { display: inline-flex !important; padding: 9px 25px; }   /* 주식 공부 글만 가운데 `주식 공부 목록` — 댓글 · TOP 사이, 높이 40 = 양옆 글자 버튼과 같게 · 양옆 16 → 25(가로 15% 넓게, 실측 폭 약 117 → 135, 폰 375 에서 세 버튼이 한 줄 그대로) (2026-11-15 사용자) */
-.post-shell .post-nav, .post-shell.ends-text .post-nav { border-top: 0 !important; border-bottom: 1px solid #E2E8F0 !important; padding-top: 0 !important; padding-bottom: 12px !important; }   /* 버튼 줄 아래 구분선 — 버튼 글자 → 선 20(버튼 안쪽 8 + 12), 그 아래 푸터 · 열린 댓글 (2026-11-12 사용자) */
-.post-shell:has(.post-body [data-head-sub]) .post-nav, .post-shell:has(.post-body [data-head-sub]) .post-share-buttons-bottom { border-top: 0 !important; border-bottom: 0 !important; }   /* 주식 공부 글(머리 줄 옆 `- 주식공부` 표시 data-head-sub)만 버튼 줄 아래 · 푸터 위 구분선 없음 (2026-11-20 사용자) */
-.post-nav-cm { color: #6B7280; }   /* 댓글이 없거나 아직 개수를 모를 때 = 회색(글자 · 말풍선 아이콘 모두 currentColor) — 안 고른 칸 색과 같다 (2026-11-12 사용자) */
+.post-shell .post-nav .post-nav-list.post-nav-study { display: inline-flex !important; padding: 9px 25px; }   /* 주식 공부 글만 가운데 `주식 공부 목록` — 댓글 · TOP 사이, 높이 40 = 양옆 글자 버튼과 같게 · 양옆 16 → 25(가로 15% 넓게, 실측 폭 약 117 → 135, 폰 375 에서 세 버튼이 한 줄 그대로) */
+.post-shell .post-nav, .post-shell.ends-text .post-nav { border-top: 0 !important; border-bottom: 1px solid #E2E8F0 !important; padding-top: 0 !important; padding-bottom: 12px !important; }   /* 버튼 줄 아래 구분선 — 버튼 글자 → 선 20(버튼 안쪽 8 + 12), 그 아래 푸터 · 열린 댓글 */
+.post-shell:has(.post-body [data-head-sub]) .post-nav, .post-shell:has(.post-body [data-head-sub]) .post-share-buttons-bottom { border-top: 0 !important; border-bottom: 0 !important; }   /* 주식 공부 글(머리 줄 옆 `- 주식공부` 표시 data-head-sub)만 버튼 줄 아래 · 푸터 위 구분선 없음 */
+.post-nav-cm { color: #6B7280; }   /* 댓글이 없거나 아직 개수를 모를 때 = 회색(글자 · 말풍선 아이콘 모두 currentColor) — 안 고른 칸 색과 같다 */
 .post-nav-cm.has-cm { color: #111; }   /* 댓글이 하나라도 있으면 검정 */
 .post-nav-cm.has-cm:hover { color: var(--accent); }
 .post-shell.ends-text:not(.rel-first) .post-nav { margin-top: 40px !important; }
@@ -725,7 +725,7 @@ __SEARCH_CSS__
   </head>
 
   <body>
-    <b:comment>홈 나누기 (H35, 2026-11-10 사용자): 홈(/) = 미국 화면, 고정 페이지 /p/__KR_HOME_SLUG__.html(제목 __KR_HOME_TITLE__) = 한국 화면.
+    <b:comment>홈 나누기: 홈(/) = 미국 화면, 고정 페이지 /p/__KR_HOME_SLUG__.html(제목 __KR_HOME_TITLE__) = 한국 화면.
       두 화면 모두 대시보드를 그리고 body data-home-mkt 로 시장을 알린다 — 카드 거르기 · 국기 스위치는 alphaflow-home.html 의 H35 장치. 한국 화면은 글 보기(item-view)가 아니다</b:comment>
     <b:class cond='data:view.isSingleItem and !(data:view.isPage and data:view.title == &quot;__KR_HOME_TITLE__&quot;)' name='item-view'/>
     <b:class cond='data:view.isArchive' name='archive-view'/>
@@ -750,8 +750,8 @@ __SEARCH_CSS__
         </b:section>
 
         <nav class='menu-items' id='primary-menu'>
-          <b:comment>메뉴 = 미국 · 한국(data-bar · data-flag → 로고 오른쪽 국기 스위치) · 증시 전망(서랍만) — H35 목업 그대로 (2026-11-10 사용자). 옛 홈 · 미국 증시 리포트 · 시총 TOP 10 메뉴는 뺐다(홈 카드 · 글 아래 함께 보는 페이지로 간다)</b:comment>
-          <b:comment>전체 메뉴 (2026-11-12 사용자 여정 테스트 확정, 목업 experiments/mock_server.py /j): 맨 위 미국 · 한국 홈(data-bar — 국기 스위치가 읽는다, 글자 `미국` · `한국` 그대로 · ` 홈` 은 CSS),
+          <b:comment>메뉴 = 미국 · 한국(data-bar · data-flag → 로고 오른쪽 국기 스위치) · 증시 전망(서랍만) — H35 목업 그대로. 옛 홈 · 미국 증시 리포트 · 시총 TOP 10 메뉴는 뺐다(홈 카드 · 글 아래 함께 보는 페이지로 간다)</b:comment>
+          <b:comment>전체 메뉴: 맨 위 미국 · 한국 홈(data-bar — 국기 스위치가 읽는다, 글자 `미국` · `한국` 그대로 · ` 홈` 은 CSS),
             그 아래 메뉴 이름 = 오늘 화면(data-latest = 라벨의 최신 글로, 테마 JS) · 오른쪽 작은 `지난 …` = 목록. 타이틀은 하위 이름만으로 뜻이 안 통하는 테마 묶음에만.</b:comment>
           <div class='menu-mk'>
           <a class='nav-item' data-bar='1' data-flag='us' href='/'>
@@ -766,15 +766,15 @@ __NAV_ITEMS__
       <div class='nav-right'>
         <b:section class='search-holder' id='search_top' maxwidgets='1' name='Search' showaddelement='false'>
           <b:widget id='BlogSearch1' locked='true' title='Search This Blog' type='BlogSearch' visible='true'>
-            <b:includable id='main'><b:comment>검색 버튼 삭제 (2026-10-25 사용자) — 위젯 틀만 남기고 아무것도 그리지 않는다</b:comment></b:includable>
+            <b:includable id='main'><b:comment>검색 버튼 삭제 — 위젯 틀만 남기고 아무것도 그리지 않는다</b:comment></b:includable>
           </b:widget>
         </b:section>
 
-        <!-- 알림 · 검색 버튼 삭제 (2026-10-25 사용자, 홈 수정 H1 · H2) — 헤더 오른쪽은 메뉴 버튼만 -->
-        <!-- 검색 즉답 아이콘 (2026-11-11 사용자 "진행해", 목업 experiments/site-search) — search.js 가 국기 스위치 줄 맨 앞으로 옮긴다 -->
+        <!-- 알림 · 검색 버튼 삭제 — 헤더 오른쪽은 메뉴 버튼만 -->
+        <!-- 검색 즉답 아이콘 — search.js 가 국기 스위치 줄 맨 앞으로 옮긴다 -->
         <button aria-label='검색 (단축키 /)' class='as-search-btn' data-as-search='' type='button'><svg aria-hidden='true' viewBox='0 0 24 24'><circle cx='11' cy='11' r='7'/><path d='M20 20l-3.5-3.5'/></svg></button>
 
-        <!-- 로그인 · 계정 버튼 (2026-11-13 사용자 "상단 메뉴 앞에 로그인 버튼") — 로그인 전 = 사람 아이콘, 로그인 뒤 = 내 사진. 누르면 계정 창(테마 JS). 방문자 요청 0: Firebase 는 누를 때 · 로그인해 둔 기기에서만 불러온다 -->
+        <!-- 로그인 · 계정 버튼 — 로그인 전 = 사람 아이콘, 로그인 뒤 = 내 사진. 누르면 계정 창(테마 JS). 방문자 요청 0: Firebase 는 누를 때 · 로그인해 둔 기기에서만 불러온다 -->
         <button aria-label='로그인' class='as-login-btn' type='button'><svg aria-hidden='true' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='8.5' r='3.5'/><path d='M5 19.5c.9-3.3 3.6-5 7-5s6.1 1.7 7 5'/></svg></button>
 
         <button class='nav-toggle' type='button' aria-controls='primary-menu' aria-expanded='false'>
@@ -811,7 +811,7 @@ __DASHBOARD__
                   </article>
                   <p class='post-nav'>
                     <b:comment>목록 버튼은 글의 연재(라벨)로 간다 — 트럼프 트렌드 글이면 그 라벨 목록, 고정 페이지는 홈으로(종목 상세는 테마 JS 가 온 곳 따라 목록으로 · 홈으로, 2026-10-29 P94), 아니면 데일리 리포트 목록.
-                      오른쪽 끝 TOP 은 맨 위로 (2026-10-13 사용자). 이전 글 · 다음 글은 같은 날 삭제.</b:comment>
+                      오른쪽 끝 TOP 은 맨 위로. 이전 글 · 다음 글은 같은 날 삭제.</b:comment>
                     <b:if cond='data:post.labels any (l =&gt; l.name == &quot;__TRUMP_LABEL__&quot;)'>
                       <a class='post-nav-list' href='/__TRUMP_LIST_PATH__'>목록</a>
                     <b:elseif cond='data:post.labels any (l =&gt; l.name == &quot;__NVDA_LABEL__&quot;)'/>
@@ -821,22 +821,22 @@ __DASHBOARD__
                     <b:elseif cond='data:post.labels any (l =&gt; l.name == &quot;__PEOPLE_LABEL__&quot;)'/>
                       <a class='post-nav-list' href='/__PEOPLE_LIST_PATH__'>목록</a>
                     <b:elseif cond='data:post.labels any (l =&gt; l.name == &quot;주식 공부&quot;)'/>
-                      <b:comment>주식 공부 = 댓글 · TOP 사이 가운데 `주식 공부 목록` 버튼 (2026-11-15 사용자) — 다른 글의 검은 목록 버튼은 숨긴 채</b:comment>
+                      <b:comment>주식 공부 = 댓글 · TOP 사이 가운데 `주식 공부 목록` 버튼 — 다른 글의 검은 목록 버튼은 숨긴 채</b:comment>
                       <a class='post-nav-list post-nav-study' href='/p/study.html'>주식 제대로 알기 목록</a>
                     <b:elseif cond='data:view.isPage or data:post.labels any (l =&gt; l.name == &quot;__MEDIA_LABEL__&quot;)'/>
-                      <b:comment>인물 발언 = 인물 발언 목록 · 미디어 데일리(방송) = 홈으로 — 둘 다 미국 증시 리포트 목록으로 가던 것 (2026-11-11 사용자)</b:comment>
+                      <b:comment>인물 발언 = 인물 발언 목록 · 미디어 데일리(방송) = 홈으로 — 둘 다 미국 증시 리포트 목록으로 가던 것</b:comment>
                       <a class='post-nav-list' expr:href='data:blog.homepageUrl'>홈으로</a>
                     <b:else/>
                       <a class='post-nav-list' href='/__LIST_PATH__'>목록</a>
                     </b:if>
                     <button aria-label='맨 위로' class='post-nav-top' type='button'>TOP<svg aria-hidden='true' fill='none' height='22' stroke='currentColor' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.6' viewBox='0 0 22 22' width='22'><circle cx='11' cy='11' r='10'/><path d='M11 15.5V7M7.5 10.5 11 7l3.5 3.5'/></svg></button>
                   </p>
-                  <b:comment>댓글은 우리 것 — 테마 JS "댓글" IIFE 가 Firebase 로 그린다 (2026-10-14 사용자: 폰에서 블로거 댓글 입력창이 좁다). 블로거 댓글(commentPicker)은 더 쓰지 않는다.</b:comment>
+                  <b:comment>댓글은 우리 것 — 테마 JS "댓글" IIFE 가 Firebase 로 그린다. 블로거 댓글(commentPicker)은 더 쓰지 않는다.</b:comment>
                   <section class='comments' expr:data-post-id='data:post.id' id='comments'><h3 class='comments-title'>댓글</h3></section>
                 </b:loop>
               </div>
             <b:elseif cond='data:view.isHomepage or (data:view.isPage and data:view.title == &quot;__KR_HOME_TITLE__&quot;)'/>
-              <b:comment>홈 아래 최근 리포트 링크 영역은 삭제 (2026-10-14 사용자). 홈 · 한국 홈은 위 대시보드만 — 한국 홈 페이지 본문은 그리지 않는다 (H35).</b:comment>
+              <b:comment>홈 아래 최근 리포트 링크 영역은 삭제. 홈 · 한국 홈은 위 대시보드만 — 한국 홈 페이지 본문은 그리지 않는다 (H35).</b:comment>
             <b:else/>
               <section class='reports'>
                 <div class='section-head'>
@@ -857,7 +857,7 @@ __DASHBOARD__
                 <div class='post-grid'>
                   <b:loop values='data:posts' var='post'>
                     <article class='post-card'>
-                      <b:comment>목록 카드 위 이미지는 두지 않는다 — 날짜 · 제목 · 요약만. 트럼프 · 엔비디아(2026-10-13) → 모든 리포트 (2026-11-10 사용자: 데일리 목록에 글 첫 그림인 S&amp;P 500 그래프가 표지로 떠 이상했다)</b:comment>
+                      <b:comment>목록 카드 위 이미지는 두지 않는다 — 날짜 · 제목 · 요약만. 트럼프 · 엔비디아(2026-10-13) → 모든 리포트</b:comment>
                       <div class='post-card-body'>
                         <div class='post-card-meta'>
                           <b:eval expr='data:post.date format &quot;yyyy.MM.dd&quot;'/>
@@ -887,7 +887,7 @@ __BLOG_INCLUDABLES__
 
 __FOOTER_BLOCK__
 
-    <!-- 하단 고정 메뉴 (2026-11-12 사용자 여정 테스트 확정) — 주소 · 지금 칸은 테마 JS 가 채운다(나라 = 지금 페이지 · 고른 홈) -->
+    <!-- 하단 고정 메뉴 — 주소 · 지금 칸은 테마 JS 가 채운다(나라 = 지금 페이지 · 고른 홈) -->
     <nav aria-label='주요 페이지' class='as-tabbar'>
       <a data-tab='home' href='/'><svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true' stroke-width='2.2'><path d='M4 11l8-7 8 7'/><path d='M6 10v10h12V10'/></svg><span>홈</span></a>
       <a data-tab='report' href='/search/label/%EB%8D%B0%EC%9D%BC%EB%A6%AC%20%EB%B8%8C%EB%A6%AC%ED%95%91'><svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true' stroke-width='2.2'><path d='M4 19h16'/><path d='M6 16l4-5 3 3 5-7'/></svg><span>증시 리포트</span></a>
@@ -949,13 +949,13 @@ __SEARCH_JS__
 </html>
 """
 
-# 홈 · 목록의 검색 설명 (블로거 설정의 검색 설명이 비어 있을 때만, 2026-10-13 사용자: 구글 검색에 잘 안 나온다)
-# 특정 종목 이름은 넣지 않는다 — 종목별 리포트는 늘어날 수 있다 (2026-10-13 사용자)
-SITE_DESC = "미국 · 한국 증시 리포트와 종목별 주가 · 실적 일정, 증시 전망과 핫이슈, 주식 공부까지 한곳에서 봅니다"   # 2026-11-16 사용자: 증시 전망 · Hot Issue · 주식 공부 추가, Blogger 설정 Description 과 같은 문장 (142바이트, 150 안). 옛 11-10 문장(113바이트)
+# 홈 · 목록의 검색 설명
+# 특정 종목 이름은 넣지 않는다 — 종목별 리포트는 늘어날 수 있다
+SITE_DESC = "미국 · 한국 증시 리포트와 종목별 주가 · 실적 일정, 증시 전망과 핫이슈, 주식 공부까지 한곳에서 봅니다"   #: 증시 전망 · Hot Issue · 주식 공부 추가, Blogger 설정 Description 과 같은 문장 (142바이트, 150 안). 옛 11-10 문장(113바이트)
 
-# 상단 메뉴 = 지금 있는 리포트 연재 (2026-10-13 사용자: "리포트들은 메뉴에 있어야 하고 클릭하면 리포트 리스트 화면으로"). (보이는 이름, 블로거 라벨)
+# 상단 메뉴 = 지금 있는 리포트 연재. (보이는 이름, 블로거 라벨)
 # 엔비디아 리포트는 뺐다 — 2026-11-01 부터 날짜별 글 없이 종목 고정 페이지(시총 TOP 10 에서 들어감). 지난 글 목록 화면 · 목록 버튼은 아래 NVDA_LABEL 로 그대로
-NAV_LABELS = [("미국 증시 리포트", "데일리 브리핑")]   # 트럼프 연재 메뉴 삭제 (2026-11-04 종료 · 2026-11-07 사용자)
+NAV_LABELS = [("미국 증시 리포트", "데일리 브리핑")]   # 트럼프 연재 메뉴 삭제
 
 # 데일리 리포트 목록 화면. publish_blogger.LABELS 의 첫 라벨과 같아야 한다 —
 # 파이프라인이 실제로 붙이는 라벨이라야 목록에 글이 잡힌다.
@@ -971,18 +971,18 @@ TRUMP_LIST_PATH = "search/label/" + quote(TRUMP_LABEL)
 NVDA_LABEL = "엔비디아"
 NVDA_LIST_PATH = "search/label/" + quote(NVDA_LABEL)
 
-# 한국 증시 리포트 연재 (experiments/kr-market-report/publish_report.LABEL). 글 아래 목록 버튼이 미국(데일리) 목록으로 가고, 라벨 목록 제목도 `미국 증시 리포트 목록` 이던 것 (2026-11-10 사용자)
+# 한국 증시 리포트 연재 (experiments/kr-market-report/publish_report.LABEL). 글 아래 목록 버튼이 미국(데일리) 목록으로 가고, 라벨 목록 제목도 `미국 증시 리포트 목록` 이던 것
 KR_REPORT_LABEL = "한국 증시 리포트"
 KR_REPORT_LIST_PATH = "search/label/" + quote(KR_REPORT_LABEL)
 
-# 인물 발언 (experiments/people-radar/render_html.LABELS 첫 라벨) = 인물 발언 목록, 미디어 데일리(experiments/media-daily/config.LABELS 첫 라벨) = 홈으로 (2026-11-11 사용자)
+# 인물 발언 (experiments/people-radar/render_html.LABELS 첫 라벨) = 인물 발언 목록, 미디어 데일리(experiments/media-daily/config.LABELS 첫 라벨) = 홈으로
 PEOPLE_LABEL = "인물 발언"
 PEOPLE_LIST_PATH = "search/label/" + quote(PEOPLE_LABEL)
 MEDIA_LABEL = "미디어 데일리"
 
 
 def nav_items():
-    # 전체 메뉴 줄 (2026-11-12 사용자 여정 테스트 확정, 2026-11-17 index.html 에서 옮김) — 미국 · 한국 홈 버튼은 템플릿(.menu-mk)에 직접.
+    # 전체 메뉴 줄 — 미국 · 한국 홈 버튼은 템플릿(.menu-mk)에 직접.
     # 주소는 '/' 로 시작 (2026-11-09): 폰 화면(?m=1)에서 homepageUrl 이 `/?m=1` 이라 `/?m=1p/...` 로 붙어 메뉴 · 목록이 모두 홈으로 갔다
     return """          <div class='menu-row'><a class='nav-item' data-latest='데일리 브리핑' href='/search/label/%EB%8D%B0%EC%9D%BC%EB%A6%AC%20%EB%B8%8C%EB%A6%AC%ED%95%91'>미국 증시 리포트</a><a class='menu-past' href='/search/label/%EB%8D%B0%EC%9D%BC%EB%A6%AC%20%EB%B8%8C%EB%A6%AC%ED%95%91'>지난 리포트</a></div>
           <div class='menu-row'><a class='nav-item' data-latest='한국 증시 리포트' href='/search/label/%ED%95%9C%EA%B5%AD%20%EC%A6%9D%EC%8B%9C%20%EB%A6%AC%ED%8F%AC%ED%8A%B8'>한국 증시 리포트</a><a class='menu-past' href='/search/label/%ED%95%9C%EA%B5%AD%20%EC%A6%9D%EC%8B%9C%20%EB%A6%AC%ED%8F%AC%ED%8A%B8'>지난 리포트</a></div>
@@ -994,13 +994,13 @@ def nav_items():
           <div class='menu-row'><a class='nav-item' data-latest='인물 발언' href='/search/label/%EC%9D%B8%EB%AC%BC%20%EB%B0%9C%EC%96%B8'>주요 인물 발언</a><a class='menu-past' href='/search/label/%EC%9D%B8%EB%AC%BC%20%EB%B0%9C%EC%96%B8'>지난 발언</a></div>
           <div class='menu-row'><a class='nav-item' data-latest='미디어 데일리' href='/search/label/%EB%AF%B8%EB%94%94%EC%96%B4%20%EB%8D%B0%EC%9D%BC%EB%A6%AC'>방송 브리핑</a><a class='menu-past' href='/search/label/%EB%AF%B8%EB%94%94%EC%96%B4%20%EB%8D%B0%EC%9D%BC%EB%A6%AC'>지난 브리핑</a></div>
           <div class='menu-grp'><div class='menu-grp-t'>테마</div><a class='nav-item' href='/p/theme-ai-capex.html'>AI 투자 자금 방향</a><a class='nav-item' href='/p/theme-fed-rate-cut-expectations.html'>연준 금리 인하 기대</a><a class='nav-item' href='/p/theme-insider-trading.html'>임원 기관 매매 동향</a></div>
-          <b:comment>관리자 줄 (2026-11-13 사용자) — 블로그 주인이 구글 로그인한 기기에서만 보인다(localStorage as-admin, 방문자 요청 0). 누르면 Firebase ID 토큰을 운영 Worker 로 POST</b:comment>
+          <b:comment>관리자 줄 — 블로그 주인이 구글 로그인한 기기에서만 보인다(localStorage as-admin, 방문자 요청 0). 누르면 Firebase ID 토큰을 운영 Worker 로 POST</b:comment>
           <div class='menu-row menu-admin' hidden='hidden'><a class='nav-item' href='https://alphascope-ops-console.red6keep.workers.dev/'>운영 현황</a></div>"""
 
 
 TOP10_SLUG, TOP10_NAME = "us-market-cap-top10", "시총 TOP 10"
 FORECAST_SLUG, FORECAST_NAME = "forecast-list", "증시 전망"
-# 한국 홈 고정 페이지 (H35, 2026-11-10 사용자) — 테마는 제목으로 알아본다(Blogger 조건식에서 주소 비교가 불안정). 제목을 바꾸면 페이지 제목도 같이 (experiments/home-split/publish_korea_home.py)
+# 한국 홈 고정 페이지 — 테마는 제목으로 알아본다(Blogger 조건식에서 주소 비교가 불안정). 제목을 바꾸면 페이지 제목도 같이 (experiments/home-split/publish_korea_home.py)
 KR_HOME_SLUG, KR_HOME_TITLE = "korea", "한국 증시 · 종목 주가"
 
 
@@ -1026,7 +1026,7 @@ def blog_includables(backup_path="index.indie-backup.html"):
     )
     if len(blocks) < 20:
         sys.exit(f"[build_theme] Blog1 includable 추출이 부족합니다 ({len(blocks)}개).")
-    # 글 보기 제목은 h1 (검색 노출, 2026-10-18 사용자 — 가이드라인 10-5). 원래 테마는 h3. 모양은 .post-title 클래스라 그대로
+    # 글 보기 제목은 h1. 원래 테마는 h3. 모양은 .post-title 클래스라 그대로
     for i, b in enumerate(blocks):
         if b.startswith("<b:includable id='postTitle'"):
             if "<h3 class='post-title entry-title'>" not in b:
@@ -1040,7 +1040,7 @@ def indent(text, spaces):
     return "\n".join(pad + line if line.strip() else line for line in text.split("\n"))
 
 
-# PC 글자 — 네이버 블로그 글(스마트에디터 ONE) 기준 (2026-10-15 사용자: "blog.naver.com/lmkek41/224417597667 화면 참고해서 폰트 적용,
+# PC 글자 — 네이버 블로그 글(스마트에디터 ONE) 기준 (: "blog.naver.com/lmkek41/224417597667 화면 참고해서 폰트 적용,
 # 본문 폰트 사이즈도 이것으로, 행간은 기존보다 늘었어, 폰트 두께는 1단계 두껍게" — PC 만).
 # 그 글: 나눔바른고딕(se-ff-nanumbarungothic) · 본문 16px(se-fs-fs16) · 행간 2.0 · 자간 0.
 # 그래서 본문 19 → 16, 16px 보다 큰 글자는 같은 비율(16/19)로 줄이되 16 아래로는 내리지 않는다(17 · 18 → 16). 16px 이하는 그대로.
@@ -1057,7 +1057,7 @@ PC_FONT = "'AS Num', 'AS Barun', 'NanumBarunGothic', 'Apple SD Gothic Neo', 'Mal
 PC_STROKE = "0.25px"       # 한 단계 두껍게 (Medium 대신)
 BARUN = "https://hangeul.pstatic.net/hangeul_static/webfont/NanumBarunGothic/"   # 네이버 한글 글꼴 공식 배포
 PC_FIXED = {".post-title": (28, 36)}
-PC_KEEP = {".rt-pop-body"}   # 폰에서도 줄이지 않는 규칙 — 팝업 글은 폰도 19/28 하나 (2026-11-14 사용자, e8247c68 · 2026-11-17 index.html 에서 옮김)   # 글 제목 28 · 36 (네이버 뉴스 기사 제목, 같은 날)
+PC_KEEP = {".rt-pop-body"}   # 폰에서도 줄이지 않는 규칙 — 팝업 글은 폰도 19/28 하나   # 글 제목 28 · 36 (네이버 뉴스 기사 제목, 같은 날)
 POST_INLINE_SIZES = (17, 18, 19, 20, 21, 22, 26, 28)   # 리포트 렌더러가 본문에 인라인으로 넣는 16 초과 크기
 POST_INLINE_LH = {27: 19, 28: 22, 32: 18, 34: 19}       # 렌더러 인라인 행간 → 그 행간을 쓰는 글자 크기
 
@@ -1131,11 +1131,11 @@ def pc_type_css(css):
                        f' {{ margin-top: {round((new_lh - dot) / 2)}px !important; }}')
     # 테마의 3px 점 — 본문 행간(17 × 1.56 = 26.5)의 첫 줄 가운데
     out.append(f"  .report-columns li::before, .kv-row--block li::before {{ margin-top: {round((round(PC_BODY * PC_PARA_LH * 2) / 2 - 3) / 2)}px; }}")
-    # 글꼴 — 나눔바른고딕. 테마의 글꼴 변수와 리포트 본문 인라인 글꼴(design_kit.WRAP_OPEN)을 바꾼다. 숫자 칸(--num · 'AS Num' = Inter, 2026-11-21 사용자)은 그대로
+    # 글꼴 — 나눔바른고딕. 테마의 글꼴 변수와 리포트 본문 인라인 글꼴(design_kit.WRAP_OPEN)을 바꾼다. 숫자 칸은 그대로
     out.append(f"  :root {{ --sans: {PC_FONT}; --report-font: {PC_FONT}; }}")
     out.append("  .logo-word { font-family: 'Noto Sans KR', sans-serif; }")   # 로고 글자는 그대로
     out.append("  .post-body [style*=\"font-family\"]:not([style*=\"monospace\"]):not([data-brand-font]) { font-family: var(--report-font) !important; }")
-    # 브랜드 `AlphaScope`(render_html.brand_mark · 강조 카드 질문) = 로고 글꼴 그대로 (2026-11-15 사용자: "로고에 있는 서체로") ·
+    # 브랜드 `AlphaScope`(render_html.brand_mark · 강조 카드 질문) = 로고 글꼴 그대로 ·
     # 문장 속 브랜드는 둘레 글자 − 2 — 둘레가 PC 크기로 줄면 브랜드도 PC 둘레 − 2 (data-brand-font = 둘레 px)
     out.append("  .post-body [data-brand-font] { font-family: 'Noto Sans KR', sans-serif !important; }")
     for n in POST_INLINE_SIZES:
@@ -1143,7 +1143,7 @@ def pc_type_css(css):
     out.append(f"  body {{ -webkit-text-stroke: {PC_STROKE}; }}")
     face = ("@font-face {{ font-family: 'AS Barun'; font-weight: {w}; font-display: swap; "
             "src: url({u}NanumBarunGothicWeb{s}.woff) format('woff'); }}")
-    return ("/* PC 글자 — build_theme.pc_type_css 가 만든다. 직접 고치지 말 것 (2026-10-15 사용자, 네이버 블로그 글 기준) */\n"
+    return ("/* PC 글자 — build_theme.pc_type_css 가 만든다. 직접 고치지 말 것 */\n"
             + face.format(w=400, u=BARUN, s="") + "\n" + face.format(w=700, u=BARUN, s="Bold") + "\n"
             f"@media (min-width: {PC_MIN}px) {{\n" + "\n".join(out) + "\n}")
 
@@ -1151,7 +1151,7 @@ def pc_type_css(css):
 def build_theme(parts):
     """블로거에 붙여넣는 테마 XML 을 만든다."""
     includables, n = blog_includables()
-    # 공유 버튼: 제목 아래(headerByline)에는 두지 않고 본문 아래(postFooter)에만 (2026-10-10 사용자)
+    # 공유 버튼: 제목 아래(headerByline)에는 두지 않고 본문 아래(postFooter)에만
     includables = includables.replace(
         "<b:include cond='data:view.isMultipleItems or data:widgets.Blog.first.headerByline.items.share' data='{ shareButtonClass: &quot;post-share-buttons-top&quot;, overridden: true }' name='maybeAddShareButtons'/>",
         "<b:comment>공유 버튼은 본문 아래(postFooter)에만 둔다</b:comment>")

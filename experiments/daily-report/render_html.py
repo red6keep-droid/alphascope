@@ -15,23 +15,23 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 import design_kit as dk  # noqa: E402  — 디자인-가이드라인.md 공통 조각 (2026-10-11)
-import people_section  # noqa: E402  — 인물 발언 구획 (2026-11-07 사용자, 목업)
+import people_section  # noqa: E402  — 인물 발언 구획
 
-dk.TIP_SRC = "Yahoo Finance"   # 툴팁 기본 데이터 출처. 금리 · 경제 일정이 들어간 툴팁만 with_src (2026-10-20 사용자)
+dk.TIP_SRC = "Yahoo Finance"   # 툴팁 기본 데이터 출처. 금리 · 경제 일정이 들어간 툴팁만 with_src
 import candle_chart as CDL  # noqa: E402  — 본문 맨 위 봉차트 = 종목 페이지와 같은 실제 차트 (2026-11-16)
 import cards  # noqa: E402  — 질문 카드 · 막대 그래프 (2026-10-18 재설계)
 import sections as sx  # noqa: E402  — 독자 질문 D1 ~ D6 · K1 ~ K3 구획 (doc/기획/데일리-리포트-기획.md 6절)
-import market as mk  # noqa: E402  — 시장 탭 질문 카드 8개 (2026-11-07 사용자: 시장 탭도 질문 · 답 형태로)
+import market as mk  # noqa: E402  — 시장 탭 질문 카드 8개
 import datetime  # noqa: E402
-import media_feed  # noqa: E402  — 방송 줄 (미디어 데일리 재료의 시장 · 업종 이슈, 2026-10-25 사용자)
+import media_feed  # noqa: E402  — 방송 줄
 import kr_news  # noqa: E402  — 한국장 탭 `한국장에 영향을 줄 만한 소식` (미디어 데일리 뒤에 이 칸만 갱신)
 import news_pick  # noqa: E402  — 뉴스 묶기 · 꼭 볼 뉴스 · 팝업 재료 (2026-11-05 batch 8)
 
-MEDIA_SHOWN = 5    # 뉴스 구획 끝의 방송 줄 — 앞 5건만 펼쳐 두고 나머지는 `방송 n건 더 보기` 접기 (2026-10-30 사용자: 상한 없이 다 싣는다. 옛 MEDIA_MAX=3 은 미디어 데일리가 나머지를 들던 때 숫자)
-MEDIA_HOURS = 48   # 글을 만드는 시각 기준 최근 48시간 영상 (2026-10-30 사용자, 옛 24)
-KR_CLAMP2 = "display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;"   # 한국 뉴스 보조 줄 두 줄 자르기 (2026-11-25 사용자 "세 줄은 안 돼")
-KR_CHIP_MIN, KR_CHIPS = 3, 3   # 한국 분야 칩 = 3건 넘게 다룬 분야만 · 많은 순 3개까지 (2026-11-25 사용자 "탭이 너무 많다")
-NEW_LEAD = dk.NEW_PILL.replace("margin-left:4px;", "margin-right:5px;").replace("vertical-align:middle;", "vertical-align:middle;position:relative;top:-2px;")   # 제목 글자와 세로 가운데 (2026-11-07 사용자 P347: 아래로 치우침)   # 새 뉴스 N 은 제목 앞에 (2026-11-05 사용자)
+MEDIA_SHOWN = 5    # 뉴스 구획 끝의 방송 줄 — 앞 5건만 펼쳐 두고 나머지는 `방송 n건 더 보기` 접기
+MEDIA_HOURS = 48   # 글을 만드는 시각 기준 최근 48시간 영상
+KR_CLAMP2 = "display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;"   # 한국 뉴스 보조 줄 두 줄 자르기
+KR_CHIP_MIN, KR_CHIPS = 3, 3   # 한국 분야 칩 = 3건 넘게 다룬 분야만 · 많은 순 3개까지
+NEW_LEAD = dk.NEW_PILL.replace("margin-left:4px;", "margin-right:5px;").replace("vertical-align:middle;", "vertical-align:middle;position:relative;top:-2px;")   # 제목 글자와 세로 가운데   # 새 뉴스 N 은 제목 앞에
 STORY_SHOWN = 5    # `여러 방송이 같이 다룬 뉴스는?` 카드에 보이는 묶음 수 (2026-11-05 batch 8 ③)
 CHART_MAIN = getattr(dk, "CHART_MAIN", "#F59E0B")   # 우리 그래프 기본색(주황 · 사용자가 노랑이라 부르는 색) · 비교 대상 회색 — 가이드라인 8-0 (⑨)
 CHART_CMP = getattr(dk, "CHART_CMP", "#CBD5E1")
@@ -85,7 +85,7 @@ REGIME_COMPONENT_LABELS = {
 }
 
 # 뉴스 테마 어휘. 프롬프트·validate_report와 같은 목록이어야 한다. 밖의 값은 '기타'로 접는다.
-THEME_VOCAB = ["금리", "AI/반도체", "실적", "거시경제", "에너지", "정책/규제", "지정학", "기타"]   # `매크로` → `거시경제` (2026-11-05 사용자 batch 9 ⑦: 영어 그대로는 어렵다 — 공용 어휘 news_store.THEME · media_feed.THEME 도 같이)
+THEME_VOCAB = ["금리", "AI/반도체", "실적", "거시경제", "에너지", "정책/규제", "지정학", "기타"]   # `매크로` → `거시경제`
 
 # 뉴스 '관련 자산' 줄에서 심볼 대신 보여줄 이름
 SYMBOL_NAMES = {
@@ -94,7 +94,7 @@ SYMBOL_NAMES = {
     "^VIX": "VIX", "^TNX": "미국 10년물 금리", "^FVX": "미국 5년물 금리", "^IRX": "미국 3개월물 금리",
 }
 
-INDEX_LABELS = {   # 한국어 위주 (가이드라인 3-4). S&P 500·VIX 는 고유명으로 둔다. 이름 옆 (의미)는 작은 글씨 — dk.paren (2026-10-14 사용자: 블로그 모든 지수 이름)
+INDEX_LABELS = {   # 한국어 위주 (가이드라인 3-4). S&P 500·VIX 는 고유명으로 둔다. 이름 옆 (의미)는 작은 글씨 — dk.paren
     "sp500": "S&P 500 (대형주)",
     "nasdaq": "나스닥 (기술주)",
     "dow": "다우존스 (우량주)",
@@ -105,8 +105,8 @@ INDEX_LABELS = {   # 한국어 위주 (가이드라인 3-4). S&P 500·VIX 는 �
 TERM_KO = {"위험선호(Risk-On)": "위험 선호", "위험회피(Risk-Off)": "위험 회피", "위험 선호(Risk-On)": "위험 선호", "위험 회피(Risk-Off)": "위험 회피",
            "Risk-On": "위험 선호", "Risk-Off": "위험 회피", "Risk On": "위험 선호", "Risk Off": "위험 회피", "Neutral": "중립",
            "Nasdaq": "나스닥", "Dow Jones": "다우존스", "Dow": "다우", "Russell 2000": "러셀 2000", "Market Regime": "시장 상태"}
-TAB_TODAY, TAB_MARKET, TAB_STOCKS, TAB_RISK = "오늘", "시장", "종목 · 뉴스", "위험"   # "·" 앞뒤 띄우기 (2026-10-13 사용자)
-TAB_KOREA, TAB_CAL, TAB_NEWS, TAB_PEOPLE = "한국장", "일정", "뉴스", "인물 발언"   # 인물 발언 = 뉴스 옆 탭 (2026-11-07 사용자 P365)   # 2026-10-18 재설계: 오늘 · 한국장 · 시장 · 일정 (종목 · 뉴스 · 위험 탭은 없앰 — 기획 6절)
+TAB_TODAY, TAB_MARKET, TAB_STOCKS, TAB_RISK = "오늘", "시장", "종목 · 뉴스", "위험"   # "·" 앞뒤 띄우기
+TAB_KOREA, TAB_CAL, TAB_NEWS, TAB_PEOPLE = "한국장", "일정", "뉴스", "인물 발언"   # 인물 발언 = 뉴스 옆 탭   # 2026-10-18 재설계: 오늘 · 한국장 · 시장 · 일정 (종목 · 뉴스 · 위험 탭은 없앰 — 기획 6절)
 
 # report_input.json의 지수 키 → analysis.json series의 심볼 (analyze.INDEX_SYMBOL과 동일)
 INDEX_SYMBOL = {
@@ -134,7 +134,7 @@ __BODY__
 
 STATE_HISTORY = os.path.join(os.path.dirname(os.path.abspath(__file__)), "output", "state", "history")   # analyze.STATE_DIR/history — report-state 브랜치에서 불러온 분석 이력
 
-SECTOR_KO = {   # yfinance info.sector → 섹터 라벨 (섹터 표의 이름과 같게, 2026-10-13 사용자: 급등주 · 관심 종목 섹터 라벨)
+SECTOR_KO = {   # yfinance info.sector → 섹터 라벨
     "Technology": "기술", "Financial Services": "금융", "Energy": "에너지", "Healthcare": "헬스케어",
     "Consumer Cyclical": "소비 (경기민감)", "Consumer Defensive": "소비 (필수)", "Utilities": "유틸리티",
     "Industrials": "산업", "Basic Materials": "소재", "Real Estate": "부동산", "Communication Services": "통신",
@@ -146,7 +146,7 @@ MUTED = dk.MUTED
 
 
 def _prev_analysis(analysis):
-    """어제(이 글 날짜 바로 앞) 분석 이력 — 값마다 어제 대비를 그리려고 (2026-10-13 사용자: "모든 데이터는 어제 기준으로 증가했는지 감소했는지").
+    """어제(이 글 날짜 바로 앞) 분석 이력 — 값마다 어제 대비를 그리려고.
     이력이 없으면 {} — 어제 대비는 빠진다."""
     today = (analysis or {}).get("date")
     if not today or not os.path.isdir(STATE_HISTORY):
@@ -269,17 +269,17 @@ ZOOM_ICON = ('<svg viewBox="0 0 16 16" width="18" height="18" aria-hidden="true"
 
 
 def sec_chart(output_dir):
-    """S&P 500 가격 그래프 — 본문 맨 앞, 탭 줄 위 (2026-10-18 사용자: "다른 리포트처럼 상단에, 클릭하면 새 창"). 엔비디아 sec_chart 와 같은 모양.
+    """S&P 500 가격 그래프 — 본문 맨 앞, 탭 줄 위. 엔비디아 sec_chart 와 같은 모양.
     data-zoom: 테마 JS 가 전체 화면 팝업 + 가로 스크롤로 연다(가이드 8절), JS 없으면 원본 링크 새 창. chart.json 이 없으면 빈 문자열."""
     path = os.path.join(output_dir or "", "chart.json")
     if not output_dir or not os.path.exists(path):
         return ""
     with open(path, encoding="utf-8") as f:
         c = json.load(f)
-    real = CDL.card("S&P 500", c.get("bars") or [], 2, title="")   # 종목 페이지와 같은 실제 봉차트 (2026-11-16 사용자: "상세 페이지는 그림 파일 말고 우리가 진짜 하는 차트") — 일 · 주 · 월 · 지표는 브라우저 계산
+    real = CDL.card("S&P 500", c.get("bars") or [], 2, title="")   # 종목 페이지와 같은 실제 봉차트 — 일 · 주 · 월 · 지표는 브라우저 계산
     if not real:
         return ""
-    return real + CDL.GAP + CDL.SCRIPT + dk.tv_chart_fold("AMEX:SPY", "America/New_York", "SPY")   # 장중 차트 접힘 줄 — 종목 페이지 · 한국 증시 리포트와 같은 자리, 미국 정규장에만 보임 (2026-11-07 사용자)
+    return real + CDL.GAP + CDL.SCRIPT + dk.tv_chart_fold("AMEX:SPY", "America/New_York", "SPY")   # 장중 차트 접힘 줄 — 종목 페이지 · 한국 증시 리포트와 같은 자리, 미국 정규장에만 보임
 
 
 def _cover_image(cover_url):
@@ -290,7 +290,7 @@ def _cover_image(cover_url):
 
 
 SHARE_IMG = ('<img data-share-img="1" src="https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/share/share_logo.png" '
-             'alt="" width="1200" height="600" hidden style="display:none">')   # 본문 맨 앞 숨은 공통 로고 — Blogger 대표 이미지(목록 썸네일 · og:image)가 표 속 회사 로고가 되지 않게 (2026-11-16 사용자, 주식 공부 share_tag 와 같은 방식)
+             'alt="" width="1200" height="600" hidden style="display:none">')   # 본문 맨 앞 숨은 공통 로고 — Blogger 대표 이미지(목록 썸네일 · og:image)가 표 속 회사 로고가 되지 않게
 
 
 PARA_GAP = int(dk.LH_BODY[:-2])   # 문단 사이 = 빈 줄 하나 (본문 행간)
@@ -298,7 +298,7 @@ PARA_GAP = int(dk.LH_BODY[:-2])   # 문단 사이 = 빈 줄 하나 (본문 행�
 
 def _paragraphs(text):
     """Gemini 문구 → [[문장, …], …]. 빈 줄이 문단 경계(내용이 바뀌는 곳), 마침표 뒤 공백이나 줄바꿈이 문장 끝.
-    (2026-10-16 사용자: "문장이 길면 마침표 뒤에 줄바꿈, 내용이 바뀌면 줄바꿈 두 번") — 프롬프트가 주제가 바뀌는 곳에 빈 줄을 넣는다."""
+ — 프롬프트가 주제가 바뀌는 곳에 빈 줄을 넣는다."""
     paras = []
     for block in re.split(r"\n\s*\n", str(text or "").strip()):
         sents = [s.strip() for s in re.split(r"(?<=\.)\s+|\n", block) if s.strip()]
@@ -308,7 +308,7 @@ def _paragraphs(text):
 
 
 def _text_flow(text):
-    """한 문단으로 이어 쓰기 — 문단 · 문장 나눔 없이 PC · 모바일 같게, 줄바꿈은 띄어쓰기에서만 (2026-11-07 사용자 P391: 오늘 탭 지수 해설).
+    """한 문단으로 이어 쓰기 — 문단 · 문장 나눔 없이 PC · 모바일 같게, 줄바꿈은 띄어쓰기에서만.
     data-sent 를 달지 않는다(테마 CSS 가 PC 에서 문장마다 줄을 바꾸는 표시)."""
     sents = [x for p in _paragraphs(text) for x in p]
     if not sents:
@@ -323,7 +323,7 @@ def _text(text):
     if not paras:
         return dk.muted("데이터 없음")
     # data-para · data-sent: 테마 CSS 가 PC 에서는 문장을 블록(한 줄씩), 모바일(≤900px)에서는 인라인(이어 흐름)으로 — 문장 뒤 공백은 인라인일 때의 띄어쓰기
-    return "".join(f'<div data-para="1" style="margin:{PARA_GAP if i else 0}px 0 6px;padding-left:{dk.ALIGN_PX}px;">' + "".join(f'<span data-sent="1">{dk.tint(_esc(dk.ko(s, TERM_KO)))}</span> ' for s in sents) + "</div>"   # 증감 색 (2026-10-12 사용자: 모든 곳)
+    return "".join(f'<div data-para="1" style="margin:{PARA_GAP if i else 0}px 0 6px;padding-left:{dk.ALIGN_PX}px;">' + "".join(f'<span data-sent="1">{dk.tint(_esc(dk.ko(s, TERM_KO)))}</span> ' for s in sents) + "</div>"   # 증감 색
                    for i, sents in enumerate(paras))
 
 
@@ -331,12 +331,12 @@ def _light_word(light):
     return {"🟢": "정상", "🟡": "주의", "🔴": "경계"}.get(light, "")
 
 
-LIGHT_KIND = {"🟢": "good", "🟡": "uncertain", "🔴": "negative"}   # 신호등 → 라벨·상태 카드 색 (🟢 녹색, 2026-10-12 사용자)
-SCORE_SIZE = "20px"   # 점수 카드의 "86 / 100" — 20px 굵게 (2026-10-12 사용자, 18·16·14 밖의 유일한 예외)
-# 툴팁 글은 뜻 · 오늘(+ 참고) — 기록상 줄은 2026-11-01 폐지 (디자인-가이드라인.md 2-6, 2026-10-18 사용자: "툴팁은 어려운 용어를 쉽게 전달하는 것인데 숫자만 나열돼 있다").
+LIGHT_KIND = {"🟢": "good", "🟡": "uncertain", "🔴": "negative"}   # 신호등 → 라벨·상태 카드 색
+SCORE_SIZE = "20px"   # 점수 카드의 "86 / 100" — 20px 굵게
+# 툴팁 글은 뜻 · 오늘(+ 참고) — 기록상 줄은 2026-11-01 폐지.
 # 오늘 값을 읽어 줘야 하므로 툴팁은 상수가 아니라 데이터를 받는 함수. 이 리포트의 지표는 아직 우리 검증 결과가 없어 `기록상` 줄은 두지 않는다.
 # 등급 경계는 analyze.py 와 같아야 한다 — 시장 상태 70 · 45 (REGIME_RISK_ON · OFF), 상승 비율 65 · 45 (breadth_proxy), 위험 신호는 status_board.
-REGIME_GRADE_NOW = {   # 점수 카드 툴팁의 오늘 줄 — 등급의 뜻 (옛 GRADE_MEANING, 2026-10-12 사용자)
+REGIME_GRADE_NOW = {   # 점수 카드 툴팁의 오늘 줄 — 등급의 뜻
     "위험 선호": "위험 선호 구간. 투자자들이 위험을 감수하고 주식 쪽으로 움직이기 쉬운 환경",
     "중립": "중립 구간. 위험 선호와 위험 회피 어느 쪽으로도 크게 기울지 않았다",
     "위험 회피": "위험 회피 구간. 투자자들이 위험을 피해 안전한 자산 쪽으로 움직이기 쉬운 환경",
@@ -372,7 +372,7 @@ def regime_rule(regime):
 
 def _light_pill(light, text=None):
     kind = LIGHT_KIND.get(light, "neutral")
-    return dk.pill(text or _light_word(light) or "—", kind).replace(f"margin:0 {dk.PILL_GAP}px;", f"margin:0 {dk.PILL_GAP + 5}px 0 {dk.PILL_GAP}px;", 1)   # 등급 라벨 오른쪽 +5 (2026-10-13 사용자)
+    return dk.pill(text or _light_word(light) or "—", kind).replace(f"margin:0 {dk.PILL_GAP}px;", f"margin:0 {dk.PILL_GAP + 5}px 0 {dk.PILL_GAP}px;", 1)   # 등급 라벨 오른쪽 +5
 
 
 
@@ -390,7 +390,7 @@ def sec_seo_lead(input_data, analysis):
     day = ""
     if as_of:
         try:
-            day = dk.kst_close_day(as_of, "US") + " 새벽 "   # 독자 = 한국 시간 (2026-11-14 사용자, 옛 뉴욕 날짜)
+            day = dk.kst_close_day(as_of, "US") + " 새벽 "   # 독자 = 한국 시간
         except ValueError:
             day = ""
     indices = (input_data.get("market") or {}).get("indices") or {}
@@ -403,43 +403,43 @@ def sec_seo_lead(input_data, analysis):
     outs = [sx.INDEX_NAME[k] for k in ("^GSPC", "^IXIC", "^DJI") if (nr.get(k) or {}).get("outside")]
     if nr.get("^GSPC"):   # 점수 대신 평소 범위 (2026-10-18 재설계 — 점수는 앞날을 가르지 못했다)
         sents.append((sx.eun(" · ".join(outs)) + " 평소 하루 움직임의 범위를 벗어났습니다.") if outs else "주요 지수는 모두 평소 하루 움직임의 범위 안이었습니다.")
-    k = sx.seo_korea(a)   # 코스피 영향 한 문장 — 검색어 "코스피 영향" (2026-10-18 사용자)
+    k = sx.seo_korea(a)   # 코스피 영향 한 문장 — 검색어 "코스피 영향"
     if k:
         sents.append(k)
     if not sents:
         return ""
-    html = dk.bold_pct(dk._tint_inline(_esc(" ".join(sents))))   # 증감 숫자 굵게 (2026-11-07 사용자 P390)
-    html = re.sub(r"(평소의 [0-9.]+배)", r'<span style="font-weight:700;">\1</span>', html)   # 배수 굵게 — `범위를 벗어났습니다` 는 굵게 하지 않는다 (같은 날 사용자 정정)
+    html = dk.bold_pct(dk._tint_inline(_esc(" ".join(sents))))   # 증감 숫자 굵게
+    html = re.sub(r"(평소의 [0-9.]+배)", r'<span style="font-weight:700;">\1</span>', html)   # 배수 굵게 — `범위를 벗어났습니다` 는 굵게 하지 않는다
     return f'<p data-seo-lead="1" style="{dk.SEO_LEAD}">' + html + "</p>"   # 요약 문장의 증감도 색 (가이드라인 3-3-1, 예외 없음) — 문장이라 숫자(와 앞 지수 이름)만 칠한다. dk.tint 는 가운뎃점 덩어리 통째로 칠해 문장 앞머리까지 파랗게 된다
 
 
 def sec_lead(report, analysis):
-    """글 머리(제목 없음, data-lead): 한 줄 결론 + 종합을 한 강조 카드에 (2026-10-12 사용자: 하나의 카드로 통합, 가로 구분선, 16px).
+    """글 머리(제목 없음, data-lead): 한 줄 결론 + 종합을 한 강조 카드에.
     홈 카드는 '(머리)'로 한 줄 결론을 읽는다."""
     one = str(report.get("one_line") or "").strip()
-    inner = f'<div style="color:#111;font-weight:700;padding-left:{dk.ALIGN_PX}px;">{_esc(dk.ko(one, TERM_KO))}</div>' if one else dk.muted("한 줄 결론 없음")   # 카드 대신 굵게 (2026-10-13 사용자)
-    # 구분선 아래 종합(Gemini opinion, data-insight)은 뺐다 — `최근 며칠 · 몇 주와 비교` 는 시장 탭 `지금 시장 흐름은?` 과 겹친다 (2026-11-07 사용자). 홈 카드는 10-20부터 한 줄만 읽는다
-    return dk.cards(f'<div style="margin:16px 0 8px;line-height:{dk.LH_BODY};">{inner}</div>')   # 지수 표 아래로 옮김 — 위 여백 16 (2026-11-07 사용자 순서: 그래프 → 지수 표 → 한 줄 결론)   # 오늘 탭 첫 콘텐츠 위 +10 (2026-10-13 사용자)   # 강조 카드 디자인 삭제 — 배경 · 테두리 · 안쪽 여백 없음 (2026-10-13 사용자)
+    inner = f'<div style="color:#111;font-weight:700;padding-left:{dk.ALIGN_PX}px;">{_esc(dk.ko(one, TERM_KO))}</div>' if one else dk.muted("한 줄 결론 없음")   # 카드 대신 굵게
+    # 구분선 아래 종합(Gemini opinion, data-insight)은 뺐다 — `최근 며칠 · 몇 주와 비교` 는 시장 탭 `지금 시장 흐름은?` 과 겹친다. 홈 카드는 10-20부터 한 줄만 읽는다
+    return dk.cards(f'<div style="margin:16px 0 8px;line-height:{dk.LH_BODY};">{inner}</div>')   # 지수 표 아래로 옮김 — 위 여백 16   # 오늘 탭 첫 콘텐츠 위 +10   # 강조 카드 디자인 삭제 — 배경 · 테두리 · 안쪽 여백 없음
 
 
 def sec_regime(analysis, report, prev=None):
-    """시장 상태 — 해설 먼저(2026-10-12 사용자: 모든 탭 일괄), 점수 카드(접힘) → 펼치면 어제 대비 + 요소별 막대 C 카드. 점수는 analyze.py 규칙값.
-    2026-10-13 사용자: 등급 라벨은 점수 앞, 오른쪽 끝 펼침 화살표, 6개 정보는 펼쳤을 때."""
+    """시장 상태 — 해설 먼저, 점수 카드(접힘) → 펼치면 어제 대비 + 요소별 막대 C 카드. 점수는 analyze.py 규칙값.
+: 등급 라벨은 점수 앞, 오른쪽 끝 펼침 화살표, 6개 정보는 펼쳤을 때."""
     regime = (analysis or {}).get("regime") or {}
     comment = _text(report.get("regime_comment"))
     if regime.get("score") is None:
         return dk.muted("오늘은 시장 상태 점수를 계산하지 못했습니다.") + comment
     light = regime.get("light") or "🟡"
     grade = dk.ko(regime.get("label") or "", TERM_KO)
-    # 점수 · 등급 설명은 본문 글머리표가 아니라 "점수" 옆 ? 툴팁 (2026-10-12 사용자: "점수 위험 선호 내용은 툴팁으로 제공하고 본문에서 삭제")
+    # 점수 · 등급 설명은 본문 글머리표가 아니라 "점수" 옆 ? 툴팁
     explain = score_tip(regime)   # 뜻 · 오늘 · 나누는 법 (가이드라인 2-6)
-    score_card = dk.state_card("점수" + dk.tip_icon(explain), LIGHT_KIND.get(light, "neutral"),   # `안내 ?` (2026-10-13 사용자: 아이콘만 두지 않는다) · 따로 카드, 배경은 등급 라벨 색 (2026-10-12 사용자)
-                               _light_pill(light, grade) + f' <span style="font-size:{SCORE_SIZE};">{int(regime["score"])} <span style="color:{dk.SUB};font-weight:400;">/ 100</span></span>', chev=True)   # 라벨이 점수 앞 (2026-10-13 사용자) · 86 / 100 은 20px 굵게 (2026-10-12 사용자)
+    score_card = dk.state_card("점수" + dk.tip_icon(explain), LIGHT_KIND.get(light, "neutral"),   # `안내 ?` · 따로 카드, 배경은 등급 라벨 색
+                               _light_pill(light, grade) + f' <span style="font-size:{SCORE_SIZE};">{int(regime["score"])} <span style="color:{dk.SUB};font-weight:400;">/ 100</span></span>', chev=True)   # 라벨이 점수 앞 · 86 / 100 은 20px 굵게
     rows = []
     if regime.get("score_prev") is not None:
         rows.append(("어제 대비", dk.arrow(regime.get("delta") or 0, 0, ""), _esc(f"어제 {regime['score_prev']}점")))
     else:
-        rows.append(("어제 대비", dk.dash(), "어제 점수 없음"))   # 구분명 │ 보조 줄 한 줄 (crow, 2026-10-12 사용자)
+        rows.append(("어제 대비", dk.dash(), "어제 점수 없음"))   # 구분명 │ 보조 줄 한 줄
     html_rows = [dk.crow(n, v, sb, first=(i == 0)) for i, (n, v, sb) in enumerate(rows)]
     bars = []
     for key, label in REGIME_COMPONENT_LABELS.items():
@@ -450,30 +450,30 @@ def sec_regime(analysis, report, prev=None):
         frac = score / mx
         col = LIGHT_COLOR["🟢"] if frac >= 0.7 else LIGHT_COLOR["🟡"] if frac >= 0.45 else LIGHT_COLOR["🔴"]
         p = _get(prev, "regime", "components", key, "score")
-        d = "" if p is None else " " + dk.arrow(score - p, 0, "")   # 요소 점수도 어제 대비 (2026-10-13 사용자)
+        d = "" if p is None else " " + dk.arrow(score - p, 0, "")   # 요소 점수도 어제 대비
         bars.append((_esc(label), frac, col, f"{int(score)} <span style='color:{dk.SUB};font-weight:400;'>/ {int(mx)}</span>{d}"))
-    if bars:   # 막대는 가장 긴 이름(금리 환경) + 14px 뒤에서 시작, 모두 같은 길이 (2026-10-12 사용자)
+    if bars:   # 막대는 가장 긴 이름(금리 환경) + 14px 뒤에서 시작, 모두 같은 길이
         w = dk.bar_widths([b[0] for b in bars], [b[3] for b in bars])
         html_rows += [dk.bar_row(n, f, c, v, w) for n, f, c, v in bars]
-    return dk.state_fold(score_card, dk.card_of(html_rows)) + comment   # 제목 밑줄 없이 바로 점수 카드, 해설은 아래 (2026-10-13 사용자) · 누르면 6개 정보
+    return dk.state_fold(score_card, dk.card_of(html_rows)) + comment   # 제목 밑줄 없이 바로 점수 카드, 해설은 아래 · 누르면 6개 정보
 
 
 def _arrows(last5):
-    """최근 5일 방향 ↑↓ — 왼쪽이 5거래일 전, 끝이 오늘. 상승 빨강 · 하락 파랑, 굵게 (2026-10-12 사용자)."""
+    """최근 5일 방향 ↑↓ — 왼쪽이 5거래일 전, 끝이 오늘. 상승 빨강 · 하락 파랑, 굵게."""
     colors = {"↑": UP_COLOR, "↓": DOWN_COLOR}
     return "".join(f'<b style="color:{colors.get(a, MUTED)};">{_esc(a)}</b>' for a in last5)
 
 
-INDEX_SHOWN = 1   # S&P 500 만 보이고 나머지는 펼침 (2026-11-07 사용자, 옛 2 = S&P 500 · 나스닥)
+INDEX_SHOWN = 1   # S&P 500 만 보이고 나머지는 펼침
 
 
 IDX_CELL_W = 190     # 칸 폭 — `5일 -3.37% · 20일 -10.18%` 한 줄이 들어가는 폭(Chrome 360px 실측). 360px 화면에서 둘째 칸(나스닥)이 화면 끝에 잘려 넘겨 보기가 있다는 게 보인다
-IDX_PAD_R = 20      # 칸 오른쪽 여백(내용 ~ 구분선) — 왼쪽 12 보다 넓게 (2026-11-08 사용자 P416). 칸은 내용만큼 넓어진다(옛 고정 190 에 러셀 2000 이 넘쳤다)
-IDX_BLEED = 14       # 글 좌우 여백(폰) — 넘겨 보기 줄은 오른쪽 화면 끝까지 (2026-11-08 사용자 P408: "화면 밖으로 걸쳐지게")
+IDX_PAD_R = 20      # 칸 오른쪽 여백(내용 ~ 구분선) — 왼쪽 12 보다 넓게. 칸은 내용만큼 넓어진다(옛 고정 190 에 러셀 2000 이 넘쳤다)
+IDX_BLEED = 14       # 글 좌우 여백(폰) — 넘겨 보기 줄은 오른쪽 화면 끝까지
 
 
 def _idx_cell(key, rec, s):
-    """지수 한 칸 — 이름(괄호 작게) · `가격 ▲ 등락` 한 줄 · 아래 작은 회색 `5일 · 20일` 한 줄 · 최근 5일 (2026-11-08 사용자 P399 · P408)."""
+    """지수 한 칸 — 이름(괄호 작게) · `가격 ▲ 등락` 한 줄 · 아래 작은 회색 `5일 · 20일` 한 줄 · 최근 5일."""
     sub = []
     if s.get("ret_5d") is not None:
         sub.append(f"5일 {s['ret_5d']:+.2f}%")
@@ -485,7 +485,7 @@ def _idx_cell(key, rec, s):
     if s.get("last5"):
         lines.append("최근 5일 " + _arrows(s["last5"]))
     sub_html = "".join(f'<span style="display:block;white-space:nowrap;">{x}</span>' for x in lines)
-    bg = "#fff"   # 칸 배경 흰색 — 방향 색 배경 없앰 (2026-11-08 사용자, 옛 CARD_DIR 방향 배경)
+    bg = "#fff"   # 칸 배경 흰색 — 방향 색 배경 없앰
     return (f'<span data-idx-cell="1" style="display:block;flex:0 0 auto;min-width:{IDX_CELL_W}px;box-sizing:border-box;background:{bg};padding:{14 - dk.VP}px {IDX_PAD_R}px {14 - dk.VP}px 12px;">'
             f'<span style="display:block;font-weight:700;color:#111;font-size:{dk.NAME};line-height:{dk.LH_CARD};white-space:nowrap;">{dk.paren(_esc(INDEX_LABELS.get(key, key)))}</span>'
             f'<span style="display:block;margin-top:4px;line-height:25px;white-space:nowrap;"><span style="font-size:{dk.NAME};color:#111;">{_esc(_fmt_price(rec.get("price")))}</span> '
@@ -494,9 +494,9 @@ def _idx_cell(key, rec, s):
 
 
 def sec_indices(indices, analysis, report, with_text=True):
-    """주요 지수 — 칸 4개(S&P 500 · 나스닥 · 다우존스 · 러셀 2000)를 가로로 넘겨 보는 줄 (2026-11-08 사용자 P408, 옛 P399 2열 + `지수 2개 더 보기`).
+    """주요 지수 — 칸 4개(S&P 500 · 나스닥 · 다우존스 · 러셀 2000)를 가로로 넘겨 보는 줄.
     순서 = 탭 줄처럼 왼쪽부터, 넘기면 오른쪽 칸이 나온다. 줄은 오른쪽 화면 끝까지 걸쳐 둘째 칸이 잘려 보인다 — 넘겨 보기가 있다는 표시.
-    칸 = 이름 · 가격 ▲ 등락 · 5일 · 20일 · 최근 5일. VIX 줄 · 20일 위치는 뺐다 — 분위기 카드가 말한다 (2026-11-07 사용자: 오늘 = 그날 기록만)."""
+    칸 = 이름 · 가격 ▲ 등락 · 5일 · 20일 · 최근 5일. VIX 줄 · 20일 위치는 뺐다 — 분위기 카드가 말한다."""
     series = (analysis or {}).get("series") or {}
     cells, themes = [], []
     for key in ("sp500", "nasdaq", "dow", "russell"):
@@ -504,18 +504,18 @@ def sec_indices(indices, analysis, report, with_text=True):
         if rec.get("price") is None and rec.get("change_pct") is None:
             continue
         cells.append(_idx_cell(key, rec, series.get(INDEX_SYMBOL[key]) or {}))
-        themes.append("neutral")   # 테두리 · 구분선도 회색 하나로 — 흰 카드 (2026-11-08 사용자, 옛 칸마다 방향 색)
+        themes.append("neutral")   # 테두리 · 구분선도 회색 하나로 — 흰 카드
     if not cells:
         return _text(report.get("summary")) if with_text else ""
-    # 가로로 긴 흰 카드 한 장 안에 칸 4개 · 칸 사이 세로 구분선만 (2026-11-08 사용자 P414, 옛 P408 칸마다 카드). 카드는 화면 오른쪽 밖으로 잘린다
-    # 칸마다 강조 카드 모양 — 바깥선 = 그 방향 카드 테두리, 칸 사이 = 연한 구분선 (2026-11-08 사용자: 옛 회색 #E2E8F0 바깥선 · 구분선, 한국과 같게)
+    # 가로로 긴 흰 카드 한 장 안에 칸 4개 · 칸 사이 세로 구분선만. 카드는 화면 오른쪽 밖으로 잘린다
+    # 칸마다 강조 카드 모양 — 바깥선 = 그 방향 카드 테두리, 칸 사이 = 연한 구분선
     row = (f'<div data-cards="1" data-idx-scroll="1" style="overflow-x:auto;margin:0 -{IDX_BLEED}px 8px 0;padding:0 {IDX_BLEED}px 0 0;'
            f'-webkit-overflow-scrolling:touch;scrollbar-width:none;">'
            f'<span style="display:flex;width:max-content;border-radius:8px;overflow:hidden;">{dk.dir_cells(cells, themes)}</span></div>')
     return (_text(report.get("summary")) if with_text else "") + row
 
 
-FOLD_SHOWN = 2   # 카드 줄이 많으면 앞 2줄만 보이고 나머지는 '더 보기' 펼침 (2026-10-12 사용자: "섹터는 2개만, 다른 탭에도 동일하게 2개만")
+FOLD_SHOWN = 2   # 카드 줄이 많으면 앞 2줄만 보이고 나머지는 '더 보기' 펼침
 
 
 def _folded(rows_html, noun):
@@ -523,22 +523,22 @@ def _folded(rows_html, noun):
     if len(rows_html) <= FOLD_SHOWN:
         return dk.card_of(rows_html)
     rest = rows_html[FOLD_SHOWN:]
-    return dk.card_of(rows_html, fold_at=FOLD_SHOWN, noun=noun)   # 펼침 버튼은 같은 카드 안 (2026-10-13 사용자)
+    return dk.card_of(rows_html, fold_at=FOLD_SHOWN, noun=noun)   # 펼침 버튼은 같은 카드 안
 
 
 QUOTE_LEFT = 40   # 종목 칸 40% — 값 `$162.57 ▲ 1.25%` 이 한 줄에 들도록 (거래량은 종목 아래 줄)
 
 
 def _quote_rows(quotes):
-    """급등주·관심 종목 — 종목 아래 줄에 거래량, 값(가격 + 등락)은 한 줄 (2026-10-12 사용자). data-pick: 홈 '오늘의 급등주' 카드가 읽는다."""
+    """급등주·관심 종목 — 종목 아래 줄에 거래량, 값(가격 + 등락)은 한 줄. data-pick: 홈 '오늘의 급등주' 카드가 읽는다."""
     rows = []
     for q in quotes or []:
         sym = q.get("symbol") or "-"
         sector = SECTOR_KO.get(q.get("sector") or "", q.get("sector") or "")
         vol = '<span style="white-space:nowrap;">' + _esc("거래량 " + _fmt_volume(q.get("volume"))) + "</span>"   # 라벨과 거래량 사이에서만 줄이 바뀌게
-        tag = dk.pill(sector, bare=True) if sector else ""   # 여백 없음 (2026-10-13 사용자)   # 줄 첫머리 라벨 — 왼쪽 0, 오른쪽 4   # 섹터 라벨이 거래량보다 앞 (2026-10-13 사용자: "어느 섹터인지가 더 중요")
-        value = (f'<span style="font-weight:400;">{_esc(_fmt_price(q.get("price")))}</span> {dk.arrow(q.get("change_pct"))}'   # 가격은 보통 굵기 (2026-10-13 사용자)
-                 + (f'<span style="display:block;line-height:1;margin:6px 0 0;">{tag}</span>' if tag else ""))   # 섹터 라벨은 증감 아래 줄, 오른쪽 정렬, 여백 없음 (2026-10-13 사용자)
+        tag = dk.pill(sector, bare=True) if sector else ""   # 여백 없음   # 줄 첫머리 라벨 — 왼쪽 0, 오른쪽 4   # 섹터 라벨이 거래량보다 앞
+        value = (f'<span style="font-weight:400;">{_esc(_fmt_price(q.get("price")))}</span> {dk.arrow(q.get("change_pct"))}'   # 가격은 보통 굵기
+                 + (f'<span style="display:block;line-height:1;margin:6px 0 0;">{tag}</span>' if tag else ""))   # 섹터 라벨은 증감 아래 줄, 오른쪽 정렬, 여백 없음
         r = dk.crow(dk.ticker_logo(sym) + _esc(sym), value, vol, first=len(rows) == 0,
                     left=QUOTE_LEFT, nowrap=True, sub_block=True)
         chg = q.get("change_pct")
@@ -550,16 +550,16 @@ def _quote_rows(quotes):
 
 
 def _named_reaction(sym, value_html):
-    """관련 자산 한 칸 — 이름까지 증감 색 (2026-10-11 사용자: % 만이 아니라 종목도 같이 색). 값이 bp 등 색 없는 경우는 이름도 기본색."""
+    """관련 자산 한 칸 — 이름까지 증감 색. 값이 bp 등 색 없는 경우는 이름도 기본색."""
     name = _esc(SYMBOL_NAMES.get(sym, sym))
     col = UP_COLOR if "▲" in value_html else DOWN_COLOR if "▼" in value_html else None
-    if col is None and "<" not in value_html and value_html[:1] in "+-−":   # 금리 bp 처럼 색 없이 온 값도 증감 색 (2026-10-12 사용자)
+    if col is None and "<" not in value_html and value_html[:1] in "+-−":   # 금리 bp 처럼 색 없이 온 값도 증감 색
         col = UP_COLOR if value_html[0] == "+" else DOWN_COLOR
         value_html = f'<span style="color:{col};font-weight:700;">{value_html}</span>'
     return f'<span style="color:{col};">{name}</span> {value_html}' if col else f"{name} {value_html}"
 
 
-NEWS_REL_SIZE = "15px"   # 뉴스 `관련 자산` 줄 14 → 15 굵게 (2026-10-13 사용자)
+NEWS_REL_SIZE = "15px"   # 뉴스 `관련 자산` 줄 14 → 15 굵게
 
 
 def _meter(n, total):
@@ -592,12 +592,12 @@ def _has_pop(g, built):
     """두 줄 이상 있을 때만 팝업 (batch 9 ④: 한 줄 팝업은 의미 없다 — 목록 보조 글씨로).
     한국 사실 기사 · 제목 묶음은 한 줄이어도 팝업 — 원문 주소가 없거나(사실) 여럿이라(묶음) 줄 링크로 보낼 곳이 없다 (2026-11-24)."""
     n = len(_pop_lines(g, built))
-    # 주소가 없는 줄(한국 방송 — 영상 링크를 뺌, 2026-11-25 사용자)도 한 줄이어도 팝업 — 줄 링크로 보낼 곳이 없다
+    # 주소가 없는 줄도 한 줄이어도 팝업 — 줄 링크로 보낼 곳이 없다
     return n >= 1 if (g["rep"]["kind"] in ("fact", "head") or not g["rep"].get("url")) else n >= 2
 
 
 def _story_dir(g):
-    """묶음의 방향 하나 — 막대(긍정 · 부정 · 불확실 · 중립)와 같은 네 단어 (2026-11-07 사용자 P335).
+    """묶음의 방향 하나 — 막대(긍정 · 부정 · 불확실 · 중립)와 같은 네 단어.
     긍정 · 부정이 같이 있거나, 그 둘 없이 불확실이 있으면 `불확실` · 한쪽만 있으면 그쪽 · 아무 방향도 없으면 `중립`."""
     ds = [x.get("market_dir") for x in g["items"]]
     pn = {d for d in ds if d in ("positive", "negative")}
@@ -612,33 +612,33 @@ def _dir_pill(g):
 
 
 def _story_row(g, built, first, kr=False):
-    """주요 뉴스 한 줄 (2026-11-05 사용자: `여러 방송이 같이 다룬 뉴스` 5줄과 주요 뉴스 5건이 같아 하나로) — 대표 기사 제목 · 보조 한 줄 · 사건 이름 + `n곳 / 전체` 칸 막대 · 시각 · 매체."""
+    """주요 뉴스 한 줄 — 대표 기사 제목 · 보조 한 줄 · 사건 이름 + `n곳 / 전체` 칸 막대 · 시각 · 매체."""
     n_ch = built["n_channels_all"]
     rep = g["rep"]
     lines = _pop_lines(g, built)
     sub = _first_text(lines[0]) if lines else ""
     attrs = (f' data-news-pop="{_esc(g["id"])}"' if _has_pop(g, built) else "") + ' data-trhelp="skip"'
     head = dk.keep_tone(f'<a href="{_esc(rep.get("url") or "#")}" target="_blank" rel="noopener"{attrs} style="color:#111;font-weight:700;text-decoration:none;font-size:{dk.NEWS_TITLE_FS};line-height:{dk.NEWS_TITLE_LH};display:block;">'
-                        f'{NEW_LEAD if g.get("new") and not kr else ""}{_esc(rep["text"])}</a>')   # 한국 = N 없음 (2026-11-25 사용자)   # 헤드라인은 합니다체로 바꾸지 않는다 (공용 카드와 같게)
+                        f'{NEW_LEAD if g.get("new") and not kr else ""}{_esc(rep["text"])}</a>')   # 한국 = N 없음   # 헤드라인은 합니다체로 바꾸지 않는다 (공용 카드와 같게)
     meta = f'<span style="color:{dk.SUB};font-size:{dk.TINY};line-height:{dk.LH_TINY};">{" · ".join(_esc(x) for x in (_kst(rep["published_at"]), rep["source"]) if x)}</span>'   # 메타 = `시각 · 매체` (0-6) — 매체가 비면 시각만(한국 방송, 2026-11-25)
     count = (f'<span style="display:inline-flex;align-items:center;gap:6px;">{_meter(g["n_channels"], n_ch)}'
              f'<span style="font-size:{dk.TINY};line-height:{dk.LH_TINY};color:#333;"><b style="color:#111;">{g["n_channels"]}곳</b> / {n_ch}곳</span></span>') if g["n_channels"] >= 2 else ""
-    clamp = KR_CLAMP2 if kr else ""   # 한국 = 보조 줄 두 줄까지 · 넘으면 … (2026-11-25 사용자)
+    clamp = KR_CLAMP2 if kr else ""   # 한국 = 보조 줄 두 줄까지 · 넘으면 …
     return (head + (dk.keep_tone(f'<span style="{dk.NEWS_SUM}{clamp}">{dk.speaker_html(sub, tail=False)}</span>') if sub else "")   # 목록 줄은 발언자 없이 — 팝업에서만 (P364)
             + f'<span style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin:8px 0 0;line-height:1;">'
             + dk.pill_row(dk.pill(g["theme"], bare=True) + " " + _dir_pill(g)) + "</span>"   # 분야 · 방향 (P335 · P336)
-            + f'<span style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin:8px 0 1px;line-height:1;">{count}{meta}</span>')   # 다음 줄 = 곳 수 막대 + 시각 · 매체 (2026-11-07 사용자 P348)
+            + f'<span style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin:8px 0 1px;line-height:1;">{count}{meta}</span>')   # 다음 줄 = 곳 수 막대 + 시각 · 매체
 
 
 def _sub_title(t, note, tip_html="", line=False):
-    """뉴스 안 소제목. line=True: 안내 글 대신 아래 가로 구분선 (2026-11-05 사용자: `여러 방송이 같이 다룬 뉴스`) — 첫 줄 위 구분선은 이 선이 대신한다."""
+    """뉴스 안 소제목. line=True: 안내 글 대신 아래 가로 구분선 — 첫 줄 위 구분선은 이 선이 대신한다."""
     rule = f"padding-bottom:8px;border-bottom:1px solid #E2E8F0;margin:24px 0 0;" if line else "margin:24px 0 2px;"
     return (f'<h3 style="display:flex;align-items:center;flex-wrap:wrap;gap:2px 6px;font-size:{dk.NEWS_TITLE_FS};line-height:26px;font-weight:700;color:#111;{rule}padding-left:{dk.ALIGN_PX}px;position:relative;">'
             f'{_esc(t)}{tip_html}' + (f'<span style="font-weight:400;color:{dk.SUB};font-size:{dk.TINY};">{_esc(note)}</span>' if note else "") + "</h3>")
 
 
 def _news_pop_body(g, built):
-    """팝업 글 (숨긴 div, 테마 JS 가 화면 가운데 창에 옮긴다): 요약 줄 → 관련 종목 → 작은 `원문 보기`. 머리 줄 · `같은 뉴스` 칸 삭제 (2026-11-07 사용자 P352 · P354) — 공용 dk.news_pop_body."""
+    """팝업 글 (숨긴 div, 테마 JS 가 화면 가운데 창에 옮긴다): 요약 줄 → 관련 종목 → 작은 `원문 보기`. 머리 줄 · `같은 뉴스` 칸 삭제 — 공용 dk.news_pop_body."""
     rep = g["rep"]
     sx = built["stocks"]
     related, seen = [], set()
@@ -656,7 +656,7 @@ def _news_pop_body(g, built):
         return dk.bundle_pop_body(g["id"], rep["text"], list(rep.get("rows") or []))   # 첫 줄 = 팝업 제목이라 본문에서 반복하지 않는다(bundle_pop_body 가 rows[1:] 만 글머리표로)
     kind = "기사" if rep["kind"] == "article" else "방송"
     return dk.news_pop_body(g["id"], rep["text"], _pop_lines(g, built), source=rep["source"], kind=kind,
-                            url=rep.get("url") if rep["kind"] != "fact" else None, related=related)   # 한국 사실 기사 = 원문 보기 없음 (2026-11-24 사용자)
+                            url=rep.get("url") if rep["kind"] != "fact" else None, related=related)   # 한국 사실 기사 = 원문 보기 없음
 
 
 def _story_item(g, built, reaction, known, compact=False):
@@ -679,7 +679,7 @@ def _story_item(g, built, reaction, known, compact=False):
 
 
 def news_tip():
-    """구획 제목 `뉴스` 옆 읽는 법 ? (2026-11-05 사용자: 툴팁은 뉴스 타이틀 옆에)."""
+    """구획 제목 `뉴스` 옆 읽는 법 ?."""
     return ("주요 뉴스 = 우리 데이터로 매긴 점수 순 5건입니다. AI 가 고르지 않습니다.\n· 다룬 방송 수 = 두 곳 이상이면 한 곳마다 2점\n· 관련 자산의 그날 움직임 = 1% 마다 1점 (4점까지)\n"
             "· 예상 밖 표시 = 2점\n· 시장에 좋거나 나쁜 방향이 있는 뉴스 = 1점\n· 최근 12시간 안 = 1점\n"
             "분야 칩을 누르면 그 분야 뉴스가 최신 순으로 나옵니다. 같은 사건을 다룬 기사 · 방송은 한 줄로 묶고 몇 곳이 다뤘는지(n곳) 적습니다.\n"
@@ -689,7 +689,7 @@ def news_tip():
 def sec_news(input_data, report, analysis):
     """뉴스 (2026-11-05 batch 8 · 9 재설계) — 방향 막대 / `여러 방송이 같이 다룬 뉴스` 5줄 / `뉴스`(칩: 주요 뉴스 먼저 · 분야).
     기사(CNBC 48시간) · 유튜브 방송 주제(48시간)를 news_stories 가 같은 사건끼리 묶고(news_pick.build), 같은 뉴스는 한 줄 + `n곳`. 두 줄 이상 있는 줄은 팝업(요약 · 원문 작은 링크).
-    옛 `방송 n건 더 보기`(111건) 는 없앴다 — 독자가 볼 수 없는 목록이었다 (사용자)."""
+    옛 `방송 n건 더 보기`(111건) 는 없앴다 — 독자가 볼 수 없는 목록이었다."""
     series = (analysis or {}).get("series") or {}
     rates = (analysis or {}).get("rates") or {}
     quotes = {q["symbol"]: q for q in input_data.get("gainers", []) + input_data.get("most_active", []) if q.get("symbol")}
@@ -713,7 +713,7 @@ def sec_news(input_data, report, analysis):
             dirs[n["market_dir"]] = dirs.get(n["market_dir"], 0) + 1
     for k, v in media_feed.direction_counts(media).items():
         dirs[k] = dirs.get(k, 0) + v
-    week = dict(dirs)   # 최근 7일 = 오늘 기사(CNBC 는 48시간만 받는다) + 방송 이슈 7일 (2026-11-07 사용자: 종목 페이지처럼 오늘 · 최근 7일 막대 두 개)
+    week = dict(dirs)   # 최근 7일 = 오늘 기사(CNBC 는 48시간만 받는다) + 방송 이슈 7일
     since7 = (datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=7)).strftime("%Y-%m-%dT%H:%M")
     for k, v in media_feed.direction_counts(media_feed.market_top(media_feed.issues(_media_rows(), since7), None)).items():
         week[k] = week.get(k, 0) - media_feed.direction_counts(media).get(k, 0) + v
@@ -721,20 +721,20 @@ def sec_news(input_data, report, analysis):
 
 
 def news_tab(built, dirs, week, reaction=None, known=(), pick_name="주요 뉴스", kr=False, posts=()):
-    """뉴스 탭 내용 — 분야 칩 · 방향 막대 · 주요 뉴스 · 칩별 목록 · 팝업. 미국 증시 · 한국 증시 리포트 공용 (2026-11-07 사용자 M82: 한국 뉴스 탭을 미국과 같게)."""
+    """뉴스 탭 내용 — 분야 칩 · 방향 막대 · 주요 뉴스 · 칩별 목록 · 팝업. 미국 증시 · 한국 증시 리포트 공용."""
     reaction = reaction or (lambda s: "")
     bars = dk.direction_bars(dirs, week)   # 뉴스 방향 막대 오늘 · 최근 7일 (P143 의 `오늘` 만 → 둘, 2026-11-07) — 분야 탭 아래 (P334)
     out = ""
-    # `유튜브 방송이 많이 다룬 분야는?` 카드 · `여러 방송이 같이 다룬 뉴스` 5줄은 뺐다 — 분야 칩이 많은 순이고 주요 뉴스 5건과 같았다 (2026-11-05 사용자). 막대 바로 아래 칩
+    # `유튜브 방송이 많이 다룬 분야는?` 카드 · `여러 방송이 같이 다룬 뉴스` 5줄은 뺐다 — 분야 칩이 많은 순이고 주요 뉴스 5건과 같았다. 막대 바로 아래 칩
     picks, rest = built["picks"], built["rest"]
     pops = []
     if picks or rest:
-        if kr:   # 한국 (2026-11-25 사용자): 첫 칩 `Newfact` = 전체 보기(5건 + 10건씩), 분야 칩은 이슈 된 것만 — 3건 이상인 분야, 많은 순 3개까지(나머지 분야 줄도 Newfact 칩에 다 있음)
+        if kr:   # 한국: 첫 칩 `Newfact` = 전체 보기(5건 + 10건씩), 분야 칩은 이슈 된 것만 — 3건 이상인 분야, 많은 순 3개까지(나머지 분야 줄도 Newfact 칩에 다 있음)
             order = news_pick.tab_order(picks, rest)
             chips = [(pick_name, len(picks) + len(rest) + len(posts))] + sorted([c for c in order if c[1] >= KR_CHIP_MIN], key=lambda c: -c[1])[:KR_CHIPS]
         else:
             chips = [(pick_name, len(picks))] + news_pick.tab_order(picks, rest)   # 탭 = 8개 묶음(P357) · 순서 = 그날 주요 뉴스 순 → 건수 순(P358). `전체` 없음 (batch 9 ①)
-        # 분야 탭 = 홈 `테마 종목` 묶음 탭 모양 (2026-11-07 사용자 P332): 하나로 이은 둥근 박스 · 메뉴 사이 세로 구분선 · 선택 = 굵은 검정 + 1px 검정 외곽선(테마 CSS).
+        # 분야 탭 = 홈 `테마 종목` 묶음 탭 모양: 하나로 이은 둥근 박스 · 메뉴 사이 세로 구분선 · 선택 = 굵은 검정 + 1px 검정 외곽선(테마 CSS).
         # 박스 테두리는 버튼들이 나눠 가진다(위 · 아래 + 첫 버튼 왼쪽 · 끝 버튼 오른쪽) — 가로로 밀면 박스째 움직인다 (P333). 위치 = 뉴스 탭 맨 위, 방향 막대는 그 아래 (P334)
         last = len(chips) - 1
         def chip_css(i):
@@ -745,14 +745,14 @@ def news_tab(built, dirs, week, reaction=None, known=(), pick_name="주요 뉴�
                           for i, (k, n) in enumerate(chips)) + "</div>")   # 한국 첫 칩 = 보이는 글자 `Newfact` · 안쪽 키는 `주요 뉴스` — 테마 붙여넣기 전 옛 칩 JS(`주요 뉴스` 고정)에서도 다시 눌렀을 때 비지 않게 (2026-11-25)
         out += bars
         lis = []
-        for p in posts if kr else ():   # Newfact 글 줄 = 첫 칩(Newfact) 맨 위, 홈 글 줄 꼴(배지 · 제목 한 줄 …) — 분야 칩엔 안 나옴 (2026-11-26 사용자)
+        for p in posts if kr else ():   # Newfact 글 줄 = 첫 칩(Newfact) 맨 위, 홈 글 줄 꼴(배지 · 제목 한 줄 …) — 분야 칩엔 안 나옴
             lis.append(f'<li data-theme="Newfact" data-pick="1" data-row-link="1" data-href="{_esc(p["url"])}" style="margin:0;padding:{dk.RULE_GAP - dk.NEWS_VP}px {dk.ALIGN_PX}px {dk.RULE_GAP - dk.NEWS_VP}px;'
                        f'line-height:{dk.LH_BODY};box-shadow:inset 0 1px 0 #E2E8F0;">{p["html"]}</li>')
         for i, g in enumerate(picks + rest):
             is_pick = kr or i < len(picks)   # 한국 = 모든 줄이 첫 칩(Newfact 전체 보기) · 같은 줄 꼴
             item = _story_row(g, built, i == 0, kr=kr) if is_pick else _story_item(g, built, reaction, known, compact=True)   # 주요 뉴스 = 사건 이름 + n곳 막대 줄
             pick_attr = ' data-pick="1"' if is_pick else " hidden"
-            pick_attr += (f' data-news-pop="{_esc(g["id"])}"' if _has_pop(g, built) else f' data-row-link="1" data-href="{_esc(g["rep"].get("url") or "#")}"')   # 구분선 안 아무 데나 눌러도 팝업 · 원문 (2026-11-05 사용자, 가이드라인 10-9 줄 전체 링크)
+            pick_attr += (f' data-news-pop="{_esc(g["id"])}"' if _has_pop(g, built) else f' data-row-link="1" data-href="{_esc(g["rep"].get("url") or "#")}"')   # 구분선 안 아무 데나 눌러도 팝업 · 원문
             lis.append(f'<li data-theme="{_esc(news_pick.tab_of(g["theme"]))}"{pick_attr} style="margin:0;padding:{dk.RULE_GAP - dk.NEWS_VP}px {dk.ALIGN_PX}px {dk.RULE_GAP - dk.NEWS_VP}px;'
                        f'line-height:{dk.LH_BODY};box-shadow:inset 0 1px 0 #E2E8F0;">{item}</li>')   # 첫 줄 구분선은 테마 JS 가 지운다. 주요 뉴스 외는 숨김 — 칩이 켠다
             if _has_pop(g, built):
@@ -800,7 +800,7 @@ def sec_status(analysis, report, prev=None):
              ("금리 위험", status.get("rates"), f"10년물 5일 {int(rates['us10y_change_5d_bp']):+d}bp" if rates.get("us10y_change_5d_bp") is not None else "—"),
              ("과열 위험", status.get("overheat"), overheat)]
     p = prev or {}
-    vs = {   # 근거 값의 어제 대비 (2026-10-13 사용자: 모든 데이터)
+    vs = {   # 근거 값의 어제 대비
         "변동성": _vs(vix.get("now"), _get(p, "vix", "now"), 2, ""),
         "시장 폭": _vs(breadth.get("ratio"), _get(p, "breadth", "ratio"), 1, "%p"),
         "금리 위험": _vs(rates.get("us10y_change_5d_bp"), _get(p, "rates", "us10y_change_5d_bp"), 0, "bp"),
@@ -810,23 +810,23 @@ def sec_status(analysis, report, prev=None):
     was = {"추세 유지": pst.get("trend"), "변동성": pst.get("volatility"), "시장 폭": pst.get("breadth"), "금리 위험": pst.get("rates"), "과열 위험": pst.get("overheat")}
     overall = status["overall"]
     head, why = _overall_text(overall, items)
-    overall_card = dk.state_card(_esc(head), LIGHT_KIND.get(overall, "neutral"), sub_html=_esc(why), center=True)   # 가운데 정렬 (2026-10-13 사용자)
+    overall_card = dk.state_card(_esc(head), LIGHT_KIND.get(overall, "neutral"), sub_html=_esc(why), center=True)   # 가운데 정렬
     pad_old = f"padding:{dk.EMPH_PAD - dk.VP_EMPH}px 14px {dk.EMPH_PAD - dk.VP}px;margin:0 0 8px;"
-    overall_card = overall_card.replace(pad_old, f"padding:{dk.EMPH_PAD - dk.VP_EMPH - 12}px 14px {dk.EMPH_PAD - dk.VP - 13}px;margin:40px 0 8px;", 1)   # 높이 −20%(83 → 66: 위아래 패딩 −8 · −8) · 위 여백 20 → 40 (2026-10-14 사용자)
-    overall_card = overall_card.replace("color:#333;margin-top:2px;", "color:#333;margin-top:1px;", 1)   # 두 문장 사이 보이는 12 → 11 (−10%, 같은 날)   # 높이 약 10% 줄임(위아래 −4 · −5) · 위 여백 +20 (2026-10-13 사용자)   # 종합은 따로 카드, 라벨 없이 설명, 배경은 신호 색 (2026-10-12 사용자)
+    overall_card = overall_card.replace(pad_old, f"padding:{dk.EMPH_PAD - dk.VP_EMPH - 12}px 14px {dk.EMPH_PAD - dk.VP - 13}px;margin:40px 0 8px;", 1)   # 높이 −20%(83 → 66: 위아래 패딩 −8 · −8) · 위 여백 20 → 40
+    overall_card = overall_card.replace("color:#333;margin-top:2px;", "color:#333;margin-top:1px;", 1)   # 두 문장 사이 보이는 12 → 11 (−10%, 같은 날)   # 높이 약 10% 줄임(위아래 −4 · −5) · 위 여백 +20   # 종합은 따로 카드, 라벨 없이 설명, 배경은 신호 색
     rows = []
     for label, light, basis in items:
         changed = f"어제 {_light_word(was[label])}" if was.get(label) and light and was[label] != light else ""   # 신호가 바뀐 날만 어제 신호
         rows.append((_esc(label), _light_pill(light) if light else dk.dash(), _join(_esc(basis), vs.get(label, ""), _esc(changed))))
     risks = [dk.ko(ln, TERM_KO) for ln in str(report.get("risk") or "").splitlines() if ln.strip()]
-    risk_ul = dk.dot_ul([dk.dot_li(dk.tint(_esc(t)), size=3, lh=dk.LH_BODY, margin=dk.LI_MARGIN) for t in risks]) if risks else ""   # 강조 카드 삭제 — 본문 글머리표 (2026-10-13 사용자)
-    return risk_ul + overall_card + dk.rule_rows(rows)   # 신호 줄은 흰 카드 대신 가로 구분선 (2026-10-13 사용자)   # 글 먼저, 강조 카드 (2026-10-12 사용자), 소제목 없음 — 구획 제목이 '주의할 위험요인'   # 판정 규칙은 제목 옆 ? 툴팁 (가이드라인 2-1 상태 카드 규칙)
+    risk_ul = dk.dot_ul([dk.dot_li(dk.tint(_esc(t)), size=3, lh=dk.LH_BODY, margin=dk.LI_MARGIN) for t in risks]) if risks else ""   # 강조 카드 삭제 — 본문 글머리표
+    return risk_ul + overall_card + dk.rule_rows(rows)   # 신호 줄은 흰 카드 대신 가로 구분선   # 글 먼저, 강조 카드, 소제목 없음 — 구획 제목이 '주의할 위험요인'   # 판정 규칙은 제목 옆 ? 툴팁 (가이드라인 2-1 상태 카드 규칙)
 
 
 KR_REPORT_URL = f"{mk.BLOG}/search/label/%ED%95%9C%EA%B5%AD%20%EC%A6%9D%EC%8B%9C%20%EB%A6%AC%ED%8F%AC%ED%8A%B8"   # 한국 증시 리포트 라벨 목록 (kr-stocks universe_kr.REPORT_URL 과 같다)
 RELATED_LINKS = [("미국 시가총액 상위 10개 종목 주가", mk.US_LIST_URL), ("한국 증시 리포트", KR_REPORT_URL),
                  ("한국 시가총액 상위 10개 종목 주가", f"{mk.BLOG}/p/stock-lists.html?m=kr#tab-%EC%8B%9C%EA%B0%80%EC%B4%9D%EC%95%A1"),
-                 ("주요 인물 발언 전체 보기", people_section.ALL_URL)]   # 함께 보는 페이지 (2026-11-08 사용자: 미국 증시 리포트에도, 인물 발언 전체 보기 포함)
+                 ("주요 인물 발언 전체 보기", people_section.ALL_URL)]   # 함께 보는 페이지
 
 
 def build_body(input_data, report, cover_url=None, analysis=None, output_dir=None):
@@ -834,52 +834,52 @@ def build_body(input_data, report, cover_url=None, analysis=None, output_dir=Non
     오늘(D1 · D2 · D3 · D6 + 옛 시장 탭 카드 8개, 2026-11-07 시장 탭 없앰) · 뉴스 · 인물 발언 · 한국장(K1 · K2 · K3) · 일정(D5). 시장 상태 점수 · 신호등 · 급등주 · 거래 상위 · 위험요인은 뺐다 (5절 B5 · B6).
     홈 카드 CARDS: summary = (머리), insight = (종합) — 머리 카드의 data-insight 그대로."""
     indices = input_data.get("market", {}).get("indices", {})
-    prev = _prev_analysis(analysis)   # 어제 대비 (2026-10-13 사용자)
+    prev = _prev_analysis(analysis)   # 어제 대비
     a = analysis or {}
     parts = [
         dk.WRAP_OPEN,
         SHARE_IMG,   # 첫 그림 = 공통 로고 (대표 이미지)
-        (dk.price_stamp(a["as_of"], "US") if a.get("as_of") else ""),   # 맨 위 안내 상자 = 종목 페이지와 같게 — 종가 리포트 · 발행 시각 (2026-11-14 사용자)
+        (dk.price_stamp(a["as_of"], "US") if a.get("as_of") else ""),   # 맨 위 안내 상자 = 종목 페이지와 같게 — 종가 리포트 · 발행 시각
         sec_seo_lead(input_data, analysis),   # 검색 결과 요약 — 보이는 첫 요소, data-lead 보다 앞 (2026-10-18)
-        # S&P 500 그래프가 커버 이미지 자리 (2026-10-18 사용자, 엔비디아처럼). 그래프가 없는 날만 AI 커버
+        # S&P 500 그래프가 커버 이미지 자리. 그래프가 없는 날만 AI 커버
         sec_chart(output_dir) or _cover_image(cover_url),
-        # 오늘 탭 머리 = 탭 줄 바로 아래 (2026-11-07 사용자: 한국 증시 리포트처럼, 구획 제목 · 그래프 제목 없이)
+        # 오늘 탭 머리 = 탭 줄 바로 아래
         #   시가 갭 · 장중 · 하루 막대 → 지수 표(S&P 500 + 지수 3개 더 보기) → 한 줄 결론(data-lead) → 지수 해설 문장. 테마는 첫 data-cards 부터 첫 h2 까지를 첫 탭에 넣는다
-        sec_indices(indices, analysis, report, with_text=False),   # 넘겨 보기 지수 줄 = 오늘 탭 바로 아래, 그래프 위 (2026-11-08 사용자)
+        sec_indices(indices, analysis, report, with_text=False),   # 넘겨 보기 지수 줄 = 오늘 탭 바로 아래, 그래프 위
         sx.split_chart(a),
         sec_lead(report, analysis),
         _text_flow(report.get("summary")),   # 한 문단 이어 쓰기 (P391)
     ]
-    # 오늘 탭 = 옛 시장 탭 카드까지 한 곳에 (2026-11-07 사용자: "시장 탭을 오늘 탭으로 다 옮기자" — 시장 탭은 없앰). 맨 첫 카드만 펼침
+    # 오늘 탭 = 옛 시장 탭 카드까지 한 곳에. 맨 첫 카드만 펼침
     # 세 덩어리 (같은 날 P384): ① 주요 지수 = 같은 지수를 근거로 쓰는 것(지수 값 → 평소와 달랐나 → 충격 → 흐름 → 기술주 · 소형주)
     #   ② 종목 · 업종 = 무엇이 움직였나(대형주 10개 → 업종 → 테마 → 고르게) ③ 시장 바탕(긴장 → 금리 → 경제)
     grid = lambda h: cards.cards_grid(h) if h else ""  # noqa: E731
-    idx_cards = sx.shock_card(a) + mk.index_cards(a, prev)   # `오늘 움직임은 평소와 달랐나?` 는 `미국 증시 분위기는?` 안으로 (2026-11-07 사용자)   # 오늘 탭 카드는 모두 닫힌 채로 (2026-11-07 사용자, 옛 P216 첫 카드 펼침)
-    parts.append(dk.section(TAB_TODAY, grid(idx_cards), tab=TAB_TODAY))   # 탭 이름과 같은 제목은 테마가 숨긴다 — `주요 지수` 제목 삭제 (2026-11-07 사용자), 지수 표 · 그래프는 탭 머리로
+    idx_cards = sx.shock_card(a) + mk.index_cards(a, prev)   # `오늘 움직임은 평소와 달랐나?` 는 `미국 증시 분위기는?` 안으로   # 오늘 탭 카드는 모두 닫힌 채로
+    parts.append(dk.section(TAB_TODAY, grid(idx_cards), tab=TAB_TODAY))   # 탭 이름과 같은 제목은 테마가 숨긴다 — `주요 지수` 제목 삭제, 지수 표 · 그래프는 탭 머리로
     move = mk.move_cards(a, prev)
     if move:
         parts.append(dk.section("종목 · 업종", grid(move), tab=TAB_TODAY))
     base = mk.base_cards(a, input_data.get("macro") or {}, input_data.get("cftc"))
     if base:
-        parts.append(dk.section("시장 환경", grid(base), tab=TAB_TODAY))   # 옛 `시장 바탕` (2026-11-08 사용자 P404)
+        parts.append(dk.section("시장 환경", grid(base), tab=TAB_TODAY))   # 옛 `시장 바탕`
     parts += [
-        # 뉴스 = 오늘 옆 탭 (2026-11-07 사용자: 오늘 탭이 너무 길다). 탭 이름과 같은 제목 `뉴스` 는 테마가 숨긴다. 읽는 법 툴팁 삭제 (같은 날)
-        dk.keep_tone(dk.section("뉴스", sec_news(input_data, report, analysis), tab=TAB_NEWS)),   # 뉴스는 헤드라인체 그대로 (2026-10-18 사용자)
+        # 뉴스 = 오늘 옆 탭. 탭 이름과 같은 제목 `뉴스` 는 테마가 숨긴다. 읽는 법 툴팁 삭제 (같은 날)
+        dk.keep_tone(dk.section("뉴스", sec_news(input_data, report, analysis), tab=TAB_NEWS)),   # 뉴스는 헤드라인체 그대로
     ]
-    people = people_section.for_market()   # 뉴스 탭 맨 아래 — 최근 24시간 시장 관련도 높은 인물 발언 3줄 (2026-11-07 사용자). 없으면 뺀다
+    people = people_section.for_market()   # 뉴스 탭 맨 아래 — 최근 24시간 시장 관련도 높은 인물 발언 3줄. 없으면 뺀다
     if people:
         parts.append(dk.keep_tone(dk.section(TAB_PEOPLE, people_section.summary_card(cards.question_card) + people, tab=TAB_PEOPLE)))   # 맨 위 질문 카드 3개 (P380, 옛 요약 상자 P376)   # `최근 24시간` 뺌 — 줄마다 시각 (P369)
-    k_open = sx.korea_open_card(a)   # 한국장 탭 첫 카드는 펼친 채로 (2026-11-08 사용자) — 연결 카드가 없는 날(평소)은 `연결된 국내 종목은?` 이 첫 카드
+    k_open = sx.korea_open_card(a)   # 한국장 탭 첫 카드는 펼친 채로 — 연결 카드가 없는 날(평소)은 `연결된 국내 종목은?` 이 첫 카드
     korea = k_open + sx.korea_pairs_card(a, opened=not k_open) + sx.fx_card(a)
     if korea:
         parts.append(dk.section(TAB_KOREA, cards.cards_grid(korea), tab=TAB_KOREA))   # 탭 이름과 같은 구획 제목은 테마가 탭 화면에서 숨긴다
     parts.append(kr_news.section(_media_rows()))   # 소식이 없어도 표시 주석은 남긴다 — 미디어 데일리 실행 뒤 kr_news.py 가 이 칸만 채운다 (2026-10-25)
     if a.get("calendar"):
         parts.append(dk.section(TAB_CAL, cards.cards_grid(sx.macro_cal_card(a) + sx.earnings_cal_card(a)), tab=TAB_CAL))
-    parts.append(dk.related_buttons(RELATED_LINKS))   # 함께 보는 페이지 — 한국 증시 리포트와 같은 블록 · 주요 인물 발언 전체 보기 포함 (2026-11-08 사용자)
-    parts.append(dk.WRAP_CLOSE)   # 출처 · 면책 꼬리말 없음 — 블로그 공통 푸터가 맡는다 (2026-10-18 사용자: 중복 안내 금지, 가이드라인 6절)
-    # ":" 앞뒤 띄우기 (2026-10-11 사용자: 모든 페이지) · 반말 문장 끝은 합니다체 (2026-10-18 사용자: 블로그 기본 문체, 데일리는 재작업 때 일괄 — 지금)
-    return dk.formal(dk.fix_colons(dk.align_titles("\n".join(p for p in parts if p))))   # 카드 밖 제목을 좌측 기준선(ALIGN_PX)으로 (2026-10-23 사용자)
+    parts.append(dk.related_buttons(RELATED_LINKS))   # 함께 보는 페이지 — 한국 증시 리포트와 같은 블록 · 주요 인물 발언 전체 보기 포함
+    parts.append(dk.WRAP_CLOSE)   # 출처 · 면책 꼬리말 없음 — 블로그 공통 푸터가 맡는다
+    # ":" 앞뒤 띄우기 · 반말 문장 끝은 합니다체
+    return dk.formal(dk.fix_colons(dk.align_titles("\n".join(p for p in parts if p))))   # 카드 밖 제목을 좌측 기준선(ALIGN_PX)으로
 
 
 def build_tables(input_data, report, cover_url=None, analysis=None):
@@ -916,7 +916,7 @@ def render(input_path, report_path, output_dir, cover_url=None, analysis_path=No
 
     title_path = os.path.join(output_dir, "title.txt")
     title = open(title_path, encoding="utf-8").read().strip() if os.path.exists(title_path) else "미국 증시 리포트"
-    mock = dk.write_mock(body, os.path.join(output_dir, "daily_mock.html"), title)   # 테마 입힌 목업 (2026-10-11 사용자: 목업 화면 확인)
+    mock = dk.write_mock(body, os.path.join(output_dir, "daily_mock.html"), title)   # 테마 입힌 목업
     if mock:
         print(f"목업 -> {mock}")
     print(f"HTML 렌더 완료 -> {body_path}")

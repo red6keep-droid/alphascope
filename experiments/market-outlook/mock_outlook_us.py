@@ -1,4 +1,4 @@
-"""시장 전망 지도(가칭) — 미국 목업. 기획: 비공개 doc/기획/시장-전망-리포트-기획.md 3 · 5 · 11 · 12절 (2026-11-25 사용자 "미국 먼저 시작해").
+"""시장 전망 지도(가칭) — 미국 목업. 기획: 비공개 doc/기획/시장-전망-리포트-기획.md 3 · 5 · 11 · 12절.
 
     python experiments/market-outlook/outlook_us.py              # 먼저 output/outlook_us.json
     python experiments/market-outlook/mock_outlook_us.py         # → output/mock_outlook_us.html

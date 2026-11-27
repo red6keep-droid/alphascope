@@ -28,7 +28,7 @@ def _overlap(h, d):
     g = lambda t: {t[i:i + 2] for i in range(len(t) - 1)} if t else set()
     hs, ds = g(re.sub(r"[^가-힣A-Za-z0-9]", "", h)), g(re.sub(r"[^가-힣A-Za-z0-9]", "", re.sub(r"(했습니다|입니다|습니다|밝혔|말했|강조했)", "", d)))
     return len(hs & ds) / len(ds) if ds else 0
-PATH_TEMPLATE = re.compile(r"(직접 연결되는|닿는 자리입니다|먼저 닿는|닿)")   # `닿다` 표현은 쓰지 않는다 — `연결` (2026-11-07 사용자)   # 예문 틀을 베낀 문장은 버린다 (10-25 첫 실행에서 전부 같은 틀)
+PATH_TEMPLATE = re.compile(r"(직접 연결되는|닿는 자리입니다|먼저 닿는|닿)")   # `닿다` 표현은 쓰지 않는다 — `연결`   # 예문 틀을 베낀 문장은 버린다 (10-25 첫 실행에서 전부 같은 틀)
 NARRATE_BATCH = 16   # 한 호출 신호 수 — 52개를 한 번에 보내면 Groq 가 413 (10-25)
 BANNED = re.compile(r"(전망됩니다|예상됩니다|것으로 보입니다|오를 것|내릴 것|매수 추천|매수 권유|매도 추천|투자 기회|주목해야)")   # 매매 공시의 "매수"는 사실이라 막지 않는다
 PROMPT = """너는 시장 리서치 블로그의 편집자다. 아래 JSON 은 미국 정책 결정자 · 투자자 · CEO 의 최근 발언 신호 목록이다.
@@ -77,7 +77,7 @@ def _source(radar):
     import article
     import paths
     sec = [s["lead"]["url"] for p in radar["people"] for s in p["signals"] if s["source_kind"] != "primary" and not s["lead"]["body"]]
-    got = article.leads(sec) if sec else {}   # 보도 발언 — 기사 설명 + 첫 문단 (2026-10-25 사용자: 요약이 제목을 되풀이한다)
+    got = article.leads(sec) if sec else {}   # 보도 발언 — 기사 설명 + 첫 문단
     out = []
     for p in radar["people"]:
         for s in p["signals"]:
@@ -111,7 +111,7 @@ def _validate(v, src, min_ratio=0.7):
         if d and (len(d) > DETAIL_MAX or re.search(r"(습니다|니다|했다|이다|한다|됐다)$", d)):
             why.append("설명 형식(뉴스 문체)")
         if d and _overlap(h, d) >= RESTATE:
-            d = ""   # 헤드라인 되풀이 — 줄을 비운다 (2026-10-25 사용자)
+            d = ""   # 헤드라인 되풀이 — 줄을 비운다
         pth = str(it.get("path") or "").strip().rstrip(".").strip()
         pth = re.sub(r"^[^:：]{1,40}\)\s*[:：]\s*", "", pth)   # "테슬라(TSLA) : …" — 자산 이름은 화면이 붙인다
         if pth and len(re.sub(r"\s", "", pth)) < 10:
@@ -123,7 +123,7 @@ def _validate(v, src, min_ratio=0.7):
         probs = fact_check.check([h, d], by_id[it["id"]])
         if probs:
             why.append(f"숫자 {probs[0]}")
-        if not probs:   # 원문이 어림 · 예상으로 말한 숫자 = `약` · `(예상)` (2026-11-12 사용자 — 추정이 사실처럼 읽히던 것, hedge_check)
+        if not probs:   # 원문이 어림 · 예상으로 말한 숫자 = `약` · `(예상)`
             src_txt = hedge_check.hedge_text(by_id[it["id"]])
             h2, hw1 = hedge_check.hedge(h, src_txt)
             d2, hw2 = hedge_check.hedge(d, src_txt)
@@ -151,7 +151,7 @@ INPUT:
 
 
 def translate_subtopics(radar, pool):
-    """radar.keywords 의 세부 주제 가운데 subtopic_ko.json 에 없는 것만 한 번에 번역해 누적한다 (2026-10-21 사용자: 키워드로). 실패하면 영어 그대로 보인다."""
+    """radar.keywords 의 세부 주제 가운데 subtopic_ko.json 에 없는 것만 한 번에 번역해 누적한다. 실패하면 영어 그대로 보인다."""
     try:
         with open(SUBTOPIC_KO_PATH, encoding="utf-8") as f:
             cache = json.load(f)

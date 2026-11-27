@@ -1,4 +1,4 @@
-"""전체 종목 범위 (universe_all) — 최종 목표 약 850종목의 명단 (2026-11-12 사용자 "그렇게 적용", 기획 = 비공개 기획/회원-내-종목-기획.md 6-5-1).
+"""전체 종목 범위 (universe_all) — 최종 목표 약 850종목의 명단.
 
     python experiments/universe_all.py      # ref/universe_all.json 다시 만들기 (분기 1회 — 지수 편입 · 제외를 따라간다)
 

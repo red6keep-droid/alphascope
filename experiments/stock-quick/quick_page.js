@@ -1,4 +1,4 @@
-/* 종목 고정 페이지 `stock`(독자에게 보이는 이름 = 종목 주가, 2026-11-14 사용자: 독자 화면에 `간단 정보` 말 금지) — 주소 뒤 종목 코드(?s=UBER · ?s=259960)로 카드 조각을 받아 끼워 넣는다 (2026-11-14, 기획 6-3-1 · 6-6).
+/* 종목 고정 페이지 `stock` — 주소 뒤 종목 코드(?s=UBER · ?s=259960)로 카드 조각을 받아 끼워 넣는다 (2026-11-14, 기획 6-3-1 · 6-6).
    카드 HTML 은 매일 파이썬이 정식 종목 렌더러로 만든다(experiments/stock-quick/full_us.py · full_kr.py) → 기록 없는 브랜치 quick-us · quick-kr.
    읽는 순서: Cloudflare Pages alpha-scope.pages.dev/us/UBER(2026-11-15 예비 추가, 먼저) → jsDelivr @quick-us/version.json(매일 purge) → 커밋 번호 → @<커밋>/us/UBER.html → GitHub 원본.
    커밋 번호 주소는 내용이 안 바뀌어 캐시를 지울 일이 없다.
@@ -19,7 +19,7 @@
   try { q = new URLSearchParams(location.search).get('s') || ''; } catch (e) { q = ''; }
   var s = (q || root.getAttribute('data-default') || '').toUpperCase().replace(/\.(KS|KQ)$/, '').replace(/[^A-Z0-9\-]/g, '').slice(0, 12);
 
-  // 안내 — 독자에게 보이는 말. 상황마다 다르게: 종목을 안 고름 · 우리가 다루지 않는 코드 · 잠시 못 불러옴 (2026-11-14 사용자)
+  // 안내 — 독자에게 보이는 말. 상황마다 다르게: 종목을 안 고름 · 우리가 다루지 않는 코드 · 잠시 못 불러옴
   function msg(t) {
     root.innerHTML = '<p style="font-size:17px;line-height:30px;color:#333;margin:12px 0;padding-left:6px;word-break:keep-all;">' + t + '</p>' +
       '<p style="font-size:17px;line-height:30px;margin:0 0 12px;padding-left:6px;">' +
@@ -53,7 +53,7 @@
     }
   }
 
-  // 일반 주소 /p/stock.html?s=코드 로 왔고 그 종목 전용 페이지가 있으면 그리로 (2026-11-15 사용자: 전용 주소라야 검색 · 공유가 종목별로 잡힌다).
+  // 일반 주소 /p/stock.html?s=코드 로 왔고 그 종목 전용 페이지가 있으면 그리로.
   // 주소표 = Pages /shells.json (publish_quick_shells.py 가 매일). 전용 페이지(data-default 가 있는 곳)에서는 부르지 않는다.
   if (!local && q && !root.getAttribute('data-default')) {
     try {
@@ -67,7 +67,7 @@
   if (local) {
     html = getSync(local + path);
   } else {
-    // ① Cloudflare Pages(jsDelivr 예비, 2026-11-15 사용자) — 배포하면 바로 새 파일이라 커밋 번호 단계가 없다. 확장자 없이(.html 이면 308 한 번 더)
+    // ① Cloudflare Pages — 배포하면 바로 새 파일이라 커밋 번호 단계가 없다. 확장자 없이(.html 이면 308 한 번 더)
     html = getSync(PAGES + path.replace(/\.html$/, ''));
     notFound = false;   // Pages 에 없는 것(첫 배포 전 등)만으로 `찾지 못했다`고 하지 않는다 — 아래 jsDelivr 결과로 판단
   }

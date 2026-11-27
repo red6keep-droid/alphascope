@@ -1,4 +1,4 @@
-"""AlphaScope 시황 해설 발행기 (2026-11-19 사용자 "커밋하고 발행기 만들어", 처음부터 공개 발행).
+"""AlphaScope 시황 해설 발행기.
 
 수집기가 쓴 글 columns/{날짜}-{am|pm}(status ready, format story — News-doc 23절)을 읽어 검사하고, 배너를 그려 Blogger 에 공개 발행한다.
 블로그 AI 0 — 글은 수집기가 쓰고, 여기서는 읽기 · 검사 · 그리기 · 발행만.
@@ -33,7 +33,7 @@ KST = datetime.timezone(datetime.timedelta(hours=9))
 RAW = "https://raw.githubusercontent.com/red6keep-droid/alphascope/gh-pages"
 OUT = os.path.join(BASE, "output", "publish")
 LATE = {"am": (12, 0), "pm": (23, 59)}   # 이 시각(KST) 뒤엔 그 편을 내지 않는다
-# 저녁 편은 그날 이 시각(KST) 뒤에 저장된 글만 낸다 (2026-11-20 사용자, News-doc 33절) — 한국장 마감 재료 없이 낮에 미리 써진 rev
+# 저녁 편은 그날 이 시각(KST) 뒤에 저장된 글만 낸다 — 한국장 마감 재료 없이 낮에 미리 써진 rev
 # (11-20 12:58 rev 1)가 17:00 · 21:00 에 나가지 않게. 수집기는 저장할 때마다 createdAt 을 서버 시각으로 새로 찍는다(= 그 rev 를 쓴 시각)
 PM_MIN_WRITTEN = (16, 30)
 
@@ -174,7 +174,7 @@ def stage_prepare(a):
         else f"columns/{key} 읽음 — rev {col.get('rev')} · 저장 시각 없음")
     log(f"  모델 {col.get('model')} · 요청 {col.get('calls')}")
     if slot == "am" and os.environ.get("CALLER") == "collector" and str(col.get("round")) == "1":
-        # 아침 편은 완성본(2차)만 (2026-11-26 사용자 "완성본만 내자") — 수집기가 1차 저장 뒤 불러도 내지 않는다.
+        # 아침 편은 완성본(2차)만 — 수집기가 1차 저장 뒤 불러도 내지 않는다.
         # 2차가 실패해 1차만 남은 날은 Worker 08:40 안전망이 그 1차를 낸다(그때는 CALLER 가 비어 있음)
         log(f"{key} — 아침 편 1차(rev {col.get('rev')})라 내지 않음 · 2차 또는 08:40 안전망을 기다림")
         return 0
@@ -204,7 +204,7 @@ def stage_prepare(a):
     banner_url = info["url"] if info else None
     if info:   # 글에 넣는 배너 = 그림 내용 해시가 든 이름(images/commentary-날짜-편-해시.webp) — 같은 이름에 다시 그리면 jsDelivr 가 브랜치 주소를
         # 몇 시간 붙잡아 옛 그림을 내주고(11-19 다시 그리기 때 확인 실패 → 배너 없이 나감), 브라우저도 7일 저장. 해시 이름은 늘 처음 보는 주소라 바로 새 그림.
-        # 날짜 이름(commentary-날짜-편.webp)은 홈 시황 배너가 쓰므로 그대로 둔다. 이름에 날짜가 있어 30일 정리(image_prune) 대상 (2026-11-19 사용자)
+        # 날짜 이름(commentary-날짜-편.webp)은 홈 시황 배너가 쓰므로 그대로 둔다. 이름에 날짜가 있어 30일 정리(image_prune) 대상
         try:
             import hashlib
             raw = open(info["path"], "rb").read() if info.get("path") else urllib.request.urlopen(f"{RAW}/{ref}", timeout=30).read()
@@ -222,7 +222,7 @@ def stage_prepare(a):
         first = (b.get("titles") or [[]])[0] if b.get("titles") else (b.get("lines") or [])
         alt = "AI 생성 이미지 — " + " ".join(first) if first else alt
     if slot == "pm" and briefing and (briefing.get("close") or {}).get("sectors_basis") != "lists":
-        # 묶음을 만들 때(16:40 무렵) 목록 파일이 아직 없었으면 지금 목록 파일로 업종 표를 다시 셈 — 업종 탭과 같은 숫자 (2026-11-20 사용자).
+        # 묶음을 만들 때(16:40 무렵) 목록 파일이 아직 없었으면 지금 목록 파일로 업종 표를 다시 셈 — 업종 탭과 같은 숫자.
         # 검사(check)는 위에서 수집기 글과 묶음 원래 숫자로 이미 끝났다. 여기선 화면 표만 바꾼다
         import build_briefing as BB
         secs = BB.sectors_from_lists(BB.read_lists_doc("kr"), briefing.get("trade_date"))
@@ -275,7 +275,7 @@ def stage_publish(a):
     blog_id = PB._blog_id(creds, blog_url)
     old = already(creds, blog_id, post["key"])
     newer = False
-    if old:   # 수집기 2차(rev 가 오름) — 저녁 편 17:00 1차 뒤 21:00 에 저녁 방송을 보탠 rev 2 (2026-11-20 사용자, News-doc 31절)
+    if old:   # 수집기 2차(rev 가 오름) — 저녁 편 17:00 1차 뒤 21:00 에 저녁 방송을 보탠 rev 2
         m = re.search(r'data-rev="(\d+)"', old.get("content") or "")
         old_rev = int(m.group(1)) if m else None
         try:
@@ -321,7 +321,7 @@ def previous_editions(day, slot, n=2):
 
 def stage_missing(a):
     """빠진 편 찾기 — 정시 실행 끝에 직전 두 편을 본다. 수집기 글이 ready 인데 Blogger 에 없으면 '슬롯 날짜' 한 줄(가장 오래된 것 하나만).
-    워크플로가 그 편을 손 실행처럼(마감 시각 검사 없이) 다시 부른다 — 11-24 저녁 편이 Blogger 429 로 빠지고 사람이 다음 날 손으로 낸 것을 자동으로 (2026-11-25 사용자).
+    워크플로가 그 편을 손 실행처럼(마감 시각 검사 없이) 다시 부른다 — 11-24 저녁 편이 Blogger 429 로 빠지고 사람이 다음 날 손으로 낸 것을 자동으로.
     한 실행에 하나만: concurrency 묶음에서 기다리는 실행은 하나만 남아 둘을 부르면 앞의 것이 취소된다. 남은 편은 다음 실행이 메운다."""
     import publish_blogger as PB
     creds = PB._credentials()

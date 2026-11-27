@@ -1,7 +1,7 @@
-"""미국 데일리 뉴스 재료 정리 (2026-11-05 사용자 batch 8 ③ · ⑤ · ⑬) — 기사(CNBC) 와 유튜브 방송 주제를 **같은 뉴스끼리 묶고**, 규칙으로 `꼭 볼 뉴스` 를 고르고,
+"""미국 데일리 뉴스 재료 정리 — 기사(CNBC) 와 유튜브 방송 주제를 **같은 뉴스끼리 묶고**, 규칙으로 `꼭 볼 뉴스` 를 고르고,
 팝업(요약 다섯 줄 · 관련 종목 오늘 등락 · 몇 곳이 다뤘나)의 재료를 만든다. 그리는 일은 render_html.sec_news.
 
-왜 규칙인가 : 데일리 AI 가 고른 3~5건은 기준이 보이지 않았다(사용자). 점수는 전부 우리 데이터 — 다룬 방송 수 · 관련 자산의 그날 움직임 · 예상 밖 표시 · 최근성.
+왜 규칙인가 : 데일리 AI 가 고른 3~5건은 기준이 보이지 않았다. 점수는 전부 우리 데이터 — 다룬 방송 수 · 관련 자산의 그날 움직임 · 예상 밖 표시 · 최근성.
              툴팁에 그대로 적는다. AI 는 묶기(news_stories) · 요약(news_summary)만.
 """
 
@@ -44,7 +44,7 @@ def _seed_home_summaries(cache_path):
         print(f"[news_pick] 홈 요약 {len(add)}건 재사용")
 
 
-# 뉴스 탭 분야 탭 = 8개 묶음 (2026-11-07 사용자 P357: 18개 분류를 전부 탭으로 만들어 너무 많았다 — 탭에만, 줄 라벨 · 기록은 18개 그대로).
+# 뉴스 탭 분야 탭 = 8개 묶음.
 # 근거 = 방송 이슈 12일 1,467건 하루 평균 — 하루 10건 안팎씩 되게 작은 분야를 뜻이 가까운 큰 탭에 붙였다
 TAB_GROUP = {"AI_CAPEX": "AI · 반도체", "EARNINGS": "실적 · 기업", "CORP_EVENT": "실적 · 기업", "INVESTOR_CALLS": "실적 · 기업",
              "RATES_FED": "금리 · 경기", "INFLATION": "금리 · 경기", "GROWTH_JOBS": "금리 · 경기",
@@ -69,7 +69,7 @@ def tab_order(picks, rest):
     return [(t, counts[t]) for t in order]
 
 def _issue_ko(n):
-    """CNBC 기사 분야 = 기록 이슈 코드 이름 (2026-11-07 사용자 P339). 옛 theme(8개 화면 어휘)은 issue 가 없을 때만."""
+    """CNBC 기사 분야 = 기록 이슈 코드 이름. 옛 theme(8개 화면 어휘)은 issue 가 없을 때만."""
     import issue_codes
     iss = n.get("issue")
     return issue_codes.ISSUE_KO.get(iss) if iss in issue_codes.ISSUE_KO else (n.get("theme") or "그 밖")
@@ -111,7 +111,7 @@ _notable = None
 
 
 def notable():
-    """같은 stocks.json 의 `notable` — 최근 급락일에 버틴 종목(종목 레이더 crash_watch, 홈 `주목할 종목` 카드와 같은 재료). 데일리 `급락한 날 버틴 종목은?` (2026-11-08 사용자). 못 읽으면 {}."""
+    """같은 stocks.json 의 `notable` — 최근 급락일에 버틴 종목(종목 레이더 crash_watch, 홈 `주목할 종목` 카드와 같은 재료). 데일리 `급락한 날 버틴 종목은?`. 못 읽으면 {}."""
     if _notable is None:
         stocks()
     return _notable or {}
@@ -131,7 +131,7 @@ def build(input_data, analysis, media_lines, now=None, summarize=True, all_chann
     """재료 → {"stories", "picks", "rest", "chips", "n_channels_all", "channels_all", "prev", "lines", "stocks"}.
     media_lines = media_feed.market_top(issues) (시장 · 업종 이슈, 48시간). analysis 는 없을 수 있다.
     한국 증시 리포트(M82) = 방송 + 한국 기사(extra), prev · stories_cache 를 따로 준다 (미국 데일리 상태를 쓰지 않게).
-    extra (2026-11-24 사용자 "미국처럼 합치고 탭도 적용") = 이미 만든 항목 — kind "fact"(뉴스 수집기 사건별 사실: lines = (글, 출처) 줄 · n_out = 보도 곳 수)는
+    extra = 이미 만든 항목 — kind "fact"(뉴스 수집기 사건별 사실: lines = (글, 출처) 줄 · n_out = 보도 곳 수)는
     방송과 같은 사건 묶기에 넣고, kind "head"(제목만 있는 기사 묶음: rows = 제목 · 매체 · 주소)는 AI 묶기 없이 한 줄씩. 미국 데일리는 extra 없이 지금 그대로."""
     now = now or datetime.datetime.now(datetime.timezone.utc)
     series = (analysis or {}).get("series") or {}
@@ -187,7 +187,7 @@ def build(input_data, analysis, media_lines, now=None, summarize=True, all_chann
         if g["n_channels"] >= 2:
             score += min(g["n_channels"], 10) * 2
             why.append(f"방송 {g['n_channels']}곳")
-        n_out = max((x.get("n_out") or 0 for x in g["items"]), default=0)   # 한국 사실 기사 = 보도 곳 수, 방송 곳 수와 같은 무게 (2026-11-24 사용자)
+        n_out = max((x.get("n_out") or 0 for x in g["items"]), default=0)   # 한국 사실 기사 = 보도 곳 수, 방송 곳 수와 같은 무게
         if n_out >= 2:
             score += min(n_out, 10) * 2
             why.append(f"보도 {n_out}곳")
@@ -216,7 +216,7 @@ def build(input_data, analysis, media_lines, now=None, summarize=True, all_chann
                                            cache_path=os.path.join(STATE_DIR, "news_summaries.json"), lead_cache=os.path.join(DATA_DIR, "leads.json"), label="daily-summary")
         except Exception as e:  # noqa: BLE001
             print(f"[news_pick] 요약 실패 — 요약 줄 하나로 : {str(e)[:100]}")
-    # 요약 두 줄 못 되는 뉴스는 독자 목록에서 뺀다 — 기록 · 방향 막대 · n곳은 그대로 (2026-11-10 사용자: "한 줄짜리 기사는 가치가 없을 수 있다", 옛 batch 9 ④ 원문 링크 폐지)
+    # 요약 두 줄 못 되는 뉴스는 독자 목록에서 뺀다 — 기록 · 방향 막대 · n곳은 그대로
     # 묶음 안에 두 줄 이상인 기사 · 방송이 있으면 그것을 대표로 바꾼다
     checked = bool(summarize or os.environ.get("NEWS_NO_AI"))   # 요약을 안 돌린 호출(기록용 summarize=False)은 기사를 거르지 않는다 — 방송은 수집기 줄이 늘 있다
 

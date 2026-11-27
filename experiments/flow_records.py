@@ -1,4 +1,4 @@
-"""돈이 어디로 가나 — 업종 11 · 세부 업종 20 · 시장(S&P 500) 의 하루 한 줄 기록 (2026-11-20 사용자 "스마트 머니 · 떠오르는 업종 · 누적 기록 · 순환매 … 진행해줘").
+"""돈이 어디로 가나 — 업종 11 · 세부 업종 20 · 시장(S&P 500) 의 하루 한 줄 기록.
 
     python experiments/flow_records.py --state "$STATE_DIR/radar"      # 정기 실행(미국 장 마감 뒤 본 실행, 하루 한 번)
     python experiments/flow_records.py --dry                           # 로컬 확인 — 표만 찍고 쓰지 않는다

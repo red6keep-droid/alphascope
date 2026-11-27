@@ -1,4 +1,4 @@
-"""종목 주가(간단 종목, 미국) 뉴스 — Finnhub 기사 목록 + 원문 첫 문단 → 공용 분류 · 요약 (2026-11-15 사용자 "1단계 시작해", 853종목 뉴스 계획).
+"""종목 주가(간단 종목, 미국) 뉴스 — Finnhub 기사 목록 + 원문 첫 문단 → 공용 분류 · 요약.
 
 왜 Finnhub: 구글 뉴스 주소 풀기는 한 IP 에서 시작 약 1분 뒤 막힌다(11-15 실측 — 동시 3개 198건 · 1초 간격 36건 · 2초 간격 23건).
   Finnhub company-news = 종목당 평일 하루 4.16건 · 요약 글 86% · 막힘 0, 그 링크로 원문에 직접 들어가면 첫 문단 75%(막힘 0) — 기억 quick-news-plan.
@@ -120,7 +120,7 @@ def main():
         sys.exit("FINNHUB_API_KEY 없음")
 
     now = datetime.datetime.now(datetime.timezone.utc)
-    hours = HOURS * 3 if now.astimezone(datetime.timezone(datetime.timedelta(hours=9))).weekday() == 1 else HOURS   # 화요일(KST 06:40) = 토요일 아침 실행 뒤 72시간(주말 · 월요일 미국 장) — 일 · 월 아침엔 실행이 없다 (2026-11-15 사용자)
+    hours = HOURS * 3 if now.astimezone(datetime.timezone(datetime.timedelta(hours=9))).weekday() == 1 else HOURS   # 화요일(KST 06:40) = 토요일 아침 실행 뒤 72시간(주말 · 월요일 미국 장) — 일 · 월 아침엔 실행이 없다
     cut = now - datetime.timedelta(hours=hours)
     keep = (now - datetime.timedelta(days=KEEP_DAYS)).strftime("%Y-%m-%dT%H:%M:%SZ")
     store = {k: v for k, v in _load(news_p, {}).items() if v.get("published_at", "") >= keep}

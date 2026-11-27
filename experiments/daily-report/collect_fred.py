@@ -25,7 +25,7 @@ SERIES = {
     "us2y": "DGS2",
     "spread_10_2": "T10Y2Y",
     "fed_funds": "DFF",
-    # 주간 실업수당 청구 (매주 목 08:30 ET, 계절 조정) — 필수 아님. 결측이면 `경제 지표는?` 카드에서 그 줄만 빠진다 (2026-11-09 사용자)
+    # 주간 실업수당 청구 (매주 목 08:30 ET, 계절 조정) — 필수 아님. 결측이면 `경제 지표는?` 카드에서 그 줄만 빠진다
     "claims": "ICSA",           # 신규 청구, 기준일 = 그 주 토요일
     "claims_4wk": "IC4WSA",     # 신규 청구 4주 평균
     "claims_cont": "CCSA",      # 계속 청구 (신규보다 한 주 늦다)
@@ -54,7 +54,7 @@ def _last_value(session, api_key, series_id):
     resp.raise_for_status()
     obs = resp.json().get("observations", [])
 
-    found = []   # 최근 관측 둘 — 값 옆 직전 대비 증감에 쓴다 (2026-10-12 사용자: "증감 표시는 안 되는 거야?")
+    found = []   # 최근 관측 둘 — 값 옆 직전 대비 증감에 쓴다
     for o in obs:
         value = str(o.get("value") or "").strip()
         date = str(o.get("date") or "").strip()

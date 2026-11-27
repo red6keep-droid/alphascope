@@ -1,4 +1,4 @@
-"""테마 상태 기록 — 테마 페이지가 그날 계산한 상태를 테마마다 하루 한 줄씩 쌓는다 (2026-11-24 사용자, 헌법 제4조 · 기록 대장 빈 칸 2).
+"""테마 상태 기록 — 테마 페이지가 그날 계산한 상태를 테마마다 하루 한 줄씩 쌓는다.
 
     python experiments/theme-monitor/theme_records.py --state "$STATE_DIR"     # nvda-report.yml 테마 단계, main.py 다음
 

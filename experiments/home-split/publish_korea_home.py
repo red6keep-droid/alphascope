@@ -1,4 +1,4 @@
-"""한국 홈 고정 페이지 만들기 (홈 나누기 H35, 2026-11-10 사용자).
+"""한국 홈 고정 페이지 만들기.
 
     python experiments/home-split/publish_korea_home.py            # 확인만 (블로그에 쓰지 않음)
     python experiments/home-split/publish_korea_home.py --publish  # 페이지 1개 만들기 (이미 있으면 제목 · 본문만 맞춤)

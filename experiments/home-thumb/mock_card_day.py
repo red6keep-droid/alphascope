@@ -1,4 +1,4 @@
-"""홈 미국 증시 · 한국 증시 카드 — 하루(장중) 그래프 시안, 실제 홈 카드 그대로 (2026-11-14 사용자).
+"""홈 미국 증시 · 한국 증시 카드 — 하루(장중) 그래프 시안, 실제 홈 카드 그대로.
 
     python experiments/home-thumb/mock_card_day.py     # design-samples/output/mock_home_card_day.html (목업 목록 = 디자인 샘플 · 홈 카드 그래프)
 
@@ -15,7 +15,7 @@ import re
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 EXP = os.path.dirname(HERE)
-OUT = os.path.join(EXP, "design-samples", "output")   # 목업 목록 = 디자인 샘플 묶음 (2026-11-14 사용자)
+OUT = os.path.join(EXP, "design-samples", "output")   # 목업 목록 = 디자인 샘플 묶음
 UP, DN, INK, NOTE = "#d93025", "#1a73e8", "#111", "#6B7280"
 UP_FILL, DN_FILL = "rgba(217,48,37,.16)", "rgba(26,115,232,.16)"
 VW, VH = 340, 150   # 그래프 상자 = 지금 카드 그림 비율 2.27 : 1 (폰 실제 폭 약 316 ~ 338)
@@ -39,7 +39,7 @@ def slot(sym, hm):
     return ((h * 60 + m) - (h0 * 60 + m0)) // 5
 
 
-HEAD_TOP = 13   # 숫자 줄 위 여백 8 → 13 (+5, 2026-11-14 사용자)
+HEAD_TOP = 13   # 숫자 줄 위 여백 8 → 13
 EDGE = 10       # 최고 · 최저 글자 · 숫자 줄이 상자 끝에서 떨어지는 거리
 PLOT_TOP, PLOT_BOT = 52, 32   # 선이 그려지는 범위 = 위 52 · 아래 32 를 비움 — 숫자 줄 · 최고 글자 · 최저 글자 자리 (최저가 바닥에 붙지 않게)
 
@@ -58,7 +58,7 @@ def geom(sym, d, vh):
 
 
 def grid(sym, vh, vert):
-    """배경 눈금 (2026-11-14 사용자) — 가로 = 상자 높이 4등분, 세로(vert) = 한 시간마다(한국 시간 정시)"""
+    """배경 눈금 — 가로 = 상자 높이 4등분, 세로(vert) = 한 시간마다(한국 시간 정시)"""
     g = "".join(f'<line x1="0" x2="{VW}" y1="{vh * k / 4:.1f}" y2="{vh * k / 4:.1f}" stroke="#EEF1F5" stroke-width="1" vector-effect="non-scaling-stroke"/>' for k in (1, 2, 3))
     if vert:
         first = 0 if START[sym][1] == 0 else (60 - START[sym][1]) // 5
@@ -92,7 +92,7 @@ def day_col(d):
 
 
 def mark(p, kind, vh, col, val):
-    """최고 · 최저 글자(HTML) — 최고 = 빨강 · 최저 = 파랑, 글자 · 숫자 · 점 모두 (2026-11-14 사용자 정정: 한때 등락 색 하나로 했다가 되돌림).
+    """최고 · 최저 글자(HTML) — 최고 = 빨강 · 최저 = 파랑, 글자 · 숫자 · 점 모두.
     최고는 점 위, 최저는 점 아래. 좌우 끝 가까우면 상자 끝에서 EDGE 만큼 띄운다.
     최고 글자가 오른쪽 위 숫자 줄 자리(가로 50% 넘고 위 40 안)에 오면 점 왼쪽 옆으로 비킨다."""
     x, y = p[0] / VW * 100, p[1] / vh * 100
@@ -113,7 +113,7 @@ def head(d):
     c, pc = d["c"][-1], d["prev"]
     ch = c - pc
     tri = "▲" if ch > 0 else "▼" if ch < 0 else ""
-    # 오른쪽 정렬 · 앞(왼쪽) = 전날 대비 삼각형 + 퍼센트만(포인트 · 부호 없음) · 뒤(오른쪽) = 종가, 종가도 같은 색 (2026-11-14 사용자)
+    # 오른쪽 정렬 · 앞(왼쪽) = 전날 대비 삼각형 + 퍼센트만(포인트 · 부호 없음) · 뒤(오른쪽) = 종가, 종가도 같은 색
     return (f'<div class="hc-head" style="color:{day_col(d)};"><span class="hc-chg">{tri}{abs(ch / pc * 100):.2f}%</span>'
             f'<span class="hc-num">{fmt(c)}</span></div>')
 
@@ -133,13 +133,13 @@ def card(sym, d, kind):
             f'<div class="report-block"><div class="report-columns"><ul><li>{SUMMARY[sym]}</li></ul></div></div></a></div>')
 
 
-VARIANTS = {"B1": (150, False)}   # 2026-11-14 사용자 B1 확정 (B2 세로 눈금 · B3 · B4 높은 상자는 뺌)   # (상자 높이 viewBox, 세로 눈금)
+VARIANTS = {"B1": (150, False)}   # B1 확정 (B2 세로 눈금 · B3 · B4 높은 상자는 뺌)   # (상자 높이 viewBox, 세로 눈금)
 SPECS = [
     ("B1", "가로 눈금", "상자 크기 = 지금 그림과 같음(2.27 : 1). 배경에 가로 눈금 3줄"),
 ]
 
 CSS = """
-:root { --hc-num: 16px; --hc-chg: 14px; --hc-mark: 12px; }   /* 종가 16 · 전날 대비 14 · 최고 · 최저 12 (2026-11-14 사용자) */
+:root { --hc-num: 16px; --hc-chg: 14px; --hc-mark: 12px; }   /* 종가 16 · 전날 대비 14 · 최고 · 최저 12 */
 .hc-box { position: relative; border: 1px solid #eee; border-radius: 8px; overflow: hidden; background: #fff; }
 .hc-head { position: absolute; right: 10px; top: 13px; display: flex; align-items: baseline; gap: 0 8px; font-family: var(--num); font-variant-numeric: tabular-nums; }
 .hc-num { font-size: var(--hc-num); line-height: calc(var(--hc-num) + 6px); font-weight: 700; }
@@ -181,7 +181,7 @@ def controls():
     def grp(label, var, vals, cur):
         bs = "".join(f'<button type="button" data-var="{var}" data-v="{v}px" aria-pressed="{"true" if v == cur else "false"}">{v}</button>' for v in vals)
         return f'<span>{label} {bs}</span>'
-    return ('<div class="hc-ctl">' + grp("종가", "--hc-num", (18, 20, 22, 24), 20) + "</div>")   # 전날 대비 13 · 최고 · 최저 12 는 정해짐 (2026-11-14 사용자)
+    return ('<div class="hc-ctl">' + grp("종가", "--hc-num", (18, 20, 22, 24), 20) + "</div>")   # 전날 대비 13 · 최고 · 최저 12 는 정해짐
 
 
 def home_css():

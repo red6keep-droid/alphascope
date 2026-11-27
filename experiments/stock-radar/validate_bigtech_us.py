@@ -1,4 +1,4 @@
-"""빅테크 회사별 업계 지표 검증 (2026-11-01 사용자: 빅테크는 회사마다 맞는 업계 동향 — 메타는 광고 등).
+"""빅테크 회사별 업계 지표 검증.
 
     python experiments/stock-radar/validate_bigtech_us.py          # 자료 받기 + 검증 → doc/검증/미국-빅테크-지표-검증.md
 

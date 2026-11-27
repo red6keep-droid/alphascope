@@ -1,4 +1,4 @@
-"""하단 메뉴 `종목` → 묶음 탭 목록 목업 (2026-11-17 사용자 "추천대로 진행해서 목업") — 비공개 기획 `doc/기획/종목-탭-그룹-목록-기획.md`.
+"""하단 메뉴 `종목` → 묶음 탭 목록 목업 — 비공개 기획 `doc/기획/종목-탭-그룹-목록-기획.md`.
 
     python experiments/stock-lists/mock_stock_lists.py   → output/mock_stock-lists-*.html · mock_stock-star-*.html (목업 서버 `stock-lists` 묶음)
 
@@ -8,8 +8,8 @@
   mock_stock-lists-empty.html       아직 안 담음 · 미국 → 빈 화면 + 이 기기에서 최근 본 종목 (목업은 `관심` 탭으로 열림)
   mock_stock-star-us.html           종목 상세(엔비디아) 제목 옆 ☆ — 누르면 바로 담기 · 알림 줄
   mock_stock-star-kr.html           종목 상세(SK하이닉스) 같은 동작
-관심 종목 = 로그인 없이 이 브라우저(localStorage)에만 저장 (2026-11-19 사용자). 로그인 · 서버 보관은 나중 — 그 전에는 로그인 안내 문구를 넣지 않는다.
-별(☆)은 종목 상세 페이지 제목의 종목 이름 바로 뒤(회색 `주가 실적 일정` 앞)에만 둔다(2026-11-17 사용자). 목록 줄에는 없다 — 줄 전체가 링크라 잘못 누르기 쉽다. 빼기는 관심 탭 `편집`.
+관심 종목 = 로그인 없이 이 브라우저(localStorage)에만 저장. 로그인 · 서버 보관은 나중 — 그 전에는 로그인 안내 문구를 넣지 않는다.
+별(☆)은 종목 상세 페이지 제목의 종목 이름 바로 뒤(회색 `주가 실적 일정` 앞)에만 둔다. 목록 줄에는 없다 — 줄 전체가 링크라 잘못 누르기 쉽다. 빼기는 관심 탭 `편집`.
 
 데이터 = 실제 값, 인터넷 · AI 0:
   간단 종목 853 = 원격 브랜치 quick-us · quick-kr 의 <코드>.json(운영 실행이 이미 올린 가격 요약, `git fetch origin quick-us quick-kr` 뒤)
@@ -43,7 +43,7 @@ attr = lambda t: html.escape(str(t), quote=True)  # noqa: E731
 
 # 오늘 움직임 기준 (기획 2-3 제안값)
 UP_PCT, DOWN_PCT, VOL_X, NEAR_HI = 3.0, -3.0, 2.0, -2.0
-TOP = 10   # 이 페이지 목록은 10개까지만, 접기 없이 다 펼침 (2026-11-17 사용자 "10개만 보여줘. 다른 종목들도 모두 10개 이상은 보여주지마") — CLAUDE.md `상한으로 버리지 않기`의 예외. 관심 탭(회원이 담은 목록)은 제외
+TOP = 10   # 이 페이지 목록은 10개까지만, 접기 없이 다 펼침 — CLAUDE.md `상한으로 버리지 않기`의 예외. 관심 탭(회원이 담은 목록)은 제외
 STAR = "#F5B400"
 STAR_PATH = "M12 3.2l2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 17l-5.4 2.9 1.1-6.1-4.5-4.2 6.1-.8z"
 G_LOGO = ('<svg viewBox="0 0 18 18" width="18" height="18" aria-hidden="true"><path fill="#4285F4" d="M17.6 9.2c0-.6-.1-1.2-.2-1.8H9v3.4h4.8a4.1 4.1 0 0 1-1.8 2.7v2.2h2.9c1.7-1.6 2.7-3.9 2.7-6.5z"/>'
@@ -157,7 +157,7 @@ def code(r):
 
 
 def sub_of(r, tail):
-    """종목 줄 회색 보조 줄 — 한국 종목은 종목 코드(숫자)를 넣지 않는다 (2026-11-18 사용자). 미국은 티커 · tail."""
+    """종목 줄 회색 보조 줄 — 한국 종목은 종목 코드(숫자)를 넣지 않는다. 미국은 티커 · tail."""
     return tail if r["m"] == "kr" else (f"{code(r)} · {tail}" if tail else code(r))
 
 
@@ -165,7 +165,7 @@ def row_html(r, i, sub=None, right_sub=None, rank=None, chips=""):
     """종목 줄 — 지금 목록 페이지 줄(list_row)과 같은 짜임: [순위] 로고 이름(굵게 16) / 회색 보조 줄 · 오른쪽 가격 / 등락. 줄 전체 = 종목 페이지."""
     sub = sub if sub is not None else sub_of(r, r['sec'])
     rk = (f'<span style="flex:none;width:26px;color:{dk.NOTE};font-weight:700;font-size:15px;line-height:24px;">{rank}</span>' if rank else "")
-    # 로고 22 → 44, 이름 · 보조 줄 두 줄의 세로 가운데 (2026-11-17 사용자 "로고 2배 · 오른쪽 글자와 미들 정렬")
+    # 로고 22 → 44, 이름 · 보조 줄 두 줄의 세로 가운데
     left = (f'<span style="display:flex;align-items:center;min-width:0;flex:1 1 auto;">{rk}'
             f'<span style="flex:none;display:flex;align-items:center;">{dk.ticker_logo(r["s"], LOGO_PX).replace("vertical-align:-4px;", "vertical-align:0;").replace("margin-right:6px;", f"margin-right:{LOGO_GAP}px;")}</span>'
             f'<span style="min-width:0;"><span style="display:block;font-size:16px;line-height:24px;font-weight:700;color:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{esc(r["n"])}</span>'
@@ -173,19 +173,19 @@ def row_html(r, i, sub=None, right_sub=None, rank=None, chips=""):
     rs = right_sub if right_sub is not None else pct_html(r["r"], CHG_PX)
     right = (f'<span style="flex:none;display:flex;flex-direction:column;align-items:flex-end;white-space:nowrap;">'
              f'<span style="font-size:{CHG_PX}px;line-height:24px;">{rs}</span>'
-             f'<span style="font-size:15px;line-height:{dk.LH_TINY};color:{dir_col(r["r"])};">{esc(price_text(r))}</span></span>')   # 증감 위 · 가격 아래 (2026-11-17 사용자 규칙), 가격 = 증감과 같은 색 (2026-11-18 사용자)
+             f'<span style="font-size:15px;line-height:{dk.LH_TINY};color:{dir_col(r["r"])};">{esc(price_text(r))}</span></span>')   # 증감 위 · 가격 아래, 가격 = 증감과 같은 색
     return (f'<span data-row-link="1" data-href="{attr(r["u"])}" data-sym="{attr(r["s"])}" style="{ROW_STYLE}{f"padding-top:{ROW_TOP}px;" if i == 0 else dk.MULTI_SEP}align-items:flex-start;">'
             f'{left}{right}</span>')
 
 
-LIST_BOX = "display:block;margin:0 0 8px;border-bottom:1px solid #E2E8F0;"   # 카드 없이 구분선 목록 — 맨 위 선 없음 · 줄 사이 · 맨 끝 선 (2026-11-17 사용자 "카드로 하지 말고 그냥 구분선으로", 가이드라인 구분선 목록 = dk.rule_rows 와 같은 틀)
-ROW_TOP = dk.RULE_GAP - 1 - dk.VP - 3   # 첫 줄 위 = 24 − 3 = 21 (2026-11-17 사용자: 처음엔 첫 종목 자리 유지, 이어 "타이슨 푸드도 같이 3픽셀 더")
-ROW_PAD = ROW_TOP - 5                    # 구분선 위아래 = 21 − 5 = 16 (2026-11-17 사용자: −5 뒤 전체 −3)
+LIST_BOX = "display:block;margin:0 0 8px;border-bottom:1px solid #E2E8F0;"   # 카드 없이 구분선 목록 — 맨 위 선 없음 · 줄 사이 · 맨 끝 선
+ROW_TOP = dk.RULE_GAP - 1 - dk.VP - 3   # 첫 줄 위 = 24 − 3 = 21
+ROW_PAD = ROW_TOP - 5                    # 구분선 위아래 = 21 − 5 = 16
 ROW_STYLE = dk.MULTI_ROW.replace(f"padding:{dk.SEP_GAP - dk.VP - 1}px 12px;", f"padding:{ROW_PAD}px {dk.ALIGN_PX}px;")   # 좌우 = 왼쪽 기준선 6
 
 
 def list_card(items, render, empty=""):
-    """앞에서 10개만, 다 펼침 (TOP). 카드가 아니라 구분선 목록 (2026-11-17 사용자)."""
+    """앞에서 10개만, 다 펼침 (TOP). 카드가 아니라 구분선 목록."""
     if not items:
         return empty
     shown = "".join(render(x, i) for i, x in enumerate(items[:TOP]))
@@ -194,7 +194,7 @@ def list_card(items, render, empty=""):
 
 
 def pills(key, names, on=0, joined=False):
-    """알약 줄. joined = 홈 `테마 종목` 아래 묶음 줄(#watch-tabs) 모양 — 칸이 붙은 한 줄 상자 (2026-11-17 사용자: 오늘 움직임 · 테마)."""
+    """알약 줄. joined = 홈 `테마 종목` 아래 묶음 줄(#watch-tabs) 모양 — 칸이 붙은 한 줄 상자."""
     return (f'<div class="seg-row{" sl-joined" if joined else ""}" data-sl-pills="{key}" style="padding:0 0 12px;">'
             + "".join(f'<button class="seg" type="button" data-sl-pill="{i}" aria-selected="{"true" if i == on else "false"}">{esc(n)}</button>' for i, n in enumerate(names))
             + "</div>")
@@ -209,14 +209,14 @@ def note(t):
 
 
 def empty_box(title, text, extra=""):
-    """관심 탭 안내(로그인 전 · 담은 종목 없음) — 카드 없이 가운데 정렬, 제목 17/26 레귤러 · 문장 15/24, 글자 전부 회색 (2026-11-19 사용자)."""
+    """관심 탭 안내(로그인 전 · 담은 종목 없음) — 카드 없이 가운데 정렬, 제목 17/26 레귤러 · 문장 15/24, 글자 전부 회색."""
     return (f'<div style="text-align:center;padding:32px {dk.ALIGN_PX}px 24px;">'
             f'<div style="font-size:17px;line-height:26px;font-weight:400;color:{dk.NOTE};">{esc(title)}</div>'
             f'<div style="font-size:15px;line-height:24px;color:{dk.NOTE};margin:4px 0 0;word-break:keep-all;">{text}</div>{extra}</div>')
 
 
 def recent_head():
-    """`이 기기에서 최근 본 종목` — 기본형 아이콘(시계, 회색 원 22) + 소제목 15/22 굵게, 글자와 6 (가이드라인 8절) · 아래 구분선 #E2E8F0 (2026-11-19 사용자). 접기 버튼은 넣었다가 뺐다(같은 날 사용자)."""
+    """`이 기기에서 최근 본 종목` — 기본형 아이콘(시계, 회색 원 22) + 소제목 15/22 굵게, 글자와 6 (가이드라인 8절) · 아래 구분선 #E2E8F0. 접기 버튼은 넣었다가 뺐다."""
     return (f'<div style="display:flex;align-items:center;gap:6px;margin:8px 0 0;padding:0 0 12px {dk.ALIGN_PX}px;border-bottom:1px solid #E2E8F0;font-size:15px;line-height:22px;font-weight:700;color:#111;">'
             f'{dk.soft_icon("clock")}이 기기에서 최근 본 종목</div>')
 
@@ -226,12 +226,12 @@ def info_card(title, text, extra=""):
                     f'<div style="font-size:15px;line-height:24px;color:#333;margin:4px 0 0;word-break:keep-all;">{text}</div>{extra}')
 
 
-# ── 히트맵 (테마 · 업종 탭 묶음 고르기, 2026-11-18 사용자 "네모난 히트맵이 상단에, 누르면 그 종목들") ──
+# ── 히트맵 ──
 # 칸 크기 = 묶음 시가총액 합의 제곱근(작은 묶음도 눌릴 크기로 남게 — 원값이면 반도체 하나가 판을 덮는다). 시가총액 값이 절반 넘게 없는 묶음(목업의 미국 업종)은 종목 수.
 # 칸 색 = 묶음 전 종목 하루 등락 단순 평균(10개 목록 밖 종목도 포함), 빨강 오름 · 파랑 내림 4단계 + 보합 회색. 글자 = 이름 · ▲▼ 평균. 칸은 하나도 버리지 않는다.
 HEAT_W, HEAT_GAP = 360, 2   # 판 기준 너비(폰) — 칸 위치는 % 로 써서 실제 너비에 맞춰 늘어난다
-# 색 = D안(사이트 강조 카드 바탕 계열) + 세기 4단계 조금 (2026-11-18 사용자 "D안, 컬러 대비 조금만" · 시안 mock_heat_colors.py)
-# 글자(이름 · 숫자) = 칸과 같은 방향 색 — 파랑 칸엔 파랑 글자, 빨강 칸엔 빨강 글자 (2026-11-18 사용자). 가장 진한 칸은 한 톤 짙은 글자(대비).
+# 색 = D안(사이트 강조 카드 바탕 계열) + 세기 4단계 조금
+# 글자(이름 · 숫자) = 칸과 같은 방향 색 — 파랑 칸엔 파랑 글자, 빨강 칸엔 빨강 글자. 가장 진한 칸은 한 톤 짙은 글자(대비).
 HEAT_UP = ["#FFF7EE", "#FFECE0", "#FDDDD0", "#F9CBBD"]
 HEAT_DN = ["#EFF6FF", "#E2EEFE", "#D0E3FD", "#BCD6FB"]
 HEAT_FLAT = "#F8FAFC"
@@ -330,12 +330,12 @@ def move_tab(rows, m, stats):
          f"{abs(DOWN_PCT):.0f}% 넘게 내린 종목이 없어 많이 내린 순입니다.", None),
         ("거래 급증", sorted([r for r in xs if (r["v"] or 0) >= VOL_X], key=lambda r: -r["v"]), sorted([r for r in xs if r["v"]], key=lambda r: -r["v"]),
          "평소의 2배를 넘은 종목이 없어 많이 늘어난 순입니다.",
-         lambda r: f'<span style="color:{dk.NOTE};font-size:{dk.TINY};">평소의 {r["v"]:.1f}배 · </span>{pct_html(r["r"], CHG_PX)}'),   # 말 = 회색 보조 줄과 같은 크기 · 색, 증감 = 다른 탭처럼 굵게 (2026-11-18 사용자)
+         lambda r: f'<span style="color:{dk.NOTE};font-size:{dk.TINY};">평소의 {r["v"]:.1f}배 · </span>{pct_html(r["r"], CHG_PX)}'),   # 말 = 회색 보조 줄과 같은 크기 · 색, 증감 = 다른 탭처럼 굵게
         ("52주 최고가 근처", sorted([r for r in xs if r["h"] is not None and r["h"] >= NEAR_HI], key=lambda r: -r["h"]),
          sorted([r for r in xs if r["h"] is not None], key=lambda r: -r["h"]),
          "최고가 2% 안 종목이 없어 가까운 순입니다.",
          lambda r: f'<span style="color:{dk.UP};font-weight:700;font-size:{CHG_PX}px;">최고가</span>' if r["h"] >= 0
-         else f'<span style="color:{dk.NOTE};font-size:{dk.TINY};">최고가까지 </span><b style="color:{dk.DOWN};font-size:{CHG_PX}px;">{abs(r["h"]):.1f}%</b>'),   # 말 = 보조 줄 크기 · 색, 최고가 · 남은 % = 증감 숫자 크기 굵게 (2026-11-18 사용자)   # 최고가 = 빨강 굵게, 남은 % = 파랑 굵게, 크기 = 보조 줄 (2026-11-18 사용자)
+         else f'<span style="color:{dk.NOTE};font-size:{dk.TINY};">최고가까지 </span><b style="color:{dk.DOWN};font-size:{CHG_PX}px;">{abs(r["h"]):.1f}%</b>'),   # 말 = 보조 줄 크기 · 색, 최고가 · 남은 % = 증감 숫자 크기 굵게   # 최고가 = 빨강 굵게, 남은 % = 파랑 굵게, 크기 = 보조 줄
     ]
     bodies = []
     for name, hit, fallback, empty_text, rsub in groups:
@@ -344,8 +344,8 @@ def move_tab(rows, m, stats):
         if hit:
             bodies.append(list_card(hit, render))
         else:
-            bodies.append(list_card(fallback, render) + note(empty_text))   # 탭 · 묶음 줄 바로 아래엔 정보 없음 — 안내는 목록 아래 (2026-11-17 사용자)
-    basis = "마지막 종가 기준 · 거래 급증 = 20일 평균의 2배 이상"   # 짧게 (2026-11-17 사용자 "읽어볼 사람 거의 없어, 짤막하게")
+            bodies.append(list_card(fallback, render) + note(empty_text))   # 탭 · 묶음 줄 바로 아래엔 정보 없음 — 안내는 목록 아래
+    basis = "마지막 종가 기준 · 거래 급증 = 20일 평균의 2배 이상"   # 짧게
     return pills(f"move-{m}", [g[0] for g in groups], joined=True) + panels(f"move-{m}", bodies) + note(basis)
 
 
@@ -363,13 +363,13 @@ def theme_tab(rows, m):
     board, groups, basis = heatmap(f"theme-{m}", groups)
     bodies = []
     for n, xs in groups:
-        # `n종목 중 n개 오름 · 평균` 줄 삭제 — 탭 · 묶음 줄 아래 바로 목록 (2026-11-17 사용자)
+        # `n종목 중 n개 오름 · 평균` 줄 삭제 — 탭 · 묶음 줄 아래 바로 목록
         link = ""
         if m == "us" and n in ("AI 칩", "메모리", "칩 생산", "반도체 장비", "데이터 센터"):   # 반도체를 넷으로 나눔 (2026-11-19)
             link = (f'<a href="{BLOG}/p/theme-ai-capex.html" style="display:block;margin:4px 0 12px;padding-left:{dk.ALIGN_PX}px;font-size:15px;line-height:24px;'
                     f'color:#111;font-weight:700;text-decoration:none;">AI 투자 자금 흐름 보기 →</a>')
         bodies.append(list_card(sorted(xs, key=lambda r: -(r["r"] or -99)), lambda r, i: row_html(r, i)) + link)
-    return board + panels(f"theme-{m}", bodies) + note(basis)   # 히트맵이 묶음 줄 자리 (2026-11-18 사용자)
+    return board + panels(f"theme-{m}", bodies) + note(basis)   # 히트맵이 묶음 줄 자리
 
 
 def sector_tab(rows, m):
@@ -388,7 +388,7 @@ def sector_tab(rows, m):
 
 def cap_tab(rows, m):
     xs = sorted([r for r in rows.values() if r["m"] == m and r.get("cap")], key=lambda r: -r["cap"])
-    return list_card(xs, lambda r, i: row_html(r, i, sub=sub_of(r, cap_text(r)), rank=i + 1))   # `시가총액 상위 10 종목 페이지 →` 줄 삭제 — 여기서 다 본다 (2026-11-19 사용자)
+    return list_card(xs, lambda r, i: row_html(r, i, sub=sub_of(r, cap_text(r)), rank=i + 1))   # `시가총액 상위 10 종목 페이지 →` 줄 삭제 — 여기서 다 본다
 
 
 def etf_tab(etf, m):
@@ -398,20 +398,20 @@ def etf_tab(etf, m):
 
 GRIP = ('<span data-sl-grip aria-label="끌어서 순서 바꾸기" style="display:none;flex:none;align-self:center;width:32px;height:32px;margin:0 -6px 0 0;align-items:center;justify-content:center;'
         'color:#9CA3AF;cursor:grab;touch-action:none;"><svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><path d="M4 6.5h12M4 10h12M4 13.5h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>')
-# 빼기 = 흰 바탕 + 연한 빨강 테두리 선 1 + 빨강 − (2026-11-18 사용자 "빨간 채움 말고 흰 바탕 라인으로, 너무 세지 않게" — 옛 #E5484D 채움 · 흰 −)
+# 빼기 = 흰 바탕 + 연한 빨강 테두리 선 1 + 빨강 −
 RM = ('<button type="button" data-sl-rm aria-label="{name} 빼기" style="display:none;flex:none;align-self:center;width:24px;height:24px;margin:0 10px 0 0;padding:0;border:1px solid #F3A6A3;border-radius:50%;box-sizing:border-box;'
       'background:#fff;cursor:pointer;"><svg viewBox="0 0 22 22" width="22" height="22" aria-hidden="true"><path d="M7 11h8" stroke="#E5484D" stroke-width="1.6" stroke-linecap="round"/></svg></button>')
-LOGO_GAP = 11  # 로고 ~ 종목 이름 6 → 11 (2026-11-18 사용자 "5픽셀 정도 여백")
-LOGO_PX = 35   # 종목 줄 로고 (2026-11-17 사용자: 22 의 2배 = 44 → 20% 작게 = 35)
-CHG_PX = 17    # 오른쪽 윗줄 증감 글자 15 → 16 (2026-11-17 사용자 "한 포인트 더") → 17 (2026-11-18 사용자 "1포인트 더"), 삼각형 = 80% → 14
-# 저장 안내 = 목록 아래 작은 회색 (2026-11-19 사용자: 로그인 없이 브라우저에 임시 저장). 서버 보관(로그인)이 생기면 `계정에 보관하려면 로그인하세요` 를 더한다 — 그 전엔 넣지 않는다
+LOGO_GAP = 11  # 로고 ~ 종목 이름 6 → 11
+LOGO_PX = 35   # 종목 줄 로고
+CHG_PX = 17    # 오른쪽 윗줄 증감 글자 15 → 16 → 17, 삼각형 = 80% → 14
+# 저장 안내 = 목록 아래 작은 회색. 서버 보관(로그인)이 생기면 `계정에 보관하려면 로그인하세요` 를 더한다 — 그 전엔 넣지 않는다
 SAVE_NOTE = "관심 종목은 이 브라우저에만 저장됩니다. 홈 화면에 추가해 두면 더 오래 남습니다."
 A2HS_BTN = ("display:inline-block;margin:0 0 0 6px;padding:0 7px;border:1px solid #CBD5E1;border-radius:6px;background:#fff;"
             "font:inherit;font-size:12px;line-height:18px;font-weight:700;color:#111;vertical-align:baseline;cursor:pointer;-webkit-tap-highlight-color:transparent;")
 
 
 def save_note():
-    """저장 안내 + 아주 작은 `홈 화면에 추가` 버튼 (2026-11-19 사용자 "최대한 작게") — 12/18 굵게 · 외곽선 · 높이 20.
+    """저장 안내 + 아주 작은 `홈 화면에 추가` 버튼 — 12/18 굵게 · 외곽선 · 높이 20.
     누르면 테마의 홈 화면 추가 안내(window.asA2hs: 안드로이드 설치 창 · 아이폰 방법)를 바로 연다. 이미 홈 화면 앱이거나 PC 면 버튼을 숨긴다(asA2hs 없음)."""
     return (f'<p style="font-size:13px;line-height:19px;color:{dk.NOTE};margin:4px 0 12px;padding-left:{dk.ALIGN_PX}px;word-break:keep-all;">{esc(SAVE_NOTE)}'
             f'<button type="button" data-sl-a2hs hidden style="{A2HS_BTN}">홈 화면에 추가</button></p>'
@@ -419,7 +419,7 @@ def save_note():
             "b.onclick=function(){window.asA2hs();};}if(document.readyState==='complete')go();else window.addEventListener('load',go);})();</script>")
 
 
-WATCH_MAX = 100   # 미국 · 한국 합쳐 100개 (2026-11-17 사용자 "200개 담는 사람이 누가 있다고 · 100개까지만"). 안내 문장은 두지 않고, 넘칠 때만 알림
+WATCH_MAX = 100   # 미국 · 한국 합쳐 100개. 안내 문장은 두지 않고, 넘칠 때만 알림
 
 
 def watch_rows(rows, syms):
@@ -435,20 +435,20 @@ def watch_rows(rows, syms):
 
 
 SEARCH_ICON = ('<svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" '
-               'style="flex:none;display:block;"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>')   # 테마 헤더 검색 아이콘과 같은 꼴 (2026-11-19 사용자 "종목 검색해서 담기 앞에 돋보기")
+               'style="flex:none;display:block;"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>')   # 테마 헤더 검색 아이콘과 같은 꼴
 PLUS_ICON = ('<span aria-hidden="true" style="flex:none;display:inline-flex;width:22px;height:22px;border-radius:50%;background:#E5E7EB;align-items:center;justify-content:center;">'
              '<svg viewBox="0 0 12 12" width="12" height="12"><path d="M6 1.5v9M1.5 6h9" stroke="#4B5563" stroke-width="1.6" stroke-linecap="round"/></svg></span>')
 
 
 def watch_member(rows, syms, m, all_rows):
-    """관심 탭(로그인) — 탭 바로 아래는 목록뿐 (2026-11-17 사용자: 탭 밑에 정보 없음, 종목 수 · 편집 버튼 · 나라 안내 · 200개 안내 삭제).
+    """관심 탭(로그인) — 탭 바로 아래는 목록뿐.
     편집 모드 들어가기 = ① 줄을 길게 누르기(0.5초) ② 목록 맨 끝 줄 오른쪽 `편집`. 맨 끝 줄 왼쪽 = `종목 추가`(검색 팝업에서 바로 담기).
     편집 모드 = 줄 왼쪽 빼기 · 오른쪽 끌어서 순서 바꾸기, 화면 맨 아래 고정 바 `전체 삭제` · `완료`(하단 메뉴 자리를 잠시 덮음)."""
     lst = f'<div data-cards="1"{"" if syms else " hidden"} style="margin:0 0 8px;"><span data-list="1" data-sl-list style="{LIST_BOX}">{"".join(watch_rows(rows, syms))}</span></div>'
     foot = (f'<div data-sl-foot style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:6px {dk.ALIGN_PX}px 12px;">'
             f'<button type="button" data-sl-add style="display:inline-flex;align-items:center;gap:8px;padding:8px 0;border:0;background:none;font:inherit;font-size:16px;line-height:24px;font-weight:700;color:#111;cursor:pointer;">{PLUS_ICON}종목 추가</button>'
             f'<button type="button" data-sl-edit style="padding:8px 0 8px 12px;border:0;background:none;font:inherit;font-size:15px;line-height:22px;color:{dk.NOTE};cursor:pointer;">편집</button></div>')
-    # 빈 상태 = 카드 없이 가운데 정렬 · 글자 전부 회색 · 제목 레귤러 · 큰 별 없음(문장 속 ★ 만) · 버튼 앞 돋보기 (2026-11-19 사용자)
+    # 빈 상태 = 카드 없이 가운데 정렬 · 글자 전부 회색 · 제목 레귤러 · 큰 별 없음(문장 속 ★ 만) · 버튼 앞 돋보기
     find_btn = f'<button type="button" data-sl-add style="{dk.FOLD_BTN}width:100%;box-sizing:border-box;margin:16px 0 0;font:inherit;font-size:15px;line-height:22px;font-weight:700;">{SEARCH_ICON}종목 검색해서 담기</button>'
     empty = empty_box("담은 종목이 없습니다",
                       f'종목을 검색해서 바로 담거나, 종목 페이지 제목 옆 <span style="color:{STAR};">★</span> 를 누르면 여기에 모입니다.', find_btn)
@@ -461,7 +461,7 @@ def watch_member(rows, syms, m, all_rows):
     cfg = {"m": m, "max": WATCH_MAX, "held": held if syms else [s for s in held if all_rows[s]["m"] != m], "recent": RECENT,
            "row": ROW_STYLE, "logo": LOGO_PX, "top": ROW_TOP, "pad": ROW_PAD, "sep": dk.MULTI_SEP, "rm": RM, "grip": GRIP, "note": dk.NOTE, "up": dk.UP, "down": dk.DOWN, "muted": dk.MUTED, "star": STAR, "starPath": STAR_PATH, "chg": CHG_PX, "gap": LOGO_GAP}
     js = ('<script type="application/json" id="sl-data">' + json.dumps({"cfg": cfg, "rows": data}, ensure_ascii=False).replace("</", "<\\/") + "</script>")
-    # 이 기기에서 최근 본 종목 = 담은 종목이 없을 때만 (2026-11-19 사용자: 관심 종목이 있으면 같이 안 보인다)
+    # 이 기기에서 최근 본 종목 = 담은 종목이 없을 때만
     recent = [all_rows[x] for x in RECENT if x in all_rows and all_rows[x]["m"] == m]
     recent_html = (recent_head() + list_card(recent, lambda r, i: row_html(r, i)).replace(f"padding-top:{ROW_TOP}px;", "", 1)) if recent else ""
     return (f'<div data-sl-watch="1"><div data-sl-comp></div>{lst}<div data-sl-has{"" if syms else " hidden"}>{foot}</div>'
@@ -469,7 +469,7 @@ def watch_member(rows, syms, m, all_rows):
 
 
 def watch_tab(rows, state, m):
-    """관심 탭 — state: empty(아직 안 담음) · watch(담음). 들어온 나라(m) 종목만 (2026-11-17 사용자). 로그인 화면 없음 — 브라우저 저장 (2026-11-19 사용자)."""
+    """관심 탭 — state: empty(아직 안 담음) · watch(담음). 들어온 나라(m) 종목만. 로그인 화면 없음 — 브라우저 저장."""
     syms = [] if state == "empty" else [s for s in WATCH if s in rows and rows[s]["m"] == m]
     return watch_member(rows, syms, m, rows)
 
@@ -519,7 +519,7 @@ PAGE_CSS = ("<style>[data-sl-panel][hidden]{display:none !important;}"
             "display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;overflow:hidden;text-align:center;-webkit-tap-highlight-color:transparent;}"
             ".hm-n{display:block;max-width:100%;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}"
             ".hm-p{display:block;font-weight:400;white-space:nowrap;}"
-            ".hm-c[aria-selected=\"true\"]{box-shadow:inset 0 0 0 1.5px var(--hm-fg);}"   # 고른 칸 = 칸 글자와 같은 방향 색 테두리 1.5 (2026-11-18 사용자 2안 · 굵기 1.5, 옛 검정 2)
+            ".hm-c[aria-selected=\"true\"]{box-shadow:inset 0 0 0 1.5px var(--hm-fg);}"   # 고른 칸 = 칸 글자와 같은 방향 색 테두리 1.5
             ".hm-c:active{filter:brightness(.94);}"
             ".cp-pills{margin:0 0 12px;}"
             ".sl-title-day{flex:none;font-size:13px;line-height:19px;font-weight:400;color:#6B7280;white-space:nowrap;letter-spacing:0;}" + TOAST_CSS + "</style>")
@@ -535,7 +535,7 @@ if(td&&meta){var sp=document.createElement('span');sp.className='sl-title-day';s
 })();</script>"""
 
 
-# 관심 탭 편집 · 검색 담기 (2026-11-17 사용자: 편집 버튼 없이 편집 모드 · 순서 바꾸기 · 전체 삭제 · 검색해서 바로 담기 · 100개)
+# 관심 탭 편집 · 검색 담기
 WATCH_JS = """<script>(function(){
 var W=document.querySelector('[data-sl-watch]'),D=document.getElementById('sl-data');if(!W||!D)return;
 var J=JSON.parse(D.textContent),C=J.cfg,BY={};J.rows.forEach(function(r){BY[r.s]=r;});
@@ -543,14 +543,14 @@ var held=C.held.slice(),L=W.querySelector('[data-sl-list]'),body=document.body;
 function rowsEl(){return [].slice.call(L.children);}
 function mine(){return rowsEl().map(function(x){return x.getAttribute('data-sym');});}
 function all(){var a=held.slice();mine().forEach(function(s){if(a.indexOf(s)<0)a.push(s);});return a;}
-/* 업종 탭 (2026-11-18 사용자): 오늘 움직임과 같은 묶음 줄 `전체 · 기술 · 경기 소비재 …`(담은 개수 많은 순). 칸 나누기 시안은 지저분해 접음.
+/* 업종 탭: 오늘 움직임과 같은 묶음 줄 `전체 · 기술 · 경기 소비재 …`(담은 개수 많은 순). 칸 나누기 시안은 지저분해 접음.
    누르면 그 업종 종목만, 담기 · 빼기 때마다 다시 그린다 */
 var cur='';
 function secOf(x){var r=BY[x.getAttribute('data-sym')];return r?r.sec:'기타';}
 function comp(){var box=W.querySelector('[data-sl-comp]'),cnt={},ks=[],n=rowsEl().length;
  rowsEl().forEach(function(x){var k=secOf(x);if(!cnt[k]){cnt[k]=0;ks.push(k);}cnt[k]++;});
  ks.sort(function(a,b){return cnt[b]-cnt[a];});if(cur&&!cnt[cur])cur='';
- if(ks.length<2){cur='';box.innerHTML='';return;}   /* 업종 둘 이상일 때만 (2026-11-19 사용자) */
+ if(ks.length<2){cur='';box.innerHTML='';return;}   /* 업종 둘 이상일 때만 */
  function pill(k,t){return '<button class="seg" type="button" data-comp="'+esc(k)+'" aria-selected="'+(cur===k)+'">'+t+'</button>';}
  box.innerHTML='<div class="seg-row sl-joined cp-pills">'+pill('','전체')+ks.map(function(k){return pill(k,esc(k));}).join('')+'</div>';}
 function seps(){comp();var vis=rowsEl().filter(function(x){var on=!cur||secOf(x)===cur;x.style.display=on?'flex':'none';return on;});
@@ -633,15 +633,15 @@ W.querySelectorAll('[data-sl-add]').forEach(function(b){b.addEventListener('clic
 
 
 def day_text(d, m):
-    """증시 시황 기준 줄과 같은 꼴 `11.19 한국 종가` · `11.18 미국 종가`(미국 = 미국 장 날짜) (2026-11-19 사용자)."""
+    """증시 시황 기준 줄과 같은 꼴 `11.19 한국 종가` · `11.18 미국 종가`(미국 = 미국 장 날짜)."""
     return f"{int(d[5:7])}.{d[8:10]} {'미국' if m == 'us' else '한국'} 종가"
 
 
 def page(rows, etf, state, m, stats, tab):
-    """한 나라만 — 나라는 페이지 안 버튼이 아니라 들어온 쪽(헤더 국기 스위치가 적는 as-home-mkt, 하단 `종목` 칸이 #m= 로 넘김)으로 정한다 (2026-11-17 사용자).
+    """한 나라만 — 나라는 페이지 안 버튼이 아니라 들어온 쪽(헤더 국기 스위치가 적는 as-home-mkt, 하단 `종목` 칸이 #m= 로 넘김)으로 정한다.
     다른 나라를 보려면 헤더 국기 스위치로 그 나라 홈 → `종목`."""
     day = max(r["d"] for r in rows.values() if r["m"] == m)
-    # 소개 문장 삭제 · 기준일은 제목 줄 오른쪽(공유 버튼 앞) — 테마 JS 가 제목 줄(.post-title-meta)로 옮긴다 (2026-11-17 사용자)
+    # 소개 문장 삭제 · 기준일은 제목 줄 오른쪽(공유 버튼 앞) — 테마 JS 가 제목 줄(.post-title-meta)로 옮긴다
     top = f'<span data-sl-title-day="{attr(day_text(day, m))}" hidden></span>'
     # 빈 머리 표시 — 테마 탭 장치는 `첫 data-cards/data-lead 부터 첫 h2 전까지`를 첫 탭 머리로 옮긴다. 없으면 관심 탭 안 카드가 걸려 알약 줄 위로 올라갔다
     body = (top + '<span data-lead="1" hidden></span>'
@@ -656,7 +656,7 @@ def page(rows, etf, state, m, stats, tab):
 
 
 def tab_star():
-    """관심 탭 이름 앞 노란 별 — 실제 페이지(stock_lists.js tabStar · publish_stock_lists_page CSS)를 그대로 떼어 붙인다 (2026-11-19 사용자: 모든 목업에 같게)."""
+    """관심 탭 이름 앞 노란 별 — 실제 페이지(stock_lists.js tabStar · publish_stock_lists_page CSS)를 그대로 떼어 붙인다."""
     js = open(os.path.join(HERE, "stock_lists.js"), encoding="utf-8").read()
     pub = open(os.path.join(HERE, "publish_stock_lists_page.py"), encoding="utf-8").read()
     m = re.search(r"  \(function tabStar\(\) \{.*?\n  \}\)\(\);", js, re.S)
@@ -667,7 +667,7 @@ def tab_star():
     return f"<style>{c.group(1)}</style><script>\n{m.group(0)}\n</script>"
 
 
-def write(body, name, title="종목 모아보기"):   # 옛 `종목` (2026-11-18 사용자 "제목을 좀 더")
+def write(body, name, title="종목 모아보기"):   # 옛 `종목`
     path = dk.write_mock(dk.align_titles(dk.WRAP_OPEN + body + dk.WRAP_CLOSE), os.path.join(OUT, name), title)
     if path:
         pg = open(path, encoding="utf-8").read().replace("</body>", PAGE_JS + WATCH_JS + tab_star() + "</body>", 1)
@@ -676,11 +676,11 @@ def write(body, name, title="종목 모아보기"):   # 옛 `종목` (2026-11-18
 
 
 # ── 종목 상세 ☆ ──────────────────────────────────────────────────────
-STAR_JS = """<style>/* 별 아래 끝 = 종목 이름 글자 아래선 (2026-11-19 사용자: 별이 위로 떠 보임 — 3배 캡처 실측 3px 아래로 → 2px 다시 올림 = 1px, 사용자) */.sl-star{display:inline-flex;flex:none;align-items:center;justify-content:center;width:22px;height:22px;margin:0 0 0 5px;position:relative;top:1px;vertical-align:middle;padding:0;border:0;background:none;cursor:pointer;color:#9CA3AF;-webkit-tap-highlight-color:transparent;}
+STAR_JS = """<style>/* 별 아래 끝 = 종목 이름 글자 아래선 */.sl-star{display:inline-flex;flex:none;align-items:center;justify-content:center;width:22px;height:22px;margin:0 0 0 5px;position:relative;top:1px;vertical-align:middle;padding:0;border:0;background:none;cursor:pointer;color:#9CA3AF;-webkit-tap-highlight-color:transparent;}
 .sl-star svg{width:22px;height:22px;display:block;}.sl-star[aria-pressed="true"]{color:%(star)s;}
 %(toast)s</style>
 <script>(function(){
-var LINK='%(link)s',on=false,P='%(path)s';   /* 로그인 없이 바로 담기 — 실제는 이 브라우저 localStorage (2026-11-19 사용자) */
+var LINK='%(link)s',on=false,P='%(path)s';   /* 로그인 없이 바로 담기 — 실제는 이 브라우저 localStorage */
 var t=document.querySelector('.pr-sticky .post-title')||document.querySelector('.post-title');if(!t)return;
 var b=document.createElement('button');b.type='button';b.className='sl-star';b.setAttribute('aria-pressed','false');b.setAttribute('aria-label','관심 종목에 담기');
 function draw(){b.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="'+P+'" fill="'+(on?'currentColor':'none')+'" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>';

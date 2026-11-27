@@ -136,7 +136,7 @@ def _eps(t):
         return None
     if rv is not None and "+1y" in rv.index:
         out["up30"], out["down30"] = int(rv.loc["+1y"].get("upLast30days") or 0), int(rv.loc["+1y"].get("downLast30days") or 0)
-    try:   # +1y 가 끝나는 날 = Yahoo 다음 결산일(0y 끝) + 1년 — 화면에 `2028년 1월 결산` (2026-11-02 사용자 P277: `내년` 이 달력 내년으로 읽힌다)
+    try:   # +1y 가 끝나는 날 = Yahoo 다음 결산일(0y 끝) + 1년 — 화면에 `2028년 1월 결산`
         nxt = (t.info or {}).get("nextFiscalYearEnd")
         if nxt:
             d = datetime.datetime.fromtimestamp(nxt, datetime.timezone.utc).date()
@@ -252,7 +252,7 @@ def card_eps(conn):
     wins = (("7일", "7daysAgo"), ("30일", "30daysAgo"), ("60일", "60daysAgo"), ("90일", "90daysAgo"))
     bars = [{"label": lb, "stock": chg(me, k), "peers": _med([chg(e, k) for s, e in dd["eps"].items() if "current" in e])} for lb, k in wins]
     c30 = bars[1]["stock"]
-    state = "높아지는 중" if c30 is not None and c30 >= EPS_PCT else "낮아지는 중" if c30 is not None and c30 <= -EPS_PCT else "그대로"   # 전망 말로 (2026-10-27 사용자 B안, 옛 올라가는 중 · 내려가는 중 · 큰 변화 없음)
+    state = "높아지는 중" if c30 is not None and c30 >= EPS_PCT else "낮아지는 중" if c30 is not None and c30 <= -EPS_PCT else "그대로"   # 전망 말로
     return {"state": state, "c30": c30, "bars": bars, "current": me["current"], "up30": me.get("up30"), "down30": me.get("down30")}
 
 

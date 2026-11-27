@@ -1,11 +1,11 @@
-"""기사 요약 다섯 줄 (news_summary) — 기사를 누르면 뜨는 팝업의 글 (2026-11-05 사용자 batch 8 ⑤: "요약글을 한 5줄 정도는", 8줄은 원문 대체 위험으로 5문장까지).
+"""기사 요약 다섯 줄 (news_summary) — 기사를 누르면 뜨는 팝업의 글.
 
 규칙 (저작권법 기준, doc/운영 지침과 같은 선) :
 - 사실만 — 숫자 · 누가 · 무엇을 · 언제. 기자의 분석 · 전망 · 평가 말 · 인용 문장은 옮기지 않는다. 원문 문장 순서를 따라가지 않는다.
 - 재료 = 제목 + 첫 문단(article_lead, 저장 · 공개 안 함) 또는 RSS 요약. 재료가 짧으면 줄 수를 줄인다 — 억지로 채우지 않는다.
 - 한 줄 = 명사형 헤드라인체(news_store.detail_style_bad 로 걸러낸다). 숫자는 재료에 있는 것만(news_store._num_problem).
 - 매체 이름 · 원문 링크는 팝업이 붙인다(출처 표시, 저작권법 제37조).
-줄 태그 (2026-11-11 사용자 — 한 기사 안의 시장 · 업종 · 종목 · 규제 이야기를 사실 줄 단위로 나눈다, 증시 전망 근거 · 더보기 팝업 재료):
+줄 태그:
   tags[i] = {"scope": market|sector|stock, "tickers": [우리 종목만], "sector": 업종 ETF | None, "issue": 이슈 코드, "dir": positive|negative|uncertain|neutral,
              "stage": done|talk} 또는 None(태그 탈락 — 줄은 살린다). 논의 중이어도 방향은 붙인다(`불확실`은 좋고 나쁨 자체가 갈릴 때만).
   업종은 모델이 고른 ETF 가 목록 밖이면 줄의 종목 → universe.sector_etf 로. 화면에는 독자 말로만 (내부 부호 금지).
@@ -22,7 +22,7 @@ import sys
 BASE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, BASE)
 import article_lead  # noqa: E402
-import hedge_check  # noqa: E402  — 원문의 `대략 · 예상` 이 빠진 줄 바로잡기 (2026-11-12 사용자)
+import hedge_check  # noqa: E402  — 원문의 `대략 · 예상` 이 빠진 줄 바로잡기
 import news_store  # noqa: E402
 
 BATCH = 3          # Qwen 분당 출력 1,000토큰 — 기사당 다섯 줄 + 줄 태그 ≈ 290토큰 (11-11 태그 추가로 4 → 3, 4건이면 약 1,160 으로 넘친다)
@@ -122,7 +122,7 @@ def _check(lines, src):
         ln = str(ln or "").replace("—", ", ").strip().rstrip(".")
         if not ln or len(ln) > MAX_LINE_CHARS or news_store.detail_style_bad(ln) or news_store._num_problem(ln, src):
             continue
-        ln, hw = hedge_check.hedge(ln, src)   # 원문이 어림 · 예상으로 말한 숫자 = `약` · `(예상)` (2026-11-12 사용자: 추정이 사실처럼 읽히던 것)
+        ln, hw = hedge_check.hedge(ln, src)   # 원문이 어림 · 예상으로 말한 숫자 = `약` · `(예상)`
         if hw:
             HEDGED.append((ln, hw))
         if ln not in out:
@@ -138,7 +138,7 @@ def summarize(items, cache_path, lead_cache=None, label="summary", max_items=Non
     """items = [{"item_id", "title", "url", "snippet"(RSS 요약, 없을 수 있음)}] → {item_id: [줄]}. 캐시에 있으면 그대로.
     lead_cache = 첫 문단 캐시 파일(깃 밖). None 이면 기사를 열지 않고 snippet 만 쓴다."""
     cache = _load(cache_path) if cache_path else {}
-    # 요약이 두 줄 못 된 기사(팝업 없이 원문 링크로 나감)는 한 번만 다시 — 재료가 RSS 요약뿐이었던 것을 첫 문단으로 (2026-11-10 사용자: 뉴스를 눌렀는데 원문으로 나감)
+    # 요약이 두 줄 못 된 기사(팝업 없이 원문 링크로 나감)는 한 번만 다시 — 재료가 RSS 요약뿐이었던 것을 첫 문단으로
     redo = {k for k, v in cache.items() if len(v.get("lines") or []) < 2 and not v.get("retry")} if lead_cache else set()
     out = {x["item_id"]: cache[x["item_id"]]["lines"] for x in items if x.get("item_id") in cache}
     need = [x for x in items if x.get("item_id") and (x["item_id"] not in cache or x["item_id"] in redo) and x.get("title")]

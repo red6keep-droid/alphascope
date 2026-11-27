@@ -54,7 +54,7 @@ def _norm(u):
 
 def targets(only=None):
     """(키, 한글 제목, 영문 제목, 주소, 본문 파일). 키 = 'list' · 종목 코드."""
-    # 시총 상위 10 페이지(list)는 더 만들지 · 고치지 않는다 — 종목 모아보기 시가총액 탭으로 옮김, 블로그에서 삭제 (2026-11-19 사용자). 남겨 두면 지운 뒤 다음 실행이 새로 만든다
+    # 시총 상위 10 페이지(list)는 더 만들지 · 고치지 않는다 — 종목 모아보기 시가총액 탭으로 옮김, 블로그에서 삭제. 남겨 두면 지운 뒤 다음 실행이 새로 만든다
     rows = [(U.code(s), U.page_title(s), U.slug_title(s), U.page_url(s)) for s, *_ in U.CANDIDATES]
     import data_guard   # 빈 값 막기 (2026-11-12) — 일봉이 비거나 늦은 종목은 어제 페이지 그대로, 너무 많으면 이번 실행 갱신 전부 멈춤
     g = data_guard.load_report(os.path.join(BASE, "data"))

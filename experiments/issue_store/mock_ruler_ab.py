@@ -1,4 +1,4 @@
-"""판정 자 그래프 A · B · C 비교 목업 (2026-11-15 사용자: `브로드컴 vs 업종` 인데 선이 하나라 헷갈린다 → 두 안 나란히).
+"""판정 자 그래프 A · B · C 비교 목업.
 
     .venv/bin/python experiments/issue_store/mock_ruler_ab.py
       → output/mock_ruler_ab.html    A · B 나란히 (폰 폭 두 칸)
@@ -39,7 +39,7 @@ def build(variant, reg, px):
     orig = dk.trend_card
 
     def card(title, labels, series, fmt, **kw):
-        if variant == "c":   # 판정 그래프는 빼고, 위 비교 그래프에 기준선 둘 — 업종 선 + 기준 폭 (2026-11-15 사용자 제안)
+        if variant == "c":   # 판정 그래프는 빼고, 위 비교 그래프에 기준선 둘 — 업종 선 + 기준 폭
             if title.startswith(fc["ruler_short"]):
                 return ""
             g, L = fc["gap"], fc["line"]

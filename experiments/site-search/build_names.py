@@ -1,4 +1,4 @@
-"""검색어 미리보기 목록 — 정식 · 간단 종목 전부의 이름 · 티커(코드) · 페이지 주소 (2026-11-16 사용자: "삼" 한 글자만 써도 검색어가 미리 뜨게, 종목 검색 입력창 전부).
+"""검색어 미리보기 목록 — 정식 · 간단 종목 전부의 이름 · 티커(코드) · 페이지 주소.
 
 검색 창(search.js)은 처음 열 때 이 파일 하나를 더 읽어, 글자를 칠 때마다 이름 · 티커 · 코드 · 영문 이름으로 찾아 아래에 목록을 띄운다.
 값(주가 · 실적)은 넣지 않는다 — 즉답 색인(search/us.json · kr.json)은 정식 종목만 그대로. 간단 종목을 고르면 그 종목 페이지로 간다.
@@ -35,7 +35,7 @@ def _load(p, default):
 
 
 def build(ref, shells, caps, logos=None):
-    """logos = ref/ticker_logos.json 의 logos — 미리보기 줄 앞 작은 로고(2026-11-19 사용자). 없는 종목은 화면이 원 배지로."""
+    """logos = ref/ticker_logos.json 의 logos — 미리보기 줄 앞 작은 로고. 없는 종목은 화면이 원 배지로."""
     logos = logos or {}
     out = []
     for m, rows in (("us", ref.get("us") or {}), ("kr", ref.get("kr") or {})):

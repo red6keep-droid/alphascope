@@ -1,4 +1,4 @@
-"""브랜드 `AlphaScope` 로고 꼴 시안 (2026-11-15 사용자: "로고처럼 · 앞에 로고 · 지금보다 2포인트 작게 · 공식 AlphaScope 가 들어가면 모두 이렇게").
+"""브랜드 `AlphaScope` 로고 꼴 시안.
     .venv/bin/python experiments/design-samples/build_brand.py  → output/mock_brand.html
 자리마다 둘레 글자 크기와 브랜드 크기(둘레 − 2)를 나란히 놓는다. 옛 표기(굵게만 · 띄어 쓰기)와 비교."""
 import os

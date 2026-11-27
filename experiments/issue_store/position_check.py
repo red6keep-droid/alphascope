@@ -1,4 +1,4 @@
-"""헤지펀드 선물 포지션 + VIX 상승 → 급락 검증 (2026-11-09 사용자 "다음 단계 해").
+"""헤지펀드 선물 포지션 + VIX 상승 → 급락 검증.
 
     python experiments/issue_store/position_check.py
 

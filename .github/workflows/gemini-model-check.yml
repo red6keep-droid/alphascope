@@ -28,7 +28,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      # 상태 · 기록 브랜치는 비공개 저장소 alphascope-state 에 둔다 (2026-11-04 사용자: 기록은 우리 자산 — 공개 저장소에 두지 않는다). 쓰기 배포 키 = Secret STATE_DEPLOY_KEY
+      # 상태 · 기록 브랜치는 비공개 저장소 alphascope-state 에 둔다. 쓰기 배포 키 = Secret STATE_DEPLOY_KEY
       - name: State repo (private alphascope-state)
         env:
           STATE_DEPLOY_KEY: ${{ secrets.STATE_DEPLOY_KEY }}

@@ -1,4 +1,4 @@
-"""가격 패널 PNG — 30거래일 봉차트 + 5·20·60일선 + 볼린저 (2026-10-11 사용자: 표를 그래프로, 5·20·30일 누적 방향).
+"""가격 패널 PNG — 30거래일 봉차트 + 5·20·60일선 + 볼린저.
 
 모양은 graph-v1 앱(Expo, Victory Native)의 규칙을 따른다: 상승 빨강 #f44336 · 하락 파랑 #2196f3,
 5일선 주황 #ff5722 · 20일선 보라 #9c27b0 · 60일선 파랑 #2196f3 · 볼린저 초록 점선 #2e7d32, 오른쪽 현재가 태그.
@@ -24,7 +24,7 @@ import config  # noqa: E402
 WINDOW = 30            # 보이는 거래일
 MARKS = (5, 20)        # 세로선: n거래일 전 (창 안에 있는 것만)
 CHANGE_WINDOWS = (5, 20, 60, 120)   # (옛) 기간 변화율 — 그림 제목에는 더 쓰지 않는다
-MA_WINDOWS = (5, 20, 60, 120, 200)  # 평균선 대비 (2026-10-11 사용자: 전부 평균선 대비로). 50일선은 60일선과 겹쳐 뺀다
+MA_WINDOWS = (5, 20, 60, 120, 200)  # 평균선 대비. 50일선은 60일선과 겹쳐 뺀다
 LOOKBACK = 200         # 200일 평균선 계산용
 UP, DOWN = "#f44336", "#2196f3"
 MA_COLORS = {5: "#ff5722", 20: "#9c27b0", 60: "#2196f3"}
@@ -151,7 +151,7 @@ def draw(bars, path, symbol="NVDA"):
 
     fig.tight_layout()
     os.makedirs(os.path.dirname(path), exist_ok=True)
-    fig.savefig(path, dpi=100, **({"pil_kwargs": {"lossless": True, "method": 6}} if path.endswith(".webp") else {}))   # WebP 무손실 — 같은 그림 PNG 의 약 45% 크기 (2026-11-12 사용자: png 말고 다른 그림 형식, 실측 73 → 33KB)
+    fig.savefig(path, dpi=100, **({"pil_kwargs": {"lossless": True, "method": 6}} if path.endswith(".webp") else {}))   # WebP 무손실 — 같은 그림 PNG 의 약 45% 크기
     plt.close(fig)
     return ch
 

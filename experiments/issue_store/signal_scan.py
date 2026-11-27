@@ -59,7 +59,7 @@ def fetch(days=200):
         if f in YAHOO:
             continue
         try:
-            if key:   # FRED API(키) — 공개 그래프 CSV 는 GitHub 실행기에서 매번 시간 초과(11-18 ~ 11-21 BAA10Y · T10YIE · DGS2, 2026-11-21 사용자)
+            if key:   # FRED API(키) — 공개 그래프 CSV 는 GitHub 실행기에서 매번 시간 초과
                 r = requests.get("https://api.stlouisfed.org/fred/series/observations", timeout=30,
                                  params={"series_id": f, "api_key": key, "file_type": "json", "observation_start": start})
                 r.raise_for_status()

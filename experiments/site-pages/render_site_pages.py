@@ -1,5 +1,5 @@
 """사이트 기본 페이지 3개 — 소개(/p/about.html) · 개인정보처리방침(/p/privacy.html) · 문의(/p/contact.html).
-애드센스 신청 전 필수 페이지 (2026-11-16 사용자 "진행해줘", 계획 문서: alphascope-docs doc/기획/애드센스-신청-준비.md).
+애드센스 신청 전 필수 페이지.
 
     .venv/bin/python experiments/site-pages/render_site_pages.py            # output/mock_about.html · mock_privacy.html · mock_contact.html
     .venv/bin/python experiments/site-pages/render_site_pages.py --dry      # 발행 미리 보기(쓰기 없음)
@@ -44,7 +44,7 @@ def table(head, rows):
 
 
 def brand(size=None):
-    """문장 속 `Newfact` = 로고 + 로고 글꼴(Noto Sans KR 900) — 리포트 문장과 같은 render_html.brand_mark (2026-11-21 사용자: 영어 Newfact · 노토 산스)."""
+    """문장 속 `Newfact` = 로고 + 로고 글꼴(Noto Sans KR 900) — 리포트 문장과 같은 render_html.brand_mark."""
     sys.path.insert(0, os.path.join(HERE, "..", "nvda-report"))
     import render_html as R  # noqa: E402
     return R.brand_mark(size or int(str(dk.BODY).rstrip("px")))
@@ -79,14 +79,14 @@ def _icons():
     return {k: v.replace('class="mi"', 'width="22" height="22" style="display:block;"') for k, v in M.IC.items()}
 
 
-TITLE_PX = 26         # 큰 제목 글자 (2026-11-27 사용자 24 · 26 시안 중 26 확정)
-ABOUT_PX = 17         # 소개 페이지 본문 글자 (2026-11-26 사용자 "17포인트로 써 본문을")
+TITLE_PX = 26         # 큰 제목 글자
+ABOUT_PX = 17         # 소개 페이지 본문 글자
 ABOUT_LH = 31         # 본문 행간 — 19 · 35 를 글자 비율대로 줄임(35 × 17 / 19 ≈ 31, 사용자 "글자 비율에 맞게 행간도")
 ITEM_LH = ABOUT_LH - 2   # 아이콘 단락(무엇을 하나요 · 어떻게 만드나요)만 본문보다 2 좁게 (사용자 2차)
 ITEM_GAP = 22         # 아이콘 단락 사이 · 제목 아래 — 행간 여백(29 − 17 = 12)보다 크게
 SECTION_GAP = 48      # 구획 사이(큰 구분) — 구획 안 여백(22 · 16 · 10)보다 크게
 RULE_PX, RULE_LH, RULE_GAP = 16, 26, 10   # 지키는 원칙 = 16 회색, 점 줄 사이 10 = 행간 여백보다 넓게
-# 여백 원칙 (2026-11-26 사용자): 영역은 여백으로 가른다 — 영역 사이 여백은 그 안 문장의 행간 여백과 같으면 안 되고,
+# 여백 원칙: 영역은 여백으로 가른다 — 영역 사이 여백은 그 안 문장의 행간 여백과 같으면 안 되고,
 # 작은 구분(단락 · 점 줄) < 큰 구분(구획). 작은 여백을 큰 구분에 쓰지 않는다.
 
 
@@ -106,16 +106,16 @@ def _how_icons():
 
 
 def about():
-    # 2026-11-26 사용자 "전체적으로 정리 · 보강 · 개선" — 헌법 전문(가 이름의 뜻 · 나 독자 · 라 기록) · 제1 · 2 · 5 · 6 · 7조와
+    # — 헌법 전문(가 이름의 뜻 · 나 독자 · 라 기록) · 제1 · 2 · 5 · 6 · 7조와
     # 지금 메뉴(리포트 둘 · 증시 시황 · 증시 전망 · Hot Issue · 종목 목록 · Newfact 뉴스 · 주요 인물 발언 · 주식 공부)에 맞춤.
-    # 같은 날 사용자 고침: 독자 = 개인 투자자 · 페이지 전체 글자 단위 줄바꿈 · 로고는 첫 문장만 · 본문 17 · 행간 비율대로 ·
+    # 고침: 독자 = 개인 투자자 · 페이지 전체 글자 단위 줄바꿈 · 로고는 첫 문장만 · 본문 17 · 행간 비율대로 ·
     # 제목 = 구분선 없이 본문 선 · 물음표 · 무엇을 하나요 · 어떻게 만드나요 = 아이콘 + 이름 줄 / 설명 줄(아이콘 칸 침범 없음, 링크 색 없음) ·
     # 지키는 원칙 = 16 회색 · 2px 점 · '누가 계산해도 같은 숫자' 문장 · 앞으로 · 연락 구획 뺌.
     ic = {**_icons(), **_how_icons()}
     al = dk.ALIGN_PX
 
     def h(title, gap=11, big=False):
-        # big = 큰 제목(Newfact 란 · 무엇을 하나요? · 어떻게 만드나요?) — TITLE_PX · 행간 +8 (사용자: 24 → 28, 시안 24 · 26 비교)
+        # big = 큰 제목(Newfact 란 · 무엇을 하나요? · 어떻게 만드나요?) — TITLE_PX · 행간 +8
         if big:
             return h(title, gap).replace(f"font-size:{dk.H2_SIZE};", f"font-size:{TITLE_PX}px !important;", 1).replace(f"line-height:{dk.LH_H2};", f"line-height:{TITLE_PX + 8}px !important;", 1)   # !important = 테마가 폰에서 구획 제목을 20 으로 덮는 것을 이김
         return dk.h2(title, line=False).replace("margin:28px 0 11px;padding:0;", f"margin:{SECTION_GAP}px 0 {gap}px;padding:0 0 0 {al}px;", 1)
@@ -144,11 +144,11 @@ def about():
                  "외부 의견(애널리스트 의견 · 목표가 · 인물 발언)은 누구의 말인지 밝혀 옮깁니다.",
                  "모든 독자에게 같은 글을 보여 줍니다. 유료 회원 · 유료 정보가 없습니다.",
              ]) + "</ul>")
-    # 6차(사용자 2026-11-27): 제목 줄 = `Newfact 소개`(로고는 제목 줄에만 — 뉴스 글 제목과 같은 테마 장치: 본문 [data-headline] + [data-news-post] 표식 →
+    # 6차: 제목 줄 = `Newfact 소개`(로고는 제목 줄에만 — 뉴스 글 제목과 같은 테마 장치: 본문 [data-headline] + [data-news-post] 표식 →
     # 저장 제목의 `Newfact ` 를 머리 줄 로고로 바꿈, 테마 붙여넣기 없음) · 문장 속 Newfact 는 로고 없이 글자만 · '짧게' 뺌 ·
     # 설명글이 아니라 소개글 — 독자에게 주는 가치 · 하려는 일 · 계속 노력한다는 뜻을 문장에 녹임(과장 · 적중 자랑 없이, 헌법 제5 · 6 · 7조 안에서) ·
     # 주식 공부 = 주식 공부 페이지 소개 문장에 맞춤 · 아이콘 학사모.
-    # 7차(사용자): 제목 줄 `소개`(폰 18 · PC 23 — 11-27 1 줄임) = 작은 회색 글씨 · 사이 막대 없이 로고 글자와 비슷하게(Noto Sans KR 900 · 검정) — 이 페이지 안 style 로만 덮음 ·
+    # 7차: 제목 줄 `소개`(폰 18 · PC 23 — 11-27 1 줄임) = 작은 회색 글씨 · 사이 막대 없이 로고 글자와 비슷하게(Noto Sans KR 900 · 검정) — 이 페이지 안 style 로만 덮음 ·
     # `Newfact` 굵게 = 맨 위 문장 + `Newfact 란` 구획만(확인된 사실만 · 앞으로의 Newfact 는 보통 굵기)
     B = lambda t: f'<b style="font-weight:700;color:#111;">{t}</b>'
     NF = B("Newfact")
@@ -183,7 +183,7 @@ def about():
         + item("data", "공개 자료 · 종가 기준", "공개된 시세 · 미국 증권거래위원회(SEC)와 금융감독원 전자공시(DART) 공시 · 미국 연방준비은행(FRED)과 한국은행(ECOS) 경제 지표 · 뉴스를 모아, "
                "미리 정한 계산 규칙으로 숫자를 만듭니다. 가격은 종가 기준입니다.")
         + item("compare", "비교 대상과 함께", "숫자는 견줄 대상이 있어야 뜻이 생깁니다. 종목은 시장 · 업종과, 지표는 그 지표의 평소와 견준 값을 함께 싣습니다.")
-        # 2026-11-25 사용자: 수집기 글 = 같은 사건 보도 여러 건에서 사실만 뽑아 씀. '새로 쓴 글' · 부정문(단독 안 씀 등) 쓰지 않기
+        #: 수집기 글 = 같은 사건 보도 여러 건에서 사실만 뽑아 씀. '새로 쓴 글' · 부정문(단독 안 씀 등) 쓰지 않기
         + item("fact", "확인된 사실만", "Newfact 의 국내 기사는 같은 사건을 다룬 여러 보도에서 확인된 사실만 모아 전달합니다.")
         + item("rule", "숫자는 규칙이, 글은 AI 가 돕습니다", "뉴스 분류 · 번역 · 해설 문장 일부는 AI 가 쓰며, 숫자 계산은 AI 가 하지 않습니다.")
         + item("record", "같은 기준으로 쌓는 기록", "기록은 날마다 같은 기준으로 쌓습니다. 하루치 기록은 작지만, 쌓일수록 지난 비슷한 때에 어떻게 됐는지를 더 깊이 보여 드릴 수 있습니다.")
@@ -253,7 +253,7 @@ def privacy():
 # ── 문의 ─────────────────────────────────────────────────────────────
 def contact():
     return wrap(
-        # 2026-11-16 사용자 결정: 이메일은 누구나(비회원 포함) 보낼 수 있는 세 주제만 — 개인정보 · 권리 · 오류 정정.
+        #: 이메일은 누구나(비회원 포함) 보낼 수 있는 세 주제만 — 개인정보 · 권리 · 오류 정정.
         # 일반 의견 · 제안은 댓글, 개별 투자 상담은 회원이어도 받지 않음(유사투자자문 위험).
         lead(brand() + "는 개인정보 요청 · 권리 침해 · 내용 오류를 이메일로 받습니다. 회원이 아니어도 보낼 수 있습니다.")
         + dk.section("이메일", p(mail()) + p("보통 영업일 기준 3일 안에 답장합니다."))

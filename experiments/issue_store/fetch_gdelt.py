@@ -1,4 +1,4 @@
-"""과거 뉴스 · 분위기 일별 백필 — GDELT DOC 2.0 (2017~, 무료 · 공개) (2026-11-07 사용자 "과거 뉴스 채우기 진행", 기획 9-3 의 1).
+"""과거 뉴스 · 분위기 일별 백필 — GDELT DOC 2.0 (2017~, 무료 · 공개).
 
     python experiments/issue_store/fetch_gdelt.py            # 받을 것만 받고 이어 받기(끊겨도 다시 돌리면 이어짐)
     python experiments/issue_store/fetch_gdelt.py --build    # 받은 원자료 → data/store/gdelt/{topic}.csv (day, count, total, share, tone)

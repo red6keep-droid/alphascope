@@ -1,4 +1,4 @@
-"""섹터 · 한국 지수가 크게 움직인 날 찾기 — 사건표(scope 섹터 · 종목 13건)를 채울 후보 (데이터-기록-계획 A3-3-2 의 7, 2026-11-06 사용자 "받아와").
+"""섹터 · 한국 지수가 크게 움직인 날 찾기 — 사건표(scope 섹터 · 종목 13건)를 채울 후보.
 
     .venv/bin/python experiments/issue_store/detect_sector_shocks.py
 

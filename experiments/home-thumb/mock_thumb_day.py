@@ -1,4 +1,4 @@
-"""홈 미국 증시 · 한국 증시 카드 그래프 — 하루(장중) 선 그래프 시안 (2026-11-14 사용자: 네이버 페이 증권 코스피 1일 화면처럼, 숫자는 잘 보이게).
+"""홈 미국 증시 · 한국 증시 카드 그래프 — 하루(장중) 선 그래프 시안.
 
     python experiments/home-thumb/mock_thumb_day.py     # output/mock_home_thumb_day.html (+ output/day_*.webp)
 

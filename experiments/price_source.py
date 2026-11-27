@@ -4,7 +4,7 @@
     FRED(공식 · 지수 · VIX · 금리 · 환율, 키 FRED_API_KEY) → Polygon/Massive → Twelve Data → Finnhub(호가만) → Alpha Vantage(하루 25회, 맨 뒤)
 
 약관: 네 곳 무료 등급은 모두 "개인 · 비상업 · 내부(비표시)" 라이선스라 공개 블로그 표시는 약관 밖이다 — yfinance(Yahoo 약관)와
-같은 조건이다. 2026-10-21 사용자: "yfinance 와 동일하면 수집 순위로 올려줘, 예비로". 그래서 1순위가 아니라 **yfinance 가 실패한
+같은 조건이다.. 그래서 1순위가 아니라 **yfinance 가 실패한
 심볼에만** 쓴다. Stooq CSV 는 2026-10 현재 JS 브라우저 확인 뒤라 못 쓴다.
 
 무료 한도 (2026-10-21 요금표): Polygon 5회/분 · 종가(EOD) · 2년 — Twelve Data 8크레딧/분 · 800/일 · 실시간 — Finnhub 60회/분, 일봉 캔들은 유료

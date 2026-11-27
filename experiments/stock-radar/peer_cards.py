@@ -1,4 +1,4 @@
-"""종목 페이지 새 카드 넷 — 같은 업종 S&P 500 종목과 견준다 (2026-11-22 사용자 "전부 발행 · 한 번에 쫙", 목업 2026-11-20 ~ 22 mock_earn_mom · mock_fin_cards).
+"""종목 페이지 새 카드 넷 — 같은 업종 S&P 500 종목과 견준다.
 
 카드 (자리)
   `같은 업종 안 주가 순위는?`  오늘 탭 가격 카드 아래 — 기간별(1주 ~ 5년) 상승률 순위. 답 = 1년(없으면 3개월) 순위 구간
@@ -403,7 +403,7 @@ def _mods():
 
 
 def rank_cols(R, dk, rows, top_word="1위", bottom_word="꼴찌", flip=False):
-    """같은 업종 안 순위 세로 막대 (2026-11-22 사용자: 가로막대 → 넘겨 보기 그래프, 세로 막대로 확정) — 넷 카드 가운데 셋이 같이 쓴다.
+    """같은 업종 안 순위 세로 막대 — 넷 카드 가운데 셋이 같이 쓴다.
     rows = [{lb(가로축 이름, 줄바꿈 가능), rank, pct(0 = 꼴찌 · 100 = 1위)}]. 0선 = 업종 중앙값, 위 끝 = 1위(top_word) · 아래 끝 = 꼴찌(bottom_word).
     눈금은 25% 단위로 고정(상위 25% · 하위 25% 경계가 그대로 눈금선). 색 = 위 4분의 1 빨강 · 아래 4분의 1 파랑 · 사이 회색, flip 이면 반대(주가 수준 = 높으면 파랑).
     틀 = 공용 col_frame 오른쪽 모양(축 오른쪽 · 넘칠 때만 `‹ 넘겨 보기`)."""
@@ -470,9 +470,9 @@ def mom_card(name, sym, gname, group, rets):
     first = (f"{name} 주가는 최근 {base['lb']} 동안 {RP._sgn(base['ret'])}% 움직여, S&P 500 안 {gname} {base['n']}종목 가운데 {base['rank']}위입니다. "
              f"같은 기간 {gname} 종목의 중앙값은 {RP._sgn(base['med'])}%입니다.")
     missing = [lb for lb, _ in PERIODS if lb not in {x["lb"] for x in rows}]
-    ax = lambda x: f"{x['lb']}\n{x['ret']:+.0f}%".replace("-", "−")   # noqa: E731 — 가로축 둘째 줄 = 이 종목 상승률(정수 %, 회색). 중앙값은 0선이 보여 준다 (2026-11-22 사용자 "복잡하지 않게")
+    ax = lambda x: f"{x['lb']}\n{x['ret']:+.0f}%".replace("-", "−")   # noqa: E731 — 가로축 둘째 줄 = 이 종목 상승률(정수 %, 회색). 중앙값은 0선이 보여 준다
     chart = rank_chart(R, dk, [dict(x, lb=ax(x)) for x in rows[::-1]], ax(base), keep_order=True)   # 5년 → 1주, 가까운 기간 오른쪽 (P165 · 기간별 수익률 막대와 같은 방향)
-    for x in rows:   # 둘째 줄(상승률) = 한 포인트 작게 12 · 오름 빨강 · 내림 파랑, 부호 +/− (2026-11-22 사용자, 가이드라인 9절 가로축 아래 보조 숫자)
+    for x in rows:   # 둘째 줄(상승률) = 한 포인트 작게 12 · 오름 빨강 · 내림 파랑, 부호 +/−
         t = ax(x).split("\n")[1]
         col = R.UP if round(x["ret"]) > 0 else R.DOWN if round(x["ret"]) < 0 else "#111"
         chart = chart.replace(f"<br>{t}</span>", f'<br><span style="font-size:12px;color:{col};">{t}</span></span>')
@@ -682,7 +682,7 @@ def value_card(name, sym, gname, peers, d):
     if not base:
         return None
     state = ("업종보다 낮음", "업종 수준", "업종보다 높음")[_zone(base["pct"])]
-    # 숫자와 반대 색 — 업종보다 낮으면 빨강 · 높으면 파랑 (2026-11-20 사용자: `하락에 거는 돈은?` 처럼)
+    # 숫자와 반대 색 — 업종보다 낮으면 빨강 · 높으면 파랑
     theme = {"업종보다 낮음": ("positive", R.UP), "업종보다 높음": ("negative", R.DOWN)}.get(state, ("neutral", "#111"))
     first = (f"{name}의 {base['name']}은 {base['val']}로, S&P 500 안 {gname} {base['n']}종목 가운데 높은 쪽부터 {base['rank']}번째입니다. "
              f"높을수록 이익 · 매출에 비해 주가가 높게 매겨져 있다는 뜻입니다.")

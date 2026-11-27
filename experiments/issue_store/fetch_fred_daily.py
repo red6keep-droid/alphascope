@@ -1,4 +1,4 @@
-"""FRED 일별 — 증시 전망 `오늘 나온 것` · 사슬 고리 · 배경 (2026-11-07 사용자 "모자란 일별 자료 추가해줘", 기획 9-2).
+"""FRED 일별 — 증시 전망 `오늘 나온 것` · 사슬 고리 · 배경.
 
     python experiments/issue_store/fetch_fred_daily.py      # data/store/fred/{id}.csv  (day, value)
 

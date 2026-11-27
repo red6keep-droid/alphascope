@@ -1,4 +1,4 @@
-"""시황 해설 배너 목업 (2026-11-17 사용자 "목업부터 만들어줘") — 화풍 4 × 분위기 2(내린 날 · 오른 날), 글자 얹기 있음 · 없음.
+"""시황 해설 배너 목업 — 화풍 4 × 분위기 2(내린 날 · 오른 날), 글자 얹기 있음 · 없음.
 
     python experiments/market-commentary/banner_mock.py            # 그림 받기(없는 것만) + 목업 HTML
     python experiments/market-commentary/banner_mock.py --html     # 그림은 그대로, HTML 만 다시

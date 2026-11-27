@@ -1,5 +1,5 @@
-"""옛 시장 탭 질문 카드 8개 — 2026-11-07 오후 시장 탭을 없애고 오늘 탭 `오늘 움직임은 평소와 달랐나?` 아래로 옮겼다 (사용자: "시장 탭을 오늘 탭으로 다 옮기자").
-처음: 2026-11-07 사용자 "시장 탭도 종목 페이지처럼 질문하고 답하는 형태로".
+"""옛 시장 탭 질문 카드 8개 — 2026-11-07 오후 시장 탭을 없애고 오늘 탭 `오늘 움직임은 평소와 달랐나?` 아래로 옮겼다.
+처음:.
 
 옛 구획(대형주 · 시장 폭 · 달라진 것 · 섹터 · 금리·지표)과 Gemini 해설(change · sector · macro_comment)을 대신한다 —
 숫자는 analysis.json(파이썬), 문장은 여기 고정 틀(합니다체). 오늘 · 한국장 · 일정 탭(sections.py)과 같은 방식.
@@ -34,7 +34,7 @@ def _tri(v):
     return f'<span style="color:{col};">{"▲" if v > 0 else "▼" if v < 0 else "–"}</span>'
 
 
-SLASH_GRAY = "#9CA3AF"   # `▲ n / ▼ n` 가운데 `/` — 보통 굵기 · 연한 회색 (2026-11-08 사용자)
+SLASH_GRAY = "#9CA3AF"   # `▲ n / ▼ n` 가운데 `/` — 보통 굵기 · 연한 회색
 
 
 def _up_down(up, down):
@@ -45,7 +45,7 @@ def _up_down(up, down):
 
 def _dir(v):
     """결과 방향 → (카드 색, 답 글자 색). 증감 카드 (가이드라인 7-1 · 4절): 오름 = 주황 카드 · 빨강 답, 내림 = 파랑 카드 · 파랑 답, 0 · 없음 = 회색.
-    답에는 보라를 쓰지 않는다 (2026-11-07 사용자: "답변 컬러는 상승이냐 하락이냐의 컬러")."""
+    답에는 보라를 쓰지 않는다."""
     if v is None or v == 0:
         return "neutral", "#111"
     return ("positive", UP) if v > 0 else ("negative", DOWN)
@@ -56,12 +56,12 @@ def _ans_arrow(v, digits, unit):
     return dk.arrow(v, digits, unit).replace("font-weight:700;", "", 1)
 
 
-# 줄 목록 · 더 보기 부품은 cards.py 로 옮겼다 — 한국 증시 리포트도 같이 쓴다 (2026-11-08 사용자: 미국 기준으로 한국 맞추기)
+# 줄 목록 · 더 보기 부품은 cards.py 로 옮겼다 — 한국 증시 리포트도 같이 쓴다
 _rows_block, _rows_fold, _end_fix, more_details, _flat, _line_col = C.rows_block, C.rows_fold, C.end_fix, C.more_details, C.flat_rows, C.line_col
 
 
 def _one_line(name, pct, ink):
-    """답 한 줄 — 이름 + 등락 (2026-11-08 사용자 P405: 두 줄 답이 카드 세로를 늘렸다 — 옛 P382 `_two_line` 두 줄)."""
+    """답 한 줄 — 이름 + 등락."""
     return f'<span style="color:{ink};white-space:nowrap;">{C.esc(name)} {C.esc(_s(pct))}</span>'
 
 
@@ -74,7 +74,7 @@ def _mon(day):
 
 
 def pos_label(label):
-    """20일 위치 라벨 — 고점·저점은 굵게, 라벨 전체 증감 색 (고점 빨강 · 저점 파랑, 2026-10-12 사용자)."""
+    """20일 위치 라벨 — 고점·저점은 굵게, 라벨 전체 증감 색."""
     if not label:
         return ""
     col = UP if "고점" in label else DOWN if "저점" in label else None
@@ -86,7 +86,7 @@ def pos_label(label):
 
 def mega_card(a, prev=None):
     """1. 시총 상위 10개 중 평소와 다르게 움직인 종목은? — 답 = 평소 밖 종목 수 `1종목`(없으면 `모두 평소 안`), 카드 색 = 가장 크게 벗어난 종목의 방향.
-    펼치면 평소 밖 종목 줄만 보이고, 평소 안 종목은 `평소 범위 안 n개 더 보기` 안. 툴팁 없음 (2026-11-07 사용자 P381)."""
+    펼치면 평소 밖 종목 줄만 보이고, 평소 안 종목은 `평소 범위 안 n개 더 보기` 안. 툴팁 없음."""
     nr = a.get("normal") or {}
     syms = [s for s in sx.MEGA_KO if s in nr]
     if not syms:
@@ -102,23 +102,23 @@ def mega_card(a, prev=None):
         state = "모두 평소 안"
         first = f"{len(syms)}개 모두 그 종목의 평소 하루 움직임 안에서 움직였습니다."
     rows = sx.mega_rows(a)   # 평소에서 벗어난 크기 순 — 평소 밖 종목이 앞
-    # `고르게 올랐나?` 를 합침 (2026-11-08 사용자): 문장 이어 붙이고, 시총 상위 10개 상승 / 하락 + 옛 고르게 카드 근거 줄 → 그 아래 종목 목록
+    # `고르게 올랐나?` 를 합침: 문장 이어 붙이고, 시총 상위 10개 상승 / 하락 + 옛 고르게 카드 근거 줄 → 그 아래 종목 목록
     br = breadth_card(a, prev, parts=True) or ("", [])
     if br[0]:
         first += " " + br[0]
     tu, td = sum(1 for s in syms if nr[s]["ret_pct"] > 0), sum(1 for s in syms if nr[s]["ret_pct"] < 0)
     b_rows = [("row", f"시총 상위 {len(syms)}개 상승 / 하락", _span(_up_down(tu, td)), "미국 시가총액 상위")] + br[1]
     lines = [(first, "plain")] + b_rows + [(_rows_fold(rows, len(outs), f"평소 범위 안 {len(rows) - len(outs)}개 더 보기", theme), "html")]
-    return _end_fix(C.question_card("상위 종목 움직임은?", state,   # 옛 `시총 상위 10개 중 평소와 다르게 움직인 종목은?` (2026-11-08 사용자 P413)
+    return _end_fix(C.question_card("상위 종목 움직임은?", state,   # 옛 `시총 상위 10개 중 평소와 다르게 움직인 종목은?`
                            theme, ink, lines))
 
 
 BLOG = "https://www.newfact.app"
-US_LIST_URL = f"{BLOG}/p/stock-lists.html?m=us#tab-%EC%8B%9C%EA%B0%80%EC%B4%9D%EC%95%A1"   # 시총 상위 10 페이지 → 종목 모아보기 시가총액 탭 (2026-11-19 사용자)
+US_LIST_URL = f"{BLOG}/p/stock-lists.html?m=us#tab-%EC%8B%9C%EA%B0%80%EC%B4%9D%EC%95%A1"   # 시총 상위 10 페이지 → 종목 모아보기 시가총액 탭
 
 
 def notable_card():
-    """급락한 날 버틴 종목은? — 한국 증시 리포트 notable_card 와 같은 카드 (2026-11-08 사용자). 재료 = 홈 `주목할 종목`(gh-pages stocks.json notable, 종목 레이더 crash_watch:
+    """급락한 날 버틴 종목은? — 한국 증시 리포트 notable_card 와 같은 카드. 재료 = 홈 `주목할 종목`(gh-pages stocks.json notable, 종목 레이더 crash_watch:
     S&P 500 이 2% 넘게 내린 가장 최근 날 오르거나 지수보다 2%p 넘게 덜 내린 후보 종목, 지수와 차이 큰 순) 위 3개. 답 = 1위 종목 · S&P 500 대비 %p, 카드 색 = 그 방향. 줄 = 종목 페이지."""
     import news_pick   # noqa: E402 — 같은 stocks.json 을 이미 한 번 읽는다(뉴스 관련 종목 등락)
     n = news_pick.notable()
@@ -130,7 +130,7 @@ def notable_card():
     rows = ""
     for p in picks:
         url = f"{BLOG}/p/{p['slug']}.html" if p.get("page") and p.get("slug") else US_LIST_URL
-        sub = dk.tint(C.esc(f"S&P 500보다 {_s(p['ex'], 1, '%p')} · 급락일 {p['held_total']}번 중 ")) + f'<span style="color:#111;">{p["held_n"]}번</span>' + " 버팀"   # 버틴 횟수 = 검정 (2026-11-08 사용자: 보라 그만)
+        sub = dk.tint(C.esc(f"S&P 500보다 {_s(p['ex'], 1, '%p')} · 급락일 {p['held_total']}번 중 ")) + f'<span style="color:#111;">{p["held_n"]}번</span>' + " 버팀"   # 버틴 횟수 = 검정
         rows += (f'<span data-row-link="1" data-href="{C.esc(url)}" style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;'
                  f'border-top:1px solid {bd};font-size:{dk.EMPH_Q};line-height:{dk.LH_EMPH_Q};cursor:pointer;">'
                  f'<span style="flex:1 1 auto;min-width:0;color:#111;"><span style="white-space:nowrap;">{C.esc(p["name"])}</span>'
@@ -186,7 +186,7 @@ def sector_card(a):
              (_rows_fold(rows, 1, f"업종 {len(ranked) - 1}개 더 보기", _dir(max(ranked, key=lambda r: abs(r["ret_1d"]))["ret_1d"])[0]), "html")]
     big = max(ranked, key=lambda r: abs(r["ret_1d"]))   # 답 = 가장 크게 움직인 업종 (한국 리포트 `어느 테마가 움직였나?` 와 같은 기준) · 카드 색 = 그 방향
     theme, ink = _dir(big["ret_1d"])
-    return _end_fix(C.question_card("업종의 움직임은?", _one_line(big["theme"], big["ret_1d"], ink), theme, ink, lines))   # 툴팁 없음 — 카드 문장 · 근거 줄이 뜻과 값을 다 말한다 (2026-11-08 사용자: 카드와 겹치는 툴팁 생략, 가이드라인 11절)
+    return _end_fix(C.question_card("업종의 움직임은?", _one_line(big["theme"], big["ret_1d"], ink), theme, ink, lines))   # 툴팁 없음 — 카드 문장 · 근거 줄이 뜻과 값을 다 말한다
 
 
 def theme_card(a):
@@ -219,9 +219,9 @@ def theme_card(a):
         bars += [(C.esc(sx.MEGA_KO.get(m, m)), abs(v) / max_abs, UP if v >= 0 else DOWN, dk.arrow(v), C.esc(m)) for m, v in sorted(vals, key=lambda x: -x[1])]
         w = dk.bar_widths([b[0] for b in bars], [b[3] for b in bars])
         lines.append((_rows_block([dk.bar_row(n, f, c, v, w, sb, first=(i == 0)) for i, (n, f, c, v, sb) in enumerate(bars)], theme), "html"))
-    ans = (_span(f'<span style="color:{ink};">{C.esc(_s(round(big[1], 2)))}</span>') if len(got) == 1   # 테마가 하나면 답 = 등락만 — 이름까지 넣으면 360px 에서 제목이 두 줄 (2026-11-08 사용자 P410)
+    ans = (_span(f'<span style="color:{ink};">{C.esc(_s(round(big[1], 2)))}</span>') if len(got) == 1   # 테마가 하나면 답 = 등락만 — 이름까지 넣으면 360px 에서 제목이 두 줄
            else _one_line(big[0]["name"], round(big[1], 2), ink))
-    return C.question_card("테마의 움직임은?", ans, theme, ink, lines)   # 툴팁 없음 — 카드 문장 · 근거 줄이 뜻과 값을 다 말한다 (2026-11-08 사용자: 카드와 겹치는 툴팁 생략, 가이드라인 11절)
+    return C.question_card("테마의 움직임은?", ans, theme, ink, lines)   # 툴팁 없음 — 카드 문장 · 근거 줄이 뜻과 값을 다 말한다
 
 
 def breadth_card(a, prev, parts=False):
@@ -257,7 +257,7 @@ def breadth_card(a, prev, parts=False):
         lines.append(("row", "동일가중 − 시총가중", dk.arrow(r1, 2, "%p"), "오늘 하루"))
     if r5 is not None:
         lines.append(("row", "동일가중 − 시총가중", dk.arrow(r5, 2, "%p"), "5거래일"))
-    if parts:   # `상위 종목 움직임은?` 카드 안으로 (2026-11-08 사용자 — 한국 P461 과 같게): 문장 · 근거 줄만
+    if parts:   # `상위 종목 움직임은?` 카드 안으로: 문장 · 근거 줄만
         return first, [("row", ("업종" if b.get("mode") != "full" else "S&P 500 종목") + " 상승 / 하락", *x[2:]) if x[1] == "상승 / 하락" else x for x in lines[1:]]   # 이름에 무엇의 상승 / 하락인지
     tip = (f"오늘 {what} 가운데 오른 쪽이 얼마나 되는지\n· 오늘 {b['ratio']:.1f}% : {n_all}개 중 {up}개가 올랐다"
            "\n· 참고 : 동일가중 − 시총가중은 종목을 똑같이 담은 지수와 큰 회사 위주 지수의 차이. 플러스면 상승이 넓게 퍼졌다는 뜻")
@@ -268,7 +268,7 @@ def breadth_card(a, prev, parts=False):
 
 def rs_card(a, prev, parts=False):
     """4. 기술주 · 소형주는 시장보다 셌나? — 최근 5거래일 나스닥 종합 · 러셀 2000 등락 − S&P 500(%p, 지수 기준 analyze.index_rs) + 나스닥이 웃돈 연속 일수.
-    2026-11-07 사용자: 상장지수펀드(QQQ · IWM · SPY) 대신 지수로 — `지수 기술지표의 방향은?` 의 S&P 500 대비와 같은 값. 지수 값이 없는 옛 analysis 는 상장지수펀드 값."""
+: 상장지수펀드(QQQ · IWM · SPY) 대신 지수로 — `지수 기술지표의 방향은?` 의 S&P 500 대비와 같은 값. 지수 값이 없는 옛 analysis 는 상장지수펀드 값."""
     ri = a.get("rs_idx") or {}
     if ri.get("nasdaq_5d") is not None or ri.get("russell_5d") is not None:
         q, i, streak, nq = ri.get("nasdaq_5d"), ri.get("russell_5d"), ri.get("nasdaq_streak"), "나스닥"
@@ -301,17 +301,17 @@ def rs_card(a, prev, parts=False):
            "· 오늘 : " + (" · ".join(won) + " 쪽이 시장 전체보다 강했다" if won else "둘 다 시장 전체보다 약했다")
            + "\n· 참고 : 값이 플러스면 앞에 적힌 쪽이 더 많이 올랐다는 뜻")
     theme, ink = _dir(len(strong) * 2 - len(known))   # 둘 다 강함 = 주황 · 둘 다 약함 = 파랑 · 엇갈림 = 회색
-    if parts:   # `미국 증시 분위기는?` 카드 안 한 묶음으로 (2026-11-07 사용자)
+    if parts:   # `미국 증시 분위기는?` 카드 안 한 묶음으로
         return ("기술주 · 소형주는 시장보다 셌나?", state, theme, ink, lines, dk.with_src(tip, SRC_PRICE))
     return C.question_card("기술주 · 소형주는 시장보다 셌나?", state, theme, ink, lines, tip=dk.with_src(tip, SRC_PRICE))
 
 
 def flow_card(a, parts=False):
-    """지금 시장 흐름은? — 옛 오늘 탭 카드(sections.market_now_card, D6)와 `고점에서 얼마나 떨어져 있나?` 를 합쳤다 (2026-11-07 사용자: 오늘 · 시장 탭 겹침).
+    """지금 시장 흐름은? — 옛 오늘 탭 카드(sections.market_now_card, D6)와 `고점에서 얼마나 떨어져 있나?` 를 합쳤다.
     오늘 탭 = 오늘 하루에 일어난 일, 시장 탭 = 지금 시장의 상태. 변동성 지수 · 금리는 각자 카드가 있어 여기 두지 않는다.
     답 = S&P 500(SPY)이 20 · 50일 평균선 위인가. 둘 다 위 = 주황, 둘 다 아래 = 파랑, 엇갈림 = 회색 (답에 보라 금지, 7-1 — 옛 P330 엇갈림 보라를 바꿨다)."""
     se = a.get("series") or {}
-    spy = se.get("^GSPC") or {}   # 지수 기준 (2026-11-07 사용자: 지수 기술지표 카드와 같은 값, 옛 SPY)
+    spy = se.get("^GSPC") or {}   # 지수 기준
     pos = a.get("position") or {}
     sp = pos.get("sp500") or {}
     a20, a50 = spy.get("above_ma20"), spy.get("above_ma50")
@@ -330,18 +330,18 @@ def flow_card(a, parts=False):
     for n in (20, 50):   # 값 = 평균 가격 대비 % (7-1: 방향 글자만 있는 값 금지, 2026-11-07)
         if spy.get("last") and spy.get(f"ma{n}"):
             lines.append(("row", f"{n}일 평균 가격 대비", dk.arrow(round((spy["last"] / spy[f"ma{n}"] - 1) * 100, 2)), f"S&P 500 · 최근 {n}거래일 평균"))
-    # 지수별 `20일 위치` 줄은 `지수 기술지표의 방향은?` 카드 라벨 안으로 옮겼다 (2026-11-07 사용자 P392: 지수 수치를 한 카드에)
+    # 지수별 `20일 위치` 줄은 `지수 기술지표의 방향은?` 카드 라벨 안으로 옮겼다
     tip = ("S&P 500이 평균 가격선(최근 20 · 50거래일) 위에 있는지와, 최근 한 달 고점 · 저점 사이에서 지금 어디쯤인지\n"
            f"· 오늘 {state} : 20일선 {'위' if a20 else '아래'}, 50일선 {'위' if a50 else '아래'}"
            "\n· 20일 위치 : 고점과 1% 안이면 고점 부근, 저점과 1% 안이면 저점 부근, 그 사이는 박스 중간. 고점 부근이면서 한 달에 5% 넘게 오르면 과열 주의")
-    if parts:   # `미국 증시 분위기는?` 카드 안 한 묶음으로 (2026-11-07 사용자)
+    if parts:   # `미국 증시 분위기는?` 카드 안 한 묶음으로
         return ("지금 시장 흐름은?", state, theme, ink, lines, dk.with_src(tip, SRC_PRICE))
     return C.question_card("지금 시장 흐름은?", state, theme, ink, lines, tip=dk.with_src(tip, SRC_PRICE))   # 오늘 탭 중간이라 접힘 — 탭 첫 카드만 펼침 (P216, 2026-11-07 시장 탭 없앰)
 
 
 def vix_card(a, parts=False):
     """6. 변동성 지수 — 답 = 변동성 지수 값 + 5거래일 증감. 1년 범위 막대(종목 페이지 `가격 범위 (1년)` 부품) — 그래프에는 비교 대상(9절).
-    2026-11-08 사용자 P403: 따로 카드(`시장은 얼마나 긴장했나?`) 대신 `미국 증시 분위기는?` 안 `기술주 · 소형주` 아래 묶음 — 막대 먼저, 그 아래 문장.
+ P403: 따로 카드(`시장은 얼마나 긴장했나?`) 대신 `미국 증시 분위기는?` 안 `기술주 · 소형주` 아래 묶음 — 막대 먼저, 그 아래 문장.
     5거래일 전 값은 막대 안 회색 눈금 + 글자(옛 `5거래일 전` 줄 삭제). 35 · 25 기준은 오늘 탭 충격 카드(기획 5절 B3)와 같다 — 늘 같은 안내라 작은 회색 줄."""
     v = a.get("vix") or {}
     now = v.get("now")
@@ -365,10 +365,10 @@ def vix_card(a, parts=False):
     if lo is not None and hi is not None and v.get("pos_pct") is not None:
         ref = None
         if v.get("prev_5d") is not None and hi > lo:
-            ref = ("", (v["prev_5d"] - lo) / (hi - lo) * 100)   # 눈금 · 구간만, 글자 `5거래일 전 19.42` 는 삭제 (2026-11-08 사용자 P412 — 문장에 값이 있다)
-        lines.append((C.range_gauge(lo, hi, v["pos_pct"], v["pct_from_high"], lambda x: f"{x:.2f}", "",   # 툴팁 없음 — 최저 · 최고 · 오늘 자리를 막대가 보여 준다 (2026-11-08 사용자)
+            ref = ("", (v["prev_5d"] - lo) / (hi - lo) * 100)   # 눈금 · 구간만, 글자 `5거래일 전 19.42` 는 삭제
+        lines.append((C.range_gauge(lo, hi, v["pos_pct"], v["pct_from_high"], lambda x: f"{x:.2f}", "",   # 툴팁 없음 — 최저 · 최고 · 오늘 자리를 막대가 보여 준다
                                    
-                                    "변동성 지수 범위 (1년)", "1년 최고 대비", "1년 최고 근처", ref=ref), "html"))   # 최고가 며칠 전인지는 싣지 않는다 (2026-11-07 사용자: 종목 페이지처럼)
+                                    "변동성 지수 범위 (1년)", "1년 최고 대비", "1년 최고 근처", ref=ref), "html"))   # 최고가 며칠 전인지는 싣지 않는다
     lines.append((first, "plain"))   # 문장은 막대 아래 (P403)
     lines.append(("35를 넘으면 시장 충격 국면이 시작되고, 25 아래로 내려오면 끝난 것으로 봅니다 (오늘 탭 충격 카드와 같은 기준).", "note"))
     tip = ("변동성 지수 (VIX)는 앞으로 한 달 동안 S&P 500이 얼마나 흔들릴지를 옵션 가격으로 매긴 값. 높을수록 시장이 긴장했다는 뜻\n"
@@ -431,9 +431,9 @@ def rates_card(a, macro, parts=False):
     tip = ("미국 국채 금리의 오늘 값과 변화. 10년물은 주식 · 집값 · 달러에 두루 연결되는 기준 금리로, 10년물 − 2년물 차이는 경기 전망을 볼 때 흔히 씁니다\n"
            f"· 오늘 10년물 {v10:.2f}% : " + (f"하루 {_s(d1)}p" if d1 is not None else "변화 값 없음")
            + "\n· 금리와 성장주 : 5거래일 동안 10년물이 0.1%p 넘게 움직이고 나스닥이 반대로 가면 `부담` · `동반`, 같이 가면 `견조`, 그 밖은 `중립`")
-    if parts:   # `시장 환경은?` 카드 안 한 묶음 (2026-11-08 사용자 P404)
+    if parts:   # `시장 환경은?` 카드 안 한 묶음
         return ("금리는 어떻게 움직였나?", state, theme, ink, lines, dk.with_src(tip, f"{SRC_FRED} · {SRC_PRICE}"))
-    return C.question_card("금리의 움직임은?", state, theme, ink, lines, tip=dk.with_src(tip, f"{SRC_FRED} · {SRC_PRICE}"))   # 옛 `금리는 어떻게 움직였나?` (2026-11-08 사용자 P409)
+    return C.question_card("금리의 움직임은?", state, theme, ink, lines, tip=dk.with_src(tip, f"{SRC_FRED} · {SRC_PRICE}"))   # 옛 `금리는 어떻게 움직였나?`
 
 
 def _man(v):
@@ -447,7 +447,7 @@ def _wk(day):
 
 
 def claims_lines(macro):
-    """주간 실업수당 청구 — 문장 하나 + 줄 둘(신규 · 계속). 사실만 (값 · 전주 대비 · 4주 평균), 좋다 · 나쁘다 판정 없음 (2026-11-09 사용자)."""
+    """주간 실업수당 청구 — 문장 하나 + 줄 둘(신규 · 계속). 사실만 (값 · 전주 대비 · 4주 평균), 좋다 · 나쁘다 판정 없음."""
     c, c4, cc = macro.get("claims") or {}, macro.get("claims_4wk") or {}, macro.get("claims_cont") or {}
     if c.get("value") is None:
         return []
@@ -496,21 +496,21 @@ def economy_card(macro, parts_out=False):
     theme, ink = _dir(signs.pop() if len(signs) == 1 else 0)   # 둘 다 오름 = 주황 · 둘 다 내림 = 파랑 · 엇갈림 · 없음 = 회색 (증감 방향, 좋고 나쁨이 아니다)
     if parts_out:   # `시장 환경은?` 카드 안 한 묶음 (P404)
         return ("경제 바탕은 어떤가?", _span(" · ".join(parts)), theme, ink, lines, dk.with_src(tip, SRC_FRED))
-    return C.question_card("경제 지표는?", _span(" · ".join(parts)), theme, ink, lines)   # 툴팁 없음 — 카드 문장 · 근거 줄이 뜻과 값을 다 말한다 (2026-11-08 사용자: 카드와 겹치는 툴팁 생략, 가이드라인 11절)   # 옛 `경제 바탕은 어떤가?` — 금리 카드와 짝 (P409)
+    return C.question_card("경제 지표는?", _span(" · ".join(parts)), theme, ink, lines)   # 툴팁 없음 — 카드 문장 · 근거 줄이 뜻과 값을 다 말한다   # 옛 `경제 바탕은 어떤가?` — 금리 카드와 짝 (P409)
 
 
 def index_cards(a, prev):
-    """오늘 탭 첫 덩어리(주요 지수 아래) — 같은 지수를 근거로 쓰는 카드: 흐름(20 · 50일) → 기술주 · 소형주(5거래일) (2026-11-07 사용자 P384).
+    """오늘 탭 첫 덩어리(주요 지수 아래) — 같은 지수를 근거로 쓰는 카드: 흐름(20 · 50일) → 기술주 · 소형주(5거래일).
     `오늘 움직임은 평소와 달랐나?`(sections.normal_card) · 충격 카드는 render_html 이 이 앞에 둔다."""
     a = a or {}
     mood = mood_card(a, prev)
     if not mood:   # 분위기 값이 없는 날은 옛 카드 셋을 따로
         mood = sx.normal_card(a, opened=False) + flow_card(a) + rs_card(a, prev)
-    return "".join(x for x in (mood, index_tech_card(a, prev)) if x)   # 세 카드 → `미국 증시 분위기는?` 한 카드 (2026-11-07 사용자) · 지수 기술지표 카드 = 덩어리 끝 (P392)
+    return "".join(x for x in (mood, index_tech_card(a, prev)) if x)   # 세 카드 → `미국 증시 분위기는?` 한 카드 · 지수 기술지표 카드 = 덩어리 끝 (P392)
 
 
 def move_cards(a, prev):
-    """둘째 덩어리 — 무엇이 움직였나: 고르게 → 대형주 10개 → 업종 → 테마 (2026-11-08 사용자 P402: `고르게 올랐나?` 를 첫 카드로)."""
+    """둘째 덩어리 — 무엇이 움직였나: 고르게 → 대형주 10개 → 업종 → 테마."""
     a = a or {}
     return "".join(x for x in (mega_card(a, prev), sector_card(a), theme_card(a), notable_card()) if x)
 
@@ -528,7 +528,7 @@ def _man(v):
 
 
 def _cftc_actor(cftc, ks, who):
-    """한 큰손 = 한 문장 — 이번 주 선물 순매수 · 순매도를 주식 쪽 말로 (2026-11-11 사용자 "주가 시장 관점 · 매수 · 매도 물량 흐름만 간단히").
+    """한 큰손 = 한 문장 — 이번 주 선물 순매수 · 순매도를 주식 쪽 말로.
     지수 선물 순매수 = 주식을 사 둔 것과 같은 효과. 헤지펀드가 순매도 잔고인 선물은 사 둔 주식의 하락 대비라 `하락 대비를 줄였 · 늘렸` 으로."""
     name = {"hf": "헤지펀드는", "am": "자산운용사 · 연기금(우리 시장의 기관)은"}[who]
     parts = []   # (지수 이름, 이번 주 변화, 뜻)
@@ -585,7 +585,7 @@ def _cftc_weeks_chart(cftc, ks, who):
     dates = [d for d, _v in _cftc_flows(cftc[ks[0]], who)]
     if len(dates) < 4:
         return ""
-    # 2026-11-11 사용자: 세로 막대 → 선 그래프, 수치는 마지막만 · 날짜마다 동그라미 (ends_only — 증시 전망 비교 그래프와 같은 모양)
+    #: 세로 막대 → 선 그래프, 수치는 마지막만 · 날짜마다 동그라미 (ends_only — 증시 전망 비교 그래프와 같은 모양)
     n = len(dates)
     labels = [f"{int(d[5:7])}/{int(d[8:10])}" if (n - 1 - i) % 3 == 0 else "" for i, d in enumerate(dates)]   # 3주마다 이름 — 폰 폭에서 안 겹치게, 마지막 주는 늘
     series = [(cftc[k]["name"], [round(fl[k].get(d, 0) / 10000, 1) for d in dates], dk.CHART_MAIN if i == 0 else dk.CHART_CMP, "solid") for i, k in enumerate(ks)]
@@ -595,7 +595,7 @@ def _cftc_weeks_chart(cftc, ks, who):
 
 
 def cftc_card(cftc):
-    """큰손은 주식 비중을 늘렸나? — CFTC 지수 선물 잔고의 이번 주 변화를 주식 쪽 말로 (2026-11-11 사용자: 옛 `헤지펀드 선물은?` 이 어렵다,
+    """큰손은 주식 비중을 늘렸나? — CFTC 지수 선물 잔고의 이번 주 변화를 주식 쪽 말로 (: 옛 `헤지펀드 선물은?` 이 어렵다,
     "자금 흐름 매수 · 매도 물량만 간단히 · 주가 시장 관점으로"). 본문 = 기관 한 문장 · 헤지펀드 한 문장 · 한 줄 주의.
     잔고 · 3년 범위 자리 · 신규 매수 / 환매수 세부 · 급락 주 기록은 제목 툴팁. 위험 점수 · 판정 없음 (방향 검증 = 표본 부족, 비공개 doc/검증/헤지펀드-포지션-급락-검증.md).
     답 · 카드 색 = 자산운용사 · 연기금의 S&P 500 선물 이번 주 증감 (증감 색, 좋고 나쁨이 아니다)."""
@@ -609,7 +609,7 @@ def cftc_card(cftc):
     state = _span("늘림" if ach and ach > 0 else "줄임" if ach and ach < 0 else "그대로" if ach == 0 else "—")
     theme, ink = _dir(ach)
     d = head["date"]
-    # 2026-11-11 사용자: 늘 같은 안내 두 문장(무엇을 보는 카드 · 신호 아님)은 툴팁으로, 큰손 문장마다 이번 주 순매수 · 순매도 막대
+    #: 늘 같은 안내 두 문장(무엇을 보는 카드 · 신호 아님)은 툴팁으로, 큰손 문장마다 이번 주 순매수 · 순매도 막대
     chs = {(who, k): ((cftc[k] if who == "hf" else (cftc[k].get("am") or {})).get("net"), (cftc[k] if who == "hf" else (cftc[k].get("am") or {})).get("prev"))
            for who in ("am", "hf") for k in ks}
     chs = {key: n - p for key, (n, p) in chs.items() if n is not None and p is not None}
@@ -624,7 +624,7 @@ def cftc_card(cftc):
         trend = _cftc_trend(cftc, ks, who)
         lines.append((t + (" " + trend if trend else ""), "plain"))
         chart = _cftc_weeks_chart(cftc, ks, who)
-        if chart:   # 12주 주간 순매수 · 순매도 세로 막대 (2026-11-11 사용자 "기간에 따라 늘고 있는지 · 어느 정도인지")
+        if chart:   # 12주 주간 순매수 · 순매도 세로 막대
             lines.append((chart, "html"))
             continue
         bars = []   # 지난 주 수 기록이 없는 저장값 — 이번 주 가로 막대만
@@ -639,7 +639,7 @@ def cftc_card(cftc):
         if bars:
             w = dk.bar_widths([b[0] for b in bars], [b[3] for b in bars])
             lines.append((_rows_block([dk.bar_row(n, f, c, v, w, first=(j == 0)) for j, (n, f, c, v) in enumerate(bars)], theme), "html"))
-    # 2026-11-11 사용자 "툴팁 내용이 너무 많다" — 카드를 읽는 데 꼭 필요한 넉 줄만. 잔고 · 3년 자리 · 신규 매수 / 환매수 세부 · 급락 주 기록(46번 중 45번)은 뺐다 (기사 재료, 비공개 doc/검증)
+    # — 카드를 읽는 데 꼭 필요한 넉 줄만. 잔고 · 3년 자리 · 신규 매수 / 환매수 세부 · 급락 주 기록(46번 중 45번)은 뺐다 (기사 재료, 비공개 doc/검증)
     tip = ("지수 선물을 사면 그 지수의 주식을 사 둔 것과 같은 효과가 있습니다. 실제 주식 매매가 아니고, 주가 방향 신호도 아닙니다"
            "\n· 선 = 주마다 순매수(+) · 순매도(−), 단위 만 계약"
            "\n· 헤지펀드의 S&P 500 선물 순매도는 대부분 사 둔 주식의 하락 대비입니다"
@@ -650,9 +650,9 @@ def cftc_card(cftc):
 
 
 def base_cards(a, macro, cftc=None):
-    """셋째 덩어리 — 시장 환경: `금리의 움직임은?` · `경제 지표는?` 두 카드 (2026-11-08 사용자 P409, P404 한 카드 묶음을 되돌림). 긴장(변동성 지수)은 분위기 카드 안(P403)."""
+    """셋째 덩어리 — 시장 환경: `금리의 움직임은?` · `경제 지표는?` 두 카드. 긴장(변동성 지수)은 분위기 카드 안(P403)."""
     a, macro = a or {}, macro or {}
-    return "".join(x for x in (rates_card(a, macro), economy_card(macro), cftc_card(cftc)) if x)   # 큰손 선물(옛 헤지펀드 선물) = 덩어리 끝 (2026-11-09 · 11-11 사용자)
+    return "".join(x for x in (rates_card(a, macro), economy_card(macro), cftc_card(cftc)) if x)   # 큰손 선물(옛 헤지펀드 선물) = 덩어리 끝
 
 
 def env_card(a, macro):
@@ -679,7 +679,7 @@ IDX_POS = {"^GSPC": "sp500", "^IXIC": "nasdaq", "^DJI": "dow", "^RUT": "russell"
 
 
 def index_tech_card(a, prev):
-    """지수 기술지표의 방향은? — 지수 4개(S&P 500 · 나스닥 · 다우 · 러셀 2000) 라벨을 눌러 바꿔 보는 한 카드 (2026-11-07 사용자 P392).
+    """지수 기술지표의 방향은? — 지수 4개(S&P 500 · 나스닥 · 다우 · 러셀 2000) 라벨을 눌러 바꿔 보는 한 카드.
     라벨 안 = ① 오늘 · 흐름(오늘 등락 · 평소 배수 · 20 · 50일선 · 20일 위치 · 5거래일 S&P 500 대비 — `평소와 달랐나?` · `시장 흐름` · `기술주 · 소형주` 카드의 지수 숫자를 여기로)
     ② 종목 페이지 `기술지표의 방향은?` 과 같은 게이지 · 지표 · 이동평균(tech_signals.card). 답 · 카드 색 = S&P 500 전체 요약. 라벨 전환은 글 안 짧은 스크립트(테마 붙여넣기 없음).
     정보 전달만 — 지수 기술지표 판정은 검증한 적 없다(가이드라인 1절 4-2)."""
@@ -698,7 +698,7 @@ def index_tech_card(a, prev):
         rows = []
         if k in nr:
             x = nr[k]
-            rows.append(f'<span>하루 등락률 <span style="font-size:{TS.WHY_FS};color:#6B7280;">평소 ±{x["sigma_pct"]:.2f}%의 {sx._times(x["z"])}</span></span><b>{dk.arrow(x["ret_pct"])}</b>')   # `오늘` → `하루 등락` (2026-11-07 사용자: 오늘이라고 쓰면 무엇인지 모른다) — 평소 ± = 그 지수의 평소 하루 움직임 크기
+            rows.append(f'<span>하루 등락률 <span style="font-size:{TS.WHY_FS};color:#6B7280;">평소 ±{x["sigma_pct"]:.2f}%의 {sx._times(x["z"])}</span></span><b>{dk.arrow(x["ret_pct"])}</b>')   # `오늘` → `하루 등락` — 평소 ± = 그 지수의 평소 하루 움직임 크기
         s_ = se.get(k) or {}
         for d in (20, 50):   # 값 = 평균 가격 대비 % (7-1: 방향 글자만 있는 값 금지, 2026-11-07)
             if s_.get("last") and s_.get(f"ma{d}"):
@@ -711,13 +711,13 @@ def index_tech_card(a, prev):
             rows.append(f'<span>S&amp;P 500 대비 <span style="font-size:{TS.WHY_FS};color:#6B7280;">5거래일</span></span><b>{dk.arrow(round(s_["ret_5d"] - spx5, 2), 2, "%p")}</b>')
         lines, _ = TS.card(tx[k], sx.INDEX_NAME[k], UP, DOWN, MUTED)
         flow = (TS._sub("오늘 · 흐름") + TS._table(rows, line_col)) if rows else ""
-        # 순서 = 게이지(전체 요약 · 기술지표 · 이동평균) → 오늘 · 흐름 → 기술지표 표 → 이동평균 표 (2026-11-07 사용자: 오늘 · 흐름은 `기술지표` 글자 위)
+        # 순서 = 게이지(전체 요약 · 기술지표 · 이동평균) → 오늘 · 흐름 → 기술지표 표 → 이동평균 표
         body = "".join(f'<div style="margin:0 0 12px;">{(flow if i == 1 else "") + h}</div>' for i, (h, _k) in enumerate(lines))
         panels.append(f'<div data-ixp="{n}"{"" if n == 0 else " hidden"}>{body}</div>')
     last = len(keys) - 1
     def chip(i, k):
         on = i == 0
-        # 뉴스 탭 분야 탭과 같은 단추(data-chip) — 선택 = 굵은 검정 + 1px 검정 외곽선(테마 CSS [data-chip][aria-pressed=true], P332 · P344) (2026-11-07 사용자: 주요 뉴스 탭과 통일)
+        # 뉴스 탭 분야 탭과 같은 단추(data-chip) — 선택 = 굵은 검정 + 1px 검정 외곽선(테마 CSS [data-chip][aria-pressed=true], P332 · P344)
         return (f'<button type="button" data-chip="{C.esc(sx.INDEX_NAME[k])}" data-ixc="{i}" aria-pressed="{"true" if on else "false"}" style="flex:1 0 auto;padding:6px 14px;margin:0;background:#fff;color:#333;font:inherit;'
                 f'font-size:{dk.TINY};line-height:{dk.LH_TINY};cursor:pointer;white-space:nowrap;border:1px solid #E2E8F0;{"border-left:0;" if i else ""}'
                 f'border-radius:{"7px" if i == 0 else "0"} {"7px" if i == last else "0"} {"7px" if i == last else "0"} {"7px" if i == 0 else "0"};">{C.esc(sx.INDEX_NAME[k])}</button>')
@@ -740,9 +740,9 @@ MOOD_KIND = {"상승 추세": ("positive", UP), "단기 조정": ("neutral", "#1
 PART_NAME = {"평소와 달랐나?": ("오늘 움직임", "지수 4개 · 평소 하루 움직임과 비교"),
              "지금 시장 흐름은?": ("최근 흐름", "S&P 500 · 20 · 50거래일 평균 가격"),
              "기술주 · 소형주는 시장보다 셌나?": ("기술주 · 소형주", "최근 5거래일 · S&P 500 대비"),
-             "시장은 얼마나 긴장했나?": ("VIX 5거래일 전 대비", ""),   # `변동성 지수` 이름 삭제 — 바로 위 막대 제목 · 아래 문장과 겹친다 (2026-11-08 사용자 P412)
+             "시장은 얼마나 긴장했나?": ("VIX 5거래일 전 대비", ""),   # `변동성 지수` 이름 삭제 — 바로 위 막대 제목 · 아래 문장과 겹친다
              "금리는 어떻게 움직였나?": ("금리 움직임", "10년물 국채 · 하루"),
-             "경제 바탕은 어떤가?": ("경제 지표", "실업률 · 소비자물가지수 · 전월 대비")}   # 묶음 제목 = 짧은 명사 (2026-11-08 사용자 P404)   # 묶음 머리 = 근거 줄(이름 · 값 · 뜻) — 옛 카드의 답이 오른쪽 값 (2026-11-07 사용자: 그래프 제목 모양 취소)
+             "경제 바탕은 어떤가?": ("경제 지표", "실업률 · 소비자물가지수 · 전월 대비")}   # 묶음 제목 = 짧은 명사   # 묶음 머리 = 근거 줄(이름 · 값 · 뜻) — 옛 카드의 답이 오른쪽 값
 
 
 def _part_row(q, state, ink, noline=False):
@@ -754,7 +754,7 @@ def _part_row(q, state, ink, noline=False):
 
 
 def mood_card(a, prev):
-    """미국 증시 분위기는? — 종목 페이지와 같은 질문 · 같은 답(상승 추세 · 단기 조정 · 조정장 · 불안 국면, analyze.market_mood) (2026-11-07 사용자).
+    """미국 증시 분위기는? — 종목 페이지와 같은 질문 · 같은 답(상승 추세 · 단기 조정 · 조정장 · 불안 국면, analyze.market_mood).
     안에 옛 카드 셋을 묶음으로: `오늘 움직임은 평소와 달랐나?` · `지금 시장 흐름은?` · `기술주 · 소형주는 시장보다 셌나?` — 각 묶음 머리에 옛 질문 · 답 · 툴팁 그대로."""
     m = a.get("mood") or {}
     if not m.get("regime"):
@@ -764,25 +764,25 @@ def mood_card(a, prev):
     ph = m["pct_from_high"]
     where = "1년 최고가 근처" if ph > -0.5 else f"1년 최고가보다 {abs(ph):.1f}% 아래"
     first = f"1년 고점과 200일 평균으로 보면 S&P 500은 {where}이고, 200일 평균 가격보다 {'위' if m['above_ma200'] else '아래'}에 있습니다."   # 첫 문장 괄호 설명 금지 (7-1)
-    # 20일 · 50일 평균 문장은 뺐다 — 바로 아래 `최근 흐름` 묶음이 같은 말을 한다 (2026-11-07 사용자: 반복)
+    # 20일 · 50일 평균 문장은 뺐다 — 바로 아래 `최근 흐름` 묶음이 같은 말을 한다
     if m["regime"] == "불안 국면" and m.get("vix") is not None:
         first += f" 변동성 지수(VIX)가 {m['vix']:.1f}로 {m['vix_high']:.0f}을 넘었습니다."
     lines = [(first, "plain")]
-    if m.get("low_1y") is not None and m.get("high_1y", 0) > m["low_1y"]:   # 1년 범위 막대 + 200일 평균 눈금 (2026-11-07 사용자: 종목 페이지 `가격 범위 (1년)` 막대 · 목표가 막대 눈금처럼)
+    if m.get("low_1y") is not None and m.get("high_1y", 0) > m["low_1y"]:   # 1년 범위 막대 + 200일 평균 눈금 (: 종목 페이지 `가격 범위 (1년)` 막대 · 목표가 막대 눈금처럼)
         lo, hi = m["low_1y"], m["high_1y"]
         at = lambda v: (v - lo) / (hi - lo) * 100  # noqa: E731
         f0 = lambda v: f"{v:,.0f}"  # noqa: E731
-        avg_marks = [("", at(m["ma200"]))]   # 눈금은 200일 평균만(20 · 50일은 넣었다가 뺐다) · 눈금 글자 `200일 평균 7,325` 삭제 (2026-11-07 사용자)
+        avg_marks = [("", at(m["ma200"]))]   # 눈금은 200일 평균만(20 · 50일은 넣었다가 뺐다) · 눈금 글자 `200일 평균 7,325` 삭제
         hd = m.get("high_days")
-        legend = "최고가 대비" + ("" if hd is None else " (오늘)" if hd <= 0 else f" ({hd}거래일 전)")   # 종목 페이지 `가격 범위 (1년)` 과 같은 머리 (같은 날 사용자)
-        # 제목에서 `(1년)` 뺌 — 범례 `1년 최고 대비` 와 겹친다 · 최고가 며칠 전인지 · 툴팁 없음 (2026-11-07 사용자: 정보 과잉)
+        legend = "최고가 대비" + ("" if hd is None else " (오늘)" if hd <= 0 else f" ({hd}거래일 전)")   # 종목 페이지 `가격 범위 (1년)` 과 같은 머리
+        # 제목에서 `(1년)` 뺌 — 범례 `1년 최고 대비` 와 겹친다 · 최고가 며칠 전인지 · 툴팁 없음
         lines.append((C.range_gauge(lo, hi, at(m["last"]), m["pct_from_high"], f0, "", "가격 범위 (1년)", legend, "최고가 근처",
                                     marks=avg_marks), "html"))
-    parts = [x for x in (flow_card(a, parts=True), sx.normal_card(a, parts=True), rs_card(a, prev, parts=True), vix_card(a, parts=True)) if x]   # 변동성 지수 = 기술주 · 소형주 아래 (2026-11-08 사용자 P403)   # 최근 흐름(20 · 50일 평균 대비)을 가격 범위 막대 바로 아래로 — 첫 문장 · 막대와 같은 평균 가격 이야기 (2026-11-07 사용자)
+    parts = [x for x in (flow_card(a, parts=True), sx.normal_card(a, parts=True), rs_card(a, prev, parts=True), vix_card(a, parts=True)) if x]   # 변동성 지수 = 기술주 · 소형주 아래   # 최근 흐름(20 · 50일 평균 대비)을 가격 범위 막대 바로 아래로 — 첫 문장 · 막대와 같은 평균 가격 이야기
     for k, (q, st, _th, ik, ls, _tp) in enumerate(parts):   # 묶음 = 머리 근거 줄(이름 · 옛 답) → 그 묶음의 문장 · 그래프 · 수치 줄
-        if q in ("평소와 달랐나?", "시장은 얼마나 긴장했나?"):   # 변동성 지수도 막대 먼저 (P403)   # 그래프(오늘 움직임과 평소 하루 크기)를 `오늘 움직임` 줄 위로 (2026-11-08 사용자)
+        if q in ("평소와 달랐나?", "시장은 얼마나 긴장했나?"):   # 변동성 지수도 막대 먼저 (P403)   # 그래프(오늘 움직임과 평소 하루 크기)를 `오늘 움직임` 줄 위로
             charts = [x for x in ls if isinstance(x, tuple) and len(x) == 2 and x[1] == "html"]
-            # 위 수치 줄(50일 평균 가격 대비) 아래 구분선 + 선에서 그래프 제목까지 = 가격 범위 제목 위 여백과 같게 (2026-11-08 사용자) — MOOD_CHART_GAP 은 Chrome 실측으로 맞춘 값
+            # 위 수치 줄(50일 평균 가격 대비) 아래 구분선 + 선에서 그래프 제목까지 = 가격 범위 제목 위 여백과 같게 — MOOD_CHART_GAP 은 Chrome 실측으로 맞춘 값
             lines += [(f'<span data-mood-sep="1" style="display:block;border-top:1px solid {line_col};margin-top:-6px;padding-top:{MOOD_CHART_GAP}px;">{h}</span>', "html") for h, _k in charts[:1]] + charts[1:]
             ls = [x for x in ls if x not in charts]
         lines.append(_part_row(q, st, ik, noline=(lines[-1][1] == "html")))   # 가로 막대 · 그래프 바로 아래 줄은 위 선 없음 (9절)

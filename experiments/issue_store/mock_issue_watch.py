@@ -1,4 +1,4 @@
-"""이슈 모니터링 목업 (2026-11-13 사용자: "이슈 모니터링으로 별도 페이지 — 평소 계속 지켜보다가 주식이 선반영되는 낌새가 보이면 포착, 동향 파악").
+"""이슈 모니터링 목업.
 
     python experiments/issue_store/mock_issue_watch.py   → output/mock_issue_watch.html
 
@@ -34,7 +34,7 @@ import cards as qc  # noqa: E402  — 질문 카드(강조 카드 + 접기, 가�
 OUT = os.path.join(_HERE, "output")
 KST = dt.timezone(dt.timedelta(hours=9))
 RULES = "IW-2026-11-13a"
-HEAD_TITLE = "Hot Issue"   # 머리 줄 제목 — 옛 `이슈 모니터링` (2026-11-13 사용자: 영어로 핫 이슈)
+HEAD_TITLE = "Hot Issue"   # 머리 줄 제목 — 옛 `이슈 모니터링`
 PUBLIC = False   # True = 블로그 게시용(issue_watch_daily.py): 목록 줄 = 블로그 주소 · 운영자 상자 없음 · 글 끝 `함께 보는 페이지`
 
 # 지켜보는 이슈 — 키워드로 모은다. by = 자동(뉴스가 평소 2배) · 운영자(직접 추가)
@@ -55,7 +55,7 @@ SIDE_PAT = [
     ("확전", r"공격|타격|공습|미사일|위협|확전|제재|일촉즉발|봉쇄|폭발|기뢰|피격|파괴|나포|격추|attack|strike|missile|escalat"),
 ]
 SIDE_NAME = {"멀어짐": "확전", "종전": "종전", "확전": "확전"}
-SIDE_KIND = {"종전": "positive", "확전": "negative", "방향 미정": "neutral"}   # 종전 = 시장에 좋은 쪽 빨강 · 확전 = 나쁜 쪽 파랑 — 증시 전망 `전망A · B` · 뉴스 긍정 · 부정과 같은 색 (2026-11-13 사용자)
+SIDE_KIND = {"종전": "positive", "확전": "negative", "방향 미정": "neutral"}   # 종전 = 시장에 좋은 쪽 빨강 · 확전 = 나쁜 쪽 파랑 — 증시 전망 `전망A · B` · 뉴스 긍정 · 부정과 같은 색
 def josa(w, pair):
     """받침에 맞춘 조사 — pair = ("은", "는") · ("이", "가")."""
     c = w.rstrip()[-1]
@@ -64,7 +64,7 @@ def josa(w, pair):
 
 
 def side_pill(side, pop=False):
-    """쪽 라벨 — 종전쪽 빨강 · 확전쪽 파랑(뉴스 긍정 · 부정), 방향미정 = 증시 전망 `향방미정` 라벨과 같은 회색(바탕 #F8FAFC · 테두리 #E2E8F0, H.open_pill) (2026-11-13 사용자).
+    """쪽 라벨 — 종전쪽 빨강 · 확전쪽 파랑(뉴스 긍정 · 부정), 방향미정 = 증시 전망 `향방미정` 라벨과 같은 회색(바탕 #F8FAFC · 테두리 #E2E8F0, H.open_pill).
     pop = 팝업 줄 앞(flex 줄 안, H.news_pill)."""
     k = SIDE_KIND[side]
     if k == "neutral":
@@ -77,7 +77,7 @@ def side_pill(side, pop=False):
     return dk.pill(SIDE_LABEL[side], k, bare=True)
 
 
-SIDE_LABEL = {"종전": "종전", "확전": "확전", "방향 미정": "방향미정"}   # 안쪽 열쇠 `종전` = 시장에 좋은 쪽 · `확전` = 나쁜 쪽 — 화면 이름은 이슈마다 use() 가 바꾼다   # `쪽` 없이 — 증시 전망 `반등` · `지속` 과 같게 (2026-11-11 · 11-13 사용자)   # 라벨 글자는 띄어쓰기 없이 (가이드라인 8절, `논의중` · `시장예상` 과 같게)
+SIDE_LABEL = {"종전": "종전", "확전": "확전", "방향 미정": "방향미정"}   # 안쪽 열쇠 `종전` = 시장에 좋은 쪽 · `확전` = 나쁜 쪽 — 화면 이름은 이슈마다 use() 가 바꾼다   # `쪽` 없이 — 증시 전망 `반등` · `지속` 과 같게   # 라벨 글자는 띄어쓰기 없이 (가이드라인 8절, `논의중` · `시장예상` 과 같게)
 TALK = re.compile(r"[“”\"'‘’]|선언|밝혀|말했|발언|검토|기대|희망|우려|위험|경고|가능|전망|분석|어떻게|맞설|논의|추진|모멘텀|긍정|이냐|할까|\?|관측|시사|의향|촉구|요구|주장|which|could|would", re.I)   # 논의 · 추진 · 모멘텀 · `…이냐` 추가 (2026-11-13: 단계 사다리가 말을 일어난 일로 올렸다)
 
 # 가격 — 사슬 고리 지표(yfinance) + 비교
@@ -91,12 +91,12 @@ KR_KEYS = {"EWY", "091160.KS"}   # 한국 장 = 미국보다 하루 먼저 닫�
 EXTRA_LINKS = [("에너지 업종 약세", "XLE", -1), ("항공 강세 (연료비 ↓)", "JETS", +1)]   # 공급 복귀 사슬(OIL_SUPPLY_RETURN)에서   # 공급 복귀 사슬에서 — 그림자 스캔 11-09 · 11-10 에 움직인 둘
 CASE_COLS = [("유가", "CL=F"), ("S&P 500", "^GSPC"), ("한국 (EWY)", "EWY"), ("에너지", "XLE"), ("방산", "ITA")]
 Z_CLEAR, Z_SOME, BASE = 2.0, 1.0, 60
-WIN = 5   # 독자 카드의 시장 기간 = 5거래일 = 뉴스 바늘 `최근 일주일` (2026-11-14 사용자: 기간을 하나로)
+WIN = 5   # 독자 카드의 시장 기간 = 5거래일 = 뉴스 바늘 `최근 일주일`
 # 지표 묶음 — 한 줄로 세면 서로 다른 이유(11-05 반도체 급락)로 움직인 주식이 유가 쪽 신호를 가린다 (2026-11-13 실측: 유가 쪽 3개 모두 종전 방향, 주식 쪽 3개 반대)
-GROUPS = [("유가", ("CL_F", "XLE", "JETS")), ("주식", ("XLK", "EWY", "ITA")), ("안전 자산", ("_VIX", "GC_F"))]   # `쪽` 없이 (2026-11-13 사용자)
+GROUPS = [("유가", ("CL_F", "XLE", "JETS")), ("주식", ("XLK", "EWY", "ITA")), ("안전 자산", ("_VIX", "GC_F"))]   # `쪽` 없이
 
 
-# 이슈마다 다른 것 (2026-11-13 사용자: 관세 · 반도체 수출 통제도 이란 전쟁처럼 모니터링)
+# 이슈마다 다른 것
 #   good / bad = 기사 방향 이름(좋은 쪽 빨강 · 나쁜 쪽 파랑), watch = 시장 지표가 재는 쪽(사슬 사전 고리의 부호가 그 사건 기준), q 의 질문과 같은 쪽
 CFG = {
     "IRAN": dict(slug="issue-iran", good="종전", bad="확전", watch="종전", file="mock_issue_watch.html",
@@ -145,12 +145,12 @@ CFG = {
                    stages={"종전": [("발언", r"완화|허가|승인"), ("허가 · 승인", r"허가|승인|허용|면제"), ("규제 해제", r"해제|철회|폐지")],
                            "확전": [("검토 · 보도", r"검토|추진|보도|위협"), ("발표", r"발표|명단|거래 제한|규정"), ("시행", r"시행|발효|금지|차단"), ("확대", r"확대|추가 제한|동맹국|강화")]}),
 }
-# 뉴스 타임라인 기준 가격 (2026-11-14 사용자: 증시 전망처럼 날마다 기준이 되는 가격) — 이슈가 가장 먼저 움직이는 값 하나.
+# 뉴스 타임라인 기준 가격 — 이슈가 가장 먼저 움직이는 값 하나.
 #   이란 = 브렌트유(호르무즈 · 공급, 이 페이지 그래프도 브렌트), 관세 = S&P 500(관세 그래프와 같음), 수출 통제 = 미국 반도체 지수
 TL_REF = {"IRAN": ("브렌트유", "BZ=F", "{:,.1f}달러"), "TARIFF": ("S&P 500", "^GSPC", "{:,.0f}"), "EXPORT": ("반도체 지수", "^SOX", "{:,.0f}")}
 C = {}   # 지금 그리는 이슈 설정 (use() 가 채운다)
 
-# 비교 지표 둘 — 헌법 제1조(모든 데이터에는 비교 대상) · doc/검증/HotIssue-비교지표-검증.md (2026-11-22 사용자)
+# 비교 지표 둘 — 헌법 제1조(모든 데이터에는 비교 대상) · doc/검증/HotIssue-비교지표-검증.md
 # (이름, 기호, 빼는 기호 또는 None = 상대 지표 %p, 값 표기 또는 None, 나쁜 쪽(확전 · 강화 · 악화)일 때 방향 +1 오름 · −1 내림)
 # 타임라인 날짜 줄 = 둘 다 그날 움직임, `시장도 같은 쪽인가?` 카드 = 둘의 5거래일 움직임과 읽는 법. 새 수집 없음(prices() 가 이미 받는 기호)
 REF2 = {"IRAN": [("브렌트유", "BZ=F", None, "{:,.1f}달러", 1), ("에너지 업종 시장 대비", "XLE", "^GSPC", None, 1)],
@@ -199,7 +199,7 @@ def pair_lines(px):
         read = "두 지표 모두 평소 범위입니다."
     return [(_ttl("대표 지표 둘 (최근 5거래일)"), "html")] + rows + [(read, "plain")]
 
-# `종전되면 · 확전되면 주가는?` — 쪽마다 흔한 설명(사슬 갈림) + 사건표 사례 (2026-11-14 사용자: 독자가 궁금한 건 확전 때 · 종전 때 주가)
+# `종전되면 · 확전되면 주가는?` — 쪽마다 흔한 설명(사슬 갈림) + 사건표 사례
 #   chain = 흔한 설명을 가져올 사슬(None = 없음) · kinds = 사건표 분류 · inc / exc = 제목 낱말 · note = 표 아래 안내
 IF_SIDES = {
     "IRAN": {"종전": dict(chain="CEASEFIRE", kinds=("휴전 · 종전",), inc=None, exc=None,
@@ -214,18 +214,18 @@ IF_SIDES = {
                "확전": dict(chain="REGULATION", kinds=("규제 (수출 · 반독점)",), inc=r"수출|BIS|H20|규제 강화", exc=None,
                            note="기록은 눈금일 뿐 이번이 그대로 되풀이된다는 뜻은 아닙니다.")},
 }
-# `종전되면 · 확전되면 수혜주는?` — 시장에서 흔히 꼽는 종목 (2026-11-14 사용자: "확전되면 수혜주, 종전되면 수혜주를 예를 들어").
+# `종전되면 · 확전되면 수혜주는?` — 시장에서 흔히 꼽는 종목.
 #   종목 고르기 = Claude 설계(흔한 설명 · 교과서 · 언론), 알파스코프의 추천이 아니다(법 기준: 매수 추천 금지). (이름, 야후 기호, 흔히 드는 이유)
-#   2026-11-14 둘째 (사용자: "테마를 먼저, 그 테마의 주도주를 하나씩 · 유가가 움직이면 따라 나오는 수혜주는 왜 빠졌나 · 한국 · 미국이 섞였나"):
+#   2026-11-14 둘째:
 #   테마 = (이름, 경로, 흔한 이유, 미국 후보, 한국 후보). 경로 = 이 테마가 좋아지는 길 — "유가 하락" · "유가 상승" 은 이번 주 유가 움직임과 맞대어 본다.
 #   주도주 = 후보 중 시가총액 1위(나라마다 하나, 자동 — 사람이 고르지 않는다). 테마 값 = 후보 전체 시장 대비 평균(미국 = S&P 500 · 한국 = 코스피 대비).
 #   후보 = Claude 설계(흔한 설명 · 언론), 알파스코프의 추천이 아니다(법 기준: 매수 추천 금지).
 OIL_PATH = {"유가 하락": -1, "유가 상승": +1}
 THEME_ICON = {"항공": "t_air", "여행 · 크루즈": "t_travel", "화학": "t_chem", "중동 재건 · 건설": "t_build", "방산": "t_defense", "석유 생산": "t_oil",
               "정유": "t_refine", "해운": "t_ship", "자동차": "t_car", "전자 · 스마트폰": "t_phone", "소매 · 의류": "t_shop", "철강": "t_steel",
-              "태양광 · 미국 공장": "t_solar", "AI 반도체": "t_chip", "반도체 장비": "t_tool"}   # 테마 이름 앞 기본형 회색 원 (design_kit.ICON_GLYPHS t_*, 2026-11-14 사용자 — 수혜주는 계속 쓰니 아이콘을 만들어 둔다)
-THEME_SEP_EXTRA = 15   # 테마 사이 구분선 아래(다음 테마 이름 위) +15 (2026-11-14 사용자: "화학 위 구분선 여백 15픽셀 더")
-STAGE_Q = {"IRAN": "전쟁 진행 상황", "TARIFF": "관세 진행 상황", "EXPORT": "수출 통제 진행 상황"}   # 옛 `실제로 어디까지 갔나?` (2026-11-14 사용자: "전쟁 진행 상황 이렇게 줄여줘")
+              "태양광 · 미국 공장": "t_solar", "AI 반도체": "t_chip", "반도체 장비": "t_tool"}   # 테마 이름 앞 기본형 회색 원
+THEME_SEP_EXTRA = 15   # 테마 사이 구분선 아래(다음 테마 이름 위) +15
+STAGE_Q = {"IRAN": "전쟁 진행 상황", "TARIFF": "관세 진행 상황", "EXPORT": "수출 통제 진행 상황"}   # 옛 `실제로 어디까지 갔나?`
 BENEFIT = {
     "IRAN": {"종전": [("항공", "유가 하락", "연료비 부담 줄어듦 · 중동 노선 회복", [("델타항공", "DAL"), ("유나이티드항공", "UAL"), ("아메리칸항공", "AAL")],
                        [("대한항공", "003490.KS"), ("진에어", "272450.KS")]),
@@ -247,12 +247,12 @@ BENEFIT = {
                          [("한미반도체", "042700.KS")])],
                "확전": []},   # 강화 때 흔히 꼽는 수혜 테마가 뚜렷하지 않다 — 피해 쪽만 주로 거론 → 빈 탭은 그렇게 말한다
 }
-# 테마 아래 회색 한 줄 = 왜 좋아지나 명사형 몇 마디 (2026-11-14 사용자: 경로 · 숫자 없이, 문장 말고 `연료비 감소` 처럼)
+# 테마 아래 회색 한 줄 = 왜 좋아지나 명사형 몇 마디
 THEME_WHY = {"항공": "연료비 감소", "여행 · 크루즈": "연료비 감소 · 여행 수요 회복", "화학": "원료(나프타) 값 하락", "중동 재건 · 건설": "재건 공사 발주",
              "방산": "무기 · 탄약 주문 증가", "석유 생산": "원유 값 상승", "정유": "재고 값 · 정제 마진 상승", "해운": "우회 항로 · 운임 상승",
              "자동차": "차 · 부품 관세 인하", "전자 · 스마트폰": "아시아 생산품 관세 인하", "소매 · 의류": "수입품 값 하락",
              "철강": "수입 철강 경쟁 감소", "태양광 · 미국 공장": "미국 생산 회사 유리",
-             "AI 반도체": "중국 칩 판매 재개", "반도체 장비": "중국 장비 판매 재개"}   # 명사형 짧게 (2026-11-14 사용자: 합니다체 문장 X)
+             "AI 반도체": "중국 칩 판매 재개", "반도체 장비": "중국 장비 판매 재개"}   # 명사형 짧게
 BENEFIT_NONE = "강화 때 흔히 꼽는 수혜 테마는 뚜렷하지 않습니다. 주로 피해 쪽(AI 반도체 · 장비)이 거론됩니다."
 FORK_WORDS = [("되돌림 — 전쟁 사슬로 돌아감", "되돌림 — 유가 오름 · 위험 회피로 돌아감"), ("유가 · 물가 경로로 금리 사슬로 넘어감", "유가 · 물가를 거쳐 금리 걱정으로 이어짐"),
               ("경기 사슬로", "경기 걱정으로 이어짐"), ("사슬로 넘어감", "다른 걱정으로 이어짐")]   # `사슬` = 내부 말
@@ -433,7 +433,7 @@ def daily_counts(rows, days):
 
 def counts_24h(rows, now, n=14):
     """지금 시각에서 24시간씩 끊어 센 기사 수 — 열쇠 = 그 24시간이 끝나는 날짜(KST), 옛 것 → 최근.
-    옛 셈(달력 하루)은 마지막 점이 `오늘 0시 ~ 지금` 몇 분치라 늘 뚝 떨어졌다 (2026-11-14 사용자: 오늘 0시가 왜 거의 0인가)."""
+    옛 셈(달력 하루)은 마지막 점이 `오늘 0시 ~ 지금` 몇 분치라 늘 뚝 떨어졌다."""
     c = {}
     for i in range(n - 1, -1, -1):
         hi = now - dt.timedelta(hours=24 * i)
@@ -457,7 +457,7 @@ def prices():
 
 def z10(s, end=None, n=10):
     """signal_scan.scan 과 같은 셈 — n거래일 로그 누적 ÷ (직전 60거래일 하루 σ × √n). VIX 도 비율(pct). end = 모든 지표가 있는 마지막 날.
-    n = 10(운영자 상자 · 옛 셈) · WIN 5(독자 카드 — 위 뉴스 바늘 `최근 일주일` 과 같은 기간, 2026-11-14 사용자: 카드끼리 기간이 달라 위아래가 안 맞아 보였다)."""
+    n = 10(운영자 상자 · 옛 셈) · WIN 5."""
     s = s.dropna()
     s = s[s > 0]
     if end is not None:
@@ -540,7 +540,7 @@ def case_gap(rows, exp=None):
 # ───────────── 화면
 def arrow(v, d=1):
     """증감 = 부호 숫자 + 증감 색 + 굵게 — 공용 마무리 fix_colons 가 ▲ · ▼(그 자리 글자의 80%, dk.tri_span)로 바꾼다 (가이드라인 5절).
-    dk.arrow 는 ▲ 를 글자 크기 그대로 써서 쓰지 않는다 (2026-11-13 사용자: 삼각형 디자인 규칙)."""
+    dk.arrow 는 ▲ 를 글자 크기 그대로 써서 쓰지 않는다."""
     if v is None:
         return f'<span style="color:{dk.SUB};">—</span>'
     if round(v, d) == 0:
@@ -574,7 +574,7 @@ def group_state(links):
 
 
 def group_side(links):
-    """묶음마다 어느 쪽으로 움직였나 — 종전 쪽 · 확전 쪽 둘 다 센다 (2026-11-14 사용자: 시장 카드가 종전 쪽만 재서 위 뉴스 바늘 `확전` 과 말이 안 맞았다).
+    """묶음마다 어느 쪽으로 움직였나 — 종전 쪽 · 확전 쪽 둘 다 센다.
     묶음 안 2개 이상(지표 하나뿐이면 1개)이 한쪽으로 평소의 1배 넘게 → 그 쪽. strong = 그 쪽에 2배 넘는 지표가 있음."""
     by = {r["key"]: r for r in links}
     out = []
@@ -638,7 +638,7 @@ def head_card(st, kind, news48, base48, groups, sides48=None, asof=""):
 
 
 def list_card(rows, cur_id):
-    """지켜보는 이슈 = 이슈마다 페이지 하나, 줄 전체를 누르면 그 페이지(테마 줄 링크 data-row-link, 가이드라인 10-9) (2026-11-13 사용자: 관세 · 반도체 수출 통제도 모니터링).
+    """지켜보는 이슈 = 이슈마다 페이지 하나, 줄 전체를 누르면 그 페이지(테마 줄 링크 data-row-link, 가이드라인 10-9).
     지금 보는 이슈 = 이름 굵게 · 링크 없음."""
     parts = []
     for i, r in enumerate(rows):
@@ -657,14 +657,14 @@ NOW_LABEL = [""]
 
 
 def news_chart(counts, now_label="", base_day=None):
-    """now_label = 마지막 날이 오늘(진행 중)이면 그 눈금 글자 `오늘 23시` — 문장의 48시간 건수와 그래프가 같은 날까지 (2026-11-13 사용자: 오늘 확전 61건이 그래프에 없어 숫자가 안 맞아 보였다)."""
+    """now_label = 마지막 날이 오늘(진행 중)이면 그 눈금 글자 `오늘 23시` — 문장의 48시간 건수와 그래프가 같은 날까지."""
     days = list(counts)
     labels = [H.md(d) if i in (0, len(days) // 2, len(days) - 1) else "" for i, d in enumerate(days)]
     if now_label:
         labels[-1] = now_label
-    series = [("기사", [sum(counts[d].values()) for d in days], dk.CHART_MAIN, "solid")]   # 하루 기사 수 한 줄 = 관심의 크기 — 종전 · 확전 두 선은 옮긴 기사 수라 방향으로 읽히면 안 된다 (2026-11-13 사용자)
+    series = [("기사", [sum(counts[d].values()) for d in days], dk.CHART_MAIN, "solid")]   # 하루 기사 수 한 줄 = 관심의 크기 — 종전 · 확전 두 선은 옮긴 기사 수라 방향으로 읽히면 안 된다
     if base_day:
-        series.append(("평소", [round(base_day, 1)] * len(days), dk.CHART_CMP, "dash"))   # 비교 대상 = 평소 하루 (직전 4주 48시간 평균 ÷ 2)   # 라벨과 같은 빨강 · 파랑 (2026-11-13 사용자)   # 방향 미정은 선에서 뺀다 — 회색 점선은 범례가 `비교 대상` 이 된다. 건수는 아래 한 줄에
+        series.append(("평소", [round(base_day, 1)] * len(days), dk.CHART_CMP, "dash"))   # 비교 대상 = 평소 하루 (직전 4주 48시간 평균 ÷ 2)   # 라벨과 같은 빨강 · 파랑   # 방향 미정은 선에서 뺀다 — 회색 점선은 범례가 `비교 대상` 이 된다. 건수는 아래 한 줄에
     return dk.trend_card(f"날마다 {C['name']} 기사 (건)", labels, series, lambda v: f"{v:.0f}" if float(v).is_integer() else "", ends_only=True)   # 건수 축에 0.5 없음
 
 
@@ -739,7 +739,7 @@ CASE_NAME_W, CASE_WHEN_W, CASE_COL_W, CASE_ROW_H = 92, 62, 84, 32   # 왼쪽 고
 
 def cases_card(rows):
     """과거 사례 표 — 사례(시간)를 가로로: 왼쪽 = 옛날 · 오른쪽 = 최근, 처음엔 오른쪽 끝(최근 사례), `‹ 넘겨 보기` 왼쪽 · 넘길 것이 남으면 왼쪽 그림자.
-    그래프 넘겨 보기와 같은 꼴(dk._col_frame_right: direction rtl · data-lscroll · data-sh="l") (2026-11-13 사용자: 넘겨 보는 방향을 우리 그래프처럼 · 좌측 그림자).
+    그래프 넘겨 보기와 같은 꼴(dk._col_frame_right: direction rtl · data-lscroll · data-sh="l").
     지표 이름 칸은 넘겨도 그대로(그래프의 세로축 숫자처럼 고정). 사례 이름은 표 아래 작은 줄."""
     if not rows:
         return ""
@@ -802,7 +802,7 @@ def bridge_card(px):
     return dk.state_card("증시 전망으로 넘어가는 때", items=rows)
 
 
-# ───────────── 같은 사건 묶기 (AI 0) — 기사 수백 건을 그대로 늘어놓지 않고 사건 한 줄 + 보도 n곳 + 원문 링크 몇 개 (2026-11-13 사용자)
+# ───────────── 같은 사건 묶기 (AI 0) — 기사 수백 건을 그대로 늘어놓지 않고 사건 한 줄 + 보도 n곳 + 원문 링크 몇 개
 EV_SIM, EV_HOURS, EV_MIN_SRC, EV_LINKS = 0.3, 36, 3, 3   # 제목 글자 둘씩 겹침(자카드) · 같은 사건으로 보는 시간 폭 · 위 목록에 올리는 보도 곳 수 · 원문 링크 수
 
 
@@ -893,19 +893,19 @@ def small_row(ev):
             f'<span style="display:block;font-size:13px;line-height:19px;color:{dk.SUB};">{dk.esc(meta)}</span></div>')
 
 
-# ───────────── 관련 뉴스 = 막대 두 개 + 타임라인 (2026-11-13 사용자: "우리 뉴스 긍정 · 부정 그래프처럼 · 뉴스 타임라인 · 누르면 그날 사실 블릿 · 끝에 - 기사 22건")
-SIDE_BAR = {"종전": dk.BAR_PASTEL["positive"], "확전": dk.BAR_PASTEL["negative"], "방향 미정": dk.BAR_PASTEL["neutral"]}   # 뉴스 방향 막대의 긍정 · 부정 · 중립 색 그대로 (2026-11-13 사용자: 종전 = 빨강 · 확전 = 파랑)
+# ───────────── 관련 뉴스 = 막대 두 개 + 타임라인
+SIDE_BAR = {"종전": dk.BAR_PASTEL["positive"], "확전": dk.BAR_PASTEL["negative"], "방향 미정": dk.BAR_PASTEL["neutral"]}   # 뉴스 방향 막대의 긍정 · 부정 · 중립 색 그대로
 TL_SHOWN = 5   # 타임라인 처음에 보이는 날 — 나머지는 `지난 n일 더 보기` (증시 전망 타임라인과 같은 5)
 
 
 def side_bars(today_rows, rows):
-    """dk.direction_bars 와 같은 꼴 — 처음엔 `오늘` 막대만, 제목 줄 오른쪽 `최근 2주` + 접기 버튼을 누르면 최근 2주 막대가 펼쳐진다 (2026-11-13 사용자: 미국 증시 뉴스 막대).
+    """dk.direction_bars 와 같은 꼴 — 처음엔 `오늘` 막대만, 제목 줄 오른쪽 `최근 2주` + 접기 버튼을 누르면 최근 2주 막대가 펼쳐진다.
     색 · 이름만 종전 · 확전 · 방향미정. direction_bars 는 긍정 · 부정 이름이 고정이라 같은 틀을 여기서 짠다."""
     def cnt(rs):
         return {k: sum(r["side"] == k for r in rs) for k in SIDE_BAR}
 
     def bar(label, c):
-        return dk.legend_bar(f"{label} 소식 {sum(c.values())}개", [(SIDE_LABEL[k], c[k], *SIDE_BAR[k]) for k in SIDE_BAR])   # 사건 개수 — 같은 소식을 옮긴 기사는 하나로 (2026-11-13 사용자)
+        return dk.legend_bar(f"{label} 소식 {sum(c.values())}개", [(SIDE_LABEL[k], c[k], *SIDE_BAR[k]) for k in SIDE_BAR])   # 사건 개수 — 같은 소식을 옮긴 기사는 하나로
     t, w = cnt(today_rows), cnt(rows)
     if not sum(w.values()):
         return ""
@@ -927,49 +927,49 @@ ONE_WIRE = {"연합뉴스", "뉴스1", "뉴시스", "연합인포맥스", "연�
 
 
 def one_pick(e):
-    """한 곳만 보도한 사건 중 팝업에 올릴 것 — 따옴표 발언이 아닌 `일어난 일` + 사건 낱말, 또는 통신사 기사 (AI 0, 2026-11-13 사용자: 23건 다 펼치지 말고 다른 방법).
+    """한 곳만 보도한 사건 중 팝업에 올릴 것 — 따옴표 발언이 아닌 `일어난 일` + 사건 낱말, 또는 통신사 기사.
     막 터진 사실(유조선 폭발 · 기지 공격)은 처음엔 한 곳만 보도할 수 있다. 반응 · 해설 · 칼럼은 빠진다."""
     return (not e["talk"] and bool(ONE_HARD.search(e["title"]))) or bool(e["links"] and e["links"][0][0] in ONE_WIRE)
 
 
 POP_ART_GAP = 10
-POP_HEAD = {"종전": ("종전 전망 정보", dk.UP), "확전": ("확전 전망 정보", dk.DOWN), "방향 미정": ("방향미정 정보", "#111")}   # 팝업 소제목 = 라벨 대신 글자 (2026-11-13 사용자: `확전 전망 정보` 파랑 굵게 본문 글씨)
+POP_HEAD = {"종전": ("종전 전망 정보", dk.UP), "확전": ("확전 전망 정보", dk.DOWN), "방향 미정": ("방향미정 정보", "#111")}   # 팝업 소제목 = 라벨 대신 글자
 
 
 SIDE_KIND3 = {"종전": "up", "확전": "down", "방향 미정": "flat"}   # 팝업 소제목 아이콘 · 색 = H.pop_group_head (증시 전망 팝업과 같은 부품)
 
 
 def ev_rank(e):
-    """사건 순서 = 실제로 일어난 일 먼저 → 단계 높은 것 → 최근. 옮긴 기사 수는 쓰지 않는다 (2026-11-13 사용자: 복사 수가 중요도로 읽히는 선입견)."""
+    """사건 순서 = 실제로 일어난 일 먼저 → 단계 높은 것 → 최근. 옮긴 기사 수는 쓰지 않는다."""
     st = stage_of(e)
     return (e["talk"], -(st if st is not None else -1), -e["first"].timestamp())
 
 
 def _day_pop(pid, day, evs):
     """그날 팝업 = 사건마다 한 줄(사실) + 끝 꼬리 `- 기사 n건` — 증시 전망 근거 팝업 줄(H._pop_li)과 같은 모양. 쪽마다 라벨 하나 + 블릿.
-    두 곳 이상 보도한 사건 + 한 곳만이라도 one_pick 에 맞는 사건. 나머지 한 곳만 보도는 팝업에 싣지 않는다 (옛 `그 밖에 n건` 줄 삭제, 2026-11-13 사용자)."""
+    두 곳 이상 보도한 사건 + 한 곳만이라도 one_pick 에 맞는 사건. 나머지 한 곳만 보도는 팝업에 싣지 않는다."""
     lis = ""
     many = [e for e in evs if e["n"] >= 2 or one_pick(e)] or evs[:1]
     many.sort(key=ev_rank)
     groups = sorted({e["side"] for e in many}, key=lambda k: -sum(W_TALK if e["talk"] else W_ACT for e in many if e["side"] == k))   # 무게(실제 일 1 · 발언 0.5) 큰 묶음 먼저 — 옮긴 기사 수 X
-    for gi, side in enumerate(groups):   # 묶음 = 방향 소제목(아이콘 + `확전 전망 정보`) + 기사 줄, 묶음 사이 가로 점선 + 15 (2026-11-13 사용자 — 옛 소제목 오른쪽 점선)
+    for gi, side in enumerate(groups):   # 묶음 = 방향 소제목(아이콘 + `확전 전망 정보`) + 기사 줄, 묶음 사이 가로 점선 + 15
         lis += H.pop_group_head(POP_HEAD[side][0], SIDE_KIND3[side], first=gi == 0)
         for k, e in enumerate([e for e in many if e["side"] == side]):
-            li = H._pop_li(e["title"], "", talk=e["talk"])   # `- 기사 n건` 꼬리 삭제 — 옮긴 곳이 많다고 중요한 일이 아니다 (2026-11-13 사용자)
-            lis += H.art_gap(li, k)   # 기사와 기사 사이 +10 (2026-11-13 사용자) — 증시 전망 팝업과 같은 부품
+            li = H._pop_li(e["title"], "", talk=e["talk"])   # `- 기사 n건` 꼬리 삭제 — 옮긴 곳이 많다고 중요한 일이 아니다
+            lis += H.art_gap(li, k)   # 기사와 기사 사이 +10 — 증시 전망 팝업과 같은 부품
     title = f'{H.md(day)} {C["name"]} 뉴스'
     return f'<div data-news-pop-body="{dk.esc(pid)}" data-news-pop-title="{dk.esc(title)}" hidden>{lis}</div>'
 
 
-TL_MORE_STEP = H.MORE_STEP   # 더 보기 한 번에 10일 — 증시 전망 `지난 경과 더 보기` 와 같은 버튼 · 같은 개수 (2026-11-13 사용자)
-TL_TRI_PX = 12   # News Timeline 날짜 줄 ▲ · ▼ = 13 에서 1 작게 (2026-11-15 사용자: 가격 옆 삼각형이 커 보인다 — 5절 80% 의 예외, 숫자와 2 · 위로 1 은 그대로)
-TL_BOTTOM = 5   # 타임라인 아래 더 띄움 (2026-11-13 사용자 "5픽셀 정도 더")
-TL_TITLE_MORE = 3   # `News Timeline` 제목 ~ 첫 날짜 = 쪽 라벨 줄 ~ 다음 날짜(아래 10 + 날짜 사이 15 + 위 10 = 35)보다 3 넓게 = 38 (2026-11-15 사용자, Chrome 실측) — 옛 11 + 10 = 21
+TL_MORE_STEP = H.MORE_STEP   # 더 보기 한 번에 10일 — 증시 전망 `지난 경과 더 보기` 와 같은 버튼 · 같은 개수
+TL_TRI_PX = 12   # News Timeline 날짜 줄 ▲ · ▼ = 13 에서 1 작게
+TL_BOTTOM = 5   # 타임라인 아래 더 띄움
+TL_TITLE_MORE = 3   # `News Timeline` 제목 ~ 첫 날짜 = 쪽 라벨 줄 ~ 다음 날짜(아래 10 + 날짜 사이 15 + 위 10 = 35)보다 3 넓게 = 38 — 옛 11 + 10 = 21
 TL_TITLE_BELOW = 2 * (12 - dk.VP) + H.TL_DAY_GAP + TL_TITLE_MORE
 
 
 def tail_chev(text):
-    """문장 끝 › — 마지막 낱말과 › 를 한 덩어리(줄바꿈 없음)로 묶어, 두 줄로 꺾여도 › 가 문장 끝 글자 옆에 붙는다 (P541, 2026-11-13 사용자).
+    """문장 끝 › — 마지막 낱말과 › 를 한 덩어리(줄바꿈 없음)로 묶어, 두 줄로 꺾여도 › 가 문장 끝 글자 옆에 붙는다.
     옛 flex 꼴은 글이 꺾이면 › 가 오른쪽 끝에 따로 떨어졌다. 증시 전망 근거 줄은 한 줄 말줄임(_one_line)이라 해당 없음."""
     head, _, last = text.rstrip().rpartition(" ")
     chev = H._CHEV_R.replace("flex:none;display:inline-flex;", "display:inline-flex;vertical-align:-2px;margin-left:4px;", 1)
@@ -977,7 +977,7 @@ def tail_chev(text):
 
 
 def tl_lead():
-    """증시 전망 timeline_lead 와 같은 머리 — 시계 아이콘을 레일 마디로, 오른쪽 `News Timeline`. 아래 날짜 점까지 점선이 이어진다 (2026-11-13 사용자: 아이콘과 점이 끊겨 있었다)."""
+    """증시 전망 timeline_lead 와 같은 머리 — 시계 아이콘을 레일 마디로, 오른쪽 `News Timeline`. 아래 날짜 점까지 점선이 이어진다."""
     big = H.CLOCK.replace('width="16" height="16"', f'width="{H.TL_TITLE_ICON}" height="{H.TL_TITLE_ICON}"', 1)
     icon = f'<span style="display:inline-flex;color:{dk.SUB};">{big}</span>'
     title = (f'<div data-tl-title="1" style="padding:0 0 {TL_TITLE_BELOW}px;font-size:{H.TL_TITLE_FS}px;line-height:{H.TL_TITLE_ICON + 4}px;font-weight:700;color:#111;">News Timeline</div>')
@@ -995,7 +995,7 @@ def news_timeline(evs, days_desc, px=None):
     by = {}
     for e in evs:
         by.setdefault(e["first"].astimezone(KST).date().isoformat(), []).append(e)
-    days = list(days_desc)   # 모든 날짜를 줄로 — 기사 없는 날 = `관련 기사 없음`, 휴장 = `토요일 휴장` (2026-11-22 사용자: 빈 날은 에러처럼 보인다). 옛: 기사 있는 날만
+    days = list(days_desc)   # 모든 날짜를 줄로 — 기사 없는 날 = `관련 기사 없음`, 휴장 = `토요일 휴장`. 옛: 기사 있는 날만
     pops = ""
     node = (f'<span style="display:inline-block;width:{H.TL_DOT}px;height:{H.TL_DOT}px;box-sizing:border-box;border:2px solid {H.TL_LINE};border-radius:50%;background:#fff;"></span>')
     ref_nm, ref_sym, ref_fmt = TL_REF[C["iss"]["id"]]
@@ -1027,9 +1027,9 @@ def news_timeline(evs, days_desc, px=None):
         if ref is None:   # 기준 가격이 없는 이슈도 주말은 `휴장` (2026-11-22)
             return off_word(d)
         if t not in ref.index:
-            # 주말 · 공휴일(값이 없는 지난 평일) = `휴장` — 뉴스만 있는 날이 값 빠진 것처럼 보이지 않게 (2026-11-15 사용자). 아직 안 닫힌 날(마지막 종가 뒤 평일)은 그대로 비움.
+            # 주말 · 공휴일(값이 없는 지난 평일) = `휴장` — 뉴스만 있는 날이 값 빠진 것처럼 보이지 않게. 아직 안 닫힌 날(마지막 종가 뒤 평일)은 그대로 비움.
             if len(ref) and (t.weekday() >= 5 or t < ref.index[-1]):
-                why = {5: "토요일", 6: "일요일"}.get(t.weekday(), "공휴일")   # 왜 쉬는지까지 — `토요일 휴장` · `일요일 휴장` · 평일은 `공휴일 휴장` (2026-11-15 사용자), 기준 가격 이름은 뺌(시장 전체가 쉬는 날)
+                why = {5: "토요일", 6: "일요일"}.get(t.weekday(), "공휴일")   # 왜 쉬는지까지 — `토요일 휴장` · `일요일 휴장` · 평일은 `공휴일 휴장`, 기준 가격 이름은 뺌(시장 전체가 쉬는 날)
                 return f'<span style="font-weight:400;color:{dk.SUB};white-space:nowrap;">{why} 휴장</span>'
             return ""
         if refs2:   # 비교 지표 둘이 정해진 이슈 = 둘 다 (2026-11-22)
@@ -1041,7 +1041,7 @@ def news_timeline(evs, days_desc, px=None):
         if c == p:   # 전날 값을 그대로 채운 줄(선물 자료가 아직 안 들어온 날) — 0.0% 로 보이지 않게 비움
             return ""
         chg = (c / p - 1) * 100
-        # 삼각형 = 가이드 5절(그 자리 글자 16 의 80% = 13 · 위로 1 · 숫자와 2, dk.tri_span) — 옛: 14 + 띄어쓰기 한 칸 (2026-11-15 사용자 "삼각형 가이드 맞춰줘")
+        # 삼각형 = 가이드 5절(그 자리 글자 16 의 80% = 13 · 위로 1 · 숫자와 2, dk.tri_span) — 옛: 14 + 띄어쓰기 한 칸
         val = (f'<span style="color:{dk.UP if chg > 0 else dk.DOWN};font-weight:400;white-space:nowrap;">{dk.tri_span(chg > 0, TL_TRI_PX / 0.8)}{abs(chg):.1f}%</span>'
                if round(chg, 1) != 0 else '<span style="color:#111;">0.0%</span>')
         return (f'<span style="font-weight:400;color:{dk.SUB};white-space:nowrap;">{dk.esc(ref_nm)}</span>'
@@ -1065,7 +1065,7 @@ def news_timeline(evs, days_desc, px=None):
         return H._tl_row(node, int(dk.LH_CARD.rstrip("px")), 0 if first else pad, content, False, last), ""
 
     def row(d, last, first=False):
-        """증시 전망 타임라인(H._waiting · day_why_html)과 같은 꼴 (2026-11-14 사용자): 날짜 굵게 한 줄 → 아래 근거 한 줄 = 쪽 라벨 + 한 줄 글(말줄임) + ›.
+        """증시 전망 타임라인(H._waiting · day_why_html)과 같은 꼴: 날짜 굵게 한 줄 → 아래 근거 한 줄 = 쪽 라벨 + 한 줄 글(말줄임) + ›.
         라벨은 줄바꿈 없이 글 앞, 논의중은 글 뒤 작은 표시(H._talk_mark). 줄 전체 = 그날 팝업."""
         if not by.get(d):
             return empty_row(d, last, first)
@@ -1118,14 +1118,14 @@ def news_timeline(evs, days_desc, px=None):
     return H.PLUS_CSS + tl_lead() + out + pops
 
 
-# ───────────── 뉴스 바늘 (2026-11-13 사용자: 기술 지표 게이지처럼 바늘이 종전 · 확전 쪽으로) — 기사 방향을 센 것, 예측 아님
+# ───────────── 뉴스 바늘 — 기사 방향을 센 것, 예측 아님
 GAUGE_ZONES = [(-1.0, -0.5, "확전 뚜렷", TS.ZONES[0][3]), (-0.5, -0.15, "확전", TS.ZONES[1][3]), (-0.15, 0.15, "방향미정", TS.ZONES[2][3]),
                (0.15, 0.5, "종전", TS.ZONES[3][3]), (0.5, 1.0, "종전 뚜렷", TS.ZONES[4][3])]   # 왼쪽 확전 파랑 · 오른쪽 종전 빨강 = 라벨 색 그대로
-GAUGE_TITLE_TOP = 6 + 15   # 카드 안 위 테두리 ~ `최근 일주일 뉴스는 어느 쪽?` 글자 +15 (2026-11-13 사용자 — 카드 바깥 여백이 아니라 안쪽)
+GAUGE_TITLE_TOP = 6 + 15   # 카드 안 위 테두리 ~ `최근 일주일 뉴스는 어느 쪽?` 글자 +15
 GAUGE_DAYS = 7   # 바늘 = 최근 7일 기사 — 48시간은 하루 건수에 바늘이 크게 흔들린다
 
 
-W_ACT, W_TALK = 1.0, 0.5   # 사건 무게 — 실제로 일어난 일 1 · 발언 · 논의 0.5. 같은 일을 몇 곳이 옮겼는지는 세지 않는다 (2026-11-13 사용자: 복사 기사 수는 방향이 아니다)
+W_ACT, W_TALK = 1.0, 0.5   # 사건 무게 — 실제로 일어난 일 1 · 발언 · 논의 0.5. 같은 일을 몇 곳이 옮겼는지는 세지 않는다
 
 
 def events(rows):
@@ -1141,7 +1141,7 @@ def ev_net(evs):
     return (a - b) / tot if tot else 0.0
 
 
-# ───────────── 하루 한 번 AI 판정 (2026-11-13 사용자: "매시간 말고 하루 한 번 묶어서 결론") — 사건마다 방향 · 실제로 일어났나 · 단계
+# ───────────── 하루 한 번 AI 판정 — 사건마다 방향 · 실제로 일어났나 · 단계
 AI_ON = False        # issue_watch_daily --ai (07:30 본 실행만). 13:00 갱신 · 목업은 캐시만 읽는다
 AI_CACHE = os.path.join(OUT, "_stage_ai.json")   # 운영 = 상태 저장소 records/issues/stage_ai.json
 AI_BATCH, AI_MAX_CALLS, AI_TIME = 20, 5, 120   # 20사건 묶음 · 이슈마다 실행당 최대 5회 · 이슈마다 2분(세 이슈 최대 6분, Groq 는 호출 사이 60초 — 07:30 실행 60분 제한).
@@ -1271,7 +1271,7 @@ WEEK_PREV = {"종전 뚜렷": "종전 기사가 훨씬 많았습니다", "종전
 
 
 def week_line(w, pw):
-    """게이지 아래 한 줄 — 숫자 없이 이번 주 · 지난주 (P542, 2026-11-13 사용자: 구체적인 숫자 X, 짤막하게)."""
+    """게이지 아래 한 줄 — 숫자 없이 이번 주 · 지난주."""
     if pw is None:
         return f"이번 주는 {WEEK_DESC[w]}."
     if pw == w:
@@ -1299,7 +1299,7 @@ def gauge_card(evs, today):
             '</span></span>')
 
 
-# ───────────── 질문 카드 (강조 카드 · 펼침 — 데일리 · 증시 전망 갈래 카드와 같은 qc.question_card, 2026-11-13 사용자 "강조 카드의 펼침 열림 디자인")
+# ───────────── 질문 카드
 VIOLET = qc.SOON
 
 
@@ -1314,7 +1314,7 @@ def _sp(html):
 
 def _ttl(t):
     """카드 안 그래프 · 표 제목 — 그래프 제목과 같은 `※` + 16/24 굵게."""
-    return f'{dk.CHART_TITLE_M}{dk.esc(t)}</span>'   # 공용 그래프 제목 (가이드라인 9절 간격 · 7-3, 2026-11-14 사용자 "그래프 스타일은 디자인 규칙에 맞게")
+    return f'{dk.CHART_TITLE_M}{dk.esc(t)}</span>'   # 공용 그래프 제목
 
 
 def q_news(iran, counts, days, r48):
@@ -1323,11 +1323,11 @@ def q_news(iran, counts, days, r48):
     th, ink = _theme(iran["hot"])
     ans = f"평소의 {ratio:.1f}배" if ratio else f"{n48}건"
     nm = C["name"]
-    first = (f"최근 48시간 {nm} 기사는 {n48}건으로 평소({base:.0f}건)의 {ratio:.1f}배입니다." if ratio else f"최근 48시간 {nm} 기사는 {n48}건입니다.")   # 방향 건수 삭제 — 화제성만 (2026-11-13 사용자)
+    first = (f"최근 48시간 {nm} 기사는 {n48}건으로 평소({base:.0f}건)의 {ratio:.1f}배입니다." if ratio else f"최근 48시간 {nm} 기사는 {n48}건입니다.")   # 방향 건수 삭제 — 화제성만
     r2w = [x for x in iran["rows"] if x["t"].astimezone(KST).date().isoformat() >= days[0]]
     t, w = sum(x["side"] == "종전" for x in r2w), sum(x["side"] == "확전" for x in r2w)
     cap = sorted(c for c in iran["capped"] if c in days)
-    note = "같은 소식을 여러 곳이 옮긴 기사도 모두 센 숫자라, 관심의 크기만 보여 줍니다."   # 방향은 바늘 · `어디까지 왔나?` 가 사건 단위로 (2026-11-13 사용자: 복사 기사 수 ≠ 중요도)
+    note = "같은 소식을 여러 곳이 옮긴 기사도 모두 센 숫자라, 관심의 크기만 보여 줍니다."   # 방향은 바늘 · `어디까지 왔나?` 가 사건 단위로
     tip = ("출처 : Newfact 뉴스 모음(CNBC) + 구글 뉴스 한국어 검색, 방송은 아직 안 셈\n평소 = 직전 4주 동안 48시간마다 나온 기사 수의 평균\n"
            "그래프 점 하나 = 지금 시각에서 24시간씩 끊어 센 기사 수, 마지막 점 = 최근 24시간")
     lines = [(first, "plain"), (news_chart(counts, NOW_LABEL[0], base / 2 if base else None), "html"), (note, "note")]
@@ -1365,14 +1365,14 @@ def q_market(links, groups, oil_gr, oil_line):
     return qc.question_card("시장이 먼저 움직이나?", ans, th, ink, lines, tip=tip)
 
 
-HIST_COL_OLD = {"strong": GAUGE_ZONES[4][3], "some": GAUGE_ZONES[3][3], "rev": GAUGE_ZONES[0][3], "mixed": "#CBD5E1", "calm": "#F1F5F9"}   # 종전 빨강 · 종전 조금 연빨강 · 확전 파랑 · 방향미정 회색 · 평소 연회색 (2026-11-13 사용자: 종전 · 확전 색으로)
+HIST_COL_OLD = {"strong": GAUGE_ZONES[4][3], "some": GAUGE_ZONES[3][3], "rev": GAUGE_ZONES[0][3], "mixed": "#CBD5E1", "calm": "#F1F5F9"}   # 종전 빨강 · 종전 조금 연빨강 · 확전 파랑 · 방향미정 회색 · 평소 연회색
 def news_col(word):
     return "good" if word.startswith(C["good"]) else "bad" if word.startswith(C["bad"]) else "mixed"   # 뉴스가 늘어난 날 = 그날 기사 방향 색   # 움직임 보라 · 조금 연보라(카드 보라 계열) · 반대 연파랑 · 평소 회색
 
 
 def _hist_grid(hist):
     """줄 = 뉴스 · 유가 · 주식 · 안전 자산, 칸 = 거래일(왼쪽 옛날 → 오른쪽 최근, 가이드라인 시간 축). 칸 색 = 그날 상태.
-    그래프 규칙에 맞춤 (2026-11-14 사용자 "강조 카드 안 그래프 스타일은 디자인 규칙에 맞게"): 흰 카드 안쪽 = dk.trend_card 와 같은 값(위 10 + 범례 5 · 좌우 12 · 아래 0),
+    그래프 규칙에 맞춤: 흰 카드 안쪽 = dk.trend_card 와 같은 값(위 10 + 범례 5 · 좌우 12 · 아래 0),
     범례 = 그래프 위 오른쪽(칩 9 · 모서리 2 · 칩 사이 12 · 13px), 칸 = 줄 막대 꼴(높이 10 · 모서리 3 · 빈 칸 #F1F5F9), 가로축 이름 13 · 줄 칸 26."""
     def cell(c):
         return f'<span style="flex:1 1 0;min-width:0;height:10px;border-radius:3px;background:{c};"></span>'
@@ -1451,14 +1451,14 @@ def _side_box(side):
 
 
 def _align_table(gs):
-    """시장 지표 = 기술 지표 표 꼴 (2026-11-14 사용자: "일반 독자가 꼼꼼히 볼 수치가 아니라 가볍게 보는 수치 — 기술 지표 느낌으로").
+    """시장 지표 = 기술 지표 표 꼴.
     묶음 = 기술 지표 묶음 제목(18 굵게) + 오른쪽 묶음 상자, 줄 = 이름 15 + 회색 13 `종전되면 흔히 내림` · 오른쪽 등락(보통 굵기) + 상자. 평소의 몇 배는 툴팁 기준으로만."""
     th = "uncertain" if market_side(gs) != "평소 범위" else "neutral"
     line = dk.darken(dk.lighten(dk.lighten(dk.CARD_DIR[th][1]), 0.3), 0.02)   # 질문 카드 줄 구분선과 같은 색
     out = ""
     for x in gs:
         head = (f'<span style="display:flex;justify-content:space-between;align-items:center;margin:18px 0 2px;font-weight:700;color:#111;font-size:18px;line-height:26px;">'
-                f'<span>{dk.esc(x["g"])}</span></span>')   # 묶음 · 줄 상자(종전 · 확전 · 평소) 삭제 — 회색 `종전되면 흔히 내림` 과 반복돼 헷갈린다 (2026-11-14 사용자)
+                f'<span>{dk.esc(x["g"])}</span></span>')   # 묶음 · 줄 상자(종전 · 확전 · 평소) 삭제 — 회색 `종전되면 흔히 내림` 과 반복돼 헷갈린다
         trs = []
         for r in x["rs"]:
             exp = "내림" if r["sg"] < 0 else "오름"
@@ -1467,13 +1467,13 @@ def _align_table(gs):
             pct = f'{"+" if r["pct"] >= 0 else "−"}{abs(r["pct"]):.1f}%'
             trs.append(f'<span style="min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{dk.esc(r["name"])}'
                        f'<span style="margin-left:4px;font-size:{TS.WHY_FS};line-height:19px;color:{dk.SUB};">{W()}되면 흔히 {exp}</span></span>'
-                       f'<span style="flex:none;display:inline-flex;align-items:center;gap:8px;">{pct}{_side_box(way)}</span>')   # 줄마다 종전 · 확전 · 평소 상자 (2026-11-14 사용자: 묶음 제목 상자만 빼고 줄에는 붙임)
+                       f'<span style="flex:none;display:inline-flex;align-items:center;gap:8px;">{pct}{_side_box(way)}</span>')   # 줄마다 종전 · 확전 · 평소 상자
         out += head + TS._table(trs, line)
     return f'<span style="display:block;margin-top:-12px;">{out}</span>'
 
 
 def q_align(word, links, gs, oil_gr, oil_line, hist, asof):
-    """시장도 같은 쪽인가? — 옛 `지금은` · `시장이 먼저 움직이나?` · `지난 2주는?` 셋을 하나로 (2026-11-14 사용자: 위 바늘은 확전인데 아래 카드는 종전 방향이라 헷갈림).
+    """시장도 같은 쪽인가? — 옛 `지금은` · `시장이 먼저 움직이나?` · `지난 2주는?` 셋을 하나로.
     기간 = 최근 일주일(뉴스 7일 · 시장 5거래일), 시장 지표도 양쪽을 다 센다. 뉴스와 시장이 다르면 `엇갈림` 이라고 말한다."""
     g, b = C["good"], C["bad"]
     ns, mk = news_side(word), market_side(gs)
@@ -1502,7 +1502,7 @@ def q_align(word, links, gs, oil_gr, oil_line, hist, asof):
            "평소의 몇 배 = 이 지표가 보통 5거래일에 움직이는 폭(직전 60거래일 기준)의 몇 배인지, 1배 넘으면 그 쪽.\n"
            "흔한 설명 = 시장에서 흔히 쓰는 설명(교과서 · 언론), Newfact의 주장이 아님.\n"
            "예측이 아니라 지금까지 일어난 일입니다.")
-    # 카드 색 = 답 방향 (가이드라인 7-1: 답에 보라 금지, 2026-11-15 사용자) — 같은 쪽 · 시장만 한쪽 = 그 쪽 색(좋은 쪽 빨강 · 나쁜 쪽 파랑),
+    # 카드 색 = 답 방향 — 같은 쪽 · 시장만 한쪽 = 그 쪽 색(좋은 쪽 빨강 · 나쁜 쪽 파랑),
     # 엇갈림 · 시장 안에서 엇갈림 · 평소 범위 = 회색. 옛: 움직임이 있으면 보라(_theme)
     side = mk if (mk in (g, b) and (ns is None or ns == mk)) else None
     th, ink = ("positive", dk.UP) if side == g else ("negative", dk.DOWN) if side == b else ("neutral", "#111")
@@ -1510,7 +1510,7 @@ def q_align(word, links, gs, oil_gr, oil_line, hist, asof):
 
 
 def q_now(st, kind, iran, groups, sides48, asof):
-    """`지금은` = 다른 질문 카드와 같은 접는 강조 카드, 줄 = 왼쪽 구분 · 오른쪽 값 (2026-11-13 사용자: 강조 카드처럼 좌 구분명 · 우 값, 접는 방향)."""
+    """`지금은` = 다른 질문 카드와 같은 접는 강조 카드, 줄 = 왼쪽 구분 · 오른쪽 값."""
     th, ink = ("uncertain", VIOLET) if kind in ("uncertain", "area") else ("neutral", "#111")
     n48, base = iran["n48"], iran["base48"]
     lines = [("row", "뉴스", f"48시간 {n48}건", f"평소 {base:.0f}건" if base is not None else "")]
@@ -1545,12 +1545,12 @@ def _reach(hit):
     return r if r >= 0 else None
 
 
-LADDER_LAST_TOP = 6 + 5   # 단계 이름 줄 ~ 아래 `11.12 …` 최근 일 줄 — 6 에서 +5 (2026-11-15 사용자: 너무 붙어 있다)
+LADDER_LAST_TOP = 6 + 5   # 단계 이름 줄 ~ 아래 `11.12 …` 최근 일 줄 — 6 에서 +5
 
 
 def _ladder(side, reach, hit):
     """쪽마다 한 줄 진행 막대 — 칸 = 단계, 오른 칸까지 색, 아래 단계 이름. 그 아래 도달한 단계의 가장 최근 일.
-    막대 = 줄 막대 꼴(가이드라인 9절: 높이 10 · 모서리 3 · 빈 칸 #F1F5F9 · 부호 있는 값 = 연빨강 · 연파랑 dk.BAR_PASTEL), 단계 이름 = 가로축 이름 13 (2026-11-14 사용자)."""
+    막대 = 줄 막대 꼴(가이드라인 9절: 높이 10 · 모서리 3 · 빈 칸 #F1F5F9 · 부호 있는 값 = 연빨강 · 연파랑 dk.BAR_PASTEL), 단계 이름 = 가로축 이름 13."""
     lad = C["stages"][side]
     col = dk.BAR_PASTEL["positive" if side == "종전" else "negative"][0]
     ink = dk.UP if side == "종전" else dk.DOWN
@@ -1562,7 +1562,7 @@ def _ladder(side, reach, hit):
                  f'<span style="font-size:{dk.AXIS_FS};line-height:20px;text-align:center;word-break:keep-all;color:{"#111" if on else dk.NOTE};font-weight:{700 if on and i == reach else 400};">{dk.esc(nm)}</span></span>')
     where = f"‘{lad[reach][0]}’ 단계까지" if reach is not None else "아직 단계에 오른 일이 없습니다"
     head = (f'<span style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin:0 0 8px;font-size:{dk.NAME};line-height:{dk.LH_CARD};color:#111;">'
-            f'<b style="flex:none;color:{ink};">{dk.esc(SIDE_LABEL[side])}</b><span style="text-align:right;word-break:keep-all;">{dk.esc(where)}</span></span>')   # `‘협상 제안’ 단계까지` = 오른쪽 정렬 (2026-11-14 사용자)
+            f'<b style="flex:none;color:{ink};">{dk.esc(SIDE_LABEL[side])}</b><span style="text-align:right;word-break:keep-all;">{dk.esc(where)}</span></span>')   # `‘협상 제안’ 단계까지` = 오른쪽 정렬
     e = hit.get(reach) if reach is not None else None
     last = (f'<span style="display:block;margin:{LADDER_LAST_TOP}px 0 0;font-size:{dk.TINY};line-height:20px;color:{dk.SUB};word-break:keep-all;">'
             f'<b style="font-weight:600;color:#333;">{H.md(e["first"].astimezone(KST).date().isoformat())}</b> {dk.esc(e["title"])}</span>') if e else ""
@@ -1570,14 +1570,14 @@ def _ladder(side, reach, hit):
 
 
 def q_stage(evs):
-    """종전 · 확전, 실제로 어디까지 갔나? — 최근 2주 사건을 쪽마다 단계 사다리에 놓고 한 줄 진행 막대로 (2026-11-14 사용자: 1~6 줄 · `없음` 줄은 이해하기 어렵다).
+    """종전 · 확전, 실제로 어디까지 갔나? — 최근 2주 사건을 쪽마다 단계 사다리에 놓고 한 줄 진행 막대로.
     답 = 양쪽 다. 같은 일을 몇 곳이 옮겼는지 무관 · 발언 · 논의는 첫 단계로만 · 단계는 차례대로만."""
     g, b = C["good"], C["bad"]
     hits = {s: _stage_hits(evs, s) for s in ("종전", "확전")}
     reach = {s: _reach(hits[s]) for s in hits}
     STAGE_RAW.update({s: (max(hits[s]) if hits[s] else None) for s in hits})
     sh = lambda s: C["stages"][s][reach[s]][0].split(" · ")[0] if reach[s] is not None else "없음"   # noqa: E731
-    ans = (f'<span style="display:inline-block;text-align:right;white-space:nowrap;">{dk.esc(g + " " + sh("종전"))}<br>{dk.esc(b + " " + sh("확전"))}</span>')   # 두 줄 (2026-11-14 사용자 "줄바꿈")
+    ans = (f'<span style="display:inline-block;text-align:right;white-space:nowrap;">{dk.esc(g + " " + sh("종전"))}<br>{dk.esc(b + " " + sh("확전"))}</span>')   # 두 줄
     word = lambda s: f"‘{C['stages'][s][reach[s]][0]}’ 단계까지" if reach[s] is not None else "아직 단계에 오른 일 없이"   # noqa: E731
     first = f"최근 2주 동안 {josa(g, ('은', '는'))} {word('종전')}, {josa(b, ('은', '는'))} {word('확전')} 갔습니다."
     cand = [(hits[s][i]["first"], s, i) for s in hits if reach[s] is not None for i in range(reach[s] + 1)]
@@ -1649,14 +1649,14 @@ SEG_JS = ("<script>document.addEventListener('click',function(e){var b=e.target.
 
 
 def seg_tabs(panes):
-    """카드 · 접는 줄 안 전환 버튼 — 테마 `.rt-segs` · `.rt-seg`(가이드라인 서브탭 · 전환 버튼 19/25) 모양, 누르면 그 쪽 내용만 (2026-11-14 사용자: 종전되면 · 확전되면을 탭으로)."""
+    """카드 · 접는 줄 안 전환 버튼 — 테마 `.rt-segs` · `.rt-seg`(가이드라인 서브탭 · 전환 버튼 19/25) 모양, 누르면 그 쪽 내용만."""
     if len(panes) == 1:   # 한 쪽뿐(수출 통제 = 완화 사례 없음)이면 버튼 하나는 그리지 않는다
         return panes[0][1]
     tone = lambda lab: "up" if lab.startswith(C["good"]) else "down"   # noqa: E731 — 탭 색은 순서가 아니라 쪽으로(확전이 앞서면 확전 탭이 첫째)
     btns = "".join(f'<button type="button" class="rt-seg" data-seg="{i}" data-tone="{tone(lab)}" aria-pressed="{"true" if i == 0 else "false"}">{dk.esc(lab)}</button>'
                    for i, (lab, _) in enumerate(panes))
     body = "".join(f'<div data-segp="{i}"{" hidden" if i else ""}>{html}</div>' for i, (_, html) in enumerate(panes))
-    css = (_UL + _ULC).format(v=".post-body .iw-seg")   # E1 밑줄 탭 — 글자 폭 탭 + 오른쪽 끝까지 바닥선, 고른 쪽 색 글자 + 2px 색 밑줄 (2026-11-14 사용자 결정)
+    css = (_UL + _ULC).format(v=".post-body .iw-seg")   # E1 밑줄 탭 — 글자 폭 탭 + 오른쪽 끝까지 바닥선, 고른 쪽 색 글자 + 2px 색 밑줄
     return f'<style>{css}</style><div class="iw-seg" data-segbox="1"><div class="rt-segs" style="margin:0 0 10px {dk.ALIGN_PX}px;">{btns}</div>{body}</div>'
 
 
@@ -1670,7 +1670,7 @@ def _cnt(xs, verb):
 
 
 def if_fold(chain_id, scs):
-    """종전되면 · 확전되면 주가는? — 원래 자리(아래쪽 접는 줄 묶음 = `과거 기록에서 비슷한 때는?` 자리)로 되돌리고 안은 전환 버튼 두 쪽 (2026-11-14 사용자).
+    """종전되면 · 확전되면 주가는? — 원래 자리(아래쪽 접는 줄 묶음 = `과거 기록에서 비슷한 때는?` 자리)로 되돌리고 안은 전환 버튼 두 쪽.
     쪽마다: 첫 문장(S&P 500 그날 · 20거래일 뒤) → 흔한 설명 갈림 → 지난 사례 표 → 안내."""
     cfg = IF_SIDES[C["iss"]["id"]]
     base_side = "종전" if C["watch"] == C["good"] else "확전"   # CFG case_exp 가 재는 쪽
@@ -1696,7 +1696,7 @@ def if_fold(chain_id, scs):
     if not panes:
         return ""
     note = H._plain_rows("", [], note="흔한 설명은 교과서 · 언론의 설명이고, 사례는 지난 기록입니다. 이번에 그대로 된다는 뜻은 아닙니다.")
-    return H._fold_group(H._fold_row(f"과거 기록에서 {C['good']} · {C['bad']} 때 주가는?", seg_tabs(panes) + note)) + SEG_JS   # 과거 기록임을 제목에 (증시 전망 `과거 기록에서 비슷한 때는?` 과 같은 말, 2026-11-14 사용자)
+    return H._fold_group(H._fold_row(f"과거 기록에서 {C['good']} · {C['bad']} 때 주가는?", seg_tabs(panes) + note)) + SEG_JS   # 과거 기록임을 제목에
 
 
 def _ttl_plain(t):
@@ -1770,19 +1770,19 @@ def _beat(px, sym, cs):
     return n, k
 
 
-LEADER_LOGO = 24   # 주도주 로고 20 → 24 (2026-11-14 사용자: 수혜주는 중요 — 왼쪽 이름 18(본문 19 보다 1 작게) · 로고 키움 · 종목 사이 구분선)
+LEADER_LOGO = 24   # 주도주 로고 20 → 24 (: 수혜주는 중요 — 왼쪽 이름 18(본문 19 보다 1 작게) · 로고 키움 · 종목 사이 구분선)
 LEADER_PAD = 13    # 주도주 줄 · 테마 머리 아래 ~ 구분선 — 선 사이 종목 위아래 같게, 줄 전체가 종목 상세 링크라 누르기 쉽게 (26 + 26 = 52)
-THEME_GAP = 20     # 테마 구획 사이 — 앞 구획 마지막 종목 아래 구분선 ~ 다음 테마 머리 20 (2026-11-14 사용자 `구분선 기준 20`)
+THEME_GAP = 20     # 테마 구획 사이 — 앞 구획 마지막 종목 아래 구분선 ~ 다음 테마 머리 20
 
 
-# 가상 로고 (목업만) — 우리 로고 사본(ref/ticker_logos.json)이 아직 없는 종목. 발행 전 fetch_ticker_logos.py 로 실제 로고를 받는다 (2026-11-14 사용자: 회색 글자 배지 대신 로고처럼)
+# 가상 로고 (목업만) — 우리 로고 사본(ref/ticker_logos.json)이 아직 없는 종목. 발행 전 fetch_ticker_logos.py 로 실제 로고를 받는다
 VIRTUAL_LOGO = {"AAL": ("#0078D2", "AA"), "272450.KS": ("#7AB800", "J"), "039130.KS": ("#5B2C83", "H"), "FLR": ("#0033A0", "F"),
                 "079550.KS": ("#00468C", "LIG"), "FRO": ("#003A70", "F"), "CLF": ("#0A2240", "C")}
-LOGO_ZOOM = {"003490.KS": 1.6}   # 그림이 원 안에 작게 든 로고 — 대한항공 태극이 지름의 57% 라 키워 꽉 채움 (2026-11-14 사용자)
+LOGO_ZOOM = {"003490.KS": 1.6}   # 그림이 원 안에 작게 든 로고 — 대한항공 태극이 지름의 57% 라 키워 꽉 채움
 
 
 def _logo(sym, nm):
-    """주도주 이름 앞 로고 20 (2026-11-14 사용자: 나라 라벨 대신 티커 로고). 우리 gh-pages 로고가 없으면 dk 는 티커 두 글자 배지 —
+    """주도주 이름 앞 로고 20. 우리 gh-pages 로고가 없으면 dk 는 티커 두 글자 배지 —
     한국 종목은 숫자(`03`)가 되므로 이름 첫 글자 배지로."""
     sz = LEADER_LOGO
     if sym in VIRTUAL_LOGO and sym.upper() not in dk._logo_files():
@@ -1801,7 +1801,7 @@ def _logo(sym, nm):
 
 
 def _good_red(html):
-    """수혜주 카드 글자 속 좋은 쪽 말(종전 · 완화) = 빨강 (2026-11-14 사용자 "종전이라는 말은 다 빨간색") — 글자 마디만, 속성 · 툴팁은 그대로."""
+    """수혜주 카드 글자 속 좋은 쪽 말(종전 · 완화) = 빨강 — 글자 마디만, 속성 · 툴팁은 그대로."""
     w = C["good"]
     red = lambda t: re.sub(r">([^<]*)<", lambda m: ">" + m.group(1).replace(w, f'<span style="color:{dk.UP};">{w}</span>') + "<", t)   # noqa: E731
     parts = re.split(r"(<button\b.*?</button>)", html, flags=re.S)   # 탭 버튼 글자는 탭 색을 따른다 (D 시안 — 고른 쪽 색 · 흰 글자)
@@ -1818,7 +1818,7 @@ def _theme_block(th, first, oil5, last=False):
     else:
         path = dk.esc(path + " 경로")
     ic = dk.soft_icon(THEME_ICON[th["name"]]) if th["name"] in THEME_ICON else ""
-    # 구획 = 테마 머리 → 구분선 → 종목 → 구분선 → 종목 (2026-11-14 사용자: 머리 아래에도 구분선, 선 사이 종목은 위아래 여백 같게 · 테마 구획 사이 20)
+    # 구획 = 테마 머리 → 구분선 → 종목 → 구분선 → 종목
     line = f'<div style="height:0;margin:0 {A}px;border-top:1px solid #E2E8F0;"></div>'
     head = (f'<div style="padding:{14 - dk.VP if first else THEME_GAP}px {A}px {LEADER_PAD}px;">'
             f'<span style="display:flex;align-items:center;gap:6px;min-width:0;font-size:{dk.NAME};line-height:{dk.LH_CARD};"><b style="flex:none;color:#111;">{dk.esc(th["name"])}</b>'
@@ -1831,7 +1831,7 @@ def _theme_block(th, first, oil5, last=False):
                  f'<span style="display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:16px;line-height:26px;">'
                  f'<span style="display:inline-flex;align-items:center;color:#111;min-width:0;font-size:18px;">{_logo(ld["sym"], ld["nm"])}<span>{dk.esc(ld["nm"])}</span></span>'
                  f'{_pp_html(ld["ex"])}</span></span>', ld["sym"])   # 줄 전체 = 종목 상세 페이지(가이드라인 10절 줄 전체 링크) · `지난 사례` 줄 삭제
-    return head + rows + line + (f'<div style="height:{14 - dk.VP}px;"></div>' if last else "")   # 마지막 종목 아래도 구분선, 다음 구획 머리까지 = 선 기준 20 (2026-11-14 사용자)
+    return head + rows + line + (f'<div style="height:{14 - dk.VP}px;"></div>' if last else "")   # 마지막 종목 아래도 구분선, 다음 구획 머리까지 = 선 기준 20
 
 
 def _pct_html(v):
@@ -1840,7 +1840,7 @@ def _pct_html(v):
 
 
 def bene_card(px, scs):
-    """종전되면 · 확전되면 수혜주는? — 테마 먼저(시장 대비 평균) → 테마마다 주도주(시가총액 1위, 미국 · 한국 하나씩) (2026-11-14 사용자 둘째).
+    """종전되면 · 확전되면 수혜주는? — 테마 먼저(시장 대비 평균) → 테마마다 주도주(시가총액 1위, 미국 · 한국 하나씩).
     유가 경로 테마는 이번 주 유가 움직임과 맞대어 `이 쪽` · `반대 쪽`. 추천이 아니다."""
     lst = BENEFIT[C["iss"]["id"]]
     g, b = C["good"], C["bad"]
@@ -1866,15 +1866,15 @@ def bene_card(px, scs):
         if vals:
             avg[side] = sum(vals) / len(vals)
         if ths:
-            ths.sort(key=lambda t: -t["avg"] if t["avg"] is not None else 1e9)   # 최근 일주일 시장 대비 가장 센 테마가 맨 위 (2026-11-14 사용자) — `n개 가운데 가장 셌던 것은 …` 문장은 삭제
+            ths.sort(key=lambda t: -t["avg"] if t["avg"] is not None else 1e9)   # 최근 일주일 시장 대비 가장 센 테마가 맨 위 — `n개 가운데 가장 셌던 것은 …` 문장은 삭제
             html = "".join(_theme_block(t, i == 0, oil5, i == len(ths) - 1) for i, t in enumerate(ths))
         else:
             html = H._plain_rows(BENEFIT_NONE if C["iss"]["id"] == "EXPORT" else f"{lab} 때 흔히 꼽는 수혜 테마가 뚜렷하지 않습니다.", [])
         panes.append((f"{lab}되면", html))
     if len(avg) == 2:
         d = avg["종전"] - avg["확전"]
-        ans = "비슷함" if abs(d) < 1 else f"이번 주 {josa(g if d > 0 else b, ('이', '가'))} 앞섬"   # 2026-11-14 사용자 `이번 주 종전이 앞섬`
-        th_, ink_ = ("neutral", "#111") if abs(d) < 1 else ("positive", dk.UP) if d > 0 else ("negative", dk.DOWN)   # 카드 색 = 앞선 쪽 색(종전 = 빨강 카드 · 확전 = 파랑) (2026-11-14 사용자)
+        ans = "비슷함" if abs(d) < 1 else f"이번 주 {josa(g if d > 0 else b, ('이', '가'))} 앞섬"   # `이번 주 종전이 앞섬`
+        th_, ink_ = ("neutral", "#111") if abs(d) < 1 else ("positive", dk.UP) if d > 0 else ("negative", dk.DOWN)   # 카드 색 = 앞선 쪽 색(종전 = 빨강 카드 · 확전 = 파랑)
         first = (f"최근 일주일 시장 대비로 {g} 수혜 테마는 평균 {_pp(avg['종전'])}, {b} 수혜 테마는 {_pp(avg['확전'])} 움직였습니다. "
                  + ("두 쪽이 비슷했습니다." if abs(d) < 1 else f"{g if d > 0 else b} 쪽 테마가 더 셌습니다."))
     elif avg:
@@ -1886,17 +1886,17 @@ def bene_card(px, scs):
         return ""
     if oil5 is not None and C["iss"]["id"] == "IRAN":
         first += f" 같은 기간 유가(WTI)는 {_pp(oil5).replace('%p', '%')}입니다."
-    if len(avg) == 2 and avg["확전"] - avg["종전"] >= 1:   # 이번 주 앞선 쪽 탭이 첫째 — 확전이 앞서면 `확전되면` 이 앞 · 처음 열림 (2026-11-14 사용자)
+    if len(avg) == 2 and avg["확전"] - avg["종전"] >= 1:   # 이번 주 앞선 쪽 탭이 첫째 — 확전이 앞서면 `확전되면` 이 앞 · 처음 열림
         panes = panes[::-1]
     lines = [(first, "plain"), (seg_tabs(panes) + SEG_JS, "html")]   # 카드 끝 `알파스코프의 추천이 아닙니다` 줄 삭제 — 면책은 블로그 공통 푸터 하나(꼬리말 금지), 툴팁엔 남김 (2026-11-14)
     tip = ("수혜 테마 = 그 일이 생기면 좋아진다고 시장에서 흔히 꼽는 테마(교과서 · 언론), Newfact의 주장 · 추천이 아님.\n"
-           "주도주 = 테마 안 시가총액 1위, 미국 · 한국 하나씩. 오른쪽 = 최근 5거래일 그 나라 시장 대비(미국 = S&P 500 · 한국 = 코스피).")   # 테마 평균 · 셌던 때 줄 삭제 (2026-11-14 사용자)
+           "주도주 = 테마 안 시가총액 1위, 미국 · 한국 하나씩. 오른쪽 = 최근 5거래일 그 나라 시장 대비(미국 = S&P 500 · 한국 = 코스피).")   # 테마 평균 · 셌던 때 줄 삭제
     if th_ != "neutral":
         lab = g if th_ == "positive" else b
         ans = f'<span style="color:{ink_};">{dk.esc(ans).replace(lab, f"<span>{lab}</span>")}</span>'
-    row_line = dk.darken(dk.lighten(dk.lighten(qc.CARD_DIR[th_][1]), 0.3), 0.02)   # 테마 사이 구분선 = 그 카드 색의 줄 구분선(question_card bd_row 와 같은 셈) — 회색 #E2E8F0 아님 (2026-11-14 사용자)
+    row_line = dk.darken(dk.lighten(dk.lighten(qc.CARD_DIR[th_][1]), 0.3), 0.02)   # 테마 사이 구분선 = 그 카드 색의 줄 구분선(question_card bd_row 와 같은 셈) — 회색 #E2E8F0 아님
     lines[1] = (lines[1][0].replace("border-top:1px solid #E2E8F0;", f"border-top:1px solid {row_line};").replace("border-left:1px solid #E2E8F0;", f"border-left:1px solid {row_line};"), "html")
-    return _good_red(qc.question_card("수혜주는?", ans, th_, ink_, lines, tip=tip))   # 옛 `종전되면 · 확전되면 수혜주는?` (2026-11-14 사용자: "그냥 수혜주는")
+    return _good_red(qc.question_card("수혜주는?", ans, th_, ink_, lines, tip=tip))   # 옛 `종전되면 · 확전되면 수혜주는?`
 
 
 def q_related(today_rows, r2w):
@@ -1916,7 +1916,7 @@ def q_if(chain_id, cs):
 
 
 def bottom(chain_id, cs):
-    """증시 전망 페이지 아래쪽과 같은 접는 줄 묶음 + 안내 글 (2026-11-13 사용자: `이렇게 되면?` = 과거 기록, `증시 전망으로 넘어가나?` = 안내 글)."""
+    """증시 전망 페이지 아래쪽과 같은 접는 줄 묶음 + 안내 글."""
     ch = CH.CHAINS[chain_id]
     forks = H._plain_rows("시장에서 흔히 쓰는 설명입니다. Newfact의 주장은 아닙니다.",
                           [(a, "", b.replace("전쟁 사슬로 돌아감", "유가 오름 · 위험 회피로 돌아감")) for a, b in ch["forks"]])
@@ -1942,7 +1942,7 @@ def bridge_now(px):
 
 def title_h2(iss):
     """증시 전망 질문 줄과 같은 꼴 — 저울 아이콘 + 질문, 아래 줄 오른쪽 `게시 : 11.13` (forecast_body 의 q)."""
-    icon = f'<span style="display:flex;flex:none;align-items:center;height:1lh;">{H.gauge_icon(24)}</span>'   # 저울 → 반원 게이지 (2026-11-15 사용자: Hot Issue 는 뉴스 바늘 모양)
+    icon = f'<span style="display:flex;flex:none;align-items:center;height:1lh;">{H.gauge_icon(24)}</span>'   # 저울 → 반원 게이지
     date = (f'<span style="display:flex;flex-wrap:wrap;justify-content:flex-end;align-items:center;gap:4px 10px;margin-top:29px;line-height:{dk.LH_TINY};">'
             f'<span style="display:flex;flex:none;flex-wrap:wrap;align-items:center;gap:4px 10px;font-size:{dk.TINY};font-weight:400;color:{dk.SUB};">'
             f'<span style="white-space:nowrap;">게시 : <span style="color:#111;">{H.md(iss["since"])}</span></span></span></span>')
@@ -1990,12 +1990,12 @@ def page(cur, watch, items, px, now, today, days, sums, logs):
     links, groups, st, kind = cur["links"], cur["groups"], cur["state"], cur["kind"]
     hist = history(px, cur["chain"], cur["rows"])
     logs[cur["id"]] = hist
-    counts = counts_24h(cur["rows"], now)   # 지금에서 24시간씩 — 마지막 점도 꽉 찬 24시간 (2026-11-14 사용자: 오늘 0시가 뚝 떨어짐)
+    counts = counts_24h(cur["rows"], now)   # 지금에서 24시간씩 — 마지막 점도 꽉 찬 24시간
     NOW_LABEL[0] = f"지금 {now.astimezone(KST):%H}시"
     chart_gr, chart_line = oil_chart(px) if C["chart"] is None else year_chart(px, *C["chart"])
     cs = cases(px, cur["cases"])
 
-    top = ""   # 맨 위 안내 문장 · 이슈 목록 삭제 — 이슈마다 따로 페이지, 제목이 바로 머리 줄 아래 (2026-11-13 사용자, 증시 전망 질문 줄과 같은 자리)
+    top = ""   # 맨 위 안내 문장 · 이슈 목록 삭제 — 이슈마다 따로 페이지, 제목이 바로 머리 줄 아래
 
     q = title_h2(cur)
     r48 = [r for r in cur["rows"] if now - r["t"] <= dt.timedelta(hours=48)]
@@ -2012,14 +2012,14 @@ def page(cur, watch, items, px, now, today, days, sums, logs):
 
     c_news, r2w = q_news(cur, counts, days, r48)
     today_evs = [e for e in evs if e["first"].astimezone(KST).date() == today]
-    # 순서 = 독자 질문 순 (2026-11-14 사용자) — 바늘 → 시장도 같은 쪽? → 어디까지 갔나? → 되면 수혜주는? · `되면 주가는?` 은 아래 접는 줄
+    # 순서 = 독자 질문 순 — 바늘 → 시장도 같은 쪽? → 어디까지 갔나? → 되면 수혜주는? · `되면 주가는?` 은 아래 접는 줄
     scs = side_cases(px)
     bene = bene_card(px, scs)
     BENE_HTML[cur["id"]] = bene   # 탭 모양 시안 페이지(seg_variants)가 같은 카드를 쓴다
-    qcards = f'<div style="margin:0 0 8px;">{c_align + q_stage(evs) + bene}</div>'   # 수혜주 카드 = 단계 카드 아래 (2026-11-14 사용자)
+    qcards = f'<div style="margin:0 0 8px;">{c_align + q_stage(evs) + bene}</div>'   # 수혜주 카드 = 단계 카드 아래
 
     sec_list = (dk.section("관련 뉴스", c_news + side_bars(today_evs, evs), line=False)   # `얼마나 화제인가?` = 방향이 아닌 관심의 크기 → 위 방향 카드들 사이에서 뉴스 구획으로
-                + f'<div style="margin:0 0 24px;padding:0 0 {TL_BOTTOM}px;">{news_timeline(evs, days[::-1], px)}</div>')   # 아래 +5 = padding — margin 은 아래 접는 줄 묶음 위 28 과 겹쳐(collapse) 늘지 않았다 (2026-11-13 사용자)
+                + f'<div style="margin:0 0 24px;padding:0 0 {TL_BOTTOM}px;">{news_timeline(evs, days[::-1], px)}</div>')   # 아래 +5 = padding — margin 은 아래 접는 줄 묶음 위 28 과 겹쳐(collapse) 늘지 않았다
 
     op_rows = [
         ("규칙", RULES), ("모으기", f"키워드 /{cur['pat']}/ — 공용 뉴스(CNBC 8일 보관) {cur['n_store']}건 + 구글 뉴스 한국어(하루씩, 42일) {cur['n_gn']}건, 겹침 제거. 100건 상한 닿은 날 {', '.join(sorted(cur['capped'])) or '없음'}"),
@@ -2044,13 +2044,13 @@ def page(cur, watch, items, px, now, today, days, sums, logs):
             ("놓친 등록", "11-04 유가 −8.3% · XLE vs S&P −6.3%p 3.9σ = 틀 R 기준 넘음. 자동 등록(11-11~) 전이라 미등록. 거슬러 등록하지 않음"),
         ]
     op = "" if PUBLIC else H.operator_box(op_rows)
-    body = (top + q + gauge + qcards + sec_list + op + if_fold(cur["chain"], scs) + bottom(cur["chain"], cs) + (H.RELATED if PUBLIC else ""))   # `주가는?` = 원래 아래 접는 줄 자리 (2026-11-14 사용자)
+    body = (top + q + gauge + qcards + sec_list + op + if_fold(cur["chain"], scs) + bottom(cur["chain"], cs) + (H.RELATED if PUBLIC else ""))   # `주가는?` = 원래 아래 접는 줄 자리
     body = body.replace('data-cards="1" ', "")   # data-cards 는 테마(엔비디아 탭) JS 가 글 머리로 옮긴다 — 이 페이지 카드는 제자리에
     return dk.fix_colons(f'<div data-head-title="{HEAD_TITLE}"{H.head_date_attr()} data-seo-lead="{dk.esc(HEAD_TITLE + " — " + cur["q"] + " 뉴스와 시장 " + align)}">{body}</div>')
 
 
 BENE_HTML = {}
-# 2026-11-14 사용자 둘째: "탭은 D 로, D 에서 더 세부 시안 — 종전되면 내용을 흰 카드(강조 카드 안 그래프 흰 카드)에 넣고 그 위에서 탭 모양 여러 가지".
+# 둘째: "탭은 D 로, D 에서 더 세부 시안 — 종전되면 내용을 흰 카드(강조 카드 안 그래프 흰 카드)에 넣고 그 위에서 탭 모양 여러 가지".
 # 공통 = 고른 쪽 색이 바뀌는 탭(종전 연빨강 · 확전 연파랑) + 내용 = 흰 카드(흰 바탕 · 모서리 8 · 양쪽 5 내밈 · 테두리 EMPH_WHITE_BD, 안 줄 선 #E2E8F0).
 _RED, _BLUE = ("#FEF2F2", "#FCA5A5", "#B91C1C"), ("#EFF6FF", "#93C5FD", "#1D4ED8")   # 바탕 · 테두리 · 글자 = 외곽선 라벨 긍정 · 부정 색 (8절)
 _WC = ("{v} [data-segp]{{background:#fff;border:1px solid " + dk.EMPH_WHITE_BD + ";border-radius:8px;margin:0 " + str(dk.CHART_CARD_X) + "px;padding:4px 6px 0}}"
@@ -2060,7 +2060,7 @@ _SEL = ("{v} .rt-seg[data-tone='up'][aria-pressed=true]{{background:" + _RED[0] 
         "{v} .rt-seg[data-tone='down'][aria-pressed=true]{{background:" + _BLUE[0] + "!important;border-color:" + _BLUE[1] + "!important;color:" + _BLUE[2] + "!important}}")
 _BTN2 = ("{v} .rt-segs{{display:flex!important;gap:6px!important;padding:0!important;background:none!important;margin-bottom:8px!important}}"
          "{v} .rt-seg{{flex:1 1 0;border:1px solid #E2E8F0!important;background:#fff!important;border-radius:8px!important;box-shadow:none!important}}")
-# 2026-11-14 사용자 셋째: 지금 페이지(수혜주 구분선 구획) 기준으로 다시 — 본 페이지엔 D1(양쪽 색 두 칸 버튼) 우선 적용,
+# 셋째: 지금 페이지(수혜주 구분선 구획) 기준으로 다시 — 본 페이지엔 D1(양쪽 색 두 칸 버튼) 우선 적용,
 # 시안 = `탭 오른쪽 아래로 구분선이 이어지는` 밑줄 탭 여러 가지(E). 흰 카드 없음.
 _LINE = "rgba(15,23,42,.10)"   # 탭 바닥선 — 색 카드 위에서도 보이는 옅은 선
 _UL = ("{v} .rt-segs{{display:flex!important;gap:20px!important;padding:0 " + str(dk.ALIGN_PX) + "px!important;margin:0 0 12px!important;background:none!important;border-radius:0!important;border-bottom:1px solid " + _LINE + "}}"

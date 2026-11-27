@@ -1,12 +1,12 @@
 name: KR RSS probe (한국 간단 종목 뉴스 매체 시험)
 
-# 한국 간단 종목 뉴스 — 언론사 RSS 제목 모으기 시험 (2026-11-16 사용자 "그렇게 해", 기록 alphascope-docs 검증/한국-간단종목-RSS-매체-조사.md).
+# 한국 간단 종목 뉴스 — 언론사 RSS 제목 모으기 시험.
 #   - 2시간마다 12개 매체 RSS 21개 주소를 받아 제목 · 매체 · 링크 · 발행 시각만 모은다. 피드가 3시간치뿐인 매체가 있어 2시간 간격.
 #   - AI 0 · Blogger · gh-pages 쓰기 0 · 화면 0. 결과 = 비공개 상태 저장소 kr-rss-state(기록 없이 덮어씀).
 #   - STOP_AFTER(KST 날짜) 뒤에는 정기 실행이 아무것도 안 하고 끝난다 — 5일 시험. 사람이 거는 실행은 늘 돈다(--report 로 숫자 보기).
 #   - 매체 끄기: 저장소 변수 KR_RSS_OFF = "매체,매체" (삭제 요청 등).
 
-#   - 시작 = Cloudflare Worker(infra/cron-trigger REPEAT, UTC 짝수 시 :10, scheduled=true) — GitHub cron '53 */2' 는 24시간에 2번만 돌아 뺐다 (2026-11-17 사용자 "Worker로 옮기고").
+#   - 시작 = Cloudflare Worker(infra/cron-trigger REPEAT, UTC 짝수 시 :10, scheduled=true) — GitHub cron '53 */2' 는 24시간에 2번만 돌아 뺐다.
 
 on:
   workflow_dispatch:

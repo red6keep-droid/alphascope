@@ -192,7 +192,7 @@ def build(card, body_html, title, url, day=None, intraday=None):
         "chart": chart_of(soup) if spec["chart"] else None,
         "sections": sections,
     }
-    if intraday and spec["chart"]:   # 홈 증시 카드 하루 그래프 재료 (2026-11-14 사용자) — 못 받으면 키 없음 → 홈은 옛 그림(chart)
+    if intraday and spec["chart"]:   # 홈 증시 카드 하루 그래프 재료 — 못 받으면 키 없음 → 홈은 옛 그림(chart)
         import intraday as ID
         d = ID.fetch(intraday, out["date"], us=intraday != "^KS11")
         if d:

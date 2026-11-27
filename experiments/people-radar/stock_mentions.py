@@ -1,4 +1,4 @@
-"""인물 발언 → 종목 페이지 · 미국 증시 리포트용 JSON (2026-11-07 사용자: 인물 발언을 종목 · 증시 리포트에 붙이기, 목업).
+"""인물 발언 → 종목 페이지 · 미국 증시 리포트용 JSON.
 
 인물 레이더 실행이 끝날 때 radar.json(최근 24시간 신호) + narrative.json(한국어 헤드라인)을 받아 지난 기록과 합쳐
 output/state/people_mentions.json 을 쓴다. 이 파일은 radar-state 브랜치에 남고, 종목(03:36) · 데일리(07:30) 실행이 읽는다.
@@ -42,7 +42,7 @@ def _ko(sym):
 
 
 def _pop_lines(s, card):
-    """팝업 줄 (2026-11-07 사용자 P366) — 새 AI 없이 레이더가 만든 한국어 재료만. 영어 원문 인용은 싣지 않는다(운영지침 4-3)."""
+    """팝업 줄 — 새 AI 없이 레이더가 만든 한국어 재료만. 영어 원문 인용은 싣지 않는다(운영지침 4-3)."""
     out = []
     if card.get("detail"):
         out.append(card["detail"])
@@ -50,7 +50,7 @@ def _pop_lines(s, card):
     if pth and pth.get("assets"):
         why = card.get("path") or ""
         names = " · ".join((paths.asset_label(a) if a in paths.ASSET_KO else f"{_ko(a)}({a})" if _ko(a) else a) for a in pth["assets"])
-        out.append(f"{names} : {why}" if why else f"{paths.related_label(pth['assets'])} : {names}")   # AI 구절 없으면 `관련 종목 : …` (2026-11-12 사용자: `○○ 경로` 말 금지)   # 종목은 `엔비디아(NVDA)` (인물 발언 글과 같게)
+        out.append(f"{names} : {why}" if why else f"{paths.related_label(pth['assets'])} : {names}")   # AI 구절 없으면 `관련 종목 : …`   # 종목은 `엔비디아(NVDA)` (인물 발언 글과 같게)
     n = s.get("novelty") or {}
     if n.get("first30"):
         out.append("30일 만에 처음 나온 주제")
@@ -60,11 +60,11 @@ def _pop_lines(s, card):
     if nx and nx.get("day"):
         _, m, d = nx["day"].split("-")
         out.append(f"다음 날짜 : {int(m)}월 {int(d)}일 {nx.get('kind', '')}".strip())
-    return out   # `보도 : 매체` 줄은 뺐다 — 매체는 원문 링크 글자에 (2026-11-07 사용자 P370)
+    return out   # `보도 : 매체` 줄은 뺐다 — 매체는 원문 링크 글자에
 
 
 def _avatar(p):
-    """줄 왼쪽 얼굴 동그라미 (2026-11-07 사용자 P368) — 인물 발언 글과 같은 것(사진, 없으면 성 첫 글자 · 인물군 색)."""
+    """줄 왼쪽 얼굴 동그라미 — 인물 발언 글과 같은 것(사진, 없으면 성 첫 글자 · 인물군 색)."""
     try:
         import render_html
         return render_html._avatar(p, 32)
@@ -88,7 +88,7 @@ def _points_at(it, sym):
     return bool(name) and (name in it["headline"] or name in it["detail"])
 
 
-# 세부 주제(ai_subtopic) 같은 뜻 합치기 — 분류 모델이 같은 이야기를 다른 말로 붙인다 (2026-11-08 사용자 P406). 소문자 키 → 대표 영어 키(subtopic_ko.json 의 키)
+# 세부 주제(ai_subtopic) 같은 뜻 합치기 — 분류 모델이 같은 이야기를 다른 말로 붙인다. 소문자 키 → 대표 영어 키(subtopic_ko.json 의 키)
 SUBTOPIC_SAME = {"chips": "Semiconductors", "semiconductor": "Semiconductors", "semiconductors": "Semiconductors", "ai chips": "Semiconductors",
                  "roadster": "Tesla Roadster", "artificial intelligence": "AI", "ai": "AI", "tariffs": "Tariff", "tariff": "Tariff"}
 SUBTOPIC_KO_PATH = os.path.join(config.BASE_DIR, "ref", "subtopic_ko.json")   # narrate.translate_subtopics 가 채운다 (깃에 남는다)
@@ -117,8 +117,8 @@ def _issue_key(sub, ko):
 
 
 def summary(radar):
-    """인물 발언 탭 맨 위 요약 (2026-11-07 사용자 P376) — 오늘(레이더 24시간) 신호만, 파이썬 셈 · AI 없음.
-    2026-11-08 사용자 P406: 큰 분야(`기업 사건` · `투자자 매매 · 의견`)는 범위가 넓어 뜻이 없다 → 좁은 이슈(세부 주제, 예 관세 · AI 거품 · 반도체).
+    """인물 발언 탭 맨 위 요약 — 오늘(레이더 24시간) 신호만, 파이썬 셈 · AI 없음.
+ P406: 큰 분야(`기업 사건` · `투자자 매매 · 의견`)는 범위가 넓어 뜻이 없다 → 좁은 이슈(세부 주제, 예 관세 · AI 거품 · 반도체).
     issues = 많이 말한 이슈 3 (두 명 이상) [{key, name, n, n_who, who, dirs}] · split = 의견이 갈린 이슈 · 종목 — 같은 이슈(또는 같은 종목)를 두고
     다른 사람이 긍정 · 부정으로 맞선 것만 [{name, pos (이름, 건수), neg (이름, 건수), n}] (옛: 분야로만 묶어 다른 종목끼리도 '갈림') · stocks = 많이 언급된 종목 3."""
     from collections import Counter, defaultdict
@@ -157,7 +157,7 @@ def summary(radar):
 
 
 def person_summary(today_sigs, p7):
-    """인물 페이지 요약 카드 재료 (2026-11-11 사용자: "인물마다 많이 한 말 · 이슈 카드, 오늘 · 최근 7일") — 파이썬 셈, AI 없음.
+    """인물 페이지 요약 카드 재료 — 파이썬 셈, AI 없음.
     today_sigs = 레이더 그 인물 signals(24시간), p7 = radar["person7"][speaker](aggregate.person_counts, 7일).
     → {"today": {n, dirs, issues}, "d7": {n, dirs, issues, stocks}} · issues · stocks = [{name, n, dirs}] 건수 순. 한국어 이름이 없는 세부 주제는 뺀다(영문 노출 금지)."""
     from collections import Counter

@@ -1,4 +1,4 @@
-"""시장 지도 — 목업 (2026-11-22 사용자: "3D 는 아니더라도 확대 · 축소 정도 … 그 꼴로 로컬 목업 먼저").
+"""시장 지도 — 목업.
 
     .venv/bin/python experiments/market-map/mock_map.py [--fetch]   → output/mock_market_map_us.html · _kr.html
 

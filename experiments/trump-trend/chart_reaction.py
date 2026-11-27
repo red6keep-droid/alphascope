@@ -1,4 +1,4 @@
-"""과거 반응 그래프 PNG — 주제 × 구간(당일·5일)마다 한 장 (2026-10-11 사용자: "당일 변화와 5일 동안 변화 그래프, 탭으로 연결").
+"""과거 반응 그래프 PNG — 주제 × 구간(당일·5일)마다 한 장.
 
 trump_analysis.json 의 reactions → output/images/trump-reaction-{day}-{주제}-{구간}.png, output/reaction_charts.json.
 한 줄 = 자산 하나. 막대 = 발언 뒤 S&P 500(SPY) 대비 평균 초과 수익률. 회색 띠 = 발언 없는 날에서 같은 수를 뽑았을 때 평균의 95% 범위

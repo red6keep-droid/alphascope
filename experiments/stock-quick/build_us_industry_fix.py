@@ -1,4 +1,4 @@
-"""미국 간단 종목 업계 카드 배정표 만들기 — ref/us_industry_fix.json (2026-11-25 사용자 "미국도 한국처럼 끝까지").
+"""미국 간단 종목 업계 카드 배정표 만들기 — ref/us_industry_fix.json.
 
     python experiments/stock-quick/build_us_industry_fix.py
 

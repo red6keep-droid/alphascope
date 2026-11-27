@@ -1,4 +1,4 @@
-"""Alpha Scope 신호 검증 1차 — 가격으로 다시 만들 수 있는 신호 (doc/기획/알파스코프-신호-재설계.md 3-4 · 4절, 2026-11-02 사용자 "검증해").
+"""Alpha Scope 신호 검증 1차 — 가격으로 다시 만들 수 있는 신호.
 
     python experiments/stock-radar/validate_alpha_signals.py    # → doc/검증/알파스코프-신호-검증.md · data/validate_alpha_signals.json
 

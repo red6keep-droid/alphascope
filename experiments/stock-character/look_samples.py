@@ -1,7 +1,7 @@
-"""샘플 종목 그래프 눈으로 보기 — 가격 + 하루 등락 + 거래량, 네 종목 같은 눈금 (2026-11-24 사용자).
+"""샘플 종목 그래프 눈으로 보기 — 가격 + 하루 등락 + 거래량, 네 종목 같은 눈금.
 
 길잡이 = 비공개 alphascope-docs/doc/기획/종목-그래프-패턴-분류-목적.md (4절 1번 "그래프를 먼저 본다").
-사용자: "금융주 · 테슬라 · 마이크로소프트 · 서클 4개만. 3개월 일봉 → 6개월 → 1년. 한 종목이 a유형 → b유형 → a유형으로 갈 수도 있어서. 2개월씩 비교해도 되고."
+
 
     python experiments/stock-character/look_samples.py                # 기본 네 종목
     python experiments/stock-character/look_samples.py JPM TSLA MSFT CRCL

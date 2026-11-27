@@ -1,7 +1,7 @@
 """종목 페이지 후보 (doc/기획/종목-레이더-기획.md 10-10 · 10-12).
 
 처음 20개 (2026-10-18) = S&P 500 편입 종목 중 시가총액 상위 20개 (외국 ADR 제외, 한 회사의 두 주식은 하나). 분기마다 다시 뽑는다.
-2026-10-20 사용자 확정 48개 = 시총 TOP 10 + 섹터 대표 2개씩(11개 섹터) + 이슈 종목(반도체 · 데이터 센터 · 우주항공 · 경기 방어주) — 새 29개를 뒤에 붙였다.
+ 48개 = 시총 TOP 10 + 섹터 대표 2개씩(11개 섹터) + 이슈 종목(반도체 · 데이터 센터 · 우주항공 · 경기 방어주) — 새 29개를 뒤에 붙였다.
 MA 는 처음 20개였고 48개에는 없다 — 이미 발행된 주소라 남길지 지울지 사용자 결정 대기.
 slug 는 고정 페이지 영문 주소(`/p/<slug>.html`)가 된다. 한 번 만든 뒤에는 바꾸지 않는다 — 검색 이력이 쌓이는 주소다.
 새 페이지는 하루 NEW_PAGES_PER_RUN 개까지만 만든다 (publish_pages.py) — 몰아서 만들면 블로거가 429 · 스팸으로 막는다 (10-18 : 20개 중 10개 실패).
@@ -59,7 +59,7 @@ CANDIDATES = [
     ("PLD", "프롤로지스", "prologis-pld-stock", "부동산"),
     ("NEE", "넥스트에라 에너지", "nextera-energy-nee-stock", "유틸리티"),
     ("SO", "서던 컴퍼니", "southern-company-so-stock", "유틸리티"),
-    # 2026-10-25 사용자: 홈 테마 종목에 가상자산 · 에너지 탭 추가 (Claude 가 종목 선정) — 에너지는 XOM · CVX 가 이미 있어 3개만, 가상자산은 5개
+    #: 홈 테마 종목에 가상자산 · 에너지 탭 추가 (Claude 가 종목 선정) — 에너지는 XOM · CVX 가 이미 있어 3개만, 가상자산은 5개
     ("COP", "코노코필립스", "conocophillips-cop-stock", "에너지"),
     ("SLB", "SLB", "slb-stock", "에너지"),                        # 유전 서비스
     ("EOG", "EOG 리소시스", "eog-resources-eog-stock", "에너지"),
@@ -68,15 +68,15 @@ CANDIDATES = [
     ("HOOD", "로빈후드", "robinhood-hood-stock", "금융"),
     ("MARA", "마라 홀딩스", "marathon-digital-mara-stock", "기술"),  # 비트코인 채굴
     ("CRCL", "서클", "circle-crcl-stock", "금융"),                 # 스테이블코인 USDC 발행
-    ("VST", "비스트라", "vistra-vst-stock", "유틸리티"),           # 전력 발전 (2026-10-25 사용자: 에너지 탭)
-    ("SMR", "뉴스케일 파워", "nuscale-power-smr-stock", "산업재"),   # 소형 모듈 원전 (2026-10-25 사용자)
-    # 2026-10-25 사용자: 양자 컴퓨터 탭 (Claude 가 종목 선정) — 순수 업체 4곳 + 큰 회사 IBM
+    ("VST", "비스트라", "vistra-vst-stock", "유틸리티"),           # 전력 발전
+    ("SMR", "뉴스케일 파워", "nuscale-power-smr-stock", "산업재"),   # 소형 모듈 원전
+    #: 양자 컴퓨터 탭 (Claude 가 종목 선정) — 순수 업체 4곳 + 큰 회사 IBM
     ("IONQ", "아이온큐", "ionq-stock", "기술"),                     # 이온 포획 방식
     ("RGTI", "리게티 컴퓨팅", "rigetti-computing-rgti-stock", "기술"),   # 초전도 방식
     ("QBTS", "디웨이브 퀀텀", "d-wave-quantum-qbts-stock", "기술"),     # 양자 어닐링
     ("QUBT", "퀀텀 컴퓨팅", "quantum-computing-qubt-stock", "기술"),
     ("IBM", "IBM", "ibm-stock", "기술"),                           # 양자 컴퓨터 로드맵을 가진 대형주
-    # 2026-11-19 사용자: 반도체 · AI 핵심 종목은 정식으로 ("이런 건 핵심 종목이니까") — 테마를 하는 일로 넷(AI 칩 · 메모리 · 칩 생산 · 반도체 장비) + AI 서버.
+    #: 반도체 · AI 핵심 종목은 정식으로 ("이런 건 핵심 종목이니까") — 테마를 하는 일로 넷(AI 칩 · 메모리 · 칩 생산 · 반도체 장비) + AI 서버.
     # 주소 = 간단 종목 주소 규칙(publish_quick_shells.slug) 그대로 — 델은 이미 발행된 간단 페이지 주소를 정식이 이어받는다
     ("QCOM", "퀄컴", "qualcomm-qcom-stock", "반도체"),
     ("MRVL", "마벨 테크놀로지", "marvell-technology-mrvl-stock", "반도체"),
@@ -92,9 +92,9 @@ CANDIDATES = [
     ("HPE", "HPE", "hewlett-packard-hpe-stock", "기술"),             # AI 서버 · 네트워크
 ]
 
-# 홈 `관심 종목` 카드 묶음 (2026-10-21 사용자: "홈에 관심 종목 카드 · 섹터 상위 종목 카드, 타고 가서 개별 종목을 볼 수 있게").
-# 10-12 사용자 확정의 "이슈 종목" 네 묶음 + 시총 TOP 10 밖 반도체. 순서 = 카드 탭 순서. 섹터 상위 카드는 CANDIDATES 의 섹터 · 시총으로 만든다(home_feed.py)
-WATCH = [   # 2026-11-19 사용자 확정: 반도체 하나를 하는 일로 넷으로 나누고, AI 서버(델 · 슈퍼마이크로 · HPE)는 데이터 센터로
+# 홈 `관심 종목` 카드 묶음.
+#의 "이슈 종목" 네 묶음 + 시총 TOP 10 밖 반도체. 순서 = 카드 탭 순서. 섹터 상위 카드는 CANDIDATES 의 섹터 · 시총으로 만든다(home_feed.py)
+WATCH = [   #: 반도체 하나를 하는 일로 넷으로 나누고, AI 서버(델 · 슈퍼마이크로 · HPE)는 데이터 센터로
     ("AI 칩", ["NVDA", "AMD", "AVGO", "QCOM", "MRVL", "ARM"]),               # 칩 설계
     ("메모리", ["MU", "SKHY", "SNDK", "WDC", "STX"]),                        # D램 · 낸드 · 저장 장치
     ("칩 생산", ["TSM", "INTC"]),                                           # 파운드리
@@ -102,14 +102,14 @@ WATCH = [   # 2026-11-19 사용자 확정: 반도체 하나를 하는 일로 넷
     ("데이터 센터", ["ORCL", "ANET", "VRT", "EQIX", "CEG", "CRWV", "DELL", "SMCI", "HPE"]),
     ("우주항공", ["SPCX", "RKLB"]),
     ("경기 방어주", ["KO", "PG", "PM", "COST"]),
-    ("가상자산", ["COIN", "MSTR", "HOOD", "MARA", "CRCL"]),   # 2026-10-25 사용자
-    ("에너지", ["XOM", "CVX", "COP", "SLB", "EOG", "VST", "SMR"]),          # 2026-10-25 사용자
-    ("양자 컴퓨터", ["IONQ", "RGTI", "QBTS", "QUBT", "IBM"]),   # 2026-10-25 사용자
+    ("가상자산", ["COIN", "MSTR", "HOOD", "MARA", "CRCL"]),   #
+    ("에너지", ["XOM", "CVX", "COP", "SLB", "EOG", "VST", "SMR"]),          #
+    ("양자 컴퓨터", ["IONQ", "RGTI", "QBTS", "QUBT", "IBM"]),   #
 ]
 WATCH_NEXT = WATCH   # 목업 스크립트가 읽던 이름
 WATCH_ALIAS = {"반도체": ["AI 칩", "메모리", "칩 생산", "반도체 장비"]}   # 옛 묶음 이름 → 새 묶음들 (방송 업종 이슈 `반도체` 를 네 묶음 종목 전부에, media_feed)
 
-SAME_CO_KR = {"SKHY": ("SK하이닉스 한국 상장 주식", "sk-hynix-000660-stock")}   # 같은 회사 한국 상장 — 한국 페이지 주소(universe_kr slug), 반대쪽 = universe_kr.SAME_CO_US (2026-11-19 사용자 "꼭 연결")
+SAME_CO_KR = {"SKHY": ("SK하이닉스 한국 상장 주식", "sk-hynix-000660-stock")}   # 같은 회사 한국 상장 — 한국 페이지 주소(universe_kr slug), 반대쪽 = universe_kr.SAME_CO_US
 
 
 def any_page_url(sym):
@@ -120,7 +120,7 @@ def any_page_url(sym):
 TOP_N = 10
 TOP_EXCLUDE = {"TSM", "ASML", "SPCX", "ARM", "SKHY"}   # 시총 TOP 10 · 순위에서 뺀다 — 규칙(S&P 500 편입 · 외국 ADR 제외) 밖. TSMC · 스페이스X 는 실제 시총 10위 안 (10-12)
 PEER_GROUP_N = 20   # 비교 묶음 `시총 상위 20개` = 순위 대상 가운데 시총 상위 20개 (후보가 20개를 넘은 뒤에도 같은 뜻으로, 2026-10-20)
-NEW_PAGES_PER_RUN = 10   # 하루(실행 한 번)에 새로 만드는 고정 페이지 상한 (2026-10-20 사용자: "하루에 조금씩 만들어 나가자")
+NEW_PAGES_PER_RUN = 10   # 하루(실행 한 번)에 새로 만드는 고정 페이지 상한
 SWAP_DAYS = 5      # 11위 밖으로 5거래일 연속 밀리면 빠진다 (10-10)
 BENCH = "SPY"      # 기간별 수익률 비교 = S&P 500
 SECTOR_ETF = {"반도체": ("SMH", "반도체"), "빅테크": ("XLK", "기술"), "소비 · 플랫폼": ("XLY", "경기 소비재"), "금융": ("XLF", "금융"),
@@ -136,7 +136,7 @@ def sector_etf(sym):
     return SECTOR_OVERRIDE.get(sym) or SECTOR_ETF[BY_SYM[sym][3]]
 
 
-REPORT_TYPE = set()   # 매일 리포트가 나가는 종목 = 상세가 리포트형. 2026-11-01 사용자: 엔비디아도 고정 페이지 → 비움 (옛 값 {"NVDA"})
+REPORT_TYPE = set()   # 매일 리포트가 나가는 종목 = 상세가 리포트형.: 엔비디아도 고정 페이지 → 비움 (옛 값 {"NVDA"})
 
 BLOG = "https://www.newfact.app"
 LIST_SLUG = "us-market-cap-top10"
@@ -160,7 +160,7 @@ TITLE_NAME = {"GOOGL": "구글 알파벳"}   # 이름의 괄호(알파벳(구글
 
 
 def page_title(sym):
-    """제목 = 검색어(이름 · 티커 · 주가) + 페이지에 실제로 있는 것(실적 일정). 괄호 없이 `테슬라 TSLA 주가` — 엔비디아 글 제목과 같게 (2026-10-18 사용자).
+    """제목 = 검색어(이름 · 티커 · 주가) + 페이지에 실제로 있는 것(실적 일정). 괄호 없이 `테슬라 TSLA 주가` — 엔비디아 글 제목과 같게.
     테마가 `티커 주가` 에서 티커를 읽어 로고를 단다."""
     nm = TITLE_NAME.get(sym, name(sym))
     return f"{sym} 주가 · 실적 일정" if nm == sym else f"{nm} {sym} 주가 · 실적 일정"   # AMD 처럼 이름 = 티커면 한 번만 (2026-10-18)
@@ -171,10 +171,10 @@ def slug_title(sym):
 
 
 LIST_URL = f"{BLOG}/p/{LIST_SLUG}.html"
-STOCKS_URL = f"{BLOG}/p/stock-lists.html?m=us#tab-%EC%8B%9C%EA%B0%80%EC%B4%9D%EC%95%A1"   # 독자 링크 = 종목 모아보기 시가총액 탭 (2026-11-19 사용자) — LIST_URL(시총 상위 10 페이지)은 그 페이지 발행 · 삭제 때만
+STOCKS_URL = f"{BLOG}/p/stock-lists.html?m=us#tab-%EC%8B%9C%EA%B0%80%EC%B4%9D%EC%95%A1"   # 독자 링크 = 종목 모아보기 시가총액 탭 — LIST_URL(시총 상위 10 페이지)은 그 페이지 발행 · 삭제 때만
 
 
-# 함께 보는 회사 (캘린더 `함께 보는 회사 실적은?`) — 종목마다 한 번 정한다 (2026-10-18 Claude 설계, 사용자 "AI 없이 올릴 수 있는 것까지").
+# 함께 보는 회사 (캘린더 `함께 보는 회사 실적은?`) — 종목마다 한 번 정한다.
 # NVDA 리포트 cal_cards.PEER_ROLE 과 같은 뜻 : 고객 · 공급 · 경쟁 (+ 버크셔는 큰 보유 종목). 실적 일정을 받을 수 있는 미국 상장 종목만 (TSMC 는 ADR).
 PEERS = {
     "NVDA": {"MSFT": "고객", "GOOGL": "고객", "AMZN": "고객", "META": "고객", "ORCL": "고객", "DELL": "고객", "SMCI": "고객",

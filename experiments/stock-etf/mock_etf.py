@@ -1,4 +1,4 @@
-"""ETF 종목 페이지 목업 — A안: ETF 마다 고정 페이지, 종목 페이지와 같은 틀에서 되는 칸만 (2026-11-12 사용자 "A안으로 가야지").
+"""ETF 종목 페이지 목업 — A안: ETF 마다 고정 페이지, 종목 페이지와 같은 틀에서 되는 칸만.
 
     python experiments/stock-etf/mock_etf.py      # output/mock_etf_<티커>.html
 

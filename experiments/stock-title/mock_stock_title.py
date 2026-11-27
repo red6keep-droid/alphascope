@@ -1,4 +1,4 @@
-"""종목 제목 줄 목업 — 제목 꼬리 13/19 · 공유 버튼을 회색 기준 상자 오른쪽으로 (2026-11-11 사용자).
+"""종목 제목 줄 목업 — 제목 꼬리 13/19 · 공유 버튼을 회색 기준 상자 오른쪽으로.
 
     python experiments/stock-title/mock_stock_title.py     # output/mock_stock_title_kr.html · _us.html
 

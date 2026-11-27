@@ -1,4 +1,4 @@
-"""ETF 고정 페이지 본문 — A안 (2026-11-12 사용자 "A안으로 가야지" · "계속 진행해줘"). 목업 = mock_etf.py 와 같은 화면.
+"""ETF 고정 페이지 본문 — A안. 목업 = mock_etf.py 와 같은 화면.
 
     python experiments/stock-etf/etf_pages.py --market us   # stock-radar/data/snapshot.json 을 읽어 output/<티커>.html
     python experiments/stock-etf/etf_pages.py --market kr   # kr-stocks/data/snapshot.json → output/<코드>.html
@@ -113,7 +113,7 @@ def funds(market, syms):
 
 # ── 카드 ──
 
-SHOWN = 5   # 구성 줄 — 5개 펼침 + 나머지 `종목 n개 더 보기` (CLAUDE.md 독자 화면 목록 규칙, 2026-11-16 사용자: 구성 디자인 규칙대로)
+SHOWN = 5   # 구성 줄 — 5개 펼침 + 나머지 `종목 n개 더 보기`
 
 
 def _hold_sym(code):
@@ -133,11 +133,11 @@ def _hold_name(sym, raw):
     return NAME_KO.get(sym) or (sym if re.fullmatch(r"[A-Z][A-Z\-]{0,5}", sym) else raw)
 
 
-ROW_GAP = 20   # 구성 줄 사이 보이는 여백 — 구분선 없이 (2026-11-16 사용자 "종목과 종목 사이 구분선 삭제 · 간격 20")
-BAR_H = 8      # 구성 막대 두께 10 → 8 (같은 날 사용자 "20% 더 작게")
-VAL_PX = 15    # 구성 비중 % 글자 19 → 17 → 16 → 15 굵게 (같은 날 사용자: 미국 증시 리포트 `상위 종목 움직임은?` 줄과 같게)
-NAME_PX = 15   # 구성 종목 이름 15 굵게 (같은 날 사용자, 같은 카드 기준 — 옛 16 보통)
-BAR_FRAC = 0.7   # 막대 = 막대 칸의 70% (같은 날 사용자 "막대 가로 30% 줄여" — 긴 이름 롯데에너지머티리얼즈가 잘리던 것)
+ROW_GAP = 20   # 구성 줄 사이 보이는 여백 — 구분선 없이
+BAR_H = 8      # 구성 막대 두께 10 → 8
+VAL_PX = 15    # 구성 비중 % 글자 19 → 17 → 16 → 15 굵게
+NAME_PX = 15   # 구성 종목 이름 15 굵게
+BAR_FRAC = 0.7   # 막대 = 막대 칸의 70%
 NAME_MAX = 200   # 이름 칸 최대 px — 이름은 자르지 않는다(가장 긴 한국 종목 이름 10자 ≈ 160 + 로고 28). 넘는 이름(긴 영문)만 끝 말줄임
 
 
@@ -173,7 +173,7 @@ def weight_card(items):
 
 
 def tab_holdings(f, src_note="", link=None, name="", at_note=""):
-    """구성 탭 (2026-11-16 사용자 "구성 쪽을 우리 디자인 규칙에 맞도록") — 기업 탭과 같은 틀: 탭 맨 위 문장(dk.TAB_LEAD_GAP) · 비중 막대 카드 · 출처 안내 줄.
+    """구성 탭 — 기업 탭과 같은 틀: 탭 맨 위 문장(dk.TAB_LEAD_GAP) · 비중 막대 카드 · 출처 안내 줄.
     한국 ETF = 운용사 구성 전부(n종목), 미국 ETF = 야후가 주는 상위 10종목뿐(그 밖은 야후에 없다 — 외부 한도).
     link = (글자, 주소) — src_note 안의 `@링크@` 자리를 출처 링크로. 구획 제목마다 data-tab (테마는 표시 없는 h2 를 첫 탭으로 옮긴다)."""
     if not f or not f.get("top"):
@@ -193,11 +193,11 @@ def tab_holdings(f, src_note="", link=None, name="", at_note=""):
         top10 = sum(w for *_, w in items)
         lead = f"{who} 비중이 큰 {len(items)}종목에 전체의 {top10:.0f}%를 담고 있습니다."
     note = dk.muted(src_note) if src_note else ""
-    if link and note:   # 운용사 출처 = 카드 아래 오른쪽 정렬 (2026-11-16 사용자)
+    if link and note:   # 운용사 출처 = 카드 아래 오른쪽 정렬
         note = note.replace("@링크@", f'<a href="{dk.esc(link[1])}" style="color:inherit;text-decoration:underline;" target="_blank" rel="nofollow noopener">{dk.esc(link[0])}</a>')
-        note = note.replace(dk.GUIDE_IND, "text-align:right;", 1).replace(dk.INFO_ICON, "", 1)   # 아이콘 없이 (2026-11-16 사용자)
+        note = note.replace(dk.GUIDE_IND, "text-align:right;", 1).replace(dk.INFO_ICON, "", 1)   # 아이콘 없이
     lead_html = f'<p style="{dk.TAB_LEAD_GAP}color:#111;line-height:33px;word-break:keep-all;">{dk.esc(lead)}</p>'
-    if at_note:   # 기준일 = 카드 오른쪽 위 작은 회색 (2026-11-16 사용자) — 문장 → 카드 27 은 그대로(문장 아래 8 + 기준일 19 + 0)
+    if at_note:   # 기준일 = 카드 오른쪽 위 작은 회색 — 문장 → 카드 27 은 그대로(문장 아래 8 + 기준일 19 + 0)
         lead_html = (lead_html.replace(dk.TAB_LEAD_GAP, dk.TAB_LEAD_GAP.replace(" 27px;", " 8px;"), 1)
                      + f'<div style="text-align:right;color:{dk.NOTE};font-size:13px;line-height:19px;margin:0 0 6px;">{dk.esc(at_note)}</div>')
     out = lead_html + weight_card(items) + note
@@ -238,7 +238,7 @@ def info_rows(rows):
 
 
 def tab_basic(sym, f, bars=None):
-    """기본 정보 탭 (2026-11-16 사용자 "기본 정보도 우리 디자인에 맞도록") — 기업 탭과 같은 틀: 탭 맨 위 소개 문장(따라가는 지수 + 풀이) · 흰 카드 이름 · 값 줄.
+    """기본 정보 탭 — 기업 탭과 같은 틀: 탭 맨 위 소개 문장(따라가는 지수 + 풀이) · 흰 카드 이름 · 값 줄.
     옛 `어떤 ETF 인가?` 제목 · 줄 카드 · 맨 아래 풀이 안내 줄 → 소개 문장으로."""
     f = f or {}
     name, idx = E.BY_SYM[sym][1], E.BY_SYM[sym][2]
@@ -294,7 +294,7 @@ def compare_card(sym, bars_all, kfund):
         name = E.BY_SYM[p][1]
         nm = dk.esc(name) + (f' <span style="font-weight:400;font-size:14px;color:{dk.NOTE};">(이 ETF)</span>' if p == sym else "")
         sub = " · ".join(bits) + (f" · 따라가는 지수 {dk.esc(E.BY_SYM[p][2])}" if E.BY_SYM[p][2] != E.BY_SYM[sym][2] else "")
-        val = _R()._arrow(r1, 1)   # 1년 수익률 — 기간은 제목 괄호에 (2026-11-16 사용자), 증감 = ▲▼ + 색 (가이드라인 5절)
+        val = _R()._arrow(r1, 1)   # 1년 수익률 — 기간은 제목 괄호에, 증감 = ▲▼ + 색 (가이드라인 5절)
         rows.append((nm, val, f'<span style="font-size:14px;color:{dk.NOTE};">{sub}</span>' if sub else "", p))
     if len(rows) < 2:
         return ""
@@ -306,10 +306,10 @@ def compare_card(sym, bars_all, kfund):
             row = row.replace("<span ", f'<span data-row-link="1" data-href="{dk.esc(E.page_url(p))}" ', 1)
         parts.append(row)
     card = f'<div style="margin:0 0 8px;"><span data-grid="2" style="{dk.MULTI}">{"".join(parts)}</span></div>'
-    # 제목 = 그래프 제목 꼴 ※ (구획 h2 · 밑줄 없이), 구성 탭 안 (2026-11-16 사용자 "구성에 넣고 아래 구분선 삭제, 당구장 표시 안내로")
+    # 제목 = 그래프 제목 꼴 ※ (구획 h2 · 밑줄 없이), 구성 탭 안
     title = (f'<div style="margin:28px 0 {dk.CHART_TITLE_GAP}px;padding-left:{dk.ALIGN_PX}px;">{dk.CHART_TITLE}비슷한 ETF와 비교하면? '
              f'<span style="font-weight:400;font-size:{dk.TINY};color:{dk.NOTE};">(1년 수익률)</span></span></div>')
-    return title + card + dk.muted("같은 것을 담는 한국 상장 ETF 입니다. 1년 수익률은 분배금을 빼고 계산했습니다.").replace(dk.INFO_ICON, "", 1)   # 아이콘 없이 (2026-11-16 사용자)
+    return title + card + dk.muted("같은 것을 담는 한국 상장 ETF 입니다. 1년 수익률은 분배금을 빼고 계산했습니다.").replace(dk.INFO_ICON, "", 1)   # 아이콘 없이
 
 
 def related(sym, live, href=None):
@@ -353,14 +353,14 @@ MOCK_AVG = 0.97   # 목업에만 보이는 `내 평단 (예시)` = 마지막 종
 
 
 def candle(name, bars, dec, kr_code=None):
-    """맨 위 = 봉차트(일 · 주 · 월 · 넘겨보기 · 확대 · 전체 화면 지표) — 옛 `1년 전 대비 등락` 선 그래프 자리 (2026-11-13 사용자). 1년 비교는 `기간별 수익률` 막대에 있다."""
-    real = CC.card(name, bars, dec, title="")   # 제목 없음 (2026-11-13 사용자: `가격 흐름` 삭제)
+    """맨 위 = 봉차트(일 · 주 · 월 · 넘겨보기 · 확대 · 전체 화면 지표) — 옛 `1년 전 대비 등락` 선 그래프 자리. 1년 비교는 `기간별 수익률` 막대에 있다."""
+    real = CC.card(name, bars, dec, title="")   # 제목 없음
     if not real:
         return ""
     last = bars[-1]["close"]
     mock = CC.card(name, bars, dec, avg={"price": round(last * MOCK_AVG, dec), "label": "내 평단"}, title="")
-    gap = '<div style="height:20px;"></div>'   # 차트와 탭 사이 20 더 (2026-11-14 사용자)
-    return E_MOCK[0] + mock + CC.kr_live(kr_code, always=True) + gap + E_MOCK[1] + E_REAL[0] + real + CC.kr_live(kr_code) + gap + E_REAL[1] + CC.SCRIPT   # 한국 ETF = 장중 네이버 링크 (2026-11-23 사용자)   # ETF 전용 표시 — 한국 ETF 본문은 render_kr 를 거치며 mock-only 를 먼저 지운다
+    gap = '<div style="height:20px;"></div>'   # 차트와 탭 사이 20 더
+    return E_MOCK[0] + mock + CC.kr_live(kr_code, always=True) + gap + E_MOCK[1] + E_REAL[0] + real + CC.kr_live(kr_code) + gap + E_REAL[1] + CC.SCRIPT   # 한국 ETF = 장중 네이버 링크   # ETF 전용 표시 — 한국 ETF 본문은 render_kr 를 거치며 mock-only 를 먼저 지운다
 
 
 def load_live(market):
@@ -379,7 +379,7 @@ TOP_MIN = 3.0   # 비중 1위가 이보다 작으면(러셀 2000 · 프리미엄
 
 
 def us_move_card(sym, snap, f, s):
-    """미국 ETF `함께 움직이는 종목은?` (2026-11-14 사용자 "제안대로" — 한국 ETF move_card 와 같은 카드 · 같은 답).
+    """미국 ETF `함께 움직이는 종목은?`.
     비교 = 레버리지 · 인버스면 같은 지수 1배 ETF, 아니면 담은 비중 1위 종목(TOP_MIN% 이상, 일봉이 있을 때). 없으면(채권 · 금 · 고르게 담은 ETF) 카드 없음."""
     peer = None
     if sym in US_BASE:
@@ -432,7 +432,7 @@ def us_pages(snap, live, fund):
     R = RP.R
     snap = dict(snap, caps=dict(snap.get("caps") or {}), earnings=dict(snap.get("earnings") or {}))
     pages = {}
-    crash = RP.CW.compute(snap["bars"], "us", [t[0] for t in E.US])   # 급락장에서 어땠나? — 종목 페이지와 같은 계산 · 카드 (2026-11-14 사용자)
+    crash = RP.CW.compute(snap["bars"], "us", [t[0] for t in E.US])   # 급락장에서 어땠나? — 종목 페이지와 같은 계산 · 카드
     for sym, name, tracks, _a in E.US:
         b0 = snap["bars"].get(sym) or []
         if len(b0) < 30:
@@ -468,13 +468,13 @@ def us_pages(snap, live, fund):
             ind = RP.sec_industry_tab(s) if (s["sector_flow"] or s["industry_us"]) else ""
             hold = tab_holdings(f, name=name)
             body = (dk.price_stamp(s["day"], "US") + RP.lead(s)
-                    + candle(name, b0, 2)   # 차트 = 탭 위 (2026-11-13 사용자)
+                    + candle(name, b0, 2)   # 차트 = 탭 위
                     + R._section("오늘", today, line=False, tab="오늘") + RP.sec_crash(s)
                     + (R._section("업계상황", ind, tab="업계상황") if ind else "")   # 한국 ETF 와 같은 자리 (2026-11-14)
                     + (R._section("구성", hold, tab="구성") if hold else "")
                     + R._section("기본 정보", tab_basic(sym, f, b0), tab="기본 정보")
                     + related(sym, live))
-            if sym in E.BY_SYM[sym][1].split():   # `인베스코 QQQ` 처럼 티커가 이름의 일부 — 테마가 제목 티커를 꼬리로 옮기지 않게 (2026-11-19 사용자: 제목 옆 티커는 작은 회색 꼬리로)
+            if sym in E.BY_SYM[sym][1].split():   # `인베스코 QQQ` 처럼 티커가 이름의 일부 — 테마가 제목 티커를 꼬리로 옮기지 않게
                 body = '<span data-title-keep-ticker="1" hidden></span>' + body
             pages[E.key(sym)] = (E.page_title(sym), RP.wrap(body))
         except Exception as e:  # noqa: BLE001 — 한 ETF 실패가 나머지를 막지 않게
@@ -513,7 +513,7 @@ def _sgn(v):
 
 
 def move_state(name, day, ret_1d, us, us_ret, us_day, peer, peer_ret):
-    """강조 카드 답 (2026-11-13 사용자 P538 "강조 카드 안에" → Claude 설계): 종목 페이지 `함께 움직이는 종목은?` 과 같은 뜻 —
+    """강조 카드 답: 종목 페이지 `함께 움직이는 종목은?` 과 같은 뜻 —
     밤사이 미국 비교 대상이 올랐나 · 내렸나(±0.5% 기준, render_kr.pairs_state 와 같은 문턱). 미국 비교가 없으면(코스닥 150) 같은 날 대표 종목.
     → (답, 테마, 설명 문장) 또는 None."""
     base, who, when = (us_ret, us, f"밤사이(미국 {us_day[5:].replace('-', '.')} 종가) ") if us_ret is not None else (peer_ret, peer, "오늘 ")
@@ -526,7 +526,7 @@ def move_state(name, day, ret_1d, us, us_ret, us_day, peer, peer_ret):
 
 
 def move_card(sym, snap, stocks, K, s=None):
-    """`함께 움직이는 종목은?` (2026-11-12 사용자: 비교 종목 그래프처럼 선 그래프, 값은 주인공 선 끝에만) — 종목 페이지 같은 이름 카드의 ETF 판.
+    """`함께 움직이는 종목은?` — 종목 페이지 같은 이름 카드의 ETF 판.
     주인공 = 이 ETF(주황 실선), 비교 = 같은 업종 대표 종목(시가총액 1위, 청록 점선) · 밤사이 미국(연보라 점선). 점선은 끝 값을 달지 않는다.
     미국 값은 한국 날짜 d 에 `d 보다 앞선 마지막 미국 종가`(밤사이) — 미국과 연결 카드와 같은 기준.
     2026-11-13 P538: 강조 카드 안에(답 = move_state, 펼친 채로 — 그래프가 카드의 본문)."""
@@ -558,7 +558,7 @@ def move_card(sym, snap, stocks, K, s=None):
         m = {x["day"]: x["close"] for x in snap["bars"].get(peer[0]) or []}
         v = norm([m.get(d) for d in days])
         if v and sum(x is not None for x in v) >= 20:
-            series.append((peer[1], v, dk.CHART_SERIES[1], "thin"))   # 비교 = 얇은 실선 (2026-11-13 사용자: 점선 둘은 눈이 아프다)
+            series.append((peer[1], v, dk.CHART_SERIES[1], "thin"))   # 비교 = 얇은 실선
     peer_ret = None
     if peer:
         pb = snap["bars"].get(peer[0]) or []
@@ -591,7 +591,7 @@ def move_card(sym, snap, stocks, K, s=None):
     import render_html as R
     state, theme, sent = st
     col = {"positive": C.UP, "negative": C.DOWN}.get(theme, "#111")   # 회색 카드 답 = 검정 (가이드라인 7절, 2026-11-08)
-    lines = [(sent, "plain"), (chart + (dk.excl_note(note) if note else ""), "html")]   # 안내 = 느낌표 + 작은 회색 (2026-11-13 사용자, 가이드라인 8절 안내형)
+    lines = [(sent, "plain"), (chart + (dk.excl_note(note) if note else ""), "html")]   # 안내 = 느낌표 + 작은 회색
     return R._state_card("함께 움직이는 종목은?", state, theme, col, lines, "", fold=True, opened=True)
 
 
@@ -622,7 +622,7 @@ def kr_pages(snap, flows, hist, live, us_fund, kfund=None):
     market = analyze_kr.flows(flows, snap["bars"].get(K.BENCH)) or {}
     market["overnight"] = analyze_kr.overnight(snap, day)
     mr = analyze_kr.A.market_regime({"bars": {analyze_kr.NC.REGIME_BENCHMARK: snap["bars"].get(K.BENCH) or []}})
-    crash = render_kr.RP.CW.compute(snap["bars"], "kr", syms)   # 급락장에서 어땠나? — 종목 페이지와 같은 계산 · 카드 (2026-11-14 사용자)
+    crash = render_kr.RP.CW.compute(snap["bars"], "kr", syms)   # 급락장에서 어땠나? — 종목 페이지와 같은 계산 · 카드
     for s in stocks:   # 순위 · 모멘텀 순위 없음 (mom_rank 가 없으면 카드가 빠진다)
         s.update(market_regime=mr, sector_flow=analyze_kr.sector_flow(snap, s["sym"]), fx=market.get("fx"), crash=render_kr.RP.CW.for_stock(crash, s["sym"]),
                  rank=None, in_top=False)
@@ -631,7 +631,7 @@ def kr_pages(snap, flows, hist, live, us_fund, kfund=None):
 
     def chart(s):   # 봉차트 그림 자리 → 오늘 탭 머리 + 1년 선 그래프 (미국 ETF 와 같게)
         b = snap["bars"][s["sym"]][-252:]
-        return candle(s["name"], snap["bars"][s["sym"]], 0, kr_code=s.get("code")) + render_kr.R._section("오늘", "", line=False, tab="오늘")   # 차트 = 탭 위(증시 리포트와 같은 자리, 2026-11-13 사용자)
+        return candle(s["name"], snap["bars"][s["sym"]], 0, kr_code=s.get("code")) + render_kr.R._section("오늘", "", line=False, tab="오늘")   # 차트 = 탭 위
     render_kr.sec_chart = chart
     render_kr.sec_pairs = lambda s, a=None: move_card(s["sym"], snap, stocks_kr, K, s)   # 종목 페이지 `함께 움직이는 종목은?` 자리 → ETF 는 선 그래프
     tmp = os.path.join(OUT, "_kr_tmp")
@@ -654,7 +654,7 @@ def kr_pages(snap, flows, hist, live, us_fund, kfund=None):
             if kf.get("top") and not lev:
                 at = kf.get("at") or ""
                 hold = tab_holdings({"top": kf["top"], "sectors": [], "n": kf.get("n")}, "출처 : @링크@", (kf.get("source") or "운용사", kf.get("url") or ""), E.BY_SYM[sym][1],
-                                    at_note=f"{int(at[5:7])}월 {int(at[8:10])}일 기준" if at else "")   # 기준일 = 카드 오른쪽 위, 출처 = 카드 아래 오른쪽 (2026-11-16 사용자)
+                                    at_note=f"{int(at[5:7])}월 {int(at[8:10])}일 기준" if at else "")   # 기준일 = 카드 오른쪽 위, 출처 = 카드 아래 오른쪽
             elif not lev:   # 운용사 자료가 없을 때만 예전 길 — 같은 지수 미국 ETF 구성
                 twin = next((t[0] for t in E.US if t[2] == E.BY_SYM[sym][2]), None) if "미국" in E.BY_SYM[sym][1] else None
                 f = dict(us_fund.get(twin) or {}) if twin else {}
@@ -662,7 +662,7 @@ def kr_pages(snap, flows, hist, live, us_fund, kfund=None):
             ind = (render_kr.card_sector_flow(s) + render_kr.card_industry_mood(s) + render_kr.card_industry_work(s) + render_kr.card_industry_money(s))
             basic = {"family": KR_FAMILY.get(E.BY_SYM[sym][1].split(" ")[0]), "fee": kf.get("fee"), "aum_krw": kf.get("aum_krw"), "since": kf.get("since"), "n": kf.get("n"),
                      "source": kf.get("source") if (kf.get("fee") is not None or kf.get("aum_krw")) else None}
-            cmp = compare_card(sym, snap["bars"], kfund)   # 구성 탭 끝 (2026-11-16 사용자), 구성 탭이 없는 ETF(레버리지 · 인버스)는 기본 정보 끝
+            cmp = compare_card(sym, snap["bars"], kfund)   # 구성 탭 끝, 구성 탭이 없는 ETF(레버리지 · 인버스)는 기본 정보 끝
             body += ((render_kr.R._section("업계상황", f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{ind}</div>', tab="업계상황") if ind else "")
                      + (render_kr.R._section("구성", hold + cmp, tab="구성") if hold else "")
                      + render_kr.R._section("기본 정보", tab_basic(sym, basic, snap["bars"].get(sym)) + ("" if hold else cmp), tab="기본 정보") + related(sym, live) + ("</div>" if cut else ""))   # 잘라낸 본문의 바깥 틀 닫기
@@ -715,7 +715,7 @@ if __name__ == "__main__":
     main()
 
 
-# ── 종목 목록 페이지의 ETF 구획 (2026-11-12 사용자 "목록 페이지도 보여줘. 목업 페이지에도 보여줘") ──
+# ── 종목 목록 페이지의 ETF 구획 ──
 LIST_SHOW = 6   # 처음 보이는 줄 — 나머지는 `ETF 더 보기` 접기 (후보 11~20위 접기와 같은 틀)
 
 
@@ -735,7 +735,7 @@ def _list_rows(market, bars, syms):
         left = (f'{logo}<a href="{dk.esc(E.page_url(sym))}" style="color:#111;text-decoration:none;">{dk.esc(E.BY_SYM[sym][1])}</a>'
                 f'<span style="display:block;padding-left:{26 if logo else 0}px;font-size:{dk.MICRO};line-height:20px;font-weight:400;color:{dk.NOTE};">'
                 f'{dk.esc(E.key(sym))} · {dk.esc(E.BY_SYM[sym][2])}</span>')
-        items.append((left, f'{R._arrow(r)}<br><span style="color:{pcol};">{price}</span>', r))   # 증감 위 · 가격 아래 (2026-11-17 사용자 규칙, 가이드라인 4절)
+        items.append((left, f'{R._arrow(r)}<br><span style="color:{pcol};">{price}</span>', r))   # 증감 위 · 가격 아래
     if not items:
         return ""
 

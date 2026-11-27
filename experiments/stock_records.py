@@ -1,5 +1,5 @@
 """종목 페이지 매일 기록 — 카드 판정 · 애널리스트 · 방송 의견 · 종목 뉴스 분류를 record_store 에 덧붙인다
-(doc/기획/데이터-기록-계획.md A5-4 · A5-6 2단계, 2026-11-01 사용자: "그렇게 진행해").
+.
 
 왜: 한국 35 · 미국 64 종목 페이지의 판정은 매일 다시 그려지며 사라졌고(A3-1 8), 미국 종목 뉴스 분류(news.json)는 8일만 남는다.
 방송 의견 · 이익 예상 · 뉴스 분류는 우리가 그날 만든 것이라 지나면 다시 못 만든다 — 호재 · 리스크가 가격에 어떻게 반응했나(2부 이슈 저장소)의 재료.
@@ -9,7 +9,7 @@
               {sym}/pick/{해시}    방송 의견 한 건 — 인물별 (A5-7 2: 인물별로 남긴다). date = 영상 게시일(KST) — 5일 동안 매일 다시 보여도 한 줄
     issues    news/{item_id}      미국 종목 뉴스 분류 한 건(news_store) — 이슈 코드 · 종목별 관련도 · 방향. date = 기사 게시일(KST)
     broker    {sym}/broker/{회사}/{시각}  증권사 한 곳의 등급 · 목표가 변경 한 건(야후 upgrades_downgrades) — 월별 파일, 한 번 쓴 줄은 다시 쓰지 않는다(seen = 우리가 처음 본 날).
-              2026-11-25 사용자 "기록부터 쌓아" — 화면용 작업 파일에는 30일(BROKER_DAYS)만 있어 남의 전망 → 실제 결과를 맞춰 볼 회사별 줄이 없었다
+ — 화면용 작업 파일에는 30일(BROKER_DAYS)만 있어 남의 전망 → 실제 결과를 맞춰 볼 회사별 줄이 없었다
               (비공개 doc/기획/증권사-의견-글-기획.md 5절 · 기록 대장 3절 8). date = 변경 시각(UTC)의 날짜.
 한국 종목의 방송 이슈는 미디어 데일리가 이미 media-state 에 쌓는다 — 여기서는 다시 쓰지 않는다.
 나중 결과(1 · 5 · 20일)는 쓰지 않는다 — 읽는 쪽이 일봉으로 계산한다(record_store 원칙). 실패해도 게시는 계속(record_store.append 가 삼킨다).
@@ -103,5 +103,5 @@ def save_broker(state_dir, rows):
 
 def save(state_dir, verdicts, issues=()):
     record_store.append(state_dir, "verdicts", verdicts)
-    if issues:   # 종목 뉴스 분류는 크고 날마다 는다 → 월별 파일(2026-11-24 사용자 저장소 정리 — 연도 파일 1.3만 줄이 한 주 17MB 씩 git 에 쌓였다)
+    if issues:   # 종목 뉴스 분류는 크고 날마다 는다 → 월별 파일
         record_store.append(state_dir, "issues", list(issues), monthly=True)

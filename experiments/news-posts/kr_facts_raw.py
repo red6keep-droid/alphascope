@@ -1,4 +1,4 @@
-"""한국 기사 원본 기록 — 수집기 블로그 저장소의 facts · headlines 문서를 실행마다 그대로 남긴다 (2026-11-24 사용자 "기록 로직은 잘 지켜지고 있나").
+"""한국 기사 원본 기록 — 수집기 블로그 저장소의 facts · headlines 문서를 실행마다 그대로 남긴다.
 
     FIREBASE_SERVICE_ACCOUNT=<블로그 서비스 계정 키> python experiments/news-posts/kr_facts_raw.py --out store
     python experiments/news-posts/kr_facts_raw.py --out store --gcloud <계정>        # 로컬 시험

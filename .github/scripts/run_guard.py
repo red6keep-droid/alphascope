@@ -1,4 +1,4 @@
-"""정기 실행 중복 막기 — 이 실행이 맡은 일을 다른 실행이 이미 했나(또는 하는 중인가) (2026-11-17 사용자).
+"""정기 실행 중복 막기 — 이 실행이 맡은 일을 다른 실행이 이미 했나(또는 하는 중인가).
 
     python .github/scripts/run_guard.py --workflow quick-data.yml --job quick [--title-suffix "· kr"]
 

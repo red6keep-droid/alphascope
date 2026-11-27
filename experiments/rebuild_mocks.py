@@ -1,4 +1,4 @@
-"""목업 전체 다시 그리기 — 목업과 블로그가 늘 같은 코드 · 같은 테마로 보이게 (2026-11-15 사용자: "최신 목업 기준으로 항상 블로그랑 목업이 일치되게. 두 번 일을 하면 안 된다").
+"""목업 전체 다시 그리기 — 목업과 블로그가 늘 같은 코드 · 같은 테마로 보이게.
 
 목업은 만들 때 저장소 index.html(테마) CSS · JS 와 그때의 렌더러 코드를 복사해 굳는다(dk.write_mock).
 공통 디자인(design_kit · index.html · 렌더러)을 고친 뒤 이 스크립트를 돌리면 쓰는 목업이 모두 최신 코드로 다시 그려진다.
@@ -93,7 +93,7 @@ def main(words):
             bad.append(name)
         else:
             print(f"[완료] {name} ({took:.0f}초)")
-    if not words:   # 전부 다시 그린 시각 — 목업 서버가 `이때도 다시 안 그려진 발행된 화면 목업`(= 옛 디자인으로 남은 것)을 일주일 넘은 목업으로 내린다 (2026-11-26 사용자)
+    if not words:   # 전부 다시 그린 시각 — 목업 서버가 `이때도 다시 안 그려진 발행된 화면 목업`(= 옛 디자인으로 남은 것)을 일주일 넘은 목업으로 내린다
         with open(os.path.join(ROOT, "experiments", ".mock_rebuilt"), "w", encoding="utf-8") as f:
             f.write(str(t0))
     print(f"\n{len(jobs) - len(bad)}/{len(jobs)} 묶음 다시 그림 · {time.time() - t0:.0f}초" + (f" · 실패 {', '.join(bad)}" if bad else ""))

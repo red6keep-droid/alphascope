@@ -1,4 +1,4 @@
-"""주식 공부 기준 페이지 · 9편 그림 — 실제 주가와 '순서만 섞은 가짜 주가'를 나란히 (2026-11-21 사용자: 가짜 파동 설명이 어렵다 → 그림으로).
+"""주식 공부 기준 페이지 · 9편 그림 — 실제 주가와 '순서만 섞은 가짜 주가'를 나란히.
 
     .venv/bin/python experiments/course/make_shuffle_fig.py            # → experiments/course/figs/shuffle_quiz.html
     .venv/bin/python experiments/course/make_shuffle_fig.py MSFT 2015 1
@@ -19,7 +19,7 @@ BARS = os.path.join(HERE, "..", "..", "data", "store", "bars")
 OUT = os.path.join(HERE, "figs")
 SYM, YEAR, SEED = "MSFT", 2015, 1
 W, H, PAD_L, PAD_R, PAD_T, PAD_B = 320, 120, 4, 58, 10, 10   # 오른쪽 58 = 마지막 값 글자 자리(점 오른쪽, 선 그래프 규칙)
-LINE = "#F59E0B"   # 두 그래프 같은 색 — 색으로 어느 쪽이 실제인지 드러나지 않게. 주황 = 그래프 통일 주황 (2026-11-21 사용자 P556, 옛 #334155)
+LINE = "#F59E0B"   # 두 그래프 같은 색 — 색으로 어느 쪽이 실제인지 드러나지 않게. 주황 = 그래프 통일 주황
 
 
 def series(sym, year, seed):

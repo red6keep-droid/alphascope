@@ -84,7 +84,7 @@ def korea(normal, stats):
     return out
 
 
-FX_DAYS = 60   # 한국장 탭 `환율은?` 그래프 = 최근 60거래일 (2026-11-05 사용자 batch 8 ⑭: 숫자 줄을 가로 선 그래프로)
+FX_DAYS = 60   # 한국장 탭 `환율은?` 그래프 = 최근 60거래일
 
 
 def fx(closes, series, dates=None):

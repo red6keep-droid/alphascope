@@ -6,8 +6,8 @@ name: People Radar
 #
 # 트럼프 Truth Social 라벨(trump-state)과 데일리 시장 맥락(report-state)을 읽으므로 두 실행이 끝난 뒤에 돈다.
 # 발언 이력(statements.jsonl, 30일)은 radar-state 브랜치에 trump-state 와 같은 방식(이전 커밋 위 일반 push)으로 남긴다.
-# 2026-10-22 사용자: "인물 발언 자동실행해줘".
-# 매드머니 갱신(mode=madmoney, 2026-11-20 사용자: 그날 회차는 그날 글에): 방송 분배(media-daily)가 그날 매드머니 회차를 처음 기록하면 이 워크플로를 건다.
+#.
+# 매드머니 갱신: 방송 분배(media-daily)가 그날 매드머니 회차를 처음 기록하면 이 워크플로를 건다.
 # 아침 글이 있을 때만 · 구글 뉴스 · 추출 · 분류 AI 없이 매드머니 줄만 붙여 같은 글을 고쳐 쓴다(서술 AI = 새 카드만, main.py madmoney_update).
 
 on:
@@ -15,7 +15,7 @@ on:
     # 정시 실행은 Cloudflare Worker가 뉴욕 18:00(KST 07:00 서머타임 / 08:00 표준시)에 건다 (infra/cron-trigger).
     # 이 cron 은 예비 — 23:00 UTC = KST 08:00. 트럼프(22:15 UTC) · 데일리(22:00 UTC) GitHub cron 예비 시각보다 뒤.
     - cron: '0 23 * * *'
-  # 이어 붙이기 (2026-11-20 사용자 "미국 실행 한 줄로"): 엔비디아 · 미국 종목 실행이 홈 종목 줄을 올리면 바로 — 리포트 기록(report-state)이 이미 있고,
+  # 이어 붙이기: 엔비디아 · 미국 종목 실행이 홈 종목 줄을 올리면 바로 — 리포트 기록(report-state)이 이미 있고,
   # 같은 Groq 를 쓰는 엔비디아 뉴스 처리와 겹치지 않는다. 옛 18:00 NY 고정 시각은 예비(오늘 글이 있으면 check 가 건너뜀)
   workflow_run:
     workflows: ["NVDA Report"]
@@ -92,7 +92,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      # 상태 · 기록 브랜치는 비공개 저장소 alphascope-state 에 둔다 (2026-11-04 사용자: 기록은 우리 자산 — 공개 저장소에 두지 않는다). 쓰기 배포 키 = Secret STATE_DEPLOY_KEY
+      # 상태 · 기록 브랜치는 비공개 저장소 alphascope-state 에 둔다. 쓰기 배포 키 = Secret STATE_DEPLOY_KEY
       - name: State repo (private alphascope-state)
         env:
           STATE_DEPLOY_KEY: ${{ secrets.STATE_DEPLOY_KEY }}
@@ -115,7 +115,7 @@ jobs:
       # 오늘(KST) 글이 이미 있으면 이후 단계를 전부 건너뛴다 — 예비 GitHub cron 이 외부 cron 실행 뒤에
       # 전체를 한 번 더 돌려 Groq · Gemini 호출이 매일 두 배였다 (2026-10-26). 트럼프 · NVDA 와 같은 방식.
       # 확인이 실패하면 게시 안 된 것으로 보고 진행한다(check_published.py).
-      # 매드머니 갱신(mode=madmoney, 2026-11-20 사용자: 그날 회차는 그날 글에)은 반대로 — 오늘 아침 글이 **있을 때만** 돈다(고쳐 쓸 글).
+      # 매드머니 갱신은 반대로 — 오늘 아침 글이 **있을 때만** 돈다(고쳐 쓸 글).
       - name: Check if today's post is already published
         id: check
         if: env.IS_SCHEDULED == 'true' || env.MODE == 'madmoney'
@@ -219,7 +219,7 @@ jobs:
           git config user.name "alphascope-bot"
           git config user.email "bot@users.noreply.github.com"
           # statements.jsonl(30일 창 · 기사 본문 포함, 날마다 통째로 다시 씀)은 이력 없는 radar-work 로 — 발언 · 분류 기록은 records/issues 에 따로 쌓인다
-          # (2026-11-24 사용자 저장소 정리, 헌법 제4조 6항 · 운영지침 4-2 본문은 기록 대상 아님). 작업 브랜치를 먼저 올린다
+          #. 작업 브랜치를 먼저 올린다
           WORK="statements.jsonl"
           export GIT_INDEX_FILE="$(mktemp -u)"; n=0
           for p in $WORK; do [ -f "$STATE_DIR/$p" ] && git add -f "$STATE_DIR/$p" && n=$((n+1)); done
@@ -250,7 +250,7 @@ jobs:
           [ -z "$SLACK_WEBHOOK_URL" ] && exit 0
           curl -sS -X POST -H 'Content-type: application/json' --data "{\"text\":\"🚨 워크플로 실패 — 주요 인물 발언\n🔗 https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}" "$SLACK_WEBHOOK_URL" || true
 
-      # 오늘 실패 알림이 나간 뒤 이번 실행에서 게시에 성공했을 때만 '다시 성공' 알림. 평소 성공은 조용히 (2026-11-10 사용자)
+      # 오늘 실패 알림이 나간 뒤 이번 실행에서 게시에 성공했을 때만 '다시 성공' 알림. 평소 성공은 조용히
       - name: Notify recovered
         if: success() && hashFiles('experiments/people-radar/output/post_meta.json') != ''
         continue-on-error: true

@@ -1,4 +1,4 @@
-"""시황 배너 목업 2 — "미국(한국) 경제의 하루" 시네마틱 실사 (2026-11-17 사용자 참고 글 · 참고 사진 2장).
+"""시황 배너 목업 2 — "미국(한국) 경제의 하루" 시네마틱 실사.
 
     python experiments/market-commentary/banner_mock2.py           # 없는 그림만 받기 + HTML
     python experiments/market-commentary/banner_mock2.py --html    # HTML 만

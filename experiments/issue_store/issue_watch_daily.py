@@ -1,4 +1,4 @@
-"""이슈 모니터링 — 블로그 고정 페이지 본문 만들기 + 날마다 기록 (2026-11-13 사용자: 운영 연결 + 바로 공개).
+"""이슈 모니터링 — 블로그 고정 페이지 본문 만들기 + 날마다 기록.
 
     python experiments/issue_store/issue_watch_daily.py --state "$STATE_DIR"
 
@@ -33,7 +33,7 @@ def save_log(rec_dir, iid, row):
 
 def stock_issues(rec):
     """종목 이슈(mock_stock_issue, 지금은 젠슨 황 사임 하나) — Hot Issue 틀 그대로, 쪽 · 단계 = 글자 패턴(AI 0). 본문 · 기록 · 홈 카드 줄.
-    2026-11-16 사용자 "젠슨 황 이슈 진행해" — 자동 열고 닫기(목업 설계안)는 아직, 이 이슈만 손으로 연 것."""
+ — 자동 열고 닫기(목업 설계안)는 아직, 이 이슈만 손으로 연 것."""
     import datetime as _dt
     import mock_stock_issue as MS
     c = MS.collect()
@@ -49,7 +49,7 @@ def stock_issues(rec):
 
 
 def home_cards(logs, made=None, extra=()):
-    """홈 `Hot Issue` 카드 자료(gh-pages issues.json) — 이슈마다 이름 · 페이지 · 최근 일주일 뉴스 쪽(바늘 말) · 평소보다 뉴스 많음. AI 0 (2026-11-16 사용자).
+    """홈 `Hot Issue` 카드 자료(gh-pages issues.json) — 이슈마다 이름 · 페이지 · 최근 일주일 뉴스 쪽(바늘 말) · 평소보다 뉴스 많음. AI 0.
     바늘 말 색 = 좋은 쪽(종전 · 완화) 빨강 positive · 나쁜 쪽(확전 · 강화) 파랑 negative · 방향미정 = `향방미정` 회색."""
     import datetime as _dt
     out = []
@@ -60,7 +60,7 @@ def home_cards(logs, made=None, extra=()):
         c = IW.CFG[iss["id"]]
         g = row.get("gauge") or "방향미정"
         kind = "positive" if c["good"] in g else "negative" if c["bad"] in g else "neutral"
-        out.append({"id": iss["id"], "name": iss["name"], "q": iss.get("q") or iss["name"], "url": f"/p/{c['slug']}.html",   # q = 이슈 페이지 질문 제목(줄 = 질문, 증시 전망 카드처럼 · 2026-11-16 사용자)
+        out.append({"id": iss["id"], "name": iss["name"], "q": iss.get("q") or iss["name"], "url": f"/p/{c['slug']}.html",   # q = 이슈 페이지 질문 제목
                     "gauge": "향방미정" if g == "방향미정" else g, "kind": kind, "hot": bool(row.get("hot"))})
     return {"generated": made or _dt.datetime.now(_dt.timezone.utc).isoformat(timespec="minutes"), "issues": out}
 

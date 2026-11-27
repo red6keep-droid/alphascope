@@ -1,4 +1,4 @@
-"""④단계 — 보유 논리 점검표 (기획서 8절), SEC 원문만으로. Gemini 없음 (2026-10-10 사용자: 복잡하게 만들지 않는다).
+"""④단계 — 보유 논리 점검표 (기획서 8절), SEC 원문만으로. Gemini 없음.
 
 소스 세 가지
   1. XBRL companyfacts API — 분기 매출(Revenues)·총이익(GrossProfit)·자사주 매입(PaymentsForRepurchaseOfCommonStock, 누적 → 분기 차분)

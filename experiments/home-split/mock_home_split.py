@@ -1,4 +1,4 @@
-"""홈 나누기 목업 — 미국 화면 · 한국 화면 (2026-11-10 사용자, 홈 수정 H35).
+"""홈 나누기 목업 — 미국 화면 · 한국 화면.
 
     python experiments/home-split/mock_home_split.py     # output/mock_home_us.html · mock_home_kr.html
 
@@ -24,7 +24,7 @@ def nav(mkt, files=FILES):
     cur = lambda m: ' aria-current="page"' if m == mkt else ""
     return (
         '<nav class="menu-items" id="primary-menu" aria-label="주 메뉴">\n'
-        # data-bar = 로고 줄 스위치 후보(지금 화면이 아닌 쪽 하나가 국기 data-flag 와 함께 보인다). 나머지(증시 전망)는 메뉴 아이콘 서랍에만 (2026-11-10 사용자)
+        # data-bar = 로고 줄 스위치 후보(지금 화면이 아닌 쪽 하나가 국기 data-flag 와 함께 보인다). 나머지(증시 전망)는 메뉴 아이콘 서랍에만
         f'      <a class="nav-item" href="{files["us"]}"{cur("us")} data-bar="1" data-flag="us">미국</a>\n'
         f'      <a class="nav-item" href="{files["kr"]}"{cur("kr")} data-bar="1" data-flag="kr">한국</a>\n'
         '      <a class="nav-item" href="/p/forecast-list.html">증시 전망</a>\n'
@@ -36,7 +36,7 @@ KR_NEWS_PUBLIC = "https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages
 
 
 def kr_news():
-    """한국 홈 주요 뉴스 재료 = 운영과 같은 kr-news.json(한국 증시 방송 이슈, kr-market-report main._home_news) (2026-11-24 사용자 "방송 뉴스라도 나와야").
+    """한국 홈 주요 뉴스 재료 = 운영과 같은 kr-news.json(한국 증시 방송 이슈, kr-market-report main._home_news).
     로컬 결과가 있으면 그것, 없으면 운영 gh-pages 공개 파일(읽기만). 못 받으면 None — 테마는 '불러올 수 없습니다'를 그린다. 옛 가짜 한국 뉴스 8건은 뺌"""
     lp = os.path.join(ROOT, "experiments", "kr-market-report", "output", "kr_news.json")
     try:
@@ -145,7 +145,7 @@ def split_html(src, mkt, files=FILES):
             lists[m] = _j.dumps(d, ensure_ascii=False)
     if lists:
         html = html.replace("<head>", "<head>\n<script>window.PV_LISTS = {" + ",".join(f'"{m}":{t}' for m, t in lists.items()).replace("</", "<\\/") + "};</script>", 1)
-    # 테마 종목 = 다음 테마 구성(universe.WATCH_NEXT) · 값 = 목록 파일 실제 값 (2026-11-18 사용자: 반도체를 하는 일로 넷 · 새 정식 후보)
+    # 테마 종목 = 다음 테마 구성(universe.WATCH_NEXT) · 값 = 목록 파일 실제 값
     picks = next_picks()
     if picks:
         html = html.replace("<head>", "<head>\n<script>window.__PICKS = " + json.dumps(picks, ensure_ascii=False).replace("</", "<\\/") + ";</script>", 1)

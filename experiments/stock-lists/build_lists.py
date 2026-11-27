@@ -1,4 +1,4 @@
-"""하단 메뉴 `종목` 페이지(/p/stock-lists.html)가 읽는 목록 파일 — 시장마다 <out>/us/_lists.json · <out>/kr/_lists.json (2026-11-17 사용자 "1단계 구현 진행해").
+"""하단 메뉴 `종목` 페이지(/p/stock-lists.html)가 읽는 목록 파일 — 시장마다 <out>/us/_lists.json · <out>/kr/_lists.json.
 기획 = 비공개 기획/종목-탭-그룹-목록-기획.md 3-1. 목업 = mock_stock_lists.py.
 
     python experiments/stock-lists/build_lists.py --qd /tmp/qd --cache /tmp/qcache --search /tmp/search --shells /tmp/qd/shells.json
@@ -29,7 +29,7 @@ import universe_kr as UK  # noqa: E402
 SKIP = {"version.json", "bench.json", "_lists.json"}
 
 # 업종 = GICS 11개만 (taxonomy 세 층). 정식 검색 색인의 옛 분류(`반도체` · `결제` …)는 업종으로 올린다 — 간단 명단 밖 정식 종목(TSMC · ASML)이
-# `반도체` 업종 칸을 따로 만들어 홈 `업종 종목` 반도체에 2종목만 보였다 (2026-11-18 사용자 "반도체는 딸랑 두 개뿐이야?")
+# `반도체` 업종 칸을 따로 만들어 홈 `업종 종목` 반도체에 2종목만 보였다
 SECTOR_NAMES = set(taxonomy.SECTORS.values())
 SECTOR_ALIAS = {name: taxonomy.SECTORS[parent] for name, parent in taxonomy.SUB_INDUSTRIES.values()}
 SECTOR_ALIAS.update({"결제": "금융", "빅테크": "기술", "소비 · 플랫폼": "경기 소비재"})
@@ -84,7 +84,7 @@ def _get(url):
 
 
 def sector_etf(day, data=None):
-    """미국 업종 11개 = 섹터 ETF(XLK · XLF …) 등락 {업종 이름: %} — 증시 시황 아침 편 업종 줄(build_briefing.build_am)과 같은 값 (2026-11-20 사용자).
+    """미국 업종 11개 = 섹터 ETF(XLK · XLF …) 등락 {업종 이름: %} — 증시 시황 아침 편 업종 줄(build_briefing.build_am)과 같은 값.
     업종 탭 지도 색 · 숫자가 이것을 쓴다(옛 = 종목 단순 평균 → 11-19 기술 −1.50 · 시황 −2.75). 장 날짜가 목록과 다르거나 못 받으면 {} (화면은 단순 평균)."""
     names = {n.replace(" ", ""): n for n in SECTOR_NAMES}   # data.json `경기소비재` → 목록 `경기 소비재`
     if data is None and day:
@@ -111,7 +111,7 @@ def sector_etf(day, data=None):
 
 def usual_move(px):
     """평소 하루 움직임 = 마지막 날을 뺀 직전 60거래일 하루 등락률 절댓값의 중앙값(%, Newfact 뉴스 news_render._move 와 같은 정의). 20일 못 되면 None.
-    시황 종목 줄 둘째 줄 `평소 하루 움직임(1.6%)의 n배` 에 씀 (2026-11-26 사용자)."""
+    시황 종목 줄 둘째 줄 `평소 하루 움직임(1.6%)의 n배` 에 씀."""
     c = [x for x in (px or []) if x]
     rets = [abs(c[i] / c[i - 1] * 100 - 100) for i in range(1, len(c))]
     prev = rets[-61:-1]

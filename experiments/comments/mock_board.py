@@ -1,4 +1,4 @@
-"""토론 모아보기 목업 — 하단 메뉴 `토론` 칸이 여는 화면 (2026-11-22 사용자: 네이버페이 증권 토론 탭 캡처, "그렇게 해").
+"""토론 모아보기 목업 — 하단 메뉴 `토론` 칸이 여는 화면.
 
   output/mock_board.html        회원 — 추천 · HOT · MY 탭, 토론방 줄, 실시간 키워드, 어디에 달린 글 꼬리표
   output/mock_board-guest.html  로그인 전 — MY 탭 누르면 로그인 창, 연필 = 로그인 창
@@ -48,7 +48,7 @@ POSTS = [
 MINE = [0, 4]   # MY 탭 = 내가 쓴 글 · 답글 단 글(목업: 이 두 글)
 
 CSS = """<style>
-/* 토론 모아보기 (2026-11-22 사용자) — 글 칸은 토론 목록(.comments)과 같은 꼴 */
+/* 토론 모아보기 — 글 칸은 토론 목록(.comments)과 같은 꼴 */
 .bd-tabs{display:flex;gap:4px;margin:0 0 14px;padding:4px;border-radius:12px;background:#F1F5F9;}
 .bd-tab{flex:1;margin:0;padding:8px 0;border:0;border-radius:9px;background:none;font:inherit;font-size:16px;line-height:24px;font-weight:400;color:#6B7280;cursor:pointer;-webkit-tap-highlight-color:transparent;}
 .bd-tab[aria-selected="true"]{background:#fff;color:#111;font-weight:700;box-shadow:0 1px 2px rgba(15,23,42,.08);}

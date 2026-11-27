@@ -1,4 +1,4 @@
-"""블로그 검색 즉답 색인 — 종목 이름 · 별명 → 최신 값 (2026-11-10 사용자: 검색 + 블로그 챗봇 목업).
+"""블로그 검색 즉답 색인 — 종목 이름 · 별명 → 최신 값.
 
     python experiments/site-search/build_search_index.py                 # output/search_index.json (목업 · 두 시장)
     python experiments/site-search/build_search_index.py --market us --out deploy-home/search/us.json   # 실행 때
@@ -6,7 +6,7 @@
 AI 호출 0. 이미 모아 둔 자료만 읽는다:
   미국  stock-radar/data/snapshot.json(일봉 · 시총 · 실적 발표일) · extra.json(EPS · 목표가 · 회사 · 매출) · news.json(한국어 요약)
   한국  kr-stocks/data/snapshot.json · extra.json(EPS · 목표가 · 매출 · DART 회사 정보)
-블로그 (2026-11-11 사용자 "진행해"): 미국 = nvda-report.yml(stock-radar 자료가 있는 실행) → gh-pages search/us.json,
+블로그: 미국 = nvda-report.yml(stock-radar 자료가 있는 실행) → gh-pages search/us.json,
   한국 = kr-stocks.yml → search/kr.json. 각 실행이 이미 하던 홈 JSON 푸시(deploy-home)에 얹는다 — gh-pages 쓰기 추가 없음.
   한 시장이 실패해도 다른 시장 파일은 그대로(전날 것) — 테마 JS(search.js) 가 둘을 따로 읽어 합친다.
 값마다 기준일을 넣는다 — 화면은 "현재"가 아니라 "MM-DD 종가"로 쓴다(미국은 정규장 종가만).
@@ -30,7 +30,7 @@ _LOGOS = None
 
 
 def logo_file(sym):
-    """검색 카드 머리 로고 (2026-11-19 사용자: `한국 · 미국` 자리에 티커 로고, 조금 크게) — 우리 gh-pages 로고 파일 이름. 없으면 None(화면이 배지로)."""
+    """검색 카드 머리 로고 — 우리 gh-pages 로고 파일 이름. 없으면 None(화면이 배지로)."""
     global _LOGOS
     if _LOGOS is None:
         try:
@@ -106,7 +106,7 @@ def eps_block(x):
     rc = a.get("rating_counts") or {}
     out = {}
     # 수집(expect._eps)은 다음 회계연도(+1y) 예상이다 — 결산월(fy_end)을 같이 넣어 화면이 `2027년 12월 결산`으로 쓴다.
-    # 2026-11-12 사용자: 검색 창이 이것을 `올해 예상 EPS`로 보여 PER 까지 틀렸다(삼성전자 2.7배). 키 이름도 eps → ef 로 바꿔
+    #: 검색 창이 이것을 `올해 예상 EPS`로 보여 PER 까지 틀렸다(삼성전자 2.7배). 키 이름도 eps → ef 로 바꿔
     # 옛 테마(올해 라벨)가 새 색인을 받으면 EPS · PER 줄을 아예 안 그린다 — 틀린 라벨이 다시 나올 길을 막는다
     if e.get("current"):
         out["ef"] = [round(e["current"], 2), round(e.get("30daysAgo") or 0, 2) or None, e.get("fy_end")]
@@ -145,7 +145,7 @@ def us_news(news, sym, n=3):
     return [[(v.get("published_at") or "")[:10], v.get("title_ko") or v.get("fact"), v.get("source") or ""] for v in rows[:n]]
 
 
-# ---------------------------------------------------------------- `왜 떨어졌어 · 왜 올랐어` 근거 (2026-11-12 사용자: "증시 전망 하락 근거 규칙을 참고해서 비슷하게")
+# ---------------------------------------------------------------- `왜 떨어졌어 · 왜 올랐어` 근거
 # 증시 전망 이유 카드(issue_store/forecast_register)와 같은 재료 · 같은 함수 — 새 수집 · AI 0:
 #   ① 기사 요약 줄 태그의 좋은 소식 · 나쁜 소식 · 방향 안 정해진 일(side_news, 이 종목 lv3 · 같은 업종 lv2)  ② 애널리스트 목표가 · 의견 변경(est_history, 날짜별)
 #   ③ 평소 하루 움직임(직전 60거래일 하루 변화 표준편차)  ④ 알파스코프 신호(종목 페이지 판정 기록 — 상태 저장소가 있을 때만)

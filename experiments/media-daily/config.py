@@ -1,6 +1,6 @@
 """미디어 데일리 — 유튜브 수집기(red9keep/yutb-sub)의 영상별 요약(Firestore `summaries`)으로 "방송이 본 미국장" 글.
 
-기획 · 결정: doc/기획/유튜브-자막-기사-검토.md 7 · 11절 (2026-10-22 사용자: 데일리는 그대로, 미디어 데일리를 따로. 중복은 짧게 + 데일리 링크).
+기획 · 결정: doc/기획/유튜브-자막-기사-검토.md 7 · 11절.
 재료는 요약 문장이 아니라 이슈 칸(분류 · 방향 · 예상 밖 · 종목 · 발언자)과 영상 링크 — 자막 원문 · 요약 문장은 글 · 공개 브랜치에 두지 않는다 (운영지침 4-2 예외 D4-13).
 """
 
@@ -14,17 +14,17 @@ KST = datetime.timezone(datetime.timedelta(hours=9))
 FIRESTORE_PROJECT = "ytb-v1-b96d5"
 KEY_ENV = "YTB_FIRESTORE_KEY"   # 서비스 계정 키 JSON 전체 (GitHub Secret). 없으면 gcloud 기본 인증(ADC)
 
-TITLE_NAME = "미디어 데일리"   # 옛 "미디어 데일리 · 방송이 본 미국장" (2026-10-23 사용자: 뒤를 삭제). 같은 날 글 찾기는 주소(slug)의 날짜라 옛 제목 글도 찾는다
+TITLE_NAME = "미디어 데일리"   # 옛 "미디어 데일리 · 방송이 본 미국장". 같은 날 글 찾기는 주소(slug)의 날짜라 옛 제목 글도 찾는다
 SLUG_NAME = "media daily"          # 주소 고정용 영문 제목 "media daily YYYY-MM-DD" → /media-daily-YYYY-MM-DD.html
 LABELS = ["미디어 데일리", "미국 증시", "자동 리포트"]
-TEST_MODE = False   # 2026-11-16 사용자: 테스트 끝 — `테스트 중` 라벨 정리(애드센스 준비)                   # 첫 발행 2~4주 `테스트 중` 라벨 (운영지침 2-2)
+TEST_MODE = False   #: 테스트 끝 — `테스트 중` 라벨 정리(애드센스 준비)                   # 첫 발행 2~4주 `테스트 중` 라벨 (운영지침 2-2)
 
 # 1차(08:00) 재료 컷 — createdAt 이 이 시각(KST)까지. 2차(10:15 갱신)는 컷 없음
 PHASE1_CUTOFF = (7, 55)
 MIN_ITEMS = 5                      # 재료가 이보다 적으면 그날은 내지 않는다 (빈 구획 · "자료 없음" 금지)
 TOP_ISSUES = 5                     # 본문 이슈 상위 n
 MIN_CLUSTER = 1                    # 이슈 묶음 최소 영상 수 (1 = 혼자 다룬 이슈도 후보, 순서는 채널 수 · 영상 수가 정한다)
-# 관심도 1~10 (2026-10-23 사용자: "점수로 하자, 관심도") — 파이썬 계산, AI 판정 아님.
+# 관심도 1~10 — 파이썬 계산, AI 판정 아님.
 # 10 × (W_CH × 방송 비율 + (1 − W_CH) × 영상 점수). 방송 비율 = 다룬 방송 수 ÷ 오늘 방송 수, 영상 점수 = min(1, 영상 수 ÷ FULL_VIDEOS). 반올림 · 최소 1.
 # 넓이(몇 곳이 다뤘나)를 더 무겁게 — 한 방송이 클립을 여럿 올리면 영상 수만 커진다. 기록이 쌓이면 최근 30일 대비 상대 점수로 바꿀 수 있다
 INTEREST_W_CH = 0.6
@@ -38,7 +38,7 @@ NARRATE_CHAIN = "json-backup-first"   # 서술은 예비 공급자 먼저 (운�
 import sys as _sys   # noqa: E402
 _sys.path.insert(0, os.path.join(BASE_DIR, ".."))
 import issue_codes as _ic  # noqa: E402
-CATEGORY_KO = dict(_ic.ISSUE_KO)   # 분야 화면 이름 = 기록 이슈 코드 이름 (2026-11-07 사용자 P339: 화면 분야 라벨 = 기록 이슈 코드 18개 이름). 수집기 옛 이름(RATES_CB · ENERGY_COMMODITY · FX)은 읽을 때 FROM_YTB_CATEGORY 로 바꾼다
+CATEGORY_KO = dict(_ic.ISSUE_KO)   # 분야 화면 이름 = 기록 이슈 코드 이름. 수집기 옛 이름(RATES_CB · ENERGY_COMMODITY · FX)은 읽을 때 FROM_YTB_CATEGORY 로 바꾼다
 STANCE_KO = {"bullish": "긍정", "bearish": "부정", "neutral": "중립"}
 SURPRISE_KO = {"surprise": "예상 밖", "expected": "예상대로", "unknown": ""}
 SPEAKER_KO = {"Jim Cramer": "짐 크레이머", "Steve Liesman": "스티브 리스먼", "Dan Ives": "댄 아이브스", "Jerome Powell": "제롬 파월", "Scott Bessent": "스콧 베센트",

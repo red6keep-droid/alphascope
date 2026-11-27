@@ -1,4 +1,4 @@
-"""미국 간단 종목 업계상황 탭 목업 — 배정 고침 · 새 묶음 · 함께 볼 지표 뒤 모습 (2026-11-25 사용자 "미국도 한국처럼 끝까지").
+"""미국 간단 종목 업계상황 탭 목업 — 배정 고침 · 새 묶음 · 함께 볼 지표 뒤 모습.
 
     python experiments/stock-quick/mock_industry_tab_us.py
 
@@ -15,7 +15,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path[:0] = [HERE]
 import full_us as F  # noqa: E402  (full_us 가 stock-radar · nvda-report 경로를 넣는다)
 import industry_us as I  # noqa: E402
-import render_html as R  # noqa: E402  (실제 페이지처럼 업계상황 탭 근거 줄 작게 — small_rows, 2026-11-26 사용자)
+import render_html as R  # noqa: E402
 
 RP, dk = F.RP, F.dk
 # (종목, 목업에 적는 한 줄)

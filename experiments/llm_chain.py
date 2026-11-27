@@ -1,4 +1,4 @@
-"""모든 리포트가 같이 쓰는 LLM 호출 + 예비 사슬 (2026-10-14 사용자: "리포트를 더 많이 생산할 거야. 예비키들이 엄청 중요해" → "함께 옮겨").
+"""모든 리포트가 같이 쓰는 LLM 호출 + 예비 사슬.
 
 예전에는 엔비디아 · 트럼프(gemini_client + backup_llm 사본), 댓글 봇, 홈 뉴스 번역, 미국 증시 리포트가 각자 호출 코드를
 들고 있었고, 미국 증시 리포트에는 예비가 없었다. 이제 공급자를 더하거나 순서를 바꾸는 곳은 이 파일 하나다.
@@ -13,7 +13,7 @@
 validate 탈락 모두) 다음 단계로. 전부 실패하면 RuntimeError.
 
 Gemini 는 REST 로 부른다 — 홈 뉴스 워크플로에는 google-genai 가 없다. 필요한 패키지는 requests 하나.
-Gemini 키는 하나 — 프로젝트 하나 (2026-10-19 사용자: 한 블로그에서 키 · 프로젝트를 여러 개 돌려 한도를 늘리는 건 약관 위반(사용량 제한 우회)).
+Gemini 키는 하나 — 프로젝트 하나 (: 한 블로그에서 키 · 프로젝트를 여러 개 돌려 한도를 늘리는 건 약관 위반(사용량 제한 우회)).
 GEMINI_API_KEY 에 키가 여럿 들어 있어도 첫 키만 쓴다(gemini_keys). 하루 한도는 모든 리포트가 나눠 쓰는 예산 — 새 기능은 Groq · NVIDIA 를 먼저 쓰고 Gemini 는 예비로.
 (2026-10-14 ~ 10-18 에는 다른 프로젝트의 키 5개를 돌려 썼다 — 아래 프로젝트별 실측은 그때 기록.)
 429 분당 한도를 받으면 KEY_COOLDOWN_SECONDS 한 번 쉬고, 하루 한도(PerDay)면 그 실행 동안 그 모델을 버린다.
@@ -94,12 +94,12 @@ CHAINS = {
     # Groq 둘은 짧은 요청(분류 · 답글)용 3 · 4순위
     # gemini-lite 가 2순위 (2026-10-16): 3.5-flash 과부하 · 하루 한도 때 같은 키의 다른 모델이 먼저 받는다 — 분류 일치율이 DeepSeek 보다 높고 빠르다
     "json": ["gemini", "gemini-lite", "nvidia-deepseek", "groq-qwen", "groq"],
-    # 데일리 서술만 DeepSeek 이 lite 보다 앞 (2026-10-16 사용자): 같은 데이터로 비교하니 lite 는 숫자는 맞지만 두루뭉술하고("다양한 업종")
+    # 데일리 서술만 DeepSeek 이 lite 보다 앞: 같은 데이터로 비교하니 lite 는 숫자는 맞지만 두루뭉술하고("다양한 업종")
     # 뉘앙스가 어긋남(+0.08% 를 "약보합", 전 지수 상승을 "혼조"). DeepSeek 이 더 구체적 — 단 10-15 에 방향 오류 2건 이력
     "json-daily": ["gemini", "nvidia-deepseek", "gemini-lite", "groq-qwen", "groq"],
     "translate": ["groq", "nvidia-gptoss20", "gemini-lite", "gemini"],          # 홈 뉴스 제목 번역 — 빠른 것부터 (2026-10-11)
-    # 댓글 답글 — Gemini 는 맨 뒤 (2026-10-14 사용자: 댓글 한 건에 한도 1회가 나가니 리포트 몫을 남기자). 답글은 짧고 숫자를 쓰지 않아 예비 모델로 충분.
-    # Groq 가 첫째, DeepSeek 은 예비 (2026-10-26 사용자: NVIDIA 는 예비 사슬에만 — 비교에서 답글 품질은 DeepSeek 이 가장 좋았다)
+    # 댓글 답글 — Gemini 는 맨 뒤. 답글은 짧고 숫자를 쓰지 않아 예비 모델로 충분.
+    # Groq 가 첫째, DeepSeek 은 예비
     "comment": ["groq", "groq-qwen", "nvidia-deepseek", "gemini-lite", "gemini"],
     # 예비 모델이 임시로 분류한 행을 Gemini 로 다시 분류할 때 (2026-10-15) — 예비로 덮어쓰지 않도록 Gemini 만 (lite 도 Gemini, 정식 분류)
     "json-gemini": ["gemini", "gemini-lite"],
@@ -110,25 +110,25 @@ CHAINS = {
     # 출력이 긴 일(호출당 출력 1,000토큰 넘게 — 인물 레이더 분류 20건 · 카드 요약 16건)은 gpt-oss 먼저 (2026-10-26).
     # Qwen 은 분당 출력 1,000토큰(OTPM) 한도라 출력 2천 토큰짜리는 몇 분에 한 번만 받힌다 — 10-25 분류에서 Qwen 12번 중 11번 429
     "json-oss-first": ["groq", "groq-qwen", "nvidia-deepseek", "gemini-lite"],
-    # 공용 뉴스 처리(news_store: 제목 번역 · 사실 문장 · 요약 · 종목 관련도) — Gemini lite 먼저 (2026-11-10 사용자).
+    # 공용 뉴스 처리(news_store: 제목 번역 · 사실 문장 · 요약 · 종목 관련도) — Gemini lite 먼저.
     # 옛(10-25): Groq 먼저 → 뉴스(하루 약 300 ~ 400건)가 Groq 두 모델 하루 토큰 20만을 아침마다 바닥내, 양이 적은 인물 발언 · 방송 · 댓글이 Groq 를 못 쓰고
     # NVDA 레이더 뉴스가 60초 간격 · DeepSeek 지연으로 30분을 다 써 워크플로 60분 제한에 걸렸다(11-09 ~ 10). lite 는 하루 500회 중 약 430회가 비어 있고
     # 분류 일치도 lite 75/80 · Qwen 56 · gpt-oss 51 (10-14 · 10-16 비교). 하루 약 30 ~ 40회(10건 묶음). flash 로는 넘어가지 않는다(flash 호출 0 증가).
     # 뒤 예비는 배치마다 qwen · gpt-oss 순서를 번갈아 (lite 하루 한도 · 실패 때 Groq 기다림을 반으로)
     "news": ["gemini-lite", "groq-qwen", "groq", "nvidia-deepseek"],
-    # 급하지 않은 한 번짜리 일 — lite 의 남는 몫만 (2026-11-15 사용자: 종목 주가 기업 소개 768종목, 하루 25회 상한).
+    # 급하지 않은 한 번짜리 일 — lite 의 남는 몫만.
     # Groq 는 아침마다 하루 토큰이 차는 날이 있어 넘기지 않고, 하루 한도면 그대로 멈춰 다음 날 이어서 (설계 순서 3-2 의 예외 — 운영지침에 기록)
     "json-lite-only": ["gemini-lite"],
-    # 종목 주가(간단 종목) 뉴스 — 3.1 lite 먼저(거의 빈 몫), 넘치면 3.5 lite, 그다음 Gemma 4 26B. flash · Groq 로 넘기지 않는다 (2026-11-15 사용자, 853종목 뉴스 계획)
+    # 종목 주가(간단 종목) 뉴스 — 3.1 lite 먼저(거의 빈 몫), 넘치면 3.5 lite, 그다음 Gemma 4 26B. flash · Groq 로 넘기지 않는다
     "news-quick": ["gemini-lite31", "gemini-lite", "gemma-26b"],
-    # 한국 증시 리포트 한 줄 결론 — 하루 1회, 서술이라 예비는 DeepSeek(예비 중 서술 품질 1위). flash 하루 20회는 미국 리포트 몫 (2026-11-15 사용자)
+    # 한국 증시 리포트 한 줄 결론 — 하루 1회, 서술이라 예비는 DeepSeek(예비 중 서술 품질 1위). flash 하루 20회는 미국 리포트 몫
     "kr-lead": ["gemini-lite31", "gemini-lite", "nvidia-deepseek"],
     "news-alt": ["gemini-lite", "groq", "groq-qwen", "nvidia-deepseek"],
 }
 
 # NVIDIA(build.nvidia.com) 무료 엔드포인트는 공식 FAQ 상 개발 · 테스트 · 연구 · 평가 전용 — "실제 최종 사용자에게 서비스하는 활동" 은
 # production 이라 NVIDIA AI Enterprise 라이선스가 필요하다 (doc/운영/블로그-운영-지침.md D3-2). 2026-10-21 운영 사슬에서 뺐다가
-# 2026-10-26 사용자 결정으로 예비 자리에만 되살렸다: 블로그가 '테스트 중' 단계이고 NVIDIA 계정은 다른 데 쓰지 않아 막혀도 잃을 것이 없다.
+#으로 예비 자리에만 되살렸다: 블로그가 '테스트 중' 단계이고 NVIDIA 계정은 다른 데 쓰지 않아 막혀도 잃을 것이 없다.
 # 1순위로 두지 않는다 — 막히면 다음 단계로 넘어갈 뿐. 끄려면 LLM_ALLOW_NVIDIA=0.
 if os.environ.get("LLM_ALLOW_NVIDIA", "").strip() == "0":
     CHAINS = {name: [s for s in steps if not s.startswith("nvidia")] for name, steps in CHAINS.items()}
@@ -137,9 +137,9 @@ if os.environ.get("LLM_ALLOW_NVIDIA", "").strip() == "0":
 PROVISIONAL_SQL = "ai_model LIKE '%:%'"
 
 USAGE = defaultdict(lambda: {"ok": 0, "fail": 0, "req": 0, "tok": 0})   # 단계 → 성공 · 실패 수 · 보낸 요청(HTTP 응답을 받은 것, 재시도 포함) · 쓴 토큰(입력 + 출력) (이번 실행)
-# req · tok 은 운영 대시보드의 하루 한도 칸(Gemini 하루 요청 · Groq 하루 토큰)용 — ops_log 가 실행 끝에 KV 로 (2026-11-13 사용자 "운영 대시보드 시작해")
+# req · tok 은 운영 대시보드의 하루 한도 칸(Gemini 하루 요청 · Groq 하루 토큰)용 — ops_log 가 실행 끝에 KV 로
 EVENTS = Counter()   # 알릴 일 (이번 실행): "한도 Gemini 키 #1" · "예비 nvda-narrate → nvidia-deepseek" · "전부 실패 …" · "검사 탈락 …"
-# Slack 알림 (2026-10-14 사용자: "한도가 걸린 걸 알림으로 보내줘") — 실행이 끝날 때 EVENTS 가 비어 있지 않으면 한 번만, SLACK_WEBHOOK_URL 로.
+# Slack 알림 — 실행이 끝날 때 EVENTS 가 비어 있지 않으면 한 번만, SLACK_WEBHOOK_URL 로.
 # 한도(429) · 예비 모델 사용 · 사슬 전부 실패 · 검사 탈락이 대상. 503 재시도는 흔해서 알리지 않는다 (예비로 넘어가면 그때 알린다)
 
 
@@ -148,10 +148,10 @@ def event(kind, detail):
 
 
 def _slack_worthy(k):
-    """Slack 에 보낼 줄 — Gemini 문제만 (2026-11-07 사용자: "예비 키가 다 에러 나도 상관없다, Gemini 까지 왔는데 Gemini 도 에러 나면 심각하니 그때만").
+    """Slack 에 보낼 줄 — Gemini 문제만.
     보냄: Gemini 하루 한도(PerDay) · 사슬 전부 실패(맨 뒤 Gemini 까지 실패 — 줄에 단계별 원인이 다 들어 있다).
     안 보냄: 예비 · 대체 전환, Groq · NVIDIA 실패 · 검사 탈락, Gemini 분당 한도(기다렸다 다시 해서 대부분 성공),
-    중간 단계 Gemini 실패(다음 모델이 받아 성공 — 2026-11-16 사용자: gemini-lite 가 첫째인 news 사슬에서 형식 오류 · 항목 불일치마다
+    중간 단계 Gemini 실패(다음 모델이 받아 성공: gemini-lite 가 첫째인 news 사슬에서 형식 오류 · 항목 불일치마다
     실행당 한 통씩 알림이 와 '발행 문제냐'로 보였다). 로그 · 사용량 줄 · 운영 기록에는 전부 남는다."""
     if k.startswith("전부 실패"):
         return True
@@ -235,7 +235,7 @@ _WARNED_KEYS = False
 
 
 def gemini_keys():
-    """Gemini 키는 하나만 (2026-10-19 사용자: 여러 키 · 프로젝트로 한도를 늘리는 건 약관 위반). 여럿 들어 있으면 첫 키만 쓰고 한 번 알린다."""
+    """Gemini 키는 하나만. 여럿 들어 있으면 첫 키만 쓰고 한 번 알린다."""
     global _WARNED_KEYS
     raw = os.environ.get("GEMINI_API_KEY", "")
     keys = [k.strip().strip('"') for k in re.split(r"[;,]", raw) if k.strip()]
@@ -246,7 +246,7 @@ def gemini_keys():
 
 
 def _mask(key):
-    """로그 · Slack 에 쓰는 키 이름 — 값은 앞자리도 내보내지 않는다 (2026-10-15 사용자: 키는 절대 노출 금지, 공개 리포라 로그도 공개)."""
+    """로그 · Slack 에 쓰는 키 이름 — 값은 앞자리도 내보내지 않는다."""
     keys = gemini_keys()
     return f"#{keys.index(key) + 1}" if key in keys else "#?"
 
@@ -441,7 +441,7 @@ class LLMPool:
             except Exception as e:  # noqa: BLE001
                 USAGE[name]["fail"] += 1
                 errors.append(f"{name}: {str(e)[:160]}")
-                if step["kind"] == "gemini":   # 기록만 — Slack 은 사슬 전부 실패일 때 (2026-11-16 사용자)
+                if step["kind"] == "gemini":   # 기록만 — Slack 은 사슬 전부 실패일 때
                     event("Gemini 실패", f"{self.label} {name}: {str(e)[:120]}")
                 print(f"[{self.label}] {name} 실패 — {str(e)[:160]}")
                 continue

@@ -1,4 +1,4 @@
-"""시황 배너 글자 얹기 목업 (2026-11-17 사용자 참고 썸네일 "배경 위에 숫자 없이 글을 채울 수는 없어?").
+"""시황 배너 글자 얹기 목업.
 
     python experiments/market-commentary/banner_text_mock.py
 

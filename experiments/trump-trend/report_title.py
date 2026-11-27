@@ -5,7 +5,7 @@ import datetime
 KST = datetime.timezone(datetime.timedelta(hours=9))
 UTC = datetime.timezone.utc
 
-TITLE_NAME = "트럼프 SNS 발언 트렌드"   # (2026-10-12 사용자: 트럼프 SNS 트렌드) — 검색어 `발언` 을 넣었다 (2026-10-18 검색 노출)
+TITLE_NAME = "트럼프 SNS 발언 트렌드"   # — 검색어 `발언` 을 넣었다 (2026-10-18 검색 노출)
 LEGACY_PREFIX = "트럼프 SNS 트렌드 — "   # 2026-10-18 이전 제목
 SLUG_NAME = "trump social media trend"
 LABELS = ["트럼프 트렌드", "미국 증시", "자동 리포트"]

@@ -1,7 +1,7 @@
 """한국 증시 리포트 게시 — main.py 가 만든 output/report_body.html 을 블로그 글 1편으로 (doc/기획/한국-증시-리포트-기획.md 5절).
     python experiments/kr-market-report/publish_report.py         # 게시
     python experiments/kr-market-report/publish_report.py --dry   # 확인만
-    python experiments/kr-market-report/publish_report.py --update   # 그날 글이 이미 있으면 본문을 새로 덮어쓴다 (2026-11-09 사용자: ECOS 실패로 자금 흐름이 빠진 글 다시 채우기)
+    python experiments/kr-market-report/publish_report.py --update   # 그날 글이 이미 있으면 본문을 새로 덮어쓴다
 
 제목은 매일 같은 `한국 증시 리포트`(M1)라 제목으로는 그날 글을 못 찾는다 → 라벨 목록에서 게시일(KST)로 찾는다.
 GitHub cron 과 Cloudflare Worker 가 둘 다 도는 날 두 번째 실행은 여기서 건너뛴다.
@@ -51,7 +51,7 @@ def find_today(day, creds):
 
 
 def update_today(day, title, body, creds):
-    """그날(KST) 이 연재 글 본문 · 제목을 새로 덮어쓴다 — 주소는 그대로. 글이 없으면 None (2026-11-09 사용자)."""
+    """그날(KST) 이 연재 글 본문 · 제목을 새로 덮어쓴다 — 주소는 그대로. 글이 없으면 None."""
     blog_id = PB._blog_id(creds, PB.DEFAULT_BLOG_URL)
     r = requests.get(f"{PB.BLOGGER_API}/blogs/{blog_id}/posts",
                      params={"labels": LABEL, "maxResults": 5, "fetchBodies": "false", "fetchImages": "false"},

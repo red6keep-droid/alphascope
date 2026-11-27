@@ -1,11 +1,11 @@
-"""기술지표의 방향은? (카드 제목, P121) — 인베스팅닷컴 '기술적 분석' 화면의 지표 12 · 이동평균 6×2 를 우리 일봉으로 계산 (2026-10-30 사용자). AI 없음.
-피벗 5가지는 뺐다 (10-30 사용자 P100: 장중 단타용 기준선이라 종가 블로그 독자에게 쓸모가 적고, 검증한 적 없고, 숫자 스무 개가 초보에게 어렵다).
+"""기술지표의 방향은? (카드 제목, P121) — 인베스팅닷컴 '기술적 분석' 화면의 지표 12 · 이동평균 6×2 를 우리 일봉으로 계산. AI 없음.
+피벗 5가지는 뺐다.
 
-용어 = 상승 · 하락 · 중립 하나로 (2026-10-30 사용자 P99: "오름 쪽 · 내림 쪽은 돌려 말하기 — 상승 · 하락, 화살표, 강한 상승 · 강한 하락").
+용어 = 상승 · 하락 · 중립 하나로.
   블로그는 매수 · 매도라고 쓰지 않는다 — 지표가 가리키는 가격 방향을 그대로 적고 판단은 독자가 한다 (법적 경계 선 4).
   오실레이터의 과매수 · 과매도는 방향이 아니라 '평소 범위를 벗어난 상태'라 라벨 `주의`(노랑, ▲▼ 없음)로 적고 상승 · 하락 · 중립 집계에서 뺀다 — 줄에 (과매수) · (과매도)를 작게 붙인다
-  (2026-11-02 사용자 P273: "과매도인데 라벨이 상승이면 뜻이 잘못 전달될 위험" → 옛 과매수 = 하락 · 과매도 = 상승 반등 가정은 검증된 적 없어 버림).
-  극단 사이 구간은 가운데 선(RSI · STOCH · STOCHRSI · Ultimate 50, Williams −50, CCI 0) 위 ▲ 상승 · 아래 ▼ 하락, 괄호에 `(50 위)` · `(50 아래)` (2026-11-02 사용자 P274 — 옛 전부 중립). 이동평균은 종가가 선 위 ▲ · 아래 ▼.
+.
+  극단 사이 구간은 가운데 선(RSI · STOCH · STOCHRSI · Ultimate 50, Williams −50, CCI 0) 위 ▲ 상승 · 아래 ▼ 하락, 괄호에 `(50 위)` · `(50 아래)`. 이동평균은 종가가 선 위 ▲ · 아래 ▼.
   요약 = 강한 상승 · 상승 · 중립 · 하락 · 강한 하락, 색 = 상승 빨강 · 하락 파랑의 연한 상태 카드 톤(theme). 임계값은 널리 쓰는 기본값(RSI 70/30, 스토캐스틱 80/20, CCI ±100, Williams −20/−80, ADX 25).
 인베스팅닷컴과 값이 다를 수 있다 — 그 표는 시간봉 기준으로 보이고(10-30 점검: 5일 이동평균이 최근 5일 종가 평균과 안 맞음), 우리는 일봉 · 주봉 · 월봉.
 
@@ -61,7 +61,7 @@ def _rsi(c, n=14):
 
 
 def _level(v, hi, lo, mid=None):
-    """오실레이터 라벨 — hi 위 과매수 · lo 아래 과매도, 그 사이는 가운데 선(mid) 위 상승 · 아래 하락 (2026-11-02 사용자 P274: "50 기준선으로, 괄호에 까닭").
+    """오실레이터 라벨 — hi 위 과매수 · lo 아래 과매도, 그 사이는 가운데 선(mid) 위 상승 · 아래 하락.
     mid=None 이면 옛 규칙(그 사이 전부 중립). 반환 = (라벨, 괄호 글)."""
     if v is None:
         return None, ""
@@ -189,7 +189,7 @@ def theme(net, up_color, down_color, muted):
     return ("positive", up_color) if net >= 0.15 else ("negative", down_color) if net <= -0.15 else ("neutral", muted)
 
 
-# 이동평균 기간 · 배열 · 크로스 — 시장 관행대로 (P119, 사용자: "한국 종목만 60일 · 120일")
+# 이동평균 기간 · 배열 · 크로스 — 시장 관행대로 (P119,
 #   한국 증권사 앱 = 5 · 20 · 60 · 120일(배열), 20 · 60일선(크로스) / 미국 = 20 · 50 · 200일(배열), 50 · 200일선(크로스)
 MA_PERIODS = {"us": (5, 10, 20, 50, 100, 200), "kr": (5, 10, 20, 60, 120, 200)}
 ARRAY_PERIODS = {"us": (20, 50, 200), "kr": (5, 20, 60, 120)}
@@ -305,25 +305,25 @@ ZONES = [(-1.0, -0.5, "강한 하락", "#82B1F0"), (-0.5, -0.15, "하락", "#BCD
          (0.15, 0.5, "상승", "#F8C4BF"), (0.5, 1.0, "강한 상승", "#ED8E87")]
 
 
-# 지표 줄 라벨 박스 (10-30 사용자 P102): 바탕이 칠해진 사각 박스 안에 기호 + 글자, 같은 폭이라 세로 열이 맞는다. 색 = 공용 라벨(design_kit.PILL) 톤
-# 10-30 사용자 P103: 버튼 말고 라벨 느낌 — 외곽선 연하게, 셋 다 연한 바탕(하락 바탕이 하락 카드 바탕과 같아 색이 없어 보였다), 가로 짧게 · 높이 그대로
+# 지표 줄 라벨 박스: 바탕이 칠해진 사각 박스 안에 기호 + 글자, 같은 폭이라 세로 열이 맞는다. 색 = 공용 라벨(design_kit.PILL) 톤
+# P103: 버튼 말고 라벨 느낌 — 외곽선 연하게, 셋 다 연한 바탕(하락 바탕이 하락 카드 바탕과 같아 색이 없어 보였다), 가로 짧게 · 높이 그대로
 BOX = {"up": ("#FDE8E8", "#F6CACA", "#B91C1C"), "down": ("#DCE9FC", "#C3D7F5", "#1D4ED8"), "flat": ("#E8EDF3", "#D6DEE8", "#475569"),
        "caution": ("#FDF3D3", "#F0DDA0", "#92400E")}   # 주의 = 노랑 연한 상자(안내 상자 #fff8e1 계열) · 기호 없음 — 상승 · 하락 · 중립 셋과 다른 것으로 읽히게 (P273)
 BOX_W = 50
 DIVIDER = '<span aria-hidden="true" style="display:inline-block;width:1px;height:11px;margin:0 6px;background:#CBD5E1;vertical-align:-1px;"></span>'   # 세로 구분선: 글자 14px 의 80% = 11.2 → 11px, 양옆 6 (P116, 정수 규칙)
 PAIR_GAP = 5   # 작은 게이지 카드 둘 사이 = 전체요약 카드와의 위 여백 (P108 · P114: 8 → 5, −40%)
-TABLE_FS, TABLE_LH, WHY_FS = "15px", "23px", "13px"   # P113: 줄 높이 − 글자 = 짝수(위아래 여백 정수) — 15/23 · 13/19 · 14/22   # P104: 표 줄만 16 → 15 (사용자 "구분선으로 나눠 있는 정보만 한 포인트")   # 표 글자 18 → 16 (사용자 "두 단계 작게", 한 단계 = 1px · P96 과 같은 셈) · 괄호 글 14 → 13
+TABLE_FS, TABLE_LH, WHY_FS = "15px", "23px", "13px"   # P113: 줄 높이 − 글자 = 짝수(위아래 여백 정수) — 15/23 · 13/19 · 14/22   # P104: 표 줄만 16 → 15   # 표 글자 18 → 16 · 괄호 글 14 → 13
 
 
 # 이동평균 기간 옆 설명 (P109) — 거래일 기준 대략의 달력 길이 (20거래일 ≈ 1달)
 MA_WHAT = {5: "1주", 10: "2주", 20: "1달", 50: "2.5달", 60: "3달", 100: "5달", 120: "6달", 200: "10달"}
-# 지표 이름 옆 아주 작은 설명 (P108, 사용자: "구분명이 무엇인지 짧게, 줄바꿈 되면 안 돼") — 2~5자
+# 지표 이름 옆 아주 작은 설명 (P108, — 2~5자
 WHAT = {"rsi": "상대강도", "stoch": "9일 위치", "stochrsi": "RSI 위치", "macd": "추세 전환", "adx": "추세 세기", "wr": "14일 위치",
         "cci": "평균 이탈", "atr": "하루 진폭", "hl": "고저 중간", "uo": "3기간 종합", "roc": "변화율", "bb": "13일선 대비"}
 
 
 def _mark(kind):
-    """박스 안 기호 — ▲ · ▼ 는 같은 크기 삼각형, 중립은 삼각형 폭만 한 가로 막대 (10-30 사용자)."""
+    """박스 안 기호 — ▲ · ▼ 는 같은 크기 삼각형, 중립은 삼각형 폭만 한 가로 막대."""
     if kind == "up":
         return '<svg viewBox="0 0 10 10" width="9" height="9" aria-hidden="true" style="flex:none;"><path d="M5 1.2 9.4 8.6H.6z" fill="currentColor"/></svg>'
     if kind == "down":
@@ -332,7 +332,7 @@ def _mark(kind):
 
 
 def box(kind, text, esc, sym=True, fit=False):
-    """라벨 하나 — 기호(▲ · ▼ · 가로 막대) + 글자, 고정 폭이라 열이 맞는다. fit=True 는 폭 = 글자 + 좌우 7 (방송 의견 줄 머리, 2026-11-01 사용자 P237)."""
+    """라벨 하나 — 기호(▲ · ▼ · 가로 막대) + 글자, 고정 폭이라 열이 맞는다. fit=True 는 폭 = 글자 + 좌우 7."""
     bg, bd, fg = BOX[kind]
     width = "padding-left:7px;padding-right:7px;" if fit else f"width:{BOX_W}px;"
     return (f'<span style="display:inline-flex;align-items:center;justify-content:center;gap:3px;{width}box-sizing:border-box;flex:none;'
@@ -365,7 +365,7 @@ def _table(rows_html, line, keep=(0,)):
                    for i, r in enumerate(rows_html))
 
 
-# 게이지 치수 — 모두 정수 px (P113, 사용자: "간격은 모두 정수로, 소수점 찍지 마").
+# 게이지 치수 — 모두 정수 px (P113,.
 # 작은 게이지는 폰(360px) 칸 안쪽 폭 134 그대로 그려 축소(옛 150 → 0.89배, 간격이 소수가 되던 원인)를 없앤다.
 #   폭 · 반지름 · 위 여백 · 호 두께 · 바늘 두께 · 가운데 원 반지름 · 바늘 끝 ~ 호 안쪽 · 아래 여백(가운데 원 아래 ~ 그림 끝)
 GAUGE_BIG = dict(width=260, r=90, top=30, arc=14, needle=3, hub=5, tip_gap=15, bottom=25)   # bottom 23 → 25: 칸 이름(강한 하락 · 강한 상승) ~ 답 글자 5 → 7px (+30%, 6.5 → 7, P123)
@@ -425,7 +425,7 @@ def _sub(title, note=""):
 # 전체요약 답 아래 ~ 개수 줄 6 → 8 (P118) → 10px (+20%, 9.6 → 10, P119: margin-bottom 4)
 # 제목 위 보이는 여백 14 → 20px (+40%, 19.6 → 20, P117) = 카드 위 여백 10 + 제목 margin-top 6 + 줄 높이 반쪽 4. 기준일(absolute top 10)은 그대로
 def _tri_small(w, px):
-    """답 앞 ▲ · ▼ 를 글자의 약 80% 크기로 (P112, 사용자: "삼각형 20% 더 작게") — 정수 px (P113: 19 → 15 · 18 → 14)."""
+    """답 앞 ▲ · ▼ 를 글자의 약 80% 크기로 (P112, — 정수 px (P113: 19 → 15 · 18 → 14)."""
     if w[:1] in "▲▼":
         return f'<span style="font-size:{px}px;vertical-align:1px;">{w[0]}</span>{w[1:]}'
     return w
@@ -465,7 +465,7 @@ def card(sig, name, up_color, down_color, muted="#6B7280"):
             col = up_color if w["net"] >= 0.15 else down_color if w["net"] <= -0.15 else muted
             frames.append(f'{lab} <b style="color:{col};">{_tri_small(word(w["net"]), 12)}</b>')   # 삼각형 14 의 80% = 11 → 12px (P116 · 2026-11-06 행간 20 과 홀짝 맞춤)
     import design_kit as _dk
-    # 게이지는 게이지끼리 맨 위 (10-30 사용자): 전체 요약 크게(칸 이름) → 기술 지표 · 이동평균 작게 나란히(색만 같게)
+    # 게이지는 게이지끼리 맨 위: 전체 요약 크게(칸 이름) → 기술 지표 · 이동평균 작게 나란히(색만 같게)
     pair = (f'<span style="display:flex;gap:{PAIR_GAP}px;margin:{PAIR_GAP}px {_dk.CHART_CARD_X}px 4px;">'   # 위 여백 = 두 카드 사이 (P108)   # 두 카드 바깥 선 = 전체 요약 카드 바깥 선 (P106)
             f'<span style="flex:1 1 0;min-width:0;">{_gauge_block("기술지표", sig["counts"], "", up_color, down_color, muted, small=True)}</span>'
             f'<span style="flex:1 1 0;min-width:0;">{_gauge_block("이동평균", mc, "", up_color, down_color, muted, small=True)}</span></span>')
@@ -484,7 +484,7 @@ def card(sig, name, up_color, down_color, muted="#6B7280"):
         nm = (POP_DOT if r["key"] in POPULAR_KEYS else "") + _h.escape(r["name"])
         trs.append(f'<span style="min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{nm}'   # 폭이 모자라는 날(긴 이름 + 괄호 글)은 설명 끝이 … 로 — 줄바꿈 없음 (P108)
                    + (f'<span style="margin-left:4px;font-size:{WHY_FS};line-height:19px;color:#6B7280;">{what}</span>' if what else "") + '</span>'   # 괄호 글(과매도)과 같은 13px 회색 (P109)
-                   f'<span style="display:inline-flex;align-items:center;gap:6px;flex:none;">{w}<span>{_h.escape(r["text"])}</span>{bx}</span>')   # 값 굵기 보통 (2026-11-14 사용자 "기술지표 우측 값 볼드 빼줘")   # (과매도) → 숫자 → 라벨: 숫자가 라벨 바로 왼쪽에 열로 (P103)
+                   f'<span style="display:inline-flex;align-items:center;gap:6px;flex:none;">{w}<span>{_h.escape(r["text"])}</span>{bx}</span>')   # 값 굵기 보통   # (과매도) → 숫자 → 라벨: 숫자가 라벨 바로 왼쪽에 열로 (P103)
     lines.append((_sub("기술지표") + _table(trs, line), "html"))
     COLW = f"display:inline-flex;align-items:center;justify-content:flex-end;gap:4px;min-width:{BOX_W + 58}px;"   # 숫자 + 라벨 한 칸 — 인베스팅닷컴처럼 값마다 상승 · 하락 (P103, 옛 ▲ · ▼)
 
@@ -502,7 +502,7 @@ def card(sig, name, up_color, down_color, muted="#6B7280"):
                         f'<span style="margin-left:4px;{note}">{" · ".join(str(n) for n in ar["periods"])}일</span></span>'
                         f'<span style="display:inline-flex;align-items:center;gap:6px;flex:none;">{box(kind, UPW if kind == "up" else DNW if kind == "down" else MID, _h.escape)}</span>')
     if cr:
-        # 한 달(20거래일)이 지난 크로스는 중립 — 옛 사건의 방향이 지금 가격과 엇갈려 보였다 (2026-11-04 사용자: LG에너지솔루션 42일 전 골든크로스 · 주가는 두 선 아래)
+        # 한 달(20거래일)이 지난 크로스는 중립 — 옛 사건의 방향이 지금 가격과 엇갈려 보였다
         kind = "flat" if cr["days_ago"] > CROSS_FRESH else "up" if cr["dir"] > 0 else "down"
         top_rows.append(f'<span style="min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{POP_DOT}{cr["kind"]}'
                         f'<span style="margin-left:4px;{note}">{cr["pair"][0]} · {cr["pair"][1]}일선</span></span>'
@@ -516,5 +516,5 @@ def card(sig, name, up_color, down_color, muted="#6B7280"):
     tip = ("널리 쓰는 기술지표 11개와 이동평균 12개가 지금 가격의 어느 방향을 가리키는지, 우리 일봉으로 계산했다\n"
            f"· 오늘 {sig['word']} : 상승 − 하락을 전체로 나눈 값이 +0.5 넘으면 강한 상승, +0.15 넘으면 상승, −0.15 ~ +0.15 중립, 그 아래 하락 · 강한 하락\n"
            "· 괄호 안 과매수 · 과매도 : 평소 범위를 벗어난 상태라 주의로 적고, 상승 · 하락 집계에서 뺐다 · 괄호 안 50 위 · 아래 : 그 사이 구간은 가운데 선으로 상승 · 하락\n"   # P273 · P274
-           "· 이름 앞 보라 점 : 개인 투자자가 많이 보는 지표")   # 지표별 규칙 · 이동평균 목록 · 배열 · 크로스 설명은 뺐다 — 읽는 법 페이지로 (2026-10-31 사용자 batch 7 a)
+           "· 이름 앞 보라 점 : 개인 투자자가 많이 보는 지표")   # 지표별 규칙 · 이동평균 목록 · 배열 · 크로스 설명은 뺐다 — 읽는 법 페이지로
     return lines, tip

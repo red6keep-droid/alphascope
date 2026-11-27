@@ -1,10 +1,10 @@
-"""기록 현황 — 기록 대장(비공개 doc/기획/기록-대장.md)의 줄마다 '무엇이 얼마나 · 언제부터 언제까지 쌓였나'를 센다 (2026-11-24 사용자 "운영관리 현황에 기록 탭 기록현황").
+"""기록 현황 — 기록 대장(비공개 doc/기획/기록-대장.md)의 줄마다 '무엇이 얼마나 · 언제부터 언제까지 쌓였나'를 센다.
 
     python experiments/record_status.py --mirror <alphascope-state 를 --mirror 로 받은 폴더> [--out FILE] [--kv]
 
 - 언제: 밤 기록 사본 실행(state-backup.yml)이 이미 받은 상태 저장소로 센다 — 매시간 도는 운영 대시보드가 91MB 를 받지 않게.
 - 결과: {"made", "items": [{name, asset, where, files, bytes, first, last, n}]} → --kv 면 운영 KV `dash:records` (운영 대시보드 기록 탭이 읽는다).
-- 알림은 보내지 않는다(사용자 11-24 "빠진 날 알리지마") — 화면에 날짜만 보인다.
+- 알림은 보내지 않는다 — 화면에 날짜만 보인다.
 - 줄 = 기록 대장 1절. 대장에 줄을 더하면 여기 REGISTRY 에도 한 줄(경로 정규식). AI 0 · 수집 0.
 """
 import argparse

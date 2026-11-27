@@ -1,4 +1,4 @@
-"""한국 증권사 목표가 — 증권사 공식 텔레그램 리서치 채널 글 본문에서 (2026-11-14 사용자 "증권사 보고서 · 목표가를 수집해서 넣자" → 텔레그램 확정).
+"""한국 증권사 목표가 — 증권사 공식 텔레그램 리서치 채널 글 본문에서.
 
     .venv/bin/python experiments/broker-research/collect_tg.py            # 새 글만 읽어 kr-stocks/data/broker_tg.json 에 더함
     .venv/bin/python experiments/broker-research/collect_tg.py --days 30  # 처음 · 다시 채우기

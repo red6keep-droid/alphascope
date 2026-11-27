@@ -82,7 +82,7 @@ def apply_trump_labels(conn, since):
 
 
 def apply_madmoney_labels(conn, since):
-    """크레이머 매드머니 행 = 방송 분배가 이미 붙인 라벨을 그대로 (AI 0, 2026-11-11 사용자). 기록을 못 읽으면 투자자 프롬프트로 분류된다."""
+    """크레이머 매드머니 행 = 방송 분배가 이미 붙인 라벨을 그대로. 기록을 못 읽으면 투자자 프롬프트로 분류된다."""
     import madmoney
     rows = conn.execute("""SELECT id, ext_id, published_at FROM statements WHERE collector=? AND analyzed_at IS NULL
                            AND noise_reason IS NULL AND published_at >= ?""", (madmoney.COLLECTOR, since)).fetchall()

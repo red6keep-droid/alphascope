@@ -21,8 +21,8 @@ COLLECT_SINCE_HOURS = 72
 GOOGLE_NEWS_WHEN = "2d"
 PRIMARY_BODY_MAX_CHARS = 4000   # 1차 소스 본문 — 분류 · 인용 추출 입력 상한
 
-# 첫 발행은 '테스트 중' 라벨로 (NVDA 첫 발행 때 사용자 결정 10-10 과 같게). 테스트를 끝낼 때 False
-TEST_MODE = False   # 2026-11-16 사용자: 테스트 끝 — `테스트 중` 라벨 정리(애드센스 준비)
+# 첫 발행은 '테스트 중' 라벨로. 테스트를 끝낼 때 False
+TEST_MODE = False   #: 테스트 끝 — `테스트 중` 라벨 정리(애드센스 준비)
 
 # ── 3단계 인용 추출 (extract.py) ─────────────────────────────────────────
 # 새 기능은 예비 공급자 먼저, Gemini 는 맨 뒤 (llm_chain 머리말 2026-10-19: 키 하나를 모든 리포트가 나눠 쓴다)
@@ -142,7 +142,7 @@ PEOPLE = {
                "primary": [], "aliases": ["ackman"],
         "news": '"Bill Ackman"'},
     "cramer": {"name_ko": "짐 크레이머", "title_ko": "CNBC 진행자", "group": "commentator", "start": False,
-               "primary": [("madmoney", None, "self")],   # 매드머니 방송 기록(media-state) — 하루 전 방송, AI 0 (2026-11-11 사용자 A안)
+               "primary": [("madmoney", None, "self")],   # 매드머니 방송 기록(media-state) — 하루 전 방송, AI 0
                "aliases": ["cramer"],
         "news": '"Jim Cramer"'},
     "timiraos": {"name_ko": "닉 티미라오스", "title_ko": "WSJ 연준 담당 기자", "group": "commentator", "start": False,

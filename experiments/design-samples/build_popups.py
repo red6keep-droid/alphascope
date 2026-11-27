@@ -1,4 +1,4 @@
-"""블로그 팝업 유형 모음 목업 (2026-11-14 사용자: "팝업창도 제각각 — 샘플을 전부 모아 유형을 목업으로 정리, 그래프처럼").
+"""블로그 팝업 유형 모음 목업.
 
 틀(상자 · 닫기 · 가림막)은 테마 index.html CSS 를 그대로 읽어 쓰고, 안의 글은 최신 목업 출력물(output/*.html)의
 [data-news-pop-body] · [data-tip] 을 그대로 꺼내 넣는다. 각 샘플은 폭 390 iframe — 테마의 폰 @media 가 그대로 걸린다.
@@ -108,7 +108,7 @@ def frame(inner, h=720, page=True, body_cls="", extra_css=""):
     return f'<iframe srcdoc="{html.escape(doc, quote=True)}" style="width:390px;height:{h}px;border:1px solid #CBD5E1;border-radius:12px;background:#fff;flex:none;"></iframe>'
 
 
-# 공유 아이콘 = 테마 index.html ICONS 그대로(링크 · 페이스북 · X · 카카오톡) + Simple Icons 13.21.0(텔레그램 · 스레드) + 밴드 앱 아이콘 모양 선 그림(arcticons:band — 밴드는 공개 묶음에 없다). 단색 currentColor (10-23 사용자)
+# 공유 아이콘 = 테마 index.html ICONS 그대로(링크 · 페이스북 · X · 카카오톡) + Simple Icons 13.21.0(텔레그램 · 스레드) + 밴드 앱 아이콘 모양 선 그림(arcticons:band — 밴드는 공개 묶음에 없다). 단색 currentColor
 SHARE_ICONS = {
     '링크 복사': '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" style="flex:none;width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M10 13a5 5 0 0 0 7.100.1l3-3a5 5 0 0 0-7.100-7.100l-1.700 1.700"/><path d="M14 11a5 5 0 0 0-7.100-.1l-3 3a5 5 0 0 0 7.100 7.100l1.700-1.700"/></svg>',
     'Facebook': '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" style="flex:none;width:20px;height:20px;fill:currentColor;"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.990 4.388 10.954 10.125 11.854v-8.385H7.078v-3.470h3.047V9.430c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.830c-1.491 0-1.956.925-1.956 1.874v2.250h3.328l-.532 3.470h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>',
@@ -188,7 +188,7 @@ def samples():
     return s
 
 
-DIFF = [   # 2026-11-14 사용자 결정 — 기준 = 이슈 날짜 팝업(이란 전쟁 뉴스)
+DIFF = [   # — 기준 = 이슈 날짜 팝업(이란 전쟁 뉴스)
     ("닫기 버튼", "모두 회색 원 32 · #EEF0F3 · #4B5563 × 선 2 — 11-12 닫기 통일 규칙 그대로 (팝업 · 서랍 · 검색 · 질문하기 · 계정)"),
     ("가림막", "rgba(15,23,42,.45), 화면보다 위아래 100 더 덮는다 — 폰 아래쪽이 밝게 남던 것 고침 (서랍은 투명 그대로, 10-13 사용자)"),
     ("팝업 글씨", "19/28 하나 (툴팁도 · 폰도) — 옛 툴팁 19/35 · 폰 16/32"),

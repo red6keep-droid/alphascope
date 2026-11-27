@@ -1,4 +1,4 @@
-"""미국 업계 지표 검증 — 공식 통계(FRED)가 그 업종 종목의 시장 대비 수익에 반영되나 (2026-11-01 사용자: 미국 종목에도 업계 카드).
+"""미국 업계 지표 검증 — 공식 통계(FRED)가 그 업종 종목의 시장 대비 수익에 반영되나.
 
     python experiments/stock-radar/validate_industry_us.py          # 자료 받기 + 검증 → doc/검증/미국-업종지표-검증.md
     python experiments/stock-radar/validate_industry_us.py --fetch  # 자료만 받아 기간 확인 (검증 계산 없음)

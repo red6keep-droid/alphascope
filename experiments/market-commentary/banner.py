@@ -1,4 +1,4 @@
-"""알파스코프 시황 해설 배너 — 글 맨 위 히어로 그림 (2026-11-17 사용자: Lucid Origin · 권장대로).
+"""알파스코프 시황 해설 배너 — 글 맨 위 히어로 그림.
 
     python experiments/market-commentary/banner.py --briefing briefing.json [--column column.json] [--out DIR] [--no-ai]
 
@@ -8,12 +8,12 @@
     소재 = 그날 가장 크게 움직인 업종 → 7갈래 (날짜로 갈래 안 장면을 돌림) · 분위기 = 대표 지수 등락 5단계 · 장소 = am 미국 · pm 한국.
 - 그림 사슬: Workers AI Lucid Origin → Workers AI FLUX schnell → Hugging Face FLUX schnell → 기본 배너(static/default/{분위기}.webp).
     Pollinations 는 쓰지 않는다 (11-17 무료 = IP 당 45초 1장 + 워터마크).
-- 배치 = 주요 제목(흰색) · 강조 제목(방향 색) · 시장 요약 한 줄 (11-17 사용자 사양, 옛 알약 · 볼 것 3칸 없음). `AI 생성 이미지` 는 그림에 쓰지 않고 img alt 에 (11-17 사용자).
+- 배치 = 주요 제목(흰색) · 강조 제목(방향 색) · 시장 요약 한 줄. `AI 생성 이미지` 는 그림에 쓰지 않고 img alt 에.
 - 글자 = Pillow + 강원교육튼튼(fonts/GangwonEduPower.ttf, 강원특별자치도교육청 — 판매 · 유료 양도만 금지, 출처 표기 권장). 숫자 없음. 칸: 알약(브랜드 · 날짜 · 편) / 배너 제목 2줄 / 키워드 줄 / 오늘 볼 것 3칸 / `AI 생성 이미지`.
     글은 수집기 `banner` 칸: titles = 제목 후보 [[주요, 강조], …] 좋은 것부터 → 사양 크기에 들어가는 첫 후보, 다 길면 줄임. keys = 시장 요약.
-    후보가 없으면 글 제목(그날 주제)의 숫자 없는 앞 구절. 글이 길면 칸에 들어갈 때까지 줄인다 — 빼지 않음 (2026-11-17 사용자).
+    후보가 없으면 글 제목(그날 주제)의 숫자 없는 앞 구절. 글이 길면 칸에 들어갈 때까지 줄인다 — 빼지 않음.
 - 규칙(운영지침 4-6): 로고 · 간판 · 랜드마크(거래소 정면 · 황소상) 없음, 사람은 멀리 · 뒷모습, `AI 생성 이미지` 는 alt 에.
-- 출력 = {out}/images/commentary-{날짜}-{am|pm}.webp (900×350 — 11-17 사용자 배치 사양, 그림은 1200×630 으로 받아 줄임). 이름에 날짜가 있어 30일 정리(image_prune.py) 대상.
+- 출력 = {out}/images/commentary-{날짜}-{am|pm}.webp. 이름에 날짜가 있어 30일 정리(image_prune.py) 대상.
 - 비밀 값: CF_ACCOUNT_ID · CF_AI_TOKEN · HF_TOKEN 환경 변수. 출력 · 로그에 쓰지 않는다 (오류는 상태 코드 + 응답 앞 160자).
 """
 import argparse
@@ -29,7 +29,7 @@ import requests
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 BASE = os.path.dirname(os.path.abspath(__file__))
-FONT_FILE = os.path.join(BASE, "fonts", "GangwonEduPower.ttf")   # 강원교육튼튼 하나만 — 배너 그림 글자에만, 블로그 본문 · 테마 폰트와 무관 (2026-11-17 사용자)
+FONT_FILE = os.path.join(BASE, "fonts", "GangwonEduPower.ttf")   # 강원교육튼튼 하나만 — 배너 그림 글자에만, 블로그 본문 · 테마 폰트와 무관
 DEFAULT_DIR = os.path.join(BASE, "static", "default")
 REPO_SLUG = os.environ.get("GITHUB_REPOSITORY", "red6keep-droid/alphascope")
 W, H = 1200, 630
@@ -42,7 +42,7 @@ MASTER = ("cinematic editorial photograph for a premium business magazine, 35mm 
           "wide establishing shot, people seen from a distance or from behind with faces not in focus, "
           "no recognizable landmarks, no brand logos, no signboards, no company names, no lettering on buildings, "
           "no readable signs, no text, no letters, no numbers, no watermark")
-# 간판 · 글자 없음은 장면 바로 뒤에 긍정 표현으로도 — 그림 AI 는 설명 뒷부분 · 부정 표현을 약하게 따른다 (2026-11-19 사용자: 11-19 저녁 배경 건물에 `Forma` 간판)
+# 간판 · 글자 없음은 장면 바로 뒤에 긍정 표현으로도 — 그림 AI 는 설명 뒷부분 · 부정 표현을 약하게 따른다
 CLEAN = "plain unbranded buildings with blank facades, every surface free of signage and lettering"
 SUBJECT = {   # 7갈래 × 장면 몇 개 — 날짜로 돌린다
     "finance": ["a financial district street between glass skyscrapers with office workers walking",
@@ -202,23 +202,23 @@ def _shrink(d, text, bold, px, min_px, room):
     return px if d.textlength(text, font=_font(bold, px)) <= room else None
 
 
-# 배너 배치 (2026-11-17 사용자 사양 "미국 증시 · 편집 가능한 썸네일") — 900×350, 사진 상자 917×463 왼쪽 위(넘치는 곳은 잘림).
+# 배너 배치 — 900×350, 사진 상자 917×463 왼쪽 위(넘치는 곳은 잘림).
 # 폰트는 사양(Gayathri · Noto Sans KR) 대신 정한 강원교육튼튼, 색은 사양 그대로 + 강조 제목만 방향 색(오름 #F34032 · 내림 파랑, 사이트 증감 색 규칙).
-OUT_W, OUT_H = 900, 374   # 높이 350 → 374 = 폰(390 폭)에서 +10px (2026-11-19 사용자 시안 C)
+OUT_W, OUT_H = 900, 374   # 높이 350 → 374 = 폰(390 폭)에서 +10px
 PHOTO_W, PHOTO_H = 917, 463
 CANVAS_BG = (6, 18, 26)                      # #06121A
 LEFT = 68
 MAX_TEXT_W = OUT_W - LEFT - 40               # 시장 요약 글자가 넘지 않을 오른쪽 끝 (792)
-TITLE_MAX_W = 750   # (11-19 사용자: 700 → 750, 제목 10% 키우며 시안 C)  제목 글자 폭 상한 — 10자 제목이 오른쪽 끝까지 꽉 차 커 보이던 것(11-19 첫 발행), 넘는 제목만 줄인다(10자 제목 80 → 70px, 약 11%) · 짧은 제목은 그대로 (2026-11-19 사용자: 시안 c 620 → b 700)
+TITLE_MAX_W = 750   #  제목 글자 폭 상한 — 10자 제목이 오른쪽 끝까지 꽉 차 커 보이던 것(11-19 첫 발행), 넘는 제목만 줄인다(10자 제목 80 → 70px, 약 11%) · 짧은 제목은 그대로
 LINE_H = 1.25
 MAIN = {"top": 80, "px": 87, "spacing": -2.0, "color": (245, 246, 248)}      # 주요 제목 #F5F6F8, 그림자 0 2 3 rgba(0,0,0,.55)
-EMPH = {"top": 162, "px": 88, "spacing": -2.0}   # 제목 79/80 → 87/88(+10%) · 자간 +2/+2.5 → −2 · 줄 위치는 높이 374 에 맞춤 (2026-11-19 사용자 시안 C)                               # 강조 제목 — 색은 방향
+EMPH = {"top": 162, "px": 88, "spacing": -2.0}   # 제목 79/80 → 87/88(+10%) · 자간 +2/+2.5 → −2 · 줄 위치는 높이 374 에 맞춤                               # 강조 제목 — 색은 방향
 SUMMARY = {"top": 284, "px": 32, "spacing": 0.2, "color": (218, 225, 234)}  # 시장 요약 #DAE1EA
-BIG_PX, BIG_SPACING = round(EMPH["px"] * 1.3), EMPH["spacing"] * 1.3   # 짧은 제목 한 줄 = 30% 크게 (104px, 11-17 사용자)
+BIG_PX, BIG_SPACING = round(EMPH["px"] * 1.3), EMPH["spacing"] * 1.3   # 짧은 제목 한 줄 = 30% 크게
 # 글자 수 제한 (수집기 Q25, 튼튼체 실측 — 한글 한 자 80px ≈ 76 · 104px ≈ 100 · 32px ≈ 30, 띄어쓰기 ≈ 0.27자):
 #   띄어쓰기는 빼고 센다 — 두 줄 제목 줄마다 한글 10자 · 두 줄 합쳐 7자 안팎이면 저절로 한 줄 104px · 시장 요약 한글 20자(가운뎃점 별도)
-# 강조 제목 색 (2026-11-19 사용자 시안 4번 확정): 오름 = 주황이 살짝 도는 밝은 빨강 #FF6840 · 내림 = 하늘색이 섞인 밝은 파랑 #4AB0FF (옛 #F34032 · #549CFF — 사진에 묻힘)
-# 보합 = 밝은 보라 #B794FF (2026-11-20 사용자 "배너 강조도 보라로" — 본문 보합 색 보라와 맞춤, 옛 흰색 #F5F6F8). 밝기는 내림 파랑과 비슷(어두운 바탕 대비 7.8)
+# 강조 제목 색: 오름 = 주황이 살짝 도는 밝은 빨강 #FF6840 · 내림 = 하늘색이 섞인 밝은 파랑 #4AB0FF (옛 #F34032 · #549CFF — 사진에 묻힘)
+# 보합 = 밝은 보라 #B794FF. 밝기는 내림 파랑과 비슷(어두운 바탕 대비 7.8)
 EMPH_COLOR = {"strong_up": (255, 104, 64), "up": (255, 104, 64), "flat": (183, 148, 255),
               "down": (74, 176, 255), "plunge": (74, 176, 255)}
 EMPH_GLOW, SHADE_MAX, PHOTO_DIM = 200, 190, 0.15   # 강조 제목 뒤 어두운 번짐 · 왼쪽 어둡게(옛 150) · 사진 전체 15% 어둡게 — 글자가 사진에 묻히지 않게 (같은 날 4번)
@@ -243,8 +243,8 @@ def _cover(bg, w, h):
 
 
 def compose(bg, sc, banner, emph_rgb=None, emph_glow=EMPH_GLOW, shade_max=SHADE_MAX, photo_dim=PHOTO_DIM, text_max=None):
-    """사진 + 글자. 짧은 글은 사양 크기 그대로(키우지 않음), 긴 글은 칸에 들어갈 때까지 줄인다(빼지 않음, 2026-11-17 사용자).
-    읽히게 (2026-11-19 사용자 "강조 제목이 배경 때문에 잘 안 보인다" → 시안 4번): emph_rgb = 강조 제목 색 바꿈 · emph_glow = 강조 제목 뒤 어두운 번짐 진하기(0 ~ 255) ·
+    """사진 + 글자. 짧은 글은 사양 크기 그대로(키우지 않음), 긴 글은 칸에 들어갈 때까지 줄인다.
+    읽히게: emph_rgb = 강조 제목 색 바꿈 · emph_glow = 강조 제목 뒤 어두운 번짐 진하기(0 ~ 255) ·
     shade_max = 왼쪽 어둡게 정도 · photo_dim = 사진 전체를 이만큼 어둡게(0 ~ 1). 기본값 = 확정값."""
     emph_col = emph_rgb or EMPH_COLOR[sc["mood"]]
     MAX_W = text_max or TITLE_MAX_W   # 제목 글자가 넘지 않을 폭 — 시장 요약은 MAX_TEXT_W 그대로
@@ -284,7 +284,7 @@ def compose(bg, sc, banner, emph_rgb=None, emph_glow=EMPH_GLOW, shade_max=SHADE_
     big = _font(True, BIG_PX)
     one = " ".join(best[0]) if best else ""
     if best and _spaced_w(one, big, BIG_SPACING) <= MAX_W:
-        # 짧은 제목 = 한 줄 · 30% 크게(104px), 제목 칸 가운데. 두 줄이 왔으면 앞은 흰색 · 뒤는 방향 색 (2026-11-17 사용자)
+        # 짧은 제목 = 한 줄 · 30% 크게(104px), 제목 칸 가운데. 두 줄이 왔으면 앞은 흰색 · 뒤는 방향 색
         lines = best[0]
         if len(cands) > 1:
             log(f"제목 후보 {len(cands)}개 중 {cands.index(lines) + 1}번째: {lines}")
@@ -330,7 +330,7 @@ def compose(bg, sc, banner, emph_rgb=None, emph_glow=EMPH_GLOW, shade_max=SHADE_
         if px < SUMMARY["px"]:
             log(f"요약 줄임 {SUMMARY['px']} → {px}px")
 
-    # ③ `AI 생성 이미지` 글자는 그리지 않는다 (2026-11-17 사용자: 글자에 가려지는 단순 배경이라 의미 없음) — 표시는 img alt 에 (운영지침 4-6)
+    # ③ `AI 생성 이미지` 글자는 그리지 않는다 — 표시는 img alt 에 (운영지침 4-6)
     im = Image.alpha_composite(im, shadow.filter(ImageFilter.GaussianBlur(1.5)))
     if emph_glow:   # 강조 제목 뒤 넓은 어두운 번짐 — 두 번 겹쳐 진하게
         g = glow.filter(ImageFilter.GaussianBlur(10))
@@ -339,7 +339,7 @@ def compose(bg, sc, banner, emph_rgb=None, emph_glow=EMPH_GLOW, shade_max=SHADE_
 
 
 def banner_text(column, sc=None):
-    """배너 글 — 제목은 반드시 있다(사진만 나가지 않게, 2026-11-17 사용자). AI 0.
+    """배너 글 — 제목은 반드시 있다. AI 0.
     제목 순서: ① 수집기 banner.titles(좋은 것부터) · lines ② 글 제목(그날 주제)의 숫자 없는 앞 구절 ③ 글 제목 전체 ④ 편 이름 `11.17 미국 증시시황`."""
     column = column or {}
     b = dict(column.get("banner") or {})

@@ -20,12 +20,12 @@ USER_AGENT = "Mozilla/5.0 (alphascope nvda-report; personal research)"
 # ── 관찰 심볼 (확정값: 5개, 늘리지 않는다) ─────────────────────────────────
 SYMBOL = "NVDA"
 BENCHMARK = "SPY"
-SYMBOLS = ["NVDA", "SPY", "SMH", "AMD", "QQQ", "AVGO"]   # AVGO 2026-10-11 사용자: 브로드컴 대비 추가
-# 섹터 ETF 11개 — 반도체 자금 방향의 "어디로 갔나" 비교 (2026-10-11 사용자 승인). 데일리 브리핑과 같은 목록
+SYMBOLS = ["NVDA", "SPY", "SMH", "AMD", "QQQ", "AVGO"]   # AVGO: 브로드컴 대비 추가
+# 섹터 ETF 11개 — 반도체 자금 방향의 "어디로 갔나" 비교. 데일리 브리핑과 같은 목록
 SECTOR_ETFS = {"XLK": "기술", "XLF": "금융", "XLE": "에너지", "XLV": "헬스케어", "XLP": "필수 소비재", "XLY": "경기 소비재",
                "XLU": "유틸리티", "XLI": "산업재", "XLB": "소재", "XLRE": "부동산", "XLC": "통신"}
 EXTRA_BAR_SYMBOLS = ["^VIX"] + list(SECTOR_ETFS)   # 일봉만 받는 심볼 — 비교 칸(ret_vs_*)을 만들지 않는다. 시장 국면·반도체 자금용 (2026-10-11)
-# 반도체 자금 방향 (2026-10-11 사용자: "우리 섹터에서 자금이 모이는 중·빠져나가는 중, 쉽게"). 상태 셋 — 모이는 중 · 빠져나가는 중 · 뚜렷하지 않음
+# 반도체 자금 방향. 상태 셋 — 모이는 중 · 빠져나가는 중 · 뚜렷하지 않음
 SECTOR_FLOW_ETF = "SMH"
 SECTOR_FLOW_DAYS = 20             # 비교 창 (거래일)
 SECTOR_FLOW_PP = 2.0              # SMH − S&P 500 20일 수익률 차이가 이 %p 이상이면 방향 있음
@@ -34,7 +34,7 @@ SECTOR_FLOW_DIRECTION = {"모이는 중": "positive", "빠져나가는 중": "ne
 PRICE_BACKFILL_PERIOD = "2y"     # 첫 실행. 이후는 PRICE_UPDATE_PERIOD
 PRICE_UPDATE_PERIOD = "1mo"
 
-# ── 시장 국면 (기획서 7절, 2026-10-11 사용자 승인: 상태만 적고 매수·매도·비중·관망 어휘는 쓰지 않는다) ──
+# ── 시장 국면 ──
 REGIME_BENCHMARK = "SPY"          # S&P 500 대용 (일봉 2년 보유)
 REGIME_HIGH_DAYS = 252            # 52주 고점 (종가 기준)
 REGIME_MA_DAYS = 200
@@ -43,13 +43,13 @@ REGIME_CORRECTION_PCT = -10.0     # 이 아래 또는 200일 평균 아래면 �
 REGIME_VIX_HIGH = 30.0            # VIX 이 이상이면 불안 국면 (위 셋보다 우선)
 REGIME_DIRECTION = {"상승 추세": "positive", "단기 조정": "neutral", "조정장": "negative", "불안 국면": "uncertain"}   # 전환 이벤트의 방향 라벨
 
-# ── 볼린저 밴드 카드 (2026-10-11 사용자: 하단에 도달했을 때 알려주는 카드) ──
+# ── 볼린저 밴드 카드 ──
 BOLL_WINDOW = 20
 BOLL_SIGMA = 2.0
 HISTORY_STATS_PATH = os.path.join(STATIC_DIR, "history_stats.json")   # history_stats.py 가 만든 상장 이후 전체 기간 통계(엔비디아 1999년~, 1년에 한 번 갱신)
-# 공포·탐욕 지수 (CNN) — 시장 국면 글머리표 (2026-10-11 사용자)
+# 공포·탐욕 지수 (CNN) — 시장 국면 글머리표
 FNG_URL = "https://production.dataviz.cnn.io/index/fearandgreed/graphdata"
-# 과열 지표 카드 (2026-10-11 사용자: "이익 실현 구간" → 지시 대신, 조건에 닿은 날 과거 빈도를 사실로). 조건 셋, 하나라도 해당하면 카드
+# 과열 지표 카드. 조건 셋, 하나라도 해당하면 카드
 OVERHEAT_RSI = 80.0               # RSI14 이 이상
 OVERHEAT_MA200_PCT = 40.0         # 종가가 200일 평균보다 이 % 이상 위
 OVERHEAT_RET20_PCT = 25.0         # 20거래일 수익률 이 % 이상
@@ -146,7 +146,7 @@ FEEDS = {
     "cnbc_top": ("news", "cnbc", "https://www.cnbc.com/id/100003114/device/rss/rss.html"),
     "cnbc_tech": ("news", "cnbc", "https://www.cnbc.com/id/19854910/device/rss/rss.html"),
     "gnews": ("news", "googlenews", "https://news.google.com/rss/search?q=Nvidia+when:7d&hl=en-US&gl=US&ceid=US:en"),
-    # 법적·규제 전용 (2026-10-10 사용자: 법적 문제 기사는 꼼꼼히). q=Nvidia 100건 상한을 주가 해설이 채우는 것을 피한다
+    # 법적·규제 전용. q=Nvidia 100건 상한을 주가 해설이 채우는 것을 피한다
     "gnews_legal": ("news", "googlenews", "https://news.google.com/rss/search?q=Nvidia+(lawsuit+OR+antitrust+OR+DOJ+OR+FTC+OR+%22export+control%22+OR+BIS+OR+tariff+OR+%22export+license%22+OR+%22chips+to+China%22+OR+H20+OR+H200+OR+court+OR+ruling+OR+probe+OR+subpoena)+when:7d&hl=en-US&gl=US&ceid=US:en"),
 }
 # 외부 기사 1차 키워드 필터 — 제목+요약에 하나라도 있어야 분류 대상
@@ -193,12 +193,12 @@ NEWS_COUNT_EVENT_MULT = 2.0       # 기사 수가 7일 평균의 2배 (#48 헤�
 AREAS = ["Earnings", "Flows", "Regulation", "Legal", "Product", "Demand", "Supply", "Corporate", "Macro", "Other"]
 DIRECTIONS = ["positive", "negative", "uncertain", "neutral"]
 NOVELTIES = ["new", "update", "repeat"]
-# 발언자 (2026-10-11 사용자: 대표 발언에 "누가 말했다" 표시). 문서가 그 사람·기관의 직접 발언·결정을 전할 때만. 아니면 none
+# 발언자. 문서가 그 사람·기관의 직접 발언·결정을 전할 때만. 아니면 none
 SPEAKERS = ["ceo", "nvidia_exec", "government", "customer_partner", "none"]
 SPEAKER_KO = {"ceo": "젠슨 황", "nvidia_exec": "엔비디아 임원", "government": "정부·규제 당국", "customer_partner": "고객·협력사", "none": ""}
 RELEVANCE_RANGE = (0, 3)
 RELEVANCE_EVENT_MIN = 2
-PRIORITY_AREAS = ("Legal", "Regulation")   # 법적·규제 영역은 relevance 1부터 이벤트, 접히지 않고 맨 위 (2026-10-10 사용자)
+PRIORITY_AREAS = ("Legal", "Regulation")   # 법적·규제 영역은 relevance 1부터 이벤트, 접히지 않고 맨 위
 PRIORITY_RELEVANCE_EVENT_MIN = 1
 
 
@@ -217,8 +217,8 @@ MAX_TEXT_CHARS = 1200
 # LLM 모델 · 예비 사슬 · 키 쿨다운은 experiments/llm_chain.py 하나로 (2026-10-14 — 모든 리포트 공용)
 
 # ── 리포트 ───────────────────────────────────────────────────────────────
-# 테스트 운영 (2026-10-10 사용자: "테스트 중" 라벨을 붙이고 우선 발행, 부족한 데이터는 안내 문구로). 끝내면 False — 제목은 바뀌지 않는다
-TEST_MODE = False   # 2026-11-16 사용자: 테스트 끝 — `테스트 중` 라벨 정리(애드센스 준비)
+# 테스트 운영. 끝내면 False — 제목은 바뀌지 않는다
+TEST_MODE = False   #: 테스트 끝 — `테스트 중` 라벨 정리(애드센스 준비)
 TEST_NOTICE = ("이 리포트는 테스트 운영 중입니다. 수집·판정 규칙과 문구가 바뀔 수 있고, 일부 칸은 데이터가 쌓이는 중이라 비어 있습니다. "
                "빈 칸에는 이유와 채워질 시점을 적어 두었습니다.")
 # 빈 칸 안내 문구 — 상태판 key별. 없는 key는 기본 문구

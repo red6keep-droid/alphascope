@@ -1,4 +1,4 @@
-"""주식 공부 글 발행 — 문서 저장소 초안(doc/기획/강좌/*.md) → Blogger 글 (2026-11-15 사용자: 정식 등록).
+"""주식 공부 글 발행 — 문서 저장소 초안(doc/기획/강좌/*.md) → Blogger 글.
 
     .venv/bin/python experiments/course/publish_course.py --images     # 캐릭터 · 아이콘 · 홈 배너 → gh-pages images/study/ (바뀐 것만 커밋 · 푸시)
     .venv/bin/python experiments/course/publish_course.py --dry        # 올릴 제목 · 주소 · 그림 주소만 확인
@@ -144,7 +144,7 @@ def main(dry, published_only=False):
     if not src:
         sys.exit(f"초안 폴더 없음: {RC._SRC_CANDIDATES}")
     files = sorted(sorted(glob.glob(os.path.join(src, "*.md"))), key=lambda f: os.path.basename(f) != RC.PIECE_SRC)   # 기준 페이지 먼저 — 모든 편 팝업 끝 링크가 이 페이지로 간다
-    if published_only:   # 이미 나간 편만 다시 그려 고쳐 쓴다 — 새 편은 올리지 않음(다음 편 카드는 `준비 중` 그대로) (2026-11-20 사용자: 바뀐 모양을 과거 글에 일괄 적용)
+    if published_only:   # 이미 나간 편만 다시 그려 고쳐 쓴다 — 새 편은 올리지 않음(다음 편 카드는 `준비 중` 그대로)
         done = json.load(open(os.path.join(HERE, "published.json"), encoding="utf-8"))
         files = [f for f in files if os.path.basename(f) in done]
     missing = [os.path.basename(f) for f in files if os.path.basename(f) not in SLUGS]

@@ -87,7 +87,7 @@ def _figures(m):
 
 
 def _events(a, extra, live):
-    """홈 맨 위 일정 배너 (2026-10-28 사용자) — 미국 home_feed.events 와 같은 모양. 고정 페이지가 있는 종목만, 가까운 날 · 큰 시총 순."""
+    """홈 맨 위 일정 배너 — 미국 home_feed.events 와 같은 모양. 고정 페이지가 있는 종목만, 가까운 날 · 큰 시총 순."""
     end = (datetime.date.fromisoformat(a["day"]) + datetime.timedelta(days=EVENT_DAYS)).isoformat()
     out = []
     for s in a["stocks"]:

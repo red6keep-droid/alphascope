@@ -1,4 +1,4 @@
-# Newfact 뉴스 발행 — 뉴스 수집기 글(블로그 저장소 news-text-blog posts)을 블로그 새 글로 (2026-11-24 사용자).
+# Newfact 뉴스 발행 — 뉴스 수집기 글(블로그 저장소 news-text-blog posts)을 블로그 새 글로.
 # 블로그 AI 0. publish = 새 글 → Blogger(초안 또는 공개), refresh = 장 마감 뒤 아침 글의 관련 종목 표를 그날 값으로 고쳐 씀.
 # 지금은 손으로만 건다 — 초안 시험 · 사용자 확인 뒤 Worker 일정(09:20 · 13:20 · 18:20 · 22:20 publish, 16:10 refresh)에 넣는다.
 # 기획 = 비공개 doc/기획/뉴스-글-발행-기획.md

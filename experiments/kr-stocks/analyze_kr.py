@@ -51,7 +51,7 @@ def technical(bars, bench_bars):
     out["bench_ma_rel"] = {n: (bc[-1] / (sum(bc[-n:]) / n) - 1) * 100 for n in (20, 60, 120, 200) if len(bc) >= n}
     out["path"], out["bench_path"] = day_path(bars), day_path(bench_bars, t["day"])   # 오늘 하루 흐름 (P41)
     try:
-        import tech_signals   # experiments/ — 기술 지표 12 · 이동평균 · 피벗 (2026-10-30 사용자, 인베스팅닷컴 화면을 사실 말로)
+        import tech_signals   # experiments/ — 기술 지표 12 · 이동평균 · 피벗
         out["signals"] = tech_signals.compute(bars, market="kr")   # 이동평균 60 · 120일 · 배열 · 크로스 한국 관행 (P119)
     except Exception as e:   # noqa: BLE001
         print(f"[kr] 기술 지표 계산 실패 : {e}")
@@ -61,7 +61,7 @@ def technical(bars, bench_bars):
 
 
 def day_path(bars, day=None):
-    """오늘 하루 흐름 — 전일 종가 대비 시가 · 장중 고점 · 장중 저점 · 종가 % (2026-10-27 사용자 P41). day 를 주면 그날(지수를 종목 날짜에 맞춘다)."""
+    """오늘 하루 흐름 — 전일 종가 대비 시가 · 장중 고점 · 장중 저점 · 종가 %. day 를 주면 그날(지수를 종목 날짜에 맞춘다)."""
     if day is not None:
         bars = [x for x in bars or [] if x["day"] <= day]
     if not bars or len(bars) < 2 or bars[-1]["day"] != (day or bars[-1]["day"]):
@@ -386,7 +386,7 @@ def flows(flow_data, bench_bars):
     k = d.get("kospi") or []
     if k:
         out["kospi"] = {"day": k[-1]["day"], "close": k[-1]["v"], "ret_1d": (k[-1]["v"] / k[-2]["v"] - 1) * 100 if len(k) > 1 else None,
-                        "series": k[-40:]}   # 외국인 순매수 그래프 아래 같은 날 코스피 등락 (2026-10-29 사용자, 한국 증시 리포트 M47)
+                        "series": k[-40:]}   # 외국인 순매수 그래프 아래 같은 날 코스피 등락
     # 시장 열기 — 거래대금(억원) 오늘 vs 20일 평균, 거래량(만주)
     tv, vo = d.get("turnover_kospi") or [], d.get("volume_kospi") or []
     if len(tv) > 21:
@@ -513,7 +513,7 @@ def run(snap, flow_data=None, hist=None):
     stocks = update_ranks(stocks, day)
     market = flows(flow_data, snap["bars"].get(U.BENCH)) or {}
     market["overnight"] = overnight(snap, day)
-    crash = CW.compute(snap["bars"], "kr", [c[0] for c in U.CANDIDATES])   # 급락장에서 버틴 종목 — 홈 `주목할 종목` · 오늘 탭 카드 (2026-11-04 사용자)
+    crash = CW.compute(snap["bars"], "kr", [c[0] for c in U.CANDIDATES])   # 급락장에서 버틴 종목 — 홈 `주목할 종목` · 오늘 탭 카드
     mr = A.market_regime({"bars": {NC.REGIME_BENCHMARK: snap["bars"].get(U.BENCH) or []}})   # 시장 분위기 — 미국과 같은 규칙, KOSPI (VIX 없음 → 불안 국면 판정 없음, 2026-10-31)
     for s in stocks:
         s["market_regime"] = mr

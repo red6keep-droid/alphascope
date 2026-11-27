@@ -37,7 +37,7 @@ SECTORS = [
     "Real Estate", "Utilities", "Crypto", "Bonds/Rates", "Broad Market",
 ]
 DIRECTIONS = ["positive", "negative", "neutral"]
-# 리포트 표기용 한국어 (디자인-가이드라인 3-4, 2026-10-11 사용자: 용어는 한국어 위주). 분류 enum 은 영어 그대로 — 화면에서만 바꾼다
+# 리포트 표기용 한국어. 분류 enum 은 영어 그대로 — 화면에서만 바꾼다
 TOPIC_KO = {"Trade": "무역", "Fed": "연준", "Tax": "세금", "Energy": "에너지", "Immigration": "이민", "Regulation": "규제",
             "Geopolitics": "지정학", "Company": "기업", "Personal": "개인", "Sports": "스포츠", "Media/Press": "언론",
             "Campaign/Politics": "정치", "Legal": "법무", "Congratulations": "축하", "Other": "기타"}

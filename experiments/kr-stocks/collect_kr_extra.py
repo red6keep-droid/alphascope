@@ -51,7 +51,7 @@ def _earn_dates(t):
 
 
 def _analysts(t):
-    """애널리스트 등급 분포 · 목표가 — 미국 collect_extra._analysts 와 같은 칸 (2026-10-31 사용자: 한국도 `애널리스트 · 방송 의견은?`). 원화."""
+    """애널리스트 등급 분포 · 목표가 — 미국 collect_extra._analysts 와 같은 칸. 원화."""
     out = {}
     rec = t.recommendations
     if rec is not None and not rec.empty:
@@ -68,7 +68,7 @@ def run():
     import yfinance as yf
     sys.path.insert(0, os.path.join(BASE, ".."))
     import detail_cache as DC
-    cache = DC.shared(os.path.join(BASE, "data"))   # 칸마다 바뀌는 주기에만 (2026-11-12 사용자) — 매출 30일 · 실적 뒤, 이익 예상 · 의견 주 1회(종목별 요일) · 실적 뒤, 실적일 주 1회 · 14일 안이면 매일
+    cache = DC.shared(os.path.join(BASE, "data"))   # 칸마다 바뀌는 주기에만 — 매출 30일 · 실적 뒤, 이익 예상 · 의견 주 1회(종목별 요일) · 실적 뒤, 실적일 주 1회 · 14일 안이면 매일
     out = {"day": datetime.date.today().isoformat(), "stocks": {}, "revenue": {"series": {}}, "earnings": {}, "pair_earnings": {}}
     n_new = 0
     for sym, *_ in U.CANDIDATES:
@@ -98,14 +98,14 @@ def run():
             else:
                 out["stocks"].setdefault(sym, {})[key] = v
     print(f"[kr-extra] 새로 받은 종목 {n_new}/{len(U.CANDIDATES)} (나머지 저장값)")
-    try:   # DART 분기 매출이 있으면 그것으로 (2026-10-25 사용자: 1년치뿐인 Yahoo 대신)
+    try:   # DART 분기 매출이 있으면 그것으로
         import collect_kr_dart
         for sym, rows in collect_kr_dart.run().items():
             if sum(1 for r in rows if r["yoy"] is not None) >= sum(1 for r in out["revenue"]["series"].get(sym) or [] if r.get("yoy") is not None):
                 out["revenue"]["series"][sym] = rows
     except Exception as e:  # noqa: BLE001 — DART 가 막혀도 Yahoo 매출로 간다
         print(f"[kr-extra] DART 실패 — Yahoo 매출로: {str(e)[:120]}")
-    try:   # 돈을 어디에 쓰나 · 이익 줄 — DART 손익 · 현금흐름 분기 표 (2026-11-04 사용자, 미국 extra["capex"] 와 같은 모양). 실패하면 그 카드만 없다
+    try:   # 돈을 어디에 쓰나 · 이익 줄 — DART 손익 · 현금흐름 분기 표. 실패하면 그 카드만 없다
         import collect_kr_fin
         out["capex"] = collect_kr_fin.run()
     except Exception as e:  # noqa: BLE001

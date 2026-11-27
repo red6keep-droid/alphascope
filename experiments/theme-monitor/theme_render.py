@@ -1,5 +1,5 @@
 """테마 페이지 HTML (doc/기획/테마-모니터-기획.md 4절) — 종목 페이지와 같은 뼈대: 맨 앞 요약 → 질문 · 상태 머리 카드(제목 옆 ? = 읽는 법) → 질문 카드 → 종목 그래프.
-2026-10-21 사용자: 탭 없음 · 읽는 법은 상단 제목 옆 툴팁 · 증감은 모두 색 · 종목은 전부 그래프.
+: 탭 없음 · 읽는 법은 상단 제목 옆 툴팁 · 증감은 모두 색 · 종목은 전부 그래프.
 숫자 · 문장 전부 파이썬. 카드 조각은 엔비디아 렌더러(R._state_card · R._col_chart)와 레이더(render_pages.wrap)를 그대로 쓴다.
 """
 
@@ -60,25 +60,25 @@ def _cards(html):
 
 
 def _lead(text):
-    """맨 앞 요약 문장 — 증감(−7.0%p · +14bp …)도 색 (2026-10-21 사용자: "디자인 규칙에 반드시 있을 텐데" — 가이드라인 3-3, 요약 문장 포함)."""
+    """맨 앞 요약 문장 — 증감(−7.0%p · +14bp …)도 색."""
     return f'<p data-seo-lead="1" style="{dk.SEO_LEAD}">{dk.tint(_esc(text))}</p>'
 
 
 def page_title(t, day):
-    """페이지 제목 = 이름 + 기준 날짜 — 테마 JS 가 날짜를 제목 오른쪽 끝에 놓는다 (가이드라인 10-5, 2026-10-21 사용자: 기준 날짜 표기 위치는 제목 우측)."""
+    """페이지 제목 = 이름 + 기준 날짜 — 테마 JS 가 날짜를 제목 오른쪽 끝에 놓는다."""
     d = datetime.date.fromisoformat(str(day)[:10])
     return f"{t['title']} {d.year}년 {d.month}월 {d.day}일"
 
 
 def _head(t, state, kind, sub, guide):
-    """머리 상태 카드 — 질문 제목 옆 ? 툴팁이 읽는 법 (2026-10-21 사용자: 탭 대신 상단 제목 옆 툴팁). 둘째 줄 요약은 증감 색."""
+    """머리 상태 카드 — 질문 제목 옆 ? 툴팁이 읽는 법. 둘째 줄 요약은 증감 색."""
     card = R._state_card(t["question"], state, kind, KIND_COLOR[kind], [(dk.tint(_esc(sub)), "rich")], "", tip=guide)   # rich = 펼친 설명 문장 18/32 · 증감 굵게 (2026-11-07 0-2, 옛 html 은 19/32)
     return dk.cards(card)
 
 
 def _stock_chart(title, members, key="ret_20d", fmt=None, height=140):
-    """종목별 세로 막대 (2026-10-21 사용자: 종목은 전부 그래프). members = [{"sym", key}]. 오름 빨강 · 내림 파랑.
-    그래프 아래 종목 이름 줄은 두지 않는다 — 그래프 가로축과 중복 (2026-10-21 사용자). 종목 페이지 링크는 2단계에서 가로축 이름에."""
+    """종목별 세로 막대. members = [{"sym", key}]. 오름 빨강 · 내림 파랑.
+    그래프 아래 종목 이름 줄은 두지 않는다 — 그래프 가로축과 중복. 종목 페이지 링크는 2단계에서 가로축 이름에."""
     ms = [m for m in members if m.get(key) is not None]
     if not ms:
         return ""
@@ -115,14 +115,14 @@ def body_ai(t, a, day, guide):
     share = br["above_ma20"] / br["n"] if br.get("n") else None
     st2 = "넓게 상승" if share is not None and share >= 0.6 else "몇 종목만" if share is not None and share <= 0.4 else "반반"
     k2 = "positive" if st2 == "넓게 상승" else "negative" if st2 == "몇 종목만" else "neutral"
-    # 값 = 20일선 위 종목 수, 설명 = 그 뜻 + 오늘 오른 종목 수 (2026-10-21 사용자: "0/5 가 뭐지?" — 두 숫자가 한 줄에 섞여 있었다)
-    # 값 = "20일선 위는 (0/5)" — 앞말은 보통 굵기, 숫자만 굵게. 뜻 = "5종목 오름" (2026-10-21 사용자)
+    # 값 = 20일선 위 종목 수, 설명 = 그 뜻 + 오늘 오른 종목 수
+    # 값 = "20일선 위는 (0/5)" — 앞말은 보통 굵기, 숫자만 굵게. 뜻 = "5종목 오름"
     lines = [("row", b["name"], f'<span style="font-weight:400;">20일선 위는</span> ({b["breadth"]["above_ma20"]}/{b["breadth"]["n"]})', f"{b['breadth']['up_today']}종목 상승", True)
              for b in bs if b.get("breadth")]
     cards += R._state_card("넓게 오르나?", st2, k2, KIND_COLOR[k2], lines, "",
                            tip=f"{n_all}종목 가운데 20일 이동평균선(최근 20거래일 평균 가격) 위에 있는 종목이 몇인가. 60% 이상이면 넓게 상승, 40% 이하면 몇 종목만\n"
                                f"· 오늘 {br.get('above_ma20', 0)}종목 / {n_all}종목 : 테마가 올라도 몇 종목이 끌고 있으면 넓게 오른 게 아니다", fold=True,
-                           below_notes=True)   # "5종목 오름" 은 괄호 없이 이름 아래 줄 (2026-10-21 사용자)
+                           below_notes=True)   # "5종목 오름" 은 괄호 없이 이름 아래 줄
 
     # ③ 평소와 다른가
     nz = whole.get("normal") or {}
@@ -143,7 +143,7 @@ def body_ai(t, a, day, guide):
     cards += R._state_card("거래는 늘었나?", st4, k4, KIND_COLOR[k4], lines, "", tip="갈래 종목들의 오늘 거래량 ÷ 지난 20일 평균, 그 중앙값. 1.5배 이상이면 많음", fold=True)
     out += _cards(cards)
 
-    # 종목별 — 갈래마다 그래프 (2026-10-21 사용자)
+    # 종목별 — 갈래마다 그래프
     for b in bs:
         out += _stock_chart(f"{b['name']} {len(b['members'])}종목 · 20일 수익률 (%)", b["members"])
     return out
@@ -219,7 +219,7 @@ def body_insider(t, a, day, guide):
         lines = [("row", "공매도 비율이 늘어난 종목", f"{sh['rising']}/{sh['n']}", "직전 집계 대비"), ("row", "줄어든 종목", f"{sh['falling']}/{sh['n']}", "")]
         cards += R._state_card("하락에 거는 돈은?", st4, k4, KIND_COLOR[k4], lines, "", tip=dk.with_src("FINRA 공매도 잔고(월 2회)의 유통주식 대비 비율이 직전 집계보다 늘었는지", "FINRA · Yahoo Finance"), fold=True)
     out += _cards(cards)
-    # 누가 샀나 · 팔았나 — 한 그래프, 회사마다 순매수 금액(매수 − 계획 외 매도): 위 빨강 · 아래 파랑, 백만 달러 (2026-10-21 사용자: 종목은 전부 그래프)
+    # 누가 샀나 · 팔았나 — 한 그래프, 회사마다 순매수 금액(매수 − 계획 외 매도): 위 빨강 · 아래 파랑, 백만 달러
     net = {}
     for p in a["buyers"]:
         net[p["sym"]] = net.get(p["sym"], 0.0) + p["buy_usd"]
@@ -234,7 +234,7 @@ def body_insider(t, a, day, guide):
 # ── 공통 ────────────────────────────────────────────────────────────────
 
 def reading_guide(t):
-    """읽는 법 — 머리 카드 제목 옆 ? 툴팁 (2026-10-21 사용자: 탭 대신 상단 타이틀 옆 툴팁)."""
+    """읽는 법 — 머리 카드 제목 옆 ? 툴팁."""
     items = {
         "ai": ["세 갈래 : 반도체(만드는 쪽) · 데이터 센터(짓고 쓰는 쪽 — 클라우드 사업자 · 데이터센터 리츠) · 전력 설비(전기 · 냉각 · 네트워크). 세 쪽이 같이 가면 AI 투자 자체로 돈이 오는 것",
                f"유입 · 유출 : 갈래 바스켓(동일가중)의 {T.FLOW_DAYS}거래일 수익률 − S&P 500. ±{T.FLOW_PP:.0f}%p 가 기준",

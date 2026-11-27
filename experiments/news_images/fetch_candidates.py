@@ -1,4 +1,4 @@
-"""뉴스 글 그림 후보 받기 — 사용자 검수용으로 맥 폴더에 정리 (2026-11-25 사용자 "검증해").
+"""뉴스 글 그림 후보 받기 — 사용자 검수용으로 맥 폴더에 정리.
 
     python experiments/news_images/fetch_candidates.py                 # 전부
     python experiments/news_images/fetch_candidates.py --only topics   # 주제 그림만

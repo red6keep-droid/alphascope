@@ -1,4 +1,4 @@
-"""회원 `내 종목` 목업 (2026-11-12 사용자 "일단 기본으로 목업으로 적용해줘") — 비공개 기획 `doc/기획/회원-내-종목-기획.md` 3절 기본값 그대로.
+"""회원 `내 종목` 목업 — 비공개 기획 `doc/기획/회원-내-종목-기획.md` 3절 기본값 그대로.
 
     python experiments/my-stocks/mock_my_stocks.py   → output/mock_my-stocks-*.html (목업 서버 `my-stocks` 묶음)
 
@@ -23,7 +23,7 @@ OUT = os.path.join(HERE, "output")
 INDEX = os.path.join(HERE, "..", "site-search", "output", "search_index.json")
 SEATS, TAKEN = 10, 7   # 예시: 10자리 중 7자리 찼다
 FX, FX_DAY = 1356.34, "2026-11-06"   # 원 · 달러 환율(daily-report prices.json KRW=X 마지막 값). 실제는 검색 색인에 환율 한 칸을 더해 같이 읽는다
-NAME = "보유 종목"   # 메뉴 · 머리 줄 이름 (2026-11-12 사용자: `내 종목` → `보유 종목`)
+NAME = "보유 종목"   # 메뉴 · 머리 줄 이름
 
 # 예시 보유 (수량, 평균 매수가) — 이익 · 손실이 섞이게
 HOLD = {"NVDA": (30, 152.40), "MSFT": (10, 545.00), "TSLA": (12, 260.00),
@@ -56,16 +56,16 @@ def pct(v):
 
 
 def updown(v, text, px, tri=True):
-    """증감 = ▲ 빨강 · ▼ 파랑 · 0 회색 + 절댓값 글자 (2026-11-12 사용자: + 대신 증감 삼각형, 삼각형은 숫자보다 작게).
+    """증감 = ▲ 빨강 · ▼ 파랑 · 0 회색 + 절댓값 글자.
     삼각형 = 숫자 글자의 80% · 위로 1 (가이드라인 1절 크기표 `dk.emph_tri` 와 같은 규칙). text 는 부호 없는 절댓값 글자."""
     col = dk.UP if v > 0 else dk.DOWN if v < 0 else dk.MUTED
-    tri = ("▲" if v > 0 else "▼" if v < 0 else "") if tri else ""   # tri=False = 금액(원) — 삼각형 없이 색만 (2026-11-12 사용자: 금액은 삼각형 빼기)
+    tri = ("▲" if v > 0 else "▼" if v < 0 else "") if tri else ""   # tri=False = 금액(원) — 삼각형 없이 색만
     t = f'<span data-tri="1" style="font-size:{round(px * 0.8)}px;vertical-align:1px;margin-right:2px;">{tri}</span>' if tri else ""
     return f'<span style="color:{col};white-space:nowrap;">{t}{text if "<" in text else esc(text)}</span>'
 
 
 def won_html(v, px):
-    """가격 `5,322,651 원` — 숫자 뒤 띄어 쓰고 `원`은 보통 굵기 · 숫자보다 2px 작게 (2026-11-12 사용자: 모든 가격의 원)."""
+    """가격 `5,322,651 원` — 숫자 뒤 띄어 쓰고 `원`은 보통 굵기 · 숫자보다 2px 작게."""
     return f'{abs(v):,.0f}<span style="font-weight:400;font-size:{px - 2}px;"> 원</span>'
 
 
@@ -93,7 +93,7 @@ def total_card(rows, m):
 
 
 def grand_card(held):
-    """맨 위 = 보유 종목 전체 (2026-11-12 사용자):
+    """맨 위 = 보유 종목 전체:
       총 평가 금액                   38,647,671원   ← 이름 굵게 · 금액 26px 굵게, 오른쪽
       수익 금액 5,322,651원              ▲ 16.0%   ← 아래 네 줄 = 16px 보통 굵기 이름 + 금액 왼쪽, 수익률 오른쪽(굵게, 같은 크기)
       매수 금액 33,325,020원
@@ -107,21 +107,21 @@ def grand_card(held):
     gain = val - cost
     kind = "positive" if gain > 0 else "negative" if gain < 0 else "neutral"   # 카드 색 = 답 방향 (가이드라인 7-1)
     ROW = "display:flex;justify-content:space-between;align-items:baseline;gap:12px;"
-    FS = 15   # 아래 줄 금액 · 수익률 = 종목 줄 등락 숫자와 같은 15px (2026-11-12 사용자: 16 → 엔비디아 증감 숫자 크기)
-    # 아래 네 줄 = 세 칸 격자: 이름 | 금액(왼쪽 정렬, 네 줄이 같은 세로선) | 수익률(오른쪽). 모두 보통 굵기 (2026-11-12 사용자)
+    FS = 15   # 아래 줄 금액 · 수익률 = 종목 줄 등락 숫자와 같은 15px
+    # 아래 네 줄 = 세 칸 격자: 이름 | 금액(왼쪽 정렬, 네 줄이 같은 세로선) | 수익률(오른쪽). 모두 보통 굵기
     GRID = f"display:grid;grid-template-columns:auto 1fr auto auto;column-gap:10px;align-items:baseline;font-size:{FS}px;line-height:22px;color:#333;font-weight:400;"
     RULE = '<span aria-hidden="true" style="grid-column:1/-1;height:1px;background:#FEE6CA;margin:8px 0;"></span>'
 
     def cells(label, amount_html, rate_html=""):
-        # 이름(회색 14) | (빈 칸) | 수익률 | 금액(맨 오른쪽 끝) — 등락률을 금액 앞에 (2026-11-12 사용자)
+        # 이름(회색 14) | (빈 칸) | 수익률 | 금액(맨 오른쪽 끝) — 등락률을 금액 앞에
         return (f'<span style="white-space:nowrap;font-size:{dk.TINY};color:{dk.NOTE};">{label}</span><span></span>'
                 f'<span style="white-space:nowrap;text-align:right;">{rate_html}</span><span style="white-space:nowrap;text-align:right;">{amount_html}</span>')
 
     top = (f'<div style="{ROW}"><span style="font-size:17px;line-height:24px;font-weight:700;color:#111;white-space:nowrap;">총 평가 금액</span>'
-           f'<span style="font-size:21px;line-height:28px;font-weight:800;color:#111;white-space:nowrap;">{won_html(val, 21)}</span></div>')   # 30 → 28 → 26 → 23 → 21 (2026-11-12 사용자)
-    grid = [f'<span style="grid-column:1/-1;text-align:right;white-space:nowrap;font-size:{dk.TINY};color:{dk.NOTE};">{won_html(cost, 14)}</span>',   # 매수 금액 = 수익 금액 위 · 금액만 오른쪽 정렬, 회색 작은 글씨 (2026-11-12 사용자: `매수 금액` 글자 삭제)
+           f'<span style="font-size:21px;line-height:28px;font-weight:800;color:#111;white-space:nowrap;">{won_html(val, 21)}</span></div>')   # 30 → 28 → 26 → 23 → 21
+    grid = [f'<span style="grid-column:1/-1;text-align:right;white-space:nowrap;font-size:{dk.TINY};color:{dk.NOTE};">{won_html(cost, 14)}</span>',   # 매수 금액 = 수익 금액 위 · 금액만 오른쪽 정렬, 회색 작은 글씨
             cells("수익 금액", updown(gain, won_html(gain, FS), FS, tri=False), updown(gain, f"{abs(gain / cost * 100):.1f}%", FS))]
-    for m, head in (("us", "미국"), ("kr", "한국")):   # `미국 3종목` (2026-11-12 사용자: `미국 종목` → `미국`)
+    for m, head in (("us", "미국"), ("kr", "한국")):   # `미국 3종목`
         rows = [h for h in held if h[0]["m"] == m]
         if not rows:
             continue
@@ -132,12 +132,12 @@ def grand_card(held):
         grid.append(cells(f'{head} {len(rows)}종목',
                           updown(v - c, won_html(v - c, FS), FS, tri=False), updown(v - c, f"{abs((v - c) / c * 100):.1f}%", FS)))
     sub = [f'<div style="{GRID}margin:6px 0 0;">{"".join(grid)}</div>']
-    fx = ""   # 환율 줄 삭제 (2026-11-12 사용자) — 계산 기준은 맨 아래 작은 글씨
+    fx = ""   # 환율 줄 삭제 — 계산 기준은 맨 아래 작은 글씨
     return dk.dcard(top + "".join(sub) + fx, kind)
 
 
 def stock_rows(rows, m):
-    """종목 줄 (2026-11-12 사용자):  [로고] 엔비디아           오늘 ▲ 2.3% | ▲ 35.6%
+    """종목 줄:  [로고] 엔비디아           오늘 ▲ 2.3% | ▲ 35.6%
                                            30주 · 평균 $152.40           | 2,209,071원
     - 이름 = 한글만(티커 · 종목 코드 삭제). 보조 줄은 로고 뒤 이름 글자 왼쪽 선에 맞춤
     - 오늘 등락 = 보조 줄에서 빼서 오른쪽 수익률 앞에, 사이 세로 구분선
@@ -150,12 +150,12 @@ def stock_rows(rows, m):
         chg = s["p"]["chg"] or 0
         gk = gain * FX if m == "us" else gain   # 수익금 = 원화 (미국 종목은 환율로 바꿈, 평균 매수가는 산 통화 그대로)
         left = stock_left(s, esc(f"{q:,}주 · 평균 ") + (esc(money(a, m)) if m == "us" else won_html(a, 14)))   # 원 = 띄우고 2 작게
-        # 오른쪽 = 윗줄 `오늘 등락(굵게) | 수익률`(15px, 사이 세로 구분선) · 아랫줄 수익금(보통) — `오늘` 글자 없음 (2026-11-12 사용자)
-        rule = '<span aria-hidden="true" style="flex:none;width:1px;height:10px;margin:0 8px;background:#CBD5E1;"></span>'   # 세로 구분선 = 글자 15 의 70% → 10 (2026-11-12 사용자)
+        # 오른쪽 = 윗줄 `오늘 등락(굵게) | 수익률`(15px, 사이 세로 구분선) · 아랫줄 수익금(보통) — `오늘` 글자 없음
+        rule = '<span aria-hidden="true" style="flex:none;width:1px;height:10px;margin:0 8px;background:#CBD5E1;"></span>'   # 세로 구분선 = 글자 15 의 70% → 10
         right = (f'<span style="flex:none;display:flex;flex-direction:column;align-items:flex-end;white-space:nowrap;">'
                  f'<span style="display:flex;align-items:center;font-size:15px;line-height:22px;"><b style="font-weight:700;">{updown(chg, f"{abs(chg):.1f}%", 15)}</b>{rule}'
                  f'{updown(gain, f"{abs((c - a) / a * 100):.1f}%", 15)}</span>'
-                 f'<span style="font-size:16px;line-height:24px;font-weight:400;">{updown(gain, won_html(gk, 16), 16, tri=False)}</span></span>')   # 굵게 = 오늘 등락만, 수익금은 보통 (2026-11-12 사용자)
+                 f'<span style="font-size:16px;line-height:24px;font-weight:400;">{updown(gain, won_html(gk, 16), 16, tri=False)}</span></span>')   # 굵게 = 오늘 등락만, 수익금은 보통
         row = (f'<span style="{dk.MULTI_ROW}{"" if i == 0 else dk.MULTI_SEP}">{left}'
                f'{right}</span>')
         out.append(row.replace("<span ", f'<span data-row-link="1" data-href="{esc(s["u"])}" ', 1))
@@ -195,7 +195,7 @@ WHITE_BTN = ("display:inline-flex;align-items:center;justify-content:center;box-
 
 
 def stock_left(s, sub_html):
-    """종목 줄 왼쪽 — 로고 · 한글 이름(굵게 16) · 보조 줄(회색 14, 이름 글자 선) — `수익` 탭 종목 줄과 같은 간격 · 배치 (2026-11-12 사용자)."""
+    """종목 줄 왼쪽 — 로고 · 한글 이름(굵게 16) · 보조 줄(회색 14, 이름 글자 선) — `수익` 탭 종목 줄과 같은 간격 · 배치."""
     return (f'<span style="display:flex;align-items:flex-start;min-width:0;flex:1 1 auto;">'
             f'<span style="flex:none;display:flex;height:24px;align-items:center;">{dk.ticker_logo(s["s"], 22).replace("vertical-align:-4px;", "vertical-align:0;")}</span>'
             f'<span style="min-width:0;">'
@@ -207,12 +207,12 @@ def stock_left(s, sub_html):
 EDIT_GLYPH = '<path d="M10.5 2.5l3 3L6 13H3v-3l7.5-7.5z"/><path d="M9 4l3 3"/>'
 TRASH_GLYPH = '<path d="M2.5 4.5h11M6 4.5V3h4v1.5M4 4.5l.7 9h6.6l.7-9"/><path d="M6.8 7v4.5M9.2 7v4.5"/>'
 ICON_BTN = ("display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:36px;height:36px;background:#fff;"
-            "border:1px solid #E2E8F0;border-radius:8px;color:#111;cursor:pointer;")   # 머리 줄 뒤로 가기 버튼(.pr-back)과 같은 꼴 — 36 · 테두리 #E2E8F0 · 모서리 8 · 그림 20 (2026-11-12 사용자)
+            "border:1px solid #E2E8F0;border-radius:8px;color:#111;cursor:pointer;")   # 머리 줄 뒤로 가기 버튼(.pr-back)과 같은 꼴 — 36 · 테두리 #E2E8F0 · 모서리 8 · 그림 20
 
 
 def icon_btn(glyph, label, attrs=""):
     return (f'<a data-mock="1"{attrs} role="button" aria-label="{label}" title="{label}" style="{ICON_BTN}">'
-            f'<svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{glyph}</svg></a>')   # 그림 20 → 16(20% 작게, 상자 36 · 외곽선 그대로) · 선 1.5 = 보이는 1.5px (2026-11-12 사용자)
+            f'<svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{glyph}</svg></a>')   # 그림 20 → 16(20% 작게, 상자 36 · 외곽선 그대로) · 선 1.5 = 보이는 1.5px
 
 
 # 아래 고정 입력 칸 — 폰 · 태블릿(900 이하)은 테마 하단 고정 메뉴(71 + 안전 영역) 바로 위, PC 는 화면 맨 아래. 글 폭(--shell 980) 안에 맞춤
@@ -230,13 +230,13 @@ SHEET_CSS = ("<style>.ms-sheet{position:fixed;left:0;right:0;bottom:0;z-index:43
 
 
 def add_form(held):
-    """`종목 관리` 탭 (2026-11-12 사용자): 제목 없음 · 안내 문구 없음.
+    """`종목 관리` 탭: 제목 없음 · 안내 문구 없음.
     ① 지금 보유 종목 = `수익` 탭과 같은 줄 + 오른쪽 아이콘 버튼 연필(고치기) · 휴지통(빼기)
     ② `보유 종목 입력` = 화면 아래 고정 칸, 눌러 열고 닫음(기본 닫힘). 입력 줄(종목 | 수량 | 평균 매수가) 세 줄 ·
        버튼 두 칸 `+ 줄 추가` · `보유 종목 저장`(흰 테두리 버튼) — 10개를 넣어도 저장은 한 번(Firestore 쓰기 1회, 기획 3-2)"""
     sub = lambda s, q, a: esc(f"{q:,}주 · 평균 ") + (esc(money(a, s["m"])) if s["m"] == "us" else won_html(a, 14))
     # 연필 = 그 줄 바로 아래에 고치기 칸이 열린다: 수량 · 평균 매수가(지금 값이 들어 있음) + `취소` · `저장`. 종목 이름은 못 바꾼다(다른 종목이면 빼고 새로 넣기)
-    # 휴지통 = 그 줄 안에서 `빼기` 확인(`취소` · `빼기`) — 한 번 더 눌러야 지워진다 (2026-11-12 사용자: 연필을 누르면 어떻게 되나)
+    # 휴지통 = 그 줄 안에서 `빼기` 확인(`취소` · `빼기`) — 한 번 더 눌러야 지워진다
     einp = ("display:block;width:100%;box-sizing:border-box;height:52px;padding:0 12px;border:1px solid #CBD5E1;border-radius:8px;"
             "font-size:18px;line-height:26px;color:#111;background:#fff;min-width:0;")
     elab = f"display:block;margin:0 0 4px;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.NOTE};"
@@ -246,7 +246,7 @@ def add_form(held):
                "background:#fff;cursor:pointer;border-left:1px solid #E2E8F0;")
 
     def edit_panel(i, s, q, a):
-        """연필 = 세 가지 고치기 (2026-11-12 사용자: 추가 매수 · 매도 방식 vs 평균 단가 입력) — 저장하는 값은 늘 `수량 · 평균 매수가` 둘뿐(거래 기록은 남기지 않음).
+        """연필 = 세 가지 고치기 — 저장하는 값은 늘 `수량 · 평균 매수가` 둘뿐(거래 기록은 남기지 않음).
           추가 매수 = 산 수량 · 산 가격 → 새 평균 = (지금 수량 × 평균 + 산 수량 × 가격) ÷ 합친 수량 (화면에 바로 계산해 보여 줌)
           매도      = 판 수량 → 수량만 줄고 평균은 그대로(실현 손익은 계산 · 저장하지 않음)
           직접 고치기 = 수량 · 평균 매수가를 증권사 앱 숫자 그대로 덮어쓰기"""
@@ -287,7 +287,7 @@ def add_form(held):
     held_card = f'<div data-cards="1" style="margin:0 0 8px;"><span data-grid="2" style="{dk.MULTI}">{rows}</span></div>'
 
     inp = ("display:block;width:100%;box-sizing:border-box;height:52px;padding:0 12px;border:1px solid #CBD5E1;border-radius:8px;"
-           "font-size:18px;line-height:26px;color:#111;background:#fff;min-width:0;")   # 입력 칸 크게 44 → 52 · 글자 16 → 18 (2026-11-12 사용자)
+           "font-size:18px;line-height:26px;color:#111;background:#fff;min-width:0;")   # 입력 칸 크게 44 → 52 · 글자 16 → 18
     head = f"font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.NOTE};"
     COLS = "display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr) minmax(0,1.3fr);gap:6px;"
     lines = "".join(f'<div style="{COLS}margin:0 0 6px;"><span style="position:relative;min-width:0;"><input data-ms-stock="1" autocomplete="off" style="{inp}" placeholder="{ph}"></span>'
@@ -306,7 +306,7 @@ def add_form(held):
 
 
 def basis_note():
-    """카드 아래 오른쪽 한 줄 `블로그 종목 페이지의 종가 기준입니다 ?` — 나머지 안내는 ? 팝업 안 (2026-11-12 사용자: 맨 아래 작은 글씨를 팝업으로)."""
+    """카드 아래 오른쪽 한 줄 `블로그 종목 페이지의 종가 기준입니다 ?` — 나머지 안내는 ? 팝업 안."""
     text = "\n".join([
         "· 수수료 · 세금 : 반영하지 않습니다.",
         f"· 미국 종목 : 금액은 현재 환율(1달러 {FX:,.0f}원)로 원화로 바꾸고, 수익률은 달러 그대로 계산합니다.",
@@ -314,7 +314,7 @@ def basis_note():
         "· 추천 없음 : 공개 페이지의 정보를 보유 종목만 모아 보여 드립니다. 종목 추천이나 매매 판단을 드리지 않습니다.",
         "· 자리 : 60일 동안 열지 않으면 다음 분께 넘기고 적어 주신 내용을 지웁니다."])
     return (f'<div style="display:flex;justify-content:flex-end;align-items:center;margin:-2px 0 12px;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.NOTE};">'
-            f'종가 기준입니다{dk.tip(text)}</div>')   # 문구 = `종가 기준입니다` 만 (2026-11-12 사용자)
+            f'종가 기준입니다{dk.tip(text)}</div>')   # 문구 = `종가 기준입니다` 만
 
 
 def leave_link():
@@ -364,8 +364,8 @@ MOCK_JS = ("<script>(function(){function go(){var b=document.querySelector('[dat
 
 
 def picker_js(st):
-    """종목 칸 찾기 (2026-11-12 사용자: 이름을 치면 종목을 찾아 주기). 실제 블로그는 검색 창이 이미 읽는 색인(search/us.json · kr.json, jsDelivr)을 그대로 쓴다 —
-    새 파일 · 새 요청 없음. 목업은 같은 색인(이름 · 코드 · 별명 a)을 페이지에 넣어 흉내. 한 글자부터 · 맞는 것 전부(칸 안 스크롤, 2026-11-16 사용자 — 검색 창 미리보기와 같은 규칙) · 입력 칸 위로 펼침(칸이 화면 아래 고정이라).
+    """종목 칸 찾기. 실제 블로그는 검색 창이 이미 읽는 색인(search/us.json · kr.json, jsDelivr)을 그대로 쓴다 —
+    새 파일 · 새 요청 없음. 목업은 같은 색인(이름 · 코드 · 별명 a)을 페이지에 넣어 흉내. 한 글자부터 · 맞는 것 전부 · 입력 칸 위로 펼침(칸이 화면 아래 고정이라).
     실제 블로그에 붙일 때는 search.js 의 ASSearch.attachSuggest(정식 · 간단 종목 전부 names.json)를 쓴다."""
     rows = [{"n": x["n"], "c": x["s"].split(".")[0], "m": x["m"], "a": [str(v).lower() for v in x.get("a", [])],
              "l": dk.ticker_logo(x["s"], 22)} for x in st.values()]
@@ -408,15 +408,15 @@ def main():
     kr = [h for h in held if h[0]["m"] == "kr"]
 
     # 로그인 뒤
-    body = (dk.cards(grand_card(held) + stock_rows(us, "us") + stock_rows(kr, "kr"))   # 종가만 — `장중 가격` 토글 삭제 (2026-11-12 사용자: 종가 기준으로 하자. 한국만 장중이면 종목마다 기준이 섞이고, 300종목 장중은 야후 요청 부담)
+    body = (dk.cards(grand_card(held) + stock_rows(us, "us") + stock_rows(kr, "kr"))   # 종가만 — `장중 가격` 토글 삭제
             # 맨 위 = 총액 · 총 수익률. 글 머리 카드(data-lead) — 첫 h2 앞. 테마는 data-lead(없으면 첫 data-cards)부터 첫 h2 전까지를 머리로 옮긴다: h2 뒤에 두면 종목 줄 카드가 맨 아래로 밀렸다
-            + basis_note()   # 안내 = 맨 끝 카드(종목 줄) 아래 오른쪽 (2026-11-12 사용자)   # 총액 바로 아래 = 보유 종목, 제목 없이 (U1 `보유 종목 n개` 삭제)
+            + basis_note()   # 안내 = 맨 끝 카드(종목 줄) 아래 오른쪽   # 총액 바로 아래 = 보유 종목, 제목 없이 (U1 `보유 종목 n개` 삭제)
             + dk.h2("수익", tab="수익")   # 첫 탭 `수익` — 탭 이름과 같은 제목은 테마가 숨긴다. 머리(총액 · 종목 줄)가 이 첫 탭으로 들어간다 (U5)
             + news_block(held)
-            + dk.section("종목 관리", "".join([add_form(held)[0], leave_link(), add_form(held)[1]]), one_line=True, tab="종목 관리"))   # 제목 = 탭 이름과 같게 → 테마가 숨김 (2026-11-12 사용자: `종목 넣기 · 고치기` 제목 삭제)   # 맨 아래 작은 글씨 → 총액 카드 아래 ? 팝업 (2026-11-12 사용자)
+            + dk.section("종목 관리", "".join([add_form(held)[0], leave_link(), add_form(held)[1]]), one_line=True, tab="종목 관리"))   # 제목 = 탭 이름과 같게 → 테마가 숨김   # 맨 아래 작은 글씨 → 총액 카드 아래 ? 팝업
     write(body, "mock_my-stocks.html", NAME)
 
-    # 로그인 뒤 · 아직 아무것도 안 적었을 때 — 탭 없이 안내 카드 + 아래 입력 칸 열림 (2026-11-12 사용자: 처음엔 어떻게 보이나)
+    # 로그인 뒤 · 아직 아무것도 안 적었을 때 — 탭 없이 안내 카드 + 아래 입력 칸 열림
     empty = (dk.dcard(f'<div style="font-size:17px;line-height:26px;font-weight:700;color:#111;">아직 적어 둔 보유 종목이 없습니다</div>'
                       f'<div style="font-size:15px;line-height:24px;color:#333;margin:4px 0 0;">아래 칸에 종목 · 수량 · 평균 매수가를 적고 저장하면, 여기에 총 평가 금액과 수익률이 보입니다.</div>')
              + add_form([])[1])

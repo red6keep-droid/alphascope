@@ -5,7 +5,7 @@
 출처: MrChartist/global-stock-logos (코드 MIT, 로고 대부분은 TradingView 공개 로고 서비스에서 모은 것).
 고정한 커밋에서만 받는다 — 저장소가 바뀌어도 우리 파일은 그대로. 받은 기록은 ref/ticker_logos.json.
 
-운영지침 4-6 (2026-10-22 사용자 결정으로 바꿈): 로고는 종목 식별 용도로만, 원래 모양 그대로, 우리 gh-pages 사본만 쓴다.
+운영지침 4-6: 로고는 종목 식별 용도로만, 원래 모양 그대로, 우리 gh-pages 사본만 쓴다.
 없는 종목 · 삭제 요청이 온 종목은 design_kit.ticker_logo 가 티커 두 글자 배지로 그린다 (REMOVED 에 넣고 다시 돌린다).
 
     python experiments/fetch_ticker_logos.py         # 그 뒤 gh-pages 에 images/logos/* 복사 · 푸시
@@ -56,7 +56,7 @@ def tickers():
     syms |= {s for th in t.THEMES for _, group in th.get("baskets", []) for s in group}
     y = _load("dr_yahoo", os.path.join(BASE, "daily-report", "collect_yahoo.py"))
     syms |= set(y.HISTORY_UNIVERSE["mega"])
-    syms |= {r["sym"] for r in _universe_all().get("us") or []}   # 전체 종목 범위 S&P 500 (universe_all, 2026-11-12 사용자 "로고는 기본적으로 다")
+    syms |= {r["sym"] for r in _universe_all().get("us") or []}   # 전체 종목 범위 S&P 500
     return sorted(s for s in syms if re.fullmatch(r"[A-Z][A-Z.\-]{0,6}", s))
 
 
@@ -105,7 +105,7 @@ def main():
                 missing.append(sym)
                 continue
             svg = re.sub(r"^\s*<!--.*?-->\s*", "", svg, flags=re.S)   # 원본 주석 — 출처는 ref 에 남긴다
-            data = svg.replace('fill="#F0F3FA" d="M0 0h56v56H0z"', 'fill="#FFFFFF" d="M0 0h56v56H0z"', 1).encode("utf-8")   # 원본의 연회청 바탕 네모만 흰색 — 그림은 그대로 (2026-11-15 사용자, 화면 흰 바탕 + 외곽선과 맞춤)
+            data = svg.replace('fill="#F0F3FA" d="M0 0h56v56H0z"', 'fill="#FFFFFF" d="M0 0h56v56H0z"', 1).encode("utf-8")   # 원본의 연회청 바탕 네모만 흰색 — 그림은 그대로
         elif ext == "png" and data.startswith(b"\xff\xd8\xff"):
             ext = "jpg"   # 출처의 META · JPM · ABBV · PG 는 이름만 .png 인 JPEG — 실제 형식대로 저장 (2026-11-07 P374)
         elif ext == "png" and not data.startswith(bytes([0x89]) + b"PNG"):
@@ -122,7 +122,7 @@ def main():
 
 
 def etf_logos(meta):
-    """ETF 로고 = 운용사 로고 사본 (2026-11-16 사용자 "ETF 는 왜 티커 로고가 없어?"). 이미 받은 운용사(상장 계열사) 파일을 ETF 이름으로 복사한다 — 새로 받는 것 없음.
+    """ETF 로고 = 운용사 로고 사본. 이미 받은 운용사(상장 계열사) 파일을 ETF 이름으로 복사한다 — 새로 받는 것 없음.
     파일 이름 = 테마가 찾는 이름(etf_universe.logo_name): 한국 KR_<코드>, 미국 티커. 운용사 사본이 없는 ETF(뱅가드 등)는 배지 그대로."""
     import shutil
     sys.path.insert(0, BASE)

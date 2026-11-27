@@ -1,4 +1,4 @@
-"""홈 미국 증시 · 한국 증시 카드 그래프(썸네일) 시안 목업 (2026-11-14 사용자: "썸네일이라 글씨가 하나도 안 보인다 — 시안을 보고 결정").
+"""홈 미국 증시 · 한국 증시 카드 그래프(썸네일) 시안 목업.
 
     python experiments/home-thumb/mock_thumb.py     # output/mock_home_thumb.html (+ output/thumb_*.webp)
 

@@ -1,18 +1,18 @@
-"""홈 증시시황 카드 목업 (2026-11-17 사용자: "홈에 있는 시황 배너가 필요해, 어떻게 만들지 목업으로").
+"""홈 증시시황 카드 목업.
 
     python experiments/market-commentary/mock_home_commentary.py   # → output/mock_home_commentary.html (비교) + 화면 6개
 
 실제 홈 미리보기(home-split 의 split_html = 지금 홈 기준)에 시황 카드 안을 끼운다. 블로그 · gh-pages 쓰기 0, AI 0.
-  (11-17 사용자 3차: 옛 C(증시 카드 안 한 줄) 버림 · 세 안 모두 실적 발표 배너 바로 밑 = 홈 맨 위 쪽)
+  ( 3차: 옛 C(증시 카드 안 한 줄) 버림 · 세 안 모두 실적 발표 배너 바로 밑 = 홈 맨 위 쪽)
   A 카드형 — 실적 발표 배너 밑 첫 카드: 제목 줄(미국 증시시황 · 날짜 시각) + 배너 그림 + 머리글(그날 주제)
   B 배너 카드형 — 실적 발표 배너 밑, 그림만 카드 폭(둥근 모서리 · 그림자, 주식 공부 배너 같은 꼴)
   C 배너 + 실적 한 줄 — 맨 위 시황 배너(좌우 꽉 · 모서리 직선) + 바로 밑에 실적 발표를 한 줄로(로고 · 종목 · 실적 발표 · D-n, 날짜 · 시각 줄 뺌)
-  → 11-17 사용자 C 로 결정. 4차: 편 이름 알약 = 시각 빼고 `미국 증시시황` 만 · 11px · 제목 글자 바로 위(5 띄움) · 그림 안 `AI 생성 이미지` 삭제(alt 로)
+  → C 로 결정. 4차: 편 이름 알약 = 시각 빼고 `미국 증시시황` 만 · 11px · 제목 글자 바로 위(5 띄움) · 그림 안 `AI 생성 이미지` 삭제(alt 로)
     · 실적 한 줄 높이 +10 · 로고 왼쪽 5 · `D-Day` · 증시 카드 날짜 `11.17 아침` · 증시 카드 요약 글자 = 인물 발언 줄과 같게
     · 카드 순서 = 증시 → Hot Issue → 증시 전망 → 주요 인물 발언 → 주목할 종목 → 시장 흐름과 종목 → 시총 TOP 10
 미국 홈 = 아침 편(am, 08:40 발행 `미국 증시시황`) · 한국 홈 = 저녁 편(pm, 21:00 발행 `한국 증시시황`).
 배너 그림 = banner.compose + 기본 배너(static/default) — Workers AI 를 부르지 않는다.
-미국 · 한국 증시 카드 하루 그래프 = 실제 카드 재료(gh-pages cards/report.json · kr-report.json 11-17 사본, static/sample_cards) — 미리보기는 카드 재료가 없어 글자만 나오던 것 (11-17 사용자 "샘플로 그래프").
+미국 · 한국 증시 카드 하루 그래프 = 실제 카드 재료(gh-pages cards/report.json · kr-report.json 11-17 사본, static/sample_cards) — 미리보기는 카드 재료가 없어 글자만 나오던 것.
 """
 import base64
 import io
@@ -56,17 +56,17 @@ CSS = """<style>
   box-shadow: 0 10px 22.5px -5px rgba(0,0,0,.029), 0 8px 9px -6px rgba(0,0,0,.029); }
 .cm-boxed a:active { opacity: .85; }
 .cm-boxed img { display: block; width: 100%; height: auto; aspect-ratio: 900 / 350; }
-/* C — 시황 배너 좌우 꽉 차게 · 모서리 직선, 로고 줄에 붙임 (11-17 사용자) */
+/* C — 시황 배너 좌우 꽉 차게 · 모서리 직선, 로고 줄에 붙임 */
 .cm-wide { position: relative; margin: calc(-1 * var(--card-gap)) calc(50% - 50vw) 0; background: #06121A; }
 .cm-wide a { display: block; position: relative; border-radius: 0; -webkit-tap-highlight-color: transparent; }
 .cm-wide a:active { opacity: .85; }
 .cm-wide img { display: block; width: 100%; height: auto; aspect-ratio: 900 / 350; border-radius: 0; }
-/* 편 이름 알약 — 제목 글자 왼쪽 끝(그림 가로 8.1%)에 맞추고, 제목 글자 윗선(그림 높이 25.4%, 두 줄 제목 실측)에서 5 위 (11-17 사용자).
+/* 편 이름 알약 — 제목 글자 왼쪽 끝(그림 가로 8.1%)에 맞추고, 제목 글자 윗선(그림 높이 25.4%, 두 줄 제목 실측)에서 5 위.
    한 줄 큰 제목(104px)이 나가는 날은 제목 윗선이 달라 — 적용 때 발행기가 배너를 그리며 윗선 비율을 카드 파일에 같이 적는다 */
 .cm-pill { position: absolute; left: 8.1%; bottom: calc(74.6% + 5px); padding: 2px 8px; border-radius: 999px; background: rgba(6,18,26,.72);
   color: #fff; font-size: 11px; line-height: 16px; font-weight: 600; }
 /* C — 실적 발표 배너를 한 줄로 (기존 일정 배너 그대로, 모양만): 로고 24 · 종목 이름 · 실적 발표 · D-n, 날짜 · 시각 줄은 숨김. 높이 44 */
-#event-banner.cm-strip .eb-slide { gap: 8px; padding: 11.5px 72px 11.5px 7px; }   /* 높이 54 → 47 (2026-11-20 사용자 "7 줄여") */   /* 오른쪽 72 = 점 6개(9 × 6 + 2 × 5 = 64) + 8 — 긴 이름이 점과 겹치지 않게 */   /* 높이 54 (44 + 10, 11-17 사용자) · 로고 왼쪽 5 더 (12 → 7) */
+#event-banner.cm-strip .eb-slide { gap: 8px; padding: 11.5px 72px 11.5px 7px; }   /* 높이 54 → 47 */   /* 오른쪽 72 = 점 6개(9 × 6 + 2 × 5 = 64) + 8 — 긴 이름이 점과 겹치지 않게 */   /* 높이 54 · 로고 왼쪽 5 더 (12 → 7) */
 #event-banner.cm-strip .stock-avatar { width: 24px; height: 24px; font-size: 10px; }
 #event-banner.cm-strip .eb-text { flex-direction: row; align-items: center; gap: 8px; }
 #event-banner.cm-strip .eb-kicker, #event-banner.cm-strip .eb-title-line { display: contents; }
@@ -74,13 +74,13 @@ CSS = """<style>
 #event-banner.cm-strip .eb-title { order: 2; font-size: 14px; line-height: 24px; font-weight: 500; color: rgba(255, 255, 255, .85); }
 #event-banner.cm-strip .eb-dday { order: 3; font-size: 12px; line-height: 19px; padding: 0 6px; align-self: center; }
 #event-banner.cm-strip .eb-when, #event-banner.cm-strip .eb-more { display: none; }
-/* 증시 카드 요약 = 주요 인물 발언 줄과 같은 글자 18 · 행간 34 (PC 901 이상은 둘 다 이미 16 · 32) (11-17 사용자) */
+/* 증시 카드 요약 = 주요 인물 발언 줄과 같은 글자 18 · 행간 34 (PC 901 이상은 둘 다 이미 16 · 32) */
 #report-card .report-columns li, #kr-report-card .report-columns li { font-size: 18px; line-height: 34px; }
 #event-banner.cm-strip .eb-dots { top: 0; bottom: 0; right: 8px; left: auto; align-items: center; }
 </style>"""
 
 
-# 실적 한 줄 — `실적 발표` 는 이름 길이와 상관없이 늘 보인다 (11-17 사용자: 9자 넘으면 숨기던 규칙 되돌림).
+# 실적 한 줄 — `실적 발표` 는 이름 길이와 상관없이 늘 보인다.
 # 넘치는 이름만 끝을 … 로 줄인다 — 폰 360 에서 이름 칸 128px(한글 약 9자). 실적 발표 · D-n 은 줄지 않음.
 LONG_CSS = """<style>#event-banner.cm-strip .eb-name { flex: 0 1 auto; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }</style>"""
 # 샘플 일정 — 853종목 중 이름이 가장 긴 종목(미국 ARE · 한국 한국타이어앤테크놀로지)을 오늘(D-Day)로, 다음으로 긴 종목 · 짧은 종목을 뒤에
@@ -94,8 +94,8 @@ SAMPLE_EVENTS = {
 # Hot Issue 게시일 샘플 — issues.json 에는 아직 칸이 없다(적용 때 issue_watch_daily 가 페이지 연 날짜를 posted 로 적는다, 수집 · AI 0)
 ISSUE_POSTED = {"IRAN": "11.13", "TARIFF": "11.13", "EXPORT": "11.13", "NVDA_CEO": "11.16"}
 
-# 5차 시안 (11-17 사용자) — 편 이름 상자 · Hot Issue 라벨 자리 · 롤링
-OPTS = {   # 11-17 사용자: 시안 3(롤링)으로 결정 — 시안 1(검정 상자 · 라벨 오른쪽) · 2(흰 상자 · 라벨 아래)는 지움(커밋 이력에 있음)
+# 5차 시안 — 편 이름 상자 · Hot Issue 라벨 자리 · 롤링
+OPTS = {   #: 시안 3(롤링)으로 결정 — 시안 1(검정 상자 · 라벨 오른쪽) · 2(흰 상자 · 라벨 아래)는 지움(커밋 이력에 있음)
     "c": {"pill": "dark", "issue": "below", "roll": True},
 }
 PILL_CSS = {
@@ -103,7 +103,7 @@ PILL_CSS = {
     "white": ".cm-pill { border-radius: 0; background: #fff; color: #111; }",
 }
 ISSUE_OLD = "labels.appendChild(el('span', 'news-sub', '최근 일주일 뉴스' + (q.hot ? ' · 평소보다 많음' : '')));"
-ISSUE_NEW = {   # `최근 일주일 뉴스 · 평소보다 많음` 삭제 (11-17 사용자)
+ISSUE_NEW = {   # `최근 일주일 뉴스 · 평소보다 많음` 삭제
     "right": "d.classList.add('is-right');",
     "below": "if (q.posted) labels.appendChild(el('span', 'news-sub', q.posted + ' 게시'));",
 }
@@ -232,9 +232,9 @@ def build(src, mkt, variant, img):
     if not n:
         sys.exit(f"끼울 자리 못 찾음 ({variant} · {mkt}) — index.html 주석 확인")
     html = html.replace("</head>", CSS + "\n</head>", 1)
-    if variant.startswith("c"):   # 4차 (11-17 사용자) — 테마 코드 몇 군데를 목업에서만 바꿔 본다. 적용 때 alphaflow-home.html 에 같은 수정
+    if variant.startswith("c"):   # 4차 — 테마 코드 몇 군데를 목업에서만 바꿔 본다. 적용 때 alphaflow-home.html 에 같은 수정
         html = html.replace("left === 0 ? 'D-DAY' :", "left === 0 ? 'D-Day' :", 1)
-        # 홈 날짜 표기 = `11.17 아침` — 카드 머리 · 구획 날짜가 모두 dayKo 하나를 거친다 (11-17 사용자 "모든 카드 미국 증시 날짜 표기로")
+        # 홈 날짜 표기 = `11.17 아침` — 카드 머리 · 구획 날짜가 모두 dayKo 하나를 거친다
         old_day = "return p.length === 3 ? Number(p[1]) + '월 ' + Number(p[2]) + '일 ' + (part || '기준') : '';"
         new_day = "return p.length === 3 ? ('0' + Number(p[1])).slice(-2) + '.' + ('0' + Number(p[2])).slice(-2) + ' ' + (part || '기준') : '';"
         if old_day not in html:
@@ -252,7 +252,7 @@ def build(src, mkt, variant, img):
     return files[mkt]
 
 
-VARIANTS = [   # 11-17 사용자: C 로 결정(A · B 지움) → 5차 시안 3(롤링)으로 결정(시안 1 · 2 지움)
+VARIANTS = [   #: C 로 결정(A · B 지움) → 5차 시안 3(롤링)으로 결정(시안 1 · 2 지움)
     ("c", "C안 (결정)", "맨 위 = 시황 배너(좌우 꽉 · 모서리 직선), `미국 증시시황` 검정 네모 상자는 제목 바로 위, 그 밑에 실적 발표 한 줄. "
           "Hot Issue · 증시 전망 = 한 줄(질문 + 라벨 · 게시일)씩 3.5초마다 아래에서 위로, 제목 줄 오른쪽 펼침 버튼 = 전부 보기. "
           "카드 순서 = 증시 → Hot Issue → 증시 전망 → 주요 인물 발언 → 주목할 종목 → 시장 흐름과 종목 → 시총 TOP 10."),

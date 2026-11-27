@@ -118,7 +118,7 @@ def technical(bars, snap, sym):
         rb = {x["day"]: x["close"] for x in snap["bars"].get(ref) or []}
         out[key] = r1 - (rb[t["day"]] / rb[p["day"]] - 1) * 100 if t["day"] in rb and p["day"] in rb else None
     try:
-        import tech_signals   # experiments/ — 기술 지표 12 · 이동평균 · 피벗 (2026-10-30 사용자)
+        import tech_signals   # experiments/ — 기술 지표 12 · 이동평균 · 피벗
         out["signals"] = tech_signals.compute(bars)
     except Exception as e:   # noqa: BLE001
         print(f"[radar] {sym} 기술 지표 계산 실패 : {e}")
@@ -127,7 +127,7 @@ def technical(bars, snap, sym):
 
 
 def day_path(bars, day=None):
-    """오늘 하루 흐름 — 전일 종가 대비 시가 · 장중 고점 · 장중 저점 · 종가 % (2026-10-27 사용자 P41). day 를 주면 그날(지수를 종목 날짜에 맞춘다)."""
+    """오늘 하루 흐름 — 전일 종가 대비 시가 · 장중 고점 · 장중 저점 · 종가 %. day 를 주면 그날(지수를 종목 날짜에 맞춘다)."""
     if day is not None:
         bars = [x for x in bars or [] if x["day"] <= day]
     if not bars or len(bars) < 2 or bars[-1]["day"] != (day or bars[-1]["day"]):
@@ -153,7 +153,7 @@ def market_regime(snap):
         if d == 0 or (streak and (d > 0) != (streak > 0)):
             break
         streak += 1 if d > 0 else -1
-    phr = round(ph, 1)   # 판정은 독자에게 보이는 소수 한 자리 값으로 — −2.9997% 가 "−3.0%" 로 찍히는데 상승 추세면 설명과 어긋난다 (2026-11-02 사용자 P275: 경계는 낮은 단계로)
+    phr = round(ph, 1)   # 판정은 독자에게 보이는 소수 한 자리 값으로 — −2.9997% 가 "−3.0%" 로 찍히는데 상승 추세면 설명과 어긋난다
     regime = ("불안 국면" if vix is not None and vix >= NC.REGIME_VIX_HIGH else
               "조정장" if phr <= NC.REGIME_CORRECTION_PCT or c[-1] < ma else "단기 조정" if phr <= NC.REGIME_PULLBACK_PCT else "상승 추세")
     return {"regime": regime, "prev_regime": None, "changed": False, "pct_from_high": ph, "above_ma200": c[-1] >= ma, "ma200": ma,
@@ -291,7 +291,7 @@ def update_ranks(stocks, day, path=STATE):
 
 
 def peer_moves(snap, sym, day):
-    """함께 보는 회사(universe.PEERS)의 같은 날 등락 — [(티커, 관계, 등락 %)]. 그날 봉이 없는 회사는 뺀다 (2026-11-01 사용자 P263)."""
+    """함께 보는 회사(universe.PEERS)의 같은 날 등락 — [(티커, 관계, 등락 %)]. 그날 봉이 없는 회사는 뺀다."""
     out = []
     for p, role in (U.PEERS.get(sym) or {}).items():
         bars = [b for b in snap["bars"].get(p) or [] if b["day"] <= day]
@@ -323,7 +323,7 @@ def run(snap):
     for s in stocks:
         s["mom_peers_median"], s["mom_bench"] = (moms[len(moms) // 2] if moms else None), bench
     day = max(s["day"] for s in stocks)
-    crash = CW.compute(snap["bars"], "us", [c[0] for c in U.CANDIDATES])   # 급락장에서 버틴 종목 — S&P 500 이 2% 넘게 내린 날 (2026-11-04 사용자)
+    crash = CW.compute(snap["bars"], "us", [c[0] for c in U.CANDIDATES])   # 급락장에서 버틴 종목 — S&P 500 이 2% 넘게 내린 날
     for s in stocks:
         s["crash"] = CW.for_stock(crash, s["sym"])
     return {"day": day, "fetched_at": snap["fetched_at"], "stocks": update_ranks(stocks, day), "crash": crash}

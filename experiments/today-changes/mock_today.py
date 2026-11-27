@@ -1,4 +1,4 @@
-"""오늘 달라진 것 — 목업 (기획: 비공개 doc/기획/컨설팅/오늘-달라진-것-기획.md, 2026-11-22 사용자: "목업에 먼저 배치해 봐, 내가 판단").
+"""오늘 달라진 것 — 목업.
 
     .venv/bin/python experiments/today-changes/today_changes.py --state …   # 먼저 output/today_us.json · today_kr.json
     .venv/bin/python experiments/today-changes/mock_today.py                # → output/mock_today_home_us.html · _kr.html · mock_today_report_us.html · _kr.html

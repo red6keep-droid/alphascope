@@ -1,6 +1,6 @@
 name: Home IP fetch
 
-# 집 IP(집 공유기 VPN)로만 열리는 곳을 하루 한 번 받는다 (2026-11-17 사용자) — 미래에셋 TIGER 구성 · 마이클 버리 substack RSS.
+# 집 IP(집 공유기 VPN)로만 열리는 곳을 하루 한 번 받는다 — 미래에셋 TIGER 구성 · 마이클 버리 substack RSS.
 # GitHub 실행기(해외 데이터센터 주소)는 두 곳 모두 403, 집 IP 는 200 (11-17 시험, red9keep/News-sub trial run 44086583552).
 # 받은 것은 비공개 상태 저장소 homeip-state 브랜치(experiments/home-ip/data/) → 한국 종목(16:10) · 인물 발언(08:00)이 읽기만 한다.
 #
@@ -63,7 +63,7 @@ jobs:
             echo "오늘($today) 이미 받음 — 예비 실행 건너뜀"; echo "done=true" >> "$GITHUB_OUTPUT"
           fi
 
-      # 유튜브 수집과 계정을 나눴다(2026-11-23 사용자, VPN_USER_NEWFACT · 할당 IP 따로) — 동시 접속 시험 run 45178786653 에서 두 계정 4분 겹쳐 15/15 유지.
+      # 유튜브 수집과 계정을 나눴다 — 동시 접속 시험 run 45178786653 에서 두 계정 4분 겹쳐 15/15 유지.
       # 그래서 유튜브 수집을 기다리지 않는다. 아래 단계들이 보는 출력(free)만 남긴다
       - name: VPN 계정 = newfact (유튜브 수집과 따로)
         id: wait

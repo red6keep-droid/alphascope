@@ -1,4 +1,4 @@
-"""미국 종목 12-1 모멘텀 검증 — 한국 K18(experiments/kr-stocks/validate_daily.run_price_signals)과 같은 방법 (2026-10-31 사용자 "진행해").
+"""미국 종목 12-1 모멘텀 검증 — 한국 K18(experiments/kr-stocks/validate_daily.run_price_signals)과 같은 방법.
 
     python experiments/stock-radar/validate_momentum_us.py    # → doc/검증/미국-모멘텀-검증.md · data/validate_momentum_us.json
 

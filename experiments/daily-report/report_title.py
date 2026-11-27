@@ -8,10 +8,10 @@ import datetime
 
 KST = datetime.timezone(datetime.timedelta(hours=9))
 
-TITLE_NAME = "미국 증시 리포트"   # 2026-11-10 사용자: 제목이 길다 → `· 코스피 영향` 뺌(한국 증시 리포트와 짝). 검색어 `코스피 영향`은 맨 앞 요약 문장(seo_korea)에 그대로. 날짜는 끝 — 테마가 떼어 오른쪽에 둔다
-PREV_NAME = "미국 증시 리포트 · 코스피 영향"   # 2026-10-18 ~ 11-10 의 이름 (검색어 `코스피 영향`, 2026-10-18 사용자). 그 사이 올린 글을 찾을 때만
+TITLE_NAME = "미국 증시 리포트"   #: 제목이 길다 → `· 코스피 영향` 뺌(한국 증시 리포트와 짝). 검색어 `코스피 영향`은 맨 앞 요약 문장(seo_korea)에 그대로. 날짜는 끝 — 테마가 떼어 오른쪽에 둔다
+PREV_NAME = "미국 증시 리포트 · 코스피 영향"   # 2026-10-18 ~ 11-10 의 이름. 그 사이 올린 글을 찾을 때만
 LEGACY_PREFIX = "미국 증시 리포트 — "   # 2026-10-18 이전 제목. 줄표는 쓰지 않는다 (가이드라인 2-6)
-SLUG_NAME = "us stock market report"   # 영문 주소 (검색 노출, 2026-10-18 사용자)
+SLUG_NAME = "us stock market report"   # 영문 주소
 
 
 def today_kst():

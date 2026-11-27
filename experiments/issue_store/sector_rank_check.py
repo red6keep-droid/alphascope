@@ -1,4 +1,4 @@
-"""업종 안 순위 검증 — 가장 강한 종목 · 조건이 깨진 뒤 · 덜 오른 종목 (2026-11-22 사용자 "검증해").
+"""업종 안 순위 검증 — 가장 강한 종목 · 조건이 깨진 뒤 · 덜 오른 종목.
 
     .venv/bin/python experiments/issue_store/sector_rank_check.py                     # 지금 종목만(1차) → results/sector_rank_check.md
     .venv/bin/python experiments/issue_store/sector_rank_check.py --removed           # + 2016 뒤 제외 94종목(removed_sectors.csv)

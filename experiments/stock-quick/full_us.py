@@ -1,11 +1,11 @@
-"""간단 정보(미국) = 정식 종목 렌더러 그대로 (2026-11-14 사용자 "TIGER 2차전지 테마처럼 · 정식 종목과 거의 차이 없게, 기획서 다시 봐").
+"""간단 정보(미국) = 정식 종목 렌더러 그대로.
 
 기획 6-6: 정식 카드 가운데 막히는 줄(옵션 · 뉴스 · 방송 · 소송)만 빼고 다 — 상세 값은 바뀌는 주기에 맞춰 드물게 받아 저장해 둔다.
 ETF 페이지(stock-etf/etf_pages.us_pages)와 같은 방식: 종목을 이 실행 안에서만 정식 명단(universe)에 얹고, 정식 계산(analyze · analyze_tabs)과
 정식 카드(render_pages)를 그대로 부른다. 정식과 다른 것:
   - 탭 = 오늘 · 매수의견(애널리스트 · 증권사) · 실적 · 업계상황 · 기업. 시장 예상 흔들림(옵션) · 소송은 없다.
     한국 연관 종목 = 정식과 같은 sec_pairs — 검증 통과 짝(ref/kr_us_links.json)이 있는 22종목(GM · BA 등)만 막대 · 기록 표 (11-15부터, 11-16 GM · BA 렌더로 확인).
-    방송 의견 · 방송 줄 · 인물 발언 = 그 종목 자료가 있을 때만(방송 줄은 이 종목이 중심인 방송만, 업종 이슈 X) (2026-11-15 사용자).
+    방송 의견 · 방송 줄 · 인물 발언 = 그 종목 자료가 있을 때만(방송 줄은 이 종목이 중심인 방송만, 업종 이슈 X).
     뉴스 · 중요 이슈 · 뉴스 의견 = quick-news(Finnhub, 15:10) 분류 결과가 있을 때 정식 함수 그대로 (2026-11-15 3단계).
   - 함께 보는 회사 = 사람이 고른 목록 대신 같은 업종에서 1년 등락이 가장 비슷하게 움직인 3곳(상관 계산). 그 회사들 실적 일정 카드도 정식처럼.
   - SEC 공시(Form 4 · 8-K) = 정식 collect_extra.edgar 그대로, 8일만 받아 저장(edgar_us.json).
@@ -45,8 +45,8 @@ import industry_us  # noqa: E402
 import render_pages as RP  # noqa: E402
 
 R = RP.R
-LATE_DAY = None   # 그날 다른 종목의 마지막 일봉 날짜 — collect_quick 이 넣는다. 이보다 이른 종목 = 늦음 상자 (2026-11-21 사용자)
-WHEN = "아침 9시 무렵"            # 간단 정보 미국 = quick-data 08:20 KST(이어 붙이기) · 끝 08:48 쯤 (2026-11-24 사용자 — 옛 `오후 5시 40분` 은 11-15 · 11-20 시각 변경 뒤 그대로였다). 정식 미국 페이지는 아침 7시 30분
+LATE_DAY = None   # 그날 다른 종목의 마지막 일봉 날짜 — collect_quick 이 넣는다. 이보다 이른 종목 = 늦음 상자
+WHEN = "아침 9시 무렵"            # 간단 정보 미국 = quick-data 08:20 KST(이어 붙이기) · 끝 08:48 쯤. 정식 미국 페이지는 아침 7시 30분
 WHEN_KR = "오후 5시 무렵"         # 간단 정보 한국 = 한국 종목(15:50) 뒤 이어 붙이기 · 끝 16:36 쯤. 정식 한국 페이지는 오후 4시 30분
 MARKET = sorted({U.BENCH, "^VIX", "SMH", "^GSPC", *__import__("collect").SECTOR_ETFS})
 BUDGET = {"detail": 90, "sec": 100, "hist": 100}   # 한 번 실행에 새로 받는 종목 수 상한 — 첫 주에 나눠 채우고, 그 뒤는 주기만큼만 (기획 6-6 `요일 나눔`)
@@ -77,7 +77,7 @@ SUB_BIZ = {
 }
 
 
-# 종목별 업계 카드 배정표 (2026-11-25 사용자 "미국도 한국처럼") — build_us_industry_fix.py 가 503종목을 점검해 만든 ref/us_industry_fix.json. 한국 kr_industry_fix.json 과 같은 꼴
+# 종목별 업계 카드 배정표 — build_us_industry_fix.py 가 503종목을 점검해 만든 ref/us_industry_fix.json. 한국 kr_industry_fix.json 과 같은 꼴
 try:
     US_FIX = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "ref", "us_industry_fix.json"), encoding="utf-8"))
 except (OSError, ValueError):
@@ -300,7 +300,7 @@ EDGAR_DAYS = 8   # 화면은 7일(_news_for) — 정식처럼 30일을 받으면
 
 
 def edgar(cache_dir, syms):
-    """SEC 공시(임원 거래 Form 4 · 수시 공시 8-K) — 정식 collect_extra.edgar 그대로, 받은 공시는 저장해 다시 안 받는다. 실패하면 지난 값 (2026-11-15 사용자)."""
+    """SEC 공시(임원 거래 Form 4 · 수시 공시 8-K) — 정식 collect_extra.edgar 그대로, 받은 공시는 저장해 다시 안 받는다. 실패하면 지난 값."""
     import collect_extra
     import expect as EX
     path = os.path.join(cache_dir, "edgar_us.json")
@@ -399,7 +399,7 @@ def sec_expect(s):
 
 
 def earnings_tab(s):
-    cal = RP.sec_calendar(s, ("earnings", "peers", "macro"), open_first=False)   # 함께 보는 회사 일정 = 상관 3곳의 실적일(Finnhub 달력, 이미 받음) (2026-11-15 사용자)
+    cal = RP.sec_calendar(s, ("earnings", "peers", "macro"), open_first=False)   # 함께 보는 회사 일정 = 상관 3곳의 실적일(Finnhub 달력, 이미 받음)
     ex = sec_expect(s)
     if not ex and not cal:
         return ""
@@ -413,7 +413,7 @@ def opinions_tab(s):
         return ""
     keep = R.picks_card
     if not ps and not MEDIA_OK:
-        R.picks_card = _no_picks   # 방송 자료를 못 읽었으면 카드 없이 — 읽었는데 없으면 정식처럼 `없음` 카드 (2026-11-16 사용자, 옛 11-15 "있을 때만")
+        R.picks_card = _no_picks   # 방송 자료를 못 읽었으면 카드 없이 — 읽었는데 없으면 정식처럼 `없음` 카드
     try:
         return R.opinions_cards(s["name"], cells, s.get("close"), ps if (ps or MEDIA_OK) else None, lambda v: f"${v:,.2f}", lambda: RP.together_items(s),
                                 broker=s.get("broker") or [], news_ops=RP._news_opinions(s) if RP.NEWS else None, closes=[b["close"] for b in (RP.BARS.get(s["sym"]) or [])[-R.PICK_SHOW_DAYS:]])
@@ -452,7 +452,7 @@ def full_group(radar_dir):
     return group, {s: rev[s] for s in group if s in rev}, {s: {"eps": cache.get(s, "eps")} for s in group if cache.get(s, "eps")}
 
 
-MEDIA_OK = False   # 방송 자료를 실제로 읽었나 — 읽었을 때만 `방송 의견 없음` 카드를 둔다(안 읽고 없다고 말하지 않는다, 2026-11-16 사용자: 없어도 `없음` 카드)
+MEDIA_OK = False   # 방송 자료를 실제로 읽었나 — 읽었을 때만 `방송 의견 없음` 카드를 둔다
 
 
 def media_inputs():
@@ -520,9 +520,9 @@ def build(ref_us, bars_all, earn, det, sec, hist, fred_data, macro=None, only=No
     print(f"[quick-us] 방송 자료 읽기 {time.time() - t_m:.0f}초", flush=True)
     MF = RP.media_feed
     keep_for_page = MF.for_page
-    MF.for_page = lambda rs, sym: MF.for_ticker(rs, sym, U.name(sym))   # 방송 줄 = 이 종목이 중심인 방송만 — 정식의 `업종 이슈면 업종 종목 전부` 는 간단 종목 수십 곳에 같은 줄이 깔려 뺀다 (2026-11-15 사용자 "있을 때만")
+    MF.for_page = lambda rs, sym: MF.for_ticker(rs, sym, U.name(sym))   # 방송 줄 = 이 종목이 중심인 방송만 — 정식의 `업종 이슈면 업종 종목 전부` 는 간단 종목 수십 곳에 같은 줄이 깔려 뺀다
     mr, ms = analyze.market_regime(snap), analyze.market_shock(snap)
-    crash = RP.CW.compute(bars_all, "us", quick)   # 급락장에서 어땠나? — 정식과 같은 계산(지수 −2% 넘은 날 버텼나), 일봉만 (2026-11-14 사용자)
+    crash = RP.CW.compute(bars_all, "us", quick)   # 급락장에서 어땠나? — 정식과 같은 계산(지수 −2% 넘은 날 버텼나), 일봉만
     out, fails = {}, 0
     t0 = time.time()
     for i, sym in enumerate(quick):

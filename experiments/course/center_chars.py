@@ -1,4 +1,4 @@
-"""주식 공부 캐릭터 — 강조 줄용 '가운데 맞춤' 그림 만들기 (2026-11-21 사용자 P592: 캐릭터가 노란 상자 아래쪽에 붙어 보인다 → 상자 안 세로 가운데).
+"""주식 공부 캐릭터 — 강조 줄용 '가운데 맞춤' 그림 만들기.
 
     .venv/bin/python experiments/course/center_chars.py      # chars/*.webp(320×320) → chars/c_*.webp
 
@@ -29,7 +29,7 @@ def main():
         out = Image.new("RGBA", im.size, (0, 0, 0, 0))
         out.paste(part, ((320 - part.width) // 2, (320 - part.height) // 2))
         out.save(os.path.join(HERE, "c_" + name), "WEBP", quality=90, method=6)
-        # 대결용 = 위쪽 투명 여백만 잘라 낸 그림(바닥 맞춤 · 가로 320 그대로) — 말풍선 꼬리 바로 아래에 몸이 오게 (2026-11-21 사용자 P596)
+        # 대결용 = 위쪽 투명 여백만 잘라 낸 그림(바닥 맞춤 · 가로 320 그대로) — 말풍선 꼬리 바로 아래에 몸이 오게
         im.crop((0, bb[1], 320, 320)).save(os.path.join(HERE, "t_" + name), "WEBP", quality=90, method=6)
         n += 1
     print(f"[가운데] {n}장 → chars/c_*.webp · 대결용 t_*.webp")

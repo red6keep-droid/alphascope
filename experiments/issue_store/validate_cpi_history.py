@@ -1,4 +1,4 @@
-"""증시 전망 거시 기본 사례 = 물가 발표(CPI) — 기록상 비슷한 때 실측 (2026-11-08 사용자 "적용하고 검증해").
+"""증시 전망 거시 기본 사례 = 물가 발표(CPI) — 기록상 비슷한 때 실측.
 
     python experiments/issue_store/validate_cpi_history.py      # 표 출력 + output/cpi_history.json
 

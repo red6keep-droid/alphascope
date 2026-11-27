@@ -1,4 +1,4 @@
-"""오래된 날짜 그림 정리 — 30일 지난 그림은 글에서 그래프 칸을 빼고 gh-pages 에서 지운다 (2026-11-12 사용자: "30일 정도만 키워줘. 칸까지도 다 빼야지").
+"""오래된 날짜 그림 정리 — 30일 지난 그림은 글에서 그래프 칸을 빼고 gh-pages 에서 지운다.
 
     python experiments/image_prune.py                # 미리 보기 — 고칠 글 · 지울 그림 목록만 (아무것도 안 바꿈)
     python experiments/image_prune.py --apply        # 글 고침(Blogger PATCH) → 그림 지움(gh-pages 커밋 · 푸시)

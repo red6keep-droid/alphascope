@@ -1,6 +1,6 @@
 name: Duplicate pages (숫자 붙은 중복 고정 페이지)
 
-# 손으로만 — 11-21 도메인 연결 직후 생긴 `_숫자` 중복 페이지 찾기 · 지우기 (experiments/stock-radar/dup_pages.py, 2026-11-24 사용자)
+# 손으로만 — 11-21 도메인 연결 직후 생긴 `_숫자` 중복 페이지 찾기 · 지우기
 on:
   workflow_dispatch:
     inputs:

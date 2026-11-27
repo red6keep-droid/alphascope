@@ -1,4 +1,4 @@
-"""블로그 검색 · 질문하기 목업 (2026-11-10 사용자: "로고 영역에 검색 아이콘, 검색하면 해당 내용 + 블로그용 챗봇").
+"""블로그 검색 · 질문하기 목업.
 
     python experiments/site-search/mock_search.py     # output/mock_search.html
 
@@ -31,7 +31,7 @@ def main():
     subprocess.run([sys.executable, os.path.join(HERE, "build_search_index.py")], env=env, check=True)
     subprocess.run([sys.executable, os.path.join(ROOT, "build_theme.py"), "--preview"], cwd=ROOT, env=env, check=True, stdout=subprocess.DEVNULL)
     html = read(os.path.join(ROOT, "preview.html"))
-    # 상단 · 홈 = 지금 홈 나누기 화면(미국) 기준 — 미국 · 한국 스위치는 홈 나누기 목업으로 간다 (2026-11-10 사용자: "질문하기 상단이 예전 것")
+    # 상단 · 홈 = 지금 홈 나누기 화면(미국) 기준 — 미국 · 한국 스위치는 홈 나누기 목업으로 간다
     sys.path.insert(0, os.path.join(ROOT, "experiments", "home-split"))
     import mock_home_split as HS  # noqa: E402
     html = HS.split_html(html, "us", {m: "../../home-split/output/" + f for m, f in HS.FILES.items()})

@@ -4,7 +4,7 @@
 
 하루 한 번(평일 17:40 KST — 한국 장 마감 뒤, 미국은 지난밤 종가). AI 0 · Blogger 0 · 그림 0.
   1. 일봉 2년 — 정식 수집과 같은 함수(미국 collect._bars · 한국 collect_kr._bars), 100개씩 묶음. 매일 새로 받으므로 분할 · 무상증자는 야후가 고친 값 그대로(6-3-1).
-  2. 화면 = 정식 종목 렌더러 그대로(full_us · full_kr — 2026-11-14 사용자 "TIGER 2차전지처럼 · 정식과 거의 차이 없게"). 빠지는 것 = 옵션 · 뉴스 · 방송 · 소송(6-6).
+  2. 화면 = 정식 종목 렌더러 그대로. 빠지는 것 = 옵션 · 뉴스 · 방송 · 소송(6-6).
      상세 값(애널리스트 · 이익 예상 · 공매도 · 기업 · 분기 실적 · 고점 회복)은 주기에 맞춰 하루 상한만큼 받아 --cache 에 둔다(첫 주에 나눠 채움).
   3. 미국 실적일 = Finnhub 실적 달력(지난 2년 처음 한 번, 그 뒤 주 1회). 키는 첫 키만(price_source._key 규칙).
   4. 덧붙이는 카드 — 미국 `이름이 나온 기사`(이미 모은 기사 제목, --news) · 한국 `최근 공시`(DART 공시 목록) 7일 · 3줄. AI 0.
@@ -35,7 +35,7 @@ UA = {"User-Agent": "AlphaScope-quick/0.1"}
 KST = datetime.timezone(datetime.timedelta(hours=9))
 BENCH = {"US": ("^GSPC", "S&P 500"), "KOSPI": ("^KS11", "코스피"), "KOSDAQ": ("^KQ11", "코스닥")}
 MIN_SHARE = 0.9
-NEWS_DAYS = 7   # 옛 NEWS_MAX = 3 자르기 없앰 — 화면이 전부 싣고 5건 펼침 (2026-11-16 사용자)
+NEWS_DAYS = 7   # 옛 NEWS_MAX = 3 자르기 없앰 — 화면이 전부 싣고 5건 펼침
 sys.path.insert(0, EXP)
 sys.path.insert(0, os.path.join(EXP, "stock-radar"))
 sys.path.insert(0, os.path.join(EXP, "kr-stocks"))
@@ -189,7 +189,7 @@ def news_for(name_en, titles, cut):
 
 # ── 한국 공시 (DART 공시 목록) — 정식 한국 실행과 같은 함수 (kr-stocks/collect_kr_dart.filings, 2026-11-16) ──
 def kr_caps(cache, ref_kr, bars_kr, kr_syms):
-    """한국 시가총액 · 순위 — 정식 · 간단 모두 같은 셈(DART 보통주 발행 주식 수 × 종가, 2026-11-16 사용자).
+    """한국 시가총액 · 순위 — 정식 · 간단 모두 같은 셈.
     순위 = 우리 명단(코스피200 · 코스닥150 · 정식) 보통주 안에서 큰 순 → 화면은 RANK_SHOW 위까지만 순위, 그 밖은 금액만(명단 밖 큰 회사가 끼어들 수 있어서).
     전체 명단을 이번 실행에서 받았을 때만 kr/cap_rank.json 을 새로 쓴다 — 정식 한국 실행이 읽어 같은 순위를 쓴다. → {sym: {"cap", "rank"}}"""
     import collect_kr_dart as KD
@@ -312,7 +312,7 @@ def main():
     for m in metas:
         if m["sym"] in got:
             newest[m["mk"]] = max(newest.get(m["mk"], ""), got[m["sym"]][0][-1])
-    # 늦음 상자 기준 = 그 나라 종목이 받은 마지막 날 (2026-11-21 사용자 — 가이드라인 2절 3번). 이보다 이른 종목 · 전날 조각은 늦음 상자로
+    # 늦음 상자 기준 = 그 나라 종목이 받은 마지막 날. 이보다 이른 종목 · 전날 조각은 늦음 상자로
     late_day = {d: max((got[m["sym"]][0][-1] for m in metas if m["dir"] == d and m["sym"] in got), default=None) for d in ("us", "kr")}
     FU.LATE_DAY, FK.LATE_DAY = late_day["us"], late_day["kr"]
 
@@ -375,7 +375,7 @@ def main():
     rel = lambda s, e, mk: RQ.related({"s": s, "sec": e.get("sector"), "m": mk}, full)  # noqa: E731
     xtra = lambda s: RQ.extra_cards(files[s]) if s in files else ""  # noqa: E731
     pages = {}
-    try:   # 기업 소개 두 문장 — 하루 상한만큼 만들고(Gemini lite 하루 25회까지), 만든 것은 정식 렌더러 ABOUT 표에 (2026-11-15 사용자). 실패해도 화면은 나간다
+    try:   # 기업 소개 두 문장 — 하루 상한만큼 만들고(Gemini lite 하루 25회까지), 만든 것은 정식 렌더러 ABOUT 표에. 실패해도 화면은 나간다
         import company_intro as CI
         if not a.limit:
             CI.run(cache, ref, only=only or None)
@@ -424,7 +424,7 @@ def main():
         FK.earn_kr(cache, ref["kr"], q_kr, key=first_key("DART_API_KEY"))
         lap("한국 잠정실적 날짜")
         us_earn = (FU._load(os.path.join(cache, "earn_us.json"), {}) or {}).get("rows") or {}   # 미국 간단 실행(아침)이 받아 둔 실적 달력 — 새로 부르지 않는다
-        try:   # 잠정실적 숫자 — 7일 공시 목록에 잠정실적 줄이 보인 회사만 원문 1회, 캐시에 없는 회사는 처음 한 번 목록(하루 60곳). AI 0 (2026-11-16 사용자)
+        try:   # 잠정실적 숫자 — 7일 공시 목록에 잠정실적 줄이 보인 회사만 원문 1회, 캐시에 없는 회사는 처음 한 번 목록(하루 60곳). AI 0
             import dart_prelim
             cmap = (FU._load(os.path.join(cache, "kr", "dart_corp.json"), {}) or {}).get("map") or {}
             render_kr_mod = sys.modules.get("render_kr")
@@ -437,7 +437,7 @@ def main():
         lap("한국 잠정실적 숫자")
         for c, h in FK.build(ref["kr"], bars_kr, flows, hist_full, det, dd, hq, only=set(kr_syms),
                              related=lambda s, e: rel(s, e, "KR"), extra_today=None, caps=caps, us_earn=us_earn,
-                             disc=lambda s: (files.get(s) or {}).get("disc") or []).items():   # 최근 공시 = 기업 탭 끝 (2026-11-16 사용자, 옛 오늘 탭 끝)
+                             disc=lambda s: (files.get(s) or {}).get("disc") or []).items():   # 최근 공시 = 기업 탭 끝
             pages[("kr", c)] = h
         lap("한국 화면")
     except LookupError as e:
@@ -453,7 +453,7 @@ def main():
         key = (m["dir"], m["file"])
         if key not in pages and prev and os.path.exists(os.path.join(prev, m["dir"], m["file"] + ".html")):
             h = open(os.path.join(prev, m["dir"], m["file"] + ".html"), encoding="utf-8").read()
-            if late_day.get(m["dir"]):   # 오늘 다른 종목보다 날짜가 이르면 늦음 상자 (2026-11-21 사용자: 빠진 건 빼고 나가되 늦은 줄 알게)
+            if late_day.get(m["dir"]):   # 오늘 다른 종목보다 날짜가 이르면 늦음 상자
                 h = dk.mark_stamp_late(h, dk.kst_close_day(late_day[m["dir"]], "US" if m["dir"] == "us" else "KR"))
             open(os.path.join(out, m["dir"], m["file"] + ".html"), "w", encoding="utf-8").write(h)
             reused += 1
@@ -471,7 +471,7 @@ def main():
         print(f"[quick] {d}: 화면 조각 {len(hs)}개 평균 {sum(hs) // max(1, len(hs)) // 1024}KB · 폴더 합계 {tot // 1024 // 1024}MB")
     print(f"[quick] 일봉 {secs}초 · 받음 {fresh}/{total} · 전날 값 {carried} · 없음 {missing} · 전날 조각 {reused} · 기준일 {newest} · 전체 {round(time.time() - t0)}초")
     print(f"[quick] 1년 미만 {stats['short']} · 거래정지 {stats['halted']} · 실적일 {stats['earn']} · 기사 {stats['news']} · 공시 {stats['disc']}")
-    # 옛: 오늘 받은 종목이 90% 밖이면 통째로 안 올림 → 받은 종목은 오늘 값, 못 받은 종목은 전날 값 + 늦음 상자로 올린다 (2026-11-21 사용자: "통으로 안 되는 건 아니다").
+    # 옛: 오늘 받은 종목이 90% 밖이면 통째로 안 올림 → 받은 종목은 오늘 값, 못 받은 종목은 전날 값 + 늦음 상자로 올린다.
     # 막는 것은 올리면 페이지가 사라질 때뿐 — 오늘 값도 전날 값도 없는 종목이 10% 넘으면(지난 결과를 못 읽은 날 등) 지난 배포를 그대로 둔다
     if fresh < total * MIN_SHARE:
         try:

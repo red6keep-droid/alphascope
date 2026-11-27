@@ -1,4 +1,4 @@
-// 관리자 전용 운영 페이지 (Cloudflare Worker + GitHub 로그인, 2026-10-23 사용자).
+// 관리자 전용 운영 페이지.
 //
 // 보여 주는 것 — 날짜(KST) 하나에 대해:
 //   1) 리포트별 발행 현황: 발행 · 갱신 · 이미 있음 · 미발행(이유) · 에러 중단 · 실행 없음(예약 누락)
@@ -7,9 +7,9 @@
 //   4) 그 밖의 워크플로 실패 (뉴스 · 시세 · 댓글)
 // 자료: Cloudflare KV(OPS_KV) 의 운영 기록(experiments/ops_log.py 가 실행마다 씀) + GitHub Actions 실행 목록(API).
 //
-// 접근: GitHub OAuth 로그인 → ADMIN_GITHUB_LOGINS 의 계정만 통과 (Cloudflare Access 는 카드 등록이 필요해 쓰지 않는다, 2026-10-23 사용자).
+// 접근: GitHub OAuth 로그인 → ADMIN_GITHUB_LOGINS 의 계정만 통과.
 //       또는 블로그 구글 로그인(Firebase) — 블로그 메뉴 `운영 현황` 이 ID 토큰을 POST /fb-login 으로 보낸다. 서명(구글 공개 키) · 프로젝트 ·
-//       만료를 확인하고 ADMIN_FIREBASE_UIDS 의 UID 만 통과 (2026-11-13 사용자 "알파스코프 계정으로 로그인하면 관리자만 보는 페이지").
+//       만료를 확인하고 ADMIN_FIREBASE_UIDS 의 UID 만 통과.
 // 첫 화면(/) = 운영 대시보드 — experiments/ops-dashboard/build_ops.py 가 한 시간마다 만들어 KV dash:html 에 올린 페이지를 그대로 보낸다.
 // 날짜별 실행 화면은 /runs.
 // GITHUB_CLIENT_ID · GITHUB_CLIENT_SECRET · SESSION_SECRET · ADMIN_GITHUB_LOGINS 중 하나라도 없으면 아무것도 보여 주지 않는다.
@@ -459,7 +459,7 @@ export default {
       return redirect("/runs");
     }
     if (url.pathname === "/ontime") {
-      // 발행 시간 — 독자에게 알린 시각에 글이 나갔나 · 어긴 횟수 누적 (2026-11-24 사용자). build_ops.py 가 한 시간마다 KV dash:ontime 에 올린다
+      // 발행 시간 — 독자에게 알린 시각에 글이 나갔나 · 어긴 횟수 누적. build_ops.py 가 한 시간마다 KV dash:ontime 에 올린다
       const page = env.OPS_KV ? await env.OPS_KV.get("dash:ontime") : null;
       if (page) return new Response(page, { headers: DASH_HEADERS });
       return new Response(simplePage("발행 시간", "아직 만들어진 페이지가 없습니다. 운영 대시보드 실행(매시 50분)을 기다리세요.", false), { headers: HEADERS });

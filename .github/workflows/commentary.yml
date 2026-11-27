@@ -1,13 +1,13 @@
 name: Market Commentary
 
-# 증시 시황(AlphaScope 시황 해설) 발행 (2026-11-19 사용자 "발행기 만들어", 처음부터 공개).
+# 증시 시황(AlphaScope 시황 해설) 발행.
 # 수집기(News-sub)가 columns/{날짜}-{am|pm} 에 글을 쓰고(08:10 · 20:30, 마감 08:30 · 20:40), 이 워크플로가 ready 글만 읽어 발행한다.
 # 블로그 AI 0. 순서 = 읽기 · 검사 · 배너(Workers AI 1장) → 배너 gh-pages → CDN 확인 → Blogger 공개 발행.
 # 정시 = Cloudflare Worker(infra/cron-trigger KST 08:40 · 17:00 저녁 1차(평일) · 21:00). GitHub cron 은 예비 — 이미 발행됐으면 publish 단계가 건너뛴다
-# (단 수집기 rev 가 올랐으면 같은 주소에 고쳐 쓴다 — 저녁 편 17:00 1차 → 21:00 rev 2, 2026-11-20 사용자 News-doc 31절),
+#,
 # 발행 시각이 한참 지난 글(아침 12:00 · 저녁 23:59 KST 뒤)은 내지 않는다.
-# 수집 완료 즉시 발행 (2026-11-26 사용자 "수집 완료 시점에서 발행"): 수집기가 ready 를 저장한 직후 이 워크플로를 부른다
-# (inputs: scheduled=true · caller=collector · slot · date). 아침 편 1차(round 1)는 거른다 — 완성본(2차)만 (사용자 "완성본만 내자").
+# 수집 완료 즉시 발행: 수집기가 ready 를 저장한 직후 이 워크플로를 부른다
+# (inputs: scheduled=true · caller=collector · slot · date). 아침 편 1차(round 1)는 거른다 — 완성본(2차)만.
 # Worker 08:40 · 17:00 · 21:00 은 안전망으로 그대로 — 수집기 부르기가 실패한 날 지금처럼 낸다. 이미 나갔으면 바로 끝남.
 
 run-name: "Market Commentary · ${{ inputs.caller || (inputs.scheduled && 'worker') || github.event_name }} ${{ inputs.slot }}"
@@ -186,7 +186,7 @@ jobs:
 
       # 빠진 편 자동 메우기 — 정시 · 예비 실행만(다시 부른 실행은 또 부르지 않음). 이번 편 성공 · 실패와 상관없이 직전 두 편을 본다.
       # 수집기 글이 ready 인데 Blogger 에 없으면 그 편을 date 지정 손 실행으로 다시 부른다(마감 시각 검사 없음, 429 면 30분마다 다시).
-      # 11-24 저녁 편이 Blogger 429 로 빠지고 다음 날 사람이 손으로 낸 것을 자동으로 (2026-11-25 사용자). 읽기만: Firestore 2건 · Blogger 목록 2번
+      # 11-24 저녁 편이 Blogger 429 로 빠지고 다음 날 사람이 손으로 낸 것을 자동으로. 읽기만: Firestore 2건 · Blogger 목록 2번
       - name: Catch up missed editions
         if: always() && env.IS_SCHEDULED == 'true'
         continue-on-error: true

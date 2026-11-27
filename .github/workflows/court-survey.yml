@@ -1,7 +1,7 @@
 name: Court Survey
 
 # 미국 종목 소송 추적 후보 조사 (experiments/stock-radar/court.py --survey, P270).
-# 처음 한 번 하는 일 — 사람이 손으로 돌린다. 컴퓨터마다 토큰을 설정하지 않도록 Actions 비밀 값을 쓴다 (2026-11-02 사용자).
+# 처음 한 번 하는 일 — 사람이 손으로 돌린다. 컴퓨터마다 토큰을 설정하지 않도록 Actions 비밀 값을 쓴다.
 # 결과(court_survey.json · .md)는 court-survey 브랜치에 남긴다. 다시 돌리면 끝난 종목은 건너뛰고 남은 종목부터 이어 간다.
 # CourtListener 무료 한도에 걸리면 최대 65분까지 기다렸다 이어 간다(COURT_MAX_WAIT). 그보다 길면 저장하고 멈춘다 → 다시 실행.
 # 사람이 후보를 확인해 experiments/stock-radar/court_watch.json 에 옮기면, 매일 NVDA Report 실행이 그 사건의 일정을 읽는다.

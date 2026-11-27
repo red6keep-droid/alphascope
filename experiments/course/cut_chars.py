@@ -1,4 +1,4 @@
-"""강좌 캐릭터 시트 → 칸마다 투명 배경 그림 (2026-11-14 사용자: 캐릭터 시트를 주면 잘라서 쓰기).
+"""강좌 캐릭터 시트 → 칸마다 투명 배경 그림.
 
     .venv/bin/python experiments/course/cut_chars.py
 

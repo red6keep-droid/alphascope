@@ -1,4 +1,4 @@
-"""한국 종목 분기 매출 — 금융감독원 OpenDART 단일회사 주요계정 (2026-10-25 사용자: "실적 탭에 1년밖에 없나" → DART 로).
+"""한국 종목 분기 매출 — 금융감독원 OpenDART 단일회사 주요계정.
 
 Yahoo 는 최근 5~6분기만 줘서 `1년 전 대비` 가 1분기뿐이었다. DART 는 2015년부터 분기 · 반기 · 사업보고서를 준다.
 - 보고서마다 thstrm_amount = 그 석 달(분기 · 반기 보고서) · 1년치(사업보고서) → 4분기 = 1년치 − 3분기까지 누적(thstrm_add_amount).
@@ -182,7 +182,7 @@ def run():
     return out
 
 
-# ── 최근 공시 목록 · 발행 주식 수 — 한국 정식 · 간단 종목이 같이 쓴다 (2026-11-16 사용자) ──
+# ── 최근 공시 목록 · 발행 주식 수 — 한국 정식 · 간단 종목이 같이 쓴다 ──
 KST = datetime.timezone(datetime.timedelta(hours=9))
 FILINGS = os.path.join(BASE, "data", "dart_list.json")   # 정식 실행 = kr-state, 간단 실행 = quick-state 에 따로
 SHARES = os.path.join(BASE, "data", "dart_shares.json")

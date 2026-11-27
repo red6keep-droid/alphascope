@@ -1,4 +1,4 @@
-"""모의투자 목업 (2026-11-21 사용자 — 비공개 기획 alphascope-docs doc/기획/모의투자-기획.md).
+"""모의투자 목업.
 
     python experiments/mock-invest/mock_invest.py   → output/mock_invest-*.html (목업 서버 `mock-invest` 묶음)
 
@@ -492,7 +492,7 @@ POP_JS = ("<script>(function(){document.querySelectorAll('[data-mock]').forEach(
 
 
 # ─────────────────────────── 하단 메뉴 두 줄 + 토글 · 내 사진 → 내 정보 ───────────────────────────
-# 2026-11-21 사용자 (키움 영웅문S# 캡처): 하단 메뉴가 많아지니 오른쪽 토글로 5칸씩 바꿔 보기.
+# (키움 영웅문S# 캡처): 하단 메뉴가 많아지니 오른쪽 토글로 5칸씩 바꿔 보기.
 #   첫 줄 = 지금 5칸 그대로(홈 · 증시 리포트 · 종목 · 증시 전망 · 인물 발언) · 둘째 줄 = 지갑 · 알림 · 보유 종목 · 순위 · 내 정보
 #   토글 = 로그인 뒤에만 보인다(로그인 전 동작 안 되는 버튼은 노출 안 함, 2026-10-13 규칙) · 고른 줄은 이 브라우저에만 기억
 #   읽지 않은 알림 = 알림 아이콘 빨간 점, 첫 줄을 보고 있으면 토글에도 빨간 점
@@ -537,7 +537,7 @@ def theme_tabbar():
                  ("stock", "../../stock-lists/output/mock_stock-lists-live-kr.html"), ("forecast", "../../issue_store/output/mock_forecast-list-eh.html"),
                  ("people", "../../people-radar/output/radar_mock.html")):
         nav = re.sub(rf"(<a data-tab='{k}' href=')[^']*'", rf"\g<1>{h}'", nav)
-    # 2026-11-22 사용자: 첫 줄 6칸 = 홈 · 리포트 · 종목 · 전망 · 핫이슈 · 토론(인물 발언 뺌 → 전체 메뉴). 6칸 + 토글이면 칸 56(360 폰 51)이라 라벨 줄임
+    #: 첫 줄 6칸 = 홈 · 리포트 · 종목 · 전망 · 핫이슈 · 토론(인물 발언 뺌 → 전체 메뉴). 6칸 + 토글이면 칸 56(360 폰 51)이라 라벨 줄임
     nav = nav.replace("<span>증시 리포트</span>", "<span>리포트</span>").replace("<span>증시 전망</span>", "<span>전망</span>")
     nav = re.sub(r"\s*<a data-tab='people'.*?</a>", "", nav, flags=re.S)
     extra = "".join(f"<a data-tab='{k}' href='{h}'><svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-linecap='round' stroke-linejoin='round' aria-hidden='true' stroke-width='{w}'>{ICON[k]}</svg><span>{t}</span></a>"
@@ -655,7 +655,7 @@ def alerts_page():
     write(body, "mock_invest-alerts.html", label="알림", nav=("b", "bell"), share=False)
 
 
-NO_SHARE = '<span data-no-share="1" hidden></span>'   # 본인만 보는 화면 = 공유 버튼 없음 (2026-11-21 사용자, 테마가 .post-body [data-no-share] 를 보고 숨김)
+NO_SHARE = '<span data-no-share="1" hidden></span>'   # 본인만 보는 화면 = 공유 버튼 없음
 
 
 def write(body, name, label="모의투자", tail="", nav=("b", ""), share=True):

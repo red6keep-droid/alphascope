@@ -1,4 +1,4 @@
-"""종목 주가(간단 종목) 전용 고정 페이지 — 종목마다 주소 하나 (2026-11-15 사용자).
+"""종목 주가(간단 종목) 전용 고정 페이지 — 종목마다 주소 하나.
 
 왜: `/p/stock.html?s=코드` 하나로는 Blogger 가 대표 주소(canonical · og:url)에서 `?s=` 를 떼어, 구글이 768종목을 한 페이지로 보고
     공유 링크도 종목 코드가 빠진다(11-15 실제 블로그로 확인). 종목마다 `/p/<영문이름>-<티커>-stock.html` 을 만든다.
@@ -9,7 +9,7 @@
     스크립트를 고쳐도 768쪽을 다시 쓰지 않는다 — 페이지는 소개가 바뀔 때만 고쳐 쓴다(해시가 같으면 건너뜀).
 쓰기: 새 페이지 하루 NEW_CAP(25) · 고쳐 쓰기 하루 UPDATE_CAP(100), 4초 간격, 429 백오프 후에도 429 면 그 실행 멈춤(publish_pages 와 같은 규칙).
      새 페이지 = 밤 23:40 따로 실행(quick-shells-new.yml, --new-only)만, 한국 날짜 하루 합계 NEW_CAP(cache/shells_new_day.json).
-     장 마감 실행(quick-data)은 --no-new 로 고쳐 쓰기만 (2026-11-24 사용자: 실행마다 50쪽 · 하루 약 100쪽을 몰아 만든 직후
+     장 마감 실행(quick-data)은 --no-new 로 고쳐 쓰기만 (: 실행마다 50쪽 · 하루 약 100쪽을 몰아 만든 직후
      Blogger 가 4시간 넘게 새 글을 막아 17:00 · 21:00 시황이 빠졌다).
      소개가 아직 없는 종목은 만들지 않는다(같은 틀만 있는 페이지를 먼저 내보내지 않게).
 기록: --cache(비공개 quick-state)/shells.json {sym: {"url", "id", "hash"}} — 브라우저용 주소표는 Pages /shells.json {파일 이름: 주소}.
@@ -37,7 +37,7 @@ sys.path[:0] = [HERE, EXP, os.path.join(EXP, "stock-radar"), os.path.join(EXP, "
 import design_kit as dk  # noqa: E402
 import company_intro as CI  # noqa: E402
 
-NEW_CAP, UPDATE_CAP = 25, 100   # 새 페이지 하루 50 → 25 (2026-11-25 사용자: 남은 한국 130쪽, 몰아 만들기로 시황 429 — 기존 수량의 50%)
+NEW_CAP, UPDATE_CAP = 25, 100   # 새 페이지 하루 50 → 25
 BUNDLE = os.path.join(HERE, "pages_static", "js", "quick.js")   # 저장소에 둔다 — Pages 가 같은 폴더를 올리고, jsDelivr(@main)가 예비
 PAGES = "https://alpha-scope.pages.dev/"
 JSD = "https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@main/experiments/stock-quick/pages_static/"
@@ -93,7 +93,7 @@ def info_line(sym, e):
     return " · ".join(p for p in parts if p)
 
 
-# ── 검색용 사실 요약 (2026-11-17 사용자 A안) ─────────────────────────────────────────────
+# ── 검색용 사실 요약 ─────────────────────────────────────────────
 # 검색엔진은 스크립트 없이 읽는 본문만 확실히 본다(네이버는 스크립트를 거의 안 돌린다). 그날 주가처럼 날마다 바뀌는 값은
 # 넣지 않는다 — 768쪽을 날마다 고쳐 써야 하고(UPDATE_CAP 100), 검색엔진도 날마다 다시 읽지 않아 낡은 값이 남는다.
 # 분기에 한 번 바뀌는 것만: 최근 분기 실적 · 다음 실적 발표일 · 같은 업종 종목 분석 · 연관 종목. 해시가 같으면 다시 쓰지 않는다.

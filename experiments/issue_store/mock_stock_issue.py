@@ -1,8 +1,8 @@
-"""종목 이슈 목업 — 종목 급락 · 급등 전망이 끝나도 사건 자체를 계속 따라가는 페이지 (2026-11-15 사용자: "증시 전망이 개별 종목 이슈로 넘어가는 구조").
+"""종목 이슈 목업 — 종목 급락 · 급등 전망이 끝나도 사건 자체를 계속 따라가는 페이지.
 
     .venv/bin/python experiments/issue_store/mock_stock_issue.py   → output/mock_stock_issue_nvda.html
 
-설계(2026-11-15 Claude, 사용자 승인 전 목업):
+설계:
 - 증시 전망(가격 질문 · 판정 나면 끝)과 종목 이슈(사건 질문 · 기사가 잦아들 때까지)는 따로, 서로 링크.
 - 열림 = 종목 전망 자동 등록 때 이유 카드 이슈 코드 1위가 사건(기업 사건 · 규제 · 소송) + 48시간 기사 평소의 3배 이상. 실적 같은 일정은 열지 않음.
 - 화면 = Hot Issue 틀(mock_issue_watch) 재사용: 바늘(수습 ↔ 악화) · 진행 상황 사다리 · 관련 뉴스 · News Timeline(기준 가격 = 그 종목).
@@ -63,13 +63,13 @@ def _chg(s, a, b):
 
 
 def tri_val(v, fs, unit="%p", weight=700):
-    """증감 값 = 가이드 5절 삼각형(그 자리 글자 fs 의 80% 정수 · 위로 1 · 숫자와 2, dk.tri_span) + 증감 색 — 띄어쓰기 없음 (2026-11-15 사용자)."""
+    """증감 값 = 가이드 5절 삼각형(그 자리 글자 fs 의 80% 정수 · 위로 1 · 숫자와 2, dk.tri_span) + 증감 색 — 띄어쓰기 없음."""
     return (f'<span style="color:{dk.UP if v > 0 else dk.DOWN};font-weight:{weight};white-space:nowrap;">{dk.tri_span(v > 0, fs)}{abs(v):.1f}{unit}</span>'
             if round(v, 1) else f'<span style="font-weight:{weight};">0.0{unit}</span>')
 
 
 def rel_move(g5, when=""):
-    """`엔비디아 주가는 (같은 기간) 반도체 지수 대비 ▼ 20.8%p 움직였습니다` — 업종 대비 값 = ▼ · ▲ + 증감 색 굵게 (2026-11-15 사용자: "빠졌으니 하락 삼각형").
+    """`엔비디아 주가는 (같은 기간) 반도체 지수 대비 ▼ 20.8%p 움직였습니다` — 업종 대비 값 = ▼ · ▲ + 증감 색 굵게.
     옛 `20.8%p 더 빠졌습니다` 는 숫자에 방향 표시가 없었다. 삼각형과 숫자는 한 덩어리(dk.arrow nowrap). 3%p 안이면 `비슷하게` (숫자 없음)."""
     if abs(g5) < 3:
         return dk.esc(f"{SYM_NM} 주가는 {when}{SECTOR_NM}와 비슷하게 움직였습니다.")
@@ -105,7 +105,7 @@ def q_price(px, word):
            "업종보다 3%p 넘게 더 빠지면 악화 쪽, 더 오르면 수습 쪽 (증시 전망 종목 기준과 같은 선).\n"
            "사건 뒤 전체 = 사건 전 마지막 종가(증시 전망 기준일)부터.\n예측이 아니라 지금까지 일어난 일입니다.")
     # 카드 색 = 답 방향 (가이드라인 7-1: 답에 보라 금지) — 같은 쪽(악화) = 파랑 · 같은 쪽(수습) = 빨강 카드, 엇갈림 · 업종과 비슷 = 회색.
-    # 옛: 움직임이 있으면 보라(IW._theme) → `같은 쪽 (악화)` 가 보라 카드에 파랑 쪽 말이라 왜 보라인지 안 읽혔다 (2026-11-15 사용자)
+    # 옛: 움직임이 있으면 보라(IW._theme) → `같은 쪽 (악화)` 가 보라 카드에 파랑 쪽 말이라 왜 보라인지 안 읽혔다
     side = mk if (ns is None or ns == mk) else None
     th, ink = {"수습": ("positive", dk.UP), "악화": ("negative", dk.DOWN)}.get(side, ("neutral", "#111"))
     lines = [(first, "rich")] + rows + [(IW._excl(f"미국 {H.md(d1.strftime('%Y-%m-%d'))} 종가 기준입니다."), "html")]
@@ -137,10 +137,10 @@ def collect():
 
 
 def page(c, public=False):
-    """public=True = 블로그 발행(issue_watch_daily, 2026-11-16 사용자 "젠슨 황 이슈 진행해") — 운영자 상자 · 아직 없는 닫힘 규칙 안내는 뺀다."""
+    """public=True = 블로그 발행 — 운영자 상자 · 아직 없는 닫힘 규칙 안내는 뺀다."""
     now, today, days, cur, px, counts, r48, evs, word = (c[k] for k in ("now", "today", "days", "cur", "px", "counts", "r48", "evs", "word"))
     q = IW.title_h2(ISS)
-    # 이 이슈를 연 증시 전망 = 이미 끝난 과거 기록 → 맨 아래 작은 구분선 줄 (2026-11-15 사용자: "끝났고 더 이어지지도 않으니 크게 안 해도 된다" — 옛: 제목 아래 보라 카드)
+    # 이 이슈를 연 증시 전망 = 이미 끝난 과거 기록 → 맨 아래 작은 구분선 줄
     link = (f'<div data-related="1" style="margin-top:28px;">{dk.related_title("관련 증시 전망")}'
             + dk.related_rows([(f"{FORECAST[0]} ({FORECAST[2]})", H.page_url(FORECAST[1]))]) + '</div>')
     gauge = IW.gauge_card(evs, today)
@@ -174,7 +174,7 @@ PRICE_CARD = '<div data-cards="1" style="margin:0 0 8px;"><details data-acc="1">
 
 
 def hot_btn(href, weight=700):
-    """`Hot Issue 자세히 보기 ›` — Hot Issue 라벨 색(바탕 #EDE9FE · 테두리 #DDD6FE · 글자 VIOLET) 그대로 버튼으로 (2026-11-15 사용자).
+    """`Hot Issue 자세히 보기 ›` — Hot Issue 라벨 색(바탕 #EDE9FE · 테두리 #DDD6FE · 글자 VIOLET) 그대로 버튼으로.
     크기 = 카드 안 바로가기 버튼(H._link_a: 폭 가득 · 높이 FOLD_BOX · 모서리 FOLD_RADIUS · 14/20), 위 여백 = 카드 끝 버튼 자리(qc.MORE_GAP_TOP − 6)."""
     right = f'<span style="display:inline-flex;flex:none;transform:rotate(-90deg);">{dk.ACC_CHEV.replace("acc-chev", "fc-right")}</span>'
     a = (f'<a href="{href}" style="display:flex;align-items:center;justify-content:center;gap:4px;width:100%;height:{dk.FOLD_BOX}px;box-sizing:border-box;padding:0 12px;'
@@ -184,7 +184,7 @@ def hot_btn(href, weight=700):
 
 
 def stock_card(c, href, weight=700):
-    """종목 페이지 오늘 탭 가격 카드 바로 아래 Hot Issue 카드 (2026-11-15 사용자: "개별 종목 페이지에 눈에 띄는 것 · 보라 테마 · Hot Issue 라벨 + 제목 · 펼치면 지금 상황 요약 · 자세히 보기").
+    """종목 페이지 오늘 탭 가격 카드 바로 아래 Hot Issue 카드.
     닫힘 = 보라 강조 카드(uncertain): 첫 줄 보라 라벨 `Hot Issue`, 둘째 줄 이슈 제목, 오른쪽 답 = 뉴스 바늘 말(방향 색 — 답에는 보라를 쓰지 않는다) + 접기 버튼.
     펼침 = ① 한 문장(이번 주 뉴스 쪽 + 주가 업종 대비) ② 단계 두 줄(쪽 이름 · 어디까지 · 그 단계의 가장 최근 일) ③ 최근 소식 세 줄(날짜 · 쪽 라벨 · 한 줄) ④ `Hot Issue 자세히 보기 ›` 버튼.
     이슈 페이지가 이미 센 값만 옮긴다 — 새 계산 · AI 0."""
@@ -205,7 +205,7 @@ def stock_card(c, href, weight=700):
             continue
         e = hits[s][r]
         lines.append(("row", nm, f"{IW.C['stages'][s][r][0]} 단계", f"{H.md(e['first'].astimezone(KST).date().isoformat())} {e['title']}"))
-    # `최근 소식` 세 줄 삭제 — 바로 아래 뉴스 구획과 겹친다 (2026-11-15 사용자)
+    # `최근 소식` 세 줄 삭제 — 바로 아래 뉴스 구획과 겹친다
     lines.append((hot_btn(href, weight), "html"))
     card = qc.question_card("@@HOT@@", f'<span style="color:{ink};">{dk.esc(word)}</span>', "uncertain", ink, lines)
     pill = (f'<span style="display:inline-block;background:{HOT_PILL[0]};border:1px solid {HOT_PILL[1]};color:{dk.VIOLET};border-radius:4px;padding:3px 5px 2px;'
@@ -241,7 +241,7 @@ if __name__ == "__main__":
     fn = IW.CFG["NVDA_CEO"]["file"]
     print(dk.write_mock(page(c), os.path.join(IW.OUT, fn), IW.HEAD_TITLE))
     sp = stock_page(c, fn)
-    # 버튼 글자 굵기 시안 A(굵게) · B(보통) — 펼친 카드 둘 나란히 (2026-11-15 사용자: "자세히 보기 볼드 뺄까?")
+    # 버튼 글자 굵기 시안 A(굵게) · B(보통) — 펼친 카드 둘 나란히
     cmp_ = ('<p style="margin:16px 6px 20px;font-size:14px;line-height:21px;color:#6B7280;">종목 페이지 Hot Issue 카드의 `Hot Issue 자세히 보기` 버튼 글자 굵기 시안입니다. '
             '버튼 색 = Hot Issue 라벨 색. 둘 다 펼친 상태입니다.</p>')
     for k, (w, nm) in enumerate(((700, "A. 굵게 (700, 지금 카드 안 버튼과 같음)"), (400, "B. 보통 (400)"))):

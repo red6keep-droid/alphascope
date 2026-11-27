@@ -69,7 +69,7 @@ def _capex_row(extra, sym, end):
 
 
 def _margins(sym, extra, rows):
-    """이익률 그래프 재료 (2026-11-03 사용자) — 매출 줄(최근 8분기)마다 매출총이익 · 영업이익 · 순이익 ÷ 매출 %. 이익 줄이 하나도 없으면 None."""
+    """이익률 그래프 재료 — 매출 줄(최근 8분기)마다 매출총이익 · 영업이익 · 순이익 ÷ 매출 %. 이익 줄이 하나도 없으면 None."""
     out = []
     for r in rows:
         c = _capex_row(extra, sym, r["end"]) or {}
@@ -78,7 +78,7 @@ def _margins(sym, extra, rows):
 
 
 def _profit(sym, extra, last):
-    """매출 카드의 이익 줄 재료 (2026-11-03 사용자: 매출이 이익으로 이어지나) — 돈 표(collect_capex)의 같은 분기 매출총이익 · 영업이익 · 순이익.
+    """매출 카드의 이익 줄 재료 — 돈 표(collect_capex)의 같은 분기 매출총이익 · 영업이익 · 순이익.
     값 · 1년 전 대비 · 매출 대비 %. 그 분기 줄이 없거나(끝날 10일 넘게 어긋남) 세 값이 다 없으면 None."""
     r = _capex_row(extra, sym, last["end"])
     if not r or all(r.get(k) is None for k in ("gp", "opinc", "ni")):
@@ -92,7 +92,7 @@ CAPEX_PCT = 10   # 최근 4분기 설비 투자 합이 그 전 4분기보다 이
 
 
 def card_capex(sym, extra):
-    """돈을 어디에 쓰나 (2026-10-30 사용자) — collect_capex 분기 표 → 카드 재료. 판단 없이 사실만: 최근 분기 · 최근 4분기 합 · 1년 전 대비 · 영업으로 번 돈 대비."""
+    """돈을 어디에 쓰나 — collect_capex 분기 표 → 카드 재료. 판단 없이 사실만: 최근 분기 · 최근 4분기 합 · 1년 전 대비 · 영업으로 번 돈 대비."""
     import collect_capex as CX
     rows = (extra.get("capex") or {}).get(sym) or []
     rows = [r for r in rows if r.get("capex") is not None or r.get("ocf") is not None]
@@ -106,12 +106,12 @@ def card_capex(sym, extra):
     if last.get("capex") is None and not any(r.get("capex") is not None for r in rows[-4:]):
         state = "설비 투자 줄 없음"   # 은행 · 보험 — 현금흐름표에 설비 투자 항목이 따로 없다
     else:
-        # 4분기 합 비교가 안 되면(Yahoo 로 채운 회사 — 최근 5분기뿐) 최근 분기와 1년 전 같은 분기로 (2026-11-02 사용자 P280)
+        # 4분기 합 비교가 안 되면(Yahoo 로 채운 회사 — 최근 5분기뿐) 최근 분기와 1년 전 같은 분기로
         cmp = chg4 if chg4 is not None else last.get("capex_yoy")
         state = "늘리는 중" if cmp is not None and cmp >= CAPEX_PCT else "줄이는 중" if cmp is not None and cmp <= -CAPEX_PCT else "비슷함" if cmp is not None else "4분기 안 됨"
     f4, fp4 = sm.get("fcf"), sm.get("fcf_prev")
     fcf_chg4 = (f4 / fp4 - 1) * 100 if f4 is not None and fp4 and fp4 > 0 else None   # 그 전 4분기가 마이너스면 비율이 뜻이 없다
-    rv = [x for x in ((extra.get("revenue") or {}).get("series") or {}).get(sym) or []]   # 같은 4분기 매출 합 — 매출 성장과 현금 창출을 나란히 (2026-11-03 사용자)
+    rv = [x for x in ((extra.get("revenue") or {}).get("series") or {}).get(sym) or []]   # 같은 4분기 매출 합 — 매출 성장과 현금 창출을 나란히
     r4, rp4 = [x["rev"] for x in rv[-4:]], [x["rev"] for x in rv[-8:-4]]
     rev_chg4 = (sum(r4) / sum(rp4) - 1) * 100 if len(r4) == 4 and len(rp4) == 4 and sum(rp4) > 0 and abs((_d(rv[-1]["end"]) - _d(last["end"])).days) <= 10 else None
     return {"sym": sym, "state": state, "end": last["end"], "form": last.get("form"), "src": last.get("src"), "capex": last.get("capex"), "capex_yoy": last.get("capex_yoy"),
@@ -135,7 +135,7 @@ def card_eps(sym, extra, group):
     c30 = bars[1]["stock"]
     if c30 is None:
         return None
-    state = "높아지는 중" if c30 >= EX.EPS_PCT else "낮아지는 중" if c30 <= -EX.EPS_PCT else "그대로"   # 재는 것 그대로 (2026-10-31 사용자 P141: `더 나쁘게 봄` 이 종목 의견처럼 읽혀 방송 매수 의견과 상충해 보였다. 옛 B안 10-27)
+    state = "높아지는 중" if c30 >= EX.EPS_PCT else "낮아지는 중" if c30 <= -EX.EPS_PCT else "그대로"   # 재는 것 그대로
     return {"state": state, "c30": c30, "bars": bars, "current": me["current"], "up30": me.get("up30"), "down30": me.get("down30"), "fy_end": me.get("fy_end")}
 
 

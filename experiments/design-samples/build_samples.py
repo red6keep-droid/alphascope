@@ -1,4 +1,4 @@
-"""디자인 샘플 — 아이콘 두 꼴 · 안내 아이콘 · 라벨 (2026-11-12 사용자: "아이콘 규칙을 정하고 샘플로 등록, 라벨도").
+"""디자인 샘플 — 아이콘 두 꼴 · 안내 아이콘 · 라벨.
 
     python experiments/design-samples/build_samples.py      # output/mock_icons_labels.html
 
@@ -36,7 +36,7 @@ SOFT_USES = [
     ("person", "(예비) 인물"),
     ("scale", "(예비) 전망"),
 ]
-# 수혜 테마 그림 (2026-11-14 사용자) — Hot Issue `수혜주는?` 테마 이름 앞. 이름 = mock_issue_watch.THEME_ICON
+# 수혜 테마 그림 — Hot Issue `수혜주는?` 테마 이름 앞. 이름 = mock_issue_watch.THEME_ICON
 THEME_USES = [("t_air", "항공"), ("t_travel", "여행 · 크루즈"), ("t_chem", "화학"), ("t_build", "중동 재건 · 건설"), ("t_defense", "방산"),
               ("t_oil", "석유 생산"), ("t_refine", "정유"), ("t_ship", "해운"), ("t_car", "자동차"), ("t_phone", "전자 · 스마트폰"),
               ("t_shop", "소매 · 의류"), ("t_steel", "철강"), ("t_solar", "태양광 · 미국 공장"), ("t_chip", "AI 반도체"), ("t_tool", "반도체 장비")]

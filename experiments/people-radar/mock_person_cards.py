@@ -1,4 +1,4 @@
-"""인물 페이지 요약 카드 목업 (2026-11-11 사용자) — 상태 저장소의 마지막 레이더(radar.json) + 발언 기록(statements.jsonl)으로
+"""인물 페이지 요약 카드 목업 — 상태 저장소의 마지막 레이더(radar.json) + 발언 기록(statements.jsonl)으로
 7일 집계(person7)를 채워 실제 렌더러로 그린다. 인터넷 · AI 0. 글은 블로그에 나가지 않는다.
 
     git fetch state radar-state

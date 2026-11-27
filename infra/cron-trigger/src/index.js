@@ -42,50 +42,50 @@ function kstTime(d) {
 // 한국 시각 표 (2026-10-22): 한국 방송 시각에 묶인 작업 — 서머타임을 따르면 안 된다.
 // 미디어 데일리: 08:00 1차 발행(밤사이 클립 + 당잠사) · 10:15 같은 글 갱신(Mad Money · 증시각도기). 평일만.
 const KST_JOBS = {
-  // 홈 주요 뉴스 — 하루 두 번 (2026-10-25 사용자): 미국 장 마감 뒤 아침 · 개장 전 저녁. 매일. 분은 :45 (gh-pages push 겹침 피하기)
+  // 홈 주요 뉴스 — 하루 두 번: 미국 장 마감 뒤 아침 · 개장 전 저녁. 매일. 분은 :45 (gh-pages push 겹침 피하기)
   "06:45": [{ workflow: "news.yml", inputs: null }],
   "21:45": [{ workflow: "news.yml", inputs: null }],
   "08:00": [{ workflow: "media-daily.yml", inputs: { scheduled: "true", phase: "1" }, when: WEEKDAY }],
   "10:15": [{ workflow: "media-daily.yml", inputs: { scheduled: "true", phase: "2" }, when: WEEKDAY }],
-  // 매드머니 기록 예비 (2026-11-20 사용자: 그날 회차는 그날 인물 발언 글에). 매드머니는 KST 09:30 ~ 10:30 게시 · 요약이 10:15 뒤로 밀리는 날(11-19 11:26)용.
+  // 매드머니 기록 예비. 매드머니는 KST 09:30 ~ 10:30 게시 · 요약이 10:15 뒤로 밀리는 날(11-19 11:26)용.
   // 방송 기록만(AI 0 · 한국장 칸 X). 분은 Worker 가 깨는 분(:50) 가운데서. 새 회차를 기록하면 media-daily 가 people-radar mode=madmoney 를 건다. 화 ~ 토(미국 월 ~ 금 방송 다음 날)
   "11:50": [{ workflow: "media-daily.yml", inputs: { scheduled: "true", phase: "2", records_only: "true" }, when: KST_TUE_SAT }],
   // 한국 종목 페이지 · 한국 증시 리포트 (2026-10-27) — 한국장 마감 15:30 뒤. GitHub cron(07:10 UTC)이 10-26 에 7시간 늦었다.
   // 둘 다 도는 날은 concurrency 로 줄 서고, 뒤 실행은 페이지 해시 같음 · 리포트 이미 게시됨으로 쓰지 않는다. 휴장일은 fresh.txt 가 막는다.
-  // 15:50 (2026-11-20 사용자, 옛 16:10): 마감 15:30 + 야후 지연 시세 20분. 워크플로 맨 앞 wait_close.py 가 종가 확정을 보고 늦으면 16:10 까지 기다린다
-  // retry: 100분 뒤(17:30) 본 잡이 실패 · 취소면 한 번 자동으로 다시 건다 (2026-11-20 사용자 — 그날 16:51 시간 초과 취소 뒤 사람이 19:54 에 다시 돌려 20:10 에 바뀜)
+  // 15:50: 마감 15:30 + 야후 지연 시세 20분. 워크플로 맨 앞 wait_close.py 가 종가 확정을 보고 늦으면 16:10 까지 기다린다
+  // retry: 100분 뒤(17:30) 본 잡이 실패 · 취소면 한 번 자동으로 다시 건다
   "15:50": [{ workflow: "kr-stocks.yml", when: WEEKDAY, retry: { job: "kr-stocks", inputs: { scheduled: "true" } } }],
-  // 간단 종목(853종목) — 미국 = 장 마감 뒤 아침(뉴스 06:40 → 화면 08:20, 정식 07:30 실행이 07:56~59 에 끝난 뒤), 한국 = 장 마감 뒤 17:40 (2026-11-15 사용자).
+  // 간단 종목(853종목) — 미국 = 장 마감 뒤 아침(뉴스 06:40 → 화면 08:20, 정식 07:30 실행이 07:56~59 에 끝난 뒤), 한국 = 장 마감 뒤 17:40.
   // GitHub cron 도 그대로 — 둘 다 도는 날은 워크플로 check 잡이 '최근 6시간 안 같은 실행 성공' 을 보고 뒤 실행을 건너뛴다(뉴스 AI 두 번 X).
-  // 미국 종목 뉴스 먼저 분류 (2026-11-20 사용자) — 장 마감 뒤 엔비디아 실행이 남은 기사만 분류하게. 화~토(= 미국 월~금). 늦게 오면 워크플로가 건너뜀
-  // 한국 DART 새벽 받기 · 보고서 매출 · 수주 읽기 (2026-11-24 사용자) — GitHub 예약(03:25)이 11-21~24 나흘 내리 08:29~12:59 에 와
+  // 미국 종목 뉴스 먼저 분류 — 장 마감 뒤 엔비디아 실행이 남은 기사만 분류하게. 화~토(= 미국 월~금). 늦게 오면 워크플로가 건너뜀
+  // 한국 DART 새벽 받기 · 보고서 매출 · 수주 읽기 — GitHub 예약(03:25)이 11-21~24 나흘 내리 08:29~12:59 에 와
   // 워크플로 `Too late?`(06시 뒤 건너뜀)에 걸려 아무것도 못 받았다. Worker 가 걸면 workflow_dispatch 라 그 검사를 지난다. GitHub 예약은 예비로 둔다.
-  // 입력 없는 워크플로(inputs: null) · 감시 알림 끔(알림 대신 발행 시간 페이지, 2026-11-24 사용자). 같은 줄(concurrency quick-data)의 간단 종목은 08:20 · 16:40 이라 안 겹침
+  // 입력 없는 워크플로(inputs: null) · 감시 알림 끔. 같은 줄(concurrency quick-data)의 간단 종목은 08:20 · 16:40 이라 안 겹침
   "03:20": [{ workflow: "quick-dart.yml", inputs: null, watch: false }],
   "04:30": [{ workflow: "radar-news-early.yml", inputs: { scheduled: "true" }, when: KST_TUE_SAT }],
-  "06:20": [{ workflow: "quick-news.yml", when: KST_TUE_SAT }],   // 옛 06:40 (2026-11-20 사용자 — 미국 실행 한 줄로, 엔비디아 실행과 lite 분당 한도 안 겹치게)
+  "06:20": [{ workflow: "quick-news.yml", when: KST_TUE_SAT }],   // 옛 06:40
   "08:20": [{ workflow: "quick-data.yml", inputs: { scheduled: "true", market: "us" }, when: KST_TUE_SAT }],
-  "16:40": [{ workflow: "quick-data.yml", inputs: { scheduled: "true", market: "kr" }, when: WEEKDAY }],   // 옛 17:40 (2026-11-20 사용자) — 15:50 한국 종목 뒤 이어 붙이기의 예비
+  "16:40": [{ workflow: "quick-data.yml", inputs: { scheduled: "true", market: "kr" }, when: WEEKDAY }],   // 옛 17:40 — 15:50 한국 종목 뒤 이어 붙이기의 예비
   "13:00": [{ workflow: "nvda-report.yml" }],
-  // 집 IP 받기(미래에셋 TIGER 구성 · 버리 RSS, 집 공유기 VPN) — 유튜브 수집(News-sub)이 VPN 을 안 쓰는 12~17시 (2026-11-17 사용자).
+  // 집 IP 받기(미래에셋 TIGER 구성 · 버리 RSS, 집 공유기 VPN) — 유튜브 수집(News-sub)이 VPN 을 안 쓰는 12~17시.
   // 공유기 L2TP 는 동시 접속을 못 버텨, 워크플로가 News-sub 실행이 도는 중이면 기다린다. 매일.
-  // 시황 해설 발행(2026-11-19 사용자) — 수집기가 08:10 · 20:30 에 쓰고 08:30 · 20:40 마감, 블로그는 08:40 · 21:00 에 ready 글만 공개 발행. 매일
+  // 시황 해설 발행 — 수집기가 08:10 · 20:30 에 쓰고 08:30 · 20:40 마감, 블로그는 08:40 · 21:00 에 ready 글만 공개 발행. 매일
   // (수집기가 재료 없는 날은 skip 문서 → 발행기가 조용히 끝). 배너를 gh-pages 에 올린다 — :40 · :00 에 다른 gh-pages 푸시 실행 없음.
   "08:40": [{ workflow: "commentary.yml", inputs: { scheduled: "true", slot: "am" } }],
   "21:00": [{ workflow: "commentary.yml", inputs: { scheduled: "true", slot: "pm" } }],
-  // 저녁 편 1차 (2026-11-20 사용자, News-doc 31절): 수집기가 16:40 에 1차, 20:30 에 rev 2. 블로그는 17:00 에 1차를 내고
+  // 저녁 편 1차: 수집기가 16:40 에 1차, 20:30 에 rev 2. 블로그는 17:00 에 1차를 내고
   // 21:00 실행이 rev 가 올랐으면 같은 주소에 고쳐 쓴다(publish_commentary.py). 한국장 날만. :00 에 다른 gh-pages 푸시 없음(한국 종목 16:28 끝 · 간단 17:40)
   "17:00": [{ workflow: "commentary.yml", inputs: { scheduled: "true", slot: "pm" }, when: WEEKDAY }],
   "14:30": [{ workflow: "home-ip.yml" }], // 낮 갱신 — 종목 페이지만 다시 그린다 (check.mode=refresh, 2026-11-04 P290). GitHub cron 04:00 UTC 는 예비
-  // 한국 기사 공용 저장소 (2026-11-24 사용자) — 뉴스 수집기 정기 실행 07:00 · 16:30 이 facts 를 쓴 뒤(07:46 · 17:1x 쯤). 매일.
+  // 한국 기사 공용 저장소 — 뉴스 수집기 정기 실행 07:00 · 16:30 이 facts 를 쓴 뒤(07:46 · 17:1x 쯤). 매일.
   // gh-pages kr-facts.json 푸시 하루 2회 + 평일 장중 2회(아래, + 상태 저장소) — 09:20 · 18:20 에 다른 gh-pages 푸시 없음. 분 :20 은 Worker 가 깨는 분.
   "09:20": [{ workflow: "kr-facts.yml", inputs: { scheduled: "true" } }],
   "18:20": [{ workflow: "kr-facts.yml", inputs: { scheduled: "true" } }],
-  // 장중 사실 (2026-11-25 사용자 "2회로") — 뉴스 수집기 평일 가벼운 회차 11:40 · 14:40 에 사실 뽑기(보도 2곳 이상 사건 · 본문 20건, 수집기 31절)가 끝난 뒤.
+  // 장중 사실 — 뉴스 수집기 평일 가벼운 회차 11:40 · 14:40 에 사실 뽑기(보도 2곳 이상 사건 · 본문 20건, 수집기 31절)가 끝난 뒤.
   // 15:20 = 15:50 한국 증시 리포트 · 한국 종목 전에. :20 에 다른 gh-pages 푸시 없음(12:20 · 15:20 KST 표 · 미국 표 모두 빈 자리)
   "12:20": [{ workflow: "kr-facts.yml", inputs: { scheduled: "true" }, when: WEEKDAY }],
   "15:20": [{ workflow: "kr-facts.yml", inputs: { scheduled: "true" }, when: WEEKDAY }],
-  // Newfact 뉴스 발행 (2026-11-24 사용자 "발행해줘") — 수집기 글을 블로그 공개 글로(새 글 사이 10분) + 홈 카드 자료 gh-pages news-posts.json. 매일.
+  // Newfact 뉴스 발행 — 수집기 글을 블로그 공개 글로(새 글 사이 10분) + 홈 카드 자료 gh-pages news-posts.json. 매일.
   // 수집기 07:00 · 16:30 실행이 글을 쓴 뒤(08시 · 17시 무렵). 분 :50 — 09:20 · 18:20 공용 저장소 gh-pages 푸시와 비킨다(:50 은 Worker 가 깨는 분, 다른 gh-pages 푸시 없음).
   "09:50": [{ workflow: "news-posts.yml", inputs: { scheduled: "true", stage: "publish", draft: "false" } }],
   "13:50": [{ workflow: "news-posts.yml", inputs: { scheduled: "true", stage: "publish", draft: "false" } }],
@@ -93,7 +93,7 @@ const KST_JOBS = {
   "22:50": [{ workflow: "news-posts.yml", inputs: { scheduled: "true", stage: "publish", draft: "false" } }],
   // 아침 글 기준일 고치기 — 한국 장 마감(15:30) 뒤 그날 종가로 관련 종목 표를 고쳐 씀(같은 주소 PUT, gh-pages 안 씀). 평일만(휴장 · 주말은 기준일이 안 바뀌어 건드릴 글이 없다)
   "16:10": [{ workflow: "news-posts.yml", inputs: { scheduled: "true", stage: "refresh", draft: "false" }, when: WEEKDAY }],
-  // 간단 종목 새 전용 페이지 (2026-11-26 사용자 "그렇게 해") — GitHub 예약(23:40)이 11-25 · 11-26 다음 날 08시대에 와
+  // 간단 종목 새 전용 페이지 — GitHub 예약(23:40)이 11-25 · 11-26 다음 날 08시대에 와
   // 워크플로 시간 창(23~06시)에 걸려 이틀 동안 새 페이지 0. Worker 가 걸면 제시각. 입력 없는 워크플로(inputs: null), GitHub 예약은 예비.
   // 하루 25쪽 상한 · 같은 날 두 번 돌아도 cache/shells_new_day.json 합계라 더 만들지 않는다. 매일.
   "23:40": [{ workflow: "quick-shells-new.yml", inputs: null }],
@@ -101,7 +101,7 @@ const KST_JOBS = {
 
 const JOBS = {
   // 데일리 리포트 (뉴욕 월~금) — 장 마감 1시간 뒤. KST 06:00 (EDT) / 07:00 (EST).
-  // 미국 실행 한 줄로 (2026-11-20 사용자): 리포트 16:40 NY(장 마감 40분 뒤 — 장 마감 뒤 실적 발표가 16:05~16:30 에 몰림) → 엔비디아 · 미국 종목(이어 붙이기)
+  // 미국 실행 한 줄로: 리포트 16:40 NY(장 마감 40분 뒤 — 장 마감 뒤 실적 발표가 16:05~16:30 에 몰림) → 엔비디아 · 미국 종목(이어 붙이기)
   // → 인물 발언 · 간단 종목(이어 붙이기). 아래 17:00 · 17:30 · 18:00 · 18:30 은 예비 — 이미 했으면 각 워크플로가 건너뛴다
   "16:40": [{ workflow: "test-daily-report.yml", when: WEEKDAY }],
   "17:00": [{ workflow: "test-daily-report.yml", when: WEEKDAY }],
@@ -124,20 +124,20 @@ const JOBS = {
   "16:20": [{ workflow: "update.yml", inputs: null, when: WEEKDAY }],
 };
 
-// 간격 수집 (2026-10-22 사용자) — GitHub cron 만으로는 2시간 뉴스가 하루 12회 중 4회만 돌았다. UTC 분 · 시로 판단한다.
+// 간격 수집 — GitHub cron 만으로는 2시간 뉴스가 하루 12회 중 4회만 돌았다. UTC 분 · 시로 판단한다.
 // 분을 리포트 · 시세 시각(:00 · :15 · :20 · :30)에서 비켜 둔다 — 모두 gh-pages 에 push 해서, 같은 분에 돌면 한쪽 push 가 거부된다.
 const REPEAT = [
   // 뉴스 2시간마다는 2026-10-25 KST_JOBS 하루 두 번으로 옮겼다 (피드가 며칠에 몇 개라 33번 연속 새 기사 0)
-  // 한국 간단 종목 뉴스 매체 시험(RSS 제목) — 2시간마다 UTC 짝수 시 :10. GitHub cron 이 24시간에 2번만 돌았다 (2026-11-17 사용자 "Worker로 옮기고").
+  // 한국 간단 종목 뉴스 매체 시험(RSS 제목) — 2시간마다 UTC 짝수 시 :10. GitHub cron 이 24시간에 2번만 돌았다.
   // 시험 끝(11-21 KST) 뒤엔 걸지 않는다. gh-pages 에 안 써서 다른 실행과 push 겹침 없음.
   { workflow: "kr-rss-probe.yml", inputs: { scheduled: "true" }, when: (u) => u.m === 10 && u.h % 2 === 0 && u.day <= "2026-11-21" },
-  // 운영 대시보드 · 발행 시간(/ontime) — 매시 :50 UTC. GitHub cron 이 11-22~24 이틀 동안 3번만 돌았다 (2026-11-24 사용자 "진행해").
+  // 운영 대시보드 · 발행 시간(/ontime) — 매시 :50 UTC. GitHub cron 이 11-22~24 이틀 동안 3번만 돌았다.
   // 입력 없는 워크플로(inputs: null). 감시 알림은 끈다 — 한 시간 늦어도 다음 시각에 다시 만들고, 매시 실패 알림은 소음. gh-pages 에 안 써서 push 겹침 없음.
   // GitHub cron(같은 :50)은 예비로 그대로 — 겹치면 워크플로 concurrency 가 앞 실행을 취소한다.
   { workflow: "ops-dashboard.yml", inputs: null, watch: false, when: (u) => u.m === 50 },
 ];
 
-// 알림 (2026-11-12 사용자: "실패됐을 때 나한테 알림이 와야") — 11-12 GitHub 토큰 만료로 13:00 · 16:10 · 21:45 실행이
+// 알림 — 11-12 GitHub 토큰 만료로 13:00 · 16:10 · 21:45 실행이
 // 소리 없이 빠졌다(Worker 는 오류를 대시보드에만 남겼다). 두 겹:
 //   ① 걸기 실패 → 그 자리에서 Slack
 //   ② 감시: 건 지 60분 뒤 그 워크플로 실행이 있었나 · 성공했나 → 없거나 실패면 Slack (GitHub cron 예비가 대신 돌았으면 통과)
@@ -232,7 +232,7 @@ async function realRun(r, env) {
 }
 
 // 감시 — at 에 걸었어야 할 실행이 그 뒤로 있었나. 돌고 있으면 통과(긴 실행), 본 잡이 성공한 실행이 있으면 통과.
-// 건너뛴 실행뿐이면 그 전 6시간 안에 같은 일을 한 실행(이어 붙이기 · 사람 실행 포함)이 있었나 본다 (2026-11-20 사용자 D — 옛: 건너뜀도 성공으로 봐 실패를 놓칠 수 있었다)
+// 건너뛴 실행뿐이면 그 전 6시간 안에 같은 일을 한 실행(이어 붙이기 · 사람 실행 포함)이 있었나 본다
 const LOOKBACK_H = 6;
 async function watch(at, env) {
   const jobs = dueAt(at).filter((j) => j.watch !== false);

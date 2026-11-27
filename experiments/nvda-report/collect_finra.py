@@ -1,4 +1,4 @@
-"""FINRA Reg SHO 일별 공매도 거래량 (장외 보고분) — 스마트 머니 흔적 ② (2026-10-11 사용자: "시작해").
+"""FINRA Reg SHO 일별 공매도 거래량 (장외 보고분) — 스마트 머니 흔적 ②.
 
 파일: https://cdn.finra.org/equity/regsho/daily/CNMSshvol{YYYYMMDD}.txt (Date|Symbol|ShortVolume|ShortExemptVolume|TotalVolume|Market)
 - 장외(FINRA TRF·ADF 보고) 거래만 집계한다 — 거래소 체결은 빠진다. 그래서 TotalVolume은 일봉 거래량보다 작고, 비율은 '장외 공매도 비율'이라고 적는다.

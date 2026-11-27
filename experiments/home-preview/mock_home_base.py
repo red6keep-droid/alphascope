@@ -1,4 +1,4 @@
-"""홈 기준 줄 목업 — 오늘 실제 자료로 (2026-11-17 사용자 "콘텐츠 기준일이 제각각 · 혼란스럽다").
+"""홈 기준 줄 목업 — 오늘 실제 자료로.
 
     python experiments/home-preview/mock_home_base.py     # output/mock_home_base.html
 

@@ -1,4 +1,4 @@
-"""종목 고정 페이지 게시 — 목록 1 + 간단형 상세 (후보 수 − NVDA), 새 페이지는 하루 universe.NEW_PAGES_PER_RUN 개까지 (doc/기획/종목-레이더-기획.md 10-3 · 10-8 1단계, 2026-10-18 사용자 "발행까지").
+"""종목 고정 페이지 게시 — 목록 1 + 간단형 상세 (후보 수 − NVDA), 새 페이지는 하루 universe.NEW_PAGES_PER_RUN 개까지.
 
     python experiments/stock-radar/publish_pages.py            # 실제 게시 (main.py 가 만든 output/*.html)
     python experiments/stock-radar/publish_pages.py --dry      # 무엇을 만들고 / 갱신할지만
@@ -58,7 +58,7 @@ def _norm(u):
 
 def targets(only=None):
     """(키, 한글 제목, 영문 제목, 주소, 본문 파일)"""
-    # 시총 상위 10 페이지(list)는 더 만들지 · 고치지 않는다 — 종목 모아보기 시가총액 탭으로 옮김, 블로그에서 삭제 (2026-11-19 사용자). 남겨 두면 지운 뒤 다음 실행이 새로 만든다
+    # 시총 상위 10 페이지(list)는 더 만들지 · 고치지 않는다 — 종목 모아보기 시가총액 탭으로 옮김, 블로그에서 삭제. 남겨 두면 지운 뒤 다음 실행이 새로 만든다
     rows = [(s, U.page_title(s), U.slug_title(s), U.page_url(s)) for s, *_ in U.CANDIDATES if s not in U.REPORT_TYPE]
     import data_guard   # 빈 값 막기 (2026-11-12) — 일봉이 비거나 늦은 종목은 어제 페이지 그대로, 너무 많으면 이번 실행 갱신 전부 멈춤
     g = data_guard.load_report(os.path.join(BASE, "data"))
@@ -151,7 +151,7 @@ def publish(only=None, dry=False):
     stopped = False
     for key, title, slug, url, path in targets(only):
         page = by_url.get(_norm(url))
-        if not page and new_tries >= U.NEW_PAGES_PER_RUN:   # 새 페이지는 실행 한 번에 상한까지 — 나머지는 다음 날 (2026-10-20 사용자: "하루에 조금씩")
+        if not page and new_tries >= U.NEW_PAGES_PER_RUN:   # 새 페이지는 실행 한 번에 상한까지 — 나머지는 다음 날
             waiting += 1
             continue
         content = _body(path)

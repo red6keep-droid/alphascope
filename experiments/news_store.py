@@ -1,14 +1,14 @@
-"""공용 뉴스 처리 (news_store) — 기사 한 건을 **한 번만** AI 로 처리해 여러 리포트가 같은 결과를 쓴다 (doc/기획/뉴스-형식-통일.md 3절 · 4절 6단계, 2026-10-25 사용자: "공용 처리부터").
+"""공용 뉴스 처리 (news_store) — 기사 한 건을 **한 번만** AI 로 처리해 여러 리포트가 같은 결과를 쓴다.
 
 1단계(10-25): 종목 페이지(stock-radar/collect_news.py)의 분류를 여기로 옮겼다 — 지금 가장 완성된 처리라 공용의 바탕으로 쓴다.
 다음: 홈 주요 뉴스(fetch_news.py, CNBC) · 미국 데일리 뉴스가 같은 함수로 처리하고 결과를 나눠 쓴다. 엔비디아 리포트는 따로 둔다(발언자 · 신규성 · 법무 같은 전용 판단).
-기사와 방송 사이 중복 · 표현이 다른 같은 사건은 거르지 않는다 (10-25 사용자: 다른 글처럼 느껴지면 그대로).
+기사와 방송 사이 중복 · 표현이 다른 같은 사건은 거르지 않는다.
 
 - 분류 : 기사마다 **한 번만**, 한 호출 BATCH 건. 제목 번역(title_ko — 목록 헤드라인) · 사실 문장(fact — 종목 페이지 중요 이슈) · 요약 줄(detail) ·
   종목별 관련도 · 방향(scores) · 영역(area) · 이슈 코드 · 범위 · 영어 문장(fact_en). 테마 · 관련 종목은 이 칸에서 파이썬이 정한다(theme · related).
-- 헤드라인 = 원제를 옮긴 번역 (2026-10-25 사용자: "왜 제목 그대로 표현 안 하고 가공하나") — 사실 문장은 요약 줄이 비었을 때의 요약 · 중요 이슈용.
+- 헤드라인 = 원제를 옮긴 번역 — 사실 문장은 요약 줄이 비었을 때의 요약 · 중요 이슈용.
 - 재료 : 제목 + 최근 LEAD_HOURS 기사의 첫 문단(article_lead — AI 입력으로만, 저장 · 공개 안 함) 또는 RSS 요약(snippet).
-- 사슬 : `news` · `news-alt` 를 배치마다 번갈아 — Gemini lite 먼저(2026-11-10 사용자: Groq 하루 토큰은 양이 적은 일에), 예비 Groq(qwen · gpt-oss 순서만 번갈아) · DeepSeek.
+- 사슬 : `news` · `news-alt` 를 배치마다 번갈아 — Gemini lite 먼저, 예비 Groq(qwen · gpt-oss 순서만 번갈아) · DeepSeek.
   (옛 10-25: Groq 먼저 · lite 맨 뒤)
   Groq 가 정식 — 예비 답을 다음 실행에서 Gemini 로 다시 받는 규칙 · 관련도 3 flash 재확인은 없앴다.
 - 보정 : NVDA 리포트 labels 의 의견 매체 · 의견형 제목 규칙으로 관련도를 1 이하로 깎는다(올리지 않는다).
@@ -35,10 +35,10 @@ U = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(U)
 
 PROMPT = os.path.join(BASE, "prompts", "news_classify.txt")
-LEAD_HOURS = 36   # 첫 문단은 이 시간 안의 기사만 받는다 — 목록은 오늘자만 보인다 (2026-10-25 사용자)
+LEAD_HOURS = 36   # 첫 문단은 이 시간 안의 기사만 받는다 — 목록은 오늘자만 보인다
 SNIPPET = 500     # 모델에 넣는 첫 문단 길이 — Groq 분당 8,000토큰 안에 한 배치가 들어가게
-# 이슈 코드 → 데일리 뉴스 테마 (daily-report THEME_VOCAB) — 테마도 공용 처리에서 (2026-10-25 사용자: 데일리 AI 가 따로 정하지 않는다)
-THEME = dict(issue_codes.ISSUE_KO)   # 분야 라벨 (2026-11-07 사용자 P339: 화면 분야 라벨 = 기록 이슈 코드 18개 이름) — 옛: 8개로 뭉갬
+# 이슈 코드 → 데일리 뉴스 테마 (daily-report THEME_VOCAB) — 테마도 공용 처리에서
+THEME = dict(issue_codes.ISSUE_KO)   # 분야 라벨 — 옛: 8개로 뭉갬
 
 BATCH = 10   # 한 호출 기사 수 — Groq 분당 8,000토큰(입력 + 답) 안에 (2026-10-25, 옛 lite 25)
 QWEN_BATCH = 4   # Qwen 이 첫 단계인 사슬(news)은 4건 — 답이 기사당 약 210토큰이라 10건이면 Qwen 분당 출력 1,000토큰(OTPM)에 걸려
@@ -46,7 +46,7 @@ QWEN_BATCH = 4   # Qwen 이 첫 단계인 사슬(news)은 4건 — 답이 기사
                  # 5건(출력 약 1,100)은 두 번째 호출부터 거절, 4건(817 ~ 905)은 62초 간격 3연속 성공 (llm_chain groq-qwen 주석)
 MAX_MINUTES = int(os.environ.get("NEWS_MAX_MINUTES", "30"))   # 워크플로가 줄일 수 있다(NVDA = 15, 2026-11-10: 60분 제한에 걸려 증시 전망이 이틀 빠짐). 한 실행의 분류 시간 예산 — gpt-oss 가 하루 한도로 빠지면 Qwen 4건/분만 남아 느려진다. 남은 기사는 다음 실행 (NVDA 워크플로 제한 60분)
 CLASSIFY_HOURS = 24   # 이보다 오래된 새 기사는 AI 에 보내지 않는다 — 목록은 최근 24시간, 중요 이슈도 최신 5줄이라 거의 안 보인다.
-                      # 48 → 24 (2026-10-26 사용자): 하루 약 96건 · gpt-oss 약 44K 토큰 절약, 중요 이슈 약 3% 영향 (10-25 데이터)
+                      # 48 → 24: 하루 약 96건 · gpt-oss 약 44K 토큰 절약, 중요 이슈 약 3% 영향 (10-25 데이터)
                       # 10-25 새 기사 406건 중 115건(28%)이 2 ~ 8일 전 기사였다 (구글 뉴스 7일 검색이 매일 새로 섞여 들어옴)
 AREAS = ("Earnings", "Flows", "Regulation", "Legal", "Product", "Demand", "Supply", "Corporate", "Macro", "Other")
 DIRS = ("positive", "negative", "uncertain", "neutral")
@@ -115,7 +115,7 @@ def _cap(x):
         x["opinion"] = True
 
 
-# ---------------------------------------------------------------- 사실 문장 검사 (파이썬, 2026-10-18 사용자 확정)
+# ---------------------------------------------------------------- 사실 문장 검사
 # lite 가 "$37 Billion" 을 "37억 달러"로 옮기고 "호재로 작용했다" 같은 인과 · 평가를 쓴 일(10-18)이 있어, 문장을 쓰기 전에 거른다.
 # 탈락한 기사는 한 번 더 분류하고, 두 번 탈락하면 사실 문장 없이(원문 제목으로) 둔다. 라벨 · 관련도는 남긴다.
 
@@ -219,8 +219,8 @@ def _apply(store, res, model, label, leads=None):
         x["detail"] = (r.get("detail") or "").replace(" — ", ", ").replace("—", ", ").strip() or None
         if x["detail"] and (x["detail"] == x["fact"] or detail_style_bad(x["detail"]) or fact_problem(x, "detail", src)):
             x["detail"] = None
-        x["market_dir"] = r.get("market_dir") if r.get("market_dir") in DIRS else None   # 시장 전체에 대한 뉴스 방향 — 데일리 뉴스 방향 막대 (2026-10-31 사용자 P143). 빠져도 분류는 살린다
-        x["stage"] = r.get("stage") if r.get("stage") in STAGES else None   # 확정(done) · 논의 중(talk) — 논의 중이어도 방향은 붙인다 (2026-11-11 사용자: "논의 중이라는 이야기라도 시장에 충격을 준다"). 빠져도 분류는 살린다
+        x["market_dir"] = r.get("market_dir") if r.get("market_dir") in DIRS else None   # 시장 전체에 대한 뉴스 방향 — 데일리 뉴스 방향 막대. 빠져도 분류는 살린다
+        x["stage"] = r.get("stage") if r.get("stage") in STAGES else None   # 확정(done) · 논의 중(talk) — 논의 중이어도 방향은 붙인다. 빠져도 분류는 살린다
         x.update(issue_codes.coerce(r))   # 이슈 코드 · 세부 주제 · 범위 · 국가 · 예정 · 놀람 (doc/기획/이슈-분류-코드표.md, 2026-10-21) — 어휘 밖이면 OTHER
         _cap(x)
         why = fact_problem(x, "fact", src)
@@ -260,7 +260,7 @@ def _leads(items, cache_path):
 def classify(store, save, lead_cache=None, label="radar-news", hours=CLASSIFY_HOURS, chains=("news", "news-alt"), batch=None, item_companies=False, max_calls=None):
     """새 기사 · 문장 탈락 기사만 분류 (ai_model 이 없는 것). 두 사슬(news · news-alt, 둘 다 lite 먼저 · 예비 Groq 순서만 다름)을 배치마다 번갈아 쓴다.
     save(store) = 부르는 쪽의 저장 함수 (배치마다 부른다). lead_cache = 첫 문단 캐시 파일 (깃에 넣지 않는 곳, None 이면 기사를 열지 않는다).
-    hours = 이보다 오래된 미분류 기사는 보내지 않는다 — 기본 CLASSIFY_HOURS(24), 미국 데일리는 48 (2026-11-05 사용자: 뉴스 기사는 48시간, 시차 때문에 안전하게).
+    hours = 이보다 오래된 미분류 기사는 보내지 않는다 — 기본 CLASSIFY_HOURS(24), 미국 데일리는 48.
     chains · batch · item_companies · max_calls = 종목 주가(간단 종목) 뉴스용 (2026-11-15): 사슬 news-quick 하나 · 25건 묶음 · 묶음에 나온 회사만 목록에(452종목 전체를 넣지 않게) · 호출 상한."""
     _env()
     from llm_chain import LLMPool, usage_line

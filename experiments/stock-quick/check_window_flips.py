@@ -1,4 +1,4 @@
-"""업계 카드 판정을 한 달 기준으로 바꾸면 얼마나 자주 뒤집히나 — 3개월 묶음 17개 첫 지표 + 업계 경기(BSI) 업황 (2026-11-26 사용자 "매일 달라진 것 = Newfact, 3개월은 변화가 안 보인다").
+"""업계 카드 판정을 한 달 기준으로 바꾸면 얼마나 자주 뒤집히나 — 3개월 묶음 17개 첫 지표 + 업계 경기(BSI) 업황.
 
     GH_TOKEN=… .venv/bin/python experiments/stock-quick/check_window_flips.py [--flows F]
 

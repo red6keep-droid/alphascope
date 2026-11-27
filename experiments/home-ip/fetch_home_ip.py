@@ -1,4 +1,4 @@
-"""집 IP(VPN)로만 받는 곳을 받아 experiments/home-ip/data/ 에 둔다 — `.github/workflows/home-ip.yml` 이 하루 한 번 14:30 KST (2026-11-17 사용자).
+"""집 IP(VPN)로만 받는 곳을 받아 experiments/home-ip/data/ 에 둔다 — `.github/workflows/home-ip.yml` 이 하루 한 번 14:30 KST.
 
     HOME_SOURCE_ADDRESS=<ppp0 주소> python experiments/home-ip/fetch_home_ip.py
     python experiments/home-ip/fetch_home_ip.py --skip "유튜브 수집과 겹쳐 건너뜀"   # VPN 을 안 열었을 때 대시보드 기록만

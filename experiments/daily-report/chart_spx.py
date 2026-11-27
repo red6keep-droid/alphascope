@@ -1,5 +1,5 @@
 """S&P 500 가격 그래프 PNG — 엔비디아 chart_price.py 와 같은 모양 (30거래일 봉 + 5 · 20 · 60일선 + 볼린저), 탭 위에 놓는다
-(2026-10-18 사용자: "다른 리포트처럼 상단에 S&P 500 그래프, 클릭하면 확대").
+.
 
 - 입력: yfinance ^GSPC 일봉 1년 (이동평균 200일까지 · 볼린저용). 기준일(analysis.as_of) 이후 바는 자른다.
 - 출력: output/chart.json {bars, window, last_day} — 본문 봉차트(candle_chart) 자료. 2026-11-16 부터 그림은 만들지 않는다(draw 는 옛 그림 확인용으로만 남김)
@@ -36,7 +36,7 @@ def _repo_slug():
 def load_bars(as_of=None):
     import yfinance as yf
 
-    df = yf.Ticker(SYMBOL).history(period="2y", interval="1d", auto_adjust=True)   # 1y → 2y (2026-11-16 사용자: 본문 그래프 = 종목 페이지 봉차트, candle_chart.DAYS 2년 남짓) — 같은 요청 한 번, 기간만
+    df = yf.Ticker(SYMBOL).history(period="2y", interval="1d", auto_adjust=True)   # 1y → 2y — 같은 요청 한 번, 기간만
     bars = []
     for ts, r in df.iterrows():
         day = ts.strftime("%Y-%m-%d")
@@ -158,13 +158,13 @@ def draw(bars, path, symbol="S&P 500"):
 
     fig.tight_layout()
     os.makedirs(os.path.dirname(path), exist_ok=True)
-    fig.savefig(path, dpi=100, **({"pil_kwargs": {"lossless": True, "method": 6}} if path.endswith(".webp") else {}))   # WebP 무손실 — 같은 그림 PNG 의 약 45% 크기 (2026-11-12 사용자: png 말고 다른 그림 형식, 실측 73 → 33KB)
+    fig.savefig(path, dpi=100, **({"pil_kwargs": {"lossless": True, "method": 6}} if path.endswith(".webp") else {}))   # WebP 무손실 — 같은 그림 PNG 의 약 45% 크기
     plt.close(fig)
     return ch
 
 
 def run(day, as_of=None, output_dir=OUTPUT_DIR):
-    """본문 봉차트 자료(chart.json {bars, window, last_day})만 쓴다 — 그림(WebP)은 그리지 · 올리지 않는다 (2026-11-16 사용자: 상세 페이지는 실제 차트, 대표 이미지 없이).
+    """본문 봉차트 자료(chart.json {bars, window, last_day})만 쓴다 — 그림(WebP)은 그리지 · 올리지 않는다.
     실패 · 일봉 부족이면 None → main 이 게시를 멈춘다."""
     bars = load_bars(as_of)
     if len(bars) < 20:

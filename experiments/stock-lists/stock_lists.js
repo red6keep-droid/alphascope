@@ -1,12 +1,12 @@
-/* 하단 메뉴 `종목` 페이지 /p/stock-lists.html (2026-11-17 사용자 "1단계 구현 진행해") — 기획 비공개 기획/종목-탭-그룹-목록-기획.md, 목업 mock_stock_lists.py.
+/* 하단 메뉴 `종목` 페이지 /p/stock-lists.html — 기획 비공개 기획/종목-탭-그룹-목록-기획.md, 목업 mock_stock_lists.py.
    본문(publish_stock_lists_page.py)에 탭 뼈대(h2 data-tab 여섯 개 + 빈 칸)가 있고, 테마가 페이지를 열 때 그 h2 로 탭을 만든다. 이 스크립트는 목록 파일을 받아 빈 칸을 채운다.
-   - 나라 = 주소 ?m=us|kr(하단 메뉴가 붙임) → 고른 홈(as-home-mkt, 헤더 국기 스위치가 적음) → 미국. 페이지 안 나라 버튼 없음 (2026-11-17 사용자).
+   - 나라 = 주소 ?m=us|kr(하단 메뉴가 붙임) → 고른 홈(as-home-mkt, 헤더 국기 스위치가 적음) → 미국. 페이지 안 나라 버튼 없음.
    - 목록 파일 = 간단 종목 실행이 매일 올리는 <시장>/_lists.json (build_lists.py). 읽는 순서 Cloudflare Pages → jsDelivr(quick-<시장> 브랜치) → GitHub 원본. 방문자 1명 = 요청 1번 · 압축 약 18KB.
-   - 목록은 탭 · 묶음마다 10개 펼침 + 나머지 전부 `n개 더 보기` 접기 (2026-11-20 사용자: 하락 12위 SK텔레콤 −13%가 시황엔 있고 여기선 잘려 안 보임.
+   - 목록은 탭 · 묶음마다 10개 펼침 + 나머지 전부 `n개 더 보기` 접기 (: 하락 12위 SK텔레콤 −13%가 시황엔 있고 여기선 잘려 안 보임.
      옛 11-17 `10개까지, 접기 없음`은 CLAUDE.md `상위 n개만으로 버리지 않는다`와 어긋나 바꿈). 나머지 줄은 버튼을 누를 때 그린다(줄 수천 개를 처음부터 만들지 않게). 줄 전체 = 종목 페이지(테마의 [data-row-link] 장치).
-   - 관심 탭 = 이 브라우저에 담은 종목(as-watch, 종목 페이지 제목 옆 ☆ · 검색해서 담기), 없으면 최근 본 종목(as-recent). 로그인 · 서버 없음 (2026-11-19 사용자).
+   - 관심 탭 = 이 브라우저에 담은 종목(as-watch, 종목 페이지 제목 옆 ☆ · 검색해서 담기), 없으면 최근 본 종목(as-recent). 로그인 · 서버 없음.
    - 기준일 = 제목 줄 오른쪽(공유 버튼 앞).
-   - 2026-11-18 목업 확정분(mock_stock_lists.py)을 옮김 (2026-11-19 사용자 "진행해"): 로고 ~ 이름 11 · 증감 17(삼각형 14) · 가격 = 증감 색 · 한국 보조 줄에 종목 코드 숫자 없음
+   - 2026-11-18 목업 확정분(mock_stock_lists.py)을 옮김: 로고 ~ 이름 11 · 증감 17(삼각형 14) · 가격 = 증감 색 · 한국 보조 줄에 종목 코드 숫자 없음
      · 오늘 움직임 오른쪽 말 = 보조 줄 크기 회색 + 숫자 굵게 · 테마 · 업종 묶음 고르기 = 히트맵(칸 크기 = 시가총액 합의 제곱근, 색 = 묶음 평균 등락 4단계).
    목업(로컬): <div id="as-lists" data-local="lists/"> — 같은 폴더의 lists/<시장>/_lists.json 을 읽는다. */
 (function () {
@@ -17,13 +17,13 @@
   var CDN = 'https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@';
   var RAW = 'https://raw.githubusercontent.com/red6keep-droid/alphascope/';
   var LOGO = 'https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/', LOGO_VER = '2';   // design_kit.LOGO_BASE · LOGO_VER
-  var TOP = 10;                                  // 10개까지 (2026-11-17 사용자)
+  var TOP = 10;                                  // 10개까지
   var UP = 3, DOWN = -3, VOL = 2, NEAR = -2;     // 오늘 움직임 기준 (기획 2-3)
   var C_UP = '#d93025', C_DOWN = '#1a73e8', C_MUTED = '#9CA3AF', NOTE = '#6B7280';
-  var LIST = 'display:block;margin:0 0 8px;border-bottom:1px solid #E2E8F0;';   // 카드 없이 구분선 목록 (2026-11-17 사용자) — 맨 위 선 없음 · 줄 사이 · 맨 끝
-  var ROW = 'display:flex;justify-content:space-between;gap:12px;padding:16px 6px;white-space:nowrap;line-height:24px;align-items:flex-start;';   // 구분선 위아래 16(24 − 5 − 3), 첫 줄 위만 21(24 − 3) (2026-11-17 사용자), 좌우 = 왼쪽 기준선 6
+  var LIST = 'display:block;margin:0 0 8px;border-bottom:1px solid #E2E8F0;';   // 카드 없이 구분선 목록 — 맨 위 선 없음 · 줄 사이 · 맨 끝
+  var ROW = 'display:flex;justify-content:space-between;gap:12px;padding:16px 6px;white-space:nowrap;line-height:24px;align-items:flex-start;';   // 구분선 위아래 16(24 − 5 − 3), 첫 줄 위만 21(24 − 3), 좌우 = 왼쪽 기준선 6
   var SEP = 'border-top:1px solid #E2E8F0;';
-  var GAP = 11, CHG = 17;                        // 로고 ~ 이름 6 → 11 · 증감 15 → 16 → 17 (2026-11-18 사용자)
+  var GAP = 11, CHG = 17;                        // 로고 ~ 이름 6 → 11 · 증감 15 → 16 → 17
   var NOTE_PX = 14;                              // 보조 줄 글자(dk.TINY)
   var BADGE = [['#2F6F68', '#FFFFFF'], ['#5B6B3A', '#FFFFFF'], ['#86683A', '#FFFFFF']];   // design_kit.BADGE_COLORS
 
@@ -49,8 +49,8 @@
     return '<span style="color:' + col + ';white-space:nowrap;' + (bold === false ? '' : 'font-weight:700;') + '">' +
       (tri ? '<span style="font-size:' + Math.round(CHG * 0.8) + 'px;vertical-align:1px;margin-right:2px;">' + tri + '</span>' : '') + Math.abs(v).toFixed(2) + '%</span>';
   }
-  function dirCol(v) { return v > 0 ? C_UP : v < 0 ? C_DOWN : '#111'; }   // 가격 = 증감과 같은 색 (2026-11-18 사용자)
-  function subOf(r, tail) { return m === 'kr' ? esc(tail || '') : (tail ? esc(r.t) + ' · ' + esc(tail) : esc(r.t)); }   // 한국 = 종목 코드 숫자 넣지 않음 (2026-11-18 사용자)
+  function dirCol(v) { return v > 0 ? C_UP : v < 0 ? C_DOWN : '#111'; }   // 가격 = 증감과 같은 색
+  function subOf(r, tail) { return m === 'kr' ? esc(tail || '') : (tail ? esc(r.t) + ' · ' + esc(tail) : esc(r.t)); }   // 한국 = 종목 코드 숫자 넣지 않음
   function capText(c) {
     if (!c) return '';
     if (m === 'us') return c >= 1e12 ? (c / 1e12).toFixed(2) + '조 달러' : Math.round(c / 1e8).toLocaleString('ko-KR') + '억 달러';
@@ -58,7 +58,7 @@
     return Math.round(c / 1e8).toLocaleString('ko-KR') + '억 원';
   }
   function logo(r) {
-    var Z = 35;   // 로고 22 → 44 → 20% 작게 35, 이름 · 보조 줄 두 줄의 세로 가운데 (2026-11-17 사용자 "로고 2배 · 미들 정렬")
+    var Z = 35;   // 로고 22 → 44 → 20% 작게 35, 이름 · 보조 줄 두 줄의 세로 가운데
     var st = 'display:inline-block;width:' + Z + 'px;height:' + Z + 'px;border-radius:50%;vertical-align:0;margin-right:' + GAP + 'px;';
     if (r.lg) return '<img src="' + LOGO + esc(r.lg) + '?v=' + LOGO_VER + '" alt="" width="' + Z + '" height="' + Z + '" loading="lazy" style="' + st + 'background:#fff;object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;">';
     var k = String(r.t), n = 0; for (var i = 0; i < k.length; i++) n += k.charCodeAt(i);
@@ -77,7 +77,7 @@
       '<span style="display:block;font-size:' + NOTE_PX + 'px;line-height:20px;color:' + NOTE + ';white-space:nowrap;">' + sub + '</span></span></span>';
     var right = '<span style="flex:none;display:flex;flex-direction:column;align-items:flex-end;white-space:nowrap;">' +
       '<span style="font-size:' + CHG + 'px;line-height:24px;">' + (o.right != null ? o.right : pct(r.r)) + '</span>' +
-      '<span style="font-size:15px;line-height:20px;color:' + dirCol(r.r) + ';">' + esc(price(r)) + '</span></span>';   // 증감 위 · 가격 아래 (2026-11-17 사용자 규칙)
+      '<span style="font-size:15px;line-height:20px;color:' + dirCol(r.r) + ';">' + esc(price(r)) + '</span></span>';   // 증감 위 · 가격 아래
     return '<span data-row-link="1" data-href="' + esc(href(r)) + '" style="' + ROW + (i ? SEP : 'padding-top:21px;') + '">' + left + right + '</span>';   // 테마 줄 장치가 data-href 로 이동
   }
   var MORE = [];   // 접힌 나머지 줄 [items, render] — 버튼을 누를 때 그린다
@@ -134,7 +134,7 @@
     });
   }
 
-  /* 히트맵 — 테마 · 업종 묶음 고르기 (2026-11-18 사용자 "네모난 히트맵이 상단에, 누르면 그 종목들"). 칸 = 알약과 같은 data-sl-pill(같은 탭 전환).
+  /* 히트맵 — 테마 · 업종 묶음 고르기. 칸 = 알약과 같은 data-sl-pill(같은 탭 전환).
      칸 크기 = 묶음 시가총액 합의 제곱근(시총 값이 절반 넘게 없으면 종목 수, 한 판 안에서 잣대를 섞지 않음) · 최소 판의 4% · 큰 순.
      색 = 묶음 전 종목 하루 등락 단순 평균, 0.1% 미만 보합 · 1 · 2 · 3% 경계 4단계, 글자 = 같은 방향 색. 칸은 하나도 버리지 않는다. */
   var HEAT_W = 360;
@@ -197,19 +197,19 @@
       ['상승 종목', function (r) { return r.r >= UP; }, function (r) { return r.r; }, UP + '% 넘게 오른 종목이 없어 많이 오른 순입니다.', null],
       ['하락 종목', function (r) { return r.r <= DOWN; }, function (r) { return -r.r; }, (-DOWN) + '% 넘게 내린 종목이 없어 많이 내린 순입니다.', null],
       ['거래 급증', function (r) { return (r.v || 0) >= VOL; }, function (r) { return r.v; }, '평소의 2배를 넘은 종목이 없어 많이 늘어난 순입니다.',
-        function (r) { return '<span style="color:' + NOTE + ';font-size:' + NOTE_PX + 'px;">평소의 ' + r.v.toFixed(1) + '배 · </span>' + pct(r.r); }],   // 말 = 보조 줄 크기 · 색, 증감 = 굵게 (2026-11-18 사용자)
+        function (r) { return '<span style="color:' + NOTE + ';font-size:' + NOTE_PX + 'px;">평소의 ' + r.v.toFixed(1) + '배 · </span>' + pct(r.r); }],   // 말 = 보조 줄 크기 · 색, 증감 = 굵게
       ['52주 최고가 근처', function (r) { return r.h != null && r.h >= NEAR; }, function (r) { return r.h; }, '최고가 2% 안 종목이 없어 가까운 순입니다.',
         function (r) { return r.h >= 0 ? '<span style="color:' + C_UP + ';font-weight:700;">최고가</span>'
-          : '<span style="color:' + NOTE + ';font-size:' + NOTE_PX + 'px;">최고가까지 </span><b style="color:' + C_DOWN + ';">' + Math.abs(r.h).toFixed(1) + '%</b>'; }]   // 최고가 = 빨강 굵게, 남은 % = 파랑 굵게 (2026-11-18 사용자)
+          : '<span style="color:' + NOTE + ';font-size:' + NOTE_PX + 'px;">최고가까지 </span><b style="color:' + C_DOWN + ';">' + Math.abs(r.h).toFixed(1) + '%</b>'; }]   // 최고가 = 빨강 굵게, 남은 % = 파랑 굵게
     ];
     var bodies = G.map(function (g) {
       var pool = xs.filter(function (r) { return g[2](r) != null; }).sort(byDesc(g[2]));
       var hit = pool.filter(g[1]);
       var render = function (r, i) { return row(r, i, { right: g[4] ? g[4](r) : null }); };
-      return hit.length ? card(hit, render) : card(pool, render) + note(g[3]);   // 탭 · 묶음 줄 바로 아래엔 정보 없음 — 안내는 목록 아래 (2026-11-17 사용자)
+      return hit.length ? card(hit, render) : card(pool, render) + note(g[3]);   // 탭 · 묶음 줄 바로 아래엔 정보 없음 — 안내는 목록 아래
     });
     return pills('move', G.map(function (g) { return g[0]; })) + panels('move', bodies) +
-      note('마지막 종가 기준 · 거래 급증 = 20일 평균의 2배 이상');   // 짧게 (2026-11-17 사용자)
+      note('마지막 종가 기준 · 거래 급증 = 20일 평균의 2배 이상');   // 짧게
   }
   function theme(doc, by) {
     var gs = (doc.themes || []).map(function (g) { return [g[0], g[1].map(function (t) { return by[t]; }).filter(Boolean)]; }).filter(function (g) { return g[1].length; });
@@ -222,9 +222,9 @@
         ? '<a href="/p/theme-ai-capex.html" style="display:block;margin:4px 0 12px;padding-left:6px;font-size:15px;line-height:24px;color:#111;font-weight:700;text-decoration:none;">AI 투자 자금 흐름 보기 →</a>' : '';
       return card(xs, function (r, i) { return row(r, i); }) + link;
     });
-    return hm.board + panels('theme', bodies) + note(hm.basis);   // 히트맵이 묶음 줄 자리 (2026-11-18 사용자)
+    return hm.board + panels('theme', bodies) + note(hm.basis);   // 히트맵이 묶음 줄 자리
   }
-  function sector(rows, etfs) {   // etfs = 목록 파일 sec_etf(미국만, 업종 11개 ETF 등락) — 증시 시황 업종 줄과 같은 숫자 (2026-11-20 사용자)
+  function sector(rows, etfs) {   // etfs = 목록 파일 sec_etf(미국만, 업종 11개 ETF 등락) — 증시 시황 업종 줄과 같은 숫자
     var by = {};
     rows.forEach(function (r) { (by[r.s] = by[r.s] || []).push(r); });
     var hm = heatmap('sec', Object.keys(by).map(function (k) { return [k, by[k]]; }), etfs && Object.keys(etfs).length ? etfs : null);
@@ -235,12 +235,12 @@
   }
   function caps(rows) {
     var xs = rows.filter(function (r) { return r.c; }).sort(byDesc(function (r) { return r.c; }));
-    return card(xs, function (r, i) { return row(r, i, { rank: i + 1, sub: subOf(r, capText(r.c)) }); });   // `시가총액 상위 10 종목 페이지 →` 줄 삭제 — 여기서 다 본다 (2026-11-19 사용자)
+    return card(xs, function (r, i) { return row(r, i, { rank: i + 1, sub: subOf(r, capText(r.c)) }); });   // `시가총액 상위 10 종목 페이지 →` 줄 삭제 — 여기서 다 본다
   }
   function etf(doc) {
     return card(doc.etf || [], function (r, i) { return row(r, i, { sub: esc(r.s) }); }) + note('지수 · 업종을 따라가는 상품');
   }
-  /* ===== 관심 탭 (2026-11-19 사용자 "적용해") — 로그인 없이 이 브라우저에만 저장(localStorage as-watch). 목업 mock_stock_lists.py 확정분.
+  /* ===== 관심 탭 — 로그인 없이 이 브라우저에만 저장(localStorage as-watch). 목업 mock_stock_lists.py 확정분.
      as-watch = [{m:'us'|'kr', t:티커}] 담은 순서 그대로, 미국 · 한국 합쳐 100개. 종목 페이지 제목 옆 ☆(테마 JS)도 같은 칸을 쓴다.
      이 화면 = 들어온 나라(m) 종목만. 담은 것이 없으면 빈 화면 + 이 기기에서 최근 본 종목(as-recent). 서버 · 로그인 · AI 0. */
   var WKEY = 'as-watch', WMAX = 100;
@@ -267,13 +267,13 @@
     try { seen = JSON.parse(localStorage.getItem('as-recent') || '[]') || []; } catch (e) { seen = []; }
     var xs = seen.filter(function (x) { return x && x.m === m && by[x.t]; }).map(function (x) { return by[x.t]; });
     if (!xs.length) return '';
-    /* 제목 = 기본형 아이콘(시계, 회색 원 22) + 15/22 굵게, 글자와 6 (가이드라인 8절) · 제목 아래 구분선 · 첫 줄 위아래 16 (2026-11-19 사용자) */
+    /* 제목 = 기본형 아이콘(시계, 회색 원 22) + 15/22 굵게, 글자와 6 (가이드라인 8절) · 제목 아래 구분선 · 첫 줄 위아래 16 */
     return '<h3 style="display:flex;align-items:center;gap:6px;font-size:15px;line-height:22px;font-weight:700;color:#111;margin:8px 0 0;padding:0 0 12px 6px;border-bottom:1px solid #E2E8F0;">' +
       '<span aria-hidden="true" style="flex:none;display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:#E5E7EB;color:#4B5563;">' +
       '<svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="display:block;"><circle cx="8" cy="8" r="6"/><path d="M8 4.8V8l2.2 1.4"/></svg></span>' +
       '이 기기에서 최근 본 종목</h3>' + card(xs, function (r, i) { return row(r, i); }).replace('padding-top:21px;', '');
   }
-  function a2hsDone() {   // 홈 화면에 추가한 사람 = 홈 화면 앱으로 열었거나(standalone), 설치 창에서 설치함(테마가 as-a2hs-until 을 10년 뒤로 적음). 브라우저 데이터를 지우면 표시도 지워져 안내가 다시 나온다 (2026-11-19 사용자)
+  function a2hsDone() {   // 홈 화면에 추가한 사람 = 홈 화면 앱으로 열었거나(standalone), 설치 창에서 설치함(테마가 as-a2hs-until 을 10년 뒤로 적음). 브라우저 데이터를 지우면 표시도 지워져 안내가 다시 나온다
     try { if ((window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true) return true; } catch (e) {}
     try { return Number(localStorage.getItem('as-a2hs-until') || 0) > Date.now() + 365 * 864e5; } catch (e) { return false; }
   }
@@ -311,7 +311,7 @@
       var bx = W.querySelector('[data-sl-comp]'), cnt = {}, ks = [], n = rowsEl().length;
       rowsEl().forEach(function (x) { var k = secOf(x); if (!cnt[k]) { cnt[k] = 0; ks.push(k); } cnt[k]++; });
       ks.sort(function (a, b) { return cnt[b] - cnt[a]; }); if (cur && !cnt[cur]) cur = '';
-      if (ks.length < 2) { cur = ''; bx.innerHTML = ''; return; }   // 업종이 둘 이상일 때만 묶음 줄 — 하나뿐이면 `전체`와 같은 목록 (2026-11-19 사용자)
+      if (ks.length < 2) { cur = ''; bx.innerHTML = ''; return; }   // 업종이 둘 이상일 때만 묶음 줄 — 하나뿐이면 `전체`와 같은 목록
       function pill(k, t) { return '<button class="seg" type="button" data-comp="' + esc(k) + '" aria-selected="' + (cur === k) + '">' + t + '</button>'; }
       bx.innerHTML = '<div class="seg-row sl-joined">' + pill('', '전체') + ks.map(function (k) { return pill(k, esc(k)); }).join('') + '</div>';
     }
@@ -405,7 +405,7 @@
     if (document.readyState === 'complete') a2hs(); else window.addEventListener('load', a2hs);
     window.addEventListener('appinstalled', function () { var n = W.querySelector('[data-sl-save]'); if (n) n.remove(); });   // 이 화면에서 설치하면 바로 안내를 거둔다
   }
-  function dayText(d) {   // 날짜 = 증시 시황 기준 줄과 같은 꼴 `11.19 한국 종가` · `11.18 미국 종가`(미국 = 미국 장 날짜) (2026-11-19 사용자 "증시 시황 날짜 표기로 통일", story_render basis)
+  function dayText(d) {   // 날짜 = 증시 시황 기준 줄과 같은 꼴 `11.19 한국 종가` · `11.18 미국 종가`(미국 = 미국 장 날짜)
     var x = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(d || ''));
     if (!x) return '';
     return Number(x[2]) + '.' + x[3] + (m === 'us' ? ' 미국 종가' : ' 한국 종가');
@@ -423,7 +423,7 @@
     if (document.readyState === 'complete') go(); else window.addEventListener('load', go);
   }
 
-  /* 관심 탭 이름 앞 별 (2026-11-19 사용자) — 탭은 테마가 h2 글자로 만들므로(글자만) 만들어진 뒤 버튼 앞에 그림을 꽂는다.
+  /* 관심 탭 이름 앞 별 — 탭은 테마가 h2 글자로 만들므로(글자만) 만들어진 뒤 버튼 앞에 그림을 꽂는다.
      글자(textContent)는 그대로라 #tab-관심 이름 찾기에 영향 없음. 별 모양 · 색 = 종목 제목 옆 담긴 별(mock_stock_lists STAR · STAR_PATH) */
   (function tabStar() {
     var tries = 0;
@@ -451,7 +451,7 @@
     stamp(doc.d);
   }
   function fail() {
-    var t = '<p style="font-size:17px;line-height:30px;color:#333;margin:12px 0;padding-left:6px;word-break:keep-all;">잠시 목록을 불러오지 못했습니다. 잠시 뒤 다시 열어 주세요.</p>';   // 옛 안내 = 시총 상위 10 페이지로 — 그 페이지를 없애며 뺌 (2026-11-19 사용자)
+    var t = '<p style="font-size:17px;line-height:30px;color:#333;margin:12px 0;padding-left:6px;word-break:keep-all;">잠시 목록을 불러오지 못했습니다. 잠시 뒤 다시 열어 주세요.</p>';   // 옛 안내 = 시총 상위 10 페이지로 — 그 페이지를 없애며 뺌
     ['watch', 'move', 'theme', 'sector', 'cap', 'etf'].forEach(function (k) { put(k, t); });
   }
 

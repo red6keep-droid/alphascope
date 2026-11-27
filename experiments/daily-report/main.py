@@ -75,7 +75,7 @@ def collect():
     except Exception as e:  # noqa: BLE001
         print(f"::warning::일정 수집 실패: {e!r}")
         calendar = None
-    try:   # 헤지펀드 선물 포지션 카드 (2026-11-09 사용자) — 실패해도 리포트는 나간다, 카드만 빠진다
+    try:   # 헤지펀드 선물 포지션 카드 — 실패해도 리포트는 나간다, 카드만 빠진다
         cftc = collect_cftc.collect_cftc()
     except Exception as e:  # noqa: BLE001
         print(f"::warning::CFTC 수집 실패: {e!r}")
@@ -137,7 +137,7 @@ def run_analysis():
 
 
 def make_chart(input_data):
-    """S&P 500 가격 그래프 (탭 위, 2026-10-18 사용자). 어제 그림이 오늘 글에 붙지 않게 먼저 지운다. 실패해도 리포트는 그래프 없이 나간다."""
+    """S&P 500 가격 그래프. 어제 그림이 오늘 글에 붙지 않게 먼저 지운다. 실패해도 리포트는 그래프 없이 나간다."""
     for name in ("chart.json", "chart_ref.txt"):
         path = os.path.join(OUTPUT_DIR, name)
         if os.path.exists(path):
@@ -197,7 +197,7 @@ def main():
     print("[2/6] Gemini 리포트 생성")
     print("=" * 50)
     generate_report.generate_report(INPUT_PATH, REPORT_PATH, analysis_path=analysis_path)
-    # 선정 뉴스 = 규칙 점수(news_pick) — 데일리 AI 가 고른 index 는 쓰지 않는다 (2026-11-05 사용자 batch 8 ⑬: 고른 기준이 보이게). 기록 · 검증 · 렌더가 같은 것을 본다
+    # 선정 뉴스 = 규칙 점수(news_pick) — 데일리 AI 가 고른 index 는 쓰지 않는다. 기록 · 검증 · 렌더가 같은 것을 본다
     try:
         import news_pick
         _analysis = None
@@ -241,11 +241,11 @@ def main():
         print(f"::warning::나우캐스트 스냅샷 저장 실패 (게시는 계속): {e!r}")
 
     chart_ok = bool(make_chart(input_data))
-    # 커버 이미지는 만들지 않는다 (2026-11-16 사용자: 종목 페이지처럼 대표 이미지 없이 — 맨 위 = 봉차트). make_cover 는 남겨 둠(다시 켤 때)
+    # 커버 이미지는 만들지 않는다. make_cover 는 남겨 둠(다시 켤 때)
     image_ok, cover_url = False, None
     # 그래프(chart_spx)가 커버 자리라 커버는 그래프가 없는 날만 쓰인다 (render_html.build_body). 커버 생성 실패가 그래프 있는 날의 게시까지
     # 막던 단일 실패점을 풀었다 — 둘 다 없을 때만 멈춘다 (2026-10-21, 운영지침 D6-2; "이미지 없이 게시하지 않는다"는 그대로)
-    if not chart_ok:   # 운영지침 D6-2 (2026-11-21 사용자: 빠진 자료는 빼고 발행 — 옛 11-16 "봉차트 없으면 게시 중단" 폐지). 맨 위 봉차트 자리만 비고 글은 나간다
+    if not chart_ok:   # 운영지침 D6-2. 맨 위 봉차트 자리만 비고 글은 나간다
         print("::warning::S&P 500 봉차트 자료 없음 — 봉차트 없이 발행")
         if should_publish:
             notify.event("수집 실패", "데일리 리포트 S&P 500 봉차트 자료 없음 (야후) — 봉차트 없이 발행")

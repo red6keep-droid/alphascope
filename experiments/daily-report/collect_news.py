@@ -1,7 +1,7 @@
 """시장 뉴스 수집 (CNBC RSS)
 
-루트의 fetch_news.py 로직을 재사용한다. 후보는 **최근 NEWS_HOURS(48)시간** 기사만 (2026-11-05 사용자 batch 8 ②: CNBC 목록에는 며칠 ~ 2주 지난 기사가
-섞여 들어와 요약 줄 · 한글 헤드라인이 비었다 — 공용 처리가 오래된 기사를 AI 에 보내지 않는다). 시차 때문에 24 가 아니라 48 (사용자). 최신이 위.
+루트의 fetch_news.py 로직을 재사용한다. 후보는 **최근 NEWS_HOURS(48)시간** 기사만 ( batch 8 ②: CNBC 목록에는 며칠 ~ 2주 지난 기사가
+섞여 들어와 요약 줄 · 한글 헤드라인이 비었다 — 공용 처리가 오래된 기사를 AI 에 보내지 않는다). 시차 때문에 24 가 아니라 48. 최신이 위.
 """
 
 import datetime
@@ -101,7 +101,7 @@ HOME_STORE_URL = "https://raw.githubusercontent.com/red6keep-droid/alphascope/gh
 def process(items):
     """공용 뉴스 처리 (experiments/news_store.py, 2026-10-25 공용 처리 3단계) — 기사마다 headline_ko(원제 번역) · detail_ko(요약 줄) · theme ·
     related(관련도 2 이상 종목) · issue · subtopic · scope · scheduled · surprise. 홈 뉴스가 이미 처리한 기사(같은 CNBC 주소)는 그 결과를 그대로,
-    처음 본 기사만 AI 로 (RSS 요약이 요약 줄 재료). 데일리 AI(generate_report)는 어떤 기사를 실을지 고르기만 한다 (2026-10-25 사용자: 특별 케이스 없이).
+    처음 본 기사만 AI 로 (RSS 요약이 요약 줄 재료). 데일리 AI(generate_report)는 어떤 기사를 실을지 고르기만 한다.
     실패해도 리포트는 나간다 (영문 원제로)."""
     import hashlib
     import os

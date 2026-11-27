@@ -1,4 +1,4 @@
-"""③단계 — 추적 사건(cases.watch=1)의 도켓에서 **주가에 닿을 일정과 판결만** 뽑는다 (2026-10-10 사용자 결정: 단순하게).
+"""③단계 — 추적 사건(cases.watch=1)의 도켓에서 **주가에 닿을 일정과 판결만** 뽑는다.
 
 하는 것
   1. 최신 도켓 문서 20건을 읽어 일정 명령문의 `... set for M/D/YYYY` 중 **결정으로 이어지는 것**(심리·재판·약식판결·기각 신청·집단소송 인증)만
@@ -64,7 +64,7 @@ RULINGS = [  # (패턴, 한국어, NVDA(피고) 기준 방향, cases.status 전�
 ]
 EXCLUDE_RE = re.compile(r"seal|administrative motion|pro hac vice|withdraw|extension of time|leave to file", re.I)
 
-# 일정을 지우는 문서 (2026-11-10 사용자 확인: NVDA 카드에 합의로 멈춘 2027 일정 · 서면 판단으로 없어진 11-19 심리가 남아 있었다).
+# 일정을 지우는 문서.
 # 법원 명령 · 서기 공지 · 양측 합의서(머리가 ORDER · CLERK'S NOTICE · STIPULATION · NOTICE OF SETTLEMENT · MINUTE)에 정지 · 취소 · 서면 판단 · 합의가 있으면
 # 그 문서보다 먼저 잡힌 일정은 버린다. 그 뒤에 새로 잡힌 일정(정지가 풀려 다시 잡힘)은 남는다. 당사자의 `정지 신청`(MOTION to stay)은 명령이 아니라 보지 않는다
 CANCEL_HEAD_RE = re.compile(r"^\s*(ORDER|CLERK'?S NOTICE|NOTICE OF SETTLEMENT|STIPULATION|MINUTE)", re.I)

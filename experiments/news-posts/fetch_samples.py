@@ -4,7 +4,7 @@
     python experiments/news-posts/fetch_samples.py --gcloud <gcloud 로그인 계정>            # 키 없이 그 PC gcloud 토큰으로 (2026-11-23)
     python experiments/news-posts/fetch_samples.py --gcloud <계정> --facts --extra            # 시안용 두 가지 더 (아래)
 
-- 시안용 (2026-11-23 사용자 "다른 PC 에서도 같은 목업"), 수집기 원래 저장소(news-text-collector) 읽기만 — 그 저장소를 읽을 수 있는 gcloud 계정이 필요:
+- 시안용, 수집기 원래 저장소(news-text-collector) 읽기만 — 그 저장소를 읽을 수 있는 gcloud 계정이 필요:
   --facts : 옛 시안 — 사건 묶기 결과(eventsets) 최근 두 실행 → 수집기 코드로 facts 모양 → samples/facts.json
             (블로그 저장소 facts 는 이 옵션 없이도 늘 samples/facts_blog.json 으로 받는다, 2026-11-24)
   --extra : 수집기 posts 중 v2 · 색 강조(==)가 든 글(검사 실패로 블로그에 안 온 글 포함) → samples/posts_extra.json (상세 화면 시안만, 홈 · 목록엔 안 씀)

@@ -46,7 +46,7 @@ def _analysts(t):
     return out
 
 
-BROKER_DAYS = 30   # 증권사 등급 · 목표가 변경은 최근 30일 (2026-11-02 사용자 P275: 매수의견 탭에 증권사 의견)
+BROKER_DAYS = 30   # 증권사 등급 · 목표가 변경은 최근 30일
 
 
 def _changes(t, days=BROKER_DAYS):
@@ -75,7 +75,7 @@ def broker_history(sym):
 
 
 def _company(t):
-    """`기업` 탭 기본 정보 — 야후 회사 개요 (2026-10-31 사용자: 한국처럼 미국에도 기업 탭). 대표 = 직함에 CEO 가 든 사람."""
+    """`기업` 탭 기본 정보 — 야후 회사 개요. 대표 = 직함에 CEO 가 든 사람."""
     i = t.info or {}
     ceo = next((o.get("name") for o in i.get("companyOfficers") or [] if "CEO" in (o.get("title") or "") or "Chief Executive" in (o.get("title") or "")), None)
     fy = i.get("lastFiscalYearEnd")
@@ -147,7 +147,7 @@ def _options(t, spot, day, next_earn):
 
 
 FIELDS = ("analysts", "eps", "short", "options", "company")   # 종목별 상세 칸 — detail_cache 주기로 받는다
-DAILY = ("analysts", "eps")   # 새 거래일마다(같은 날 실행 4번은 한 번만) — 옛 3~7일이면 증권사 등급 · 목표가 변경이 며칠 늦게 떴다 (2026-11-16 사용자)
+DAILY = ("analysts", "eps")   # 새 거래일마다(같은 날 실행 4번은 한 번만) — 옛 3~7일이면 증권사 등급 · 목표가 변경이 며칠 늦게 떴다
 
 
 def _one(args, only=None):
@@ -306,7 +306,7 @@ def run(snap):
     day = max(b[-1]["day"] for b in snap["bars"].values() if b)
     sys.path.insert(0, os.path.join(BASE, ".."))
     import detail_cache as DC
-    cache = DC.shared(os.path.join(BASE, "data"))   # 칸마다 바뀌는 주기에만 새로 받는다 (2026-11-12 사용자) — 옵션 · 의견 · 이익 예상 = 새 거래일(11-16), 공매도 14일, 기업 정보 90일
+    cache = DC.shared(os.path.join(BASE, "data"))   # 칸마다 바뀌는 주기에만 새로 받는다 — 옵션 · 의견 · 이익 예상 = 새 거래일(11-16), 공매도 14일, 기업 정보 90일
     out = {"day": day, "revenue": have.get("revenue")}
     jobs, plan = [], {}
     for sym, *_ in U.CANDIDATES:

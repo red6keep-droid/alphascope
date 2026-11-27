@@ -1,4 +1,4 @@
-"""한국 전망 근거 목업 (2026-11-12 사용자: "우리가 채울 수 있는 근거를 목업으로 보고 싶어").
+"""한국 전망 근거 목업.
 
     .venv/bin/python experiments/issue_store/mock_kr_why.py
       → output/mock_kr_why-map.html    대상별 · 날짜별로 kr_why 가 채운 근거(방송 · 외국인 · 전날 밤 미국 · 공시) 전부
@@ -175,7 +175,7 @@ def us_case(px, ctx):
 
 
 def long_case():
-    """`지난 경과 더 보기` 10개씩 확인용 — 기준을 끝까지 넘지 않는 가상 전망 58거래일 (2026-11-12 사용자)."""
+    """`지난 경과 더 보기` 10개씩 확인용 — 기준을 끝까지 넘지 않는 가상 전망 58거래일."""
     import math
     w = next(x for x in R.INDEX if x["sym"] == "^SOX") if any(x["sym"] == "^SOX" for x in R.INDEX) else R.INDEX[0]
     days = [d.isoformat() for d in (dt.date(2026, 8, 3) + dt.timedelta(days=i) for i in range(90)) if d.weekday() < 5][:59]

@@ -1,4 +1,4 @@
-"""운영 대시보드 목업 (2026-11-13 사용자: "관리에 필요한 모든 것을 추천해" → 1단계 범위, "디자인 규칙을 꼭 지켜서").
+"""운영 대시보드 목업.
 
     python experiments/ops-dashboard/mock_ops.py   → output/mock_ops.html (목업 서버 `운영 대시보드` 묶음)
 
@@ -61,7 +61,7 @@ def white_card(rows, fold_at=None, noun="", left=60):
 
 
 def chart_top(html, top=15):
-    """카드 밖 그래프 제목(※) 위 +15 (2026-11-13 사용자). 탭 · 서브탭 바로 아래 그래프는 top=0.
+    """카드 밖 그래프 제목(※) 위 +15. 탭 · 서브탭 바로 아래 그래프는 top=0.
     div 로 감싼다 — 그래프 조각(span display:block)이 서브탭의 hidden 을 이겨 다른 서브탭에도 보이던 것."""
     return f'<div style="margin-top:{top}px;">{html}</div>'
 

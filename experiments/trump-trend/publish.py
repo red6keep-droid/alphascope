@@ -34,7 +34,7 @@ def event_count(output_dir=None):
 
 def publish(output_dir=None, do_publish=False):
     output_dir = output_dir or config.OUTPUT_DIR
-    # 이벤트 0건인 날은 게시하지 않는다 (2026-10-16 사용자: 발언 없는 날은 통계 반복뿐, 매일 볼 이유가 없다 — 인물-발언-레이더-기획 5절).
+    # 이벤트 0건인 날은 게시하지 않는다.
     # 렌더 · 상태 저장은 그대로. 다음 날 check_published 는 오늘 글이 없으니 정상 실행된다
     n = event_count(output_dir)
     if n == 0:

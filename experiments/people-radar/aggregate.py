@@ -24,7 +24,7 @@ import prices
 
 RELEVANCE_EVENT_MIN = 2   # trump-trend 와 같다
 WINDOW_HOURS = 24
-# 매드머니(크레이머) = **그날(KST) 올라온 회차만** (2026-11-20 사용자: 그날 회차는 그날 글에). 뉴욕 18시 방송 → 유튜브 KST 09:30 ~ 10:30 게시라
+# 매드머니(크레이머) = **그날(KST) 올라온 회차만**. 뉴욕 18시 방송 → 유튜브 KST 09:30 ~ 10:30 게시라
 # 08:00 아침 글엔 없고, 방송 분배가 기록한 뒤 `main.py --madmoney-only` 갱신이 같은 글에 붙인다. 어제 회차는 어제 글에 이미 실렸다 (옛 11-11 A안 40시간 창 폐지)
 TREND_DAYS = 7
 
@@ -84,7 +84,7 @@ def build_signals(rows):
         prim = [r for r in items if r["source_kind"] == "primary"]
         lead = max(prim or items, key=lambda r: (r["ai_intensity"], r["ai_market_relevance"]))
         dirs = [r["ai_direction"] for r in items]
-        # 한 묶음 안에 긍정 · 부정이 같이 있으면 중립 (2026-11-11 사용자: 머스크 `사이버트럭 주문 급증` 이 부정 — 같은 주제 묶음의
+        # 한 묶음 안에 긍정 · 부정이 같이 있으면 중립 (: 머스크 `사이버트럭 주문 급증` 이 부정 — 같은 주제 묶음의
         # 단종 · 환불 기사가 다수결로 이겼고, 헤드라인은 대표 기사의 주문 적체 쪽을 골라 둘이 정반대였다)
         mixed = "positive" in dirs and "negative" in dirs
         s.update({
@@ -143,11 +143,11 @@ def trend_changes(conn):
 
 
 KEYWORDS_MAX = 6   # 인물 상세 '많이 말한 키워드' 수
-STRIP_DAYS = 30   # 인물 발언 띠 — 최근 30일 vs 직전 30일 (2026-10-21 사용자: 반복 발언 통계 그래프)
+STRIP_DAYS = 30   # 인물 발언 띠 — 최근 30일 vs 직전 30일
 
 
 def history(conn):
-    """날짜별 신호를 60일 치 모아 추이 탭 재료를 만든다 (2026-10-21 사용자: 인물 목록 · 주제 반복 · 대상 통계).
+    """날짜별 신호를 60일 치 모아 추이 탭 재료를 만든다.
     신호는 24시간 단위가 아니라 기간 전체 묶음이라 하루씩 따로 세어 더한다 (trend_changes 와 같은 이유).
     people_trend: 인물별 최근 7일 · 직전 7일 신호 수(전원). topic_trend: 주제별 7일 · 직전 7일 · 말한 인물 · 며칠째 이어지는지.
     targets7: 최근 7일 언급 종목 · 섹터와 누가 몇 번. strips: 인물별 60일 띠(하루 신호 수 · 가장 많은 주제)."""
@@ -193,7 +193,7 @@ def history(conn):
             for n in names:
                 e = tg.setdefault((kind, n), {"kind": kind, "name": n, "n": 0, "speakers": {}, "dirs": {"positive": 0, "negative": 0, "neutral": 0}})
                 e["n"] += 1
-                e["dirs"][s["direction"] if s["direction"] in e["dirs"] else "neutral"] += 1   # 그 대상에 긍정 · 부정 · 중립 몇 번 (2026-10-21 사용자)
+                e["dirs"][s["direction"] if s["direction"] in e["dirs"] else "neutral"] += 1   # 그 대상에 긍정 · 부정 · 중립 몇 번
                 e["speakers"][s["speaker"]] = e["speakers"].get(s["speaker"], 0) + 1
     targets7 = sorted(({"kind": e["kind"], "name": e["name"], "n": e["n"], "dirs": e["dirs"],
                         "speakers": [{"speaker": k, "name_ko": config.PEOPLE[k]["name_ko"], "n": v}
@@ -205,13 +205,13 @@ def history(conn):
         for s in sigs:
             cell = strips.setdefault(s["speaker"], [{"n": 0, "topic": None, "by_topic": {}} for _ in range(STRIP_DAYS * 2)])[d]
             cell["n"] += 1
-            bt = cell["by_topic"].setdefault(s["topic"], {"n": 0, "positive": 0, "negative": 0, "neutral": 0})   # 주제별 건수 · 방향 (2026-10-21 사용자: 긍정 · 부정도)
+            bt = cell["by_topic"].setdefault(s["topic"], {"n": 0, "positive": 0, "negative": 0, "neutral": 0})   # 주제별 건수 · 방향
             bt["n"] += 1
             bt[s["direction"] if s["direction"] in bt else "neutral"] += 1
     for cells in strips.values():
         for c in cells:
             c["topic"] = max(c["by_topic"].items(), key=lambda kv: kv[1]["n"])[0] if c["n"] else None
-    # 인물별 키워드 = 최근 30일 세부 주제(ai_subtopic, 분류 LLM 이 "Tariff" · "Oil Prices" 처럼 짧은 명사구로 통일) 건수 · 긍정 · 부정 (2026-10-21 사용자:
+    # 인물별 키워드 = 최근 30일 세부 주제(ai_subtopic, 분류 LLM 이 "Tariff" · "Oil Prices" 처럼 짧은 명사구로 통일) 건수 · 긍정 · 부정 (:
     # "에너지 · 지정학 · 무역으로는 모르겠다, 키워드로"). 세부 주제가 없으면 큰 주제. 한국어 표기는 narrate 가 채우는 subtopic_ko.json (render 가 읽는다)
     kw = {}
     for s in window(0, STRIP_DAYS):
@@ -223,7 +223,7 @@ def history(conn):
     # 새로운가 재료 (기획 9-1 4번): 날짜별 (인물|주제) 집합 — enrich 가 오늘 신호마다 며칠째 · 30일 만에 처음을 센다
     topic_days = [sorted({f'{x["speaker"]}|{x["topic"]}' for x in day}) for day in days]
     return {"people_trend": people_trend, "topic_trend": topic_trend, "targets7": targets7, "strips": strips, "keywords": keywords,
-            "person7": person_counts(now7),   # 인물 페이지 요약 카드 `최근 7일 …` 재료 (2026-11-11 사용자) — 파이썬 셈, AI 없음
+            "person7": person_counts(now7),   # 인물 페이지 요약 카드 `최근 7일 …` 재료 — 파이썬 셈, AI 없음
             "profiles": profiles(conn, window(0, STRIP_DAYS)),   # 인물별 발언 특징 (2026-10-25)
             "topic_days": topic_days}
 
@@ -249,7 +249,7 @@ def person_counts(sigs):
 
 CAL_DIR = os.path.join(config.BASE_DIR, "..", "..", "data", "store", "calendar")   # 30년 저장소 캘린더 (로컬만 — CI 엔 없어 그 줄만 빠진다)
 CEO_TICKER = {"huang": "NVDA", "musk": "TSLA"}   # CEO 군 자사 티커 (올트먼 OpenAI 는 비상장)
-# 자사 티커는 발언이 그 회사 이야기일 때만 붙인다 (2026-11-11 사용자: 머스크의 Grok(xAI) 지연 · 앤트로픽 칭찬이 테슬라 발언으로 집계됐다).
+# 자사 티커는 발언이 그 회사 이야기일 때만 붙인다 (: 머스크의 Grok(xAI) 지연 · 앤트로픽 칭찬이 테슬라 발언으로 집계됐다).
 # 분류가 그 티커를 직접 짚었거나, 세부 주제 · 제목 · 인용 · 함께 보도된 제목에 회사 · 제품 이름이 있을 때. xAI · 스페이스X · X 는 비상장 — 연결 종목 없음
 OWN_WORDS = {
     "TSLA": re.compile(r"tesla|cybertruck|cybercab|robotaxi|\bfsd\b|full self-driving|autopilot|optimus|\bmodel [3sxy]\b|megapack|powerwall"
@@ -302,7 +302,7 @@ def _ark_trades(conn, since):
 
 
 def profiles(conn, sigs30=None):
-    """인물별 '발언 특징' (2026-10-25 사용자: 인물군마다 상세 페이지가 같은 꼴이라 특색 있게) — 최근 30일 신호에서
+    """인물별 '발언 특징' — 최근 30일 신호에서
     주제 · 대상 국가 · 언급 종목의 건수와 방향, 발언 경로(본인 글 · 기관 발표 · 매매 공시 · 보도), 연준 연설자, ARK 매매, 다음 FOMC · 다음 실적.
     화면은 인물군별로 다른 줄을 고른다 (render_html._profile_card). 값이 없는 줄은 생략."""
     if sigs30 is None:
@@ -430,7 +430,7 @@ def build(conn, path=None):
         "trend_changes": trend_changes(conn),
         "market": market_context(),
     }
-    out.update(history(conn))   # 추이 탭 — 인물 목록 · 주제 반복 막대 · 언급 대상 · 인물 띠 (2026-10-21 사용자)
+    out.update(history(conn))   # 추이 탭 — 인물 목록 · 주제 반복 막대 · 언급 대상 · 인물 띠
     enrich(people, out)   # 발언 카드의 닿는 곳 · 그날 시장 · 새로운가 · 다음 날짜 (기획 9절, 2026-10-25)
     path = path or os.path.join(config.OUTPUT_DIR, "radar.json")
     os.makedirs(os.path.dirname(path), exist_ok=True)

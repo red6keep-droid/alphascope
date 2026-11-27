@@ -1,4 +1,4 @@
-"""홈 `테마` 카드 데이터 → output/home/themes.json (2026-10-21 사용자: "홈에 카드를 만들어 각각의 페이지로 진입할 수 있게").
+"""홈 `테마` 카드 데이터 → output/home/themes.json.
 
     python experiments/theme-monitor/home_feed.py     # output/themes_analysis.json → output/home/themes.json
 

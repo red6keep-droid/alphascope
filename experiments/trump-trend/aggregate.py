@@ -332,7 +332,7 @@ def reaction_stats(events, conn=None):
     seen_day = set()
     for e in events:
         gkeys = {e["topic"], e["key"]}
-        if e.get("event_direction") in ("positive", "negative"):   # 발언 방향별 (2026-10-11 사용자: 긍정·부정을 나눠야 증감을 본다). "주제#방향"
+        if e.get("event_direction") in ("positive", "negative"):   # 발언 방향별. "주제#방향"
             gkeys.add(f'{e["topic"]}#{e["event_direction"]}')
         for gkey in gkeys:
             counts[gkey]["total"] += 1

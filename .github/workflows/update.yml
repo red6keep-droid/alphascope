@@ -17,7 +17,7 @@ concurrency:
 
 env:
   SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}   # 운영 알림 — 수집 0건 · 워크플로 실패 (experiments/notify.py, 2026-10-21)
-  # yfinance 예비 사슬 (experiments/price_source.py, 2026-10-21 사용자: "동일하면 수집 순위로, 예비로"). 없는 키는 그 단계를 건너뛴다
+  # yfinance 예비 사슬. 없는 키는 그 단계를 건너뛴다
   FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
   POLYGON_API_KEY: ${{ secrets.POLYGON_API_KEY }}
   TWELVEDATA_API_KEY: ${{ secrets.TWELVEDATA_API_KEY }}

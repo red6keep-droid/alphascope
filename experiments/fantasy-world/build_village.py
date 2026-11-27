@@ -1,4 +1,4 @@
-"""주식을 행성으로 보기 — 마을 화면 시안 (평평한 땅 · 붙박이 + 손님 집) (2026-11-23 사용자 "붙박이 + 손님 집으로 시안 만들어 줘").
+"""주식을 행성으로 보기 — 마을 화면 시안 (평평한 땅 · 붙박이 + 손님 집).
 
     python experiments/fantasy-world/build_village.py
 
@@ -9,7 +9,7 @@
     village/daily_us.json           날마다 바뀌는 숫자 — 등락 · 시가총액 · 시장 중앙값 · 지금 쓸 배치 파일 이름. 운영에서는 gh-pages 쪽.
     mock_village_flat.html          시안 (원본 = village_flat.html)
     mock_village_polish.html        다듬은 판 (원본 = village_polish.html — 모양 · 빛만 다름)
-(2026-11-23 사용자: 고정된 것은 고정 저장소 + 사용자 캐시, 날짜 붙은 것만 따로 — "그렇게 해")
+
 
 붙박이 규칙:
     자리 25개(성 1 + 24). 처음에는 시가총액 순. 그 뒤로는 자리를 지킨다 — 시가총액 29위 밖으로 밀려야 자리를 내주고(문턱),
@@ -28,7 +28,7 @@ BASE = os.path.dirname(os.path.abspath(__file__))
 SRC = os.path.join(BASE, "data", "us_lists_2026-11-20.json")
 OUTD = os.path.join(BASE, "output")
 VD = os.path.join(OUTD, "village")
-N_FIXED = 25          # 성 1 + 붙박이 24 (2026-11-23 사용자: 30채는 돼야 마을 느낌)
+N_FIXED = 25          # 성 1 + 붙박이 24
 KEEP_RANK = 29        # 이 순위 밖으로 밀리면 자리를 내준다
 
 

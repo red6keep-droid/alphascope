@@ -1,4 +1,4 @@
-"""사용자 SVG 그림 → 강좌 캐릭터 · 아이콘 WebP (2026-11-20 사용자: 캐릭터 상황 · 모래시계를 SVG 로 줌).
+"""사용자 SVG 그림 → 강좌 캐릭터 · 아이콘 WebP.
 
     python experiments/course/svg_to_webp.py chars <원본.svg> <이름>     # 320×320, 아래 맞춤 → chars/<이름>.webp, 원본은 chars/src/<이름>.svg
     python experiments/course/svg_to_webp.py icons <원본.svg> <이름>     # 128×128, 가운데 → icons/<이름>.webp

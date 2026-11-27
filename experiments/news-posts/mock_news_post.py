@@ -1,4 +1,4 @@
-"""Newfact 주요 기사 · 한국 기사 제목 묶음 — 블로그 화면 목업 (2026-11-23 사용자 "여기서 새로 그려").
+"""Newfact 주요 기사 · 한국 기사 제목 묶음 — 블로그 화면 목업.
 
     python experiments/news-posts/mock_news_post.py
 
@@ -20,7 +20,7 @@ import news_render as NR  # noqa: E402
 
 OUT = os.path.join(BASE, "output")
 SAMPLES = os.path.join(BASE, "samples")
-LISTS = {mk: os.path.join(BASE, "..", "stock-lists", "output", "lists", mk, "_lists.json") for mk in ("kr", "us")}   # 한국 + 미국 (2026-11-23 사용자 "미국 종목도")
+LISTS = {mk: os.path.join(BASE, "..", "stock-lists", "output", "lists", mk, "_lists.json") for mk in ("kr", "us")}   # 한국 + 미국
 
 SAMPLE_POST = {
     "id": "sample-1",
@@ -153,20 +153,20 @@ if __name__ == "__main__":
         print(dk.write_mock(page, os.path.join(OUT, "mock_news_facts.html"), "한국 증시 리포트 · 뉴스 (사건별 사실)"), "·", fday,
               "· 사건", len(NR.fact_events(facts)))
 
-    # ── 한국 홈 카드 `Newfact 주요 기사` (2026-11-23 사용자 "홈 카드도 새로") — 한국 홈 목업(home-split)에 끼워 본다 ──
+    # ── 한국 홈 카드 `Newfact 주요 기사` — 한국 홈 목업(home-split)에 끼워 본다 ──
     # 자리 = 한국 증시 리포트 카드 바로 아래 · 꼴 = 홈 주요 뉴스와 같은 줄(제목 17 굵게 · 요약 16 · 라벨 + 날짜), 5편 + 더 보기(버리지 않음).
     # 제목 = 글 제목 줄과 같은 Newfact 로고 + 작은 `주요 기사`. 적용 때 자료 = Pages posts/index.json(앱 대비 원칙 4절), 방문자 요청 1번.
     import html as _h
     home = os.path.join(BASE, "..", "home-split", "output", "mock_home_kr.html")
     if os.path.exists(home):
         svg = _svg.group(0).replace("class='logo-full'", "class='nf-home-logo'") if _svg else ""
-        # 기사마다 제목 + 요약 한 줄만 — 분류 · 방향 칩 · 날짜 · 기사 사이 구분선 없음, 카드 머리는 로고 + 날짜(`주요 기사` 글자 없음) · 머리 아래 구분선만 (2026-11-24 사용자)
+        # 기사마다 제목 + 요약 한 줄만 — 분류 · 방향 칩 · 날짜 · 기사 사이 구분선 없음, 카드 머리는 로고 + 날짜(`주요 기사` 글자 없음) · 머리 아래 구분선만
         rows = []
         for k, (name, post) in enumerate(jobs):
             summ = (post.get("summary") or "").strip()
             rows.append(f'<article class="news-item"{" hidden data-news-more=1" if k >= 5 else ""}><a href="{name}">{_h.escape(post["title"])}</a>'
                         + (f'<span class="news-sum nf-one">{_h.escape(summ)}</span>' if summ else "") + '</article>')
-        # 카드 날짜 = 다른 홈 카드와 같은 꼴 `11.24 아침` · `11.24 오후` (테마 genKo — 가장 늦은 글을 만든 시각을 한국 시간으로, 12시 전 아침) (2026-11-24 사용자)
+        # 카드 날짜 = 다른 홈 카드와 같은 꼴 `11.24 아침` · `11.24 오후` (테마 genKo — 가장 늦은 글을 만든 시각을 한국 시간으로, 12시 전 아침)
         def _kst(p):
             try:
                 t = datetime.datetime.fromisoformat(str(p.get("createdAt") or "").replace("Z", "+00:00"))

@@ -1,4 +1,4 @@
-"""한국 종목 장중 지연 시세 → output/home/live.json (홈 카드 `장중 가격` 토글 재료, 2026-11-05 사용자).
+"""한국 종목 장중 지연 시세 → output/home/live.json.
 
     python experiments/kr-stocks/collect_kr_live.py
 
@@ -25,7 +25,7 @@ KST = ZoneInfo("Asia/Seoul")
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "output", "home", "live.json")
 OUT_BARS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "output", "home", "live_bars.json")   # 오늘 15분봉 — 홈 · 종목 페이지 `장중 차트`(우리가 그린다)
 DELAY_MIN = 20   # 거래소 규정상 야후 한국 시세 지연 — 표시용
-INDEX_SYMS = ["^KS11"]   # 한국 증시 리포트 코스피 봉차트 아래 `장중 차트 보기` (2026-11-06 사용자 P315) — 15분봉만, live.json 가격 표에는 넣지 않는다
+INDEX_SYMS = ["^KS11"]   # 한국 증시 리포트 코스피 봉차트 아래 `장중 차트 보기` — 15분봉만, live.json 가격 표에는 넣지 않는다
 
 
 def session(now):

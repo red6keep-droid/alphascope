@@ -1,4 +1,4 @@
-"""시황 배너 Workers AI 비교 (2026-11-17 사용자 "Workers AI 비교 워크플로 만들어줘") — banner_mock2 의 6장면을 Cloudflare Workers AI 로.
+"""시황 배너 Workers AI 비교 — banner_mock2 의 6장면을 Cloudflare Workers AI 로.
 
     CF_ACCOUNT_ID=… CF_AI_TOKEN=… python experiments/market-commentary/banner_cf.py [--models flux-1-schnell,lucid-origin]
 

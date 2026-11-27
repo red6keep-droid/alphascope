@@ -1,4 +1,4 @@
-# 기록 사본 — 비공개 상태 저장소(alphascope-state) 전체를 '지금 내용 한 벌'로 묶어 다른 계정의 비공개 저장소에 (2026-11-24 사용자, 헌법 제4조 8항)
+# 기록 사본 — 비공개 상태 저장소(alphascope-state) 전체를 '지금 내용 한 벌'로 묶어 다른 계정의 비공개 저장소에
 #
 # 어디에: red9keep/News-doc(비공개) 의 브랜치 state-backup/daily(날마다 덮어씀) · state-backup/weekly-1 ~ 4(월요일마다 하나씩 돌려 씀).
 #         문서 브랜치 main 은 건드리지 않는다.
@@ -89,7 +89,7 @@ jobs:
           fi
 
       # 세 번째 사본 — Cloudflare R2 비공개 버킷 newfact-records(공개 주소 없음, 블로그 계정 red6) 의 daily/{KST 날짜}/ 에 같은 한 벌.
-      # GitHub 과 다른 회사라 GitHub 계정 사고와 따로 간다(헌법 제4조 8항, 2026-11-24 사용자). 버킷 수명 규칙 daily-30 = 30일 지나면 지움 → 약 30 × 28MB.
+      # GitHub 과 다른 회사라 GitHub 계정 사고와 따로 간다. 버킷 수명 규칙 daily-30 = 30일 지나면 지움 → 약 30 × 28MB.
       # 키(R2 API 토큰, 이 버킷 읽기 · 쓰기만)가 없으면 경고만 — GitHub 사본은 위에서 이미 올라갔다. 줄어듦으로 멈춘 날은 여기까지 오지 않는다
       - name: Copy to R2 (newfact-records)
         if: success()
@@ -107,7 +107,7 @@ jobs:
           echo "R2 올림 daily/$day/ · 파일 $n개"
 
       # 기록 현황 — 받은 상태 저장소로 기록 대장 줄마다 처음 · 마지막 날짜 · 쌓인 양을 세어 운영 대시보드 기록 탭(KV dash:records)에.
-      # 알림은 보내지 않는다(사용자 11-24 "빠진 날 알리지마"). 실패해도 사본에는 영향 없음
+      # 알림은 보내지 않는다. 실패해도 사본에는 영향 없음
       - name: Record status (운영 대시보드 기록 탭)
         if: always() && steps.build.outcome != 'skipped'
         continue-on-error: true

@@ -1,4 +1,4 @@
-"""기사 자료 사진 후보에서 기사에 안 맞는 그림을 사용안함 폴더로 옮긴다 (2026-11-26 사용자).
+"""기사 자료 사진 후보에서 기사에 안 맞는 그림을 사용안함 폴더로 옮긴다.
 
 기사 사진 = 현장 사진. 빼는 것 셋:
   흑백   — 채도 거의 없음(세피아 같은 한 색조 포함)
@@ -18,7 +18,7 @@ from PIL import Image, ImageDraw
 import numpy as np
 
 ROOT = os.path.expanduser("~/Desktop/Newfact-그림-검수")
-TRASH = os.path.join(ROOT, "사용안함")   # 쓰지 않는 그림을 모으는 한 곳 (휴지통 · 보류 통합, 11-26 사용자)
+TRASH = os.path.join(ROOT, "사용안함")   # 쓰지 않는 그림을 모으는 한 곳
 LIST = os.path.join(TRASH, "사용안함-목록.csv")
 SKIP_DIRS = {"2_기업-로고", "사용안함"}
 NIGHT_OK_DIRS = ("파업",)

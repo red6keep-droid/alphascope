@@ -1,10 +1,10 @@
-"""국민연금 기금운용본부 공시 게시판에서 주식 대량보유 내역(분기) · 국내주식 종목별 투자 현황(연말)을 받는다 (2026-11-13 사용자 "진행해줘").
+"""국민연금 기금운용본부 공시 게시판에서 주식 대량보유 내역(분기) · 국내주식 종목별 투자 현황(연말)을 받는다.
 
     python experiments/kr-stocks/collect_nps.py          # 주 1회만 실제로 확인(data/nps.json 의 checked), 새 공시만 PDF 를 받는다
     python experiments/kr-stocks/collect_nps.py --force  # 지금 확인
 
 - 게시판 fund.nps.or.kr/impa/edwmpblnt/getOHEF0001M0.do (cat=QUA 분기 · YEA 연간) → 글(getOHEF0006M0.do) → 첨부 PDF(fileDown.do).
-  누리집 robots.txt 없음. 같은 자료가 공공데이터포털에 이용허락 `제한 없음` 으로 있다(사용자 확인 2026-11-13, 운영지침 D4-15-1).
+  누리집 robots.txt 없음. 같은 자료가 공공데이터포털에 이용허락 `제한 없음` 으로 있다.
 - 분기 PDF 줄 = `번호 종목코드 발행기관명 보고서작성기준일 지분율` — 코드가 있어 이름 짝 맞추기가 필요 없다.
 - 연간 PDF 줄 = `번호 종목명 평가액(억원) 자산군 내 비중 지분율` — 이름만(nps_holdings 가 우리 종목 이름 · 정식 이름으로 찾는다).
 - 처음(nps.json 이 비었을 때)은 지난 공시를 BACKFILL_YEARS 년치 받는다. 요청 사이 GAP 초. AI 0.
@@ -114,7 +114,7 @@ def _q_end(y, q):
 def run(force=False):
     d = load()
     today = datetime.date.today()
-    empty = not d.get("major") and not d.get("annual")   # 받은 공시가 하나도 없으면 주 1회를 기다리지 않는다(11-16 연결 실패가 확인한 날로 남아 일주일 0건, 2026-11-21 사용자)
+    empty = not d.get("major") and not d.get("annual")   # 받은 공시가 하나도 없으면 주 1회를 기다리지 않는다
     if not force and not empty and d.get("checked") and (today - datetime.date.fromisoformat(d["checked"])).days < CHECK_DAYS:
         print(f"[nps] {d['checked']} 에 확인함 — 건너뜀 (주 1회)")
         return d
@@ -157,7 +157,7 @@ def run(force=False):
         feed_log.feed(feed_name, ok=not err and latest is not None, label=latest["label"] if latest else "", data_date=latest["end"] if latest else "",
                       got_new=new > 0, error=err or ("받은 공시 없음" if latest is None else ""), every_days=CHECK_DAYS, expect_new=expect,
                       detail=f"{len(d[key])}건 보관 · 이번에 {new}건 새로")
-    # 실패한 날은 확인한 날로 치지 않는다 — 주 1회 규칙에 막혀 일주일 동안 다시 안 받던 것 (11-16 실패 → 11-23 까지 대기, 2026-11-17 사용자)
+    # 실패한 날은 확인한 날로 치지 않는다 — 주 1회 규칙에 막혀 일주일 동안 다시 안 받던 것
     if not failed:
         d["checked"] = today.isoformat()
     save(d)

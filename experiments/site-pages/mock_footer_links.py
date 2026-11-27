@@ -1,4 +1,4 @@
-"""푸터 링크 줄 목업 — 소개 · 개인정보처리방침 · 문의 (2026-11-21 사용자: 개인정보처리방침은 모든 화면에서 보여야 함).
+"""푸터 링크 줄 목업 — 소개 · 개인정보처리방침 · 문의.
 
     python experiments/site-pages/mock_footer_links.py   # → experiments/site-pages/output/mock_footer_links.html
 

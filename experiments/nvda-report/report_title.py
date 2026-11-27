@@ -6,7 +6,7 @@ import config
 
 KST = datetime.timezone(datetime.timedelta(hours=9))
 
-TITLE_NAME = "엔비디아 NVDA 주가"   # 2026-10-18 사용자: `리포트` 와 괄호 기호 삭제 (검색어 엔비디아 · NVDA · 주가는 그대로). 이전 "엔비디아(NVDA) 주가 리포트" · (2026-10-12 사용자: 엔비디아 리포트) — 검색어 `NVDA` · `주가` 를 넣었다 (2026-10-18 검색 노출)
+TITLE_NAME = "엔비디아 NVDA 주가"   #: `리포트` 와 괄호 기호 삭제 (검색어 엔비디아 · NVDA · 주가는 그대로). 이전 "엔비디아(NVDA) 주가 리포트" · — 검색어 `NVDA` · `주가` 를 넣었다 (2026-10-18 검색 노출)
 LEGACY_PREFIX = "엔비디아 리포트 — "   # 2026-10-18 이전 제목
 PREV_NAME = "엔비디아(NVDA) 주가 리포트"   # 2026-10-18 검색 노출 작업 때 잠시 쓴 제목 (브랜치) — 그날 글을 찾을 때만
 SLUG_NAME = "nvidia nvda stock report"

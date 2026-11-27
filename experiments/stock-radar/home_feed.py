@@ -1,4 +1,4 @@
-"""홈 `관심 종목` · `섹터 상위 종목` 카드 데이터 → output/home/stocks.json (2026-10-21 사용자: "홈에 카드를 만들어서 관심 종목으로
+"""홈 `관심 종목` · `섹터 상위 종목` 카드 데이터 → output/home/stocks.json (: "홈에 카드를 만들어서 관심 종목으로
 카드 만들어라. 그리고 섹터 상위 종목 카드도. 그래서 그걸 타고 가서 개별 종목을 볼 수 있게").
 
     python experiments/stock-radar/home_feed.py          # data/snapshot.json(수집 결과) + data/pages_live.json(발행된 페이지) → output/home/stocks.json
@@ -37,7 +37,7 @@ def _live():
 
 
 def events(a, snap, live):
-    """홈 맨 위 일정 배너 (2026-10-28 사용자: 실적 발표 등 롤링 배너 3개, 누르면 그 종목 상세 화면 캘린더 탭).
+    """홈 맨 위 일정 배너.
     고정 페이지가 있는 종목만 — 링크가 404 가 되지 않게. 가까운 날 · 큰 시총 순."""
     end = (datetime.date.fromisoformat(a["day"]) + datetime.timedelta(days=EVENT_DAYS)).isoformat()
     out = []
@@ -51,7 +51,7 @@ def events(a, snap, live):
 
 
 def notable(a, live, by_sym, page_ok):
-    """홈 `주목할 종목` 카드 (2026-11-04 사용자: 한국 증시 · 주요 인물 발언처럼 독립 카드, 종목 이름 뒤 `주목` 라벨) — 최근 급락일에 버틴 종목, 지수와 차이 큰 순.
+    """홈 `주목할 종목` 카드 — 최근 급락일에 버틴 종목, 지수와 차이 큰 순.
     급락일이 아닌 날도 마지막 급락일 그대로(빈 카드 대신). 줄을 누르면 그 종목 `오늘` 탭의 `급락장에서 어땠나?` 카드 — 고정 페이지가 없으면 목록으로.
     by_sym = {티커: (홈 키, 이름, slug)}, page_ok(티커) = 고정 페이지가 있나. 한국(home_feed_kr)도 같은 함수."""
     c = a.get("crash") or {}

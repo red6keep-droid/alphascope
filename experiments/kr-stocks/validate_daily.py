@@ -1,4 +1,4 @@
-"""일별 · 사건 신호 검증 — K17 · K18 · K21 · K22 · K24 · K25 · K26 · K29 · K30 (기획 11-8, 2026-10-25 사용자 "검증해").
+"""일별 · 사건 신호 검증 — K17 · K18 · K21 · K22 · K24 · K25 · K26 · K29 · K30.
 
     python experiments/kr-stocks/validate_daily.py     # → doc/검증/한국-일별-사건-검증.md · data/validate_daily.json
 

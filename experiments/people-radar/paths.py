@@ -9,7 +9,7 @@ CHANNEL_KO = {
     "regulation": "규제 경로", "fiscal": "재정 경로", "earnings": "실적 경로", "attention": "관심 경로",
 }
 def related_label(assets):
-    """AI 구절이 없을 때 자산 앞 이름표 — 모두 종목이면 `관련 종목`, 지수 · 금리 · 유가 · 환율 · 업종 ETF 가 섞이면 `관련 시장` (2026-11-12 사용자: `관심 경로` 같은 경로 이름은 독자에게 안 보인다)."""
+    """AI 구절이 없을 때 자산 앞 이름표 — 모두 종목이면 `관련 종목`, 지수 · 금리 · 유가 · 환율 · 업종 ETF 가 섞이면 `관련 시장`."""
     return "관련 종목" if assets and all(a not in ASSET_KO for a in assets) else "관련 시장"
 
 
@@ -79,7 +79,7 @@ def resolve(signal, own_ticker=None):
         return {"channel": "earnings", "assets": (a or ["SPY"])[:MAX_ASSETS]}
     if t in ("Product", "Investment", "Earnings", "Deal"):
         a = _dedupe([own_ticker] + [c for c in companies if c != own_ticker][:2]) or sector_etfs[:1]
-        # 자사 티커를 못 붙인 CEO 발언(xAI · 스페이스X 같은 비상장 회사 이야기)은 S&P 500 으로 메우지 않는다 — 연결 자산 없음 (2026-11-11 사용자)
+        # 자사 티커를 못 붙인 CEO 발언(xAI · 스페이스X 같은 비상장 회사 이야기)은 S&P 500 으로 메우지 않는다 — 연결 자산 없음
         return {"channel": "earnings", "assets": a[:MAX_ASSETS]} if a else None
     if t == "Industry View":
         a = _dedupe(sector_etfs[:1] + [own_ticker])

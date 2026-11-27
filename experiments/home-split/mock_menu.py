@@ -1,4 +1,4 @@
-"""전체 메뉴(서랍) · 헤더 · 푸터 다시 짜기 목업 (2026-11-26 사용자).
+"""전체 메뉴(서랍) · 헤더 · 푸터 다시 짜기 목업.
 
     python experiments/home-split/mock_menu.py     # output/mock_menu_kr.html · mock_menu_us.html
 
@@ -67,7 +67,7 @@ def drawer(mkt, files):
     mk = ('<div class="menu-mk">'
           f'<a class="nav-item" data-bar="1" data-flag="us" href="{files["us"]}"{cur("us")}>{FLAG_US}미국 증시</a>'
           f'<a class="nav-item" data-bar="1" data-flag="kr" href="{files["kr"]}"{cur("kr")}>{FLAG_KR}한국 증시</a></div>')
-    rows = [   # 순서 (2026-11-26 사용자): 리포트 둘 → 증시 시황 → 증시 전망 → Hot Issue → 종목 목록 → Newfact 뉴스 → 주요 인물 발언 → 주식 공부. 시가총액 상위 10 둘 · 방송 브리핑 · 테마 = 뺌
+    rows = [   # 순서: 리포트 둘 → 증시 시황 → 증시 전망 → Hot Issue → 종목 목록 → Newfact 뉴스 → 주요 인물 발언 → 주식 공부. 시가총액 상위 10 둘 · 방송 브리핑 · 테마 = 뺌
         row("report", "미국 증시 리포트", L("데일리 브리핑"), "지난 리포트", "데일리 브리핑"),
         row("report", "한국 증시 리포트", L("한국 증시 리포트"), "지난 리포트", "한국 증시 리포트"),
         row("story", "증시 시황", L("증시 시황"), "지난 시황", "증시 시황") + '<!--new-->',
@@ -81,7 +81,7 @@ def drawer(mkt, files):
     ]
     rows = [r.replace('</a>', '<span class="mk-new">새로 넣음</span></a>', 1).replace('<!--new-->', '') if '<!--new-->' in r else r for r in rows]
     site = ('<div class="menu-site"><a href="/p/about.html">소개</a><i>·</i><a class="fl-privacy" href="/p/privacy.html">개인정보처리방침</a><i>·</i>'
-            '<a href="/p/contact.html">문의</a></div>')   # 한 줄 · 아이콘 없음 · 위 구분선 (2026-11-26 사용자)
+            '<a href="/p/contact.html">문의</a></div>')   # 한 줄 · 아이콘 없음 · 위 구분선
 
     return f'<nav class="menu-items" id="primary-menu">{me}{mk}{"".join(rows)}{site}</nav>'
 
@@ -124,13 +124,13 @@ CSS = """
 .menu-items .menu-acc-b .nav-item { border-bottom: 0 !important; padding: 10px 20px 10px 52px !important; font-size: 15px !important; line-height: 22px !important; font-weight: 400; color: #333; }
 .menu-items .menu-acc-b .nav-item:active { background: #F1F5F9; }
 /* ⑥ 소개 · 개인정보처리방침 · 문의 — 서랍 맨 아래 한 줄, 아이콘 없음, 위 구분선(메뉴 줄 마지막 선), 14/20 회색 · 개인정보처리방침만 굵게 · 검정(푸터와 같은 규칙) */
-.menu-items .menu-site { display: flex; align-items: center; flex-wrap: wrap; margin-top: auto; padding: 12px 14px 0; border-top: 1px solid var(--border); }   /* 서랍 맨 아래에 붙는다(메뉴가 짧으면 화면 아래, 길면 마지막 메뉴 다음) (2026-11-26 사용자) */
+.menu-items .menu-site { display: flex; align-items: center; flex-wrap: wrap; margin-top: auto; padding: 12px 14px 0; border-top: 1px solid var(--border); }   /* 서랍 맨 아래에 붙는다(메뉴가 짧으면 화면 아래, 길면 마지막 메뉴 다음) */
 .menu-items > * { flex-shrink: 0; }
 .menu-items .menu-site a { display: block; padding: 6px 6px; font-size: 14px; line-height: 20px; color: #6B7280; text-decoration: none; }
 .menu-items .menu-site i { font-style: normal; color: #CBD5E1; font-size: 14px; line-height: 20px; }
 .menu-items .menu-site a.fl-privacy { color: #111; font-weight: 700; }
 .menu-items .menu-site a:active { background: #F1F5F9; border-radius: 6px; }
-/* 서랍 가로 넓힘 320 → 360(폰은 화면의 90%까지) (2026-11-26 사용자 "조금 더 크게") */
+/* 서랍 가로 넓힘 320 → 360(폰은 화면의 90%까지) */
 .menu-items { width: min(360px, 90vw) !important; }
 /* 목업 설명 칸 */
 .mk-note { box-sizing: border-box; max-width: 680px; margin: 16px 10px; overflow: hidden; padding: 18px 18px 6px; background: #fff; border: 1px solid #E2E8F0; border-radius: 12px; font-size: 15px; line-height: 23px; color: #111; }
@@ -158,7 +158,7 @@ FOOT = ("공개된 시세 · 공시 · 경제 지표 · 뉴스를 정해진 규�
         "모든 정보는 참고용으로, 매수 · 매도를 권유하지 않으며 투자 판단과 책임은 투자자 본인에게 있습니다. 종목 로고는 각 회사의 상표입니다.")   # 푸터 한 문단 (2026-11-26)
 MORE_OLD = ("해설 문장 일부는 AI 가 씁니다. 모든 정보는 참고용이며, 앞으로의 결과는 지난 기록과 다를 수 있습니다. 애널리스트 의견 · 목표가는 외부 의견을 옮긴 것입니다. "
             "개별 투자 상담을 하지 않으며, 투자 판단과 책임은 투자자 본인에게 있습니다. 종목 로고는 각 회사의 상표이며, 종목을 구분하는 용도로만 쓰고 해당 회사와 제휴 관계가 없습니다.")   # 11-26 전 접힌 글(비교용)
-MORE_A = "해설 일부는 AI 가 씁니다. 모든 정보는 참고용이며, 투자 판단과 책임은 투자자 본인에게 있습니다. 종목 로고는 각 회사의 상표입니다."   # 접힌 글 줄임 추천 (2026-11-26 사용자 "장황하다, 소개 페이지에 있으니 짧게")
+MORE_A = "해설 일부는 AI 가 씁니다. 모든 정보는 참고용이며, 투자 판단과 책임은 투자자 본인에게 있습니다. 종목 로고는 각 회사의 상표입니다."   # 접힌 글 줄임 추천
 MORE_B = "해설 일부는 AI 가 씁니다. 투자 판단과 책임은 투자자 본인에게 있습니다."
 LEAD_B = "공개 자료를 정해진 규칙으로 정리한 기록이며, 매수 · 매도를 권유하지 않습니다."
 
@@ -224,7 +224,7 @@ def parts(mkt, files):
               '<button class="nav-toggle" type="button" aria-controls="primary-menu" aria-expanded="false">'
               '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>'
               '<span class="sr-only">메뉴 열기</span></button></div></header>')
-    # 펼침 버튼 · 접힌 글 없앰 → 한 문단 · 소개 줄은 전체 메뉴로 옮겨 푸터에서 뺌 (2026-11-26 사용자)
+    # 펼침 버튼 · 접힌 글 없앰 → 한 문단 · 소개 줄은 전체 메뉴로 옮겨 푸터에서 뺌
     footer = ('<footer class="site-footer"><div class="footer-disclaimer"><div class="footer-title"><span class="footer-name">' + logo.replace("class='logo-full'", "class='footer-logo'", 1) + '</span></div>'
               f'<p class="footer-lead"><span class="fl-full">{FOOT}</span><span class="fl-short">{ITEM_SHORT}</span></p></div>'
               '<div class="attribution"><div class="footer-row"><p class="footer-copy">© 2026 <span class="brand-word">Newfact</span>. All rights reserved.</p>'
@@ -255,7 +255,7 @@ SRC_HOME = {"us": "mock_home_us.html", "kr": "mock_home_kr.html"}   # 홈 목업
 
 
 def build_home(mkt):
-    """실제 홈 카드가 있는 홈 목업 + 새 헤더 · 서랍 · 푸터 (2026-11-26 사용자 "실제 홈에서 보고 싶어").
+    """실제 홈 카드가 있는 홈 목업 + 새 헤더 · 서랍 · 푸터.
     홈 목업은 미리보기(build_theme --preview) CSS 라 서랍 CSS 가 옛것 — index.html 테마 CSS 를 홈 목업 CSS 뒤에 한 번 더 넣어 맞춘다"""
     src = os.path.join(OUT, SRC_HOME[mkt])
     if not os.path.exists(src):
@@ -277,14 +277,14 @@ def build_home(mkt):
     write(HOME[mkt], html)
 
 
-ITEM_SHORT = "매수 · 매도를 권유하지 않으며, 투자 판단과 책임은 투자자 본인에게 있습니다."   # 상세 화면 푸터 확정 (2026-11-27 사용자: A안에서 AI 문장 뺌 — 홈에 있음)
+ITEM_SHORT = "매수 · 매도를 권유하지 않으며, 투자 판단과 책임은 투자자 본인에게 있습니다."   # 상세 화면 푸터 확정
 ITEM_A = "매수 · 매도를 권유하지 않으며, 투자 판단과 책임은 투자자 본인에게 있습니다. 해설 일부는 AI 가 씁니다."   # 상세 화면 푸터 시안 (2026-11-27)
 ITEM_B = "참고용 기록이며 매수 · 매도를 권유하지 않습니다. 해설 일부는 AI 가 씁니다."
 ITEM_SRC = os.path.join(ROOT, "experiments", "kr-stocks", "output", "mock_005930.html")   # 상세 페이지 = 삼성전자 종목 페이지 목업
 
 
 def build_item():
-    """상세 페이지(종목 · 글) 푸터 확인용 — 종목 페이지 목업(헤더 · 푸터 없이 본문만)에 새 헤더 · 전체 메뉴 · 푸터를 붙인다 (2026-11-26 사용자 "상세 페이지 푸터는 어떻게 확인해?").
+    """상세 페이지(종목 · 글) 푸터 확인용 — 종목 페이지 목업(헤더 · 푸터 없이 본문만)에 새 헤더 · 전체 메뉴 · 푸터를 붙인다.
     body 가 item-view 라 푸터는 상세 모양(제목 · 저작권 줄 없음)으로 그려진다"""
     if not os.path.exists(ITEM_SRC):
         print("상세 페이지 목업 없음:", ITEM_SRC); return

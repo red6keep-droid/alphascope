@@ -1,4 +1,4 @@
-"""한국 간단 종목 업계상황 탭 목업 — 업종 고침 · 사업 묶음 뒤 모습 (2026-11-25 사용자 `하림지주가 왜 건설` → 316개 점검 → 묶음 추가).
+"""한국 간단 종목 업계상황 탭 목업 — 업종 고침 · 사업 묶음 뒤 모습.
 
     python experiments/stock-quick/mock_industry_tab.py            # 상태 저장소 flows.json 을 gh 로 받아 그린다
     python experiments/stock-quick/mock_industry_tab.py --flows F  # 받아 둔 flows.json
@@ -25,7 +25,7 @@ import analyze_kr  # noqa: E402
 import render_kr  # noqa: E402
 import collect_kr as C  # noqa: E402
 import design_kit as dk  # noqa: E402
-import render_html as R  # noqa: E402  (실제 페이지처럼 업계상황 탭 근거 줄 작게 — small_rows, 2026-11-26 사용자)
+import render_html as R  # noqa: E402
 
 # (종목, 목업에 적는 한 줄)
 SAMPLES = [("267260.KS", "새 묶음 `전력기기`"), ("010120.KS", "새 묶음 `전력기기`"), ("001440.KS", "새 묶음 `전선`"),

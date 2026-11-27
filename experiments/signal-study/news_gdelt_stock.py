@@ -1,4 +1,4 @@
-"""r09 A안 — 종목별 언론 언급(GDELT DOC 2.0) 일별 이력 받기. 시험 10종목 (2026-11-17 사용자 "시험 10종목 먼저해").
+"""r09 A안 — 종목별 언론 언급(GDELT DOC 2.0) 일별 이력 받기. 시험 10종목.
 
     python experiments/signal-study/news_gdelt_stock.py           # 받기(이어 받기) → data/store/gdelt_stock/{sym}.csv
     python experiments/signal-study/news_gdelt_stock.py --build   # 원자료 → csv 만
