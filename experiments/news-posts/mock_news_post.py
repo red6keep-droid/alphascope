@@ -111,12 +111,12 @@ def _cap(key):
             f'<a href="{src}" {a}>{who}</a> · <a href="{lic_url}" {a}>{lic}</a></figcaption>')
 
 
-def _figure(h, key="game", name_sym=None, name=""):
+def _figure(h, key="game", name_sym=None, name="", side="left"):
     f, *_, what = PICS[key]
     chip = ""
     if name_sym:   # 흰 이름표 — 우리 종목 로고 24 + 회사 이름 14 굵게, 사진 왼쪽 아래 12 띄움
         logo = dk.ticker_logo(name_sym, 24).replace("vertical-align:-4px;", "flex:none;")
-        chip = ('<span style="position:absolute;left:12px;bottom:12px;display:flex;align-items:center;height:32px;padding:0 12px 0 4px;'
+        chip = (f'<span style="position:absolute;{side}:12px;bottom:12px;display:flex;align-items:center;height:32px;padding:0 12px 0 4px;'
                 f'border-radius:16px;background:#fff;font-size:14px;line-height:20px;font-weight:700;color:#111;">{logo}{name}</span>')
     return (f'<figure style="margin:0 0 26px;"><div style="position:relative;"><img src="mock_img/{f}" alt="자료 사진: {what}" '
             f'style="display:block;width:100%;height:{h}px;object-fit:cover;border-radius:10px;">{chip}</div>{_cap(key)}</figure>')
@@ -150,7 +150,7 @@ CASES = [
     ("2", "업종 사진만", "업종 · 시장 전체 기사(회사 하나가 주인공이 아닐 때) — 업종 폴더에서 한 장", "industry"),
     ("3", "회사 사진만", "회사 사진이 있는 회사(지금 265곳) — 예: LG전자 사진", "company"),
     ("4", "회사 사진 + 흰 이름표", "회사 사진 위 왼쪽 아래에 로고 24 + 이름 — 예: LG전자", "company_chip"),
-    ("5", "업종 사진 + 흰 이름표 (추천)", "회사 사진이 없는 회사 — 업종 사진 + 로고 24 + 이름 · 예: 크래프톤", "industry_chip"),
+    ("5", "업종 사진 + 흰 이름표 (추천)", "회사 사진이 없는 회사 — 업종 사진 + 오른쪽 아래 로고 24 + 이름 · 예: 크래프톤", "industry_chip"),
     ("6", "로고 크게 (권하지 않음)", "로고를 사진 자리에 — 상표가 주인공처럼 보여 홍보물 같음 · 예: LG전자", "logo"),
 ]
 
@@ -160,7 +160,7 @@ def case_pages(html):
         return []
     fig = {"": "", "industry": _figure(200), "company": _figure(200, "lg"),
            "company_chip": _figure(200, "lg", "066570.KS", "LG전자"),
-           "industry_chip": _figure(200, "game", "259960.KS", "크래프톤"), "logo": _big_logo()}
+           "industry_chip": _figure(200, "game", "259960.KS", "크래프톤", side="right"), "logo": _big_logo()}
     out = []
     for n, name, what, k in CASES:
         out.append((f"mock_news_photo_{n}.html", f"Newfact 주요 기사 · 사진 {n}",
