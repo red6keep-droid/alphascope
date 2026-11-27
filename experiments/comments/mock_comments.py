@@ -867,7 +867,7 @@ TITLES.update({
     "mock_comments_card-one.html": "글 아래 댓글 카드 — 1개 = 카드 하나 · NEW (시황 글)",
     "mock_comments_page-stock.html": "댓글 화면 — 종목 가격 · 홈 카드 꼴 그래프 · 댓글 목록 · 쓰기 (종목 페이지에서)",
     "mock_comments_page.html": "댓글 화면 — 배너 그림 · 댓글 목록 · 쓰기 (시황 글에서)",
-    "mock_comments_page-issue.html": "댓글 화면 — Hot Issue 머리 · 그래프 카드 그대로 · 아래 댓글 (핫이슈에서)",
+    "mock_comments_page-issue.html": "댓글 화면 — Hot Issue 제목 · 게이지 카드 그대로 · 아래 댓글 (핫이슈에서)",
     "mock_comments_page-forecast.html": "댓글 화면 시안 — 전망 제목 · 전망A · B 카드 (증시 전망에서)",
     "mock_comments_page-article.html": "댓글 화면 시안 — 기사 제목 · 자료 사진 (Newfact 기사에서)",
 })
@@ -1178,8 +1178,8 @@ def article_top():
             '<a href="https://creativecommons.org/licenses/by-sa/4.0/deed.ko" style="color:inherit;text-decoration:none;">CC BY-SA 4.0</a></figcaption></figure>')
 
 
-TAIL = """<script>(function(){function set(){var l=document.querySelector('.post-title-label')||document.querySelector('.post-title');if(!l||l.querySelector('.post-title-sub'))return;var t=document.createElement('span');t.className='post-title-sub';t.textContent='댓글 보기';l.appendChild(t);}
-window.addEventListener('load',function(){setTimeout(set,300);});})();</script>"""   # 댓글 화면 제목 줄 끝 = 작은 회색 `댓글 보기`(종목 제목 꼬리와 같은 .post-title-sub, 11-27 사용자 B안 + 문구)
+TAIL = """<script>(function(){function set(){var l=document.querySelector('.post-title-label')||document.querySelector('.post-title');if(!l||l.querySelector('.post-title-sub'))return;var t=document.createElement('span');t.className='post-title-sub';t.style.cssText='position:relative;top:1px;';t.textContent='댓글 보기';l.appendChild(t);}
+window.addEventListener('load',function(){setTimeout(set,300);});})();</script>"""   # 댓글 화면 제목 줄 끝 = 작은 회색 `댓글 보기`(종목 제목 꼬리와 같은 .post-title-sub, 11-27 사용자 B안 + 문구). 글자 획 가운데가 제목보다 0.6px 위 → 1px 내림(11-28)
 
 
 def top(kind):
@@ -1201,13 +1201,13 @@ ISSUE_BASE = os.path.join(HERE, "..", "issue_store", "output", "mock_issue_nvidi
 
 
 def issue_head():
-    """Hot Issue 댓글 화면 맨 위 = 원래 Hot Issue 페이지 본문 맨 위를 그대로 — 제목 블록(h2 · 게시 날짜 · 뉴스 쪽) → `주가도 같은 쪽인가?` 그래프 카드까지.
-    그 아래(`얼마나 화제인가?` 부터)는 잘라 내고 댓글이 이어진다(11-28 사용자). 돌아가기는 댓글 화면 쪽 표시를 쓰므로 원래 것은 뺀다."""
+    """Hot Issue 댓글 화면 맨 위 = 원래 Hot Issue 페이지 본문 맨 위를 그대로 — 제목 블록(h2 · 게시 날짜) → 흰 게이지 카드(`최근 일주일 뉴스는 어느 쪽?`)까지.
+    그 아래(`주가도 같은 쪽인가?` · 사태 진행 상황 · 관련 뉴스 …)는 잘라 내고 댓글이 이어진다(11-28 사용자). 돌아가기는 댓글 화면 쪽 표시를 쓰므로 원래 것은 뺀다."""
     p = open(ISSUE_BASE, encoding="utf-8").read()
     op = '<div class="post-body entry-content">'
     a = p.index(op) + len(op)
     b = p[a:p.index('<div class="post-share-buttons', a)]
-    cut = b.index('<h2', b.index('<h2') + 3)   # 둘째 h2(`얼마나 화제인가?`) 앞에서 자름
+    cut = b.rindex('<div style="margin:0 0 8px;">', 0, b.index('>주가도 같은 '))   # 흰 게이지 카드(`최근 일주일 뉴스는 어느 쪽?`)까지만 — 주가 · 사태 진행 강조 카드부터 잘라 냄(11-28 사용자)
     head = re.sub(r'\sdata-title-back(-label)?="[^"]*"', "", b[:cut])
     return head + "</div>"   # 맨 바깥 data-head-title 상자 닫기
 
