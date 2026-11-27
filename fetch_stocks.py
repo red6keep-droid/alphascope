@@ -51,6 +51,18 @@ def market_status():
     return "장중" if open_t <= now < close_t else "장마감"
 
 
+def last_session_date():
+    """가장 최근 미국 장 날짜 — S&P 500 일봉의 마지막 봉 날짜(뉴욕). 못 받으면 None.
+    실행한 날짜를 쓰면 휴장일(추수감사절 등)에도 그날이 장 날짜로 적혀, 아침 시황이 전 거래일 숫자를 '어제 장'으로 다시 쓴다."""
+    try:
+        h = yf.Ticker("^GSPC").history(period="7d", interval="1d")
+        if len(h):
+            return h.index[-1].tz_convert(NY).date().isoformat() if h.index.tz is not None else h.index[-1].date().isoformat()
+    except Exception as e:  # noqa: BLE001
+        print(f"장 날짜 받기 실패: {e}")
+    return None
+
+
 def num(v, digits=2):
     """fast_info 값을 JSON 에 넣을 수 있는 float 로 정리한다 (없으면 None)."""
     try:
@@ -192,12 +204,19 @@ def fetch_data():
         notify.now("홈 시세 수집 부족 — data.json 을 쓰지 않음 (yfinance 차단?): " + " · ".join(short))
         sys.exit(1)
 
+    today_ny = datetime.datetime.now(NY).strftime("%Y-%m-%d")
+    trade_date = last_session_date() or today_ny   # 못 받으면 예전처럼 오늘 날짜
+    status = market_status() if trade_date == today_ny else "장마감"   # 오늘 봉이 없으면(휴장 · 장 전) 장중이 아니다
+    if trade_date != today_ny:
+        print(f"장 날짜 {trade_date} — 오늘({today_ny}) 장이 없거나 아직 안 열림")
+        for i in index_list:
+            i["st"] = status
     output = {
         "updated_at": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC"),
         "interval": INTERVAL,
         # 종가 기준 표시용 — 홈이 "M.D 종가 기준" 또는 "M.D 장중" 으로 보여 준다 (2026-10-22)
-        "market": market_status(),
-        "trade_date": datetime.datetime.now(NY).strftime("%Y-%m-%d"),
+        "market": status,
+        "trade_date": trade_date,   # 마지막 봉 날짜 — 아침 시황 묶음(build_briefing)이 이 날짜로 장이 열렸는지 가른다
         "indices": index_list,
         "stocks": stock_list,
         "sectors": sector_list
