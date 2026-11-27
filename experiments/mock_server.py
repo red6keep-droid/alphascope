@@ -108,6 +108,8 @@ PLAN = [   # (기능 이름, 남은 일 — 한 줄, 파일 패턴 "폴더/파�
     ("오늘 달라진 것 (홈 맨 위 카드 · 증시 리포트 첫 구획, 미국 · 한국 따로)", "목업 배치 확인(사용자 판단) → 며칠 계산만 돌려 줄 다듬기 → 테마 · 리포트에 붙이기", ["today-changes/mock_today_*"]),
     ("종목 이슈 (종목 페이지 가격 카드 아래 Hot Issue)", "목업 확인 → 뉴스 양으로 자동 열고 닫는 코드 (블로그에 아직 없음)", ["issue_store/mock_stock_issue*"]),
     ("회원 `내 종목`", "목업 3화면 → Firebase 규칙 게시 · 댓글 저장 확인이 먼저 → 고정 페이지 · 10명 열기", ["my-stocks/*"]),
+    ("댓글 보기 화면 — 확정 (Newfact 기사 · 한국 증시 리포트 KOSPI 한 줄 · Hot Issue)", "11-28 사용자 확정. 블로그 적용 = 토론 저장소 Cloudflare 적용 뒤 테마 JS (기획 댓글-토론방-기획.md 0-0절)",
+     ["comments/mock_comments_page-article.html", "comments/mock_comments_page-report.html", "comments/mock_comments_page-issue.html"], "확정"),
     ("댓글 다듬기 (신고 · 가려진 댓글 · 하루 30개 · 날짜를 넘어 이어지는 시황 댓글 · 별명 · 캐릭터 10명 왕관 · 캐릭터 소개 페이지)", "목업 확인(캐릭터 이름 · 왕관 모양 · 소개 페이지) → 토론 저장소 Cloudflare 적용 → 테마 JS · 캐릭터 글 넣기 (기획 댓글-토론방-기획.md · 댓글-캐릭터-기획.md)", ["comments/mock_comments_*"]),
     ("모의투자 (가상의 10억 원 · 종가 체결 · 세금까지 실전처럼 · 순위는 100명부터)", "목업 확인 → 댓글 저장 확인 · 별명 → Cloudflare D1 · R2 · Worker → 정산 코드 (2026-11-21 기획 모의투자-기획.md, 결정 전부 확정)", ["mock-invest/mock_invest-*"]),
     ("종목별 토론방 (종목 페이지 맨 끝 탭) · 보류", "2026-11-21 사용자: 종목마다 토론방은 미룸 → 댓글 다듬기 먼저. 한 종목에 댓글이 꾸준히 달리면 다시", ["stock-board/mock_board_*"], "보류"),
@@ -467,7 +469,7 @@ def index_page(mode="main"):
             last = max(W(x) for x in rows)
             note = next((lc[f"{x[0]}/{x[1]}"][1] for x in rows if lc[f"{x[0]}/{x[1]}"][1]), "")
             when = f'{ago(last)} 고침' if last else "고친 기록 없음"
-            out = [f'<details{" open" if opened else ""}><summary>{f"""<span class="st{" hold" if tag == "보류" else ""}">{tag}</span>""" if tag else ""}{html.escape(name)} <span class="n">{len(rows)}</span>'
+            out = [f'<details{" open" if opened else ""}><summary>{f"""<span class="st{" hold" if tag == "보류" else " done" if tag == "확정" else ""}">{tag}</span>""" if tag else ""}{html.escape(name)} <span class="n">{len(rows)}</span>'
                    f'<span class="when">{when}{" · " + html.escape(note) if note else ""}</span>'
                    + (f'<span class="todo">{html.escape(todo)}</span>' if todo else "") + '</summary>']
             out += [row(*x, stars=stars, names=names, ref=ref, new=newd, when_t=W(x)) for x in rows]
@@ -518,7 +520,7 @@ body.edit .edit-btn:not(.reload-btn){{background:#1d2127;border-color:#1d2127;co
 .back{{flex:0 0 auto;border:0;background:none;font-size:13px;color:#5b6370;cursor:pointer;padding:0 14px}}
 .big{{display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:48px;padding:0 14px;margin:0 0 16px;background:#fff;border:1px solid #e3e6eb;border-radius:10px;color:inherit;text-decoration:none;font-weight:600}}
 .big span{{color:#8a919c;font-weight:400;font-size:13px}} .ti{{display:inline-flex;align-items:center;gap:8px}}
-.st{{display:inline-block;margin-right:7px;padding:1px 7px;border-radius:5px;background:#EDE9FE;color:#5B21B6;font-size:12px;font-weight:700;vertical-align:1px}} .st.hold{{background:#F1F5F9;color:#475569}} .zs{{display:block;margin-top:3px;color:#8a919c;font-size:12px;font-weight:400}}
+.st{{display:inline-block;margin-right:7px;padding:1px 7px;border-radius:5px;background:#EDE9FE;color:#5B21B6;font-size:12px;font-weight:700;vertical-align:1px}} .st.hold{{background:#F1F5F9;color:#475569}} .st.done{{background:#DCFCE7;color:#166534}} .zs{{display:block;margin-top:3px;color:#8a919c;font-size:12px;font-weight:400}}
 .when{{display:block;margin-top:4px;color:#2563EB;font-size:13px;font-weight:400}} .cut{{color:#5b6370;font-size:13px;margin:-6px 0 16px}} .cut a{{color:#2563EB}}
 .foot{{margin-top:24px}} details.more{{background:none;border:0}} details.more>summary{{padding:10px 14px;color:#2563EB;font-weight:600;font-size:14px}} details.more .row{{border:1px solid #e3e6eb;border-radius:10px;margin-bottom:8px}} .big.dark{{background:#1d2127;border-color:#1d2127;color:#fff}} .big.dark span{{color:#c3c8d0}}
 </style></head><body>

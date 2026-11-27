@@ -885,7 +885,7 @@ STOCK_TOTAL = 327
 ONE_CMT = ("새내기", "11.27 14:52", "오늘 시황 잘 읽었습니다", "환율 설명이 쉬워서 이해가 잘 됐습니다[:mid_thanks:] 내일 미국 물가 발표 뒤 시황도 기다리겠습니다.", "", [])
 ONE_CMT_R = ("장기보유", "11.27 16:48", "외국인 순매수 표 잘 봤습니다", "수급 탭에서 외국인이 사흘 만에 순매수로 돌아선 걸 확인했습니다[:mid_proof:] 업종별로도 나눠 보면 좋겠네요.", "", [])
 ONE_CMT_I = ("조심조심", "11.27 09:12", "반도체 지수는 오르는데", "업계 전체는 괜찮은데 엔비디아만 빠지는 걸 보면 회사 일로 보는 게 맞겠네요.", "", [])
-ONE_CMT_F = ("장기보유", "11.27 10:30", "전망A 맞았네요", "발표 뒤에 더 오를 줄 알았는데 생각보다 조용했습니다[:mid_question:]", "", [])
+ONE_CMT_F = ("장기보유", "11.27 10:30", "전망A 맞았네요", "급락 뒤에 더 빠질 줄 알았는데 생각보다 빨리 회복했습니다[:mid_question:]", "", [])
 ARTICLE_CMTS = [   # Newfact 기사(크래프톤 거대언어모델 출시)에 달린 댓글 예시 5개 (최신이 위)
     ("게임좋아", "11.27 11:42", "게임 회사가 언어모델까지 만드네요", "게임 안 캐릭터 대사에 쓰려는 건지 궁금합니다[:mid_question:] 기사에 나온 쓰임새를 보니 게임 밖에서도 쓰려는 것 같네요.", "", []),
     ("장기보유", "11.27 11:30", "자체 개발이라는 점이 눈에 띕니다", "다른 회사 모델을 빌려 쓰는 게 아니라 직접 만들었다는 게 핵심이네요. 개발비가 실적에 어떻게 반영될지는 다음 분기에 확인해 보겠습니다.", "", []),
@@ -913,10 +913,10 @@ ISSUE_CMTS = [ONE_CMT_I,
     ("게임좋아", "11.27 08:27", "소식이 많아서 헷갈렸는데", "날짜 순서로 정리돼 있어서 한 번에 읽었습니다[:mid_thanks:]", "", []),
 ]
 FORECAST_CMTS = [ONE_CMT_F,
-    ("조심조심", "11.27 10:18", "미리 적어 둔 전망이라 믿음이 갑니다", "발표 전에 적어 두고 그대로 판정하는 방식이 좋네요.", "", []),
+    ("조심조심", "11.27 10:18", "미리 적어 둔 전망이라 믿음이 갑니다", "급락한 날 적어 두고 그대로 판정하는 방식이 좋네요.", "", []),
     ("새내기", "11.27 10:05", "전망B는 왜 해당 없음인가요?", "두 갈래 중 하나만 판정된다는 뜻인지 궁금합니다[:mid_think:]", "", []),
-    ("데이터센터", "11.27 09:52", "판정 날짜가 적혀 있어서 좋습니다", "결과가 언제 나오는지 미리 알 수 있었습니다.", "", []),
-    ("반도체곰", "11.27 09:40", "다음 전망도 기다리겠습니다", "실적 발표 때마다 이렇게 정리되면 좋겠네요[:mid_clap:]", "", []),
+    ("데이터센터", "11.27 09:52", "급락일 숫자가 바로 보여서 좋습니다", "평소의 몇 배였는지 같이 적혀 있어서 비교가 쉬웠습니다.", "", []),
+    ("반도체곰", "11.27 09:40", "다음 전망도 기다리겠습니다", "크게 빠질 때마다 이렇게 정리되면 좋겠네요[:mid_clap:]", "", []),
 ]
 REPORT_TOTAL, STORY_TOTAL, ISSUE_TOTAL, FORECAST_TOTAL = 148, 263, 512, 137   # 목업 댓글 수 = 세 자리
 TITLES.update({
@@ -1275,6 +1275,37 @@ def issue_head():
     return head + "</div>"   # 맨 바깥 data-head-title 상자 닫기
 
 
+FORECAST_BASE = os.path.join(HERE, "..", "issue_store", "output", "mock_forecast_fix.html")   # 증시 전망 페이지(최신 꼴, 목업 · git 밖)
+FORECAST_PAGE = "S&amp;P 500 급락, 반등할까 더 빠질까? (끝남 · 맞음), 바꾼 뒤"   # 그 안의 전망 한 편 — 급락일 · 전망A 반등한다 · 전망B 지속한다
+
+
+def _div_end(t, i):
+    """t[i] 에서 여는 <div 의 짝 닫는 </div> 끝 위치."""
+    depth, k = 0, i
+    for m in re.finditer(r"<div\b|</div>", t[i:]):
+        depth += 1 if m.group(0) != "</div>" else -1
+        if depth == 0:
+            return i + m.end()
+    return len(t)
+
+
+def forecast_head():
+    """증시 전망 댓글 화면 맨 위 = 증시 전망 보기 페이지와 같은 꼴(11-28 사용자) — 제목(아이콘) · 급락일 줄 · 전망A · 전망B 카드까지.
+    카드는 펼치지 않는다: 오른쪽 펼치기 버튼과 펼쳐야 보이는 안쪽(단계 · 관련 주식 정보 · 뉴스 · 신호)을 빼고 머리 줄만. 그 아래(Timeline …)는 잘라 내고 댓글."""
+    t = open(FORECAST_BASE, encoding="utf-8").read()
+    m = re.search(r'border-top:2px solid #111;[^"]*">' + re.escape(FORECAST_PAGE) + r"</div>", t)
+    a = t.index("</div>", m.end()) + 6   # 라벨 아래 설명 줄 건너뜀
+    e = t.find('border-top:2px solid #111;', a)
+    g = t[a:e if e > 0 else t.index('<div class="post-share-buttons', a)]   # 다음 편 라벨 또는 페이지 끝까지
+    c = g.rindex('<div style="margin:0 0 24px;">', 0, g.index(">전망A<"))   # 전망 카드 묶음
+    head = g[:_div_end(g, c)]
+    head = re.sub(r"(<summary\b[^>]*>.*?</summary>).*?</details>", r"\1</details>", head, flags=re.S)   # 펼친 안쪽 빼기
+    head = re.sub(r'<span style="display:inline-flex;flex:none;align-items:center;justify-content:center;width:31px;height:31px;[^"]*">.*?</span>', "", head, flags=re.S)   # 펼치기 버튼 빼기
+    head = head.replace("<summary ", '<summary onclick="return false;" ').replace("cursor:pointer;", "cursor:default;")
+    head = re.sub(r'\sdata-title-back(-label)?="[^"]*"', "", head)
+    return head + "</div>"   # 맨 바깥 data-head-title 상자 닫기
+
+
 CARD_TOP = {"stock", "report", "issue", "forecast"}   # 맨 위가 외곽선 카드 · 그래프인 댓글 보기
 
 
@@ -1285,8 +1316,9 @@ def comment_page(cmts, total, back, kind):
     more = page_more(ARTICLE_MORE if kind == "article" else cmts, len(cmts), total) if total > len(cmts) else ""   # 더 보기 규칙(10개씩 · 화살표 흰 버튼)
     mark = (f'<span data-title-back="{back}" data-title-back-label="돌아가기" hidden></span>'
             + ('<span data-kr-code="000660" hidden></span>' if kind == "stock" else ""))
-    if kind == "issue" and os.path.exists(ISSUE_BASE):   # 원래 Hot Issue 머리 그대로 + 그 아래 댓글(틀은 git 에 없음 — 없는 PC 는 아래 예전 시안으로)
-        return (issue_head() + f'<div data-design="2" style="font-family:var(--report-font);">{mark}{TAIL}'
+    heads = {"issue": (ISSUE_BASE, issue_head), "forecast": (FORECAST_BASE, forecast_head)}   # 원래 페이지 머리 그대로(틀은 git 에 없음 — 없는 PC 는 아래 예전 시안으로)
+    if kind in heads and os.path.exists(heads[kind][0]):
+        return (heads[kind][1]() + f'<div data-design="2" style="font-family:var(--report-font);">{mark}{TAIL}'
                 f'{PAGE_CSS}<div class="comments is-open cc-page{" cc-after-card" if kind in CARD_TOP else ""}"><div class="cc-page-h">댓글 <span class="cc-n">{total}</span></div>{guard()}<ol class="cv-list">{rows}</ol>{more}</div></div>')
     return (f'<div data-design="2" style="font-family:var(--report-font);">{mark}{TAIL}{top(kind)}'
             f'{PAGE_CSS}<div class="comments is-open cc-page{" cc-after-card" if kind in CARD_TOP else ""}"><div class="cc-page-h">댓글 <span class="cc-n">{total}</span></div>{guard()}<ol class="cv-list">{rows}</ol>{more}</div></div>')
