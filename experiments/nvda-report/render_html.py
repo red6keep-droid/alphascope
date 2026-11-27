@@ -1327,6 +1327,7 @@ def opinions_summary(name, cells, close, ps, broker, news_ops, items, money, clo
         n = {k: sum(1 for c in broker if broker_move(c) == k) for k in MOVE_ORDER}
         dirs["증권사"] = SG.vote([{"상향": 1, "하향": -1}.get(broker_move(c), 0) for c in broker])
         br = ("최근 증권사들은 목표가를 올리는 곳이 더 많" if n["상향"] > n["하향"] else "최근 증권사들은 목표가를 내리는 곳이 더 많" if n["하향"] > n["상향"]
+              else "최근 증권사들은 목표가를 바꾸지 않고 그대로 두었" if not n["상향"]   # 전부 유지 — 0 = 0 을 `반반` 으로 쓰던 어긋남 (개선 1-16)
               else "최근 증권사들은 목표가를 올리는 곳과 내리는 곳이 반반이")
     ev = [{"매수": 1, "매도": -1}.get(p["action"], 0) for p in ps or []] + [{"positive": 1, "negative": -1}.get(x.get("direction"), 0) for x in news_ops or []]
     where = "방송과 뉴스" if news_ops is not None else "방송"
