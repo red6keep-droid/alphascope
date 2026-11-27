@@ -20,6 +20,7 @@ import argparse
 import datetime
 import json
 import os
+import re
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -62,6 +63,33 @@ def fact_parts(f):
     return line, " · ".join(by)
 
 
+def _grams(s):
+    """글자 묶음 — 한글은 두 글자씩, 영문 · 숫자는 낱말(2자 이상)."""
+    out = set()
+    for w in re.findall(r"[가-힣A-Za-z0-9]+", s or ""):
+        w = w.lower()
+        if re.fullmatch(r"[a-z0-9]+", w):
+            if len(w) >= 2:
+                out.add(w)
+        else:
+            out.update(w[i:i + 2] for i in range(len(w) - 1))
+    return out
+
+
+def name_matches(e, facts):
+    """사건 이름이 사실 줄과 한 글자 묶음이라도 겹치나. 하나도 안 겹치면 수집기가 이름을 다른 기사에서 붙인 것
+    (11-27: `국민은행 여자농구 경기 결과` 이름에 태국 해군 입찰 사실 · `금통위 금리 인상` 에 한남3구역 착공).
+    11-27 표본 43건 = 겹침 0 이 4건(모두 어긋남) · 그다음이 0.07(같은 브리핑 속 다른 줄)이라 기준은 '0 이면 뺌'."""
+    name = _grams(e.get("event"))
+    if not name:
+        return True
+    text = " ".join(f"{f.get('what') or ''} {f.get('line') or ''}" for f in facts) + " " + " ".join(x.get("name") or "" for x in e.get("stocks") or [])
+    return bool(name & _grams(text))
+
+
+DROPPED = []   # 이번 실행에서 이름 ↔ 사실이 어긋나 뺀 사건 이름 — 로그 한 줄 (원본은 kr_facts_raw 가 그대로 쌓는다)
+
+
 def clean_event(e, at):
     """공개해도 되는 칸만 · 조건 넘은 사실만. 사실이 하나도 안 남으면 None."""
     facts = []
@@ -73,6 +101,9 @@ def clean_event(e, at):
         g["line"], g["by"] = fact_parts(g)
         facts.append(g)
     if (e.get("sourceCount") or 0) < MIN_SOURCES or not facts:
+        return None
+    if not name_matches(e, facts):   # 틀린 제목을 사실처럼 싣느니 빼는 쪽(홈 · 리포트 · 종목 페이지 모두 이 파일을 읽는다)
+        DROPPED.append(e.get("event") or "")
         return None
     out = {k: e.get(k) for k in ("event", "cat", "direction", "stage", "sourceCount", "outletCount", "stocks", "sector", "numbers",
                                  "scheduled", "surprise", "post")}   # 수집기 19 · 20절 scheduled · surprise(리포트 `예상 밖` 점수) · 28 · 30절 post(그 사건으로 쓴 Newfact 글 slug — 같은 사건 두 줄 합치기), 2026-11-25 — 전엔 버려졌다
@@ -165,6 +196,8 @@ def main():
         fact_docs, head_docs = F.docs(c, "facts"), F.docs(c, "headlines")
     days, index = write_store(a.out, fact_docs, head_docs)
     print(f"facts 문서 {len(fact_docs)}개 · headlines 문서 {len(head_docs)}개 → 이번에 쓴 날 {sorted(days)}")
+    if DROPPED:
+        print(f"이름 ↔ 사실 어긋나 뺀 사건 {len(DROPPED)}개: " + " · ".join(DROPPED[:20]))
     for x in index[:5]:
         print(f'  {x["day"]} 실행 {x["run"]} · 사건 {x["count"]} · 기사 제목 {x["headlineCount"]}')
     if not fact_docs:
