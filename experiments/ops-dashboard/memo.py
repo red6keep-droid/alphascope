@@ -23,16 +23,19 @@ OPEN = ("열림", "확인 중", "보류")
 KST = dt.timezone(dt.timedelta(hours=9))
 
 
-def wrangler(*args):
+def wrangler(*args, missing_ok=False):
     cmd = ["npx", "--no-install", "wrangler", "kv", "key", *args, "--binding", "OPS_KV", "--remote"]
     r = subprocess.run(cmd, cwd=CONSOLE, capture_output=True, text=True, encoding="utf-8", shell=(os.name == "nt"))
     if r.returncode != 0:
-        sys.exit(f"wrangler 실패 — {(r.stderr or r.stdout).strip()[-300:]}")
+        msg = (r.stderr or r.stdout).strip()
+        if missing_ok and ("404" in msg or "not found" in msg.lower()):
+            return ""   # 아직 메모가 하나도 없음 — 첫 메모를 쓸 때 키가 생긴다
+        sys.exit(f"wrangler 실패 — {msg[-300:]}")
     return r.stdout
 
 
 def load():
-    out = wrangler("get", KEY).strip()
+    out = wrangler("get", KEY, missing_ok=True).strip()
     if not out or out.startswith("Value not found"):
         return {"next": 1, "items": []}
     return json.loads(out)
