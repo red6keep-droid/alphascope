@@ -780,7 +780,7 @@ KEY_RE = re.compile(r"(apiKey:\s*')[^']*(')")   # 목업은 로그인 · Firesto
 
 
 def write_out(name, page):
-    open(os.path.join(OUT, name), "w", encoding="utf-8").write(KEY_RE.sub(r"", page))
+    open(os.path.join(OUT, name), "w", encoding="utf-8").write(KEY_RE.sub(r"\1\2", page))
     print(f"[댓글] {name}")
 
 

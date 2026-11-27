@@ -4549,7 +4549,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
           var pic = btn && btn.querySelector('.menu-me-pic'), nm = btn && btn.querySelector('.menu-me-n');
           var OPS = 'https://alphascope-ops-console.red6keep.workers.dev';
           var SDK = 'https://www.gstatic.com/firebasejs/10.14.1/';
-          var CFG = { , authDomain: 'alphascope-352e9.firebaseapp.com', projectId: 'alphascope-352e9', appId: '1:143644264576:web:96972235fa5e8ac58c3e65', owner: 'u1vln4bbDgSgWQDe2F2FaNs81D43' };   /* 댓글 CFG 와 같은 공개 값 */
+          var CFG = { apiKey: '', authDomain: 'alphascope-352e9.firebaseapp.com', projectId: 'alphascope-352e9', appId: '1:143644264576:web:96972235fa5e8ac58c3e65', owner: 'u1vln4bbDgSgWQDe2F2FaNs81D43' };   /* 댓글 CFG 와 같은 공개 값 */
           function flag(k, v) { try { if (v === undefined) return localStorage.getItem(k) === '1'; if (v) localStorage.setItem(k, '1'); else localStorage.removeItem(k); } catch (e) {} return false; }
           try { if (location.hash === '#ops') { flag('as-admin', true); history.replaceState(null, '', location.pathname + location.search); } } catch (e) {}
           function showRow() { if (row) row.hidden = !flag('as-admin'); }
@@ -5058,7 +5058,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
       (function () {
         'use strict';
         /* Firebase 웹 앱 설정 — 공개용 값 (콘솔 → 프로젝트 설정 → 내 앱). owner 는 블로그 주인의 Firebase UID (콘솔 → Authentication → Users) — 모든 댓글 삭제 가능, 이름 옆 `운영자` 라벨 */
-        var CFG = { , authDomain: 'alphascope-352e9.firebaseapp.com', projectId: 'alphascope-352e9', appId: '1:143644264576:web:96972235fa5e8ac58c3e65', owner: 'u1vln4bbDgSgWQDe2F2FaNs81D43' };
+        var CFG = { apiKey: '', authDomain: 'alphascope-352e9.firebaseapp.com', projectId: 'alphascope-352e9', appId: '1:143644264576:web:96972235fa5e8ac58c3e65', owner: 'u1vln4bbDgSgWQDe2F2FaNs81D43' };
         var SDK = 'https://www.gstatic.com/firebasejs/10.14.1/';
         var MAX = 2000;   /* 한 댓글 최대 글자 — firestore.rules 와 같다 */
 
