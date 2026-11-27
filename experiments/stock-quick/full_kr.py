@@ -481,6 +481,10 @@ def body(s, a, peers, by, related_links, extra_today=""):
     ex = sec_expect(s)
     ea = ex + (R.group_title("주요 일정") + cal if cal else "")
     title = f"{s['name']} 주가"
+    return dk.link_page(_body(s, today, op, ea, title, related_links), {"s": s, "peers": peers}, own=s["sym"], where=s["sym"])   # 비교 종목 이름 → 그 종목 페이지 (정식 detail_body 와 같게)
+
+
+def _body(s, today, op, ea, title, related_links):
     return render_kr.wrap(f'<div data-quick-title="{dk.esc(title)}"><span data-kr-code="{s["code"]}" hidden></span>'
             + dk.report_stamp(dk.kst_close_day(s["day"], "KR"), WHEN, late=bool(LATE_DAY) and str(s["day"])[:10] < LATE_DAY)
             + render_kr.lead(s) + CC.card(s["name"], render_kr.BARS.get(s["sym"]) or [], 0, title="") + CC.kr_live(s.get("code")) + '<div style="height:20px;"></div>'   # 봉차트 하나만 — 정식 page_block 은 목업 · 발행 두 벌 + 스크립트(조각엔 페이지 본문 스크립트 하나로)

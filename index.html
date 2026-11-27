@@ -1151,6 +1151,9 @@ a, button, summary, .tab { -webkit-tap-highlight-color: transparent; }
 .news-item.is-pressed, [data-row-link].is-pressed, [data-goto-tab].is-pressed { background-color: #EEF2F7 !important; }
 a.report-card.is-pressed, .post-card.is-pressed { background-color: #F1F5F9 !important; transform: scale(.985); }
 a.is-pressed:not(.report-card), button.is-pressed, summary.is-pressed, .tab.is-pressed { opacity: .55; }
+/* 종목 이름 링크(data-stock) — 누르는 순간 연보라 바탕, PC 마우스 올림 회색 바탕. 점선은 글의 background-image 라 색만 바꾼다 */
+a[data-stock]:active, a[data-stock].is-pressed { background-color: #EDE9FE !important; opacity: 1 !important; border-radius: 3px; }
+@media (hover: hover) { a[data-stock]:hover { background-color: #F3F4F6; border-radius: 3px; } }
 .news-item:not(.load-status), [data-row-link] { transition: background-color .15s ease; }
 .news-item:not(.load-status) { margin-left: -12px; margin-right: -12px; padding-left: 12px; padding-right: 12px; border-radius: 8px; position: relative; border-top-color: transparent; }
 .news-item:not(.load-status):not(:first-child)::before { content: ''; position: absolute; top: -1px; left: 12px; right: 12px; height: 1px; background: #E2E8F0; }   /* 구분선 = 둥근 모서리(누름 효과)와 떼어 끝까지 곧게 — 테두리 선이면 8px 모서리에 양 끝이 휨 */

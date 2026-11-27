@@ -429,7 +429,7 @@ def body(s, bars_s, related_links, extra_today=""):
              + RP.price_card(s, s["day"]) + RP.sec_regime(s) + RP.sec_tech(s) + RP.sec_pairs(s) + RP.sec_states(s) + ("" if news_mode else extra_today))
     op, ea = opinions_tab(s), earnings_tab(s)
     ind = RP.sec_industry_tab(s)
-    return RP.wrap(f'<div data-quick-title="{dk.esc(U.page_title(s["sym"]).replace(" · 실적 일정", ""))}">'   # wrap = 정식과 같은 틀 · 제목 정렬 · 합니다체
+    return RP._link_peers(s, RP.wrap(f'<div data-quick-title="{dk.esc(U.page_title(s["sym"]).replace(" · 실적 일정", ""))}">'   # wrap = 정식과 같은 틀 · 제목 정렬 · 합니다체
             + dk.report_stamp(dk.kst_close_day(s["day"], "US"), WHEN, close="새벽 마감", late=bool(LATE_DAY) and str(s["day"])[:10] < LATE_DAY)
             + RP.lead(s) + CC.card(s["name"], bars_s, 2, title="") + '<div style="height:20px;"></div>'
             + R._section("오늘", today, line=False, tab="오늘")
@@ -438,7 +438,7 @@ def body(s, bars_s, related_links, extra_today=""):
             + (R._section("실적", ea, tab="실적") if ea else "")
             + R._section("업계상황", ind, tab="업계상황")
             + R._section("기업", RP.sec_company(s), tab="기업")
-            + R.related_buttons(related_links) + "</div>")
+            + R.related_buttons(related_links) + "</div>"))   # 비교 종목 이름 → 그 종목 페이지 (정식 detail_body 와 같게)
 
 
 def full_group(radar_dir):
