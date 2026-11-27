@@ -24,23 +24,25 @@ import mock_issue_watch as IW  # noqa: E402
 dk, H, qc = IW.dk, IW.H, IW.qc
 KST = IW.KST
 
-ISS = {"id": "NVDA_CEO", "name": "엔비디아 CEO 사임", "q": "젠슨 황 사임, 엔비디아는 수습되나?", "by": "자동",
+ISS = {"id": "NVDA_CEO", "name": "엔비디아 CEO 복귀", "q": "젠슨 황 복귀, 엔비디아는 수습되나?", "by": "자동",
        "pat": r"젠슨|Jensen|엔비디아 ?(CEO|최고경영자|이사회)|Nvidia'?s? (CEO|board)|크레스|Kress|황 (CEO|사임|퇴임|복귀)",
-       "gq": "젠슨 황 사임 OR 엔비디아 CEO OR 젠슨 황 조사 OR 엔비디아 임시 CEO", "since": "2026-11-10",
+       "gq": "젠슨 황 사임 OR 젠슨 황 복귀 OR 엔비디아 CEO OR 젠슨 황 조사 OR 엔비디아 임시 CEO", "since": "2026-11-10",
        "chain": None, "cases": ()}
 SYM, SYM_NM, SECTOR, SECTOR_NM = "NVDA", "엔비디아", "^SOX", "반도체 지수"
 FORECAST = ("엔비디아 급락, 반등할까 더 빠질까?", "forecast-2026-003", "11.12 하락 지속으로 끝남")   # 이 이슈를 연 증시 전망 (상태 저장소 EH-2026-003)
 EVENT_BASE = "2026-11-06"   # 사건 전 마지막 종가 = 증시 전망 기준일(base_day)
+
+RETURN_PAT = r"CEO ?(로 )?복귀|복귀(했|한|하고|하며|…|에|일|,| 후| 뒤)|경영 일선 복귀|return(s|ed)? as CEO|reinstat"   # 복귀 검토(이사회 대응)는 안 걸림
 
 IW.CFG["NVDA_CEO"] = dict(
     slug="issue-nvidia-ceo", good="수습", bad="악화", watch="수습", file="mock_stock_issue_nvda.html",
     side_pat=[("멀어짐", r"사임 ?(및|하고|과|와|,|…)|사임.{0,6}(급락|폭락|증발)|resign(s|ed)? and"),   # 사임 + 임시 CEO 가 한 제목이면 큰 일(사임) 쪽 — 수습 낱말보다 먼저
               ("종전", r"임시 ?(CEO|최고경영자)|직무 ?대행|후임|선임|임명|복귀|해명|무혐의|종결|안정|지지|interim|appoint|successor|cleared|return"),
               ("확전", r"사임|퇴임|해임|조사|의혹|스캔들|간첩|스파이|연루|소송|기소|급락|폭락|증발|배신|이탈|resign|step(s|ped)? down|probe|investigat|scandal|lawsuit|plunge")],
-    tip="수습 = 임시 CEO · 후임 · 복귀 · 해명 · 조사 종결 소식\n악화 = 사임 · 조사 · 의혹 · 소송 · 급락 소식",
+    tip="수습 = 임시 CEO · 복귀 · 후임 · 해명 · 조사 종결 소식\n악화 = 사임 · 조사 · 의혹 · 소송 · 급락 소식",
     groups=[], extra=[], skip=(), case_cols=[], case_exp={}, case_re=None, case_name="", case_note="", bridge="", bridge_sym=SYM, chart=None,
     stages={"종전": [("임시 체제", r"임시 ?(CEO|최고경영자)|직무 ?대행|interim"), ("이사회 대응", r"이사회|board|복귀 검토|주주"),
-                     ("후임 확정", r"후임 (확정|선임|발표)|신임 CEO|새 CEO|정식 CEO|successor named"), ("조사 종결", r"조사 (종결|마무리)|무혐의|cleared")],
+                     ("복귀 · 후임 확정", RETURN_PAT + r"|후임 (확정|선임|발표)|신임 CEO|새 CEO|정식 CEO|successor named"), ("조사 종결", r"조사 (종결|마무리)|무혐의|cleared")],
             "확전": [("의혹 · 보도", r"의혹|보도|연루|스캔들|간첩|스파이|report"), ("조사", r"조사|probe|investigat"),
                      ("사임", r"사임|퇴임|해임|resign|step(s|ped)? down"), ("소송 · 제재", r"소송|기소|제재|벌금|lawsuit|indict|charge")]})
 IW.TL_REF["NVDA_CEO"] = (SYM_NM, SYM, "{:,.2f}달러")
@@ -170,33 +172,6 @@ def page(c, public=False):
     return dk.fix_colons(f'<div data-head-title="{IW.HEAD_TITLE}"{IW.H.head_date_attr()} data-seo-lead="{dk.esc(IW.HEAD_TITLE + " — " + ISS["q"] + " 뉴스와 주가 " + align)}">{body}</div>')
 
 
-RETURN_PAT = r"CEO ?(로 )?복귀|복귀(했|한|하고|하며|…|에|일|,| 후| 뒤)|경영 일선 복귀|return(s|ed)? as CEO|reinstat"   # 복귀 검토(이사회 대응)는 안 걸림
-RETURN_VARIANTS = [   # (이름표, 메뉴 · 홈 이름, 질문, 수습 사다리 셋째 칸)
-    ("지금", ISS["name"], ISS["q"], None),
-    ("A안 (추천)", "엔비디아 CEO 복귀", "젠슨 황 복귀, 엔비디아는 수습되나?", ("복귀 · 후임 확정", RETURN_PAT + r"|후임 (확정|선임|발표)|신임 CEO|새 CEO|정식 CEO|successor named")),
-    ("B안", "엔비디아 CEO 사임 · 복귀", "사임 뒤 복귀한 젠슨 황, 엔비디아는 수습되나?", ("복귀", RETURN_PAT)),
-]
-
-
-def return_variants(c):
-    """젠슨 황 복귀(11-23) 뒤 이름 · 질문 · 수습 사다리 시안 — 머리 줄 + `사태 진행 상황` 카드만 셋 나란히. 아래 본문은 `지금` 그대로."""
-    base = list(IW.C["stages"]["종전"])
-    out = ('<p style="margin:16px 6px 8px;font-size:14px;line-height:21px;color:#6B7280;word-break:keep-all;">'
-           '11-23 젠슨 황 CEO 복귀 뒤 시안입니다. 바꾸는 것 = 메뉴 · 홈 카드 이름, 페이지 질문, 수습 단계 셋째 칸. '
-           '단계는 기사 제목 글자로 정해지고(AI 0) 같은 값이 이슈 단계 기록에 쌓입니다. 주소(issue-nvidia-ceo)는 그대로입니다.</p>')
-    for k, (tag, name, q, step) in enumerate(RETURN_VARIANTS):
-        st = list(base)
-        if step:
-            st[2] = step
-        IW.C["stages"]["종전"] = st
-        ladder = " → ".join(s[0] for s in st)
-        out += (f'<div style="margin:{8 if k == 0 else 36}px 0 0;padding:0 6px;font-size:16px;line-height:24px;font-weight:700;color:#111;">{dk.esc(tag)}</div>'
-                f'<div style="padding:0 6px;font-size:13px;line-height:19px;color:#6B7280;word-break:keep-all;">메뉴 · 홈 카드 이름 = {dk.esc(name)} · 수습 단계 = {dk.esc(ladder)}</div>'
-                + IW.title_h2({**ISS, "q": q}) + f'<div style="margin:0 0 8px;">{IW.q_stage(c["evs"])}</div>')
-    IW.C["stages"]["종전"] = base
-    return out + '<div style="margin:40px 6px 0;padding-top:16px;border-top:2px solid #111;font-size:14px;color:#6B7280;">아래 = 지금 페이지 전체</div>'
-
-
 HOT_PILL = ("#EDE9FE", "#DDD6FE")   # `세부전망` 보라 라벨과 같은 바탕 · 테두리 (가이드라인 14절 증시 전망 P481)
 STOCK_PAGE = os.path.join(_HERE, "..", "stock-radar", "output", "NVDA.html")   # 종목 페이지 본문(목업 다시 그리기가 만든 것)
 PRICE_CARD = '<div data-cards="1" style="margin:0 0 8px;"><details data-acc="1"><summary style="list-style:none;cursor:pointer;display:block;">'
@@ -268,7 +243,7 @@ if __name__ == "__main__":
     os.makedirs(IW.OUT, exist_ok=True)
     c = collect()
     fn = IW.CFG["NVDA_CEO"]["file"]
-    print(dk.write_mock(return_variants(c) + page(c), os.path.join(IW.OUT, fn), IW.HEAD_TITLE))
+    print(dk.write_mock(page(c), os.path.join(IW.OUT, fn), IW.HEAD_TITLE))
     sp = stock_page(c, fn)
     # 버튼 글자 굵기 시안 A(굵게) · B(보통) — 펼친 카드 둘 나란히
     cmp_ = ('<p style="margin:16px 6px 20px;font-size:14px;line-height:21px;color:#6B7280;">종목 페이지 Hot Issue 카드의 `Hot Issue 자세히 보기` 버튼 글자 굵기 시안입니다. '

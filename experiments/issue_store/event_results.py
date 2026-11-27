@@ -114,7 +114,7 @@ def fill(pub, state_dir, today=None):
 # ① 그날 줄에 겹침 표시 ② 판정은 숫자대로 쓰되 이유는 "실적만의 결과라고 볼 수 없습니다" ③ 성적표는 `여러 사건이 겹친 전망` 으로 따로 센다.
 # 사람이 고르지 않는다 — 이름 = 상태 기록 records/issues/{ID}.jsonl 의 hot, 여럿이면 뉴스가 평소보다 많이 늘어난(n48 ÷ base48) 순.
 # 관련 = Hot Issue 가 보는 계열(Hot Issue 기준 가격 · 업종 — mock_issue_watch TL_REF · mock_stock_issue SECTOR 와 같은 값)이 전망 계열과 같을 때.
-ISSUE_SERIES = {"NVDA_CEO": ("엔비디아 CEO 사임", {"sox", "NVDA", "^SOX"}), "EXPORT": ("반도체 수출 통제", {"sox", "^SOX"}),
+ISSUE_SERIES = {"NVDA_CEO": ("엔비디아 CEO 복귀", {"sox", "NVDA", "^SOX"}), "EXPORT": ("반도체 수출 통제", {"sox", "^SOX"}),
                 "TARIFF": ("관세", {"spx", "^GSPC"}), "IRAN": ("이란 전쟁", {"spx", "^GSPC"})}
 
 

@@ -73,7 +73,7 @@ def drawer(mkt, files):
         row("story", "증시 시황", L("증시 시황"), "지난 시황", "증시 시황") + '<!--new-->',
         row("forecast", "증시 전망", "/p/forecast-list.html"),
         acc("issue", "Hot Issue", [("이란 전쟁", "/p/issue-iran.html"), ("관세", "/p/issue-tariff.html"),
-                                   ("반도체 수출 통제", "/p/issue-export.html"), ("엔비디아 CEO 사임", "/p/issue-nvidia-ceo.html")]),
+                                   ("반도체 수출 통제", "/p/issue-export.html"), ("엔비디아 CEO 복귀", "/p/issue-nvidia-ceo.html")]),
         row("stock", "종목 목록", "/p/stock-lists.html"),
         row("news", '<span class="brand-word">Newfact</span> 뉴스', L("Newfact 뉴스"), "지난 뉴스", "Newfact 뉴스") + '<!--new-->',
         row("people", "주요 인물 발언", L("인물 발언"), "지난 발언", "인물 발언"),
