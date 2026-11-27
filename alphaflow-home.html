@@ -2030,13 +2030,14 @@ function newsStrip(box, track, dotBox) {
     });
     box.appendChild(list);
     if (rows.length > NT_SHOW) {
-      var more = el('div', 'nt-more', '+ ' + (rows.length - NT_SHOW) + '개 더 보기');
+      var ntN = NT_SHOW, ntLab = function () { var h = rows.length - ntN; return h > 0 ? '+ ' + Math.min(10, h) + '개 더 보기' : '접기'; };   /* 5개 + 누를 때마다 10개씩, 끝까지 펴면 접기 */
+      var more = el('div', 'nt-more', ntLab());
       more.addEventListener('click', function (e) {
         e.preventDefault(); e.stopPropagation();   /* 카드 전체 링크(<a>) · 줄 클릭 스크립트보다 먼저 — 접고 펴기만 */
-        var open = more.getAttribute('data-open') === '1';
-        [].slice.call(list.children).forEach(function (x, i) { if (i >= NT_SHOW) x.hidden = open; });
-        more.setAttribute('data-open', open ? '0' : '1');
-        more.textContent = open ? '+ ' + (rows.length - NT_SHOW) + '개 더 보기' : '접기';
+        ntN = ntN < rows.length ? ntN + 10 : NT_SHOW;
+        [].slice.call(list.children).forEach(function (x, i) { if (i >= NT_SHOW) x.hidden = i >= ntN; });
+        more.setAttribute('data-open', ntN >= rows.length ? '1' : '0');
+        more.textContent = ntLab();
       });
       box.appendChild(more);
     }
@@ -2205,11 +2206,11 @@ function newsStrip(box, track, dotBox) {
     td.colSpan = cols; td.style.cssText = 'text-align:center;padding:32px;color:var(--gray-400)';
     tr.appendChild(td); body.appendChild(tr);
   }
-  function setFold(id, hiddenCount, open, noun) {
+  function setFold(id, hiddenCount, open, noun, foldable) {   /* foldable = 접을 줄 수(테마 종목처럼 10개씩 펴는 목록) — 없으면 hiddenCount */
     var tg = document.getElementById(id);
     if (!tg) return;
-    tg.hidden = hiddenCount <= 0;
-    tg.firstChild.textContent = open ? '접기' : noun + ' ' + hiddenCount + '개 더 보기';
+    tg.hidden = (foldable == null ? hiddenCount : foldable) <= 0;
+    tg.firstChild.textContent = open ? '접기' : noun + ' ' + Math.min(10, hiddenCount) + '개 더 보기';
     tg.setAttribute('aria-expanded', String(open));
   }
 
@@ -2251,18 +2252,18 @@ function newsStrip(box, track, dotBox) {
     rows.sort(pickCmp());   /* 기본 시총순, 상승순 · 하락순 버튼으로 오늘 등락 정렬 (옛: 많이 오른 순) */
     rows.forEach(function (r, i) {
       var tr = el('tr');
-      if (i >= PICK_SHOWN) { tr.className = 'rank-more'; tr.hidden = !watchOpen; }   /* 처음 3개, 나머지 더 보기 (2026-11-18 사용자) */
+      if (i >= PICK_SHOWN) { tr.className = 'rank-more'; tr.hidden = i >= PICK_SHOWN + watchOpen; }   /* 처음 3개, 나머지 더 보기 */
       var tdName = el('td', 'col-name'); tdName.appendChild(feedCell(r)); tr.appendChild(tdName);
       var tdPrice = el('td'); tdPrice.appendChild(feedPrice(r)); tr.appendChild(tdPrice);
       if (isKR(r) && LIVE_ENABLED) tr.appendChild(chartTd('watch', r));   /* 장중 차트 (2026-11-05) */
       body.appendChild(tr);   /* 묶음 종목 전부 싣고 3개만 펼침 (2026-11-18 사용자 — 옛 10-25: 더 보기 없이 전부) */
-      if (isKR(r) && openChart.watch === r.s && !(i >= PICK_SHOWN && !watchOpen)) body.appendChild(chartRow('watch', r, 3));
+      if (isKR(r) && openChart.watch === r.s && !(i >= PICK_SHOWN + watchOpen)) body.appendChild(chartRow('watch', r, 3));
     });
-    setFold('watch-toggle', rows.length - PICK_SHOWN, watchOpen, '종목');
+    watchLen = rows.length; setFold('watch-toggle', Math.max(0, rows.length - PICK_SHOWN - watchOpen), rows.length > PICK_SHOWN && rows.length <= PICK_SHOWN + watchOpen, '종목', rows.length - PICK_SHOWN);
   }
   /* 업종 종목 (2026-11-18 사용자, 옛 섹터 대표주 = 업종별 1 · 2 · 3위): 테마 종목과 같은 꼴 — 업종 알약 줄 + 그 업종의 우리 종목 전부(간단 종목 포함), 처음 3개 · 나머지 더 보기.
      자료 = 종목 모아보기가 읽는 목록 파일 <시장>/_lists.json(간단 종목 실행이 매일 씀). 이 탭을 처음 열 때만 받는다(Pages → jsDelivr, 시장마다 1번 · 압축 약 18KB) */
-  var PICK_SHOWN = 3, SEC_MAX = 10, watchOpen = false, secOpen = false, secTab = 0, listsDoc = {}, listsBusy = {};
+  var PICK_SHOWN = 3, SEC_MAX = 10, watchOpen = 0, watchLen = 0, secOpen = false, secTab = 0, listsDoc = {}, listsBusy = {};
   function loadLists(m) {
     if (listsDoc[m] || listsBusy[m]) return;
     if (window.PV_LISTS && window.PV_LISTS[m]) { listsDoc[m] = window.PV_LISTS[m]; return; }   /* 목업 · 미리보기 */
@@ -2315,7 +2316,7 @@ function newsStrip(box, track, dotBox) {
   }
   (function () {   /* 테마 종목 · 업종 종목 더 보기 — 펼침은 알약 · 시장을 바꿔도 그대로(가이드라인 10-11) */
     var w = document.getElementById('watch-toggle'), sc = document.getElementById('sector-toggle');
-    if (w) w.addEventListener('click', function () { watchOpen = !watchOpen; renderWatch(); });
+    if (w) w.addEventListener('click', function () { watchOpen = watchLen > PICK_SHOWN + watchOpen ? watchOpen + 10 : 0; renderWatch(); });   /* 테마 종목 = 누를 때마다 10개씩, 끝까지 펴면 접기 — watchOpen = 더 펼친 줄 수 */
     if (sc) sc.addEventListener('click', function () { secOpen = !secOpen; renderSectorTop(); });
   })();
   (function () {   /* 시장 흐름과 종목 탭 전환 — 시장 흐름은 세 번째 탭 (2026-10-25 사용자) */
@@ -3107,7 +3108,7 @@ function newsStrip(box, track, dotBox) {
     var grid = document.querySelector('.post-grid');
     var lm = /\/search\/label\/([^/?#]+)/.exec(location.pathname);
     if (!grid || !lm || !window.fetch) return;
-    var PAGE = 20, next = 1, total = Infinity, busy = false;
+    var PAGE = 10, next = 1, total = Infinity, busy = false;   /* 글 더 보기 = 10개씩 */
     var um = /[?&]updated-max=([^&]+)/.exec(location.search);
     var base = '/feeds/posts/summary/-/' + lm[1] + '?alt=json' + (um ? '&updated-max=' + um[1] : '');
     var oldPager = document.querySelector('.blog-pager');
@@ -3715,8 +3716,8 @@ function newsStrip(box, track, dotBox) {
   function newId() { var s = '', A = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'; for (var i = 0; i < 20; i++) s += A.charAt(Math.floor(Math.random() * A.length)); return s; }
   /* 댓글은 최신 PAGE 개씩 읽는다 (2026-11-09 사용자 "지금 고치자"). 전에는 글을 볼 때마다 그 글 댓글을 전부(최대 500) 읽어
      방문자 × 댓글 수만큼 무료 읽기 한도(하루 5만)를 썼고, 오래된 순 500개라 501번째부터 새 댓글이 안 보였다.
-     이제 최신 20개(+1개로 더 있는지만 확인) → `이전 댓글 n개 더 보기` 로 20개씩. 더 있을 때만 개수 질의 1회(읽기 1회). */
-  var PAGE = 20;
+     이제 최신 10개(+1개로 더 있는지만 확인) → `이전 댓글 n개 더 보기` 로 10개씩. 더 있을 때만 개수 질의 1회(읽기 1회). */
+  var PAGE = 10;   /* 더 보기 = 10개씩 */
   var store = MOCK ? {
     page: function () { return MOCK.list().then(function (rows) { return { rows: rows, more: false }; }); },
     count: function () { return Promise.resolve(null); },
@@ -3810,7 +3811,7 @@ function newsStrip(box, track, dotBox) {
     toggle.classList.toggle('has-cm', loaded && shown() > 0);   /* 댓글이 있을 때만 검정 — 없거나 아직 못 읽었으면 회색 (2026-11-12 사용자) */
     var rest = total !== null ? Math.max(total - items.length, 0) : 0;
     moreBtn.hidden = !more;
-    moreBtn.textContent = '이전 댓글 ' + (rest ? rest + '개 ' : '') + '더 보기';
+    moreBtn.textContent = '이전 댓글 ' + (rest ? Math.min(PAGE, rest) + '개 ' : '') + '더 보기';   /* 숫자 = 다음에 읽을 수 */
   }
   moreBtn.addEventListener('click', function () {
     moreBtn.disabled = true;
@@ -3981,11 +3982,31 @@ function newsStrip(box, track, dotBox) {
     more.setAttribute('data-fold-more', '1'); more.hidden = true;
     d.parentNode.insertBefore(more, d);
     var text = d.getAttribute('data-label') || (label ? label.textContent : '더 보기');
+    /* 10줄씩 펼치기 — 펼칠 내용이 한 칸씩 감싸여 있으면 안으로 내려가 줄 칸을 찾고, 줄이 10개를 넘으면 누를 때마다 10줄씩 · 끝까지 펴면 `접기`.
+       안에 단계 목록(ul[data-more-list])이 있으면 그 목록이 스스로 10건씩 편다. 버튼 글자의 숫자 = 다음에 펼칠 수(`○○ 10개 더 보기`) */
+    var STEP = 10, box = more;
+    while (box.children.length === 1) box = box.children[0];
+    var units = more.querySelector('ul[data-more-list]') ? null : [].slice.call(box.children);
+    if (units && units.length <= STEP) units = null;
+    var shownN = 0;
+    function lab(n) { return /\d+(?=\s*[개건])/.test(text) ? text.replace(/\d+(?=\s*[개건])/, String(Math.min(STEP, n))) : text; }
+    function paint() { units.forEach(function (u, k) { if (k >= shownN) u.setAttribute('data-fold-off', '1'); else u.removeAttribute('data-fold-off'); }); }
+    if (units && label) label.textContent = lab(units.length);
     sum.addEventListener('click', function (e) {
       e.preventDefault();
-      var open = more.hidden;
-      more.hidden = !open; d.classList.toggle('is-open', open);
-      if (label) label.textContent = open ? '접기' : text;
+      if (!units) {
+        var open = more.hidden;
+        more.hidden = !open; d.classList.toggle('is-open', open);
+        if (label) label.textContent = open ? '접기' : text;
+        return;
+      }
+      if (more.hidden) { more.hidden = false; shownN = STEP; }
+      else if (shownN < units.length) shownN += STEP;
+      else { more.hidden = true; shownN = 0; if (more.getBoundingClientRect().top < 0) (more.previousElementSibling || d).scrollIntoView({ block: 'start' }); }
+      paint();
+      var left = units.length - shownN;
+      d.classList.toggle('is-open', !more.hidden && left <= 0);
+      if (label) label.textContent = more.hidden ? lab(units.length) : (left > 0 ? lab(left) : '접기');
     });
   });
 })();
@@ -4318,7 +4339,7 @@ function newsStrip(box, track, dotBox) {
   if (!chips || !list) return;
   var items = [].slice.call(list.querySelectorAll('li[data-theme]')), shown = parseInt(list.getAttribute('data-shown') || '10', 10), opened = false, extra = 0, current = '주요 뉴스';
   /* 한국 리포트 (2026-11-25 사용자): 첫 칩 이름 = 렌더러가 준 것(`Newfact` = 전체 보기), data-step 이 있으면 누를 때마다 그만큼(10건씩), 버튼 글자 = data-more-label. 없으면 옛 동작(미국) */
-  var firstChip = chips.querySelector('[data-chip]'), step = parseInt(list.getAttribute('data-step') || '0', 10), moreLabel = list.getAttribute('data-more-label') || '뉴스';
+  var firstChip = chips.querySelector('[data-chip]'), step = parseInt(list.getAttribute('data-step') || '10', 10), moreLabel = list.getAttribute('data-more-label') || '뉴스';
   if (firstChip) current = firstChip.getAttribute('data-chip');
   var pickChip = current;
   function apply() {

@@ -229,6 +229,7 @@ body.item-view .post-outer-container { padding-top: 13px; }
 .post-body details[data-fold] > summary::-webkit-details-marker { display: none; }
 .post-body details[data-fold].is-open > summary .acc-chev { transform: rotate(180deg); }
 .post-body [data-fold-more][hidden] { display: none !important; }
+.post-body [data-fold-more] [data-fold-off] { display: none !important; }   /* 펼친 줄 중 아직 안 연 줄 — 10줄씩 */
 /* 툴팁 (리포트 [data-tip]) → 팝업창. ? 아이콘을 누르면(PC 클릭 · 폰 탭 · Enter) 화면 가운데 창이 뜬다.
    테마 JS가 .rt-pop 을 만든다. 닫기: × 버튼 · 바깥 누르기 · Esc. 줄바꿈(&#10;)은 창 안에서 줄을 바꾼다 */
 .post-body [data-tip] { outline: none; cursor: pointer; }

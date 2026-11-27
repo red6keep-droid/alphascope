@@ -80,7 +80,7 @@
       '<span style="font-size:15px;line-height:20px;color:' + dirCol(r.r) + ';">' + esc(price(r)) + '</span></span>';   // 증감 위 · 가격 아래
     return '<span data-row-link="1" data-href="' + esc(href(r)) + '" style="' + ROW + (i ? SEP : 'padding-top:21px;') + '">' + left + right + '</span>';   // 테마 줄 장치가 data-href 로 이동
   }
-  var MORE = [];   // 접힌 나머지 줄 [items, render] — 버튼을 누를 때 그린다
+  var MORE = [], STEP = 10;   // 더 보기 = 누를 때마다 10개씩   // 접힌 나머지 줄 [items, render] — 버튼을 누를 때 그린다
   var MORE_BTN = 'cursor:pointer;display:flex;width:100%;justify-content:center;align-items:center;gap:6px;padding:12px;margin:0;border:0;' + SEP +
     'background:none;color:#111;font:inherit;font-size:14px;line-height:20px;font-weight:700;';   // = design_kit.FOLD_IN_CARD (카드 안 `n개 더 보기 ⌄`)
   var CHEV = '<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;transition:transform .15s;"><path d="M4 6l4 4 4-4"/></svg>';
@@ -90,8 +90,8 @@
     if (items.length > TOP) {
       MORE.push([items, render]);
       more = '<span data-sl-rest="' + (MORE.length - 1) + '" style="display:none;"></span>' +
-        '<button type="button" data-sl-more="' + (MORE.length - 1) + '" data-label="' + (items.length - TOP) + '개 더 보기" style="' + MORE_BTN + '"><span>' +
-        (items.length - TOP) + '개 더 보기</span>' + CHEV + '</button>';
+        '<button type="button" data-sl-more="' + (MORE.length - 1) + '" style="' + MORE_BTN + '"><span>' +
+        Math.min(STEP, items.length - TOP) + '개 더 보기</span>' + CHEV + '</button>';   // 숫자 = 다음에 펼칠 수(10개씩)
     }
     return '<div data-cards="1" style="margin:0 0 8px;"><span data-list="1" style="' + LIST + '">' +
       items.slice(0, TOP).map(render).join('') + more + '</span></div>';
@@ -101,15 +101,18 @@
     if (!b) return;
     var k = b.getAttribute('data-sl-more'), rest = b.parentNode.querySelector('[data-sl-rest="' + k + '"]');
     if (!rest) return;
-    var open = rest.style.display === 'none';
-    if (open && !rest.innerHTML) {
-      var x = MORE[+k];
-      rest.innerHTML = x[0].slice(TOP).map(function (r, i) { return x[1](r, TOP + i); }).join('');
+    // 누를 때마다 10개씩 그려 붙이고, 끝까지 펴면 `접기` → 처음 TOP 개로
+    var x = MORE[+k], total = x[0].length - TOP, n = +(rest.getAttribute('data-n') || 0);
+    if (n >= total) {
+      rest.innerHTML = ''; rest.setAttribute('data-n', '0'); rest.style.display = 'none';
+      b.firstChild.textContent = Math.min(STEP, total) + '개 더 보기'; b.lastChild.style.transform = '';
+      var top = b.closest('[data-cards]'); if (top && top.getBoundingClientRect().top < 0) top.scrollIntoView({ block: 'start' });
+      return;
     }
-    rest.style.display = open ? 'block' : 'none';
-    b.firstChild.textContent = open ? '접기' : b.getAttribute('data-label');
-    b.lastChild.style.transform = open ? 'rotate(180deg)' : '';
-    if (!open) { var top = b.closest('[data-cards]'); if (top && top.getBoundingClientRect().top < 0) top.scrollIntoView({ block: 'start' }); }
+    rest.insertAdjacentHTML('beforeend', x[0].slice(TOP + n, TOP + n + STEP).map(function (r, i) { return x[1](r, TOP + n + i); }).join(''));
+    n = Math.min(total, n + STEP); rest.setAttribute('data-n', String(n)); rest.style.display = 'block';
+    b.firstChild.textContent = n < total ? Math.min(STEP, total - n) + '개 더 보기' : '접기';
+    b.lastChild.style.transform = n < total ? '' : 'rotate(180deg)';
   });
   /* 묶음 줄 = 홈 `테마 종목` 아래 줄(#watch-tabs) 모양 — CSS 는 본문 <style> 의 .sl-joined */
   function pills(key, names) {
