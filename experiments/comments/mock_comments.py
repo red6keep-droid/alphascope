@@ -853,7 +853,14 @@ ONE_CMT = ("새내기", "11.27 14:52", "오늘 시황 잘 읽었습니다", "환
 ONE_CMT_R = ("장기보유", "11.27 16:48", "외국인 순매수 표 잘 봤습니다", "수급 탭에서 외국인이 사흘 만에 순매수로 돌아선 걸 확인했습니다[:mid_proof:] 업종별로도 나눠 보면 좋겠네요.", "", [])
 ONE_CMT_I = ("조심조심", "11.27 09:12", "반도체 지수는 오르는데", "업계 전체는 괜찮은데 엔비디아만 빠지는 걸 보면 회사 일로 보는 게 맞겠네요.", "", [])
 ONE_CMT_F = ("장기보유", "11.27 10:30", "전망A 맞았네요", "발표 뒤에 더 오를 줄 알았는데 생각보다 조용했습니다[:mid_question:]", "", [])
-ONE_CMT_A = ("새내기", "11.27 11:05", "신작 일정 정리 좋습니다", "회사마다 출시 달을 한 번에 볼 수 있어서 편했습니다[:mid_thanks:]", "", [])
+ARTICLE_CMTS = [   # Newfact 기사(크래프톤 거대언어모델 출시)에 달린 댓글 예시 5개 (최신이 위)
+    ("게임좋아", "11.27 11:42", "게임 회사가 언어모델까지 만드네요", "게임 안 캐릭터 대사에 쓰려는 건지 궁금합니다[:mid_question:] 기사에 나온 쓰임새를 보니 게임 밖에서도 쓰려는 것 같네요.", "", []),
+    ("장기보유", "11.27 11:30", "자체 개발이라는 점이 눈에 띕니다", "다른 회사 모델을 빌려 쓰는 게 아니라 직접 만들었다는 게 핵심이네요. 개발비가 실적에 어떻게 반영될지는 다음 분기에 확인해 보겠습니다.", "", []),
+    ("새내기", "11.27 11:05", "거대언어모델이 정확히 뭔가요?", "기사에 나온 말인데 처음 들어 봐서요[:mid_think:] 주식 공부 글에도 설명이 있으면 좋겠습니다.", "", []),
+    ("조심조심", "11.27 10:48", "출시와 성과는 따로 봐야겠네요", "정식 출시까지는 확인된 사실이고, 실제로 얼마나 쓰일지는 아직 숫자가 없네요. 이용자 수가 나오면 다시 보겠습니다.", "", []),
+    ("반도체곰", "11.27 10:21", "기사 깔끔하게 정리돼 있네요", "무엇이 새로 나왔는지 한눈에 들어왔습니다[:mid_thanks:]", "", []),
+]
+ARTICLE_TOTAL = 214   # 목업 댓글 수 = 세 자리
 TITLES.update({
     "mock_comments_page-report.html": "댓글 화면 — KOSPI 한 줄 · 홈 카드 하루 그래프 · 댓글 목록 · 쓰기 (한국 증시 리포트에서)",
     "mock_comments_cards.html": "글 아래 댓글 카드 — 2개 이상 = 좌우로 밀기 · 점 · 댓글 더 보기 (종목 페이지)",
@@ -1114,11 +1121,19 @@ def forecast_top():
 
 
 def article_top():
-    """시안 — Newfact 기사 댓글 화면 맨 위 = 기사 제목 → 그 기사의 자료 사진(시황 글 배너와 같은 자리) + 출처 줄."""
-    return (PTITLE.format("게임 업계, 연말 신작 몰린다")
-            + '<figure style="margin:0 0 4px;"><img src="../../news-posts/output/mock_img/industry_game.jpg" alt="자료 사진: e스포츠 대회장" '
-            'style="display:block;width:100%;height:200px;object-fit:cover;border-radius:8px;">'
-            '<figcaption style="margin:6px 0 0;font-size:11px;line-height:16px;color:#9CA3AF;">자료 사진 · Chongkian · CC BY-SA 4.0</figcaption></figure>')
+    """Newfact 기사 댓글 화면 맨 위 = 원래 기사 제목(문장 그대로, 22 굵게 · 두 줄까지) → 그 기사의 자료 사진 + 출처 줄.
+    사진 = 뉴스 글 목업 `사진 5`(최신 기사 · 확정 규칙)와 같은 값: 높이 200 · 모서리 10 · 회사 기사인데 회사 사진 없음 = 업종 사진 + 오른쪽 아래 흰 이름표(로고 24 + 이름 14 굵게, 높이 32)
+    · 출처 줄 = `자료 사진 · 사진가 · 이용 조건` 11/16 연회색 오른쪽 정렬, 링크 밑줄 없음."""
+    tag = ('<span style="position:absolute;right:12px;bottom:12px;display:flex;align-items:center;height:32px;padding:0 12px 0 4px;border-radius:16px;background:#fff;'
+           'font-size:14px;line-height:20px;font-weight:700;color:#111;"><img src="https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_259960.svg?v=2" '
+           'alt="" width="24" height="24" loading="lazy" style="display:inline-block;width:24px;height:24px;border-radius:50%;flex:none;margin-right:6px;background:#fff;'
+           'object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;">크래프톤</span>')
+    return (PTITLE.format("크래프톤, 자체 개발 거대언어모델 정식 출시")
+            + '<figure style="margin:0 0 4px;"><div style="position:relative;"><img src="../../news-posts/output/mock_img/industry_game.jpg" alt="자료 사진: e스포츠 대회장" '
+            f'style="display:block;width:100%;height:200px;object-fit:cover;border-radius:10px;">{tag}</div>'
+            '<figcaption style="margin:6px 0 0;font-size:11px;line-height:16px;color:#9CA3AF;text-align:right;">자료 사진 · '
+            '<a href="https://commons.wikimedia.org/wiki/File:Iskandar_Investment_Esports_Carnival_2019.jpg" style="color:inherit;text-decoration:none;">Chongkian</a> · '
+            '<a href="https://creativecommons.org/licenses/by-sa/4.0/deed.ko" style="color:inherit;text-decoration:none;">CC BY-SA 4.0</a></figcaption></figure>')
 
 
 TAIL = """<script>(function(){function set(){var l=document.querySelector('.post-title-label')||document.querySelector('.post-title');if(!l||l.querySelector('.post-title-sub'))return;var t=document.createElement('span');t.className='post-title-sub';t.textContent='댓글 보기';l.appendChild(t);}
@@ -1235,8 +1250,8 @@ def main():
              page=("Hot Issue", "../../issue_store/output/mock_issue_nvidia_ceo_public.html", "issue"))
     build_cc("mock_comments_page-forecast.html", BASE, [ONE_CMT_F], 1, "mock_comments_page-forecast.html",
              page=("증시 전망", "../../issue_store/output/mock_real_forecast-nvda-2026q3.html", "forecast"))
-    build_cc("mock_comments_page-article.html", BASE, [ONE_CMT_A], 1, "mock_comments_page-article.html",
-             page=("Newfact 기사", "../../news-posts/output/mock_news_photo_2.html", "article"))
+    build_cc("mock_comments_page-article.html", BASE, ARTICLE_CMTS, ARTICLE_TOTAL, "mock_comments_page-article.html",
+             page=("Newfact 기사", "../../news-posts/output/mock_news_photo_5.html", "article"))
 
 
 if __name__ == "__main__":
