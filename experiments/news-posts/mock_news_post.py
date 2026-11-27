@@ -106,6 +106,27 @@ def _figure(h):
             f'<a href="{lic_url}" {a}>{lic}</a> · <a href="{src}" {a}>위키미디어 공용</a></figcaption></figure>')
 
 
+def company_variants():
+    """시안(11-27): 회사 사진이 없는 기업 기사 — 로고를 크게(D) vs 업종 사진 + 작은 로고(E). 예 = 삼양식품(회사 사진 없음)."""
+    if not os.path.exists(os.path.join(SAMPLES, "photo_industry.jpg")):
+        return ""
+    a = 'style="color:#6B7280;text-decoration:underline;"'
+    cap = (f'<figcaption style="margin:7px 0 0;font-size:13px;line-height:19px;color:#6B7280;">자료 사진 · 사진: lazy fri13th · '
+           f'<a href="https://creativecommons.org/licenses/by/2.0/deed.ko" {a}>CC BY 2.0</a> · '
+           f'<a href="https://commons.wikimedia.org/wiki/File:24_hours_Ramyeon_Ramen_convenience_store_(South_Korea).jpg" {a}>위키미디어 공용</a></figcaption>')
+    logo = dk.ticker_logo("003230.KS", 24).replace("margin-right:6px;", "margin-right:6px;flex:none;").replace("vertical-align:-4px;", "")
+    d = ('<figure style="margin:0 0 26px;"><div style="height:200px;border:1px solid #E5E7EB;border-radius:10px;display:flex;align-items:center;justify-content:center;background:#fff;">'
+         '<img src="../samples/logo_big.png" alt="" style="width:240px;height:auto;"></div></figure>')
+    e = ('<figure style="margin:0 0 26px;"><div style="position:relative;">'
+         '<img src="../samples/photo_industry.jpg" alt="자료 사진: 라면 가게" style="display:block;width:100%;height:200px;object-fit:cover;border-radius:10px;">'
+         '<span style="position:absolute;left:12px;bottom:12px;display:flex;align-items:center;height:32px;padding:0 12px 0 4px;border-radius:16px;'
+         f'background:#fff;font-size:14px;line-height:20px;font-weight:700;color:#111;">{logo}삼양식품</span></div>{cap}</figure>')
+    return ('<div style="margin:34px 0 14px;padding-top:20px;border-top:2px dashed #C4B5FD;font-size:16px;line-height:24px;font-weight:700;color:#7C3AED;">'
+            '회사 사진이 없는 기업 기사 (예: 삼양식품)</div>'
+            + _tag("D안 (권하지 않음)", "로고를 사진 자리에 크게 — 상표가 주인공처럼 보여 회사 홍보물 같고, 같은 회사 글은 모두 같은 그림") + d
+            + _tag("E안 (추천)", "업종 사진(식품 · 음료) 높이 200 + 왼쪽 아래 흰 이름표 높이 32 · 로고 24(우리 종목 로고) · 이름 14 굵게") + e)
+
+
 def photo_variants(html):
     if not os.path.exists(PHOTO):
         return html
@@ -114,6 +135,7 @@ def photo_variants(html):
              + _tag("A안 (추천)", "본문 폭 전체 · 높이 200 · 모서리 10 · 출처 줄 13/19 회색 · 사진과 7 · 요약 상자와 26") + _figure(200)
              + _tag("B안", "본문 폭 전체 · 높이 240 — 화면 첫 칸에서 본문이 더 밀림") + _figure(240)
              + _tag("C안", "높이 160 — 띠처럼 얇게") + _figure(160)
+             + company_variants()
              + '</div>')
     i = html.find("data-headline")
     j = html.find("</h2>", i)
