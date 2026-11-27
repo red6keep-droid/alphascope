@@ -329,10 +329,13 @@ CHARS = [
 CHAR = {c[0]: c for c in CHARS}
 CHAR_AVAS = {c[1] for c in CHARS}
 CHAR_PAGE = "mock_comments_characters.html"
-CROWN = ('<svg class="cv-crown" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">'
-         '<path d="M2.2 12.6h11.6M2.6 11.2 1.4 4.6l3.9 2.9L8 3l2.7 4.5 3.9-2.9-1.2 6.6z" fill="#F4B942" stroke="#C9870F" stroke-width="1" stroke-linejoin="round"/></svg>')
+CROWN = ('<svg class="cv-crown" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">'   # 왕관 = 금색 · 끝 구슬 셋 · 아래 띠(시안 A)
+         '<path d="M4 18.5h16v2H4z" fill="#E0A21B"/><path d="M4 17 3 8l5 4 4-7 4 7 5-4-1 9z" fill="#F4B942" stroke="#C9870F" stroke-width="1" stroke-linejoin="round"/>'
+         '<circle cx="3" cy="7.5" r="1.6" fill="#F4B942" stroke="#C9870F" stroke-width="1"/><circle cx="12" cy="4.2" r="1.8" fill="#F4B942" stroke="#C9870F" stroke-width="1"/>'
+         '<circle cx="21" cy="7.5" r="1.6" fill="#F4B942" stroke="#C9870F" stroke-width="1"/></svg>')
 CROWN_IN = CROWN.replace("<svg ", '<svg style="vertical-align:-2px;" ', 1)   # 문장 속 왕관
 CROWN_BIG = CROWN.replace('width="14" height="14"', 'width="18" height="18"')
+CROWN_NAME = CROWN.replace('width="14" height="14"', 'width="24" height="24"')   # 댓글 이름 옆 = 캐릭터 그림(.cm-avatar 24)과 같은 크기
 # 캐릭터가 쓴 글 예시(소개 페이지 `쓴 글`) — 목록 · 종목 화면에 든 글은 그 화면으로, 나머지는 글 화면 예시로
 CHAR_POSTS = {
     "기록이": [("11.18 증시 시황", "오늘 같은 날, 기록에 두 번 있었습니다"), ("11.17 미국 증시 리포트", "평소 범위 밖으로 나간 날, 다음 5일의 기록입니다")],
@@ -476,7 +479,7 @@ def name_tag(name):
     if name == "owner":
         return '<span class="cm-name">Newfact</span>'
     if name in CHAR:
-        return f'<a class="cm-name cv-char" href="{CHAR_PAGE}#{name}" aria-label="{esc(name)} — Newfact 캐릭터 소개">{esc(name)}{CROWN}</a>'
+        return f'<a class="cm-name cv-char" href="{CHAR_PAGE}#{name}" aria-label="{esc(name)} — Newfact 캐릭터 소개">{esc(name)}{CROWN_NAME}</a>'
     return f'<span class="cm-name">{esc(name)}</span>'
 
 
@@ -1142,11 +1145,11 @@ def main():
     build_cc("mock_comments_cards.html", STOCK_BASE, STOCK_CMTS, STOCK_TOTAL, "mock_comments_page-stock.html")
     build_cc("mock_comments_card-one.html", BASE, [ONE_CMT], 1, "mock_comments_page.html")
     build_cc("mock_comments_page-stock.html", STOCK_BASE, STOCK_CMTS, STOCK_TOTAL, "mock_comments_page-stock.html",
-             page=("SK하이닉스 댓글", "mock_comments_cards.html", "stock"))
+             page=("SK하이닉스", "mock_comments_cards.html", "stock"))
     build_cc("mock_comments_page-report.html", BASE, [ONE_CMT_R], 1, "mock_comments_page-report.html",
-             page=("11.27 한국 증시 리포트 댓글", "../../kr-market-report/output/kr_report_mock.html", "report"))
+             page=("11.27 한국 증시 리포트", "../../kr-market-report/output/kr_report_mock.html", "report"))
     build_cc("mock_comments_page.html", BASE, [ONE_CMT], 1, "mock_comments_page.html",
-             page=("11.27 증시 시황 댓글", "mock_comments_card-one.html", "story"))
+             page=("11.27 증시 시황", "mock_comments_card-one.html", "story"))
 
 
 if __name__ == "__main__":
