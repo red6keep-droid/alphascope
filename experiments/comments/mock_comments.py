@@ -1122,12 +1122,42 @@ def forecast_top():
 
 ARTICLE_CSS = """<style>
 /* 기사 댓글 화면만(11-28) — 다른 댓글 화면은 그대로. 넓힐지는 사용자 확인 뒤 */
-.cc-article .cc-page-h{margin-top:9px;}                     /* `댓글 n` 위 18 → 9 */
+.cc-article .cc-page-h{margin-top:4px;}                     /* `댓글 n` 위 18 → 9 → 4 */
 .cc-article .cc-page-h .cc-n{font-weight:400;}              /* 숫자는 굵게 빼기 */
-.cc-article .cv-guard{margin-top:7px !important;background:none !important;border:1px solid #E2E8F0 !important;}   /* 아래 14 → 7 · 회색 면 빼고 회색 외곽선만 */
-.cc-article .cv-list .cv-main .cv-title{margin-top:3px;}    /* 이름 줄 ~ 제목 4 → 3 */
+.cc-article .cv-guard{margin:5px 0 9px !important;background:none !important;border:1px solid #E2E8F0 !important;}   /* 위 14 → 7 → 5 · 아래(첫 댓글까지) 14 → 9 · 회색 면 빼고 회색 외곽선만 */
+.cc-article .cv-list .cv-main .cv-title{margin-top:1px;}    /* 이름 줄 ~ 제목 4 → 3 → 1 */
 .cc-article .cv-list .cv-main .cv-text{margin-top:4px;line-height:25px;color:#606773;}   /* 제목 아래 6 → 4 · 행간 26 → 25 · 글자 #6B7280 → 10% 진하게 */
+.cc-article [data-cmore]{margin:8px 0 0;}
+.cc-article [data-cmore].is-open .acc-chev{transform:rotate(180deg);}
 </style>"""
+# 더 보기 = 디자인 키트 more_list 규칙(처음 5 · 누를 때마다 10 · 흰 버튼 FOLD_BTN 전체 폭 + 아래 화살표 · 다 펼치면 `접기`).
+# 목업은 아래 10개를 돌려 붙여 214까지 늘린다(실서비스 = 다음 10개를 서버에서 받음).
+ARTICLE_MORE = [
+    ("주린이탈출", "11.27 10:02", "매개변수 300억개면 큰 편인가요?", "다른 회사 모델과 비교한 표가 있으면 좋겠습니다[:mid_question:]", "", []),
+    ("데이터센터", "11.27 09:55", "추론 비용을 줄였다는 부분", "비용 효율을 개선했다고 하는데 얼마나 줄었는지 숫자가 궁금하네요.", "", []),
+    ("장투러", "11.27 09:41", "프리뷰 때보다 점수가 올랐네요", "프리뷰 대비 5.9점 상승이라고 적혀 있네요. 다음 버전도 비교해 보겠습니다.", "", []),
+    ("오늘도출근", "11.27 09:30", "게임 말고 어디에 쓰일까요", "기사에는 쓰임새가 자세히 안 나와서 다음 소식을 기다려 봅니다.", "", []),
+    ("차트보는곰", "11.27 09:12", "출시일이 25일이었군요", "주말 사이 나온 소식이라 놓쳤는데 정리돼 있어서 좋네요[:mid_thanks:]", "", []),
+    ("새벽시장", "11.27 08:58", "다른 게임사도 비슷한가요?", "국내 게임사 중 자체 언어모델을 만든 곳이 또 있는지 궁금합니다.", "", []),
+    ("천천히", "11.27 08:40", "용어 설명 고맙습니다", "활성화 매개변수라는 말을 처음 알았습니다.", "", []),
+    ("숫자확인", "11.27 08:21", "평가 점수가 세 가지네요", "점수마다 무엇을 재는 건지 알면 더 이해가 쉬울 것 같아요.", "", []),
+    ("퇴근길", "11.27 08:05", "기사 짧고 좋네요", "핵심만 있어서 출근길에 읽기 편했습니다.", "", []),
+    ("관찰중", "11.27 07:48", "다음 분기 실적에서 확인", "개발비가 얼마나 들었는지는 실적 발표 때 보겠습니다[:mid_hourglass:]", "", []),
+]
+
+
+def article_more(shown, total):
+    rows = "".join(item(c, True, f"m{k}", "mock_comments_thread.html") for k, c in enumerate(ARTICLE_MORE))
+    n = min(dk.MORE_STEP, total - shown)
+    return (f'<template id="cc-more-tpl">{rows}</template>'
+            f'<button type="button" data-cmore data-total="{total}" data-shown="{shown}" style="{dk.FOLD_BTN}width:100%;">'
+            f'<span>댓글 {n}개 더 보기</span> {dk.ACC_CHEV}</button>'
+            "<script>(function(){var b=document.querySelector('.cc-article [data-cmore]');if(!b)return;"
+            "var list=document.querySelector('.cc-article .cv-list'),tpl=document.getElementById('cc-more-tpl'),total=+b.dataset.total,first=+b.dataset.shown,shown=first,step=10;"
+            "function label(){var r=total-shown;b.querySelector('span').textContent=r>0?'댓글 '+Math.min(step,r)+'개 더 보기':'접기';b.classList.toggle('is-open',r<=0);}"
+            "b.addEventListener('click',function(){if(shown>=total){list.querySelectorAll('.cc-add').forEach(function(x){x.remove();});shown=first;label();b.scrollIntoView({block:'center'});return;}"
+            "var src=tpl.content.querySelectorAll('li.cv-item'),n=Math.min(step,total-shown);for(var i=0;i<n;i++){var li=src[(shown-first+i)%src.length].cloneNode(true);li.classList.add('cc-add');list.appendChild(li);}"
+            "shown+=n;label();});})();</script>")
 
 
 def article_top():
@@ -1187,6 +1217,8 @@ def comment_page(cmts, total, back, kind):
     제목 줄은 따로 그리지 않는다 — 글의 h3.post-title 을 테마가 고정 제목 줄(뒤로 · 로고 + 제목 · 공유)로 만든다(디자인 가이드 2절 1)."""
     rows = "".join(item(c, True, f"t{k}", "mock_comments_thread.html") for k, c in enumerate(cmts))
     more = f'<button class="cm-more" type="button">댓글 {total - len(cmts)}개 더 보기</button>' if total > len(cmts) else ""
+    if kind == "article" and total > len(cmts):   # 기사 댓글 화면 = 더 보기 규칙(10개씩 · 화살표 흰 버튼)
+        more = article_more(len(cmts), total)
     mark = (f'<span data-title-back="{back}" data-title-back-label="돌아가기" hidden></span>'
             + ('<span data-kr-code="000660" hidden></span>' if kind == "stock" else ""))
     if kind == "issue" and os.path.exists(ISSUE_BASE):   # 원래 Hot Issue 머리 그대로 + 그 아래 댓글(틀은 git 에 없음 — 없는 PC 는 아래 예전 시안으로)
