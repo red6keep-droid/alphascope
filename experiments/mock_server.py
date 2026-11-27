@@ -133,7 +133,7 @@ LIVE = [
     ("미국 증시 리포트", ["daily-report/daily_mock.html"]), ("한국 증시 리포트", ["kr-market-report/kr_report_mock.html", "kr-market-report/mock_money_flow.html"]),
     ("주요 인물 발언", ["people-radar/radar_mock.html"]), ("테마", ["theme-monitor/mock_theme-ai-capex.html"]),
     ("Hot Issue", ["issue_store/mock_issue_watch.html", "issue_store/mock_issue_watch-tariff.html", "issue_store/mock_issue_watch-export.html"]),   # 이란 · 관세 · 수출 통제 (6-11 시안 11-27)
-    ("증시 전망", ["issue_store/mock_forecast-list-eh.html", "issue_store/mock_forecast-2.html", "issue_store/mock_forecast-nvda-2026q3.html",
+    ("증시 전망", ["issue_store/mock_forecast_fix.html", "issue_store/mock_forecast-list-eh.html", "issue_store/mock_forecast-2.html", "issue_store/mock_forecast-nvda-2026q3.html",
                 "issue_store/mock_real_forecast-nvda-2026q3.html", "issue_store/mock_real_forecast-list.html", "issue_store/mock_real_forecast-2026-007.html", "issue_store/mock_real_forecast-2026-008.html", "issue_store/mock_real_forecast-2.html"]),   # mock_real_ = 상태 저장소 실제 판정 기록으로 그린 것 (2026-11-22 모든 날짜 줄 확인용)
     ("주식 제대로 알기", ["course/mock_study_list.html", "course/mock_입문-*.html", "course/mock_착각-*.html"]),   # 목록 + 나온 편 전부 · 입문 12편 발행 11-22
     ("검색", ["site-search/mock_search.html"]),

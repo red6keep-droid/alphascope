@@ -251,6 +251,12 @@ def md(iso):
     return f"{p[1]}.{p[2]}" if len(p) == 3 else ".".join(p)
 
 
+def end_txt(fc):
+    """판정 기한 `01.25` — 등록한 해와 다르면 앞에 `내년` (6-22)."""
+    e, r = str(fc.get("end_day") or ""), str(fc.get("registered") or "")
+    return ("내년 " if e[:4] and r[:4] and e[:4] > r[:4] else "") + md(e)
+
+
 def fmt_v(v, unit="%p"):
     return "—" if v is None else (f"0.0{unit}" if abs(v) < 0.05 else f"{v:+.1f}{unit}")
 
@@ -716,6 +722,8 @@ CHAIN_FS = 17   # 갈래 카드 고리 줄 이름(`급락 폭의 4분의 1 회�
 WHY_FS, WHY_LH = 16, 26
 SIG_NAME = "Newfact 신호"   # 독자 문장에서 `우리 신호` 대신
 WHY_NOTE = "전망에 따른 주식 정보를 모은 것입니다. 판단하거나 어느 쪽이 맞을지 고른 것은 아닙니다."   # P498, 문구
+FIX = [False]   # 6-22 · 6-23 · 6-25 시안 (목업만): 판정 기한 한 줄 · 성적표 안내 · 안내 문장 대상 좁히기
+WHY_NOTE_FIX = "관련 주식 정보는 갈래마다 기사를 모은 것입니다. 기사로 어느 쪽이 맞을지 고르지는 않습니다."
 EXCL_ICON = ('<svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true" style="flex:none;display:block;" fill="none" stroke="currentColor" stroke-width="1.6">'
              '<circle cx="8" cy="8" r="6.5"/><path d="M8 4.6v4.4" stroke-linecap="round"/><circle cx="8" cy="11.2" r=".9" fill="currentColor" stroke="none"/></svg>')   # 느낌표 = INFO_ICON(i) 뒤집은 모양
 
@@ -1634,6 +1642,7 @@ def _date_row(fc, out=False):
     return (f'<span style="display:flex;flex:none;flex-direction:column;align-items:flex-end;font-size:{dk.TINY};font-weight:400;color:{dk.SUB};">'
             # 결과 날짜 = 늘 검정 (P471, 옛 P413 결과 뒤 보라는 없앰) — 글자 `결과 :` 는 회색
             + "".join(f'<span style="white-space:nowrap;">{dk.esc(k)} : <span style="color:#111;">{dk.esc(wordify(v))}</span>{_shock_size(fc) if fc["kind"] != "pre" else ""}</span>' for k, v in items)
+            + (f'<span style="white-space:nowrap;">판정 : <span style="color:#111;">{end_txt(fc)}까지</span></span>' if FIX[0] and fc.get("end_day") and not fc.get("_done") else "")
             + (f'<span>{proof}</span>' if proof else "") + "</span>")
 
 
@@ -1877,7 +1886,7 @@ def why_note_html(fc):
     if "good" not in w and not w.get("our_signals"):
         return ""
     return (f'<div data-why-note="1" style="display:flex;align-items:flex-start;gap:4px;margin:12px 0 0;padding:0 {dk.ALIGN_PX}px;font-size:13px;line-height:19px;color:{dk.SUB};word-break:keep-all;">'
-            f'<span style="flex:none;display:flex;align-items:center;height:19px;">{EXCL_ICON}</span><span>{WHY_NOTE}</span></div>')
+            f'<span style="flex:none;display:flex;align-items:center;height:19px;">{EXCL_ICON}</span><span>{WHY_NOTE_FIX if FIX[0] else WHY_NOTE}</span></div>')
 
 
 def _waiting(log, unit="%", subj="", fc=None):
@@ -2223,7 +2232,8 @@ def forecast_body(reg, state=None, fc=None, others=None, op=None):
     if fc.get("overlap"):   # 겹친 사건 날 줄에 겹침 표시 (P468) — 상태 자료는 고치지 않게 줄을 복사
         ov = {o.get("day"): o for o in fc["overlap"] if o.get("role") != "parent"}
         log = [dict(x, overlap=ov[md(x["day"])]) if md(x.get("day") or "") in ov else x for x in log]
-    before = fc["kind"] == "pre" and not st.get("cond") and not st.get("result")   # 사건 전 등록 화면 — 결과가 없으니 `전망 결과` 를 그리지 않는다
+    before = fc["kind"] == "pre" and not st.get("cond") and not st.get("result")
+    fc["_done"] = bool(st.get("result"))   # 판정 기한 줄은 판정 전만 (6-22)   # 사건 전 등록 화면 — 결과가 없으니 `전망 결과` 를 그리지 않는다
     # 결과 뒤도 결과 전과 같은 타임라인 — `전망 결과` 제목 · 강조 카드 · `결과 :` 상자 없음 (P418, 결과 날짜 = 날짜 줄 보라 P413 · 결과 내용 = 갈래 카드 첫 고리 줄)
     head = (_waiting(log, fc.get("unit", "%p"), fc.get("subject", ""), fc) if before else f'<div data-lead="1">{_waiting(log, fc.get("unit", "%p"), fc.get("subject", ""), fc)}</div>')   # `앞으로 올 수 있는 일` 카드 삭제 — 내용은 갈래 카드 · 셋째 카드 안으로
     for sc in fc["scenarios"]:
@@ -2289,7 +2299,8 @@ def _row(fc, st):
             + ("" if is_stock_fc(fc) else f'<span style="display:inline-flex;vertical-align:-3px;margin-right:6px;">{scale_icon(18)}</span>')   # 거시 · 업종 줄 앞 저울 = 종목 줄 로고 자리
             + f'{title_for(fc, 18)}</a>'
             f'<span style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin:8px 0 1px;line-height:1;min-width:0;">{tags.replace("white-space:nowrap;", "flex-wrap:wrap;", 1)}'
-            f'<span style="color:{dk.SUB};font-size:{dk.TINY};line-height:{dk.LH_TINY};">{dk.esc(fc["posted"])} 게시</span>'
+            f'<span style="color:{dk.SUB};font-size:{dk.TINY};line-height:{dk.LH_TINY};">{dk.esc(fc["posted"])} 게시'
+            + (f' · {end_txt(fc)}까지 봄' if FIX[0] and fc.get("end_day") else "") + '</span>'
             # `등록 기록` 링크 삭제
             + "</span>")
     lab = e["label"][len(fc["subject"]) + 1:] if fc.get("subject") and e["label"].startswith(fc["subject"] + " ") else e["label"]   # 대상 이름은 제목에 있으니 뺀다 — `에너지 업종 조정 우세` 이 카드 밖으로 넘쳤다 (P464, 타임라인 P440 과 같은 규칙)
@@ -2440,6 +2451,10 @@ def split_done(pub, states):
             picked[1] += 1
             picked[0] += k == "hit"
     score["watch"] = sum(1 for _, fc in opened if not is_stock_fc(fc))
+    if FIX[0]:   # 6-23 ① 끝난 전망 수와 성적표 수가 왜 다른지
+        k = sum(1 for _, fc in done if is_stock_fc(fc))
+        score["note"] = ("종목 전망은 매수 · 매도 권유가 되지 않게 우리가 어느 쪽도 고르지 않아 성적표에 넣지 않습니다."
+                         + (f" 끝난 전망 {len(done)}개 중 {k}개가 종목 전망입니다." if k else ""))
     score["n"] += score["watch"]
     if picked[1] >= 5:   # 1개 중 1개를 `대부분` 이라 하지 않게 — 다섯 개부터 (2026-11-12)
         score["picked_hit"] = tuple(picked)
