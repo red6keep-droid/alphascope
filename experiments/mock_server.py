@@ -17,15 +17,16 @@
       python experiments/mock_server.py --new "stock-lists/mock_stock-lists-guest-kr.html" "stock-lists/mock_stock-lists-member.html" --note "무엇을 바꿨나 한 줄"
   로 표시한다(파일 패턴 가능, 서버가 꺼져 있어도 됨). 목록 맨 위 `N 새로 바뀐 목업` 에 메모와 함께 모이고, 그 목업을 한 번 열면 표시가 사라진다.
   rebuild_mocks 다시 그리기처럼 내용이 그대로인 갱신은 표시하지 않는다. 기록 = .mock_prefs.json "new".
--. 첫 화면 = 최근 7일 안에 실제로 고친 목업만, 7일 넘게 안 바뀐 것은
-  맨 아래 버튼 `일주일 넘은 목업`(/week) 으로. `쓰지 않는 목업` 은 휴지통(/archive)으로 이름을 바꿨다 — 시안이 확정되면 Claude 가
+-. 첫 화면 = 진행 중인 목업만(PLAN = 발행 예정 · 미확정 · 보류 + 즐겨찾기 + N 표시). 확정 · 발행된 목업(LIVE)은 날짜와 상관없이
+  맨 아래 버튼 `보관 중인 목업`(/week) 으로. `쓰지 않는 목업` 은 휴지통(/archive)으로 이름을 바꿨다 — 시안이 확정되면 Claude 가
+  대표 목업을 PLAN 에서 LIVE 로 옮기고(= 보관 중인 목업), 지난 시안은
       python experiments/mock_server.py --trash "stock-board/mock_board_*" --note "11-22 시안 A 확정"
   로 지난 시안을 바로 휴지통에 넣는다(파일은 그대로, 휴지통에서 복원).
   `고친 시각` = --new 기록(열어도 남는 "changed") 과 git 마지막 커밋(`목업 다시 그리기` 커밋 · 합치기 제외) 중 늦은 것.
   파일 수정 시각은 rebuild_mocks 가 모든 목업을 다시 써서 쓰지 않는다. git 에 없는 파일(.gitignore 폴더)은 만든 시각(birthtime).
--. 발행이 끝난 목업은 7일이 안 지나도
+-. PLAN 에 남겨 둔 채 보관하려면
       python experiments/mock_server.py --week "course/mock_study_list.html" "course/mock_착각-*"
-  로 바로 `일주일 넘은 목업` 으로 넘긴다(기록 = .mock_prefs.json "week"). 그 뒤에 다시 고치면(--new · 실제 커밋) 첫 화면으로 돌아온다.
+  로 `보관 중인 목업` 으로 넘긴다(기록 = .mock_prefs.json "week"). 그 뒤에 다시 고치면(--new · 실제 커밋) 첫 화면으로 돌아온다.
 """
 import html
 import re
@@ -136,7 +137,6 @@ LIVE = [
     ("디자인 기준표 (그래프 · 팝업 · 아이콘)", ["design-samples/*"]),
     ("운영 현황 (관리자)", ["ops-dashboard/*"]),
 ]
-WEEK_D = 7   # 첫 화면 = 최근 이만큼(일) 안에 고친 목업
 STALE_H = 24   # 같은 묶음의 가장 최근 파일보다 이만큼(시간) 먼저 만든 파일 = 지난 버전 → 자동 보관
 
 
@@ -355,24 +355,6 @@ def design_mtime():
     return max(os.path.getmtime(x) for x in (os.path.join(os.path.dirname(BASE), "index.html"), os.path.join(BASE, "design_kit.py")) if os.path.exists(x))
 
 
-def rebuilt_at():
-    """rebuild_mocks.py 가 전부 다시 그리기를 시작한 마지막 시각 (없으면 0)."""
-    try:
-        return float(open(os.path.join(BASE, ".mock_rebuilt"), encoding="utf-8").read().strip())
-    except (OSError, ValueError):
-        return 0
-
-
-# 발행된 화면 목업 중 옛 디자인으로 남은 것 = 공통 디자인이 바뀐 뒤에 전부 다시 그리기를 돌렸는데도 다시 안 그려진 파일 → 첫 화면에서 내려 `일주일 넘은 목업` 으로
-#. 다시 그리기를 아직 안 돌린 것뿐인 목업은 `옛 버전` 표시만 붙고 남는다.
-# 미확정(발행 예정) · N 표시 · 즐겨찾기는 내리지 않는다. 다시 그리기 묶음에 일부러 뺀 것(운영 대시보드 = GitHub · Cloudflare 를 읽어 만듦)도 남긴다.
-NO_SINK = ("ops-dashboard/",)
-
-
-def sunk_old(x, ref, rebuilt):
-    return bool(rebuilt) and x[2] < ref and x[2] < rebuilt and (stage_of(x[0], x[1]) or ("",))[0] == "live" and not f"{x[0]}/".startswith(NO_SINK)
-
-
 OLD_TAG = '<span class="old">옛 버전</span>'
 
 
@@ -418,7 +400,7 @@ TRASH_ICON = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke
 
 
 def index_page(mode="main"):
-    """mode = main(최근 WEEK_D 일 안에 고친 목업) · week(그보다 오래 안 바뀐 목업) · trash(휴지통 = 예전 `쓰지 않는 목업`)."""
+    """mode = main(진행 중인 목업 = 발행 예정) · week(보관 중인 목업 = 확정 · 발행된 것) · trash(휴지통 = 예전 `쓰지 않는 목업`)."""
     archive = mode == "trash"
     items = every = mockups()
     with _lock:
@@ -428,14 +410,11 @@ def index_page(mode="main"):
     old = [x for x in items if f"{x[0]}/{x[1]}" in arch]
     kept = [x for x in items if f"{x[0]}/{x[1]}" not in arch]
     lc = last_change(every, prefs)
-    from datetime import timedelta
-    cut = datetime.combine(datetime.now().date() - timedelta(days=WEEK_D), datetime.min.time()).timestamp()   # 달력 기준 — `7일 전 고침` 까지 첫 화면
     newd = prefs["new"]
-    wk = prefs["week"]   # --week 로 넘긴 목업 = 그 뒤에 다시 고치기 전까지 `일주일 넘은 목업`
-    recent = [x for x in kept if (lc[k := f"{x[0]}/{x[1]}"][0] >= cut or k in newd) and not (k in wk and wk[k] >= lc[k][0] and k not in newd)
-              or stage_of(x[0], x[1])[0] == "plan"]   # 미확정(발행 예정)은 며칠이 지나도 첫 화면 — 사용자가 확정할 때까지 (2026-11-26)
-    ref, rebuilt = design_mtime(), rebuilt_at()
-    recent = [x for x in recent if not (sunk_old(x, ref, rebuilt) and f"{x[0]}/{x[1]}" not in newd and f"{x[0]}/{x[1]}" not in stars)]   # 옛 디자인으로 남은 발행된 화면 목업은 내린다
+    wk = prefs["week"]   # --week 로 넘긴 목업 = 그 뒤에 다시 고치기 전까지 `보관 중인 목업`
+    # 첫 화면 = 진행 중인 것(발행 예정)만 — 확정 · 발행된 목업(LIVE)은 날짜와 상관없이 `보관 중인 목업`
+    recent = [x for x in kept if stage_of(x[0], x[1])[0] == "plan" and not ((k := f"{x[0]}/{x[1]}") in wk and wk[k] >= lc[k][0] and k not in newd)]
+    ref = design_mtime()
     stale = [x for x in kept if x not in recent]
     items = old if archive else recent if mode == "main" else stale
     items = sorted(items, key=lambda x: -lc[f"{x[0]}/{x[1]}"][0])   # 고친 순
@@ -444,8 +423,8 @@ def index_page(mode="main"):
     n_old = sum(1 for x in items if x[2] < ref)
     W = lambda x: lc[f"{x[0]}/{x[1]}"][0]
     parts = []
-    nav_week = f'<a class="big" href="/week">일주일 넘게 안 바뀐 목업 <span>{len(stale)}개 ›</span></a>'
-    nav_main = f'<a class="big" href="/">← 이번 주 고친 목업 <span>{len(recent)}개</span></a>'
+    nav_week = f'<a class="big" href="/week">보관 중인 목업 <span>확정 · 발행된 목업 {len(stale)}개 ›</span></a>'
+    nav_main = f'<a class="big" href="/">← 진행 중인 목업 <span>{len(recent)}개</span></a>'
     nav_trash = f'<a class="big" href="/archive"><b class="ti">{TRASH_ICON}휴지통</b> <span>{len(old) + len(ARCHIVED_LINKS)}개 ›</span></a>'
     if archive:
         parts.append('<a class="big" href="/">← 목업 목록으로</a>')
@@ -462,7 +441,7 @@ def index_page(mode="main"):
     else:
         every_key = {f"{d}/{f}": (d, f, t) for d, f, t in every}
         if mode == "main":
-            parts.append(f'<div class="cut">{WEEK_D}일 안에 고친 목업만 보입니다 · 그보다 오래 안 바뀐 목업은 맨 아래 <a href="/week">일주일 넘은 목업</a></div>')
+            parts.append('<div class="cut">진행 중인 목업만 보입니다 · 확정 · 발행된 목업은 맨 아래 <a href="/week">보관 중인 목업</a></div>')
             fresh = sorted((k for k in newd if k in every_key and k not in arch), key=lambda k: -newd[k].get("t", 0))
             if fresh:   # Claude 가 만들거나 고친 목업 — 열면 사라짐
                 parts += [f'<section><div class="newh"><h2>{NEW_TAG}새로 바뀐 목업 <span class="n">{len(fresh)}</span></h2><button class="clr">모두 확인</button></div>',
@@ -475,7 +454,7 @@ def index_page(mode="main"):
                 parts += ['<section><h2>★ 즐겨찾기</h2>', *(row(*x, show_dir=True, stars=stars, names=names, ref=ref, new=newd, when_t=W(x)) for x in fav), "</section>"]
         else:
             parts.append(nav_main)
-            parts.append(f'<div class="cut">{WEEK_D}일 넘게 고치지 않은 목업입니다. 다시 고치면 첫 화면으로 돌아갑니다.</div>')
+            parts.append('<div class="cut">확정 · 발행된 목업입니다. 다시 진행하는 기능은 발행 예정으로 옮기면 첫 화면에 보입니다.</div>')
         plan, live = {}, {}
         for x in items:
             st = stage_of(x[0], x[1])
@@ -494,7 +473,7 @@ def index_page(mode="main"):
 
         order = lambda dct: sorted(dct, key=lambda i: -max(W(x) for x in dct[i]))   # 최근에 고친 기능이 위로
         if plan or (mode == "main" and PLAN_NOMOCK):
-            parts.append('<h2 class="zone">발행 예정 <span class="zs">아직 확정 전 · 확정되면 발행된 화면으로 옮기고 지난 시안은 휴지통</span></h2>')
+            parts.append('<h2 class="zone">발행 예정 <span class="zs">아직 확정 전 · 확정되면 보관 중인 목업(발행된 화면)으로 옮기고 지난 시안은 휴지통</span></h2>')
             for n, i in enumerate(order(plan)):
                 parts += block(PLAN[i][0], PLAN[i][1], plan[i], mode == "main" and n == 0, tag=PLAN[i][3] if len(PLAN[i]) > 3 else "미확정")
             if mode == "main":
@@ -505,7 +484,7 @@ def index_page(mode="main"):
             for i in order(live):
                 parts += block(LIVE[i][0], "", live[i], False)
         if not items and mode == "main":
-            parts.append(f'<div class="meta">{WEEK_D}일 안에 고친 목업이 없습니다</div>')
+            parts.append('<div class="meta">진행 중인 목업이 없습니다</div>')
         parts.append('<div class="foot">')
         parts.append(nav_week if mode == "main" else nav_main)
         parts.append(nav_trash)
@@ -540,7 +519,7 @@ body.edit .edit-btn:not(.reload-btn){{background:#1d2127;border-color:#1d2127;co
 .when{{display:block;margin-top:4px;color:#2563EB;font-size:13px;font-weight:400}} .cut{{color:#5b6370;font-size:13px;margin:-6px 0 16px}} .cut a{{color:#2563EB}}
 .foot{{margin-top:24px}} details.more{{background:none;border:0}} details.more>summary{{padding:10px 14px;color:#2563EB;font-weight:600;font-size:14px}} details.more .row{{border:1px solid #e3e6eb;border-radius:10px;margin-bottom:8px}} .big.dark{{background:#1d2127;border-color:#1d2127;color:#fff}} .big.dark span{{color:#c3c8d0}}
 </style></head><body>
-<div class="top"><h1>{"휴지통" if archive else "목업 목록" if mode == "main" else "일주일 넘은 목업"}</h1><span class="tbtns">{RELOAD_BTN}{"" if archive else EDIT_BTN}</span></div><div class="meta">{len(items)}개 · 불러온 시각 {now} · 새로고침하면 최신 목록{"" if archive or not n_old else f" · 옛 버전 {n_old}개(공통 디자인보다 먼저 만듦 — rebuild_mocks.py 로 다시 그림)"}</div>
+<div class="top"><h1>{"휴지통" if archive else "목업 목록" if mode == "main" else "보관 중인 목업"}</h1><span class="tbtns">{RELOAD_BTN}{"" if archive else EDIT_BTN}</span></div><div class="meta">{len(items)}개 · 불러온 시각 {now} · 새로고침하면 최신 목록{"" if archive or not n_old else f" · 옛 버전 {n_old}개(공통 디자인보다 먼저 만듦 — rebuild_mocks.py 로 다시 그림)"}</div>
 {''.join(parts)}
 <script>
 const ds = [...document.querySelectorAll('details')];
@@ -1190,7 +1169,7 @@ def mark_trash(pats, note):
 
 
 def mark_week(pats):
-    """--week 패턴… — 발행이 끝나 이번 주 목록에 둘 필요 없는 목업을 `일주일 넘은 목업` 으로. 다시 고치면 첫 화면으로 돌아온다."""
+    """--week 패턴… — 발행 예정(PLAN)에 남긴 목업을 `보관 중인 목업` 으로. 다시 고치면 첫 화면으로 돌아온다."""
     from fnmatch import fnmatch
     import time
     keys = [f"{d}/{f}" for d, f, _ in mockups()]
@@ -1201,7 +1180,7 @@ def mark_week(pats):
             p["week"][k] = time.time()
             p["new"].pop(k, None)
         save_prefs(p)
-    print(f"일주일 넘은 목업으로 {len(hit)}개: " + ", ".join(hit) if hit else f"맞는 목업 없음: {pats}")
+    print(f"보관 중인 목업으로 {len(hit)}개: " + ", ".join(hit) if hit else f"맞는 목업 없음: {pats}")
 
 
 def lan_ip():
