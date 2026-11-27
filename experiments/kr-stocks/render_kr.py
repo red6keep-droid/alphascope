@@ -1058,6 +1058,7 @@ def build_expect(s, extra, group):
     s["expect"] = {}
     s["_fin_rows"] = (extra.get("capex") or {}).get(s["sym"]) or []   # DART 분기 줄(재무상태표 포함) — 잠정실적 · 살림 카드 (2026-11-16)
     s["analysts"] = AT.analysts(s["sym"], extra)   # 애널리스트 등급 · 목표가 — 미국과 같은 칸
+    s["_beat"] = (extra.get("beat") or {}).get(s["sym"])   # 발표 때 예상 · 실제 1주당 이익 (collect_kr_extra._beat, 개선 1-14)
     # 돈을 어디에 쓰나 = OpenDART 손익 · 현금흐름 표(collect_kr_fin → extra["capex"], 2026-11-04) — 매출 카드의 이익 줄 · 이익률 그래프도 같은 표에서
     for k, f in (("revenue", AT.card_revenue), ("eps", AT.card_eps), ("capex", lambda sym, extra, group: AT.card_capex(sym, extra))):
         try:
@@ -1108,8 +1109,8 @@ def sec_expect(s, open_first=True):
             lines = report_head(s, lines)
         out += R._state_card(title, state, theme, col, lines, "", tip=tip, fold=True, opened=open_first and i == 0)
         if key == "revenue":
-            out += report_biz_cards(s)
-    out += report_balance_card(s)
+            out += report_biz_cards(s) + card_beat(s)   # 미국 순서 = 돈을 더 버나 → 발표 때 예상을 넘었나 → 이익 예상
+    out += report_balance_card(s) + card_value(s)   # 주가 수준 = 실적 카드 끝 (미국과 같은 자리)
     return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{out}</div>'
 
 
@@ -1136,6 +1137,115 @@ def report_biz_cards(s):
 def report_balance_card(s):
     import report_cards as RC
     return RC.balance_card(s["name"], s.get("_fin_rows") or [])
+
+
+KOSPI_PER = None   # {"month", "v", "series"} — 한국 증시 분위기 재료의 KOSPI PER(한국거래소 월). write_all 이 a["market"]["valuation"]["per"] 로 채운다
+
+BEAT_TIP = ("실적 발표 때 실제 1주당 이익(EPS)이 애널리스트 예상 평균보다 높았는지 낮았는지. 1주당 이익은 회사 순이익을 주식 수로 나눈 값\n"
+            "· 나누는 법 : 마지막 발표의 1주당 이익이 예상보다 높으면 예상 넘음, 낮으면 예상 밑돎. 예상과 0.5% 안이면 같음\n"
+            "· 예상 : 발표 직전 애널리스트 평균(Yahoo Finance 집계). 한국은 매출 예상을 받을 수 있는 무료 자료가 없어 1주당 이익만 견준다\n"
+            "· 참고 : 잠정실적(공시)이 먼저 나와도 1주당 이익은 분기보고서 기준 값으로 견준다")
+
+
+def card_beat(s):
+    """`발표 때 예상을 넘었나?` — 미국 카드(peer_cards.beat_card) 그대로, 원 · 한국 안내 (개선 1-14). 재료가 없으면 카드 없이."""
+    b = s.get("_beat")
+    if not b:
+        return ""
+    PC = RP.PC
+    PC.init_theme()
+    e = {"dates": b.get("dates") or [], "hist": b.get("hist") or [], "finnhub": []}
+    log = {s["day"]: {"eps0q": b["est0q"]}} if b.get("est0q") else None
+    nxt = ((s.get("calendar_cards") or {}).get("earnings") or {}).get("day")   # 다음 발표일 = `다음 실적 발표는?` 과 같은 일정 (개선 1-17)
+    try:
+        got = PC.beat_card(s["name"], e, [], s["day"], log, nxt, money=lambda v: won(v), unit="원", bil=_won, rev_note="", tip=BEAT_TIP)
+    except Exception as ex:  # noqa: BLE001 — 이 카드만 빠진다
+        print(f"[kr] {s['sym']} 발표 때 예상 카드 실패: {ex!r}")
+        return ""
+    if not got:
+        return ""
+    state, lines, tip = got
+    theme, col = R.EXPECT_THEME.get(state, ("neutral", R.MUTED))
+    return R._state_card("발표 때 예상을 넘었나?", state, theme, col, lines, "", tip=tip, fold=True)
+
+
+VALUE_HI, VALUE_LO = 1.25, 0.8   # KOSPI 전체 PER 의 몇 배를 넘으면 시장보다 높음 · 아래면 낮음 (11-27 A안)
+
+
+def _ttm(rows, k, upto=None):
+    rs = [r for r in rows if upto is None or r["end"] <= upto]
+    v = [r.get(k) for r in rs[-4:]]
+    return sum(v) if len(v) == 4 and None not in v else None
+
+
+def value_lines(name, rows, cap, close, bars, kper):
+    """`이익에 비해 주가 수준은?` A안 — (state, lines, tip) 또는 None. 비교 = KOSPI 전체 PER(한국거래소 월) · 이 종목 분기 말 PER.
+    rows = DART 분기 줄(ni · equity), bars = 일봉(분기 말 종가), kper = {"month", "v", "series"}."""
+    if not rows or not cap or not close or not kper:
+        return None
+    ni, eq = _ttm(rows, "ni"), rows[-1].get("equity")
+    kmo = f"{int(kper['month'][5:])}월"
+    if not ni or ni <= 0:
+        if not eq or eq <= 0:
+            return None
+        return ("판단 유보", [(f"{_dk.josa(name, '는')} 지난 1년 순이익이 적자라 주가수익비율을 계산하지 않습니다. "
+                             f"주가순자산비율(시가총액 ÷ 자본)은 {cap / eq:.1f}배입니다.", "plain"),
+                            ("row", "주가순자산비율", f"{cap / eq:.1f}배", "시가총액 ÷ 자본")], "")
+    pe = cap / ni
+    state = "시장보다 높음" if pe > kper["v"] * VALUE_HI else "시장보다 낮음" if pe < kper["v"] * VALUE_LO else "시장 수준"
+    shares = cap / close
+    mc = {}
+    for b in bars or []:
+        if b.get("close"):
+            mc[b["day"][:7]] = b["close"]   # 그달 마지막 종가
+    kby = {x["month"]: x["v"] for x in kper.get("series") or []}
+    hist = []
+    for r in rows:
+        t = _ttm(rows, "ni", r["end"])
+        m = r["end"][:7]
+        if t and t > 0 and m in mc and r["end"] < s_day_month(bars):
+            hist.append((r["cq"], mc[m] * shares / t, kby.get(m)))
+    lines = [(f"{name}의 주가수익비율(시가총액 ÷ 지난 1년 순이익)은 {pe:.1f}배로, {kmo} KOSPI 전체 {kper['v']:.1f}배보다 {'높습니다' if pe > kper['v'] else '낮습니다'}. "
+              "높을수록 이익에 비해 주가가 높게 매겨져 있다는 뜻입니다.", "plain")]
+    if len(hist) >= 4:
+        chart = R.line_chart([_dk.q_axis(q) for q, _, _ in hist], [(name, [v for _, v, _ in hist], R.LINE_THIS, False), ("KOSPI 전체", [k for _, _, k in hist], R.LINE_GRAY, True)],
+                             lambda v: f"{v:,.1f}", "배")
+        lines.append((f"{_dk.CHART_TITLE_M}분기 말 주가수익비율, {_esc(_dk.josa(name, '와'))} KOSPI 전체</span>{chart}", "html"))
+    lines.append(("row", "주가수익비율 (지난 1년)", f"{pe:.1f}배", f"시가총액 {_won(cap)} ÷ 순이익 {_won(ni)}"))
+    ks = [x["v"] for x in (kper.get("series") or [])[-12:]]
+    lines.append(("row", "KOSPI 전체 주가수익비율", f"{kper['v']:.1f}배", f"{kmo} · 한국거래소 월 자료" + (f" · 12개월 {min(ks):.1f} ~ {max(ks):.1f}배" if ks else "")))
+    if eq and eq > 0:
+        lines.append(("row", "주가순자산비율", f"{cap / eq:.1f}배", "시가총액 ÷ 자본"))
+    if len(hist) >= 8:
+        yrs = len(hist) // 4
+        below = sum(1 for _, v, _ in hist if v < pe)
+        where = f"{yrs}년 중 가장 낮음" if below == 0 else f"{yrs}년 중 가장 높음" if below == len(hist) else f"분기 말 {len(hist)}번 중 지금보다 낮았던 때 {below}번"
+        lines.append(("row", f"주가수익비율 {yrs}년 범위", f"{min(v for _, v, _ in hist):.0f} ~ {max(v for _, v, _ in hist):.0f}배", f"지금 {pe:.1f}배 · {where}"))
+    tip = ("이익에 비해 주가가 얼마나 높게 매겨져 있는지를 KOSPI 전체와 견준 것. 싸다 · 비싸다를 판정하지 않는다\n"
+           f"· 나누는 법 : 이 종목 주가수익비율이 KOSPI 전체의 {VALUE_HI}배를 넘으면 시장보다 높음, {VALUE_LO}배 아래면 시장보다 낮음, 그 사이는 시장 수준\n"
+           "· 순이익 : 금융감독원 전자공시(OpenDART) 분기 · 사업보고서, 최근 4분기 합(연결)\n"
+           "· 분기 말 값 : 그달 마지막 종가 × 지금 주식 수 ÷ 그때까지 1년 순이익 — 그 사이 주식 수가 바뀌었으면 조금 다르다\n"
+           "· 참고 : 이익이 크게 오르내리는 업종은 이익이 꼭대기일 때 배수가 낮게 보인다")
+    return state, lines, tip
+
+
+def s_day_month(bars):
+    """분기 말 값은 그달이 다 끝난 분기만 — 마지막 봉의 달(아직 덜 찬 달)은 뺀다."""
+    return (bars[-1]["day"][:7] + "-01") if bars else "9999"
+
+
+def card_value(s):
+    """`이익에 비해 주가 수준은?` (개선 1-12, A안)."""
+    try:
+        got = value_lines(s["name"], s.get("_fin_rows") or [], s.get("cap"), s.get("close"), s.get("_bars") or BARS.get(s["sym"]) or [], KOSPI_PER)
+    except Exception as ex:  # noqa: BLE001
+        print(f"[kr] {s['sym']} 주가 수준 카드 실패: {ex!r}")
+        return ""
+    if not got:
+        return ""
+    state, lines, tip = got
+    theme, col = {"시장보다 낮음": ("positive", R.UP), "시장보다 높음": ("negative", R.DOWN)}.get(state, ("neutral", "#111"))   # 숫자와 반대 색 — 미국 카드와 같게
+    return R._state_card("이익에 비해 주가 수준은?", state, theme, col, lines, "", tip=tip, fold=True)
 
 
 def sec_earnings_tab(s):
@@ -1991,6 +2101,8 @@ def write_all(a, out_dir, snap=None, media=None, extra=None):
     os.makedirs(out_dir, exist_ok=True)
     KR_PRICES.clear()
     KR_PRICES.update({s["code"]: (s["name"], s.get("ret_1d")) for s in a["stocks"] if s.get("ret_1d") is not None})
+    global KOSPI_PER
+    KOSPI_PER = (((a.get("market") or {}).get("valuation") or {}).get("per"))   # `이익에 비해 주가 수준은?` 비교 대상
     if extra and snap:
         caps = snap.get("caps") or {}
         group = set(sorted((c[0] for c in U.CANDIDATES if caps.get(c[0])), key=lambda x: -caps[x])[:U.PEER_GROUP_N])   # 한국 시총 상위 20개

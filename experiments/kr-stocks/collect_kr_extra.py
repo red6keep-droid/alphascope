@@ -5,6 +5,7 @@
 - 이익 · 현금흐름 : OpenDART 전체 재무제표 분기 표(collect_kr_fin — 매출총이익 · 영업이익 · 순이익 · 영업현금흐름 · 설비 투자 · 배당 · 자사주 · 차입, 2026-11-04) → extra["capex"].
 - 1주당 이익 예상 : eps_trend · eps_revisions 의 +1y (nvda-report expect._eps 그대로).
 - 실적 발표일 : earnings_dates (지난 · 앞으로). 한국 회사는 장 전 · 장중 발표가 많아 그날 반응으로 본다(when=bmo).
+- 발표 때 예상 · 실제 1주당 이익 : get_earnings_dates · earnings_history · earnings_estimate(0q) → extra["beat"] (실적일과 같은 주기).
 옵션(개별 종목 옵션 없음) · 공매도(Yahoo 에 없음, 한국거래소 자료는 약관 확인 전)는 받지 않는다.
 
     python experiments/kr-stocks/collect_kr_extra.py    # 받기 → data/extra.json
@@ -23,6 +24,7 @@ import expect as EX  # noqa: E402
 import universe_kr as U  # noqa: E402
 
 EXTRA = os.path.join(BASE, "data", "extra.json")
+KEYS = ("revenue", "eps", "earnings", "analysts", "beat")   # 종목마다 받는 칸 — beat = 발표 때 예상 · 실제 1주당 이익 (실적일과 같은 주기, detail_cache)
 
 
 def _cq(end):
@@ -50,6 +52,30 @@ def _earn_dates(t):
     return [{"day": d, "when": "bmo"} for d in sorted({x.strftime("%Y-%m-%d") for x in e.index})]
 
 
+def _beat(t):
+    """`발표 때 예상을 넘었나?` 재료 — 발표마다 1주당 이익 예상 · 실제(야후, 한국 종목도 줌) + 분기 끝 · 다음 분기 예상 (개선 1-14, 2026-11-27).
+    미국 peer_cards._earn 과 같은 모양. 발표일은 서울 날짜(야후는 미국 시각 — 10월 28일 밤 = 서울 29일)."""
+    from zoneinfo import ZoneInfo
+    seoul = ZoneInfo("Asia/Seoul")
+    num = lambda v: float(v) if v is not None and v == v else None   # noqa: E731 — NaN → None
+    rows = {}
+    ed = t.get_earnings_dates(limit=16)
+    for d, r in (ed.iterrows() if ed is not None else []):
+        day = d.astimezone(seoul).date().isoformat()
+        rows[day] = {"day": day, "est": num(r.get("EPS Estimate")), "act": num(r.get("Reported EPS"))}
+    hist = []
+    eh = t.earnings_history
+    for q, r in (eh.iterrows() if eh is not None else []):
+        hist.append({"end": q.date().isoformat(), "est": num(r.get("epsEstimate")), "act": num(r.get("epsActual"))})
+    est0q = None
+    ee = t.earnings_estimate
+    if ee is not None and "0q" in ee.index and num(ee.loc["0q", "avg"]) is not None:
+        est0q = [num(ee.loc["0q", "avg"]), int(num(ee.loc["0q", "numberOfAnalysts"]) or 0)]
+    if not rows and not hist:
+        return None
+    return {"dates": sorted(rows.values(), key=lambda x: x["day"]), "hist": hist, "est0q": est0q}
+
+
 def _analysts(t):
     """애널리스트 등급 분포 · 목표가 — 미국 collect_extra._analysts 와 같은 칸. 원화."""
     out = {}
@@ -69,16 +95,16 @@ def run():
     sys.path.insert(0, os.path.join(BASE, ".."))
     import detail_cache as DC
     cache = DC.shared(os.path.join(BASE, "data"))   # 칸마다 바뀌는 주기에만 — 매출 30일 · 실적 뒤, 이익 예상 · 의견 주 1회(종목별 요일) · 실적 뒤, 실적일 주 1회 · 14일 안이면 매일
-    out = {"day": datetime.date.today().isoformat(), "stocks": {}, "revenue": {"series": {}}, "earnings": {}, "pair_earnings": {}}
+    out = {"day": datetime.date.today().isoformat(), "stocks": {}, "revenue": {"series": {}}, "earnings": {}, "pair_earnings": {}, "beat": {}}
     n_new = 0
     for sym, *_ in U.CANDIDATES:
         past, nxt = DC.earn_info(cache, sym)
-        due = [k for k in ("revenue", "eps", "earnings", "analysts") if cache.due(sym, k, earn_days=past, next_earn=nxt)]
-        cache.reused += 4 - len(due)
+        due = [k for k in KEYS if cache.due(sym, k, earn_days=past, next_earn=nxt)]
+        cache.reused += len(KEYS) - len(due)
         if due:
             n_new += 1
             t = yf.Ticker(sym)
-            fns = {"revenue": lambda: _revenue(t), "eps": lambda: EX._eps(t), "earnings": lambda: _earn_dates(t), "analysts": lambda: _analysts(t)}
+            fns = {"revenue": lambda: _revenue(t), "eps": lambda: EX._eps(t), "earnings": lambda: _earn_dates(t), "analysts": lambda: _analysts(t), "beat": lambda: _beat(t)}
             for key in due:
                 try:
                     v = fns[key]()
@@ -87,7 +113,7 @@ def run():
                     v = None
                 cache.put(sym, key, v)
             time.sleep(0.5)
-        for key in ("revenue", "eps", "earnings", "analysts"):
+        for key in KEYS:
             v = cache.get(sym, key)
             if v is None:
                 continue
@@ -95,6 +121,8 @@ def run():
                 out["revenue"]["series"][sym] = v
             elif key == "earnings":
                 out["earnings"][sym] = v
+            elif key == "beat":
+                out["beat"][sym] = v
             else:
                 out["stocks"].setdefault(sym, {})[key] = v
     print(f"[kr-extra] 새로 받은 종목 {n_new}/{len(U.CANDIDATES)} (나머지 저장값)")
@@ -137,7 +165,7 @@ def run():
     with open(EXTRA, "w", encoding="utf-8") as f:
         json.dump(out, f, ensure_ascii=False)
     n_rev = sum(1 for v in out["revenue"]["series"].values() if any(r.get("yoy") is not None for r in v))
-    print(f"[kr-extra] 매출 {n_rev} · 이익 예상 {sum(1 for v in out['stocks'].values() if (v.get('eps') or {}).get('current'))} · 실적일 {len(out['earnings'])} · 연결 미국 {len(out['pair_earnings'])}")
+    print(f"[kr-extra] 매출 {n_rev} · 이익 예상 {sum(1 for v in out['stocks'].values() if (v.get('eps') or {}).get('current'))} · 실적일 {len(out['earnings'])} · 발표 때 예상 {len(out['beat'])} · 연결 미국 {len(out['pair_earnings'])}")
     return out
 
 

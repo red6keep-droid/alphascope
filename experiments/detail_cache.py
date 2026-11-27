@@ -83,7 +83,7 @@ class DetailCache:
             return age >= WEEKLY or (spread and age >= SPREAD_MIN) or after_earn
         if field == "short":
             return age >= 14
-        if field == "earnings":
+        if field in ("earnings", "beat"):   # beat = 발표 때 예상 · 실제 1주당 이익(한국 정식) — 실적일과 같은 주기
             near = next_earn is not None and 0 <= (datetime.date.fromisoformat(next_earn) - self.today).days <= 14
             return age >= WEEKLY or (near and age >= 1) or after_earn
         if field == "company":
