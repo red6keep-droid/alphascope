@@ -13,6 +13,18 @@ ROOT = os.path.expanduser("~/Desktop/Newfact-그림-검수")
 TRASH = os.path.join(ROOT, "사용안함")
 LIST = os.path.join(TRASH, "사용안함-목록.csv")
 IMG = (".jpg", ".jpeg", ".png", ".webp", ".gif")
+# 업종 폴더 최소 장수(운영지침 4-6, 11-28): 회사 30곳 이상 들어가는 업종 = 5, 나머지 = 3
+BIG = {"반도체", "제약_·_바이오", "건설_·_부동산", "로봇_·_기계", "인터넷_·_소프트웨어", "의료기기_·_병원", "은행"}
+
+
+def done_note(g):
+    """폴더 제목 옆 — 완료에 이미 몇 장 · 목표 몇 장(업종만)."""
+    d = os.path.join(ROOT, "완료", g)
+    have = len([f for f in os.listdir(d) if f.lower().endswith(IMG)]) if os.path.isdir(d) else 0
+    if not g.startswith("3_업종"):
+        return f" <span class=dn>완료 {have}장</span>"
+    goal = 5 if os.path.basename(g) in BIG else 3
+    return f" <span class=dn>완료 {have}장 · 목표 {goal}장 → <b>{max(goal - have, 0)}장 더</b> 남기기</span>"
 
 
 def sources():
@@ -57,7 +69,7 @@ def build(skip_logos=False):
     toc = "".join(f"<a href='#k{i}'>{html.escape(g)} <i>{len(v)}</i></a>" for i, (g, v) in enumerate(gk.items()))
     body = []
     for i, (g, v) in enumerate(gk.items()):
-        body.append(f"<h2 id='k{i}'>{html.escape(g)} <i>{len(v)}</i></h2><div class=g>")
+        body.append(f"<h2 id='k{i}'>{html.escape(g)} <i>{len(v)}</i>{done_note(g)}</h2><div class=g>")
         body += [card(p, p, src.get(p), "로고" in g) for p in v]
         body.append("</div>")
     tbody = []
@@ -77,7 +89,7 @@ body{{font-family:-apple-system,sans-serif;margin:0;background:#f4f4f5;color:#11
 .cnt{{font-size:14px;color:#444}} .cnt em{{font-style:normal;font-weight:700;color:#dc2626}} .cnt u{{text-decoration:none;font-weight:700;color:#16a34a}}
 .toc{{padding:10px 16px;display:flex;flex-wrap:wrap;gap:6px}} .toc a{{font-size:13px;background:#fff;border:1px solid #ddd;border-radius:6px;padding:4px 8px;color:#111;text-decoration:none}}
 i{{font-style:normal;color:#888;font-weight:400}} main{{padding:0 16px 80px}} h2{{font-size:16px;margin:28px 0 8px}}
-.help{{padding:0 16px;font-size:13px;color:#555}}
+.help{{padding:0 16px;font-size:13px;color:#555}} .dn{{font-size:13px;font-weight:400;color:#666;margin-left:8px}} .dn b{{color:#16a34a}}
 .g{{display:flex;flex-wrap:wrap;gap:8px}} .c{{width:240px;background:#fff;border:3px solid transparent;border-radius:8px;overflow:hidden;font-size:11px;cursor:pointer;position:relative}}
 .c img{{width:240px;height:160px;object-fit:cover;display:block;background:#e5e5e5}} .c.logo img{{object-fit:contain;background:#fff}}
 .c .t{{padding:6px 8px;color:#555;word-break:break-all}} .c .t b{{color:#111}} .c a{{color:#2563eb}} .why{{color:#b45309}}

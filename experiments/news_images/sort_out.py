@@ -20,7 +20,7 @@ import numpy as np
 ROOT = os.path.expanduser("~/Desktop/Newfact-그림-검수")
 TRASH = os.path.join(ROOT, "사용안함")   # 쓰지 않는 그림을 모으는 한 곳
 LIST = os.path.join(TRASH, "사용안함-목록.csv")
-SKIP_DIRS = {"2_기업-로고", "사용안함"}
+SKIP_DIRS = {"2_기업-로고", "사용안함", "완료"}   # 완료 = 사용자가 확정한 사진
 NIGHT_OK_DIRS = ("파업",)
 NIGHT_OK_WORDS = re.compile(r"strike|protest|rally|demonstrat|vigil|march|picket|파업|시위|집회", re.I)
 # 제목만 봐도 그림인 말
