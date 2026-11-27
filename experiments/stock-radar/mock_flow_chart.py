@@ -55,8 +55,8 @@ def card(etf, rel, mode, rows):
           "rel_pp": rel, "days": 20, "sectors": [], "rank": 1, "n_pool": 11, "fund": etf_flows.summary(rows)}
     lines = RP.sector_lines(sf)
     if mode:
-        labels, vals = weekly(rows) if mode == "w" else monthly(rows)
-        title = (f"최근 {len(labels) * 5}거래일 ETF에 들어온 돈 (5거래일마다 쌓은 값, 억 달러)" if mode == "w" else f"최근 {len(labels)}개월 ETF에 들어온 돈 (달마다 쌓은 값, 억 달러)")
+        labels, vals = weekly(rows) if mode == "w" else weekly(rows, n=24) if mode == "w24" else monthly(rows)
+        title = (f"최근 {len(labels) * 5}거래일 ETF에 들어온 돈 (5거래일마다 쌓은 값, 억 달러)" if mode in ("w", "w24") else f"최근 {len(labels)}개월 ETF에 들어온 돈 (달마다 쌓은 값, 억 달러)")
         chart = dk.trend_card(title, labels, [(f"{etf} 순유입 누적", vals, dk.CHART_MAIN, "solid"), ("0 (들어온 돈 = 나간 돈)", [0.0] * len(vals), dk.CHART_CMP, "guide")],
                               lambda v: f"{v:+,.0f}".replace("-", "−"))
         lines.insert(3, (chart, "html"))
@@ -81,6 +81,7 @@ def main():
         body += label(f"지금 · {nm}", "오늘 연결한 모습(문장 + 줄, 그래프 없음)") + card(etf, rel, None, rows)
         body += label(f"A안 · {nm}", "5거래일 단위 — 최근 60거래일(약 석 달), 점 12개") + card(etf, rel, "w", rows)
         body += label(f"B안 · {nm}", "1개월 단위 — 최근 12개월, 점 12개") + card(etf, rel, "m", rows)
+        body += label(f"C안 (추천) · {nm}", "5거래일 단위 그대로, 범위만 120거래일(약 여섯 달)로 — 점 24개, 옆으로 넘겨 보기") + card(etf, rel, "w24", rows)
     print(dk.write_mock(dk.formal(body), os.path.join(BASE, "output", "mock_flow_chart.html"), "업계 자금 흐름 카드 — 들어온 돈 선 그래프 (5거래일 · 1개월)"))
 
 
