@@ -93,7 +93,7 @@ i{{font-style:normal;color:#888;font-weight:400}} main{{padding:0 16px 80px}} h2
 <div id=in><div class=toc>{toc}</div><main>{''.join(body)}</main></div>
 <div id=out><main>{''.join(tbody)}</main></div>
 <script>
-const K='newfact-review-v1';let X=new Set(),S=new Set();
+const K='newfact-review-v2';let X=new Set(),S=new Set();
 try{{const d=JSON.parse(localStorage.getItem(K)||'{{}}');X=new Set(d.x||[]);S=new Set(d.s||[])}}catch(e){{}}
 function store(){{try{{localStorage.setItem(K,JSON.stringify({{x:[...X],s:[...S]}}))}}catch(e){{}}}}
 function paint(){{document.querySelectorAll('#in .c').forEach(c=>c.classList.toggle('x',X.has(c.dataset.f)));
