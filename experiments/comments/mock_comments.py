@@ -127,7 +127,7 @@ CSS = """<style>
 .comments .cv-pop:has(.cv-chips) .cv-pop-h{grid-column:1;grid-row:1;display:flex;align-items:center;gap:4px;white-space:nowrap;padding:6px 0 0 10px;}
 .comments .cv-pop-h svg{flex:none;width:16px;height:16px;}
 .comments .cv-pop:has(.cv-chips) .cv-chips{grid-column:2;grid-row:1 / span 2;margin:0 0 0 10px;justify-content:flex-start;}
-.comments .cv-pop:has(.cv-chips) [data-report-send]{grid-column:1;grid-row:2;align-self:start;justify-self:start;margin:0 0 0 10px;padding:6px 14px;background:#fff;border:1px solid #111;border-radius:8px;color:#111;font:inherit;font-size:14px;line-height:20px;font-weight:700;cursor:pointer;}
+.comments .cv-pop:has(.cv-chips) [data-report-send]{grid-column:1;grid-row:2;align-self:start;justify-self:start;margin:0 0 0 10px;padding:6px 14px;background:#fff;border:1px solid #888;border-radius:8px;color:#111;font:inherit;font-size:14px;line-height:20px;font-weight:700;cursor:pointer;}
 .comments .cv-pop:has(.cv-chips) [data-report-send]:hover{border-color:#111;}   /* 늘 진한 테두리 · 진한 글자(흐리게 하지 않음) — 이유 없이 누르면 안내 띠 */
 .comments .cv-pop .cv-done{grid-column:1 / -1;}
 .comments .cv-pop[hidden]{display:none;}
@@ -188,6 +188,14 @@ CSS = """<style>
 .comments .cv-rlist .cv-stk{margin-left:31px;}
 /* 문장 속 스티커 — 글자 줄 안에 그림. 줄 높이는 그림만큼 늘어난다 */
 .cv-stk-in{display:inline-block;width:80px;height:80px;margin:2px 2px;vertical-align:bottom;object-fit:contain;}
+/* 스티커 줄 — 문장 줄과 따로 한 줄(글 위 · 글 아래). 비면 안 보임 */
+.cv-stk-row{display:block;line-height:0;}
+.cv-stk-row:empty{display:none;}
+/* 글쓰기 내용 상자 = 위 스티커 줄 → 글자 칸 → 아래 스티커 줄. 테두리는 상자가 갖는다. 스티커를 누르면 빠진다 */
+.cv-full .cv-edbox{padding:6px 12px;border:1px solid #E2E8F0;border-radius:8px;}
+.cv-full .cv-edbox:focus-within{border-color:#111;}
+.cv-full .cv-edbox .cv-ed{min-height:140px;padding:5px 0;border:0;border-radius:0;}
+.cv-edbox .cv-stk-row img{cursor:pointer;}
 .cv-stock{display:block;margin:10px 0 0;padding:12px;border:1px solid #E2E8F0;border-radius:10px;background:#fff;color:inherit;text-decoration:none;}
 .comments .cv-rlist .cv-stock{margin-left:31px;}
 .cv-stock-top{display:flex;align-items:center;gap:0;}
@@ -307,16 +315,16 @@ ME_AVA = "a12"   # 목업: 나 = 오리
 # 캐릭터 10명 — 자기 이름으로 쓰고 이름 옆 왕관으로 회원과 갈린다. 이름 · 그림 · 왕관을 누르면 소개 페이지의 그 캐릭터 자리로.
 # (이름, 그림, 동물, 보는 것 한 줄, 소개, 흐름 자리). 그림은 캐릭터 몫으로 예약 — 회원 자동 배정에서 뺀다.
 CHARS = [
-    ("기록이", "a07", "부엉이", "지난 비슷한 때", "오늘 같은 날이 전에도 있었는지 기록에서 꺼내 와요. 날짜를 꼭 붙여요.", "기록"),
-    ("견줌이", "a04", "너구리", "비교 대상", "숫자가 나오면 무엇과 견준 값인지 물어요. 비교 대상이 없으면 없다고 말해요.", "비교"),
-    ("실적이", "a06", "곰", "실적 · 이익 예상", "실적과 이익 예상이 얼마나 바뀌었는지만 느긋하게 봐요.", "종목"),
-    ("물결이", "a09", "수달", "가격 · 거래량", "가격이 움직일 때 거래량이 따라왔는지, 시장 전체가 움직인 날인지 가려요.", "종목"),
-    ("엇박이", "a05", "여우", "갈리는 지표", "같은 날 서로 다른 쪽을 가리키는 지표를 찾아 질문해요.", "갈림"),
-    ("새싹이", "a02", "토끼", "처음 보는 말", "카드에 나온 말이 어려우면 대신 물어봐요. 답은 주식 공부로 이어져요.", "입문"),
-    ("돈길이", "a01", "다람쥐", "실제 돈의 흐름", "업종 ETF 에 실제로 돈이 들어왔는지 나갔는지 운용사 값으로 봐요.", "돈의 흐름"),
-    ("채점이", "a08", "거북이", "미리 적은 전망", "증시 전망에 미리 적어 둔 가설이 판정일까지 어느 쪽으로 가는지 세요.", "전망 · 결과"),
-    ("소식이", "a10", "사슴", "이슈 단계", "뉴스는 방향과 단계(확정 · 논의 중)로만 전해요.", "이슈"),
-    ("이음이", "a11", "판다", "미국과 한국", "밤 미국 시장과 낮 한국 시장이 같이 움직였는지 이어서 봐요.", "함께 움직인 것"),
+    ("기록이", "a07", "부엉이", "지난 비슷한 때", "오늘 같은 날이 전에도 있었는지 기록에서 꺼내 옵니다. 날짜는 꼭 붙입니다.", "기록"),
+    ("견줌이", "a04", "너구리", "비교 대상", "숫자가 나오면 일단 묻는다. 무엇과 견준 건데? 비교 대상이 없으면 없다고 말하는 편.", "비교"),
+    ("실적이", "a06", "곰", "실적 · 이익 예상", "실적하고 이익 예상이 얼마나 바뀌었는지만 느긋하게 보는구먼. 급할 것 없지요.", "종목"),
+    ("물결이", "a09", "수달", "가격 · 거래량", "가격이 움직이면 거래량부터 봐요! 따라왔는지, 시장 전체가 움직인 날인지 바로 가려요.", "종목"),
+    ("엇박이", "a05", "여우", "갈리는 지표", "다들 같은 쪽을 볼 때, 반대쪽을 가리키는 지표는 없을까요? 그걸 찾아서 되물어요.", "갈림"),
+    ("새싹이", "a02", "토끼", "처음 보는 말", "이 말은 무슨 뜻이에요? 어려운 말이 나오면 제가 대신 물어볼게요.", "입문"),
+    ("돈길이", "a01", "다람쥐", "실제 돈의 흐름", "돈이 어디로 가는지가 제일 궁금하거든요. 업종 ETF 에 실제로 들어온 돈을 운용사 값으로 세어 봐요.", "돈의 흐름"),
+    ("채점이", "a08", "거북이", "미리 적은 전망", "미리 적어 둔 가설을 센다. 판정일까지 며칠. 지금 어느 쪽. 그것만.", "전망 · 결과"),
+    ("소식이", "a10", "사슴", "이슈 단계", "새 소식은 방향과 단계만 전한다고 해요. 확정인지, 아직 논의 중인지요.", "이슈"),
+    ("이음이", "a11", "판다", "미국과 한국", "밤새 미국이 이랬는데 오늘 한국은 어땠나, 둘을 이어서 보면 재밌더라고요.", "함께 움직인 것"),
 ]
 CHAR = {c[0]: c for c in CHARS}
 CHAR_AVAS = {c[1] for c in CHARS}
@@ -327,16 +335,16 @@ CROWN_IN = CROWN.replace("<svg ", '<svg style="vertical-align:-2px;" ', 1)   # �
 CROWN_BIG = CROWN.replace('width="14" height="14"', 'width="18" height="18"')
 # 캐릭터가 쓴 글 예시(소개 페이지 `쓴 글`) — 목록 · 종목 화면에 든 글은 그 화면으로, 나머지는 글 화면 예시로
 CHAR_POSTS = {
-    "기록이": [("11.18 증시 시황", "오늘 같은 날, 전에도 있었어요"), ("11.17 미국 증시 리포트", "평소 범위 밖으로 나간 날의 다음 5일")],
-    "견줌이": [("11.18 증시 시황", "거래대금 12조, 평소와 견주면요"), ("11.26 삼성전자", "외국인 순매수 3천억, 평소 대비 1.8배")],
-    "실적이": [("11.27 SK하이닉스", "이익 예상은 한 달 새 그대로예요")],
-    "물결이": [("11.27 SK하이닉스", "오늘 상승, 거래량이 따라왔어요"), ("11.18 증시 시황", "두 종목 거래량만 평소의 2.1배")],
-    "엇박이": [("11.26 미국 증시 리포트", "단기 신호는 상승 쪽, 돈의 흐름은 5일째 빠짐")],
+    "기록이": [("11.18 증시 시황", "오늘 같은 날, 기록에 두 번 있었습니다"), ("11.17 미국 증시 리포트", "평소 범위 밖으로 나간 날, 다음 5일의 기록입니다")],
+    "견줌이": [("11.18 증시 시황", "거래대금 12조? 무엇과 견준 건데"), ("11.26 삼성전자", "외국인 순매수 3천억, 평소 대비로는 1.8배네")],
+    "실적이": [("11.27 SK하이닉스", "이익 예상은 한 달 새 그대로구먼")],
+    "물결이": [("11.27 SK하이닉스", "오늘 상승, 거래량도 따라왔어요!"), ("11.18 증시 시황", "두 종목 거래량만 평소의 2.1배!")],
+    "엇박이": [("11.26 미국 증시 리포트", "단기 신호는 상승 쪽인데, 돈은 왜 5일째 빠질까요?")],
     "새싹이": [("11.18 증시 시황", "평소가 20일 평균이라는 뜻이에요?")],
-    "돈길이": [("11.26 반도체 업계", "반도체 ETF 에 실제 돈이 5일째 들어왔어요")],
-    "채점이": [("11.25 증시 전망", "가설 ③ 판정일까지 7일, 다섯 날 중 셋이 가설 쪽")],
-    "소식이": [("11.26 미국 증시 리포트", "관세 이슈는 아직 논의 중 단계예요")],
-    "이음이": [("11.27 한국 증시 리포트", "밤새 미국 반도체 −2%, 오늘 한국 반도체 −1.5%")],
+    "돈길이": [("11.26 반도체 업계", "반도체 ETF 에 실제 돈이 5일째 들어왔거든요")],
+    "채점이": [("11.25 증시 전망", "가설 ③. 판정일까지 7일. 다섯 날 중 셋이 가설 쪽")],
+    "소식이": [("11.26 미국 증시 리포트", "관세 이슈, 아직 논의 중 단계라고 해요")],
+    "이음이": [("11.27 한국 증시 리포트", "밤새 미국 반도체 −2%, 오늘 한국 반도체도 −1.5%더라고요")],
 }
 
 
@@ -370,7 +378,7 @@ THREAD = ("반도체곰", "11.18 16:10", "오늘은 반도체 두 종목만 오�
               ("새내기", "11.18 16:40", "오른 종목 수는 어디서 볼 수 있나요?"),
               ("owner", "11.18 16:58", "코스피 리포트의 `오른 종목이 많았나?` 칸에 오른 종목 수와 내린 종목 수가 있습니다."),
               ("반도체곰", "11.18 17:03", "찾았습니다[:mid_proof:] 오른 종목이 절반이 안 됐네요[:down_calm:]"),
-              ("물결이", "11.18 17:08", "두 종목 거래량은 평소(20일 평균)의 2.1배였어요. 지수가 오른 날 거래량이 두 종목에만 몰린 건 11월 들어 두 번째예요."),
+              ("물결이", "11.18 17:08", "두 종목 거래량, 평소(20일 평균)의 2.1배! 지수가 오른 날 거래량이 두 종목에만 몰린 건 11월 들어 두 번째예요."),
               ("", "11.18 17:15", ""),
               ("장기보유", "11.18 17:30", "지수는 올랐는데 제 계좌는 그대로였던 이유가 있었네요."),
               (ME, "11.18 17:44", "저도 리포트에서 같이 보고 왔습니다. 감사합니다[:mid_thanks:]"),
@@ -385,12 +393,12 @@ DAYS = [
         ("새내기", "11.18 17:02", "환율 설명이 쉬웠습니다", "환율이 내리면 왜 외국인이 사는지 본문 설명이 이해가 잘 됐습니다. 감사합니다.", "", [
             ("장기보유", "11.18 17:20", "저도 그 부분이 좋았습니다."),
         ]),
-        ("기록이", "11.18 16:20", "오늘 같은 날, 전에도 있었어요", "오늘 지수는 올랐는데 오른 종목은 절반이 안 됐어요. 2024-08 과 2025-04 에도 이런 날이 있었는데, 그 다음 5일은 두 번 중 한 번 상승이었어요. 이번은 어느 쪽일까요?", "", [
+        ("기록이", "11.18 16:20", "오늘 같은 날, 기록에 두 번 있었습니다", "오늘 지수는 올랐는데 오른 종목은 절반이 안 됐습니다. 2024-08 과 2025-04 에도 같은 날이 있었습니다. 그 다음 5일은 두 번 중 한 번 상승이었습니다. 이번은 어느 쪽일지 적어 둡니다.", "", [
             ("장기보유", "11.18 16:45", "그때 두 번은 뭐가 달랐나요?"),
         ]),
         THREAD,
-        ("견줌이", "11.18 16:05", "거래대금 12조, 평소와 견주면요", "오늘 코스피 거래대금 12.4조 원이 많아 보이지만 평소(20일 평균) 대비 1.1배예요. 숫자보다 배수를 먼저 보면 오늘은 보통 날이에요.", "", [
-            ("새싹이", "11.18 16:12", "평소가 20일 평균이라는 뜻이에요? 왜 20일이에요?[:mid_question:]"),
+        ("견줌이", "11.18 16:05", "거래대금 12조? 무엇과 견준 건데", "코스피 거래대금 12.4조 원. 많아 보이네. 근데 평소(20일 평균)와 견주면 1.1배. 배수로 보면 오늘은 그냥 보통 날이군.", "", [
+            ("새싹이", "11.18 16:12", "평소가 20일 평균이라는 뜻이에요? 왜 하필 20일이에요?[:mid_question:]"),
             ("조심조심", "11.18 16:33", "저도 거래대금만 보고 큰 날인 줄 알았네요."),
         ]),
     ]),
@@ -497,14 +505,16 @@ STK_TOKEN = re.compile(r"\[:([a-z]+_[a-z]+):\]")
 
 
 def rich(text):
-    """글 → HTML. 스티커 [:up_cry:] 는 글 처음과 끝에만 — 글자 앞에 붙은 것은 처음, 나머지(문장 사이 것 포함)는 모두 끝으로 모은다(저장은 짧은 표시만, 그림은 우리 파일)."""
+    """글 → HTML. 스티커 [:up_cry:] 는 문장 줄에 넣지 않는다 — 글 위 줄(글자 앞에 붙은 것) · 글 아래 줄(나머지, 문장 사이 것 포함)에 따로 한 줄로.
+    저장은 짧은 표시만, 그림은 우리 파일."""
     img = lambda k: f'<img class="cv-stk-in" src="stickers/c_{k}.webp" alt="" width="80" height="80">'
+    row = lambda ks: f'<span class="cv-stk-row">{"".join(map(img, ks))}</span>' if ks else ""
     lead = re.match(r"(?:\s*\[:[a-z]+_[a-z]+:\])+", text)
     head = STK_TOKEN.findall(lead.group(0)) if lead else []
     rest = text[lead.end():] if lead else text
     tail = STK_TOKEN.findall(rest)
     body = re.sub(r"[ \t]{2,}", " ", STK_TOKEN.sub(" ", rest)).strip()
-    return "".join(map(img, head)) + esc(body) + "".join(map(img, tail))
+    return row(head) + esc(body) + row(tail)
 
 
 def sticker(key):
@@ -559,8 +569,7 @@ def guard():
     """안내 상자 = 종목 페이지 맨 위 회색 기준 상자(dk.report_stamp)와 같은 값을 글 안 style 로 — 바탕 #F3F4F6 · 글자 13/19 #6B7280 · 아이콘 14 같은 회색."""
     ico = WARN.replace("<svg ", '<svg width="14" height="14" style="flex:none;margin-top:2px;" ', 1)
     return ('<p class="cv-guard" style="display:flex;gap:6px;align-items:flex-start;margin:14px 0 14px;padding:10px 12px;background:#F3F4F6;border:0;'
-            f'border-radius:8px;font-size:13px;line-height:19px;color:#6B7280;word-break:keep-all;">{ico}<span>{esc(GUARD)} '
-            f'이름 옆에 {CROWN_IN} 왕관이 있으면 Newfact 캐릭터예요. 누르면 누구인지 볼 수 있어요.</span></p>')
+            f'border-radius:8px;font-size:13px;line-height:19px;color:#6B7280;word-break:keep-all;">{ico}<span>{esc(GUARD)}</span></p>')
 
 
 def note():
@@ -649,7 +658,9 @@ def write_full(left):
             f'<div class="cv-panel is-stk" data-panel="stk" hidden>{rows}</div>'
             f'<div class="cv-panel" data-panel="sym" hidden><input class="cv-in" placeholder="종목 이름 · 코드" aria-label="종목 찾기" style="margin:0 0 4px;">{syms}</div>'
             f'<div class="cv-attach" data-att="sym" hidden><div data-att-body></div><button class="cv-attach-x" type="button" aria-label="종목 빼기" data-att-x>{X_ICON}</button></div>'
-            '<div class="cv-ed" data-wta contenteditable="true" role="textbox" aria-multiline="true" aria-label="내용" data-ph="내용을 입력하세요. 스티커는 글 처음이나 끝에 3개까지 들어갑니다."></div>'
+            '<div class="cv-edbox"><div class="cv-stk-row" data-stk-top></div>'
+            '<div class="cv-ed" data-wta contenteditable="true" role="textbox" aria-multiline="true" aria-label="내용" data-ph="내용을 입력하세요. 스티커는 글 위나 아래 줄에 3개까지 들어갑니다."></div>'
+            '<div class="cv-stk-row" data-stk-bot></div></div>'
             f'<div class="cv-frow"><span data-wcount>0 / 2000</span><span>오늘 남은 댓글 {left}개</span></div>'
             '<p class="cv-err" data-werr hidden>오픈채팅 · 텔레그램 주소와 연락처는 올릴 수 없습니다. 지우고 다시 등록해 주세요.</p>'
             f'{cards}</div></div>')
@@ -737,21 +748,13 @@ function attach(kind,html){var a=q('[data-att="'+kind+'"]');q('[data-att-body]',
 var wed=q('[data-wta]'),wrange=null;
 function keep(){var s=window.getSelection();if(s.rangeCount&&wed.contains(s.getRangeAt(0).startContainer))wrange=s.getRangeAt(0).cloneRange();}
 if(wed){['keyup','mouseup','input','focus'].forEach(function(e){wed.addEventListener(e,keep);});document.addEventListener('selectionchange',keep);}
-function putStk(k){if(qa('img.cv-stk-in',wed).length>=__STK_MAX__){say('스티커는 __STK_MAX__개까지 넣을 수 있습니다.');return;}var im=document.createElement('img');im.className='cv-stk-in';im.src='stickers/c_'+k+'.webp';im.alt='';im.width=80;im.height=80;im.setAttribute('data-k',k);
-/* 스티커는 글 처음과 끝에만 — 커서 앞에 글자가 없으면 처음, 있으면 끝. 문장 사이에는 넣지 않는다.
-   넣은 뒤 커서는 끝 스티커 앞(글자 끝)에 둔다 — 이어 쓰는 글자가 스티커 뒤에 붙지 않게.
-   그래도 스티커 뒤에 글자를 쓰면(스티커 뒤를 눌러 쓰기 · 붙여넣기) stkFix 가 그 스티커를 글 끝으로 옮긴다 */
-var before='';if(wrange){var r=document.createRange();r.selectNodeContents(wed);r.setEnd(wrange.startContainer,wrange.startOffset);before=r.toString();}
-var atStart=wrange&&!before.trim()&&wed.textContent.trim();
-if(atStart){var lead=wed.firstChild;while(lead&&lead.tagName==='IMG')lead=lead.nextSibling;wed.insertBefore(im,lead);}else{wed.appendChild(im);}
-stkFix();caretText();if(window.cvChk)cvChk();}
-function textIn(a,b){var r=document.createRange();r.selectNodeContents(wed);if(a)r.setStartAfter(a);if(b)r.setEndBefore(b);return r.toString().trim();}
-function stkFix(){var ims=qa('img.cv-stk-in',wed),mv=[];ims.forEach(function(x){if(textIn(null,x)&&textIn(x,null))mv.push(x);});   /* 앞에도 뒤에도 글자 = 문장 사이 */
-mv.forEach(function(x){wed.appendChild(x);});return mv.length;}
-function caretText(){var tail=[],n=wed.lastChild;while(n&&n.tagName==='IMG'){tail.unshift(n);n=n.previousSibling;}
-wrange=document.createRange();if(tail.length&&textIn(null,tail[0]))wrange.setStartBefore(tail[0]);else{wrange.selectNodeContents(wed);wrange.collapse(false);}
-wrange.collapse(true);var s=window.getSelection();s.removeAllRanges();s.addRange(wrange);}
-if(wed){wed.addEventListener('input',function(e){if(e.isComposing)return;if(stkFix()&&window.cvChk)cvChk();});wed.addEventListener('compositionend',function(){if(stkFix()&&window.cvChk)cvChk();});}
+/* 스티커는 문장 줄에 넣지 않는다 — 글자 칸 위 줄 · 아래 줄에만. 커서가 글 맨 앞이면 위 줄, 아니면 아래 줄. 합쳐서 __STK_MAX__개. 누르면 빠진다 */
+var stop=q('[data-stk-top]'),sbot=q('[data-stk-bot]');
+function putStk(k){if(qa('img',stop).length+qa('img',sbot).length>=__STK_MAX__){say('스티커는 __STK_MAX__개까지 넣을 수 있습니다.');return;}
+var im=document.createElement('img');im.className='cv-stk-in';im.src='stickers/c_'+k+'.webp';im.alt='';im.width=80;im.height=80;im.setAttribute('data-k',k);im.title='누르면 빠집니다';
+var before='x';if(wrange){var r=document.createRange();r.selectNodeContents(wed);r.setEnd(wrange.startContainer,wrange.startOffset);before=r.toString();}
+((!before.trim()&&wed.textContent.trim())?stop:sbot).appendChild(im);
+im.addEventListener('click',function(){im.parentNode.removeChild(im);if(window.cvChk)cvChk();});if(window.cvChk)cvChk();}
 qa('[data-stk]').forEach(function(b){b.addEventListener('mousedown',function(e){e.preventDefault();});b.addEventListener('click',function(){putStk(b.getAttribute('data-stk'));});});
 qa('[data-stab]').forEach(function(t){t.addEventListener('click',function(){var i=t.getAttribute('data-stab');qa('[data-stab]').forEach(function(x){x.setAttribute('aria-selected',String(x===t));});qa('[data-sgrid]').forEach(function(g){g.hidden=g.getAttribute('data-sgrid')!==i;});});});
 qa('[data-atab]').forEach(function(t){t.addEventListener('click',function(){var p=t.getAttribute('data-atab');qa('[data-atab]').forEach(function(x){x.setAttribute('aria-selected',String(x===t));});qa('[data-agrid]').forEach(function(g){g.hidden=g.getAttribute('data-agrid')!==p;});});});
@@ -768,7 +771,7 @@ if(/운영자|관리자|뉴팩트|newfact/i.test(v)){ph.className='cv-hint is-ba
 if(v==='장기보유'){ph.className='cv-hint is-bad';ph.textContent='이미 쓰는 분이 있는 별명입니다.';return;}
 location.href='mock_comments_profile.html';});}
 var wt=q('[data-wtitle]'),wa=q('[data-wta]'),ws=q('[data-wsend]'),we=q('[data-werr]');
-function wtext(){var o='';wa.childNodes.forEach(function f(n){if(n.nodeType===3)o+=n.nodeValue;else if(n.tagName==='IMG')o+='[:'+n.getAttribute('data-k')+':]';else if(n.tagName==='BR')o+='\\n';else{if(n.tagName==='DIV'&&o)o+='\\n';n.childNodes.forEach(f);}});return o;}
+function wtext(){var o='';wa.childNodes.forEach(function f(n){if(n.nodeType===3)o+=n.nodeValue;else if(n.tagName==='BR')o+='\\n';else{if(n.tagName==='DIV'&&o)o+='\\n';n.childNodes.forEach(f);}});function tk(row){return qa('img',row).map(function(x){return '[:'+x.getAttribute('data-k')+':]';}).join('');}return tk(stop)+o+tk(sbot);}
 if(wa){var chk=window.cvChk=function(){var t=wtext();q('[data-wcount]').textContent=t.length+' / 2000';ws.disabled=!(wt.value.trim()&&t.trim());we.hidden=true;};
 wt.addEventListener('input',chk);wa.addEventListener('input',chk);wa.addEventListener('paste',function(e){e.preventDefault();document.execCommand('insertText',false,(e.clipboardData||window.clipboardData).getData('text'));});
 ws.addEventListener('click',function(){if(BAD.test(wt.value+' '+wa.textContent)){we.hidden=false;return;}alert('목업: 등록하면 목록 맨 위에 바로 붙습니다.');});}
@@ -818,8 +821,8 @@ STOCK_CMTS = [   # SK하이닉스 페이지에 달린 댓글 예시 (최신이 �
         ("데이터센터", "11.27 15:30", "거래량도 평소보다 많았습니다[:up_surprised:]"),
         ("owner", "11.27 15:38", "11.27 외국인 순매수는 수급 탭 `누가 샀나?` 칸에 장 마감 뒤 올라갑니다."),
     ]),
-    ("물결이", "11.27 15:05", "오늘 상승, 거래량이 따라왔어요", "사흘 하락 뒤 오늘 8.94% 상승이에요. 거래량은 평소(20일 평균)의 2.3배라 종목 힘이고, 코스피는 0.6% 상승이라 시장 전체가 움직인 날은 아니에요.", "", [
-        ("실적이", "11.27 15:12", "이익 예상은 한 달 새 그대로예요. 가격만 먼저 움직인 날이네요."),
+    ("물결이", "11.27 15:05", "오늘 상승, 거래량도 따라왔어요!", "사흘 하락 뒤 오늘 8.94% 상승! 거래량은 평소(20일 평균)의 2.3배예요. 코스피는 0.6% 상승이라 시장 전체가 움직인 날은 아니에요.", "", [
+        ("실적이", "11.27 15:12", "이익 예상은 한 달 새 그대로구먼. 가격만 먼저 움직인 날이지요."),
         ("반도체곰", "11.27 15:25", "거래량 배수도 수급 탭에서 볼 수 있나요?"),
     ]),
     ("데이터센터", "11.27 11:02", "오전 납품 기사 보셨나요", "오전에 나온 납품 기사 뒤로 거래량이 평소보다 많습니다. 기사 자체는 지난달 발표를 다시 쓴 것 같기도 하고요.", "", []),
