@@ -1,246 +1,4 @@
 {
- "bac43362df2a": {
-  "lines": [
-   "앤스로픽 나스닥 상장 첫날 주가 17% 상승",
-   "앤스로픽 종가 97.17달러 기록하며 시가총액 1조 8000억 달러 달성",
-   "앤스로픽 IPO 공모 금액 813억 달러로 역대 최대 기록 경신"
-  ],
-  "tags": [
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLK",
-    "issue": "MARKET_STRUCTURE",
-    "dir": "neutral",
-    "stage": "done",
-    "price": true
-   },
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLK",
-    "issue": "MARKET_STRUCTURE",
-    "dir": "neutral",
-    "stage": "done",
-    "price": true
-   },
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLK",
-    "issue": "CORP_EVENT",
-    "dir": "positive",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-20T12:46:50.719269+00:00",
-  "n_src": 900
- },
- "c536ac0e5968": {
-  "lines": [
-   "아크인베스트 6개 펀드를 통해 앤스로픽 주식 9080만 달러 매수"
-  ],
-  "tags": [
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLK",
-    "issue": "CORP_EVENT",
-    "dir": "positive",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-20T12:46:50.719269+00:00",
-  "n_src": 900
- },
- "e3667ef7c9b2": {
-  "lines": [],
-  "tags": [],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-20T12:46:50.719269+00:00",
-  "n_src": 900
- },
- "6bd5e8f575b1": {
-  "lines": [
-   "2010년 전체 의류의 약 60%를 차지했던 면화 비중이 현재 약 45%로 감소",
-   "폴리에스터와 나일론 등 합성 섬유가 수입 의류의 대다수를 차지",
-   "팬데믹 이전 20년간 하락세를 보였던 의류 가격이 2020년 이후 최고치로 급등"
-  ],
-  "tags": [
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLY",
-    "issue": "MARKET_STRUCTURE",
-    "dir": "neutral",
-    "stage": "done"
-   },
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLY",
-    "issue": "MARKET_STRUCTURE",
-    "dir": "neutral",
-    "stage": "done"
-   },
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLY",
-    "issue": "INFLATION",
-    "dir": "negative",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-20T12:46:52.201247+00:00",
-  "n_src": 900
- },
- "6969f8d6a051": {
-  "lines": [
-   "앤트로픽이 상장을 통해 813억 달러를 조달"
-  ],
-  "tags": [
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLK",
-    "issue": "CORP_EVENT",
-    "dir": "positive",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-20T12:46:52.201247+00:00",
-  "n_src": 900
- },
- "cccff391ea08": {
-  "lines": [
-   "숀 케언크로스 백악관 국가사이버 국장의 퇴임",
-   "커스틴 데이비스 펜타곤 최고정보책임자의 임시 국가사이버 국장 임명 예정"
-  ],
-  "tags": [
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "REGULATION",
-    "dir": "neutral",
-    "stage": "done"
-   },
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "REGULATION",
-    "dir": "neutral",
-    "stage": "talk"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-20T12:46:52.201247+00:00",
-  "n_src": 900
- },
- "041165c31ab4": {
-  "lines": [
-   "트럼프·푸틴·시진핑의 아시아태평양경제협력체 양자 회담 개최",
-   "우크라이나 나토식 안보 보장 방안 검토"
-  ],
-  "tags": [
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "GEOPOLITICS",
-    "dir": "neutral",
-    "stage": "done"
-   },
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "GEOPOLITICS",
-    "dir": "positive",
-    "stage": "talk"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-20T12:46:59.879500+00:00",
-  "n_src": 900
- },
- "d3265ec8653d": {
-  "lines": [
-   "미국·중국·러시아 정상의 첫 3자 회담 진행"
-  ],
-  "tags": [
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "GEOPOLITICS",
-    "dir": "neutral",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-20T12:46:59.879500+00:00",
-  "n_src": 900
- },
- "71fe76ed06ab": {
-  "lines": [
-   "앤스로픽의 월스트리트 상장 여파로 나스닥종합지수 2% 하락 (예상)",
-   "소프트뱅크 주가 14.48% 급락 (예상)",
-   "오픈에이아이 관련 소프트뱅크의 총 투자금 646억 달러"
-  ],
-  "tags": [
-   {
-    "scope": "market",
-    "tickers": [],
-    "sector": null,
-    "issue": "MARKET_STRUCTURE",
-    "dir": "neutral",
-    "stage": "done",
-    "price": true
-   },
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLK",
-    "issue": "MARKET_STRUCTURE",
-    "dir": "neutral",
-    "stage": "done",
-    "price": true
-   },
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLK",
-    "issue": "AI_CAPEX",
-    "dir": "neutral",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-20T12:46:59.879500+00:00",
-  "n_src": 900
- },
- "f164454e2e48": {
-  "lines": [
-   "그랜드 테프트 오토 VI 약 1,910만 장 판매 기록",
-   "그랜드 테프트 오토 VI 관련 18억 4천만 달러 매출 달성",
-   "그랜드 테프트 오토 프랜차이즈 전 세계 누적 4억 7천만 장 이상 판매"
-  ],
-  "tags": [
-   null,
-   null,
-   null
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-20T12:47:06.390952+00:00",
-  "n_src": 900
- },
  "39c291d4dc46": {
   "lines": [
    "블루 라군 1억 1000만 달러 규모 기업공개 진행",
@@ -268,24 +26,6 @@
   "at": "2026-11-23T12:46:37.327240+00:00",
   "n_src": 900,
   "retry": true
- },
- "c956e5a3c351": {
-  "lines": [
-   "스택 오버플로 2026년 설문조사 응답 개발자 83% 인공지능 도구 사용"
-  ],
-  "tags": [
-   {
-    "scope": "sector",
-    "tickers": [],
-    "sector": "XLK",
-    "issue": "MARKET_STRUCTURE",
-    "dir": "neutral",
-    "stage": "done"
-   }
-  ],
-  "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-20T12:47:06.390952+00:00",
-  "n_src": 900
  },
  "b2f5f8ade58f": {
   "lines": [
@@ -3064,7 +2804,7 @@
  },
  "35460b7c3efe": {
   "lines": [
-   "2026년 미국 소비자들의 식료품 및 선물 비용 증가"
+   "2026년 미국 소비자들의 식품, 여행, 선물 비용 증가 전망"
   ],
   "tags": [
    {
@@ -3073,13 +2813,14 @@
     "sector": null,
     "issue": "MARKET_STRUCTURE",
     "dir": "neutral",
-    "stage": "done",
+    "stage": "talk",
     "price": true
    }
   ],
   "model": "gemini-3.5-flash-lite",
-  "at": "2026-11-25T21:46:30.306812+00:00",
-  "n_src": 900
+  "at": "2026-11-27T21:46:23.109133+00:00",
+  "n_src": 900,
+  "retry": true
  },
  "62bdeb72533b": {
   "lines": [
@@ -3894,6 +3635,193 @@
   ],
   "model": "gemini-3.5-flash-lite",
   "at": "2026-11-27T12:46:25.430719+00:00",
+  "n_src": 900
+ },
+ "6c48b6b88eca": {
+  "lines": [
+   "젠슨 황의 복귀로 인한 일시적 AI 랠리 발생"
+  ],
+  "tags": [
+   {
+    "scope": "stock",
+    "tickers": [
+     "NVDA"
+    ],
+    "sector": "SMH",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "positive",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-27T21:46:23.109133+00:00",
+  "n_src": 360
+ },
+ "1a6172d83cec": {
+  "lines": [
+   "노스 아틀란틱, 자금 조달 실패로 유럽에서 파산 신청",
+   "연중 연료 비용 상승으로 인한 노스 아틀란틱 운영 차질",
+   "수요일 수요일 노스 아틀란틱 주가 85% 하락 마감"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLY",
+    "issue": "CORP_EVENT",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLY",
+    "issue": "OIL_ENERGY",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLY",
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done",
+    "price": true
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-27T21:46:23.109133+00:00",
+  "n_src": 900
+ },
+ "d2aa545b6c5c": {
+  "lines": [
+   "메타·오픈아이·구글의 인공지능 쇼핑 에이전트 출시",
+   "아마존 등의 차단으로 인한 오토존 상품 주문 취소 발생"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLK",
+    "issue": "CORP_EVENT",
+    "dir": "positive",
+    "stage": "done"
+   },
+   {
+    "scope": "stock",
+    "tickers": [
+     "AMZN"
+    ],
+    "sector": "XLY",
+    "issue": "CORP_EVENT",
+    "dir": "negative",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-27T21:46:24.759348+00:00",
+  "n_src": 900
+ },
+ "b0afa8013bf9": {
+  "lines": [
+   "2월 12일 기준 3년 차 자동차 모델 100대당 204건의 문제 발생",
+   "10월 29일 기준 식기세척기 100대당 92건의 문제 기록",
+   "10월 29일 기준 드럼세탁기 100대당 91건의 문제 보고"
+  ],
+  "tags": [
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLY",
+    "issue": "GROWTH_JOBS",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLY",
+    "issue": "GROWTH_JOBS",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "sector",
+    "tickers": [],
+    "sector": "XLY",
+    "issue": "GROWTH_JOBS",
+    "dir": "negative",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-27T21:46:24.759348+00:00",
+  "n_src": 900
+ },
+ "f3a4333dccd4": {
+  "lines": [
+   "엔비디아의 더 트레이터스 우승 상금 24만 6300달러 획득"
+  ],
+  "tags": [
+   null
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-27T21:46:24.759348+00:00",
+  "n_src": 900
+ },
+ "c94df6fa2ace": {
+  "lines": [
+   "유럽연합 예산안 타협 결렬",
+   "예산 협상 12월 재개 예정",
+   "1조 7,300억 달러 규모의 예산안 편성"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "FISCAL_POLITICS",
+    "dir": "negative",
+    "stage": "done"
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "FISCAL_POLITICS",
+    "dir": "neutral",
+    "stage": "talk"
+   },
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "FISCAL_POLITICS",
+    "dir": "neutral",
+    "stage": "talk"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-27T21:46:26.084375+00:00",
+  "n_src": 900
+ },
+ "60d3ee50b135": {
+  "lines": [
+   "S&P 500 지수 11월 20일 조정 장세 진입"
+  ],
+  "tags": [
+   {
+    "scope": "market",
+    "tickers": [],
+    "sector": null,
+    "issue": "MARKET_STRUCTURE",
+    "dir": "neutral",
+    "stage": "done"
+   }
+  ],
+  "model": "gemini-3.5-flash-lite",
+  "at": "2026-11-27T21:46:26.084375+00:00",
   "n_src": 900
  }
 }
