@@ -102,7 +102,6 @@ ARCHIVE_SEED = [
 # 11-26 대조: 업계상황 탭 · Newfact 뉴스(글 · 홈 카드 · 사실) · 종목 새 카드 넷 · 회사 소개 안내 줄 · 늦은 날 상자 · 푸터 링크 = 블로그에 있음 → 발행 예정에서 뺌.
 PLAN = [   # (기능 이름, 남은 일 — 한 줄, 파일 패턴 "폴더/파일")
     ("한국 종목 실적 탭 새 카드 둘 (발표 때 예상을 넘었나? · 이익에 비해 주가 수준은?)", "미국 카드 틀 가져오기 — 주가 수준 비교 대상 A안(KOSPI 전체 · 3년) / B안(시총 상위 20개 순위) 고르기 → 수집(야후 실적 예상) · 화면 코드 · 이어가기 = 비공개 doc/기획/사이트-개선-방안.md 1-12 · 1-14", ["kr-stocks/mock_kr_value_*"]),
-    ("문장 속 종목 이름 링크 (모든 종목 이름 → 상세 페이지)", "모양 확정(검은 굵게 · 연한 회색 점선) · 주소 찾기 한 곳으로 · 종목 페이지 비교 종목 · ETF · 테마 · 전망 · 리포트 · 뉴스 · 시황 문장 · 간단 종목 끝, 홈 · 한국 홈 · 종목 모아보기는 이미 링크 → 남은 것 = 테마 붙여넣기(누를 때 연보라 · 마우스 올림 회색) · 이어가기 = 비공개 doc/기획/종목-이름-링크.md", ["stock-links/mock_stock_links.html"]),
     ("개성 있는 아이 찾기 게임 — 평범의 범위 · 설정으로 나온 답 · 그림 확인", "기준 설정(80% · 20일 간격)에서 나온 그룹 후보를 여덟 명씩 그림으로 확인 · 길잡이 = 비공개 doc/기획/종목-그래프-패턴-분류-목적.md", ["stock-character/mock_*.html"]),
     ("주식마을 3D (날씨 도시 · 마을 · 행성 시안)", "날씨 도시 판 모델링 · 연출 다듬기(물에 잠김 · 남은 날씨 7가지) → 방향 확정 뒤 휴대폰 발열 줄이기 5가지 · 날씨 기준 정하기 · Blogger 모듈 스크립트 시험 (흰 도시 · 3D 시험 1판은 11-24 사용자 삭제)", ["fantasy-world/mock_city_weather.html", "fantasy-world/mock_village_flat.html", "fantasy-world/mock_village_polish.html", "fantasy-world/mock_village_3d_v2.html"]),
     ("시장 지도 (업종 · 종목 네모 칸 지도, 손가락 확대 · 축소 · 전체 화면, 미국 · 한국 따로)", "목업 확인(사용자 판단) → 어디에 둘지 · 색 기준 정하기 → 한국 시가총액을 목록 파일에 채우기", ["market-map/mock_market_map_*"]),
@@ -122,6 +121,7 @@ PLAN_NOMOCK = [   # 목업 파일이 이 PC 에 없는 발행 예정 기능 — 
 LIVE = [
     ("홈 (미국 · 한국)", ["home-split/mock_menu_home_kr.html", "home-split/mock_menu_home_us.html", "home-split/mock_menu_item_kr.html"]),   # 11-27 새 헤더 · 전체 메뉴 · 푸터 확정 — 홈 둘 + 상세 페이지 푸터(삼성전자). 옛 mock_home_* 은 이 화면들의 재료(여정 테스트도 씀)
     ("증시 시황 글", ["market-commentary/mock_story.html", "market-commentary/mock_story_us.html"]),
+    ("문장 속 종목 이름 링크", ["stock-links/mock_stock_links.html"]),   # 모든 종목 이름 → 상세 페이지 (검은 굵게 · 연한 회색 점선), 1 ~ 4단계 · 테마 반영
     ("종목 모아보기", ["stock-lists/mock_stock-lists-live-kr.html", "stock-lists/mock_stock-lists-live-us.html"]),
     ("미국 종목 페이지", ["stock-radar/mock_NVDA.html", "stock-radar/mock_AAPL.html"]),
     ("한국 종목 페이지", ["kr-stocks/mock_005930.html", "kr-stocks/mock_000660.html"]),
