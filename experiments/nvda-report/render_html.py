@@ -2201,8 +2201,6 @@ def sector_flow_rule(sf):
     gap = f"반도체가 시장보다 {abs(rel):.1f}%p {'앞서' if rel > 0 else '뒤처져'}"
     if sf["state"] != "뚜렷하지 않음":
         how = f"{gap} {sf['state']}"
-    elif abs(rel) >= pp:
-        how = f"{gap} 있지만 ETF 주식 수 변화가 반대라 뚜렷하지 않음"
     else:
         how = "시장과 차이가 크지 않아 뚜렷하지 않음"
     rank = f". {sf['n_sectors'] + 1}개 분야(업종 {sf['n_sectors']}개와 반도체) 중 {sf['smh_rank']}위" if sf.get("smh_rank") and sf.get("n_sectors") else ""
@@ -2268,8 +2266,6 @@ def sector_flow_lines(sf):
     if secs:
         lines.append(("row", "앞선 섹터", "\n".join(f"{x['name']} {x['rel']:+.1f}%p" for x in secs[:2]), "시장보다 많이 오른 섹터"))   # 섹터마다 한 줄
         lines.append(("row", "뒤처진 섹터", "\n".join(f"{x['name']} {x['rel']:+.1f}%p" for x in secs[-2:][::-1]), "시장보다 내린 섹터"))
-    if sf.get("shares_5d") is not None:
-        lines.append(("row", "반도체 ETF 주식 수 (5일)", f"{sf['shares_5d']:+.1f}%", "늘면 유입 · 줄면 유출"))
     return lines
 
 
@@ -2451,7 +2447,7 @@ FLOW_SPAN = 10.0   # 반도체 자금 막대 양 끝 = −10 ~ +10%p, 가운데 
 def flow_gauge(sf, name="반도체"):
     """반도체 자금 막대. 0 이 가운데인 실제 비율 눈금 −FLOW_SPAN ~ +FLOW_SPAN %p, 세 칸 = 빠져나가는 중(−SPAN ~ −기준) |
     뚜렷하지 않음(−기준 ~ +기준) | 모이는 중(+기준 ~ +SPAN). 말풍선 = 반도체 ETF(SMH)의 S&P 500 대비 %p, 위치는 그 값(끝을 넘으면 끝).
-    진한 칸은 최종 판정 칸 — ETF 주식 수가 반대면 값은 바깥 칸이어도 판정은 가운데일 수 있다."""
+    진한 칸은 최종 판정 칸."""
     pp, rel, span = config.SECTOR_FLOW_PP, sf["rel_pp"], FLOW_SPAN
     pos = lambda v: (max(-span, min(span, v)) + span) / (2 * span) * 100   # noqa: E731
     x = pos(rel)

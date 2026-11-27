@@ -186,16 +186,8 @@ def flow_events(conn, day, s):
         out.append(_ev("Flows", "flows", f"장외 공매도 비율 {r:.0f}% (20일 평균 {avg:.0f}%)",
                        f"FINRA 보고 장외 거래 중 공매도 {r:.1f}%, 20일 평균 {avg:.1f}% (임계 ±{config.FINRA_SHORT_RATIO_DEV_PP:.0f}%p)",
                        direction="negative" if r > avg else "positive", source="finra"))
-    # 반도체 ETF 발행주식수 5거래일 변화 (2026-10-11 수집 시작)
-    for key, name in (("smh_shares_out", "SMH"), ("soxx_shares_out", "SOXX")):
-        cur = s.get(key)
-        prior = conn.execute(f"SELECT {key} AS v FROM daily_state WHERE day < ? AND {key} IS NOT NULL ORDER BY day DESC LIMIT 5", (day,)).fetchall()
-        if cur and len(prior) >= 5 and prior[-1]["v"]:
-            chg = (cur / prior[-1]["v"] - 1) * 100
-            if abs(chg) >= config.ETF_SHARES_5D_EVENT_PCT:
-                out.append(_ev("Flows", "flows", f"{name} 발행주식수 5일 {chg:+.1f}%",
-                               f"{prior[-1]['v'] / 1e6:,.2f}M → {cur / 1e6:,.2f}M주 (임계 ±{config.ETF_SHARES_5D_EVENT_PCT:.0f}%), ETF 자금 {'유입' if chg > 0 else '유출'}",
-                               direction="positive" if chg > 0 else "negative", source="yfinance"))
+    # 옛 `SMH · SOXX 발행주식수 5일 변화` 사건 — 2026-11-27 뺌. 야후 sharesOutstanding 이 여러 날 그대로라 평소엔 0%,
+    # 야후가 몇 주 만에 값을 고치는 날 가짜 '자금 유입 · 유출' 사건이 된다. 수집은 그대로(기록)
     return out
 
 
@@ -499,20 +491,14 @@ def _prev_from_meta(conn, key, day, cur):
 
 def sector_flow(conn, day, s):
     """반도체 자금 방향 — SMH가 20거래일 동안 S&P 500보다 ±SECTOR_FLOW_PP 이상 앞서면 '모이는 중', 뒤지면 '빠져나가는 중'.
-    SMH 발행주식수 5일 변화가 있고 방향이 반대면 '뚜렷하지 않음'으로 내린다. 같은 창에서 앞선 섹터·뒤처진 섹터 둘씩을 이름으로 돌려준다."""
+    (옛 확인: SMH 발행주식수 5일 변화가 반대면 '뚜렷하지 않음' — 2026-11-27 뺌. 야후 sharesOutstanding 이 여러 날 안 바뀌는 값이라 한 번도 걸리지 않았다.) 같은 창에서 앞선 섹터·뒤처진 섹터 둘씩을 이름으로 돌려준다."""
     n = config.SECTOR_FLOW_DAYS
     spy = [b["close"] for b in collect_market.bars(conn, config.BENCHMARK) if b["day"] <= day]
     rel = _rel_return(conn, config.SECTOR_FLOW_ETF, day, n, spy)
     if rel is None:
         return None
     state = "모이는 중" if rel >= config.SECTOR_FLOW_PP else "빠져나가는 중" if rel <= -config.SECTOR_FLOW_PP else "뚜렷하지 않음"
-    shares_5d = None   # 확인용: SMH 발행주식수 5거래일 변화 (쌓인 뒤)
-    cur = s.get("smh_shares_out")
-    prior = conn.execute("SELECT smh_shares_out AS v FROM daily_state WHERE day < ? AND smh_shares_out IS NOT NULL ORDER BY day DESC LIMIT 5", (day,)).fetchall()
-    if cur and len(prior) >= 5 and prior[-1]["v"]:
-        shares_5d = (cur / prior[-1]["v"] - 1) * 100
-        if state != "뚜렷하지 않음" and abs(shares_5d) >= config.ETF_SHARES_5D_EVENT_PCT and ((shares_5d > 0) != (state == "모이는 중")):
-            state = "뚜렷하지 않음"   # 가격 방향과 실제 자금이 엇갈림
+    shares_5d = None   # 화면 · 판정에 안 씀(2026-11-27) — 야후 ETF 주식 수가 멈춘 값. 수집(smh_shares_out)은 기록이 끊기지 않게 그대로
     sectors = []
     for etf, name in config.SECTOR_ETFS.items():
         r = _rel_return(conn, etf, day, n, spy)
