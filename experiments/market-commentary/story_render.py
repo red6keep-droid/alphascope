@@ -243,8 +243,8 @@ def points(items, link, pad=dk.ALIGN_PX):
         if re.fullmatch(r"\d{1,2}:\d{2}", when.strip()) and "첫 반응" in what:
             when = ""   # 장 시작 줄의 시각은 뺀다
         lead = f'<b style="color:#111;">{dk.esc(when)}</b> : ' if when else ""
-        rows.append(dk.dot_li(lead + emph(link(directional(dk.tint(dk.esc(what)))), False), lh=32, margin="12px 0").replace("font-size:18px;", "", 1))   # 행간 35 → 32 — dot_li 가 행간 32 에 박는 18px 은 뺀다(글자는 ul 의 본문 −1)
-    return f'<ul style="list-style:none;margin:-12px 0;padding:0 0 0 {pad}px;font-size:calc(1em - 1px);{BODY_WRAP}">{"".join(rows)}</ul>'   # 줄바꿈 = 본문처럼 글자 단위   # 글자 = 본문보다 1 작게 · 음수 = 첫 · 끝 줄 12 지우기 (카드 안)
+        rows.append(dk.dot_li(lead + emph(link(directional(dk.tint(dk.esc(what)))), False), lh=30, margin="9px 0"))   # 행간 30 · 문장 사이 9 (글자는 ul 의 본문 −1)
+    return f'<ul style="list-style:none;margin:-9px 0;padding:0 0 0 {pad}px;font-size:calc(1em - 1px);{BODY_WRAP}">{"".join(rows)}</ul>'   # 줄바꿈 = 본문처럼 글자 단위   # 글자 = 본문보다 1 작게 · 음수 = 첫 · 끝 줄 12 지우기 (카드 안)
 
 
 def md(iso):
@@ -305,7 +305,7 @@ def cmp_bits(chg, base, base_chg, usual=None):
     return bits
 
 
-def stock_row(x, row, slot, first, inline_sub=False, small=False, below=""):
+def stock_row(x, row, slot, first, inline_sub=False, small=False, below="", below_gap=6):
     """종목 줄 = 종목 모아보기 규칙: 로고 35 · 이름 16 굵게 · 보조 줄 14 회색(한국 = 업종, 미국 = 티커 · 업종) │ 오른쪽 증감 17 굵게 위 · 가격 15 증감 색 아래. 줄 전체가 그 종목 페이지로."""
     t, v = str(x.get("ticker") or ""), x["chg_pct"]
     sec = (row or {}).get("s") or ""
@@ -322,7 +322,7 @@ def stock_row(x, row, slot, first, inline_sub=False, small=False, below=""):
                 f'<span style="min-width:0;flex:1 1 auto;margin-top:5.5px;"><span style="display:block;font-size:16px;line-height:24px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'
                 f'<span style="font-weight:700;color:#111;">{dk.esc(x["name"])}</span>'
                 + (f'<span style="margin-left:6px;font-size:{dk.TINY};color:#6B7280;">{dk.esc(sub)}</span>' if sub else "") + '</span>'
-                + (f'<span style="display:block;margin-top:6px;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:#6B7280;white-space:normal;word-break:keep-all;">{below}</span>' if below else "")
+                + (f'<span style="display:block;margin-top:{below_gap}px;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:#6B7280;white-space:normal;word-break:keep-all;">{below}</span>' if below else "")
                 + '</span></span>')
     else:
         left = (f'<span style="display:flex;align-items:center;min-width:0;flex:1 1 auto;"><span style="flex:none;display:flex;align-items:center;">{logo(t, row)}</span>'
@@ -349,13 +349,16 @@ def white_card(inner):
     return f'<div data-cards="1" style="margin:0 0 8px;"><span style="display:block;background:#fff;border:1px solid #E2E8F0;border-radius:8px;overflow:hidden;">{inner}</span></div>'
 
 
-def sector_name(x, check):
+def sector_name(x, check, below=""):
     """업종 줄 왼쪽 = 업종 그림(기본형 회색 원, 종목 로고와 같은 35 · 이름과 11) + 이름 16 굵게 │ 볼 것 14 회색.
-    볼 것은 이름 옆에 이어 쓰고 칸이 모자랄 때만 저절로 다음 줄로 — 둘째 줄은 그림 아래로 들어가지 않는다. 그림이 없는 업종 이름은 추세선."""
+    볼 것은 이름 옆에 이어 쓰고 칸이 모자랄 때만 저절로 다음 줄로 — 둘째 줄은 그림 아래로 들어가지 않는다. 그림이 없는 업종 이름은 추세선.
+    below = 이름 아래 회색 비교 줄(종목 줄과 같은 꼴 · 간격 3)."""
     ic = dk.soft_icon(dk.sector_icon_name(x["name"]) or ("trend" if x["chg_pct"] >= 0 else "trend_down"), LOGO_Z)
     sub = (f'<span style="font-weight:400;color:{dk.SUB};font-size:{dk.TINY};line-height:{dk.LH_TINY};">{dk.VSEP}{check}</span>') if check else ""
+    cmp = (f'<span style="display:block;margin-top:3px;font-weight:400;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:#6B7280;'
+           f'white-space:normal;word-break:keep-all;">{below}</span>') if below else ""
     return (f'<span style="display:flex;align-items:center;gap:{LOGO_GAP}px;"><span style="flex:none;display:flex;">{ic}</span>'
-            f'<span style="min-width:0;">{dk.esc(x["name"])}{sub}</span></span>')
+            f'<span style="min-width:0;">{dk.esc(x["name"])}{sub}{cmp}</span></span>')
 
 
 def render(column, briefing, banner_url=None, banner_alt="", lists_live=True, lists=None, mood_base=MOOD_BASE, theme="flow"):
@@ -453,7 +456,9 @@ def render(column, briefing, banner_url=None, banner_alt="", lists_live=True, li
         mk += soft_card(plain, margin=f"0 0 {CARD_GAP}px", bg=tb, left=14 + 5 + 3,   # 글 앞 여백 +5 +3 = 22
                           style=f"font-size:{FLOW_FS};line-height:{FLOW_LH};font-weight:700;color:{ti};")
     if secs:   # 업종 = 흰 카드 줄(구분선 17), 제목 줄 없음
-        rows = [(sector_name(x, emph(dk.esc(checks.get(x["name"]) or ""), False)), f'<span style="font-size:16px;">{chg(x["chg_pct"])}</span>', "", 78) for x in secs]   # 왼쪽 78% — 볼 것이 이름 옆 한 줄에 들어갈 자리 · 증감 16 = 아래 종목 줄 증감(stock_row small)과 같게
+        sb = "S&P 500" if slot == "am" else "코스피"   # 업종도 종목 줄처럼 대표 지수와 견준 회색 줄(헌법 제1조)
+        sbc = next((x["chg_pct"] for x in indices if x.get("name") == sb and x.get("chg_pct") is not None), None)
+        rows = [(sector_name(x, emph(dk.esc(checks.get(x["name"]) or ""), False), dk.esc(" · ".join(cmp_bits(x["chg_pct"], sb, sbc)))), f'<span style="font-size:16px;">{chg(x["chg_pct"])}</span>', "", 78) for x in secs]   # 왼쪽 78% — 볼 것이 이름 옆 한 줄에 들어갈 자리 · 증감 16 = 아래 종목 줄 증감(stock_row small)과 같게
         if lists_live:
             c = dk.ccard(rows[:TOP_N], pad=pad)
             k = c.rindex("</span></div>")
@@ -469,7 +474,7 @@ def render(column, briefing, banner_url=None, banner_alt="", lists_live=True, li
             r = lists.get(str(x.get("ticker") or "").upper()) or {}
             return x.get("usual") or (r.get("w") if r.get("d") == td else None)
         inner = "".join(stock_row(x, lists.get(str(x.get("ticker") or "").upper()), slot, i == 0, inline_sub=True, small=True,
-                                  below="<br>".join(dk.esc(y) for y in cmp_bits(x["chg_pct"], bname, bchg, usual(x))))
+                                  below="<br>".join(dk.esc(y) for y in cmp_bits(x["chg_pct"], bname, bchg, usual(x))), below_gap=3)
                         for i, x in enumerate(shown))
         mk += white_card(inner + (tail("오늘 움직인 종목 전체 보기", "오늘 움직임") if lists_live else ""))
     if mk:
