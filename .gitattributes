@@ -1,0 +1,2 @@
+# git 훅은 sh 가 읽는다 — Windows 에서도 줄바꿈을 LF 로
+.githooks/* text eol=lf

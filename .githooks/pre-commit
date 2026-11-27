@@ -1,0 +1,3 @@
+#!/bin/sh
+# 헌법 제11조 검사 — 이번 커밋에 더한 줄
+exec python .githooks/check_public.py pre-commit

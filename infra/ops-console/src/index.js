@@ -425,6 +425,89 @@ function simplePage(title, msg, withLogin) {
 <body><main><div class="solo"><h1>${T(title)}</h1><p>${T(msg)}</p>${withLogin ? `<p><a class="dark" href="/login">GitHub로 로그인</a></p>` : ""}</div></main></body></html>`;
 }
 
+// ---------------------------------------------------------------- 메모 (운영자가 찾은 문제 · 리스크 → Claude 가 점검해 답을 단다)
+// 저장 = KV memo:all 한 키 { next, items: [{ id, kind, text, at, by, status, log: [{ at, by, status, note }] }] } — 지우지 않는다(만료 없음).
+// 화면 = build_ops.py 가 만든 dash:html 의 <!--MEMO_LIST--> · <!--RISK_MEMOS--> · <!--MEMO_OPTIONS--> 자리를 보낼 때 채운다.
+// 카드 조각은 같은 페이지의 <!--MEMO_TPL {json} MEMO_TPL--> (디자인 규칙 원본 design_kit 에서 잘라 온 것).
+const MEMO_KEY = "memo:all";
+const MEMO_MAX = 4000;
+const MEMO_STATES = ["열림", "확인 중", "보류", "해결"];
+const MEMO_OPEN = new Set(["열림", "확인 중", "보류"]);
+const MEMO_TAB = "/#tab-%EB%A9%94%EB%AA%A8";
+
+async function loadMemos(env) {
+  const m = env.OPS_KV ? await env.OPS_KV.get(MEMO_KEY, "json") : null;
+  return m && Array.isArray(m.items) ? m : { next: 1, items: [] };
+}
+
+const kstStamp = (iso) => {
+  const d = new Date(Date.parse(iso) + 9 * 3600e3);
+  return `${d.getUTCMonth() + 1}.${d.getUTCDate()} ${String(d.getUTCHours()).padStart(2, "0")}:${String(d.getUTCMinutes()).padStart(2, "0")}`;
+};
+const who = (by) => (by === "Claude" ? "Claude" : "관리자");
+const lines = (s) => esc(s).replace(/\r?\n/g, "<br>");
+
+function memoCard(tpl, list, empty) {
+  // 바꿀 글은 함수로 넘긴다 — 문자열로 넘기면 메모 속 `$&` · `$'` 가 특수 문자로 읽힌다
+  const put = (s, k, v) => s.replace(k, () => v);
+  if (!list.length) return tpl.open + put(put(put(tpl.first, "__N__", esc(empty)), "__V__", ""), "__S__", "") + tpl.close;
+  const rows = list.map((x, i) => {
+    const log = (x.log || []).map((l) => `${kstStamp(l.at)} ${who(l.by)}${l.status ? ` · ${esc(l.status)}` : ""}${l.note ? ` — ${lines(l.note)}` : ""}`);
+    const sub = [`#${x.id} · ${esc(x.kind)} · ${kstStamp(x.at)} ${who(x.by)}`, ...log].join("<br>");
+    const pill = put(tpl.pill[x.status] || tpl.pill["열림"], "__T__", esc(x.status));
+    return put(put(put(i ? tpl.next : tpl.first, "__N__", lines(x.text)), "__V__", pill), "__S__", sub);
+  });
+  return tpl.open + rows.join(" ") + tpl.close;
+}
+
+async function fillMemos(dash, env) {
+  const m = dash.match(/<!--MEMO_TPL ([\s\S]*?) MEMO_TPL-->/);
+  if (!m) return dash;
+  let tpl;
+  try { tpl = JSON.parse(m[1]); } catch { return dash; }
+  const { items } = await loadMemos(env);
+  const order = (x) => (x.status === "열림" ? 0 : x.status === "확인 중" ? 1 : x.status === "보류" ? 2 : 3);
+  const sorted = [...items].sort((a, b) => order(a) - order(b) || b.id - a.id);
+  const open = sorted.filter((x) => MEMO_OPEN.has(x.status));
+  const done = sorted.filter((x) => !MEMO_OPEN.has(x.status));
+  // 해결한 메모 — 5개 펼침 + 나머지 접기(버리지 않음)
+  const doneHtml = done.length
+    ? memoCard(tpl, done.slice(0, 5), "") + (done.length > 5 ? `<details style="margin:0 0 8px;"><summary style="cursor:pointer;font-size:14px;line-height:20px;color:#6B7280;margin:0 0 8px;">해결한 메모 ${done.length - 5}개 더 보기</summary>${memoCard(tpl, done.slice(5), "")}</details>` : "")
+    : "";
+  const list = memoCard(tpl, open, "열린 메모가 없습니다") + doneHtml;
+  const risks = memoCard(tpl, open.filter((x) => x.kind === "리스크"), "적어 둔 리스크가 없습니다");
+  const options = sorted.map((x) => `<option value="${x.id}">#${x.id} ${esc(x.status)} · ${esc(String(x.text).slice(0, 40))}</option>`).join("");
+  return dash.replace(m[0], () => "").replace("<!--MEMO_LIST-->", () => list).replace("<!--RISK_MEMOS-->", () => risks).replace("<!--MEMO_OPTIONS-->", () => options);
+}
+
+async function memoPost(req, url, env, session) {
+  // 같은 주소에서 온 양식만 — 쿠키는 SameSite=Lax 라 다른 사이트 POST 엔 안 실리지만 한 번 더 막는다
+  const origin = req.headers.get("Origin");
+  if (origin && origin !== url.origin) return deny("다른 곳에서 온 요청입니다.", 403);
+  if (!env.OPS_KV) return deny("저장소(KV)가 연결되지 않았습니다.", 500);
+  const f = await req.formData();
+  const text = String(f.get(url.pathname === "/memo" ? "text" : "note") || "").trim();
+  if (text.length > MEMO_MAX) return deny(`메모는 ${MEMO_MAX.toLocaleString()}자까지입니다 (지금 ${text.length.toLocaleString()}자). 나눠서 남겨 주세요.`, 400);
+  const m = await loadMemos(env);
+  const at = new Date().toISOString();
+  const by = String(session.login);
+  if (url.pathname === "/memo") {
+    if (!text) return deny("메모 내용이 비었습니다.", 400);
+    const kind = f.get("kind") === "리스크" ? "리스크" : "문제";
+    m.items.push({ id: m.next, kind, text, at, by, status: "열림", log: [] });
+    m.next += 1;
+  } else {
+    const x = m.items.find((i) => String(i.id) === String(f.get("id")));
+    if (!x) return deny("그 메모를 찾지 못했습니다.", 400);
+    const status = MEMO_STATES.includes(String(f.get("status"))) ? String(f.get("status")) : "";
+    if (!status && !text) return deny("바꿀 상태나 덧붙일 말을 넣어 주세요.", 400);
+    if (status) x.status = status;
+    x.log = [...(x.log || []), { at, by, status, note: text }];
+  }
+  await env.OPS_KV.put(MEMO_KEY, JSON.stringify(m));
+  return redirect(MEMO_TAB);
+}
+
 const HEADERS = {
   "Content-Type": "text/html; charset=utf-8",
   "Cache-Control": "no-store",
@@ -445,17 +528,19 @@ export default {
     if (missing.length) return deny(`로그인 설정이 없습니다 (${missing.join(" · ")}).`);
     const url = new URL(req.url);
     if (req.method === "POST" && url.pathname === "/fb-login") return firebaseLogin(req, c);
-    if (req.method !== "GET") return deny("허용되지 않는 요청입니다.", 405);
+    const memoWrite = req.method === "POST" && (url.pathname === "/memo" || url.pathname === "/memo/note");
+    if (req.method !== "GET" && !memoWrite) return deny("허용되지 않는 요청입니다.", 405);
     if (url.pathname === "/login") return startLogin(url, c);
     if (url.pathname === "/callback") return finishLogin(req, url, c);
     if (url.pathname === "/logout") return redirect("/signed-out", [setCookie(SESSION_COOKIE, "", 0)]);
     if (url.pathname === "/signed-out") return new Response(simplePage("로그아웃", "로그아웃했습니다.", true), { headers: HEADERS });
     const session = await readSession(req, c);
     if (!session) return new Response(simplePage("운영 현황", "관리자만 볼 수 있습니다. 블로그 오른쪽 메뉴의 운영 현황으로 들어오면 블로그 구글 로그인으로 열립니다.", true), { status: 401, headers: HEADERS });
+    if (memoWrite) return memoPost(req, url, env, session);
     if (url.pathname === "/") {
       // 운영 대시보드 — 블로그 테마 CSS · JS 로 감싼 한 페이지라 인라인 스크립트를 허용한다(외부 연결 · 다른 곳 전송은 막음)
       const dash = env.OPS_KV ? await env.OPS_KV.get("dash:html") : null;
-      if (dash) return new Response(dash, { headers: DASH_HEADERS });
+      if (dash) return new Response(await fillMemos(dash, env), { headers: DASH_HEADERS });
       return redirect("/runs");
     }
     if (url.pathname === "/ontime") {

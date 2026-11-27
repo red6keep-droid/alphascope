@@ -1,0 +1,3 @@
+#!/bin/sh
+# 헌법 제11조 검사 — 커밋 메시지
+exec python .githooks/check_public.py commit-msg "$1"

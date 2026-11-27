@@ -1,4 +1,4 @@
-"""운영 대시보드 — 실제 자료로 그린다 (2026-11-13 사용자 "이대로 블로그 발행해줘" → "시작해").
+"""운영 대시보드 — 실제 자료로 그린다.
 
     python experiments/ops-dashboard/build_ops.py                       → output/ops.html (로컬 확인)
     python experiments/ops-dashboard/build_ops.py --state-heads FILE --upload   → KV dash:html (워크플로 ops-dashboard.yml)
@@ -57,6 +57,14 @@ WORKFLOWS = [
     ("홈 뉴스", "news.yml", "06:45", (0, 1, 2, 3, 4, 5, 6)),
     ("집 IP 받기 (미래에셋 · 버리)", "home-ip.yml", "14:30", (0, 1, 2, 3, 4, 5, 6)),   # 2026-11-17 집 공유기 VPN
     ("간단 종목 한국 DART 새벽 받기", "quick-dart.yml", "03:25", (0, 1, 2, 3, 4, 5, 6)),   # 2026-11-20 — 장 마감 뒤 실행에서 뺌(GitHub cron)
+    # 하루 여러 번 도는 것은 첫 예약 시각만(그 뒤 실행은 같은 줄 `n번` 으로 셈)
+    ("간단 종목 뉴스", "quick-news.yml", "06:20", (1, 2, 3, 4, 5)),
+    ("간단 종목 853 주가", "quick-data.yml", "08:20", (1, 2, 3, 4, 5)),   # 미국 08:20(화~토) · 한국 16:40(평일)
+    ("증시 시황 해설", "commentary.yml", "08:40", (0, 1, 2, 3, 4, 5, 6)),   # 아침 08:40 · 저녁 17:00(평일) · 21:00
+    ("한국 기사 공용 저장소", "kr-facts.yml", "09:20", (0, 1, 2, 3, 4, 5, 6)),   # 09:20 · 12:20 · 15:20(평일) · 18:20
+    ("Newfact 뉴스 발행", "news-posts.yml", "09:50", (0, 1, 2, 3, 4, 5, 6)),   # 09:50 · 13:50 · 16:10(평일, 기준일 고치기) · 18:50 · 22:50
+    ("간단 종목 새 페이지", "quick-shells-new.yml", "23:40", (0, 1, 2, 3, 4, 5, 6)),
+    ("기록 사본", "state-backup.yml", "23:40", (0, 1, 2, 3, 4, 5, 6)),
     ("트럼프 기록", "trump-trend.yml", "", ()),
     ("소송 조사", "court-survey.yml", "", ()),
     ("Gemini 모델 점검", "gemini-model-check.yml", "", ()),
@@ -84,7 +92,12 @@ SCREEN_FILES = [
     ("한국 증시 리포트 카드", "cards/kr-report.json", "한국 장 마감 뒤"),
     ("인물 발언 카드", "cards/radar.json", "매일 아침"),
     ("증시 전망 카드", "hypo.json", "매일 아침"),
+    # themes.json 은 바뀐 날만 올라가 시각으로 늦음을 가리지 못해 넣지 않음
+    ("Hot Issue 카드", "issues.json", "매일 아침"),
+    ("Newfact 주요 기사 카드", "news-posts.json", "하루 4번 (09:50 · 13:50 · 18:50 · 22:50)"),
+    ("한국 기사 사실 (kr-facts)", "kr-facts.json", "하루 2~4번 (09:20 ~ 18:20)"),
 ]
+STALE_HOURS = {"news.json": 16, "news-posts.json": 16, "kr-facts.json": 16}   # 밤 사이 가장 긴 빈틈 + 여유. 그 밖은 30시간
 
 # 지금의 실패 줄 규칙 = ops_log._WARN 과 같게 (import 하면 이 실행도 운영 기록을 남긴다). 이미 쌓인 기록을 다시 거른다 — `40건` · `신규 0건` 오탐 (2026-11-21)
 WARN_NOW = re.compile(r"실패|::warning::|::error::|Forbidden|Traceback|오류|에러|중단|(?<![\d,.])(?<!신규 )(?<!변경 )0건|없음 —")
@@ -104,6 +117,8 @@ BRANCHES = [
     ("미국 증시 리포트", "report-state", 30), ("엔비디아 · 종목", "nvda-state", 30), ("한국 종목", "kr-state", 30),
     ("인물 발언", "radar-state", 30), ("방송 기록", "media-state", 30), ("댓글", "comment-state", 30),
     ("트럼프 기록", "trump-state", 0), ("소송 조사", "court-survey", 0), ("한국 그림", "kr-images", 30), ("인물 그림", "radar-images", 30),
+    # 비공개 상태 저장소의 기록 브랜치 — 워크플로가 --state-heads 로 넘긴다
+    ("한국 기사 사실", "kr-facts", 30), ("Newfact 뉴스 기록", "news-posts", 30), ("뉴스 분류 기록", "news-records", 30),
 ]
 
 
@@ -216,7 +231,7 @@ def kv_records(days):
     return out
 
 
-# 주기 자료 (feed_log.feed 가 KV feed:<이름> 에 남긴다, 2026-11-13 사용자 "잘 받고 있는지 모니터링") — 기록이 아직 없어도 줄은 보인다
+# 주기 자료 — 기록이 아직 없어도 줄은 보인다
 FEEDS = ["국민연금 대량보유 내역", "국민연금 국내주식 투자 현황", "한국 ETF 구성 · 보수 (운용사)", "미국 ETF 구성 · 보수 (야후)", "증권사 목표가 (텔레그램)", "집 IP 받기 (VPN)", "업종 · 세부 업종 ETF 순자산 (야후)"]
 
 
@@ -315,6 +330,7 @@ class Issues:
         self.area = {}          # 영역 → (값HTML, 보조)
         self.need = 0
         self.watch = 0
+        self.limits = []        # 리스크 탭 `한도 여유` — (이름, 쓴 비율, 값 문구, 보조)
 
     def add(self, name, value_html, sub, need=True):
         self.todo.append((name, value_html, sub))
@@ -342,7 +358,7 @@ def screen_tab(now, I):
             rows.append(("row", name, warn("시각 없음"), rule))
             continue
         else:
-            limit = {"news.json": 16}.get(path)
+            limit = STALE_HOURS.get(path)
             stale = ((now - t).total_seconds() / 3600 > limit) if limit else (biz_hours_since(t, now) > 30 if path in ("data.json", "cards/report.json") else (now - t).total_seconds() / 3600 > 30)
             val = over(ago(t, now)) if stale else ago(t, now)
         if stale:
@@ -386,7 +402,8 @@ def run_rows(runs, recs_by_run, now, I):
     rows, bad, done, expected = [], [], 0, 0
     for name, f, at, days in WORKFLOWS:
         rs = sorted(runs.get(f) or [], key=lambda r: r["created_at"])
-        due = now.weekday() in days and at and now.strftime("%H:%M") >= (dt.datetime.strptime(at, "%H:%M") + dt.timedelta(minutes=90)).strftime("%H:%M")
+        # 분으로 비교 — 예정 + 90분이 자정을 넘기면 오늘은 판정하지 않음
+        due = bool(now.weekday() in days and at and now.hour * 60 + now.minute >= int(at[:2]) * 60 + int(at[3:]) + 90)
         if now.weekday() in days and at:
             expected += 1
         if not rs:
@@ -573,6 +590,8 @@ def ai_tab(now, recs2, I):
         frac = n / limit if limit else 0
         vals.append(v)
         rows.append((name, frac, v, sub))
+        if limit:
+            I.limits.append((f"AI · {name}", frac, v, sub))
         if limit and frac >= 0.8:
             hot.append(name)
             heads.append(("row", name, over(v), sub))
@@ -627,6 +646,8 @@ def record_tab(now, heads, I):
         I.add("기록 브랜치 늦음", warn(f"{len(late)}곳"), " · ".join(late))
     I.area["기록"] = ((warn(), f"{len(late)}곳 늦음") if late else (ok(), f"상태 브랜치 {len(rows)}개 기준 안")) if heads is not None else (warn("읽지 못함"), "상태 저장소")
     size, err = safe(gh_pages_size)
+    if size:
+        I.limits.append(("gh-pages 크기", size[0] / 50, f"{size[0]:.1f} / 50MB", "jsDelivr 가 읽는 상자 약 50MB"))
     hist = kv_get_json("dash:hist") or {}
     if size:
         hist[now.date().isoformat()] = round(size[0], 2)
@@ -649,8 +670,8 @@ def record_tab(now, heads, I):
 
 
 def records_status_card(now, st=None):
-    """기록 현황 — 기록 대장 줄마다 처음 · 마지막 날짜 · 쌓인 양 (2026-11-24 사용자 "기록 탭에 기록현황").
-    재료 = KV dash:records(밤 기록 사본 실행이 experiments/record_status.py 로 센 것). 알림 · `지금 문제` 줄은 넣지 않는다(사용자 "빠진 날 알리지마")."""
+    """기록 현황 — 기록 대장 줄마다 처음 · 마지막 날짜 · 쌓인 양.
+    재료 = KV dash:records(밤 기록 사본 실행이 experiments/record_status.py 로 센 것). 알림 · `지금 문제` 줄은 넣지 않는다."""
     if st is None:
         st = kv_get_json("dash:records")
         p = os.environ.get("RECORDS_LOCAL", "").strip()   # 로컬 목업 확인용 — record_status.py --out 파일 (FEED_LOCAL 과 같은 방식)
@@ -689,7 +710,7 @@ def forecast_tab(now, I):
     live = j.get("open") or []
     done = j.get("done_count") or {}
     rows = [(x.get("title", ""), "미국" if x.get("market") == "us" else "한국", f"등록 {x.get('posted', '')} · {x.get('event', '')}") for x in live]
-    stalled = (j.get("ops") or {}).get("stalled") or []   # 판정이 멈춘 전망 — forecast_daily(event_results.stalled)가 hypo.json ops 에 (2026-11-22 사용자: 엔비디아 전망이 11.16 에서 멈췄는데 안 잡혔다)
+    stalled = (j.get("ops") or {}).get("stalled") or []   # 판정이 멈춘 전망 — forecast_daily(event_results.stalled)가 hypo.json ops 에
     I.area["증시 전망"] = ((warn(f"판정 멈춤 {len(stalled)}건"), " · ".join(x.get("title", "") for x in stalled)[:60]) if stalled else
                           (V(f"{len(live)}건"), "진행 중 · 끝난 " + " · ".join(f"{'미국' if k == 'us' else '한국'} {v}" for k, v in done.items())))
     stall_rows = [(x.get("title", ""), warn("판정 멈춤"), x.get("why", "")[:80]) for x in stalled]
@@ -705,8 +726,105 @@ def forecast_tab(now, I):
             + dk.sub_label("끝난 전망") + white_card([(f"{'미국' if k == 'us' else '한국'}", V(f"{v}건"), "목록의 끝난 전망") for k, v in done.items()] or [("끝난 전망", "없음", "")]))
 
 
+# ---------------------------------------------------------------- 리스크 · 메모
+# 리스크 = 아직 깨지지 않았지만 곧 문제가 될 곳. 자동 = 한도 여유 · 되풀이 실패, 적어 둔 리스크 = 메모 탭에서 종류 `리스크` 로 쓴 것.
+# 메모 = 운영자가 찾은 문제를 적고 Claude 가 점검 · 답을 다는 곳. 저장 = KV memo:all (지우지 않음, 관리자 Worker 만 읽고 씀).
+# 메모 목록은 Worker 가 화면을 보낼 때 <!--MEMO_LIST--> · <!--RISK_MEMOS--> · <!--MEMO_OPTIONS--> 자리에 채운다 — 쓰자마자 보이게.
+MEMO_KEY = "memo:all"
+MEMO_TAB_URL = "/#tab-%EB%A9%94%EB%AA%A8"   # #tab-메모
+OPEN_STATES = ("열림", "확인 중", "보류")
+
+
+def week_fails(now):
+    """정기 실행마다 최근 7일 실패 — {파일: [실패 시각 …]}. 워크플로마다 GitHub API 1번."""
+    since = (now - dt.timedelta(days=7)).astimezone(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    out = {}
+    for _, f, _, _ in WORKFLOWS:
+        j = gh(f"/actions/workflows/{f}/runs", {"created": f">={since}", "status": "failure", "per_page": 100})
+        out[f] = [parse_time(r["created_at"]) for r in j.get("workflow_runs") or []]
+    return out
+
+
+def risk_tab(now, I, fails, kv_writes):
+    limits = list(I.limits)
+    if kv_writes is not None:
+        limits.append(("Cloudflare KV 쓰기 (오늘, 추정)", kv_writes / 1000, f"{kv_writes:,} / 1,000건",
+                       "운영 기록 · 대시보드 · 메모 · 주기 자료가 같은 KV 를 씀 · 하루 1,000건 무료"))
+    limits.sort(key=lambda r: -r[1])
+    hot = [r for r in limits if r[1] >= 0.8]
+    lrows = [(n, over(f"{f * 100:.0f}%") if f >= 0.8 else V(f"{f * 100:.0f}%"), f"{v} · {s}") for n, f, v, s in limits]
+
+    rep, frows = [], []
+    if fails is None:
+        frows = [("최근 7일 실패", warn("읽지 못함"), "GitHub 실행 목록")]
+    else:
+        for name, f, _, _ in WORKFLOWS:
+            ts = sorted(t for t in fails.get(f) or [] if t)
+            if len(ts) >= 2:
+                rep.append(name)
+                frows.append((name, warn(f"{len(ts)}번"), f"{f.replace('.yml', '')} · " + " · ".join(f"{md(t)} {hm(t)}" for t in ts)))
+        frows = frows or [("되풀이 실패", ok("없음"), "최근 7일 같은 실행이 2번 넘게 실패한 곳 없음")]
+    for n in rep:
+        I.add(f"{n} 되풀이 실패", warn("리스크"), "리스크 탭 → 되풀이 실패", need=False)
+    bits = ([f"한도 80% 넘음 {len(hot)}곳"] if hot else []) + ([f"되풀이 실패 {len(rep)}곳"] if rep else [])
+    I.area["리스크"] = (warn(f"{len(hot) + len(rep)}곳"), " · ".join(bits)) if bits else (ok(), "한도 여유 · 되풀이 실패 없음")
+    lead = ("곧 문제가 될 곳입니다. " + " · ".join(bits) + ".") if bits else "한도는 모두 80% 아래이고, 최근 7일 되풀이해 실패한 실행이 없습니다."
+    head = QC.question_card("곧 문제가 될 곳은?", " · ".join(bits) if bits else "없음", "neutral", "#111",
+                            [(lead, "plain")] + [("row", *r) for r in (lrows[:len(hot)] + frows[:len(rep)])], opened=True)
+    return (dk.h2("리스크", tab="리스크") + head
+            + dk.sub_label("한도 여유", "하루 한도 · 저장 한도 가운데 이미 쓴 비율. 80% 를 넘으면 주황.")
+            + white_card(lrows or [("한도", warn("읽지 못함"), "")], fold_at=5, noun="한도")
+            + dk.sub_label("되풀이 실패", "최근 7일 같은 정기 실행이 2번 넘게 실패. 한 번은 우연, 되풀이는 원인이 남아 있다는 뜻.")
+            + white_card(frows, fold_at=5, noun="실행")
+            + dk.sub_label("적어 둔 리스크", "메모 탭에서 종류를 `리스크` 로 쓴 것 가운데 해결되지 않은 것.")
+            + "<!--RISK_MEMOS-->")
+
+
+FIELD = ("display:block;box-sizing:border-box;width:100%;margin:0 0 8px;padding:12px;border:1px solid #E2E8F0;border-radius:8px;"
+         "background:#fff;color:#111;font:inherit;font-size:16px;line-height:24px;")
+BUTTON = ("display:inline-block;background:#111;border:1px solid #111;color:#fff;border-radius:8px;font-size:16px;font-weight:700;"
+          "line-height:24px;padding:10px 32px;cursor:pointer;")
+
+
+def memo_tab(memos):
+    items = (memos or {}).get("items") or []
+    n_open = sum(x.get("status") in OPEN_STATES for x in items)
+    lead = ("운영하다 찾은 문제를 적어 두면 Claude 가 점검해 원인 · 고친 것을 그 메모에 답으로 답니다. "
+            "메모와 답은 지우지 않고 쌓입니다(관리자만 보는 저장소, 해결한 건은 비공개 문서 저장소에도 한 줄).")
+    new_form = (f'<form method="post" action="/memo" style="margin:0 0 8px;">'
+                f'<select name="kind" aria-label="종류" style="{FIELD}"><option value="문제">문제 — 지금 안 되는 것</option>'
+                f'<option value="리스크">리스크 — 아직 괜찮지만 곧 문제가 될 것</option></select>'
+                f'<textarea name="text" rows="4" required maxlength="4000" placeholder="무엇을 봤나요? 어느 화면 · 몇 시 · 무엇이 이상한지" style="{FIELD}"></textarea>'
+                f'<button type="submit" style="{BUTTON}">메모 남기기</button></form>')
+    note_form = (f'<form method="post" action="/memo/note" style="margin:0 0 8px;">'
+                 f'<select name="id" required aria-label="메모" style="{FIELD}"><!--MEMO_OPTIONS--></select>'
+                 f'<select name="status" aria-label="상태" style="{FIELD}"><option value="">상태 그대로</option>'
+                 + "".join(f'<option value="{s}">{s}</option>' for s in ("열림", "확인 중", "보류", "해결")) +
+                 f'</select><textarea name="note" rows="3" maxlength="4000" placeholder="덧붙일 말 (선택)" style="{FIELD}"></textarea>'
+                 f'<button type="submit" style="{BUTTON}">덧붙이기</button></form>')
+    return (dk.h2("메모", tab="메모")
+            + M.p(lead)
+            + dk.sub_label("새 메모") + new_form
+            + dk.sub_label("메모 목록", "열린 것 먼저. 아래 줄 = 쓴 때 · 종류 · 답과 상태가 바뀐 이력.")
+            + "<!--MEMO_LIST-->"
+            + dk.sub_label("답 · 상태 바꾸기") + note_form
+            + "<!--MEMO_TPL_SLOT-->"), n_open
+
+
+def memo_templates():
+    """Worker 가 메모 줄을 그릴 때 쓰는 카드 조각 — 디자인 규칙의 원본(dk.ccard · 라벨)을 그대로 잘라 넘긴다."""
+    html = white_card([("__N__", "__V__", "__S__"), ("__N__", "__V__", "__S__")])
+    key = '<span style="display:flex;justify-content:space-between'
+    i1 = html.index(key)
+    i2 = html.index(key, i1 + 1)
+    end = html.rindex("</span></div>")
+    t = {"open": html[:i1], "first": html[i1:i2], "next": html[i2:end], "close": html[end:],
+         "pill": {"열림": warn("__T__"), "확인 중": idle("__T__"), "보류": idle("__T__"), "해결": ok("__T__")}}
+    return "<!--MEMO_TPL " + json.dumps(t, ensure_ascii=False) + " MEMO_TPL-->"
+
+
 def summary_tab(now, I):
-    order = ["발행 시간", "화면", "수집", "AI 한도", "발행", "기록", "증시 전망"]   # 발행 시간 = 독자와의 약속, 맨 위 (2026-11-24 사용자 "최우선")
+    order = ["발행 시간", "리스크", "화면", "수집", "AI 한도", "발행", "기록", "증시 전망", "메모"]   # 발행 시간 = 독자와의 약속, 맨 위
     lead = (f'<p data-seo-lead="1" style="{dk.SEO_LEAD}">{now.month}월 {now.day}일 {now:%H:%M} 기준으로 손이 필요한 곳 '
             f'{V(f"{I.need}곳")}, 지켜볼 곳 {V(f"{I.watch}곳")}이 있습니다.</p>')
     status = white_card([(a if a != "화면" else "독자 화면", *I.area.get(a, (idle("자료 없음"), ""))) for a in order])
@@ -728,7 +846,7 @@ def shell(body, now, title="운영 현황"):
             + ' · <a href="/runs">날짜별 실행</a> · <a href="/logout">로그아웃</a></p>')
     return ('<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">'
             f'<meta name="robots" content="noindex,nofollow"><title>{title}</title><style>{css}</style>'
-            '<style>.title-share{display:none!important}</style></head>'   # 공유 버튼 없음 — 관리자 화면은 공유할 곳이 아니다 (2026-11-13 사용자)
+            '<style>.title-share{display:none!important}</style></head>'   # 공유 버튼 없음 — 관리자 화면은 공유할 곳이 아니다
             '<body class="item-view no-dashboard"><main class="main-content"><div class="post-shell"><article class="post-outer-container"><div class="post">'
             f'<h3 class="post-title">{title}</h3><div class="post-body entry-content">{body}{foot}</div></div></article></div></main>'
             f'<script>{js}</script></body></html>')
@@ -753,21 +871,21 @@ def main():
     if a.state_heads and os.path.exists(a.state_heads):
         heads = json.load(open(a.state_heads, encoding="utf-8"))
 
-    # 발행 시간(/ontime) — 약속 시각에 글이 나갔나, 어긴 횟수 누적 (2026-11-24 사용자). 요약 탭 맨 위 칸 · 할 일에도
+    # 발행 시간(/ontime) — 약속 시각에 글이 나갔나, 어긴 횟수 누적. 요약 탭 맨 위 칸 · 할 일에도
     ontime_page = None
     why_cache = (safe(kv_get_json, "dash:ontime-why")[0] or {}) if kv_conf() else {}   # 지난 날 늦은 원인 — 바뀌지 않으므로 다시 묻지 않는다 (GitHub API 아낌)
     got, err = safe(ontime.build, now, why_cache, recs2)   # 운영 기록 = 소리 없이 멈춘 스크립트 원인
     if got:
-        ontime_body, ontime_tab, (ot_val, ot_sub, ot_today), why_cache = got   # 탭 = 운영 현황 안 `발행 시간`(요약 다음), 단독 페이지 /ontime 도 그대로 (2026-11-24 사용자)
+        ontime_body, ontime_tab, (ot_val, ot_sub, ot_today), why_cache = got   # 탭 = 운영 현황 안 `발행 시간`(요약 다음), 단독 페이지 /ontime 도 그대로
         I.area["발행 시간"] = (ot_val, ot_sub + " · `발행 시간` 탭")
         for n, v, _, _ in ot_today:
-            I.add(f"{n} 기준 시각", v, "`발행 시간` 탭에서 원인 확인")   # 알림은 보내지 않는다 — 모든 건 페이지에서 (2026-11-24 사용자)
+            I.add(f"{n} 기준 시각", v, "`발행 시간` 탭에서 원인 확인")   # 알림은 보내지 않는다 — 모든 건 페이지에서
         ontime_page = shell(dk.align_titles(dk.WRAP_OPEN + ontime_body + dk.WRAP_CLOSE), now, title="발행 시간")
     else:
         I.area["발행 시간"] = (warn("읽지 못함"), err[:60])
         ontime_tab = dk.h2("발행 시간", tab="발행 시간") + white_card([("발행 시간", warn("읽지 못함"), err[:60])])
         print(f"[ops] 발행 시간 만들기 실패 {err}")
-    # 문법 검사(syntax-check.yml) — 마지막 검사가 실패면 할 일에 (알림 대신 이 페이지, 2026-11-24 사용자)
+    # 문법 검사(syntax-check.yml) — 마지막 검사가 실패면 할 일에
     sc, _ = safe(lambda: (gh("/actions/workflows/syntax-check.yml/runs", {"per_page": 1}).get("workflow_runs") or [None])[0])
     if sc and sc.get("conclusion") == "failure":
         I.add("파이썬 문법 검사 실패", warn("확인필요"), f"{sc.get('head_sha', '')[:8]} 푸시 · 이대로면 그 파일을 쓰는 실행이 멈춤")
@@ -780,10 +898,20 @@ def main():
     ai = ai_tab(now, recs2, I)
     record, hist = record_tab(now, heads, I)
     forecast = forecast_tab(now, I)
-    body = summary_tab(now, I) + ontime_tab + screen + publish + collect + ai + record + forecast
+    fails, err = safe(week_fails, now)
+    if err:
+        print(f"[ops] 최근 7일 실패 읽기 실패 {err}")
+    # KV 쓰기 추정 = 오늘 운영 기록 건수 + 대시보드(시간마다 4건) — 주기 자료 · 메모는 드물어 뺌
+    kv_writes = None if recs_today is None else len(recs_today) + 4 * (now.hour + 1)
+    risk = risk_tab(now, I, fails, kv_writes)
+    memos = (safe(kv_get_json, MEMO_KEY)[0] or {}) if kv_conf() else None
+    memo, n_open = memo_tab(memos)
+    I.area["메모"] = ((warn(f"열림 {n_open}개"), "메모 탭 — Claude 가 점검할 것") if n_open else (ok("없음"), "열린 메모 없음")) if memos is not None \
+        else (idle("자료 없음"), "운영 화면(Worker)에서 봄")
+    body = summary_tab(now, I) + ontime_tab + risk + screen + publish + collect + ai + record + forecast + memo
     body = dk.align_titles(dk.WRAP_OPEN + body + dk.WRAP_CLOSE)
     html = dk.fix_colons(body) if hasattr(dk, "fix_colons") else body
-    page = shell(html, now)
+    page = shell(html, now).replace("<!--MEMO_TPL_SLOT-->", memo_templates())   # 글자 다듬기(fix_colons) 뒤에 — 조각이 바뀌지 않게
     os.makedirs(OUT, exist_ok=True)
     with open(os.path.join(OUT, "ops.html"), "w", encoding="utf-8") as f:
         f.write(page)

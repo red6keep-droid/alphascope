@@ -1,17 +1,17 @@
 name: Quick stock data (간단 정보 853종목)
 
 # 간단 정보 — 미국 S&P 500 + 한국 코스피 200 · 코스닥 150, 종목마다 화면 조각 하나 (2026-11-14, 기획 비공개 기획/회원-내-종목-기획.md 6-3-1 · 6-3-2 · 6-6).
-#   - 화면 = 정식 종목 렌더러 그대로(experiments/stock-quick/full_us.py · full_kr.py — 2026-11-14 사용자 "TIGER 2차전지처럼 · 정식과 거의 차이 없게").
+#   - 화면 = 정식 종목 렌더러 그대로.
 #     빠지는 것 = 옵션 · 뉴스 · 방송 · 소송. 상세 값은 주기에 맞춰 하루 상한만큼(첫 주에 나눠 채움).
-#   - 두 번, 시장마다 따로 (2026-11-15 사용자): 미국 = 화~토 08:20 KST(정식 07:30 실행이 끝난 뒤 · 미국 장 마감 뒤 같은 종가 · 06:40 뉴스), 한국 = 월~금 17:40 KST(한국 장 마감 뒤).
+#   - 두 번, 시장마다 따로: 미국 = 화~토 08:20 KST(정식 07:30 실행이 끝난 뒤 · 미국 장 마감 뒤 같은 종가 · 06:40 뉴스), 한국 = 월~금 17:40 KST(한국 장 마감 뒤).
 #     쉬는 시장 조각은 지난 결과(없으면 Pages)에서 그대로 옮긴다 — 옮길 것이 모자라면 두 시장 다 새로(collect_quick --market). 분은 :40 — 운영지침 11절 다른 쓰기 시각(:00 · :15 · :30 · :45 · :07 · :22 · :37 · :52 · :10)과 겹치지 않게.
 #   - AI 0 · Blogger 0 · 그림 0. 야후: 일봉 묶음 약 10번 + 상세 하루 상한(미국 90 · 한국 60종목) + 고점 회복 묶음 2번. Finnhub 실적 달력 주 1회 약 17번(첫 실행 약 120번).
 #     SEC companyfacts 하루 100곳 · DART 하루 30곳(새 보고서만) + 기업개황 60곳 + 공시 목록 약 20번. FRED 하루 한 번.
-#     (2026-11-20 사용자) DART 매출 · 손익 · 기업개황 받기는 새벽 quick-dart.yml 로 옮김 — 여기선 저장값만(QUICK_DART_FETCH=0). 공시 목록 · 주식 수는 그대로.
+# DART 매출 · 손익 · 기업개황 받기는 새벽 quick-dart.yml 로 옮김 — 여기선 저장값만(QUICK_DART_FETCH=0). 공시 목록 · 주식 수는 그대로.
 #   - 결과 = 기록을 남기지 않는 브랜치 quick-us · quick-kr 에 통째로(force) — 저장소가 커지지 않는다. 시장별로 나눈 것은 한 묶음이 jsDelivr 150MB 안에 들게.
 #     커밋 둘: ① 데이터 ② version.json 에 ①의 커밋 번호. 브라우저는 @quick-us/version.json(purge) → @<커밋>/us/UBER.html 로 읽는다.
-#   - 종목 전용 페이지(publish_quick_shells.py) · 기업 소개(company_intro.py, Gemini lite 하루 25회까지) — 2026-11-15 사용자.
-#   - 예비 = Cloudflare Pages alpha-scope.pages.dev(2026-11-15 사용자, 블로그 red6 계정): 같은 조각을 매일 배포, 브라우저는 Pages 먼저 → jsDelivr → GitHub 원본.
+#   - 종목 전용 페이지(publish_quick_shells.py) · 기업 소개(company_intro.py, Gemini lite 하루 25회까지).
+#   - 예비 = Cloudflare Pages alpha-scope.pages.dev: 같은 조각을 매일 배포, 브라우저는 Pages 먼저 → jsDelivr → GitHub 원본.
 #   - 정식 자료(비교 묶음 · 자금 흐름 · 시장 일정 · 모은 기사)는 비공개 상태 저장소에서 읽기만. 간단 종목 저장값은 비공개 quick-state(다시 모을 수 있는 캐시라 기록 없이 덮어씀).
 #   - 게시 = 저장소 변수 QUICK_PUBLISH=true. 없으면 그림자 모드(만들기만 하고 올리지 않음, 표본만 아티팩트). 저장값은 그림자 모드에서도 남긴다(첫 주 채우기가 이어지게).
 #   - 받은 종목이 명단의 90% 밖이면 collect_quick.py 가 종료 코드 3 → 올리지 않고 전날 데이터 그대로.
@@ -21,8 +21,8 @@ run-name: "Quick stock data (간단 정보 853종목) · ${{ github.event_name =
 on:
   schedule:
     - cron: '20 23 * * 1-5'   # 미국 — UTC 월~금 23:20 = KST 화~토 08:20 (정식 07:30 실행이 07:56~59 에 끝난 뒤 · 야후 겹침 없게. 옛 17:40 은 한국 낮 내내 하루 늦었다)
-    - cron: '40 7 * * 1-5'    # 한국 — KST 월~금 16:40 예비 (2026-11-20 사용자, 옛 17:40 — 이어 붙이기가 안 걸린 날 한 시간 덜 기다리게. 이어 붙인 실행이 했으면 check 가 건너뜀)
-  # 이어 붙이기 (2026-11-17 사용자 "기준일이 제각각"): 정식 실행이 끝나면 바로 — 한국 = KR Stocks(16:10, 약 16:25 끝) 뒤, 미국 = NVDA Report(07:30, 약 08:00~08:11 끝) 뒤.
+    - cron: '40 7 * * 1-5'    # 한국 — KST 월~금 16:40 예비
+  # 이어 붙이기: 정식 실행이 끝나면 바로 — 한국 = KR Stocks(16:10, 약 16:25 끝) 뒤, 미국 = NVDA Report(07:30, 약 08:00~08:11 끝) 뒤.
   # 17:40 시작 · 46~81분이라 한국 쪽이 19시까지 날짜가 섞였다. 위 cron · Worker(08:20 · 17:40)는 예비로 남는다 — 이어 붙인 실행이 했으면 check 가 건너뛴다.
   # 어느 실행 뒤에 붙을지는 check 잡이 가린다(정식 본 잡이 성공 · 시간 창 · 요일). 야후 겹침 없게 5분 쉰 뒤 시작.
   workflow_run:
@@ -58,7 +58,7 @@ env:
 
 jobs:
   # 같은 날 두 번 막기 — Cloudflare Worker(infra/cron-trigger) · GitHub cron(예비) · 정식 실행 뒤 이어 붙이기가 모두 건다.
-  # 정기 실행만 확인한다. 사람이 거는 실행은 늘 돈다 (2026-11-15 사용자). 확인 = .github/scripts/run_guard.py (2026-11-17: 6시간 넘게 늦은 예비를 못 막던 것 고침 —
+  # 정기 실행만 확인한다. 사람이 거는 실행은 늘 돈다. 확인 = .github/scripts/run_guard.py (2026-11-17: 6시간 넘게 늦은 예비를 못 막던 것 고침 —
   # 예비는 그 cron 의 예정 시각 기준, `한 것` = 본 잡(quick)이 성공했거나 도는 중인 실행만)
   check:
     runs-on: ubuntu-latest
@@ -84,12 +84,12 @@ jobs:
           else JOB=nvda-report; [ "$W" -ge 2 ] && [ "$W" -le 6 ] && [ "$H" -ge 5 ] && [ "$H" -le 10 ] && go=true; fi   # 05시부터 (2026-11-20 — 미국 실행을 한 줄로 당겨 서머타임 땐 06시 전에 끝남)
           if [ "$go" = true ]; then
             if [ "$MARKET" = kr ]; then
-              # 한국 = 본 잡의 `Deploy kr.json to gh-pages` 단계가 성공했으면 붙는다 — 그 뒤(캐시 비우기 등)에서 끊긴 날에도 (2026-11-20 사용자:
+              # 한국 = 본 잡의 `Deploy kr.json to gh-pages` 단계가 성공했으면 붙는다 — 그 뒤(캐시 비우기 등)에서 끊긴 날에도 (:
               # 그날 16:51 시간 초과로 본 잡이 취소돼 이어 붙이기가 안 걸리고 17:40 예비 → 18:34)
               ok=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$UP_ID/jobs?per_page=50" -q "[.jobs[] | select(.name == \"$JOB\") | .steps[] | select((.name | startswith(\"Deploy kr.json\")) and .conclusion == \"success\")] | length" || echo 0)
               [ "${ok:-0}" -gt 0 ] || go=false
             else
-              # 미국도 같은 기준 (2026-11-20 사용자 D) = 본 잡의 `Deploy home stocks.json` 단계 성공 — 뒤 단계(ETF · 테마 · 이슈)에서 끊긴 날에도 붙는다
+              # 미국도 같은 기준 = 본 잡의 `Deploy home stocks.json` 단계 성공 — 뒤 단계(ETF · 테마 · 이슈)에서 끊긴 날에도 붙는다
               ok=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$UP_ID/jobs?per_page=50" -q "[.jobs[] | select(.name == \"$JOB\") | .steps[] | select((.name | startswith(\"Deploy home stocks.json\")) and .conclusion == \"success\")] | length" || echo 0)
               [ "${ok:-0}" -gt 0 ] || go=false
             fi
@@ -110,7 +110,7 @@ jobs:
           else
             echo "skip=false" >> "$GITHUB_OUTPUT"; echo "사람이 건 실행 → 돈다"
           fi
-      # 정식 실행이 막 야후를 다 쓴 참 — 쉬고 시작 (2026-11-17 영향 표 약속 5분 → 2026-11-20 사용자 1분: 한국 쪽 야후는 약 1분뿐, 거절 0건)
+      # 정식 실행이 막 야후를 다 쓴 참 — 쉬고 시작
       - name: Rest before Yahoo
         if: github.event_name == 'workflow_run' && steps.dup.outputs.skip != 'true'
         run: sleep 60
@@ -159,18 +159,20 @@ jobs:
           git remote add state git@github.com:red6keep-droid/alphascope-state.git
           if git fetch -q --no-tags state nvda-state:refs/remotes/state/nvda-state; then   # 한국 렌더러(us_calendar)가 이 이름으로 읽는다
             S=refs/remotes/state/nvda-state; P=experiments/nvda-report/output/state
-            git show $S:$P/radar/news.json > /tmp/news/radar.json || true
+            # 모은 기사 = 작업 브랜치 nvda-work, 없으면 옛 nvda-state
+            { git fetch -q --no-tags state nvda-work:refs/remotes/state/nvda-work 2>/dev/null && git show refs/remotes/state/nvda-work:$P/radar/news.json > /tmp/news/radar.json 2>/dev/null; } \
+              || git show $S:$P/radar/news.json > /tmp/news/radar.json || echo "::warning::미국 모은 기사(radar/news.json) 못 읽음"
             git show $S:$P/radar/detail_cache.json > /tmp/radar/detail_cache.json || rm -f /tmp/radar/detail_cache.json
             git show $S:$P/calendar.jsonl > /tmp/calendar.jsonl || true
           fi
           git fetch -q state report-state && git show FETCH_HEAD:experiments/daily-report/output/state/news_stories.json > /tmp/news/daily.json || true
           if git fetch -q state kr-state; then git archive FETCH_HEAD experiments/kr-stocks/data | tar -x && echo "한국 정식 상태: $(ls experiments/kr-stocks/data | wc -l)개"; fi
           if git fetch -q state quick-state; then git archive FETCH_HEAD | tar -x -C /tmp/qcache && echo "저장값: $(du -sh /tmp/qcache | cut -f1)"; else echo "::warning::저장값 못 받음"; fi
-          # 저장값 확인 (2026-11-20 사용자): 못 받은 채 돌면 끝에 빈 값으로 quick-state 를 덮어써 전용 페이지 주소 · 기업 소개 · 상세 값이 지워지고,
+          # 저장값 확인: 못 받은 채 돌면 끝에 빈 값으로 quick-state 를 덮어써 전용 페이지 주소 · 기업 소개 · 상세 값이 지워지고,
           # 전용 페이지 정리가 주소 기록 없이 같은 종목 페이지를 새로 만든다 → 받은 파일이 20개 미만이면 저장 · 전용 페이지 정리를 하지 않는다(화면 · 가격은 나감)
           N=$(find /tmp/qcache -type f | wc -l); echo "저장값 파일 $N"
           if [ "$N" -ge 20 ]; then echo "cache_ok=true" >> "$GITHUB_OUTPUT"; else echo "cache_ok=false" >> "$GITHUB_OUTPUT"; echo "::error::저장값 비어 있음(파일 $N) — 저장 · 전용 페이지 정리 건너뜀"; fi
-          # 인물 발언 — 인물 레이더가 radar-state 에 남긴 파일(정식 nvda-report 와 같은 자리). 그 종목을 지목한 발언이 있을 때만 구획 (2026-11-15 사용자)
+          # 인물 발언 — 인물 레이더가 radar-state 에 남긴 파일(정식 nvda-report 와 같은 자리). 그 종목을 지목한 발언이 있을 때만 구획
           mkdir -p experiments/people-radar/output/state
           { git fetch -q --no-tags state radar-state && git show FETCH_HEAD:experiments/people-radar/output/state/people_mentions.json > experiments/people-radar/output/state/people_mentions.json && echo "인물 발언 파일 받음"; } || { rm -f experiments/people-radar/output/state/people_mentions.json; echo "인물 발언 파일 없음"; }
           # 간단 종목 뉴스(quick-news.yml 06:40 이 남긴 분류 · 요약) — 있으면 미국 오늘 탭에 정식과 같은 중요 이슈 · 뉴스 · 뉴스 의견 (2026-11-15 3단계). 없으면 `이름이 나온 기사` 카드
@@ -193,9 +195,9 @@ jobs:
           DART_API_KEY: ${{ secrets.DART_API_KEY }}
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
           YTB_FIRESTORE_KEY: ${{ secrets.YTB_FIRESTORE_KEY }}   # 방송 줄 · 방송 의견 (media_feed, 정식과 같은 읽기 전용 키) — 없으면 그 칸 없이
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}   # 기업 소개(company_intro) — Gemini lite 하루 25회까지, 한도면 다음 날 (2026-11-15 사용자)
-          KIS_NEED_OUT: /tmp/kis_need.json   # 한국 마지막 봉 대조 = 네이버, 네이버도 못 받은 종목만 → 잡 끝 한국투자증권 확인 (2026-11-26 사용자)
-          QUICK_DART_FETCH: '0'   # DART 매출 · 손익 · 기업개황 받기는 새벽 quick-dart.yml — 여기선 저장값만 (2026-11-20 사용자, 한국 21~30분 줄임)
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}   # 기업 소개(company_intro) — Gemini lite 하루 25회까지, 한도면 다음 날
+          KIS_NEED_OUT: /tmp/kis_need.json   # 한국 마지막 봉 대조 = 네이버, 네이버도 못 받은 종목만 → 잡 끝 한국투자증권 확인
+          QUICK_DART_FETCH: '0'   # DART 매출 · 손익 · 기업개황 받기는 새벽 quick-dart.yml — 여기선 저장값만
           PYTHONUNBUFFERED: '1'   # 출력 바로 — 11-16 실행이 상한에 걸려 취소될 때 버퍼에 있던 로그가 한 줄도 안 남았다
         run: |
           set +e
@@ -219,10 +221,10 @@ jobs:
           path: /tmp/sample
           retention-days: 3
 
-      # 종목 전용 고정 페이지 (2026-11-15 사용자: /p/stock.html?s= 하나로는 Blogger 대표 주소가 ?s= 를 떼어 검색 · 공유가 종목별로 안 잡힌다).
+      # 종목 전용 고정 페이지.
       # 소개가 있는 종목만 · 새 페이지 하루 50 · 고쳐 쓰기 100 · 4초 간격 · 429 면 멈춤. 본문은 작은 불러오기 코드라 스크립트를 고쳐도 다시 안 쓴다.
       # 주소표(/tmp/qd/shells.json) → Pages /shells.json — /p/stock.html?s= 가 전용 페이지로 넘긴다
-      # 하단 메뉴 `종목` 페이지 목록 파일 (2026-11-17 사용자 "1단계 구현", 기획 비공개 기획/종목-탭-그룹-목록-기획.md) — /tmp/qd/<시장>/_lists.json.
+      # 하단 메뉴 `종목` 페이지 목록 파일 — /tmp/qd/<시장>/_lists.json.
       # 같은 폴더라 아래 Pages 배포(/us/_lists.json) · quick-us · quick-kr 브랜치에 그대로 실린다 — 새 푸시 · 수집 · AI 0. 미국 시가총액 = 저장값 주식 수 × 종가.
       # 정식 검색 색인(gh-pages search/)은 S&P 500 · 코스피 200 · 코스닥 150 밖 정식 종목(테마 묶음) · ETF 용. 실패해도 다른 단계는 그대로(페이지는 전날 파일).
       - name: Stock lists (종목 페이지 목록 파일)
@@ -235,7 +237,7 @@ jobs:
           [ -f "$SHELLS" ] || { curl -sf https://alpha-scope.pages.dev/shells.json -o /tmp/shells.json && SHELLS=/tmp/shells.json; } || SHELLS=""
           python experiments/stock-lists/build_lists.py --qd /tmp/qd --cache /tmp/qcache --search /tmp/search ${SHELLS:+--shells $SHELLS}
 
-      # 저녁 시황 묶음 업종 줄 = 방금 만든 한국 목록 기준 (2026-11-20 사용자 A) — 한국 종목 실행(15:50)이 묶음을 만들 땐 목록이 없어 옛 셈(대형주 평균).
+      # 저녁 시황 묶음 업종 줄 = 방금 만든 한국 목록 기준 — 한국 종목 실행(15:50)이 묶음을 만들 땐 목록이 없어 옛 셈(대형주 평균).
       # 수집기가 16:40 에 저녁 편 1차를 쓰기 전에 바꿔 올린다. 이미 목록 기준 · 날짜 다름이면 파일을 안 만들어 올리지도 않는다. gh-pages 푸시 바꾼 날만 +1
       - name: Briefing sectors (저녁 시황 묶음 업종 = 목록 기준)
         id: brief_sec
@@ -252,8 +254,8 @@ jobs:
           publish_branch: gh-pages
           keep_files: true
 
-      # Cloudflare Pages alpha-scope.pages.dev — jsDelivr 예비이자 먼저 읽는 곳 (2026-11-15 사용자: 용량 · 전송량 덜기, 이사 아님).
-      # 순서 (2026-11-20 사용자): 독자가 먼저 읽는 곳이라 목록 파일 바로 뒤 — 옛 자리는 Blogger 페이지 정리(10~24분) 뒤라 한국 화면이 그만큼 늦었다.
+      # Cloudflare Pages alpha-scope.pages.dev — jsDelivr 예비이자 먼저 읽는 곳.
+      # 순서: 독자가 먼저 읽는 곳이라 목록 파일 바로 뒤 — 옛 자리는 Blogger 페이지 정리(10~24분) 뒤라 한국 화면이 그만큼 늦었다.
       # 블로그 Cloudflare 계정(red6)만 — 계정 ID 고정, 토큰 = Pages 쓰기 권한만. 독자가 보는 페이지가 아직 없어 그림자 모드에서도 올린다(확인용).
       # 배포 하나 = 사이트 전체: us/ · kr/ · _headers(CORS · 검색 제외) · robots.txt · 404.html. 바뀐 파일만 올라간다. 실패해도 jsDelivr 길은 그대로.
       - name: Publish Cloudflare Pages (spare)
@@ -271,14 +273,14 @@ jobs:
           # 이 단계는 페이지 정리 앞이라 아직 오늘 주소표가 없다 → 지금 Pages 에 있는 것을 그대로 싣고, 정리 뒤 바뀌었으면 아래 단계가 다시 올린다
           if [ -f /tmp/qd/shells.json ]; then cp /tmp/qd/shells.json /tmp/cfp/shells.json
           else curl -sf https://alpha-scope.pages.dev/shells.json -o /tmp/cfp/shells.json || { rm -f /tmp/cfp/shells.json; echo "::warning::주소표 못 받음 — 이번 배포에 shells.json 없음"; }; fi
-          # 검색어 미리보기 목록(정식 · 간단 종목 이름 · 티커 · 주소, 약 110KB) — 블로그 검색 창이 처음 열 때 한 번 읽는다 (2026-11-16 사용자)
+          # 검색어 미리보기 목록(정식 · 간단 종목 이름 · 티커 · 주소, 약 110KB) — 블로그 검색 창이 처음 열 때 한 번 읽는다
           python experiments/site-search/build_names.py --cache /tmp/qcache --shells /tmp/cfp/shells.json --out /tmp/cfp/names.json || echo "::warning::검색어 미리보기 목록 실패 — 검색 창은 정식 종목만 미리 보인다"
           echo "Pages 파일 $(find /tmp/cfp -type f | wc -l)개 · $(du -sh /tmp/cfp | cut -f1)"
           npx --yes wrangler@4.162.0 pages deploy /tmp/cfp --project-name alpha-scope --branch main --commit-dirty=true
           code=$(curl -s -o /dev/null -w "%{http_code}" "https://alpha-scope.pages.dev/us/UBER")
           echo "확인 us/UBER → $code"; [ "$code" = 200 ] || echo "::warning::Pages 확인 실패 ($code) — 독자는 jsDelivr 로 읽는다"
 
-      # 순서 (2026-11-20 사용자): 독자 화면이 읽는 데이터를 Blogger 페이지 정리(약 16분) 앞에 올린다 — 한국 17:16 → 17:01쯤.
+      # 순서: 독자 화면이 읽는 데이터를 Blogger 페이지 정리(약 16분) 앞에 올린다 — 한국 17:16 → 17:01쯤.
       # 목록 파일은 그래서 전날 페이지 목록(pages.dev shells.json)을 쓴다 — 그날 처음 전용 페이지가 생긴 종목만 목록 링크가 하루 늦게 붙음(받아들임).
       # 페이지 정리 · 상태 저장(페이지 해시가 cache 에 남음) · Pages 예비는 이 뒤 — 이 단계가 실패해도 지금처럼 돈다(!cancelled)
       - name: Publish quick-us · quick-kr (no history)
@@ -309,7 +311,7 @@ jobs:
           BLOGGER_CLIENT_ID: ${{ secrets.BLOGGER_CLIENT_ID }}
           BLOGGER_CLIENT_SECRET: ${{ secrets.BLOGGER_CLIENT_SECRET }}
           BLOGGER_REFRESH_TOKEN: ${{ secrets.BLOGGER_REFRESH_TOKEN }}
-        # --no-new: 새 페이지는 밤 23:40 quick-shells-new.yml 만 만든다 — 장 마감 직후 몰아 만들면 Blogger 가 몇 시간 새 글을 막아 시황(08:40 · 17:00 · 21:00)이 빠진다 (2026-11-24 사용자)
+        # --no-new: 새 페이지는 밤 23:40 quick-shells-new.yml 만 만든다 — 장 마감 직후 몰아 만들면 Blogger 가 몇 시간 새 글을 막아 시황(08:40 · 17:00 · 21:00)이 빠진다
         run: python experiments/stock-quick/publish_quick_shells.py --cache /tmp/qcache --publish --no-new --map /tmp/qd/shells.json --market "$MARKET"   # 이 실행의 시장만 (2026-11-20)
 
       # 페이지 정리로 주소표가 바뀌었으면(새 전용 페이지) Pages 에 다시 — 바뀐 파일(shells.json · names.json)만 올라간다
@@ -341,7 +343,7 @@ jobs:
           git push -q -f git@github.com:red6keep-droid/alphascope-state.git HEAD:quick-state
           echo "저장값 $(du -sh . | cut -f1)"
 
-      # 한국투자증권 = 시세 예비 맨 뒤 (2026-11-26 사용자: 야후 → 네이버 → 한국투자증권 · 부를 때마다 폰 알림 · 세 값 날짜별 비교 안 함).
+      # 한국투자증권 = 시세 예비 맨 뒤.
       # 수집 단계(collect_kr._fix_last)가 네이버도 못 받은 종목만 /tmp/kis_need.json 에 남긴다 — 0개면(평소) VPN · 한국투자증권 0번 · 알림 0번.
       # 있으면 집 IP(VPN newfact)로 그 종목만 받아 야후 마지막 봉이 맞나 틀리나 로그만 — 값은 야후 그대로, 한국투자증권 값은 싣지 않는다(11-23).
       # 확인만 하는 단계라 게시 뒤(잡 끝) — 게시를 늦추지 않게. 실패해도 잡은 그대로.
