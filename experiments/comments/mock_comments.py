@@ -867,7 +867,7 @@ TITLES.update({
     "mock_comments_card-one.html": "글 아래 댓글 카드 — 1개 = 카드 하나 · NEW (시황 글)",
     "mock_comments_page-stock.html": "댓글 화면 — 종목 가격 · 홈 카드 꼴 그래프 · 댓글 목록 · 쓰기 (종목 페이지에서)",
     "mock_comments_page.html": "댓글 화면 — 배너 그림 · 댓글 목록 · 쓰기 (시황 글에서)",
-    "mock_comments_page-issue.html": "댓글 화면 시안 — 이슈 제목 · 종목 vs 비교 지수 한 줄 (핫이슈에서)",
+    "mock_comments_page-issue.html": "댓글 화면 — Hot Issue 머리 · 그래프 카드 그대로 · 아래 댓글 (핫이슈에서)",
     "mock_comments_page-forecast.html": "댓글 화면 시안 — 전망 제목 · 전망A · B 카드 (증시 전망에서)",
     "mock_comments_page-article.html": "댓글 화면 시안 — 기사 제목 · 자료 사진 (Newfact 기사에서)",
 })
@@ -1167,6 +1167,21 @@ def top(kind):
     return f'<img class="cc-banner" src="{STORY_BANNER}" alt="AI 생성 이미지" width="900" height="374">'
 
 
+ISSUE_BASE = os.path.join(HERE, "..", "issue_store", "output", "mock_issue_nvidia_ceo_public.html")   # Hot Issue 원래 페이지(목업)
+
+
+def issue_head():
+    """Hot Issue 댓글 화면 맨 위 = 원래 Hot Issue 페이지 본문 맨 위를 그대로 — 제목 블록(h2 · 게시 날짜 · 뉴스 쪽) → `주가도 같은 쪽인가?` 그래프 카드까지.
+    그 아래(`얼마나 화제인가?` 부터)는 잘라 내고 댓글이 이어진다(11-28 사용자). 돌아가기는 댓글 화면 쪽 표시를 쓰므로 원래 것은 뺀다."""
+    p = open(ISSUE_BASE, encoding="utf-8").read()
+    op = '<div class="post-body entry-content">'
+    a = p.index(op) + len(op)
+    b = p[a:p.index('<div class="post-share-buttons', a)]
+    cut = b.index('<h2', b.index('<h2') + 3)   # 둘째 h2(`얼마나 화제인가?`) 앞에서 자름
+    head = re.sub(r'\sdata-title-back(-label)?="[^"]*"', "", b[:cut])
+    return head + "</div>"   # 맨 바깥 data-head-title 상자 닫기
+
+
 def comment_page(cmts, total, back, kind):
     """댓글 화면 본문 — 봉차트(종목 = 그 종목, 시황 = 코스피) → `댓글 n` → 안내 → 목록 → 더 보기. 쓰기 = 오른쪽 아래 연필.
     제목 줄은 따로 그리지 않는다 — 글의 h3.post-title 을 테마가 고정 제목 줄(뒤로 · 로고 + 제목 · 공유)로 만든다(디자인 가이드 2절 1)."""
@@ -1174,6 +1189,9 @@ def comment_page(cmts, total, back, kind):
     more = f'<button class="cm-more" type="button">댓글 {total - len(cmts)}개 더 보기</button>' if total > len(cmts) else ""
     mark = (f'<span data-title-back="{back}" data-title-back-label="돌아가기" hidden></span>'
             + ('<span data-kr-code="000660" hidden></span>' if kind == "stock" else ""))
+    if kind == "issue" and os.path.exists(ISSUE_BASE):   # 원래 Hot Issue 머리 그대로 + 그 아래 댓글(틀은 git 에 없음 — 없는 PC 는 아래 예전 시안으로)
+        return (issue_head() + f'<div data-design="2" style="font-family:var(--report-font);">{mark}{TAIL}'
+                f'<div class="comments is-open cc-page"><div class="cc-page-h">댓글 {total}</div>{guard()}<ol class="cv-list">{rows}</ol>{more}</div></div>')
     return (f'<div data-design="2" style="font-family:var(--report-font);">{mark}{TAIL}{top(kind)}'
             f'<div class="comments is-open cc-page{" cc-article" if kind == "article" else ""}"><div class="cc-page-h">댓글 <span class="cc-n">{total}</span></div>{guard()}<ol class="cv-list">{rows}</ol>{more}</div></div>')
 
@@ -1258,7 +1276,7 @@ def main():
              page=("11.27 한국 증시 리포트", "../../kr-market-report/output/kr_report_mock.html", "report"))
     build_cc("mock_comments_page.html", BASE, [ONE_CMT], 1, "mock_comments_page.html",
              page=("11.27 증시 시황", "mock_comments_card-one.html", "story"))
-    build_cc("mock_comments_page-issue.html", BASE, [ONE_CMT_I], 1, "mock_comments_page-issue.html",
+    build_cc("mock_comments_page-issue.html", ISSUE_BASE, [ONE_CMT_I], 1, "mock_comments_page-issue.html",
              page=("Hot Issue", "../../issue_store/output/mock_issue_nvidia_ceo_public.html", "issue"))
     build_cc("mock_comments_page-forecast.html", BASE, [ONE_CMT_F], 1, "mock_comments_page-forecast.html",
              page=("증시 전망", "../../issue_store/output/mock_real_forecast-nvda-2026q3.html", "forecast"))
