@@ -85,10 +85,14 @@ CSS = """<style>
 .comments .cv-foot{gap:16px;}
 .comments .cv-react{display:inline-flex;align-items:center;gap:6px;margin:0;padding:4px 0;background:none;border:0;font:inherit;font-size:14px;line-height:20px;color:#333;font-variant-numeric:tabular-nums;cursor:pointer;-webkit-tap-highlight-color:transparent;}
 .comments .cv-react svg{width:20px;height:20px;}
-/* 누른 상태 = 보라(#6D28D9) 채움 + 숫자 보라 굵게. 소매 선만 흰색 */
-.comments .cv-react.is-on{color:#6D28D9;}
+/* 누른 상태 = 좋아요 부드러운 빨강 #ED8E87 · 싫어요 부드러운 파랑 #82B1F0 채움 + 숫자 같은 색 굵게(dk.CHART_UP · CHART_DN, 11-27 사용자). 소매 선만 흰색 */
 .comments .cv-react.is-on span{font-weight:700;}
-.comments .cv-react.is-on svg{fill:#6D28D9;stroke:#6D28D9;}
+.comments .cv-react[data-react="up"].is-on{color:#ED8E87;}
+.comments .cv-react[data-react="up"].is-on svg{fill:#ED8E87;stroke:#ED8E87;}
+.comments .cv-react[data-react="down"].is-on{color:#82B1F0;}
+.comments .cv-react[data-react="down"].is-on svg{fill:#82B1F0;stroke:#82B1F0;}
+/* 캐릭터 그림 = 그림 속 색 원 가장자리(위쪽 0.5px 틈)가 보이지 않게 살짝 키워 원 틀로 자른다 */
+.comments .cm-avatar img,.cv-big-av img{transform:scale(1.06);}
 .comments .cv-react.is-on svg path:last-child{stroke:#fff;}
 /* 글 화면 = 새 페이지 */
 .cv-tbar{justify-content:space-between;}
@@ -549,10 +553,10 @@ def hidden_row():   # 신고 3번 = 자동으로 가린다 — 운영자가 보�
 
 
 def reacts(seed, member):
+    up, down = counts(seed)
     h = sum(ord(ch) * (i + 1) for i, ch in enumerate(seed))
-    up, down = h % 13, (h // 7) % 4
     need = "" if member else " data-need-login"
-    on = " is-on" if member and up and h % 3 == 0 else ""   # 목업: 몇 개는 이미 누른 모습(보라)으로 시작
+    on = " is-on" if member and up and h % 3 == 0 else ""   # 목업: 몇 개는 이미 누른 모습(부드러운 빨강)으로 시작
     return (f'<button class="cv-react{on}" type="button" data-react="up"{need} aria-label="좋아요 {up}">{UP_ICON}<span>{up}</span></button>'
             f'<button class="cv-react" type="button" data-react="down"{need} aria-label="싫어요 {down}">{DOWN_ICON}<span>{down}</span></button>')
 
@@ -561,7 +565,7 @@ def item(c, member, key, link, tag=""):
     name, when, title, text, state, replies = c
     if state == "hidden":
         return hidden_row()
-    n = len(replies)
+    n = rcount(name + title)
     return (f'<li class="cv-item">{f"<span class=cv-tag>{esc(tag)}</span>" if tag else ""}{head(name, when, key, member, mine=state == "me")}'
             f'<a class="cv-main" href="{link}"><div class="cv-title">{esc(title)}</div><p class="cv-text">{rich(text)}</p>{extras(title).replace("<a ", "<span ").replace("</a>", "</span>")}</a>'
             f'<div class="cv-foot">{reacts(name + title, member)}<a class="cv-reply{" has" if n else ""}" href="{link}" aria-label="답글 {n}개 · 답글 쓰기">{BUBBLE}<span>{n}</span></a></div>'
@@ -625,7 +629,7 @@ def thread_page(member):
                  f'<div class="cv-rtime">{rwhen}</div><div class="cv-foot">{reacts(who + rtext, member)}</div>'
                  f'{menu_box(f"r{k}", who == ME) if member and who != "owner" else ""}</li>')
     return (f'<div class="cv-full cv-page" data-win="thread">{top}<div class="cv-full-body"><div class="comments is-open">{post}'
-            f'<div class="cv-count">답글 {len(replies)}</div>{box}{guard()}<ol class="cv-list cv-rlist">{rows}</ol>{note()}</div></div></div>')
+            f'<div class="cv-count">답글 {rcount(name + title)}</div>{box}{guard()}<ol class="cv-list cv-rlist">{rows}</ol>{note()}</div></div></div>')
 
 
 def win(wid, title, body, cls=""):
@@ -841,7 +845,7 @@ STOCK_CMTS = [   # SK하이닉스 페이지에 달린 댓글 예시 (최신이 �
     ]),
     ("조심조심", "11.23 21:05", "미국 반도체 지수도 같이 봅니다", "밤사이 미국 반도체 지수가 크게 움직이면 다음 날 아침 영향이 커서 저는 같이 봅니다.", "", []),
 ]
-STOCK_TOTAL = 27
+STOCK_TOTAL = 327
 ONE_CMT = ("새내기", "11.27 14:52", "오늘 시황 잘 읽었습니다", "환율 설명이 쉬워서 이해가 잘 됐습니다[:mid_thanks:] 내일 미국 물가 발표 뒤 시황도 기다리겠습니다.", "", [])
 ONE_CMT_R = ("장기보유", "11.27 16:48", "외국인 순매수 표 잘 봤습니다", "수급 탭에서 외국인이 사흘 만에 순매수로 돌아선 걸 확인했습니다[:mid_proof:] 업종별로도 나눠 보면 좋겠네요.", "", [])
 ONE_CMT_I = ("조심조심", "11.27 09:12", "반도체 지수는 오르는데", "업계 전체는 괜찮은데 엔비디아만 빠지는 걸 보면 회사 일로 보는 게 맞겠네요.", "", [])
@@ -923,7 +927,13 @@ def is_new(when):
 
 def counts(seed):
     h = sum(ord(ch) * (i + 1) for i, ch in enumerate(seed))
-    return h % 13, (h // 7) % 4
+    return 100 + h % 900, 100 + (h // 7) % 900   # 목업 = 세 자리(100~999) — 0 · 한 자리면 화면 파악이 어렵다(11-27 사용자)
+
+
+def rcount(seed):
+    """목업 답글 수 = 세 자리(100~999). 글 화면에 실제로 그린 답글은 몇 개뿐이어도 숫자는 크게."""
+    h = sum(ord(ch) * (i + 3) for i, ch in enumerate(seed))
+    return 100 + (h // 13) % 900
 
 
 def card(c, link):
@@ -938,7 +948,7 @@ def card(c, link):
             f'<span class="cc-date">{when}</span></div><div class="cc-row"><div class="cc-body"><div class="cc-title">{new}{esc(title)}</div>'
             f'<p class="cc-text">{esc(STK_TOKEN.sub(" ", text).strip())}</p></div>{pic}</div>'
             f'<div class="cc-foot"><span aria-label="좋아요 {up}">{UP_ICON}{up}</span><span aria-label="싫어요 {down}">{DOWN_ICON}{down}</span>'
-            f'<span aria-label="답글 {len(replies)}개">{BUBBLE}{len(replies)}</span></div></a>')
+            f'<span aria-label="답글 {rcount(name + title)}개">{BUBBLE}{rcount(name + title)}</span></div></a>')
 
 
 def cards_block(cmts, page_link):

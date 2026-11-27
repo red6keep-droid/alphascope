@@ -2063,10 +2063,14 @@ html.as-lock, html.as-lock body { overflow: hidden; }
 .comments .cv-foot{gap:16px;}
 .comments .cv-react{display:inline-flex;align-items:center;gap:6px;margin:0;padding:4px 0;background:none;border:0;font:inherit;font-size:14px;line-height:20px;color:#333;font-variant-numeric:tabular-nums;cursor:pointer;-webkit-tap-highlight-color:transparent;}
 .comments .cv-react svg{width:20px;height:20px;}
-/* 누른 상태 = 보라(#6D28D9) 채움 + 숫자 보라 굵게. 소매 선만 흰색 */
-.comments .cv-react.is-on{color:#6D28D9;}
+/* 누른 상태 = 좋아요 부드러운 빨강 #ED8E87 · 싫어요 부드러운 파랑 #82B1F0 채움 + 숫자 같은 색 굵게(dk.CHART_UP · CHART_DN, 11-27 사용자). 소매 선만 흰색 */
 .comments .cv-react.is-on span{font-weight:700;}
-.comments .cv-react.is-on svg{fill:#6D28D9;stroke:#6D28D9;}
+.comments .cv-react[data-react="up"].is-on{color:#ED8E87;}
+.comments .cv-react[data-react="up"].is-on svg{fill:#ED8E87;stroke:#ED8E87;}
+.comments .cv-react[data-react="down"].is-on{color:#82B1F0;}
+.comments .cv-react[data-react="down"].is-on svg{fill:#82B1F0;stroke:#82B1F0;}
+/* 캐릭터 그림 = 그림 속 색 원 가장자리(위쪽 0.5px 틈)가 보이지 않게 살짝 키워 원 틀로 자른다 */
+.comments .cm-avatar img,.cv-big-av img{transform:scale(1.06);}
 .comments .cv-react.is-on svg path:last-child{stroke:#fff;}
 /* 글 화면 = 새 페이지 */
 .cv-tbar{justify-content:space-between;}
