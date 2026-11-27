@@ -55,7 +55,7 @@ CLASSIFY_CHAIN = "json-oss-first"    # 출력이 길어(20건 약 2천 토큰) Q
 NARRATE_CHAIN = "json-oss-first"     # 카드 한국어 요약 (narrate.py) — 같은 이유
 # gpt-oss 하루 토큰(20만)이 바닥나면 NVIDIA 를 건너뛰고 바로 gemini-lite 로 (2026-10-28: NVIDIA 5/5 연결 끊김으로 45분 초과.
 # lite 하루 500회 중 최대 50회 사용 → 이 몫 최대 약 20회를 더해도 약 430회 여유)
-SKIP_WHEN_DAY_OUT = {}   # 2026-11-27 NVIDIA 를 사슬에서 빼 건너뛸 것이 없음
+SKIP_WHEN_DAY_OUT = {"groq": ["nvidia-nemotron"]}   # 2026-11-27 DeepSeek → Nemotron 3 Ultra (같은 이유 — 공용 엔드포인트 지연)
 CLASSIFY_BATCH = 20
 CLASSIFY_TEXT_MAX = 1500
 TOPICS_BY_GROUP = {
