@@ -51,7 +51,8 @@ def directional(html):
 
 
 class Linker:
-    """기사 속 종목 링크 — 글 전체에서 처음 나온 이름 하나만 보라 #7C3AED (가이드라인 10절). 페이지가 없는 종목은 글자 그대로."""
+    """기사 속 종목 링크 — 나올 때마다 전부, 문장 속 종목 모양(dk.STOCK_LINK_STYLE = 검은 굵게 · 연한 회색 점선).
+    이름 찾기 · 조사 확인 · 건너뛸 곳은 dk.link_names 와 같다. 페이지가 없는 종목은 글자 그대로."""
 
     def __init__(self, column, briefing, ink=None):
         self.ink = ink or INK
@@ -61,27 +62,23 @@ class Linker:
                 names[str(m["ticker"]).upper()] = m["name"]
         self.items = []
         for t in dict.fromkeys([str(x).upper() for x in column.get("tickers") or []] + list(names)):
-            name, href = names.get(t), None
+            name = names.get(t)
             if re.fullmatch(r"\d{6}", t):   # 한국 종목 코드
                 sym = next((s for s in UKR.BY_SYM if s.split(".")[0] == t), None)
-                if sym:
-                    name, href = name or UKR.BY_SYM[sym][1], UKR.page_url(sym)
-            else:
-                href = dk.stock_href(t)
+                name = name or (UKR.BY_SYM[sym][1] if sym else None)
+            name = name or dk.names_label(t)
+            href = dk.stock_url(t)
             if name and href:
                 self.items.append((t, name, href))
-        self.items.sort(key=lambda x: -len(x[1]))   # 긴 이름 먼저 (`SK하이닉스` 안의 `SK` 같은 겹침)
+        self.by = {t: [name] for t, name, _ in self.items}
         self.seen = set()
 
     def __call__(self, html):
-        for t, name, href in self.items:
-            if t in self.seen or name not in html:
-                continue
-            html = re.sub(r"(?<![\w])" + re.escape(name),
-                          f'<a href="{dk.esc(href)}" data-stock="{dk.esc(t)}" style="color:{self.ink};font-weight:400;text-decoration:none;">{name}</a>',
-                          html, count=1)
-            self.seen.add(t)
-        return html
+        if not self.by:
+            return html
+        out = dk.link_names("<p>" + html + "</p>", self.by)[3:-4]   # 문장 조각 — <p> 로 감싸 문장 모양으로 걸고 벗긴다
+        self.seen |= {t for t in re.findall(r'data-stock="([^"]+)"', out) if t in self.by}
+        return out
 
 
 # 본문 줄바꿈 = 글자 단위(보통 글처럼) — 테마 .post-body 의 keep-all(띄어쓰기 단위)을 본문 문단에서만 푼다. 머리글 · 제목 영역은 keep-all 그대로

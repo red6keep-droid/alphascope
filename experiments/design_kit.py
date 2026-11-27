@@ -1766,6 +1766,8 @@ def stock_link(sym, text_html, color=True):
 
 NAME_LINK_NEVER = {"나스닥"}   # 종목 이름이지만 글에서는 거의 지수 뜻 — 링크하지 않는다
 _NAME_JOSA = ("으로", "에서", "보다", "처럼", "까지", "부터", "이나", "이랑", "이며", "이었", "이다", "에는", "와의", "과의", "로는",
+         "에게", "께서", "한테", "만큼", "마저", "조차", "이라", "라는", "이란", "였다", "였고", "이고", "에도", "와도", "과도", "지만", "는데",
+         "다", "고", "던",
          "은", "는", "이", "가", "을", "를", "의", "도", "와", "과", "로", "에", "만", "나", "랑", "며", "였", "엔", "께")
 _SKIP_TAGS = {"a", "script", "style", "title", "h1", "h2", "h3", "h4", "h5", "h6", "summary", "button", "svg", "textarea", "select", "option"}
 _VOID_TAGS = {"br", "img", "input", "meta", "link", "hr", "source", "wbr", "col", "area", "base", "embed", "param", "track"}
@@ -1775,11 +1777,19 @@ _HTML_TOKENS = re.compile(r"(<script\b.*?</script\s*>|<style\b.*?</style\s*>|<!-
 
 
 def _name_end_ok(name, after):
-    """이름 바로 뒤가 낱말의 이어짐이 아닌가 — 한글로 끝나면 조사 · 한글 아닌 글자만, 영문 · 숫자로 끝나면 영문 · 숫자가 아닐 때만."""
+    """이름 바로 뒤가 낱말의 이어짐이 아닌가 — 뒤가 한글이면 조사일 때만(`SK케미칼` 안의 `SK` X), 영문 · 숫자로 끝나면 영문 · 숫자가 아닐 때만."""
     if not after:
         return True
+    if re.match(r"[가-힣]", after[0]):   # 조사를 차례로 떼고(최대 3개) 남은 첫 글자가 한글이 아니어야 — `SK이노베이션` 의 `이` 는 조사가 아니다
+        rest = after
+        for _ in range(3):
+            j = next((x for x in _NAME_JOSA if rest.startswith(x)), None)
+            if not j:
+                break
+            rest = rest[len(j):]
+        return rest != after and not re.match(r"[가-힣]", rest[:1])
     if re.match(r"[가-힣]", name[-1]):
-        return not re.match(r"[가-힣]", after[0]) or after.startswith(_NAME_JOSA)
+        return True
     return not re.match(r"[0-9A-Za-z&]", after[0])
 
 
@@ -1850,7 +1860,7 @@ def link_names(html_text, names_by_sym, own=None):
 
     def sub_text(text, sent, tinted):
         def one(m):
-            if not _name_end_ok(html_mod.unescape(m.group(1)), html_mod.unescape(text[m.end():m.end() + 3])):
+            if not _name_end_ok(html_mod.unescape(m.group(1)), html_mod.unescape(text[m.end():m.end() + 12])):
                 return m.group(0)
             sym, href = by_name[m.group(1)]
             st = (STOCK_LINK_STYLE.replace("color:#111;", "color:inherit;") if tinted else STOCK_LINK_STYLE) if sent else "color:inherit;text-decoration:none;"
@@ -1880,7 +1890,7 @@ def link_names(html_text, names_by_sym, own=None):
             low = part.lower()
             cm = re.search(r"(?<![-\w])color\s*:\s*(#[0-9a-f]{3,6}|inherit)", low)
             stack.append((tag, tag in _SKIP_TAGS or any(k in low for k in _SKIP_ATTRS),
-                          tag == "p" or "data-emph-sent" in low or "data-seo-lead" in low, cm.group(1) if cm else None))
+                          tag == "p" or "data-emph-sent" in low or 'data-seo-lead="1"' in low, cm.group(1) if cm else None))
             continue
         if any(x[1] for x in stack) or not part.strip():
             out.append(part)
@@ -1888,6 +1898,16 @@ def link_names(html_text, names_by_sym, own=None):
         color = next((x[3] for x in reversed(stack) if x[3] and x[3] != "inherit"), None)
         out.append(sub_text(part, any(x[2] for x in stack), color in _TINTS))
     return "".join(out)
+
+
+def link_page(html_text, data, own=None, extra=(), name_of=None, where=""):
+    """다 그린 페이지 · 글 → 그 데이터(data)에 나온 우리 종목 이름만 링크(page_stock_names + link_names).
+    실패하면 본문 그대로 — 링크 때문에 발행이 멈추지 않게."""
+    try:
+        return link_names(html_text, page_stock_names(data, extra, name_of), own=own)
+    except Exception as e:  # noqa: BLE001
+        print(f"::warning::[link] {where or own or ''} 종목 이름 링크 실패: {e!r}")
+        return html_text
 
 
 def stock_row_link(row_html, sym):

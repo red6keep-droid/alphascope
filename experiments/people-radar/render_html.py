@@ -441,7 +441,7 @@ def build_body(r, n, d):
         dk.related_buttons(dk.report_links("us", "kr", "forecast", "us_top")),   # 함께 보는 페이지 — 모든 리포트 공통
         dk.WRAP_CLOSE,
     ])
-    return dk.fix_colons(dk.formal(dk.align_titles(body)))   # 카드 밖 구획 제목은 좌측 기준선(ALIGN_PX)
+    return dk.link_page(dk.fix_colons(dk.formal(dk.align_titles(body))), {"r": r, "n": n}, where="people")   # 발언 자료에 나온 종목 이름 → 그 종목 페이지
 
 
 def render(radar_path=None, narrative_path=None, output_dir=None):

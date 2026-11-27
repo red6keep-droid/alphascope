@@ -125,7 +125,7 @@ def build_body(m, narrative, d):
     # `한국장에 영향을 줄 만한 소식` 은 미국 데일리 `한국장` 탭으로 옮겼다
     parts.append(dk.WRAP_CLOSE)
     html = dk.align_titles("\n".join(parts), ALIGN_PX)   # 구획 제목도 같은 시작선
-    return dk.fix_colons(dk.formal(html))   # 글 끝 "AI 서술" 줄 없음 — 공통 푸터의 AI 고지와 중복
+    return dk.link_page(dk.fix_colons(dk.formal(html)), {"m": m, "n": narrative}, where="media")   # 방송 자료에 나온 종목 이름 → 그 종목 페이지
 
 
 def render(media_path=None, narrative_path=None, output_dir=None):

@@ -253,7 +253,7 @@ def page_body(t, a, day):
     fn = {"ai": body_ai, "fed": body_fed, "insider": body_insider}[t["key"]]
     body = fn(t, a["themes"][t["key"]], day, reading_guide(t))
     body += dk.muted("매일 아침 갱신 · 기록이 30일 쌓이면 상태가 바뀐 뒤의 분포를 함께 보여 줍니다")
-    return RP.wrap(body)
+    return dk.link_page(RP.wrap(body), a["themes"][t["key"]], name_of=lambda x: U.name(x) if x in U.BY_SYM else U.PEER_KO.get(x), where=t["key"])
 
 
 def write_all(a, out_dir):

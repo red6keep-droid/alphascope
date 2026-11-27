@@ -2046,6 +2046,8 @@ def page(cur, watch, items, px, now, today, days, sums, logs):
     op = "" if PUBLIC else H.operator_box(op_rows)
     body = (top + q + gauge + qcards + sec_list + op + if_fold(cur["chain"], scs) + bottom(cur["chain"], cs) + (H.RELATED if PUBLIC else ""))   # `주가는?` = 원래 아래 접는 줄 자리
     body = body.replace('data-cards="1" ', "")   # data-cards 는 테마(엔비디아 탭) JS 가 글 머리로 옮긴다 — 이 페이지 카드는 제자리에
+    rev = {v: k for k, v in H._stock_names().items()}
+    body = dk.link_page(body, {"cur": cur, "cfg": C}, name_of=rev.get, where=cur.get("id") or "issue")   # 데이터에 나온 종목 이름 → 그 종목 페이지
     return dk.fix_colons(f'<div data-head-title="{HEAD_TITLE}"{H.head_date_attr()} data-seo-lead="{dk.esc(HEAD_TITLE + " — " + cur["q"] + " 뉴스와 시장 " + align)}">{body}</div>')
 
 

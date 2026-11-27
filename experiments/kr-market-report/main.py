@@ -1735,7 +1735,9 @@ def body(r):
                            ("주요 인물 발언 전체 보기", people_section.ALL_URL)]),   # 인물 발언 전체 목록도 함께 보는 페이지에
         _dk.WRAP_CLOSE,   # 출처 · 면책 꼬리말 없음 — 블로그 공통 푸터
     ]
-    return _dk.formal(_dk.fix_colons(_dk.align_titles("\n".join(p for p in parts if p))))
+    html = _dk.formal(_dk.fix_colons(_dk.align_titles("\n".join(p for p in parts if p))))
+    data = {k: v for k, v in r.items() if k not in ("bars", "kospi_bars")}   # 받은 일봉 전체(모든 종목 키) 말고 리포트에 쓴 칸만 — 사전 전체 맞추기가 되지 않게
+    return _dk.link_page(html, data, where="kr-report")   # 리포트 자료에 나온 종목 이름 → 그 종목 페이지
 
 
 MARKET_REC = os.path.join(_HERE, "..", "kr-stocks", "data", "records", "market")   # kr-stocks.yml Save state 가 data/records 를 통째로 올린다

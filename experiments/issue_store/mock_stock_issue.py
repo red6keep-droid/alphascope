@@ -165,6 +165,8 @@ def page(c, public=False):
     ])
     body = q + gauge + qcards + sec_list + ("" if public else op + tail) + link
     body = body.replace('data-cards="1" ', "")
+    rev = {v: k for k, v in IW.H._stock_names().items()}
+    body = dk.link_page(body, {"iss": ISS, "cur": cur}, name_of=rev.get, where="stock-issue")   # 데이터에 나온 종목 이름 → 그 종목 페이지
     return dk.fix_colons(f'<div data-head-title="{IW.HEAD_TITLE}"{IW.H.head_date_attr()} data-seo-lead="{dk.esc(IW.HEAD_TITLE + " — " + ISS["q"] + " 뉴스와 주가 " + align)}">{body}</div>')
 
 

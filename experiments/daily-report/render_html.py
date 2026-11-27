@@ -879,7 +879,8 @@ def build_body(input_data, report, cover_url=None, analysis=None, output_dir=Non
     parts.append(dk.related_buttons(RELATED_LINKS))   # 함께 보는 페이지 — 한국 증시 리포트와 같은 블록 · 주요 인물 발언 전체 보기 포함
     parts.append(dk.WRAP_CLOSE)   # 출처 · 면책 꼬리말 없음 — 블로그 공통 푸터가 맡는다
     # ":" 앞뒤 띄우기 · 반말 문장 끝은 합니다체
-    return dk.formal(dk.fix_colons(dk.align_titles("\n".join(p for p in parts if p))))   # 카드 밖 제목을 좌측 기준선(ALIGN_PX)으로
+    html = dk.formal(dk.fix_colons(dk.align_titles("\n".join(p for p in parts if p))))   # 카드 밖 제목을 좌측 기준선(ALIGN_PX)으로
+    return dk.link_page(html, {"in": input_data, "a": a}, extra=list(sx.MEGA_KO), name_of=sx.MEGA_KO.get, where="us-report")   # 리포트 자료에 나온 종목 이름 → 그 종목 페이지
 
 
 def build_tables(input_data, report, cover_url=None, analysis=None):

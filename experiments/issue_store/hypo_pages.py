@@ -2263,6 +2263,8 @@ def forecast_body(reg, state=None, fc=None, others=None, op=None):
             )   # `다른 전망` 구획 삭제 — 글 아래 [목록] 버튼이 전망 목록으로 간다, 이어진 전망은 겹침 카드 안 링크로
     # 머리 줄 오른쪽 `11.22 아침` = 지켜보는 중인 전망만 — 판정이 난 전망은 기록이 멈춰 매일 다시 올릴 까닭이 없다(날짜만 바뀌어 Blogger 쓰기가 늘지 않게) (2026-11-22)
     live = ((st or {}).get("log") or [{}])[-1].get("key") not in RESULT
+    rev = {v: k for k, v in _stock_names().items()}
+    body = dk.link_page(body, {"fc": fc, "st": st}, name_of=rev.get, where=fc.get("slug") or "forecast")   # 근거 · 기록 줄의 종목 이름 → 그 종목 페이지
     return dk.fix_colons(f'<div data-list-url="{page_url(LIST_SLUG)}" data-head-title="{HEAD_FORECAST}"{head_date_attr() if live else ""} data-nav="list" data-title-back="{page_url(LIST_SLUG)}" data-title-back-label="목록" data-seo-lead="{dk.esc(seo_lead(fc, st))}">{body}{RELATED}</div>')
 
 

@@ -3630,6 +3630,11 @@ def seo_lead(a):
 
 
 def build_body(a, n):
+    return _dk.link_page(_build_body(a, n), {"a": a, "n": n}, own="NVDA", extra=list(config.SYMBOLS) + list(cal_cards.PEER_KO),
+                         name_of=cal_cards.PEER_KO.get, where="nvda-report")   # 리포트 자료에 나온 다른 종목 이름 → 그 종목 페이지
+
+
+def _build_body(a, n):
     return _dk.formal(_dk.fix_colons(_dk.align_titles("\n".join([   # 카드 밖 제목 · 요약은 좌측 기준선(ALIGN_PX) · ":" 앞뒤 띄우기 · 반말 문장 끝은 합니다체
         # data-design="2": 테마의 옛 글 보정 규칙(div 14px → 17px !important)에서 이 글을 제외한다 (2026-10-11 — 안내 글이 17px로 커지던 원인)
         f'<div data-design="2" style="font-family:-apple-system,\'Apple SD Gothic Neo\',\'Malgun Gothic\',sans-serif;font-size:{_dk.BODY};line-height:{_dk.LH_BODY};color:#333;">',   # 행간 24px

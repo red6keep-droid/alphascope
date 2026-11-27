@@ -476,7 +476,8 @@ def us_pages(snap, live, fund):
                     + related(sym, live))
             if sym in E.BY_SYM[sym][1].split():   # `인베스코 QQQ` 처럼 티커가 이름의 일부 — 테마가 제목 티커를 꼬리로 옮기지 않게
                 body = '<span data-title-keep-ticker="1" hidden></span>' + body
-            pages[E.key(sym)] = (E.page_title(sym), RP.wrap(body))
+            pages[E.key(sym)] = (E.page_title(sym), dk.link_page(RP.wrap(body), {"s": s, "top": f.get("top")}, own=sym,
+                                                                 name_of=lambda x: U.name(x) if x in U.BY_SYM else U.PEER_KO.get(x), where=sym))
         except Exception as e:  # noqa: BLE001 — 한 ETF 실패가 나머지를 막지 않게
             print(f"::warning::[etf] {sym} 페이지 실패: {e!r}")
     return pages
@@ -505,7 +506,8 @@ def alias_kr(K, rep, etf):
             d[E.key(etf)] = d[E.key(rep)]
 
 
-MOVE_DAYS = 60   # `함께 움직이는 종목은?` 선 그래프 = 최근 60거래일(약 3개월) — 점이 24개 넘으면 끝 값만 (dk.trend_card)
+MOVE_PEER = {}   # {ETF: 함께 움직이는 종목 카드의 비교 종목} — 페이지 이름 링크 재료
+MOVE_DAYS = 60  # `함께 움직이는 종목은?` 선 그래프 = 최근 60거래일(약 3개월) — 점이 24개 넘으면 끝 값만 (dk.trend_card)
 
 
 def _sgn(v):
@@ -549,6 +551,7 @@ def move_card(sym, snap, stocks, K, s=None):
     cands = sorted((c for c in cands if caps.get(c[0])), key=lambda c: -caps[c[0]])
     if cands:
         peer = cands[0]
+        MOVE_PEER[sym] = peer[0]
 
     def norm(vals):
         first = next((v for v in vals if v is not None), None)
@@ -666,6 +669,9 @@ def kr_pages(snap, flows, hist, live, us_fund, kfund=None):
             body += ((render_kr.R._section("업계상황", f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{ind}</div>', tab="업계상황") if ind else "")
                      + (render_kr.R._section("구성", hold + cmp, tab="구성") if hold else "")
                      + render_kr.R._section("기본 정보", tab_basic(sym, basic, snap["bars"].get(sym)) + ("" if hold else cmp), tab="기본 정보") + related(sym, live) + ("</div>" if cut else ""))   # 잘라낸 본문의 바깥 틀 닫기
+            body = dk.link_page(body, {"s": s, "top": [[_hold_sym(c), n, w] for c, n, w in kf.get("top") or []]}, own=sym,
+                                extra=[MOVE_PEER.get(sym), (E.KR_US_LINE.get(E.BY_SYM[sym][2]) or [None])[0]],
+                                name_of=lambda x: K.name(x) if x in K.BY_SYM else None, where=sym)   # 뒤에 붙인 탭 · 함께 움직이는 종목 문장
             pages[code] = (E.page_title(sym), dk.formal(body))   # 업계상황 · 구성 · 기본 정보 탭은 wrap 뒤에 붙어 합니다체를 안 거쳤다 (2026-11-26 블로그 반말 점검)
         except Exception as e:  # noqa: BLE001
             print(f"::warning::[etf] {sym} 페이지 실패: {e!r}")
