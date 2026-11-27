@@ -105,8 +105,10 @@ def _tag(name, what):
 
 def _cap(key):
     f, who, lic, lic_url, src, what = PICS[key]
-    return (f'<figcaption style="margin:7px 0 0;font-size:13px;line-height:19px;color:#6B7280;">자료 사진 · 사진: {who} · '
-            f'<a href="{lic_url}" {_A}>{lic}</a> · <a href="{src}" {_A}>위키미디어 공용</a></figcaption>')
+    # 짧게(11-27): 자료 사진 · 사진가 · 이용 조건. 밑줄 없음 — 사진가 = 원본 페이지, 조건 = 조건 글(CC 표시 의무: 저작자 · 조건 주소 · 원본)
+    a = 'style="color:inherit;text-decoration:none;"'
+    return (f'<figcaption style="margin:6px 0 0;font-size:11px;line-height:16px;color:#9CA3AF;">자료 사진 · '
+            f'<a href="{src}" {a}>{who}</a> · <a href="{lic_url}" {a}>{lic}</a></figcaption>')
 
 
 def _figure(h, key="game", name_sym=None, name=""):
@@ -136,7 +138,7 @@ def photo_variants(html):
         return html
     return _after_headline(html, '<div data-mock-draft="photo">'
         + _tag("지금", "그림 없이 제목 바로 아래 요약 상자")
-        + _tag("A안 (추천)", "본문 폭 전체 · 높이 200 · 모서리 10 · 출처 줄 13/19 회색 · 사진과 7 · 요약 상자와 26") + _figure(200)
+        + _tag("A안 (추천)", "본문 폭 전체 · 높이 200 · 모서리 10 · 출처 줄 11/16 연회색 · 사진과 6 · 요약 상자와 26") + _figure(200)
         + _tag("B안", "본문 폭 전체 · 높이 240 — 화면 첫 칸에서 본문이 더 밀림") + _figure(240)
         + _tag("C안", "높이 160 — 띠처럼 얇게") + _figure(160)
         + '</div>')
