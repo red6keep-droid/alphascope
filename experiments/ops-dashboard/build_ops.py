@@ -728,9 +728,27 @@ def forecast_tab(now, I):
 
 # ---------------------------------------------------------------- 리스크 · 메모
 # 리스크 = 아직 깨지지 않았지만 곧 문제가 될 곳. 자동 = 한도 여유 · 되풀이 실패, 적어 둔 리스크 = 메모 탭에서 종류 `리스크` 로 쓴 것.
-# 메모 = 운영자가 찾은 문제를 적고 Claude 가 점검 · 답을 다는 곳. 저장 = KV memo:all (지우지 않음, 관리자 Worker 만 읽고 씀).
+# 메모 = 운영자가 찾은 문제를 적고 Claude 가 점검 · 답을 다는 곳. 저장 = KV memo:item:{id} 메모마다 키 하나 (지우지 않음, 관리자 Worker 만 읽고 씀).
 # 메모 목록은 Worker 가 화면을 보낼 때 <!--MEMO_LIST--> · <!--RISK_MEMOS--> · <!--MEMO_OPTIONS--> 자리에 채운다 — 쓰자마자 보이게.
-MEMO_KEY = "memo:all"
+MEMO_PREFIX = "memo:item:"   # 메모마다 키 하나 — Worker 와 같게
+
+
+def kv_memos():
+    """메모 전부 — 요약 탭 `열린 메모` 수에만 쓴다. KV 목록 1번 + 메모 수만큼 읽기."""
+    c = kv_conf()
+    if not c:
+        return None
+    h = {"Authorization": f"Bearer {c[2]}"}
+    j = requests.get(kv_url(c, "keys"), params={"prefix": MEMO_PREFIX, "limit": 1000}, headers=h, timeout=30).json()
+    out = []
+    for k in j.get("result") or []:
+        r = requests.get(kv_url(c, f"values/{requests.utils.quote(k['name'], safe='')}"), headers=h, timeout=30)
+        if r.status_code == 200:
+            try:
+                out.append(r.json())
+            except ValueError:
+                pass
+    return {"items": out}
 MEMO_TAB_URL = "/#tab-%EB%A9%94%EB%AA%A8"   # #tab-메모
 OPEN_STATES = ("열림", "확인 중", "보류")
 
@@ -913,7 +931,7 @@ def main():
     # KV 쓰기 추정 = 오늘 운영 기록 건수 + 대시보드(시간마다 4건) — 주기 자료 · 메모는 드물어 뺌
     kv_writes = None if recs_today is None else len(recs_today) + 4 * (now.hour + 1)
     risk = risk_tab(now, I, fails, kv_writes)
-    memos = (safe(kv_get_json, MEMO_KEY)[0] or {}) if kv_conf() else None
+    memos = (safe(kv_memos)[0] or {}) if kv_conf() else None
     memo, n_open = memo_tab(memos)
     I.area["메모"] = ((warn(f"열림 {n_open}개"), "메모 탭 — Claude 가 점검할 것") if n_open else (ok("없음"), "열린 메모 없음")) if memos is not None \
         else (idle("자료 없음"), "운영 화면(Worker)에서 봄")

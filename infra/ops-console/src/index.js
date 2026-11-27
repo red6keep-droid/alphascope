@@ -426,18 +426,30 @@ function simplePage(title, msg, withLogin) {
 }
 
 // ---------------------------------------------------------------- 메모 (운영자가 찾은 문제 · 리스크 → Claude 가 점검해 답을 단다)
-// 저장 = KV memo:all 한 키 { next, items: [{ id, kind, text, at, by, status, log: [{ at, by, status, note }] }] } — 지우지 않는다(만료 없음).
+// 저장 = 메모마다 KV 키 하나 memo:item:{id} = { id, kind, text, at, by, status, log: [{ at, by, status, note }] } — 지우지 않는다(만료 없음).
+//   한 키에 모으면 KV 가 퍼지는 동안(최대 약 1분) 연달아 쓴 메모가 서로 덮어써 사라진다 → 메모끼리 키를 나눈다.
+//   id = 쓴 시각(UTC 숫자) + 무작위 4자 — 시간순으로 정렬되고, 화면 번호(#n)는 그 순서의 자리.
 // 화면 = build_ops.py 가 만든 dash:html 의 <!--MEMO_LIST--> · <!--RISK_MEMOS--> · <!--MEMO_OPTIONS--> 자리를 보낼 때 채운다.
 // 카드 조각은 같은 페이지의 <!--MEMO_TPL {json} MEMO_TPL--> (디자인 규칙 원본 design_kit 에서 잘라 온 것).
-const MEMO_KEY = "memo:all";
+const MEMO_PREFIX = "memo:item:";
 const MEMO_MAX = 4000;
 const MEMO_STATES = ["열림", "확인 중", "보류", "해결"];
 const MEMO_OPEN = new Set(["열림", "확인 중", "보류"]);
 const MEMO_TAB = "/#tab-%EB%A9%94%EB%AA%A8";
 
+const newMemoId = () => new Date().toISOString().replace(/\D/g, "").slice(0, 17) + Math.random().toString(16).slice(2, 6);
+
 async function loadMemos(env) {
-  const m = env.OPS_KV ? await env.OPS_KV.get(MEMO_KEY, "json") : null;
-  return m && Array.isArray(m.items) ? m : { next: 1, items: [] };
+  if (!env.OPS_KV) return [];
+  const names = [];
+  let cursor;
+  do {
+    const page = await env.OPS_KV.list({ prefix: MEMO_PREFIX, cursor });
+    names.push(...page.keys.map((k) => k.name));
+    cursor = page.list_complete ? undefined : page.cursor;
+  } while (cursor);
+  const vals = await Promise.all(names.map((k) => env.OPS_KV.get(k, "json").catch(() => null)));
+  return vals.filter((x) => x && x.id).sort((a, b) => (a.id < b.id ? -1 : 1)).map((x, i) => ({ ...x, no: i + 1 }));
 }
 
 const kstStamp = (iso) => {
@@ -453,7 +465,7 @@ function memoCard(tpl, list, empty) {
   if (!list.length) return tpl.open + put(put(put(tpl.first, "__N__", esc(empty)), "__V__", ""), "__S__", "") + tpl.close;
   const rows = list.map((x, i) => {
     const log = (x.log || []).map((l) => `${kstStamp(l.at)} ${who(l.by)}${l.status ? ` · ${esc(l.status)}` : ""}${l.note ? ` — ${lines(l.note)}` : ""}`);
-    const sub = [`#${x.id} · ${esc(x.kind)} · ${kstStamp(x.at)} ${who(x.by)}`, ...log].join("<br>");
+    const sub = [`#${x.no} · ${esc(x.kind)} · ${kstStamp(x.at)} ${who(x.by)}`, ...log].join("<br>");
     const pill = put(tpl.pill[x.status] || tpl.pill["열림"], "__T__", esc(x.status));
     return put(put(put(i ? tpl.next : tpl.first, "__N__", lines(x.text)), "__V__", pill), "__S__", sub);
   });
@@ -465,9 +477,9 @@ async function fillMemos(dash, env) {
   if (!m) return dash;
   let tpl;
   try { tpl = JSON.parse(m[1]); } catch { return dash; }
-  const { items } = await loadMemos(env);
+  const items = await loadMemos(env);
   const order = (x) => (x.status === "열림" ? 0 : x.status === "확인 중" ? 1 : x.status === "보류" ? 2 : 3);
-  const sorted = [...items].sort((a, b) => order(a) - order(b) || b.id - a.id);
+  const sorted = [...items].sort((a, b) => order(a) - order(b) || b.no - a.no);
   const open = sorted.filter((x) => MEMO_OPEN.has(x.status));
   const done = sorted.filter((x) => !MEMO_OPEN.has(x.status));
   // 해결한 메모 — 5개 펼침 + 나머지 접기(버리지 않음)
@@ -476,7 +488,7 @@ async function fillMemos(dash, env) {
     : "";
   const list = memoCard(tpl, open, "열린 메모가 없습니다") + doneHtml;
   const risks = memoCard(tpl, open.filter((x) => x.kind === "리스크"), "적어 둔 리스크가 없습니다");
-  const options = sorted.map((x) => `<option value="${x.id}">#${x.id} ${esc(x.status)} · ${esc(String(x.text).slice(0, 40))}</option>`).join("");
+  const options = sorted.map((x) => `<option value="${esc(x.id)}">#${x.no} ${esc(x.status)} · ${esc(String(x.text).slice(0, 40))}</option>`).join("");
   return dash.replace(m[0], () => "").replace("<!--MEMO_LIST-->", () => list).replace("<!--RISK_MEMOS-->", () => risks).replace("<!--MEMO_OPTIONS-->", () => options);
 }
 
@@ -491,23 +503,24 @@ async function memoPost(req, url, env, session) {
   const f = await req.formData();
   const text = String(f.get(url.pathname === "/memo" ? "text" : "note") || "").trim();
   if (text.length > MEMO_MAX) return deny(`메모는 ${MEMO_MAX.toLocaleString()}자까지입니다 (지금 ${text.length.toLocaleString()}자). 나눠서 남겨 주세요.`, 400);
-  const m = await loadMemos(env);
   const at = new Date().toISOString();
   const by = String(session.login);
   if (url.pathname === "/memo") {
     if (!text) return deny("메모 내용이 비었습니다.", 400);
     const kind = f.get("kind") === "리스크" ? "리스크" : "문제";
-    m.items.push({ id: m.next, kind, text, at, by, status: "열림", log: [] });
-    m.next += 1;
-  } else {
-    const x = m.items.find((i) => String(i.id) === String(f.get("id")));
-    if (!x) return deny("그 메모를 찾지 못했습니다.", 400);
-    const status = MEMO_STATES.includes(String(f.get("status"))) ? String(f.get("status")) : "";
-    if (!status && !text) return deny("바꿀 상태나 덧붙일 말을 넣어 주세요.", 400);
-    if (status) x.status = status;
-    x.log = [...(x.log || []), { at, by, status, note: text }];
+    const id = newMemoId();
+    await env.OPS_KV.put(MEMO_PREFIX + id, JSON.stringify({ id, kind, text, at, by, status: "열림", log: [] }));
+    return redirect(MEMO_TAB);
   }
-  await env.OPS_KV.put(MEMO_KEY, JSON.stringify(m));
+  const id = String(f.get("id") || "");
+  if (!/^[0-9a-f]{17,24}$/.test(id)) return deny("그 메모를 찾지 못했습니다.", 400);
+  const x = await env.OPS_KV.get(MEMO_PREFIX + id, "json");
+  if (!x) return deny("그 메모를 찾지 못했습니다. 방금 쓴 메모면 1분쯤 뒤에 다시 해 주세요.", 400);
+  const status = MEMO_STATES.includes(String(f.get("status"))) ? String(f.get("status")) : "";
+  if (!status && !text) return deny("바꿀 상태나 덧붙일 말을 넣어 주세요.", 400);
+  if (status) x.status = status;
+  x.log = [...(x.log || []), { at, by, status, note: text }];
+  await env.OPS_KV.put(MEMO_PREFIX + id, JSON.stringify(x));
   return redirect(MEMO_TAB);
 }
 
