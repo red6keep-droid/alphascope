@@ -816,6 +816,7 @@ def build(name, member=True, first=False, thread=False, demo=""):
 STOCK_BASE = os.path.join(HERE, "..", "kr-stocks", "output", "mock_000660.html")
 STOCK_REAL = os.path.join(HERE, "..", "kr-stocks", "output", "000660.html")   # 차트 자료 = 발행 본문 쪽(내 평단 없는 것)
 STORY_BANNER = "../../market-commentary/output/story-mock/images/commentary-2026-11-18-pm.webp"   # 시황 글 배너(목업 사본)
+STOCK_REF = os.path.join(HERE, "ref", "000660_bars.json")   # 일봉 사본(git) — 종목 출력(kr-stocks/output)은 git 에 없어 다른 PC 에서는 이 사본으로 그린다
 KOSPI_REAL = os.path.join(HERE, "..", "kr-market-report", "output", "report_body.html")   # 시황 글 댓글 화면 = 코스피 봉차트(한국 증시 리포트와 같은 차트)
 NOW = (11, 27, 15 * 60 + 40)
 CARD_N = 3   # 카드 = 최신 3개, 저절로 넘어감(3초) · 손대면 멈췄다가 다시
@@ -966,11 +967,23 @@ def price_head(name, sub, bars, dec, won, one=False):
 STOCK_DAYS = 60   # 종목 댓글 화면 그래프 = 최근 60거래일(약 3개월) 종가 — 종목은 장중 자료를 모으지 않아 하루 그래프 대신 같은 꼴로 일봉
 
 
+def candle_data(src):
+    """종목 일봉 — 이 PC 에 종목 출력(src)이 있으면 그것을 읽고 사본(ref)을 새로 쓴다, 없으면(집 PC 등) git 의 사본을 읽는다."""
+    if os.path.exists(src):
+        raw = open(src, encoding="utf-8").read()
+        d = json.loads(html.unescape(re.search(r'data-candle="([^"]*)"', raw).group(1)))
+        os.makedirs(os.path.dirname(STOCK_REF), exist_ok=True)
+        with open(STOCK_REF, "w", encoding="utf-8") as f:
+            json.dump(d, f, ensure_ascii=False, separators=(",", ":"))
+        return d
+    print(f"[댓글] 종목 출력 없음 → 일봉 사본 {os.path.relpath(STOCK_REF, HERE)}")
+    return json.load(open(STOCK_REF, encoding="utf-8"))
+
+
 def stock_day(src, sub):
     """종목 댓글 화면 맨 위 = 가격 머리 + 홈 카드 하루 그래프와 같은 꼴(점선 = 비교 기준).
     비교 대상 = 60거래일 전 종가(점선) — 위는 빨강 · 아래는 파랑. 그래프 아래 한 줄로 무엇과 견준 선인지 적는다."""
-    raw = open(src, encoding="utf-8").read()
-    d = json.loads(html.unescape(re.search(r'data-candle="([^"]*)"', raw).group(1)))
+    d = candle_data(src)
     bars = [dict(zip(("day", "open", "high", "low", "close", "volume"), r)) for r in d["bars"]]
     seg = bars[-STOCK_DAYS - 1:]
     n = len(seg) - 1
@@ -1075,6 +1088,9 @@ def comment_page(cmts, total, back, kind):
 
 def build_cc(name, base, cmts, total, page_link="", page=None):
     """page=None → 글 끝에 카드 칸 · page=(제목, 돌아갈 곳, 종목?) → 그 글 틀에 본문만 댓글 화면으로 바꾼 새 페이지."""
+    if not os.path.exists(base):   # 종목 페이지 틀(kr-stocks/output)이 없는 PC = 시황 글 틀로(제목 줄 로고만 빠진다)
+        print(f"[댓글] {os.path.basename(base)} 없음 → 시황 글 틀로 그림")
+        base = BASE
     p = open(base, encoding="utf-8").read()
     js = JS.replace("__NICK_A__", json.dumps(NICK_A, ensure_ascii=False)).replace("__NICK_B__", json.dumps(NICK_B, ensure_ascii=False)).replace("__RLEFT__", str(REACT_LEFT)).replace("__STK_MAX__", str(STK_MAX))
     if page:
