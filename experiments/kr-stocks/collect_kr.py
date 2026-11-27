@@ -296,18 +296,18 @@ def run_prices():
 
 def history():
     """고점 하락 후 회복 통계 — 1999년부터(상장이 늦으면 상장부터), 비교는 KOSPI 같은 기간. 일주일에 한 번. 계산은 NVDA 리포트 history_stats 와 같다."""
+    sys.path.insert(0, os.path.join(BASE, "..", "nvda-report"))
+    import history_stats as HS
     try:
         with open(HIST, encoding="utf-8") as f:
             h = json.load(f)
-        if (datetime.date.today() - datetime.date.fromisoformat(h["built"])).days < HIST_MAX_AGE_DAYS:
+        if (datetime.date.today() - datetime.date.fromisoformat(h["built"])).days < HIST_MAX_AGE_DAYS and h.get("method") == HS.DD_METHOD:   # 사이클 정의가 바뀌면 7일을 기다리지 않고 다시
             return h
     except (OSError, ValueError, KeyError):
         pass
-    sys.path.insert(0, os.path.join(BASE, "..", "nvda-report"))
-    import history_stats as HS
     syms = [c[0] for c in U.CANDIDATES] + [U.BENCH]
     df = yf.download(syms, start="1999-01-01", interval="1d", auto_adjust=False, group_by="ticker", progress=False, threads=3)
-    out = {"built": datetime.date.today().isoformat(), "bench": U.BENCH, "stats": {}}
+    out = {"built": datetime.date.today().isoformat(), "method": HS.DD_METHOD, "bench": U.BENCH, "stats": {}}
     try:
         bench = df[U.BENCH]["Close"].dropna()
     except KeyError:

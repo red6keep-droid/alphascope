@@ -1057,11 +1057,26 @@ def _high_ago(days):
     return " (오늘)" if days <= 0 else f" ({days}거래일 전)"
 
 
+DD_MIN_REC = 5   # 회복한 횟수가 이보다 적은 구간은 `보통` 회복 일수 · `1년 넘게 걸린 비율` 을 싣지 않는다 — 한두 번이 `보통` 이 되지 않게
+
+
+def dd_ok(x):
+    """구간 통계 x 가 화면에 `보통` 값으로 실을 만큼 회복 기록이 있나."""
+    x = x or {}
+    return x.get("median_days") is not None and (x.get("recovered") or 0) >= DD_MIN_REC
+
+
+def dd_ratio_cols(st, bn):
+    """`회복에 1년 넘게 걸린 비율` 표 칸 — 이 종목 · 비교 대상 둘 다 기록이 넉넉한 구간만 [(구간, 이 종목 %, 비교 %)]."""
+    return [(lv, st[lv]["over_year"] / st[lv]["recovered"] * 100, bn[lv]["over_year"] / bn[lv]["recovered"] * 100)
+            for lv in ("10", "20", "30") if dd_ok(st.get(lv)) and dd_ok(bn.get(lv))]
+
+
 def dd_block(name, st, bn, bench, span, x, tip, tail):
     """고점 하락 후 가격 회복 한 덩이 (2026-10-27 P24 · P28). 영역 제목 없이 접힌 머리 = 문장 두 줄(굵게) + 작은 회색 한 줄(영역 이름 · 툴팁 · 기간 · 횟수 · 비교),
     펼치면 구간별 이 종목 · 비교 대상 막대(흰 카드) + `회복에 1년 넘게 걸린 비율` 표(tail). st · bn = 구간별 통계(이 종목 · 비교), bench = 비교 이름.
     –x% 와 `N거래일째` 는 위 가격 범위가 갖는다 (P15)."""
-    lvs = [lv for lv in ("10", "20", "30") if (st.get(lv) or {}).get("n") and (st.get(lv) or {}).get("median_days") is not None]
+    lvs = [lv for lv in ("10", "20", "30") if dd_ok(st.get(lv))]   # 회복 기록이 DD_MIN_REC 번 미만인 구간은 뺀다
     if not lvs:
         return ""
     cur = dd_cur(x, st)
@@ -1077,7 +1092,7 @@ def dd_block(name, st, bn, bench, span, x, tip, tail):
             f'</span>{ACC_BTN}</span>')
     # 구간별 세로 막대 (2026-10-27 P36, 넘겨 보기) — 이 종목 · 비교 두 막대, 숫자 = 보통 회복 거래일, 지금 구간의 이 종목 막대는 진하게.
     # 비교 쪽은 횟수가 적어(KOSPI 5~10번) 횟수를 그래프 아래 작은 글씨로 (P28)
-    groups = [(f"−{lv}% 넘게 하락 시" + ("\n지금" if lv == cur else ""), [st[lv]["median_days"], (bn.get(lv) or {}).get("median_days")]) for lv in lvs]
+    groups = [(f"−{lv}% 넘게 하락 시" + ("\n지금" if lv == cur else ""), [st[lv]["median_days"], bn[lv]["median_days"] if dd_ok(bn.get(lv)) else None]) for lv in lvs]
     chart_html = _col_chart(groups, [lambda v: _PASTEL_DN, lambda v: _GRAY_BAR], [lambda v: DOWN, lambda v: NOTE], fmt=lambda v: f"{v:,.0f}")
     if cur in lvs:   # 지금 구간 = 막대 색 대신 축 이름 위 점 (P176, 옛 20% 진하게)
         chart_html = axis_dot(chart_html, f"−{cur}% 넘게 하락 시\n지금", DOWN)
@@ -1086,7 +1101,7 @@ def dd_block(name, st, bn, bench, span, x, tip, tail):
     bl = [lv for lv in lvs if (bn.get(lv) or {}).get("n")]
     cnt = dd_table(f"{span} 동안 있었던 횟수", "하락", lvs,
                    [(name, [f"{st[lv]['n']}번" for lv in lvs])] + ([(bench, [f"{(bn.get(lv) or {}).get('n', 0)}번" if lv in bl else "—" for lv in lvs])] if bl else []))
-    chart = (f'<span style="display:block;padding:4px 12px 12px;"><span style="display:block;margin:0 0 {_dk.CHART_TITLE_GAP}px;font-weight:700;color:#111;font-size:{_dk.NAME};">{_dk.CHART_MARK}최고가를 되찾기까지 보통 걸리는 일수{_tipx(tip)}</span>'
+    chart = (f'<span style="display:block;padding:4px 12px 12px;"><span style="display:block;margin:0 0 {_dk.CHART_TITLE_GAP}px;font-weight:700;color:#111;font-size:{_dk.NAME};">{_dk.CHART_MARK}고점을 되찾기까지 보통 걸리는 일수{_tipx(tip)}</span>'
              f'<span style="display:block;background:#fff;border:1px solid rgb(226,232,240);border-radius:8px;margin:0 {_dk.CHART_CARD_X}px;font-size:{SMALL};line-height:{LH_CARD};">'   # rgb() — 강조 카드 _flatten 이 흰 카드로 보지 않게
              f'<span style="display:block;padding:{_dk.CHART_CARD_PAD}px 12px 0;">{_dk.legend_top(chart_html, legend)}</span></span></span>')
     return f'<details data-acc="1"><summary style="list-style:none;cursor:pointer;display:block;">{head}</summary>{chart}{cnt}{tail}</details>'
@@ -1653,7 +1668,7 @@ def news_opinion_card(name, ns, span=PICK_SPAN):
 
 def dd_cur(x, st):
     """지금 해당하는 가장 깊은 구간 — 없으면 None (10% 안쪽)."""
-    return next((l for l in ("30", "20", "10") if -x > int(l) and (st.get(l) or {}).get("median_days") is not None), None)
+    return next((l for l in ("30", "20", "10") if -x > int(l) and dd_ok(st.get(l))), None)
 
 
 _SEC_RE = re.compile(r'<div style="[^"]*margin:24px 0 10px;">(.*?)</div><div data-cards="1" style="margin:0 0 8px;"><span style="[^"]*">(.*)</span></div>$', re.S)
@@ -1735,14 +1750,14 @@ def price_in(bg, bd, parts):
 def dd_tip(d):
     st, pk = d["stats"]["nvda"], d["stats"]["peers"]
     x = d["pct_from_high"]
-    lv = next((l for l in ("30", "20", "10") if -x > int(l) and (st.get(l) or {}).get("median_days") is not None), None)
+    lv = next((l for l in ("30", "20", "10") if -x > int(l) and dd_ok(st.get(l))), None)
     if lv:
         md = st[lv]["median_days"]
         now = f"· 지금 {_tri(x)} : −{lv}% 넘게 빠진 경우. 이때 엔비디아는 절반이 {md}거래일({_months(md)}) 안에 회복했다"
     else:
         now = f"· 지금 {_tri(x)} : 아직 −10%까지 빠지지 않았다"
-    slower = all((pk.get(l) or {}).get("median_days", 0) > (st.get(l) or {}).get("median_days", 0) for l in ("10", "20", "30") if st.get(l))
-    return (f"크게 떨어진 뒤 원래 최고가를 되찾기까지 걸린 시간의 {_span_label(d['stats'])} 기록\n" + now + "\n"
+    slower = all(pk[l]["median_days"] > st[l]["median_days"] for l in ("10", "20", "30") if dd_ok(st.get(l)) and dd_ok(pk.get(l)))
+    return (f"크게 떨어진 뒤 고점을 되찾기까지 걸린 시간의 {_span_label(d['stats'])} 기록\n" + now + "\n"
             "· 보통 : 절반은 이 기간 안에 회복했다는 뜻" + (". 다른 대형 기술주는 더 오래 걸렸다" if slower else ""))
 
 
@@ -1780,12 +1795,7 @@ def sec_drawdown(a):
         return ""
     st, pk = d["stats"]["nvda"], d["stats"]["peers"]
     span = _span_label(d["stats"])
-    cols = []
-    for lv in ("10", "20", "30"):
-        x, y = st.get(lv) or {}, pk.get(lv) or {}
-        if not x.get("n") or x.get("median_days") is None or y.get("median_days") is None:
-            continue
-        cols.append((lv, x["over_year"] / x["recovered"] * 100, y["over_year"] / y["recovered"] * 100))
+    cols = dd_ratio_cols(st, pk)
     tail = ""
     if cols:   # 세로 구분선 — 첫 칸 = 이름, 나머지 = −10 · −20 · −30%
         vb = "border-left:1px solid #E2E8F0;"
@@ -1798,9 +1808,9 @@ def sec_drawdown(a):
         tbl = "".join(f'<span style="display:flex;align-items:stretch;line-height:24px;">{r}</span>' for r in (head_cells, r1, r2))
         x20, y20 = st.get("20") or {}, pk.get("20") or {}
         mono = all(cols[i][1] <= cols[i + 1][1] for i in range(len(cols) - 1))
-        tip = ("크게 떨어진 일 가운데, 최고가를 되찾기까지 1년(250거래일) 넘게 걸린 경우의 비율"
+        tip = ("크게 떨어진 일 가운데, 고점을 되찾기까지 1년(250거래일) 넘게 걸린 경우의 비율"
                + (f"\n· 엔비디아 {x20['over_year'] / x20['recovered'] * 100:.0f}% : −20% 넘게 빠졌다가 회복한 {x20['recovered']}번 중 {x20['over_year']}번이 1년 넘게 걸렸다. "
-                  f"다른 대형 기술주는 {y20['over_year'] / y20['recovered'] * 100:.0f}%" if x20.get("recovered") and y20.get("recovered") else "")
+                  f"다른 대형 기술주는 {y20['over_year'] / y20['recovered'] * 100:.0f}%" if dd_ok(x20) and dd_ok(y20) else "")
                + ("\n· 참고 : 많이 빠질수록 오래 걸린 경우가 늘었다" if mono else ""))
         title_line = (f'<span style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin:0 0 4px;">'
                       f'<span style="color:#111;font-weight:700;white-space:nowrap;">회복에 1년 넘게 걸린 비율{_tipx(tip)}</span></span>')   # `(약 30년 기간 중)` 은 뺐다 — 기간은 머리 작은 줄에 (2026-10-27 P17 · P24)

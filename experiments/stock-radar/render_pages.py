@@ -743,13 +743,7 @@ def sec_drawdown(s):
         return ""
     st, sp = d["stock"]["dd"], d["stock"]["spy_dd"]   # S&P 500 은 이 종목과 같은 기간
     span = R._span_label(d["stock"])
-    cols = []
-    for lv in ("10", "20", "30"):
-        x, y = st.get(lv) or {}, sp.get(lv) or {}
-        if not x.get("n") or x.get("median_days") is None:
-            continue
-        if x.get("recovered") and y.get("recovered"):
-            cols.append((lv, x["over_year"] / x["recovered"] * 100, y["over_year"] / y["recovered"] * 100))
+    cols = R.dd_ratio_cols(st, sp)   # 둘 다 회복 기록이 넉넉한 구간만 (R.DD_MIN_REC)
     tail = ""
     if cols:
         vb = "border-left:1px solid #E2E8F0;"

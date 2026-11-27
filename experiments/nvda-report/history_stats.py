@@ -18,22 +18,31 @@ import config
 
 PEERS = ["NVDA", "AMD", "QCOM", "AVGO", "AMAT", "LRCX", "KLAC", "MU", "INTC", "TXN", "AAPL", "MSFT", "AMZN", "GOOGL", "CSCO"]   # 15종목 (검증과 같은 목록)
 DD_LEVELS = (10, 20, 30)
+DD_YEAR = 250      # 이 거래일 안에 고점을 못 되찾으면 하락 한 번을 끊고 새로 센다
+DD_METHOD = 2      # 사이클 정의 번호 — 캐시(history.json · hist*.json)가 이 번호와 다르면 다시 계산
 
 
 def drawdown_cycles(c):
-    """종가가 직전 최고 종가에서 몇 % 내려갔다가 그 고점을 다시 넘을 때까지 — 사이클마다 (깊이 %, 고점 날짜부터 센 거래일, 회복 여부)."""
+    """고점에서 내려갔다가 그 고점을 다시 넘을 때까지 — 사이클마다 (깊이 %, 고점 날짜부터 센 거래일, 회복 여부).
+    고점을 1년(DD_YEAR 거래일) 안에 되찾지 못하면 그 하락은 거기서 한 번으로 끊고(회복 일수는 실제로 되찾은 날까지 따라가 적는다)
+    그날부터 새로 센다 — 오래 못 되찾은 고점 하나가 그 뒤 몇 년의 하락을 모두 삼켜 '한 번'으로 만들지 않게 (DD_METHOD 2)."""
     v = c.values
+    n = len(v)
     peak, peak_i, trough = v[0], 0, 0.0
     out = []
-    for i in range(1, len(v)):
+    for i in range(1, n):
         if v[i] >= peak:
             if trough < 0:
                 out.append((trough * 100, i - peak_i, True))
             peak, peak_i, trough = v[i], i, 0.0
-        else:
-            trough = min(trough, v[i] / peak - 1)
+            continue
+        trough = min(trough, v[i] / peak - 1)
+        if i - peak_i >= DD_YEAR:
+            j = next((k for k in range(i + 1, n) if v[k] >= peak), None)
+            out.append((trough * 100, (j if j is not None else n - 1) - peak_i, j is not None))
+            peak, peak_i, trough = v[i], i, 0.0
     if trough < 0:
-        out.append((trough * 100, len(v) - 1 - peak_i, False))   # 아직 회복 못 한 지금 사이클
+        out.append((trough * 100, n - 1 - peak_i, False))   # 아직 회복 못 한 지금 사이클
     return out
 
 
@@ -66,7 +75,7 @@ def drawdown_stats():
     if "NVDA" not in per:
         return None
     return {**span, "nvda": per["NVDA"], "peers": dd_summary(pooled), "peers_n": len(per),
-            "peers_span": "1999~" , "note": "고점 날짜부터 그 고점을 다시 넘을 때까지 거래일. 사이클마다 깊이가 수준(10 · 20 · 30%)을 넘은 것만 센다."}
+            "peers_span": "1999~" , "note": "고점 날짜부터 그 고점을 다시 넘을 때까지 거래일. 1년 안에 못 되찾으면 그 하락은 거기서 끊고 새로 센다. 사이클마다 깊이가 수준(10 · 20 · 30%)을 넘은 것만 센다.", "method": DD_METHOD}
 
 
 def main():

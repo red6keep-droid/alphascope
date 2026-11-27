@@ -57,53 +57,54 @@
   "to": "2026-10-16",
   "nvda": {
    "10": {
-    "n": 38,
-    "recovered": 38,
+    "n": 62,
+    "recovered": 62,
     "median_days": 46,
-    "over_year": 4,
+    "over_year": 7,
     "longest_days": 2138
    },
    "20": {
-    "n": 16,
-    "recovered": 16,
-    "median_days": 121,
-    "over_year": 4,
+    "n": 31,
+    "recovered": 31,
+    "median_days": 108,
+    "over_year": 7,
     "longest_days": 2138
    },
    "30": {
-    "n": 11,
-    "recovered": 11,
-    "median_days": 123,
-    "over_year": 4,
+    "n": 19,
+    "recovered": 19,
+    "median_days": 209,
+    "over_year": 7,
     "longest_days": 2138
    }
   },
   "peers": {
    "10": {
-    "n": 565,
-    "recovered": 553,
-    "median_days": 50,
-    "over_year": 92,
+    "n": 1158,
+    "recovered": 1146,
+    "median_days": 52,
+    "over_year": 201,
     "longest_days": 5403
    },
    "20": {
-    "n": 248,
-    "recovered": 239,
-    "median_days": 159,
-    "over_year": 91,
+    "n": 524,
+    "recovered": 515,
+    "median_days": 182,
+    "over_year": 198,
     "longest_days": 5403
    },
    "30": {
-    "n": 143,
-    "recovered": 136,
-    "median_days": 349,
-    "over_year": 84,
+    "n": 299,
+    "recovered": 292,
+    "median_days": 356,
+    "over_year": 180,
     "longest_days": 5403
    }
   },
   "peers_n": 15,
   "peers_span": "1999~",
-  "note": "고점 날짜부터 그 고점을 다시 넘을 때까지 거래일. 사이클마다 깊이가 수준(10 · 20 · 30%)을 넘은 것만 센다."
+  "note": "고점 날짜부터 그 고점을 다시 넘을 때까지 거래일. 1년 안에 못 되찾으면 그 하락은 거기서 끊고 새로 센다. 사이클마다 깊이가 수준(10 · 20 · 30%)을 넘은 것만 센다.",
+  "method": 2
  },
  "generated_at": "2026-10-18",
  "note": "각 조건 '진입일'(연속 구간 첫날)의 20·60거래일 뒤 수익률. base = 아무 날. 과거 빈도이지 예측이 아니다."

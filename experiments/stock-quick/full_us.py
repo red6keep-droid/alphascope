@@ -267,6 +267,8 @@ def history(cache_dir, syms):
     path = os.path.join(cache_dir, "hist_us.json")
     c = _load(path, {"stats": {}, "day": {}})
     today = datetime.date.today()
+    if c.get("method") != HS.DD_METHOD:   # 사이클 정의가 바뀌면 모든 종목을 다시 받을 차례로 (하루 BUDGET 안에서)
+        c["day"], c["method"] = {}, HS.DD_METHOD
     old = [s for s in syms if not c["day"].get(s) or (today - datetime.date.fromisoformat(c["day"][s])).days >= 7]
     old.sort(key=lambda s: (s in c["stats"], c["day"].get(s) or ""))
     todo = old[:BUDGET["hist"]]

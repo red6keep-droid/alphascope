@@ -168,19 +168,19 @@ def run():
 def history():
     """고점 하락 후 회복 통계 — 1999년부터(검증 데이터 기준과 같게) 종가 사이클. 일주일에 한 번만 다시 받는다.
     계산은 NVDA 리포트 history_stats 와 같은 함수(drawdown_cycles · dd_summary)."""
-    try:
-        with open(HIST, encoding="utf-8") as f:
-            h = json.load(f)
-        if (datetime.date.today() - datetime.date.fromisoformat(h["built"])).days < HIST_MAX_AGE_DAYS:
-            return h
-    except (OSError, ValueError, KeyError):
-        pass
     import sys
     sys.path.insert(0, os.path.join(BASE, "..", "nvda-report"))
     import history_stats as HS
+    try:
+        with open(HIST, encoding="utf-8") as f:
+            h = json.load(f)
+        if (datetime.date.today() - datetime.date.fromisoformat(h["built"])).days < HIST_MAX_AGE_DAYS and h.get("method") == HS.DD_METHOD:   # 사이클 정의가 바뀌면 7일을 기다리지 않고 다시
+            return h
+    except (OSError, ValueError, KeyError):
+        pass
     syms = [c[0] for c in U.CANDIDATES] + [e for e in etf_universe.US_SYMS if e != U.BENCH] + [U.BENCH]   # ETF 페이지도 같은 카드 (2026-11-12) — 주 1회
     df = yf.download(syms, start="1999-01-01", interval="1d", auto_adjust=False, group_by="ticker", progress=False, threads=True)
-    out = {"built": datetime.date.today().isoformat(), "stats": {}}
+    out = {"built": datetime.date.today().isoformat(), "method": HS.DD_METHOD, "stats": {}}
     spy = df[U.BENCH]["Close"].dropna()
     for s in syms:
         try:
