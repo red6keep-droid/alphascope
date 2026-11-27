@@ -106,7 +106,7 @@ def fetch_fund(sym, tries=2, cache_dir=None):
     import etf_flows
     f = etf_flows.fund(sym, cache_dir)
     if f:
-        return f
+        return {k: v for k, v in f.items() if k != "weekly"}   # 그래프용 묶음은 기록에 안 넣는다 — 운용사 파일에 전체 이력이 있어 다시 계산된다
     import yfinance as yf
     for k in range(tries):
         try:

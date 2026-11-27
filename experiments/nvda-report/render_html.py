@@ -2158,6 +2158,14 @@ def sector_lines(sf, bench):
         lines.insert(1, (f"{'다만 ' if gap else ''}같은 기간 이 ETF({lab})에는 실제로 {abs(v):,.1f}억 달러가 {word}.", "plain"))
         pct = f" · 순자산의 {_sgn1(fd['flow20_pct'])}%" if fd.get("flow20_pct") is not None else ""
         lines.insert(4, ("row", f"ETF에 실제 들어온 돈 ({n}일)", f"{abs(v):,.1f}억 달러 {'유입' if v > 0 else '유출'}", f"좌수 변화 × 기준가{pct} · 자료 {fd.get('src_name') or 'State Street'}"))
+        wk = fd.get("weekly") or {}
+        if len(wk.get("vals") or []) >= 4:   # 5거래일마다 쌓은 순유입 선 — 몇 달 흐름과 최근 꺾임을 한 그림에 (개선 3-2 C안). 판정 막대 바로 아래
+            vs = [x / 1e8 for x in wk["vals"]]
+            chart = _dk.trend_card(f"최근 {len(vs) * wk.get('step', 5)}거래일 ETF에 들어온 돈 (5거래일마다 쌓은 값, 억 달러)", wk["labels"],
+                                   [(f"{lab} 순유입 누적", vs, _dk.CHART_MAIN, "solid"), ("0 (들어온 돈 = 나간 돈)", [0.0] * len(vs), _dk.CHART_CMP, "guide")],
+                                   lambda x: f"{x:+,.0f}".replace("-", "−"))
+            if chart:
+                lines.insert(3, (chart, "html"))
     secs = sf.get("sectors") or []
     if secs:
         lines.append(("row", "앞선 업계", "\n".join(f"{x['name']} {_sgn1(x['rel'])}%p" for x in secs[:2]), "시장보다 많이 오른 업계"))

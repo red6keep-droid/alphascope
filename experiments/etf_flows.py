@@ -80,11 +80,29 @@ def daily_flows(rows):
     return out
 
 
+WEEK_STEP, WEEK_N = 5, 24   # 카드 선 그래프 — 5거래일마다 쌓은 값, 120거래일(약 여섯 달)
+
+
+def weekly(rows, n=WEEK_N, step=WEEK_STEP):
+    """최근 n×step 거래일 순유입을 step 거래일마다 쌓은 값 → {"labels": ["6.12", …], "vals": [달러, …]}. 첫 점 = 첫 묶음까지 쌓인 값."""
+    fl = daily_flows(rows)[-n * step:]
+    labels, vals, acc = [], [], 0.0
+    for k in range(0, len(fl), step):
+        chunk = fl[k:k + step]
+        acc += sum(v for _, v in chunk)
+        d = chunk[-1][0]
+        labels.append(f"{int(d[5:7])}.{int(d[8:])}")
+        vals.append(round(acc, 0))
+    return {"labels": labels, "vals": vals, "step": step}
+
+
 def summary(rows):
     """이력 → 마지막 날 값과 5 · 20 · 60거래일 순유입(달러 · 그 구간 첫날 순자산 대비 %)."""
     d, nav, sh, aum = rows[-1]
     out = {"as_of": d, "nav": nav, "units": sh, "aum": aum, "src": "ssga"}
     fl = daily_flows(rows)
+    if len(rows) > WEEK_N * WEEK_STEP:
+        out["weekly"] = weekly(rows)
     for n in DAYS:
         if len(rows) > n:
             flow = sum(v for _, v in fl[-n:])
