@@ -538,10 +538,12 @@ def _money(v):
     return f"${v:.2f}".replace("$-", "−$")
 
 
-def beat_card(name, e, rev_series, today, log=None, next_day=None):
+def beat_card(name, e, rev_series, today, log=None, next_day=None, money=None, unit="달러", bil=None, rev_note=None, tip=None):
     """`발표 때 예상을 넘었나?` — (state, lines, tip) 또는 None.
+    money · unit · bil · rev_note · tip = 나라별 글(한국 종목은 원 · 조 원 · 한국 안내, 개선 1-14). 비우면 미국 그대로.
     next_day = 페이지가 쓰는 다음 실적 발표일(요약 문단 · `다음 실적 발표는?` 과 같은 일정). 있으면 그 날을 쓴다 — 일정이 둘이면 카드끼리 날짜가 갈렸다(개선 1-17)."""
     RP, R, dk = _mods()
+    M, B = money or _money, bil or RP._bil
     rows = [r for r in beat_rows(e, rev_series, log) if r["act"] is not None]
     if not rows:
         return None
@@ -553,10 +555,11 @@ def beat_card(name, e, rev_series, today, log=None, next_day=None):
     when = f"{int(last['day'][5:7])}월 {int(last['day'][8:])}일" if last["day"] else ""
     q = f"{last['cq'][2:4]}년 {last['cq'][-1]}분기"
     verb = {1: "넘었습니다", -1: "밑돌았습니다", 0: "같았습니다"}
-    first = f"{dk.josa(name, '는')} {when + ' ' if when else ''}{q} 실적을 발표했습니다. 1주당 이익은 {_money(last['act'])}"
-    first += f"로, 애널리스트 예상 {_money(last['est'])}를 {verb[ce]}." if ce is not None else "입니다. 발표 전 애널리스트 예상은 없었습니다."
+    J = (lambda t, j: t + j) if unit == "달러" else dk.josa   # `$2.10로` 는 미국 그대로 · 원은 받침 따라(`11,462원으로`)
+    first = f"{dk.josa(name, '는')} {when + ' ' if when else ''}{q} 실적을 발표했습니다. 1주당 이익은 {M(last['act'])}"
+    first = (first[:-len(M(last['act']))] + J(M(last['act']), "로") + f", 애널리스트 예상 {J(M(last['est']), '를')} {verb[ce]}.") if ce is not None else first + "입니다. 발표 전 애널리스트 예상은 없었습니다."
     if cr is not None:
-        first += f" 매출은 {RP._bil(last['rev'])}로 예상 {RP._bil(last['rev_est'])}를 {verb[cr]}."
+        first += f" 매출은 {B(last['rev'])}로 예상 {B(last['rev_est'])}를 {verb[cr]}."
     scored = [r for r in rows if _cmp(r["act"], r["est"]) is not None and abs(r["est"]) >= MIN_EPS]   # 분할로 1센트 단위가 된 옛 값은 반올림 차이가 판정을 가른다(엔비디아 2014 ~ 17년 0.01달러)
     nbeat = sum(1 for r in scored if _cmp(r["act"], r["est"]) > 0)
     since = scored[0]["cq"][:4] if scored else ""
@@ -570,17 +573,17 @@ def beat_card(name, e, rev_series, today, log=None, next_day=None):
         if c is None or c == 0:
             return ("#9CA3AF", "#111")
         return (R._PASTEL_UP, R.UP) if c > 0 else (R._PASTEL_DN, R.DOWN)
-    inner = R._col_chart(groups_, [lambda v: R._GRAY_BAR] * 2, [lambda v: "#111"] * 2, fmt=lambda v: f"{v:.2f}".replace("-", "−"), color_at=color_at, right=True)
+    inner = R._col_chart(groups_, [lambda v: R._GRAY_BAR] * 2, [lambda v: "#111"] * 2, fmt=lambda v: (f"{v:.2f}" if unit == "달러" else f"{v:,.0f}").replace("-", "−"), color_at=color_at, right=True)
     legend = R._legend_chips([("예상보다 높음", R._PASTEL_UP), ("예상보다 낮음", R._PASTEL_DN), ("애널리스트 예상", R._GRAY_BAR)])
     chart = (f'<span style="{R.MULTI}margin:0 {dk.CHART_CARD_X}px;"><span style="display:block;padding:{dk.CHART_CARD_PAD}px 12px 0;">'
-             f'{dk.legend_top(inner, dk.legend_unit(legend, "달러"))}</span></span>')
+             f'{dk.legend_top(inner, dk.legend_unit(legend, unit))}</span></span>')
     lines = [(first, "plain"), (f'{dk.CHART_TITLE_M}발표마다 1주당 이익, 실제와 예상</span>{chart}', "html")]
     if scored:
         lines.append(("row", "예상을 넘은 횟수", f"{len(scored)}번 중 {nbeat}번", f"{since}년 이후 발표 · 1주당 이익"))
     for r in rows[::-1]:   # 매출 예상이 있는 분기만 줄로 (최신 위)
         c = _cmp(r["rev"], r["rev_est"])
         if c is not None:
-            lines.append(("row", f"{r['cq'][2:4]}년 {r['cq'][-1]}분기 매출", RP._bil(r["rev"]), f"예상 {RP._bil(r['rev_est'])} · {({1: '넘음', -1: '밑돎', 0: '같음'})[c]}"))
+            lines.append(("row", f"{r['cq'][2:4]}년 {r['cq'][-1]}분기 매출", B(r["rev"]), f"예상 {B(r['rev_est'])} · {({1: '넘음', -1: '밑돎', 0: '같음'})[c]}"))
     nxt = [x for x in e["dates"] if x["act"] is None and x["day"] >= today]
     fh_next = [x for x in e.get("finnhub") or [] if x.get("eps_act") is None and x["day"] >= today]
     est = (log or {}).get(max(log)) if log else {}
@@ -591,13 +594,15 @@ def beat_card(name, e, rev_series, today, log=None, next_day=None):
         left = (datetime.date.fromisoformat(day) - datetime.date.fromisoformat(today)).days
         if (est or {}).get("eps0q"):
             v, n = est["eps0q"]
-            lines.append(("row", "다음 발표 1주당 이익 예상", _money(v), f"애널리스트 {int(n or 0)}명 평균 · {int(day[5:7])}월 {int(day[8:])}일 발표 예정({left}일 뒤)"))
+            lines.append(("row", "다음 발표 1주당 이익 예상", M(v), f"애널리스트 {int(n or 0)}명 평균 · {int(day[5:7])}월 {int(day[8:])}일 발표 예정({left}일 뒤)"))
         if (est or {}).get("rev0q"):
             v, n = est["rev0q"]
-            lines.append(("row", "다음 발표 매출 예상", RP._bil(v), f"애널리스트 {int(n or 0)}명 평균"))
-    if not any(_cmp(r["rev"], r["rev_est"]) is not None for r in rows):
-        lines.append(("지난 분기 매출 예상은 받을 수 있는 무료 자료가 없어, 다음 발표부터 발표 전 예상을 기록해 견줍니다.", "note"))
-    tip = ("실적 발표 때 실제 1주당 이익(EPS)이 애널리스트 예상 평균보다 높았는지 낮았는지. 1주당 이익은 회사 순이익을 주식 수로 나눈 값\n"
+            lines.append(("row", "다음 발표 매출 예상", B(v), f"애널리스트 {int(n or 0)}명 평균"))
+    if rev_note is None:
+        rev_note = "지난 분기 매출 예상은 받을 수 있는 무료 자료가 없어, 다음 발표부터 발표 전 예상을 기록해 견줍니다."
+    if rev_note and not any(_cmp(r["rev"], r["rev_est"]) is not None for r in rows):
+        lines.append((rev_note, "note"))
+    tip = tip or ("실적 발표 때 실제 1주당 이익(EPS)이 애널리스트 예상 평균보다 높았는지 낮았는지. 1주당 이익은 회사 순이익을 주식 수로 나눈 값\n"
            "· 나누는 법 : 마지막 발표의 이익 · 매출이 둘 다 예상보다 높으면 예상 넘음, 둘 다 낮으면 예상 밑돎, 하나씩이면 엇갈림. 예상과 0.5% 안이면 같음\n"
            "· 예상 : 발표 직전 애널리스트 평균(Yahoo Finance · Finnhub 집계, 매출은 우리가 매일 기록한 값도)\n"
            "· 넘은 횟수 : 주식 분할로 1센트 단위가 된 옛 발표(예상 0.10달러 미만)는 반올림 차이가 커서 세지 않는다\n"
