@@ -18,7 +18,8 @@
     down · up 최근 60거래일 중 시장이 내린 날 · 오른 날만 골라, 그날들의 시장 대비 하루 차이 평균(%p)과 시장보다 나았던 날 수.
               down.big = 시장이 1% 넘게 내린 날만. "시장이 빠질 때 더 빠지나 · 버티나".
     turnover  거래대금(종가 × 거래량) 20일 평균, 같은 층 안 비중(%), 최근 5일 ÷ 60일 평균(배) — 관심이 몰리는 곳
-    fund      야후 순자산(aum) · 기준가(nav) · 좌수 추정(units = aum ÷ nav). 원값만 — 순유입은 읽는 쪽이 계산한다:
+    fund      src=ssga(스테이트 스트리트 ETF 19개): 운용사가 낸 기준가(nav) · 좌수(units) · 순자산(aum) · 그 날짜(as_of) · 5 · 20 · 60거래일 순유입(flowN 달러 · flowN_pct).
+              src=yahoo(나머지): 야후 순자산(aum) · 기준가(nav) · 좌수 추정(units = aum ÷ nav). 원값만 — 순유입은 읽는 쪽이 계산한다:
               순유입 ≈ (오늘 units − 어제 units) × 오늘 nav.  야후 sharesOutstanding 칸은 순자산과 안 맞아(11-20 XLK · SMH 확인) 참고로만 둔다.
               **야후가 순자산을 날마다 고치는지는 쌓아 봐야 안다** — 며칠째 같은 값이면 운용사 파일(스테이트 스트리트 · 아이셰어즈 · 반에크 · 퍼스트 트러스트)로 바꾼다.
 나중 결과(그 뒤 며칠 수익)는 쓰지 않는다 — 읽는 쪽이 일봉으로 계산한다(record_store 원칙). 실패해도 다른 단계는 계속.
@@ -99,15 +100,20 @@ def price_row(etf, bench):
     return out
 
 
-def fetch_fund(sym, tries=2):
-    """야후 ETF 정보 → 순자산 · 기준가 원값. 못 받으면 None."""
+def fetch_fund(sym, tries=2, cache_dir=None):
+    """순자산 · 기준가 · 좌수. 운용사 이력이 있는 ETF(etf_flows.SSGA)는 그 값(src=ssga, 좌수 = 운용사 발표 · 5 · 20 · 60일 순유입 포함),
+    없는 ETF 는 야후 정보(src=yahoo, 좌수 = 순자산 ÷ 기준가 추정). 못 받으면 None."""
+    import etf_flows
+    f = etf_flows.fund(sym, cache_dir)
+    if f:
+        return f
     import yfinance as yf
     for k in range(tries):
         try:
             i = yf.Ticker(sym).info or {}
             aum, nav = i.get("totalAssets"), i.get("navPrice")
             if aum and nav:
-                return {"aum": float(aum), "nav": float(nav), "units": round(float(aum) / float(nav), 1), "yahoo_shares": i.get("sharesOutstanding")}
+                return {"aum": float(aum), "nav": float(nav), "units": round(float(aum) / float(nav), 1), "yahoo_shares": i.get("sharesOutstanding"), "src": "yahoo"}
         except Exception as ex:  # noqa: BLE001
             print(f"[flow] {sym} 순자산 받기 실패({k + 1}): {str(ex)[:120]}")
         time.sleep(2)

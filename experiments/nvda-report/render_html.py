@@ -2150,6 +2150,14 @@ def sector_lines(sf, bench):
              (flow_gauge(sf, sf["name"]), "html"),   # 엔비디아 반도체 자금 카드와 같은 막대
              ("row", f"{sf['name']} vs 시장 ({n}일)", f"{_sgn1(rel)}%p", f"+{pp:.0f}%p 넘으면 유입 · −{pp:.0f}%p 아래면 유출", False, True),
              ("row", "업계 순위", f"{sf['n_pool']}개 중 {_dk.violet(str(sf['rank']) + '위')}", "같은 기간 수익률 순", True)]   # 순위 숫자 = 보라   # 업종 → 업계
+    fd = sf.get("fund") or {}
+    if fd.get("flow20") is not None:   # 운용사 좌수 이력으로 센 실제 돈 (etf_flows.py) — 이 ETF 한 개의 돈이지 업계 전체가 아니다
+        v, lab = fd["flow20"] / 1e8, sf.get("etf_label") or sf["etf"]
+        word = "들어왔다" if v > 0 else "빠져나갔다"
+        gap = (v > 0) != (rel > 0) and sf["state"] != "뚜렷하지 않음"
+        lines.insert(1, (f"{'다만 ' if gap else ''}같은 기간 이 ETF({lab})에는 실제로 {abs(v):,.1f}억 달러가 {word}.", "plain"))
+        pct = f" · 순자산의 {_sgn1(fd['flow20_pct'])}%" if fd.get("flow20_pct") is not None else ""
+        lines.insert(4, ("row", f"ETF에 실제 들어온 돈 ({n}일)", f"{abs(v):,.1f}억 달러 {'유입' if v > 0 else '유출'}", f"좌수 변화 × 기준가{pct} · 자료 {fd.get('src_name') or 'State Street'}"))
     secs = sf.get("sectors") or []
     if secs:
         lines.append(("row", "앞선 업계", "\n".join(f"{x['name']} {_sgn1(x['rel'])}%p" for x in secs[:2]), "시장보다 많이 오른 업계"))
