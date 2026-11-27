@@ -101,7 +101,6 @@ ARCHIVE_SEED = [
 # 발행 여부는 블로그 실제 페이지(www.newfact.app 글자 · 피드)와 origin/main 코드로 확인해 옮긴다 — 발행된 기능은 LIVE 로, 대표가 아닌 지난 시안은 표에서 빼 휴지통으로.
 # 11-26 대조: 업계상황 탭 · Newfact 뉴스(글 · 홈 카드 · 사실) · 종목 새 카드 넷 · 회사 소개 안내 줄 · 늦은 날 상자 · 푸터 링크 = 블로그에 있음 → 발행 예정에서 뺌.
 PLAN = [   # (기능 이름, 남은 일 — 한 줄, 파일 패턴 "폴더/파일")
-    ("업계 자금 흐름 카드 — ETF에 실제 들어온 돈 (미국 종목 업계상황 탭)", "문장 · 줄 확인 → 종목 페이지에 연결(반도체 SMH 등 다른 운용사는 다음)", ["stock-radar/mock_flow_money.html"]),
     ("증시에서 돈이 빠져나가나? (한국 증시 리포트 수급 탭 맨 위 새 카드)", "카드 이름 · 판정 기준 확인 → 수급 탭에 붙이기 · 기록 대장 한 줄", ["kr-market-report/mock_money_flow.html"]),
     ("개성 있는 아이 찾기 게임 — 평범의 범위 · 설정으로 나온 답 · 그림 확인", "기준 설정(80% · 20일 간격)에서 나온 그룹 후보를 여덟 명씩 그림으로 확인 · 길잡이 = 비공개 doc/기획/종목-그래프-패턴-분류-목적.md", ["stock-character/mock_*.html"]),
     ("주식마을 3D (날씨 도시 · 마을 · 행성 시안)", "날씨 도시 판 모델링 · 연출 다듬기(물에 잠김 · 남은 날씨 7가지) → 방향 확정 뒤 휴대폰 발열 줄이기 5가지 · 날씨 기준 정하기 · Blogger 모듈 스크립트 시험 (흰 도시 · 3D 시험 1판은 11-24 사용자 삭제)", ["fantasy-world/mock_city_weather.html", "fantasy-world/mock_village_flat.html", "fantasy-world/mock_village_polish.html", "fantasy-world/mock_village_3d_v2.html"]),
