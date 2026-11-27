@@ -438,7 +438,7 @@ STOCKS = {
     "NVDA": ("엔비디아", "NVDA · 나스닥", "$125.53", "-14.01%", False, [10, 12, 11, 14, 15, 14, 16, 15, 17, 16, 22, 26, 29, 31]),
 }
 STICKERS = [   # (탭 이름, [컷 …]) 그림 여섯 장(course/sheet_to_webp.py 로 자름) 먼저, 그 뒤 옛 주식 공부 컷
-    ("상승이", ["up_flip", "up_panic", "up_throw", "up_box", "up_flat", "up_cheer", "up_chicken", "up_night",
+    ("상승이", ["up_flip", "up_panic", "up_throw", "up_box", "up_flat", "up_chicken", "up_night",
                 "up_pray", "up_treadmill", "up_recheck", "up_flowers",
                 "up_laptop", "up_search", "up_book", "up_coffee", "up_walk", "up_news", "up_tablet", "up_ponder",
                 "up_surprised", "up_cry", "up_sweat", "up_regret", "up_relief", "up_wait", "up_wonder", "up_buy"]),
@@ -858,7 +858,7 @@ KOSPI_REAL = os.path.join(HERE, "..", "kr-market-report", "output", "report_body
 NOW = (11, 27, 15 * 60 + 40)
 CARD_N = 3   # 카드 = 최신 3개, 저절로 넘어감(3초) · 손대면 멈췄다가 다시
 STOCK_CMTS = [   # SK하이닉스 페이지에 달린 댓글 예시 (최신이 위) — 꼴은 DAYS 와 같다
-    ("반도체곰", "11.27 15:21", "사흘 하락 뒤 오늘 크게 상승했네요", "사흘 하락하고 오늘 8% 넘게 상승했습니다[:up_cheer:] 외국인 순매수가 같이 늘었는지 수급 탭에서 확인해 보려고요.", "", [
+    ("반도체곰", "11.27 15:21", "사흘 하락 뒤 오늘 크게 상승했네요", "사흘 하락하고 오늘 8% 넘게 상승했습니다. 외국인 순매수가 같이 늘었는지 수급 탭에서 확인해 보려고요.", "", [
         ("데이터센터", "11.27 15:30", "거래량도 평소보다 많았습니다[:up_surprised:]"),
         ("owner", "11.27 15:38", "11.27 외국인 순매수는 수급 탭 `누가 샀나?` 칸에 장 마감 뒤 올라갑니다."),
     ]),
@@ -1185,6 +1185,10 @@ PAGE_CSS = """<style>
 .cc-page .cv-list .cv-main .cv-text{margin-top:4px;line-height:25px;color:#454C55;}   /* 제목 아래 6 → 4 · 행간 26 → 25 · 글자 #6B7280 → #606773 → #565D68 → #4D545E → #454C55(10%씩 네 번 진하게) */
 .cc-page [data-cmore]{margin:8px 0 0;}
 .cc-page [data-cmore].is-open .acc-chev{transform:rotate(180deg);}
+/* 종목 댓글 보기 맨 위(11-28) — 가격 28 → 26 · 그래프 아래 8 → 18 · `댓글 n` 위 4 → 14 (위가 그래프인 화면만) */
+.cc-px-one .cc-px-big{font-size:26px;line-height:34px;}
+.cc-px-one + .cc-chart{margin-bottom:18px;}
+.cc-px-one ~ .cc-page .cc-page-h{margin-top:14px;}
 </style>"""
 # 더 보기 = 디자인 키트 more_list 규칙(처음 5 · 누를 때마다 10 · 흰 버튼 FOLD_BTN 전체 폭 + 아래 화살표 · 다 펼치면 `접기`).
 # 목업은 아래 10개를 돌려 붙여 214까지 늘린다(실서비스 = 다음 10개를 서버에서 받음).
