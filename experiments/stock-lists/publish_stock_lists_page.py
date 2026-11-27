@@ -5,8 +5,10 @@
     python experiments/stock-lists/publish_stock_lists_page.py --mock    # 로컬 목업 output/mock_stock-lists-live-us.html · -kr (실제 스크립트 + 로컬 목록 파일)
 
 본문 = 탭 뼈대(h2 data-tab 여섯 개 + 빈 칸) + stock_lists.js. 테마를 고치지 않는다 — 탭은 테마가 h2 로 만들고, 목록은 스크립트가 목록 파일(build_lists.py)로 채운다.
-Blogger 쓰기 = 처음 1번(이후 스크립트를 고칠 때만). 종목 분석 게시기(stock-radar/publish_pages.publish)를 그대로 쓴다(해시가 같으면 건너뜀).
-검색: 본문에 글이 거의 없는 목록 페이지 — 검색 유입은 시총 상위 10 · 종목 페이지가 맡는다(기획 4절). 설정(robots · noindex)은 바꾸지 않는다.
+    python experiments/stock-lists/publish_stock_lists_page.py --lists /tmp/qd   # 간단 종목 실행(quick-data.yml)이 목록 파일을 만든 뒤 — 고치기만(새 페이지 X)
+
+Blogger 쓰기 = 간단 종목 실행마다 이 페이지 고치기 최대 1번(새 글 · 새 페이지 만들기 0). 종목 분석 게시기(stock-radar/publish_pages.publish)를 그대로 쓴다(해시가 같으면 건너뜀).
+검색: 탭 목록은 스크립트로만 그려 HTML 에 종목 링크가 없다 → 탭 밖 맨 아래 `전체 종목 · 업종별`(all_links) 정적 링크로 검색 로봇이 종목 페이지를 찾는다. 설정(robots · noindex)은 바꾸지 않는다.
 """
 import argparse
 import os
@@ -77,7 +79,72 @@ CSS = ("<style>[data-sl-panel][hidden]{display:none !important;}"
        "</style>")
 
 
-def body(local=""):
+ALL_CSS = ("<style>.sl-all{margin:28px 0 8px;padding:16px 0 0;border-top:1px solid #E2E8F0;}"
+           ".sl-all h3{margin:0 0 4px;padding-left:6px;font-size:19px;line-height:28px;font-weight:700;color:#111;}"
+           ".sl-all-note{margin:0 0 12px;padding-left:6px;font-size:14px;line-height:20px;color:#6B7280;}"
+           ".sl-all-g{padding:10px 6px;border-top:1px solid #F1F5F9;}"
+           ".sl-all-h{font-size:16px;line-height:24px;font-weight:700;color:#111;margin:0 0 4px;}"
+           ".sl-all-h span{font-size:14px;font-weight:400;color:#6B7280;margin-left:4px;}"
+           ".sl-all-l{font-size:15px;line-height:26px;color:#9CA3AF;}"
+           ".sl-all-l a{color:#111;text-decoration:none;border-bottom:1px dotted #CBD5E1;}"
+           ".sl-all-l a:hover{border-bottom-color:#111;}"
+           ".sl-all-l i{font-style:normal;color:#6B7280;}"   # 아직 페이지가 없는 종목 = 이름만(회색)
+           ".sl-all details{display:inline;}.sl-all summary{display:inline;cursor:pointer;color:#6B7280;font-size:14px;list-style:none;}"
+           ".sl-all summary::-webkit-details-marker{display:none;}.sl-all details[open] summary{display:none;}"
+           "</style>")
+SHOW = 5   # 업종마다 처음 보이는 종목 수 — 나머지는 접기(상한으로 버리지 않음, 링크는 접힌 채로도 HTML 에 있다)
+
+
+def all_links(lists):
+    """전체 종목 정적 링크 — 시장마다 업종별(시가총액 순) + ETF. 탭 밖 글 맨 아래(data-related)에 둔다.
+    목적 = 검색 로봇이 사이트맵 말고도 종목 페이지를 찾는 길(목록 탭은 스크립트로만 그려 HTML 에 링크가 없다).
+    lists = {"us": _lists.json, "kr": _lists.json}. 나라는 위 목록과 같게 한 나라만 보인다(스크립트가 다른 나라 묶음을 숨김)."""
+    import html as H
+    import design_kit as dk
+    esc = H.escape
+    for d in lists.values():   # 목록 파일에 주소가 없는 종목 = 모든 화면이 쓰는 주소 찾기(dk.stock_url)로 한 번 더
+        for r in d.get("rows", []) + d.get("etf", []):
+            if not r.get("u"):
+                u = dk.stock_url(r.get("t"))
+                if u:
+                    r["u"] = u.replace("https://www.newfact.app", "")
+    out = []
+    for m, label in (("us", "미국"), ("kr", "한국")):
+        d = lists.get(m)
+        if not d:
+            continue
+        groups = {}
+        for r in d.get("rows", []):
+            groups.setdefault(r.get("s") or "기타", []).append(r)
+        order = sorted(groups.items(), key=lambda kv: (-len(kv[1]), kv[0]))
+        if d.get("etf"):
+            order.append(("ETF", d["etf"]))
+
+        def item(r):
+            nm = esc(r.get("n") or r.get("t", ""))
+            return f'<a href="{esc(r["u"])}">{nm}</a>' if r.get("u") else f"<i>{nm}</i>"
+
+        gs = []
+        for sec, rs in order:
+            rs = sorted(rs, key=lambda r: -(r.get("c") or 0))
+            head, rest = rs[:SHOW], rs[SHOW:]
+            line = " · ".join(item(r) for r in head)
+            if rest:
+                line += (f' · <details><summary>나머지 {len(rest)}개 보기 ›</summary>'
+                         + " · ".join(item(r) for r in rest) + "</details>")
+            gs.append(f'<div class="sl-all-g"><div class="sl-all-h">{esc(sec)}<span>{len(rs)}</span></div><div class="sl-all-l">{line}</div></div>')
+        n = len(d.get("rows", [])) + len(d.get("etf", []))
+        out.append(f'<section class="sl-all" data-sl-all="{m}"><h3>{label} 전체 종목 · 업종별</h3>'
+                   f'<p class="sl-all-note">{label} 종목 {n}개 · 업종마다 시가총액 순</p>{"".join(gs)}</section>')
+    if not out:
+        return ""
+    hide = ("<script>(function(){var q='';try{q=(new URLSearchParams(location.search).get('m')||'').toLowerCase();}catch(e){}"
+            "if(q!=='us'&&q!=='kr'){try{q=localStorage.getItem('as-home-mkt')||'';}catch(e){}}if(q!=='us'&&q!=='kr')q='us';"
+            "[].forEach.call(document.querySelectorAll('[data-sl-all]'),function(s){if(s.getAttribute('data-sl-all')!==q)s.hidden=true;});})();</script>")
+    return ALL_CSS + f'<div data-related="1">{"".join(out)}</div>' + hide
+
+
+def body(local="", links=""):
     js = open(os.path.join(HERE, "stock_lists.js"), encoding="utf-8").read()
     if "</script" in js:
         sys.exit("stock_lists.js 안에 </script — 본문이 끊긴다")
@@ -91,14 +158,37 @@ def body(local=""):
     skel = "".join(f'<h2 data-tab="{name}">{name}</h2><div id="sl-{key}">{wait}</div>' for key, name in TABS)
     return (pre + CSS + f'<div id="as-lists"{f" data-local={chr(34)}{local}{chr(34)}" if local else ""}></div><div id="sl-day" hidden></div>'
             '<span data-lead="1" hidden></span>'   # 테마 탭 장치가 첫 칸의 카드를 머리로 끌어올리지 않게 (목업에서 확인)
-            + skel + f"\n<script>\n{js}\n</script>\n")
+            + skel + links + f"\n<script>\n{js}\n</script>\n")
+
+
+PAGES_URL = "https://alpha-scope.pages.dev/"   # 목록 파일이 이 실행에 없는 나라는 어제 올린 것 (stock_lists.js 가 읽는 곳과 같다)
+
+
+def load_lists(folder):
+    """{"us": …, "kr": …} — folder/<시장>/_lists.json, 없으면 Pages 에서. 둘 다 못 구한 나라는 빠진다(그 나라 묶음 없이)."""
+    import json
+    import urllib.request
+    out = {}
+    for m in ("us", "kr"):
+        p = os.path.join(folder, m, "_lists.json")
+        try:
+            if os.path.isfile(p):
+                out[m] = json.load(open(p, encoding="utf-8"))
+            else:
+                req = urllib.request.Request(f"{PAGES_URL}{m}/_lists.json", headers={"User-Agent": "alphascope"})
+                with urllib.request.urlopen(req, timeout=30) as r:
+                    out[m] = json.loads(r.read().decode("utf-8"))
+        except Exception as e:  # noqa: BLE001
+            print(f"[종목 페이지] {m} 목록 못 읽음 — 그 나라 전체 종목 묶음 없이: {e}")
+    return out
 
 
 def mock():
     """로컬 목업 — 실제 스크립트 그대로, 목록 파일은 output/lists/<시장>/_lists.json(build_lists.py --out output/lists)."""
     import design_kit as dk
+    links = all_links(load_lists(os.path.join(OUT, "lists")))
     for m in ("us", "kr"):
-        b = body(local="lists/").replace("location.pathname+location.search+", f"location.pathname+'?m={m}'+")
+        b = body(local="lists/", links=links.replace("location.search", f"'?m={m}'")).replace("location.pathname+location.search+", f"location.pathname+'?m={m}'+")
         path = dk.write_mock(b, os.path.join(OUT, f"mock_stock-lists-live-{m}.html"), TITLE)
         print(f"[종목 페이지] 목업 {path}")
 
@@ -107,11 +197,13 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--dry", action="store_true")
     ap.add_argument("--mock", action="store_true")
+    ap.add_argument("--lists", default="", help="목록 파일 폴더(<폴더>/<시장>/_lists.json, 간단 종목 실행 = /tmp/qd). 없는 나라는 Pages 에서")
     a = ap.parse_args()
     os.makedirs(OUT, exist_ok=True)
     if a.mock:
         return mock()
-    open(BODY, "w", encoding="utf-8").write(body())
+    links = all_links(load_lists(a.lists or os.path.join(OUT, "lists")))
+    open(BODY, "w", encoding="utf-8").write(body(links=links))
     import publish_pages as PP
     import universe as U
     PP.targets = lambda only=None: [(KEY, TITLE, KEY, f"{U.BLOG}/p/{KEY}.html", BODY)]

@@ -328,6 +328,18 @@ jobs:
           python experiments/site-search/build_names.py --cache /tmp/qcache --shells /tmp/cfp/shells.json --out /tmp/cfp/names.json || true
           npx --yes wrangler@4.162.0 pages deploy /tmp/cfp --project-name alpha-scope --branch main --commit-dirty=true
 
+      # 종목 모아보기(/p/stock-lists.html) 맨 아래 `전체 종목 · 업종별` 정적 링크 — 검색 로봇이 종목 페이지를 찾는 길.
+      # 이미 있는 페이지 고치기 1번(새 페이지 X) · 본문이 같으면 건너뜀. 이 실행에 없는 나라 목록은 Pages 에서. 주소 = 방금 주소표(shells.json)
+      - name: Stock lists page (Blogger, 전체 종목 링크)
+        if: "!cancelled() && env.DO_PUBLISH == 'true' && steps.collect.outputs.code == '0'"
+        continue-on-error: true
+        env:
+          BLOGGER_CLIENT_ID: ${{ secrets.BLOGGER_CLIENT_ID }}
+          BLOGGER_CLIENT_SECRET: ${{ secrets.BLOGGER_CLIENT_SECRET }}
+          BLOGGER_REFRESH_TOKEN: ${{ secrets.BLOGGER_REFRESH_TOKEN }}
+          QUICK_SHELLS_JSON: /tmp/qd/shells.json
+        run: python experiments/stock-lists/publish_stock_lists_page.py --lists /tmp/qd
+
       # 저장값은 게시 여부와 상관없이 남긴다 — 하루 상한으로 나눠 채우는 것이 이어지게. 다시 모을 수 있는 캐시라 기록 없이 덮어쓴다(저장소가 커지지 않게)
       - name: Save quick-state (private, no history)
         if: always() && steps.collect.outcome == 'success' && steps.state.outputs.cache_ok == 'true'
