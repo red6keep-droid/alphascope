@@ -1099,11 +1099,8 @@ def article_top():
             '<figcaption style="margin:6px 0 0;font-size:11px;line-height:16px;color:#9CA3AF;">자료 사진 · Chongkian · CC BY-SA 4.0</figcaption></figure>')
 
 
-TAIL_AB = """<div class="mock-ab" style="margin:0 0 12px;padding:8px 10px;border:1px dashed #A78BFA;border-radius:8px;font-size:13px;line-height:19px;color:#4B5563;">
-<b style="color:#7C3AED;">시안 · 제목 줄 꼬리</b> — 맨 위 제목 줄 끝에 작은 회색 `댓글` 을 붙일지
-<div style="display:flex;gap:6px;margin-top:6px;"><button type="button" data-ab="a" style="flex:1;min-height:36px;border-radius:6px;font:inherit;font-weight:700;">A 꼬리 없음 (지금)</button><button type="button" data-ab="b" style="flex:1;min-height:36px;border-radius:6px;font:inherit;font-weight:700;">B 작은 회색 꼬리 `댓글`</button></div></div>
-<script>(function(){var bs=document.querySelectorAll('[data-ab]');function set(k){var l=document.querySelector('.post-title-label')||document.querySelector('.post-title');if(!l)return;var t=l.querySelector('.mock-tail');if(k==='b'&&!t){t=document.createElement('span');t.className='post-title-sub mock-tail';t.textContent='댓글';l.appendChild(t);}if(k==='a'&&t)t.remove();bs.forEach(function(b){var on=b.getAttribute('data-ab')===k;b.style.background=on?'#6D28D9':'#fff';b.style.color=on?'#fff':'#111';b.style.border=on?'1px solid #6D28D9':'1px solid #D1D5DB';});}
-bs.forEach(function(b){b.addEventListener('click',function(){set(b.getAttribute('data-ab'));});});window.addEventListener('load',function(){setTimeout(function(){set('a');},300);});})();</script>"""
+TAIL = """<script>(function(){function set(){var l=document.querySelector('.post-title-label')||document.querySelector('.post-title');if(!l||l.querySelector('.post-title-sub'))return;var t=document.createElement('span');t.className='post-title-sub';t.textContent='댓글 보기';l.appendChild(t);}
+window.addEventListener('load',function(){setTimeout(set,300);});})();</script>"""   # 댓글 화면 제목 줄 끝 = 작은 회색 `댓글 보기`(종목 제목 꼬리와 같은 .post-title-sub, 11-27 사용자 B안 + 문구)
 
 
 def top(kind):
@@ -1128,7 +1125,7 @@ def comment_page(cmts, total, back, kind):
     more = f'<button class="cm-more" type="button">댓글 {total - len(cmts)}개 더 보기</button>' if total > len(cmts) else ""
     mark = (f'<span data-title-back="{back}" data-title-back-label="돌아가기" hidden></span>'
             + ('<span data-kr-code="000660" hidden></span>' if kind == "stock" else ""))
-    return (f'<div data-design="2" style="font-family:var(--report-font);">{mark}{TAIL_AB}{top(kind)}'
+    return (f'<div data-design="2" style="font-family:var(--report-font);">{mark}{TAIL}{top(kind)}'
             f'<div class="comments is-open cc-page"><div class="cc-page-h">댓글 {total}</div>{guard()}<ol class="cv-list">{rows}</ol>{more}</div></div>')
 
 
