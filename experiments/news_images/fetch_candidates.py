@@ -58,8 +58,8 @@ TOPICS = {
         "유통 · 대형마트": ["supermarket aisle", "hypermarket store interior Korea"],
         "온라인 쇼핑 · 배송": ["parcel delivery truck", "logistics warehouse conveyor", "delivery boxes"],
         "통신": ["cell tower 5G antenna", "telecommunication tower"],
-        "인터넷 · 소프트웨어": ["software developer code screen", "Naver Green Factory"],
-        "게임 · 엔터테인먼트": ["video game convention G-Star", "K-pop concert stage"],
+        "인터넷 · 소프트웨어": ["software developer code screen", "Naver Green Factory", "programmers working office laptops", "Kakao headquarters Pangyo", "Pangyo Techno Valley", "startup office open space"],
+        "게임 · 엔터테인먼트": ["video game convention G-Star", "K-pop concert stage", "G-Star BEXCO Busan", "Gamescom visitors hall", "esports tournament arena", "Tokyo Game Show booth"],
         "화장품": ["cosmetics store Myeongdong", "cosmetic products"],
         "식품 · 음료": ["food factory production line", "ramen noodles Korea"],
         "로봇 · 기계": ["industrial robot arm", "excavator construction machinery"],
@@ -98,7 +98,7 @@ TOPICS = {
         "그리어 무역대표": ["Jamieson Greer"],
         "밴스": ["JD Vance official portrait"],
         "이재명": ["Lee Jae-myung 2025"],
-        "이창용": ["Rhee Chang-yong"],
+        "이창용": ["Rhee Chang-yong", "Rhee Chang-yong Bank of Korea governor", "Chang Yong Rhee IMF"],
         "시진핑": ["Xi Jinping 2023"],
         "푸틴": ["Vladimir Putin 2023"],
         "젤렌스키": ["Volodymyr Zelensky official portrait"],
@@ -118,7 +118,7 @@ TOPICS = {
         "정의선": ["Chung Eui-sun"],
         "구광모": ["Koo Kwang-mo"],
         "캐시 우드": ["Cathie Wood"],
-        "마이클 버리": ["Michael Burry"],
+        "마이클 버리": ["Michael Burry", "Michael Burry investor", "Scion Asset Management"],
         "짐 크레이머": ["Jim Cramer"],
     },
     "6_전쟁-국제": {
@@ -139,7 +139,7 @@ TOPICS = {
         "뉴욕증권거래소": ["New York Stock Exchange facade", "NYSE trading floor"],
         "나스닥": ["Nasdaq MarketSite Times Square"],
         "월가": ["Wall Street sign", "Charging Bull"],
-        "한국거래소 · 코스피": ["Korea Exchange Yeouido", "Korea Exchange building Busan"],
+        "한국거래소 · 코스피": ["Korea Exchange Yeouido", "Korea Exchange building Busan", "Korea Exchange", "KRX Korea Exchange Seoul", "Busan International Financial Center"],
         "여의도": ["Yeouido skyline"],
         "도쿄 증시": ["Tokyo Stock Exchange Arrowhead"],
         "상하이 · 홍콩 증시": ["Hong Kong Exchanges building", "Shanghai Lujiazui skyline"],
@@ -147,11 +147,11 @@ TOPICS = {
     },
     "8_사건-분류": {
         "금리 · 연준": ["Federal Reserve Eccles building", "FOMC meeting"],
-        "물가": ["supermarket price tags", "grocery shopping cart"],
+        "물가": ["supermarket price tags", "grocery shopping cart", "supermarket aisle shoppers", "traditional market Seoul vegetables", "Gwangjang Market", "fruit vegetable market stall prices"],
         "경기 · 고용": ["job fair crowd", "shopping street crowd Seoul"],
         "관세 · 무역": ["container port cranes", "cargo ship containers"],
-        "환율": ["United States dollar banknotes", "South Korean won banknotes", "currency exchange board"],
-        "유가 · 원자재": ["gold bars", "copper cathodes", "crude oil barrels"],
+        "환율": ["United States dollar banknotes", "South Korean won banknotes", "currency exchange board", "currency exchange office sign", "money exchange booth airport", "foreign currency banknotes colorful"],
+        "유가 · 원자재": ["gold bars", "copper cathodes", "crude oil barrels", "oil refinery", "oil pumpjack field", "gold bullion", "copper mine open pit", "iron ore stockpile"],
         "AI 투자": ["AI data center", "Nvidia GPU"],
         "실적 발표": ["earnings conference call", "annual report charts"],
         "기업 사건 · 인수합병": ["handshake business deal", "corporate headquarters lobby"],
@@ -364,6 +364,15 @@ def companies(limit=None):
 
 
 # ---------- 주제 ----------
+def last_num(folder, topic, pat):
+    """이미 쓴 가장 큰 번호 — 검수 폴더 · 완료 · 사용안함까지 본다(빈 주제를 다시 받을 때 옛 파일 이름과 겹치지 않게, 11-27)."""
+    nums = []
+    for base in (OUT, os.path.join(OUT, "완료"), os.path.join(OUT, "사용안함")):
+        d = os.path.join(base, folder, safe(topic))
+        nums += [int(m.group(1)) for f in (os.listdir(d) if os.path.isdir(d) else []) for m in [re.search(pat, f)] if m]
+    return max(nums, default=0)
+
+
 def topics(per_query=4, only=None):
     stat = {}
     have = set()
@@ -374,8 +383,7 @@ def topics(per_query=4, only=None):
             if only and topic not in only:
                 continue
             d = os.path.join(OUT, folder, safe(topic))
-            nums = [int(m.group(1)) for f in (os.listdir(d) if os.path.isdir(d) else []) for m in [re.search(r"_(\d+)\.", f)] if m]
-            n = max(nums, default=0)   # 다시 돌릴 때 번호를 이어 붙인다(이미 받은 파일 · 사용자가 지운 번호를 덮지 않게)
+            n = last_num(folder, topic, r"_(\d+)\.")   # 다시 돌릴 때 번호를 이어 붙인다(이미 받은 파일 · 사용자가 지운 번호를 덮지 않게)
             seen = set(have)
             for q in queries:
                 r = api(action="query", generator="search", gsrnamespace=6, gsrlimit=15,
@@ -406,13 +414,15 @@ OV_LIC = {"by": "CC BY", "by-sa": "CC BY-SA", "cc0": "CC0", "pdm": "Public domai
 def openverse(per_topic=4, only=None):
     """주제 그림만(회사 사진은 공용 · 위키데이터가 정확). 파일 이름 = 주제_flickrNN — 출처가 이름에 보이게."""
     stat = {}
+    have = set()   # 이미 받은(뺀 것 포함) 원본 주소 — 다시 받지 않는다
+    if os.path.exists(os.path.join(OUT, "출처.csv")):
+        have = {r["source"] for r in csv.DictReader(open(os.path.join(OUT, "출처.csv"), encoding="utf-8-sig"))}
     for folder, items in TOPICS.items():
         for topic, queries in items.items():
             if only and topic not in only:
                 continue
             d = os.path.join(OUT, folder, safe(topic))
-            nums = [int(m.group(1)) for f in (os.listdir(d) if os.path.isdir(d) else []) for m in [re.search(r"_flickr(\d+)\.", f)] if m]
-            n = max(nums, default=0)
+            n = last_num(folder, topic, r"_flickr(\d+)\.")
             got = 0
             for q in queries:
                 url = "https://api.openverse.org/v1/images/?" + urllib.parse.urlencode(
@@ -426,6 +436,8 @@ def openverse(per_topic=4, only=None):
                 k = 0
                 for r in res:
                     lic = OV_LIC.get(r.get("license"))
+                    if r.get("foreign_landing_url") in have:
+                        continue
                     if not lic or (r.get("width") or 0) < 1000 or (folder != "5_인물" and (r.get("width") or 0) < (r.get("height") or 0) * 0.9):
                         continue
                     lic_s = lic + (" " + r["license_version"] if r.get("license_version") and lic.startswith("CC BY") else "")

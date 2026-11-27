@@ -1,6 +1,7 @@
 """자료 사진 사용자 검수표 — 지금 폴더에 남은 그림만 보여 주고, 눌러서 빼기 · 살리기를 고른다.
 
-  python review_sheet.py            # ~/Desktop/Newfact-그림-검수/검수표.html 다시 만들기
+  python review_sheet.py            # ~/Desktop/Newfact-그림-검수/검수표.html 다시 만들기(완료/ 는 안 보임)
+  python review_sheet.py --skip-logos   # 로고 빼고
   python review_sheet.py --apply ~/Downloads/검수-결정.json
                                     # 검수표에서 저장한 결정대로 옮기기(빼기 → 사용안함/, 살리기 → 제자리)
 
@@ -36,9 +37,10 @@ def card(rel, src, r, logo):
             f"<div class=t><b>{html.escape(os.path.basename(rel))}</b><br>{meta}{link}</div></div>")
 
 
-def build():
+def build(skip_logos=False):
     src = sources()
-    keep = [p for p in scan(ROOT) if not p.startswith("사용안함")]
+    keep = [p for p in scan(ROOT) if not p.startswith(("사용안함", "완료"))   # 완료 = 사용자가 이미 확정한 사진
+            and not (skip_logos and p.startswith("2_기업-로고"))]
     out = scan(TRASH)
     reasons = {}
     if os.path.exists(LIST):
@@ -141,7 +143,8 @@ def apply(path):
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--apply")
+    ap.add_argument("--skip-logos", action="store_true", help="로고는 빼고 보기(새 후보만 볼 때)")
     a = ap.parse_args()
     if a.apply:
         apply(a.apply)
-    build()
+    build(a.skip_logos)
