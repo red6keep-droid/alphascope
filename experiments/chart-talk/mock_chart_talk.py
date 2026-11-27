@@ -1,7 +1,7 @@
 """목업 — 종목 페이지 맨 위 차트 아래 `차트 읽기` 버튼. 누르면 캐릭터가 지금 그래프를 대화체로 풀어 준다.
 
 기존 종목 페이지 목업(삼성전자 · 애플)의 그래프 아래에 버튼과 말풍선을 끼워 output/ 에 따로 쓴다. 읽기만 · 쓰기 · AI 0.
-문장 = experiments/chart_talk.py (목업 속 그래프와 같은 일봉으로 계산). 상승 흐름 = 상승이 · 하락 흐름 = 하락이 · 팽팽한 날 = 분석이(제안).
+문장 = experiments/chart_talk.py (목업 속 그래프와 같은 일봉으로 계산). 상승 흐름 = 상승이 · 하락 흐름 = 하락이 · 팽팽한 날 = 분석이.
 분석이 화면은 삼성전자 일봉을 중립이었던 가장 최근 날(2026-11-02)까지만 잘라 그래프와 글을 같이 그날로 맞춘 것.
     python experiments/chart-talk/mock_chart_talk.py
 """
@@ -23,7 +23,7 @@ ALTS = {}   # 고르기 전 시안 — {컷: [(이름표, 컷), …]} 같은 말
 CASES = [
     ("kr-stocks/output/mock_005930.html", "kr", "mock_chart_talk_down.html", "차트 읽기 버튼 · 하락 흐름 = 하락이 (삼성전자)", None),
     ("stock-radar/output/mock_AAPL.html", "us", "mock_chart_talk_up.html", "차트 읽기 버튼 · 상승 흐름 = 상승이 (애플)", None),
-    ("kr-stocks/output/mock_005930.html", "kr", "mock_chart_talk_mid.html", "차트 읽기 버튼 · 팽팽한 날 = 분석이 (제안, 삼성전자 11월 2일까지)", "2026-11-02"),
+    ("kr-stocks/output/mock_005930.html", "kr", "mock_chart_talk_mid.html", "차트 읽기 버튼 · 팽팽한 날 = 분석이 (삼성전자 11월 2일까지)", "2026-11-02"),
 ]
 CANDLE = re.compile(r'data-candle="([^"]+)"')
 SPOT = 'style="min-height:300px;"></div></span></span>'   # 그래프 카드가 끝나는 자리 — 버튼은 카드 바로 아래 2px
