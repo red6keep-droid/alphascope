@@ -472,6 +472,7 @@ def card_industry_mood(s):
 
 
 # 답 낱말 — 사업 묶음 질문에 맞춘다
+UP_PAST = {"price": "올랐지만", "qty": "늘었지만", "margin": "넓어졌지만", "size": "커졌지만"}   # 엇갈림 툴팁 (1-3)
 BIZ_WORDS = {"price": ("오르는 중", "내리는 중"), "qty": ("늘고 있음", "줄고 있음"), "margin": ("넓어지는 중", "좁아지는 중"), "size": ("커지는 중", "줄어드는 중")}
 
 
@@ -519,6 +520,8 @@ def biz_work_state(s):
     lim = 0.5 if r0["kind"] == "pct" else 5
     up_w, dn_w = BIZ_WORDS[b["mode"]]
     state = "판단 유보" if chg is None else up_w if chg >= lim else dn_w if chg <= -lim else "비슷함"
+    if b["months"] == 1 and peak_split(r0, state, b["mode"]):   # 1년 전보다 늘었지만 최근 고점에서 석 달 넘게 줄어 → 갈림 (헌법 제1조, 1-3 11-27)
+        state = "엇갈림"
     return state, (U.BIZ_Q[b["group"]] if b.get("group") else None)
 
 
@@ -526,9 +529,6 @@ def _release_txt(r):
     """줄 끝 ` · 다음 발표 11월 30일` — 국가데이터처 보도계획에 있는 지표만 (2026-11-25)."""
     n = r.get("next_release")
     return f" · 다음 발표 {int(n['day'][5:7])}월 {int(n['day'][8:])}일" if n else ""
-
-
-SPLIT = [None]   # 1-3 시안 (목업만): None = 지금 · "A" = 답 `엇갈림` · "B" = 답 그대로 + 고점 문장
 
 
 def peak_split(r0, state, mode):
@@ -564,7 +564,7 @@ def card_industry_work(s):
     months = b["months"]
     chg, span_txt = _window_change(r0, months)
     state = biz_work_state(s)[0]
-    theme, col = ("neutral", R.MUTED) if state in ("판단 유보", "비슷함") else ("positive", UP) if state == BIZ_WORDS[b["mode"]][0] else ("negative", DOWN)
+    theme, col = ("neutral", R.MUTED) if state in ("판단 유보", "비슷함", "엇갈림") else ("positive", UP) if state == BIZ_WORDS[b["mode"]][0] else ("negative", DOWN)
     unit = "%p" if r0["kind"] == "pct" else "%"
     v0 = _ind_value(r0)
     if months > 1 and chg is not None:
@@ -579,21 +579,15 @@ def card_industry_work(s):
         head = (f"{_name_josa(r0['name'], '은')} {r0['month'][:4]}년 {int(r0['month'][5:])}월 "
                 + (f"{_dk.josa(v0, '로')} 작년 같은 달보다 {_sgn(chg, 1)}{unit}입니다." if chg is not None else f"{v0}입니다."))
         why = ""
-    sp = peak_split(r0, state, b["mode"]) if SPLIT[0] and months == 1 else None
-    if sp:
-        pm, pv, ratio, n = sp
-        pv_txt = _ind_value(dict(r0, v=pv))
-        tail = f"{n}개월째 줄었습니다"
-        if SPLIT[0] == "A":
-            state, theme, col = "엇갈림", "neutral", R.MUTED
-            head += f" 다만 최근 고점({int(pm[5:])}월 {pv_txt})의 {ratio * 100:.0f}% 수준으로 {tail}. 작년보다는 많고 고점보다는 적어 둘이 갈립니다."
-        else:
-            head += f" 다만 최근 고점({int(pm[5:])}월 {pv_txt})의 {ratio * 100:.0f}% 수준으로 {tail}."
+    if state == "엇갈림":   # 갈림 문장 — 고점 · 줄어든 달 수 (biz_work_state 와 같은 peak_split)
+        pm, pv, ratio, n = peak_split(r0, BIZ_WORDS[b["mode"]][0], b["mode"])
+        head += f" 다만 최근 고점({int(pm[5:])}월 {_ind_value(dict(r0, v=pv))})의 {ratio * 100:.0f}% 수준으로 {n}개월째 줄었습니다. 작년보다는 {'많고' if b['mode'] == 'qty' else '높고'} 고점보다는 {'적어' if b['mode'] == 'qty' else '낮아'} 둘이 갈립니다."
     up_w, dn_w = BIZ_WORDS[b["mode"]]
     lim = "0.5%p" if r0["kind"] == "pct" else "5%"
     base = "작년 같은 3개월" if months > 1 and chg is not None else "작년 같은 달"
     srcs = sorted({IND_SRC.get(r["src_stat"], "한국은행 ECOS") for r in rows_data if r.get("src_stat")})
-    tip = _dk.with_src(f"이 업계의 실물 통계. 월별 자료라 1~2달 늦게 나와 주가가 먼저 움직이곤 한다\n· {up_w} · {dn_w} : {base}보다 {lim} 넘게 바뀔 때" + why,
+    tip = _dk.with_src(f"이 업계의 실물 통계. 월별 자료라 1~2달 늦게 나와 주가가 먼저 움직이곤 한다\n· {up_w} · {dn_w} : {base}보다 {lim} 넘게 바뀔 때" + why
+                       + (f"\n· 엇갈림 : {base}보다 {lim} 넘게 {UP_PAST[b['mode']]} 최근 12개월 고점의 70% 아래로 3개월 넘게 연달아 줄었을 때" if months == 1 else ""),
                        " · ".join(srcs) or "한국은행 ECOS")   # 늘 같은 안내(늦게 나옴 · 3개월 까닭 · 판정 기준)는 툴팁으로
     part = getattr(U, "BIZ_PART_NOTE", {}).get(s["sym"].split(".")[0])   # 지표가 회사 사업 일부만 볼 때 (삼성전기 = 콘덴서만, 2026-11-25)
     lines = [(head + (R.small_note(part) if part else ""), "plain")]   # 카드에는 이 종목에만 붙는 안내만
