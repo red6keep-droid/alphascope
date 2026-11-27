@@ -80,7 +80,6 @@ MODELS = [
     ("Gemma 4 26B", "gemma-26b", "req", 14_400, "pt"),            # 2026-11-15 news-quick 셋째. 실제 상한은 분당 토큰 1만 6천
     ("Groq gpt-oss", "groq", "tok", 200_000, "24h"),
     ("Groq Qwen", "groq-qwen", "tok", 200_000, "24h"),
-    ("NVIDIA DeepSeek", "nvidia-deepseek", "req", 0, "24h"),
 ]
 
 # 독자 화면 파일 — (이름, gh-pages 경로, 기준 문구, 늦음 판정)

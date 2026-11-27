@@ -61,8 +61,8 @@ assert c == ["gemini-3.6-flash", "gemini-3.5-flash-lite"] and s == 0, (c, s)
 CALLS.clear(); pool = llm_chain.LLMPool("json", label="t2"); pool.generate_json("p")
 assert CALLS == ["gemini-3.5-flash-lite"], CALLS
 print("    (다음 풀) 호출", CALLS)
-c, s = run("3 flash · lite 둘 다 503 → DeepSeek", {"gemini-3.6-flash": [(503, E503)], "gemini-3.5-flash-lite": [(503, E503)]})
-assert c == ["gemini-3.6-flash"] * 2 + ["gemini-3.5-flash-lite"] * 4 + ["deepseek-ai/deepseek-v4.1-flash"] and s == 9 + 45, (c, s)
+c, s = run("3 flash · lite 둘 다 503 → 예비 없음(Groq 키 없음)", {"gemini-3.6-flash": [(503, E503)], "gemini-3.5-flash-lite": [(503, E503)]})
+assert c == ["gemini-3.6-flash"] * 2 + ["gemini-3.5-flash-lite"] * 4 and s == 9 + 45, (c, s)
 c, s = run("4 json-gemini: 둘 다 실패 → 예비 없이 실패", {"gemini-3.6-flash": [(503, E503)], "gemini-3.5-flash-lite": [(429, E429D)]}, chain="json-gemini")
 assert c == ["gemini-3.6-flash"] * 2 + ["gemini-3.5-flash-lite"], c
 c, s = run("5 정상: flash 바로 성공", {})

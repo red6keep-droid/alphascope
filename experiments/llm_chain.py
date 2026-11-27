@@ -93,37 +93,36 @@ CHAINS = {
     # 서술 세 가지를 모두 통과한 예비는 DeepSeek 뿐 — Groq 둘은 트럼프 서술 · 데일리가 분당 8,000토큰을 넘어 413, gpt-oss 는 NVDA 서술 숫자 방향을 틀림).
     # Groq 둘은 짧은 요청(분류 · 답글)용 3 · 4순위
     # gemini-lite 가 2순위 (2026-10-16): 3.5-flash 과부하 · 하루 한도 때 같은 키의 다른 모델이 먼저 받는다 — 분류 일치율이 DeepSeek 보다 높고 빠르다
-    "json": ["gemini", "gemini-lite", "nvidia-deepseek", "groq-qwen", "groq"],
-    # 데일리 서술만 DeepSeek 이 lite 보다 앞: 같은 데이터로 비교하니 lite 는 숫자는 맞지만 두루뭉술하고("다양한 업종")
-    # 뉘앙스가 어긋남(+0.08% 를 "약보합", 전 지수 상승을 "혼조"). DeepSeek 이 더 구체적 — 단 10-15 에 방향 오류 2건 이력
-    "json-daily": ["gemini", "nvidia-deepseek", "gemini-lite", "groq-qwen", "groq"],
-    "translate": ["groq", "nvidia-gptoss20", "gemini-lite", "gemini"],          # 홈 뉴스 제목 번역 — 빠른 것부터 (2026-10-11)
-    # 댓글 답글 — Gemini 는 맨 뒤. 답글은 짧고 숫자를 쓰지 않아 예비 모델로 충분.
-    # Groq 가 첫째, DeepSeek 은 예비
-    "comment": ["groq", "groq-qwen", "nvidia-deepseek", "gemini-lite", "gemini"],
+    # 2026-11-27: NVIDIA 무료 목록에서 DeepSeek V4.1 Flash · gpt-oss-20b 가 내려가 410 — 모든 사슬에서 뺐다(STEPS 정의는 남김)
+    "json": ["gemini", "gemini-lite", "groq-qwen", "groq"],
+    # 데일리 서술: 옛 2순위 DeepSeek(lite 보다 구체적)이 없어져 lite 가 2순위
+    "json-daily": ["gemini", "gemini-lite", "groq-qwen", "groq"],
+    "translate": ["groq", "gemini-lite", "gemini"],          # 홈 뉴스 제목 번역 — 빠른 것부터 (2026-10-11)
+    # 댓글 답글 — Gemini 는 맨 뒤. 답글은 짧고 숫자를 쓰지 않아 예비 모델로 충분. Groq 가 첫째
+    "comment": ["groq", "groq-qwen", "gemini-lite", "gemini"],
     # 예비 모델이 임시로 분류한 행을 Gemini 로 다시 분류할 때 (2026-10-15) — 예비로 덮어쓰지 않도록 Gemini 만 (lite 도 Gemini, 정식 분류)
     "json-gemini": ["gemini", "gemini-lite"],
     # 시총 TOP 10 뉴스 분류 — lite 먼저 (doc/기획/종목-레이더-기획.md 10-4: flash 하루 약 20회는 NVDA 리포트 몫으로 남긴다, lite 는 버킷이 따로)
-    "json-lite": ["gemini-lite", "nvidia-deepseek", "groq-qwen", "groq"],
+    "json-lite": ["gemini-lite", "groq-qwen", "groq"],
     # 새 기능 — 예비 공급자 먼저, Gemini 는 맨 뒤 (2026-10-19, 위 머리말: 키 하나를 모든 리포트가 나눠 쓴다). 인물 발언 레이더 인용 추출
-    "json-backup-first": ["groq-qwen", "groq", "nvidia-deepseek", "gemini-lite"],
+    "json-backup-first": ["groq-qwen", "groq", "gemini-lite"],
     # 출력이 긴 일(호출당 출력 1,000토큰 넘게 — 인물 레이더 분류 20건 · 카드 요약 16건)은 gpt-oss 먼저 (2026-10-26).
     # Qwen 은 분당 출력 1,000토큰(OTPM) 한도라 출력 2천 토큰짜리는 몇 분에 한 번만 받힌다 — 10-25 분류에서 Qwen 12번 중 11번 429
-    "json-oss-first": ["groq", "groq-qwen", "nvidia-deepseek", "gemini-lite"],
+    "json-oss-first": ["groq", "groq-qwen", "gemini-lite"],
     # 공용 뉴스 처리(news_store: 제목 번역 · 사실 문장 · 요약 · 종목 관련도) — Gemini lite 먼저.
     # 옛(10-25): Groq 먼저 → 뉴스(하루 약 300 ~ 400건)가 Groq 두 모델 하루 토큰 20만을 아침마다 바닥내, 양이 적은 인물 발언 · 방송 · 댓글이 Groq 를 못 쓰고
     # NVDA 레이더 뉴스가 60초 간격 · DeepSeek 지연으로 30분을 다 써 워크플로 60분 제한에 걸렸다(11-09 ~ 10). lite 는 하루 500회 중 약 430회가 비어 있고
     # 분류 일치도 lite 75/80 · Qwen 56 · gpt-oss 51 (10-14 · 10-16 비교). 하루 약 30 ~ 40회(10건 묶음). flash 로는 넘어가지 않는다(flash 호출 0 증가).
     # 뒤 예비는 배치마다 qwen · gpt-oss 순서를 번갈아 (lite 하루 한도 · 실패 때 Groq 기다림을 반으로)
-    "news": ["gemini-lite", "groq-qwen", "groq", "nvidia-deepseek"],
+    "news": ["gemini-lite", "groq-qwen", "groq"],
     # 급하지 않은 한 번짜리 일 — lite 의 남는 몫만.
     # Groq 는 아침마다 하루 토큰이 차는 날이 있어 넘기지 않고, 하루 한도면 그대로 멈춰 다음 날 이어서 (설계 순서 3-2 의 예외 — 운영지침에 기록)
     "json-lite-only": ["gemini-lite"],
     # 종목 주가(간단 종목) 뉴스 — 3.1 lite 먼저(거의 빈 몫), 넘치면 3.5 lite, 그다음 Gemma 4 26B. flash · Groq 로 넘기지 않는다
     "news-quick": ["gemini-lite31", "gemini-lite", "gemma-26b"],
-    # 한국 증시 리포트 한 줄 결론 — 하루 1회, 서술이라 예비는 DeepSeek(예비 중 서술 품질 1위). flash 하루 20회는 미국 리포트 몫
-    "kr-lead": ["gemini-lite31", "gemini-lite", "nvidia-deepseek"],
-    "news-alt": ["gemini-lite", "groq", "groq-qwen", "nvidia-deepseek"],
+    # 한국 증시 리포트 한 줄 결론 — 하루 1회. flash 하루 20회는 미국 리포트 몫. 예비 = Qwen(출력 400토큰 안이라 분당 출력 한도 안, 검사 탈락이면 파이썬 문장)
+    "kr-lead": ["gemini-lite31", "gemini-lite", "groq-qwen"],
+    "news-alt": ["gemini-lite", "groq", "groq-qwen"],
 }
 
 # NVIDIA(build.nvidia.com) 무료 엔드포인트는 공식 FAQ 상 개발 · 테스트 · 연구 · 평가 전용 — "실제 최종 사용자에게 서비스하는 활동" 은

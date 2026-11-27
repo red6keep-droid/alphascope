@@ -1463,7 +1463,7 @@ def _lead_ok(line, up):
 
 def ai_one(r):
     """한 줄 결론을 AI 가 원인까지. 하루 1회 · 같은 날 저장값 · 검사 탈락이면 None → 파이썬 문장.
-    사슬 kr-lead = 3.1 lite → 3.5 lite → DeepSeek (flash 하루 20회는 미국 리포트 몫)."""
+    사슬 kr-lead = 3.1 lite → 3.5 lite → Groq Qwen (flash 하루 20회는 미국 리포트 몫)."""
     k, q = r["idx"].get(U.BENCH), r["idx"].get(U.KOSDAQ)
     if not k:
         return None
