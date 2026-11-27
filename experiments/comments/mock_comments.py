@@ -476,6 +476,8 @@ def stk_css():
         for sel, *px in STK_BOX.values():
             sels = ",".join(f'{sel}[src$="c_{k}.webp"]' for k in STK_SHRINK[pct])
             out += f"{sels}{{width:{px[col - 1]}px;height:{px[col - 1]}px;}}\n"
+    tight = ",".join(f'.comments .cv-stk[src$="c_{k}.webp"]' for ks in STK_SHRINK.values() for k in ks)
+    out += f"{tight}{{margin-top:13px;}}\n"   # 몸이 칸을 꽉 채우는 컷 = 위 글자와 붙어 보임 → 8 + 5
     return out
 
 
@@ -890,6 +892,31 @@ ARTICLE_CMTS = [   # Newfact 기사(크래프톤 거대언어모델 출시)에 �
     ("반도체곰", "11.27 10:21", "기사 깔끔하게 정리돼 있네요", "무엇이 새로 나왔는지 한눈에 들어왔습니다[:mid_thanks:]", "", []),
 ]
 ARTICLE_TOTAL = 214   # 목업 댓글 수 = 세 자리
+REPORT_CMTS = [ONE_CMT_R,
+    ("데이터센터", "11.27 16:31", "업종별 등락 표가 보기 좋네요", "어느 업종이 평소보다 크게 움직였는지 한눈에 들어옵니다[:mid_proof:]", "", []),
+    ("새내기", "11.27 16:20", "평소 범위 밖이 무슨 뜻인가요?", "리포트에 자주 나오는 말인데 기준이 궁금합니다[:mid_think:]", "", []),
+    ("조심조심", "11.27 16:08", "거래대금도 같이 봐야겠네요", "지수는 올랐는데 거래대금이 평소보다 많았는지 표에서 다시 확인했습니다.", "", []),
+    ("게임좋아", "11.27 15:57", "마감 뒤 바로 올라와서 좋습니다", "퇴근길에 오늘 장을 정리하기 편했습니다[:mid_thanks:]", "", []),
+]
+STORY_CMTS = [ONE_CMT,
+    ("장기보유", "11.27 14:40", "환율과 외국인 흐름을 같이 설명해 주네요", "두 가지를 따로 보다가 이어서 읽으니 이해가 됩니다.", "", []),
+    ("반도체곰", "11.27 14:28", "반도체 얘기가 앞에 나온 이유", "오늘 지수를 움직인 업종이라 먼저 다룬 거군요[:mid_explain:]", "", []),
+    ("조심조심", "11.27 14:15", "내일 일정도 적혀 있어서 좋습니다", "물가 발표 시각을 따로 찾지 않아도 되네요.", "", []),
+    ("데이터센터", "11.27 14:03", "용어 풀이가 도움이 됐습니다", "어려운 말마다 괄호로 풀어 줘서 읽기 쉬웠습니다[:mid_clap:]", "", []),
+]
+ISSUE_CMTS = [ONE_CMT_I,
+    ("장기보유", "11.27 09:03", "단계가 바뀌면 다시 보겠습니다", "아직 확정된 게 없으니 다음 단계로 넘어가는 날을 기다려 봅니다[:mid_hourglass:]", "", []),
+    ("새내기", "11.27 08:51", "수습 단계가 세 칸이네요", "지금 어느 칸인지 표시돼 있어서 흐름을 따라가기 쉽습니다.", "", []),
+    ("데이터센터", "11.27 08:40", "지난 비슷한 일과 비교가 있네요", "그때는 며칠 걸렸는지 같이 보여 줘서 참고가 됩니다[:mid_proof:]", "", []),
+    ("게임좋아", "11.27 08:27", "소식이 많아서 헷갈렸는데", "날짜 순서로 정리돼 있어서 한 번에 읽었습니다[:mid_thanks:]", "", []),
+]
+FORECAST_CMTS = [ONE_CMT_F,
+    ("조심조심", "11.27 10:18", "미리 적어 둔 전망이라 믿음이 갑니다", "발표 전에 적어 두고 그대로 판정하는 방식이 좋네요.", "", []),
+    ("새내기", "11.27 10:05", "전망B는 왜 해당 없음인가요?", "두 갈래 중 하나만 판정된다는 뜻인지 궁금합니다[:mid_think:]", "", []),
+    ("데이터센터", "11.27 09:52", "판정 날짜가 적혀 있어서 좋습니다", "결과가 언제 나오는지 미리 알 수 있었습니다.", "", []),
+    ("반도체곰", "11.27 09:40", "다음 전망도 기다리겠습니다", "실적 발표 때마다 이렇게 정리되면 좋겠네요[:mid_clap:]", "", []),
+]
+REPORT_TOTAL, STORY_TOTAL, ISSUE_TOTAL, FORECAST_TOTAL = 148, 263, 512, 137   # 목업 댓글 수 = 세 자리
 TITLES.update({
     "mock_comments_page-report.html": "댓글 화면 — KOSPI 한 줄 · 홈 카드 하루 그래프 · 댓글 목록 · 쓰기 (한국 증시 리포트에서)",
     "mock_comments_cards.html": "글 아래 댓글 카드 — 2개 이상 = 좌우로 밀기 · 점 · 댓글 더 보기 (종목 페이지)",
@@ -1149,15 +1176,15 @@ def forecast_top():
             + '<div class="cc-px cc-px-sub" style="margin-top:2px;">결과 11.17</div>')
 
 
-ARTICLE_CSS = """<style>
-/* 기사 댓글 화면만(11-28) — 다른 댓글 화면은 그대로. 넓힐지는 사용자 확인 뒤 */
-.cc-article .cc-page-h{margin-top:4px;}                     /* `댓글 n` 위 18 → 9 → 4 */
-.cc-article .cc-page-h .cc-n{font-weight:400;}              /* 숫자는 굵게 빼기 */
-.cc-article .cv-guard{margin:5px 0 9px !important;background:none !important;border:1px solid #E2E8F0 !important;}   /* 위 14 → 7 → 5 · 아래(첫 댓글까지) 14 → 9 · 회색 면 빼고 회색 외곽선만 */
-.cc-article .cv-list .cv-main .cv-title{margin-top:1px;}    /* 이름 줄 ~ 제목 4 → 3 → 1 */
-.cc-article .cv-list .cv-main .cv-text{margin-top:4px;line-height:25px;color:#454C55;}   /* 제목 아래 6 → 4 · 행간 26 → 25 · 글자 #6B7280 → #606773 → #565D68 → #4D545E → #454C55(10%씩 네 번 진하게) */
-.cc-article [data-cmore]{margin:8px 0 0;}
-.cc-article [data-cmore].is-open .acc-chev{transform:rotate(180deg);}
+PAGE_CSS = """<style>
+/* 댓글 보기 화면 공통 기준(11-28) = Newfact 기사 댓글 보기에서 다듬은 값. 종목 · 리포트 · 시황 · Hot Issue · 증시 전망 · 기사 모두 같다 */
+.cc-page .cc-page-h{margin-top:4px;}                     /* `댓글 n` 위 18 → 9 → 4 */
+.cc-page .cc-page-h .cc-n{font-weight:400;}              /* 숫자는 굵게 빼기 */
+.cc-page .cv-guard{margin:5px 0 9px !important;background:none !important;border:1px solid #E2E8F0 !important;}   /* 위 14 → 7 → 5 · 아래(첫 댓글까지) 14 → 9 · 회색 면 빼고 회색 외곽선만 */
+.cc-page .cv-list .cv-main .cv-title{margin-top:1px;}    /* 이름 줄 ~ 제목 4 → 3 → 1 */
+.cc-page .cv-list .cv-main .cv-text{margin-top:4px;line-height:25px;color:#454C55;}   /* 제목 아래 6 → 4 · 행간 26 → 25 · 글자 #6B7280 → #606773 → #565D68 → #4D545E → #454C55(10%씩 네 번 진하게) */
+.cc-page [data-cmore]{margin:8px 0 0;}
+.cc-page [data-cmore].is-open .acc-chev{transform:rotate(180deg);}
 </style>"""
 # 더 보기 = 디자인 키트 more_list 규칙(처음 5 · 누를 때마다 10 · 흰 버튼 FOLD_BTN 전체 폭 + 아래 화살표 · 다 펼치면 `접기`).
 # 목업은 아래 10개를 돌려 붙여 214까지 늘린다(실서비스 = 다음 10개를 서버에서 받음).
@@ -1175,14 +1202,14 @@ ARTICLE_MORE = [
 ]
 
 
-def article_more(shown, total):
-    rows = "".join(item(c, True, f"m{k}", "mock_comments_thread.html") for k, c in enumerate(ARTICLE_MORE))
+def page_more(pool, shown, total):
+    rows = "".join(item(c, True, f"m{k}", "mock_comments_thread.html") for k, c in enumerate(pool))
     n = min(dk.MORE_STEP, total - shown)
     return (f'<template id="cc-more-tpl">{rows}</template>'
             f'<button type="button" data-cmore data-total="{total}" data-shown="{shown}" style="{dk.FOLD_BTN}width:100%;">'
             f'<span>댓글 {n}개 더 보기</span> {dk.ACC_CHEV}</button>'
-            "<script>(function(){var b=document.querySelector('.cc-article [data-cmore]');if(!b)return;"
-            "var list=document.querySelector('.cc-article .cv-list'),tpl=document.getElementById('cc-more-tpl'),total=+b.dataset.total,first=+b.dataset.shown,shown=first,step=10;"
+            "<script>(function(){var b=document.querySelector('.cc-page [data-cmore]');if(!b)return;"
+            "var list=document.querySelector('.cc-page .cv-list'),tpl=document.getElementById('cc-more-tpl'),total=+b.dataset.total,first=+b.dataset.shown,shown=first,step=10;"
             "function label(){var r=total-shown;b.querySelector('span').textContent=r>0?'댓글 '+Math.min(step,r)+'개 더 보기':'접기';b.classList.toggle('is-open',r<=0);}"
             "b.addEventListener('click',function(){if(shown>=total){list.querySelectorAll('.cc-add').forEach(function(x){x.remove();});shown=first;label();b.scrollIntoView({block:'center'});return;}"
             "var src=tpl.content.querySelectorAll('li.cv-item'),n=Math.min(step,total-shown);for(var i=0;i<n;i++){var li=src[(shown-first+i)%src.length].cloneNode(true);li.classList.add('cc-add');list.appendChild(li);}"
@@ -1197,8 +1224,7 @@ def article_top():
            'font-size:14px;line-height:20px;font-weight:700;color:#111;"><img src="https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_259960.svg?v=2" '
            'alt="" width="24" height="24" loading="lazy" style="display:inline-block;width:24px;height:24px;border-radius:50%;flex:none;margin-right:6px;background:#fff;'
            'object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;">크래프톤</span>')
-    return (ARTICLE_CSS
-            + '<h2 style="margin:4px 0 12px;padding:0 0 0 6px;font-size:26px;line-height:38px;font-weight:700;color:#111;word-break:keep-all;">'   # 기사 제목 = 원래 기사(data-headline)와 같은 26/38(폰은 테마가 22로)
+    return ('<h2 style="margin:4px 0 12px;padding:0 0 0 6px;font-size:26px;line-height:38px;font-weight:700;color:#111;word-break:keep-all;">'   # 기사 제목 = 원래 기사(data-headline)와 같은 26/38(폰은 테마가 22로)
               '<span style="display:block;font-size:26px;line-height:38px;">크래프톤, 자체 개발 거대언어모델 정식 출시</span></h2>'
             + '<figure style="margin:0 0 4px;"><div style="position:relative;"><img src="../../news-posts/output/mock_img/industry_game.jpg" alt="자료 사진: e스포츠 대회장" '
             f'style="display:block;width:100%;height:200px;object-fit:cover;border-radius:10px;">{tag}</div>'
@@ -1245,16 +1271,14 @@ def comment_page(cmts, total, back, kind):
     """댓글 화면 본문 — 봉차트(종목 = 그 종목, 시황 = 코스피) → `댓글 n` → 안내 → 목록 → 더 보기. 쓰기 = 오른쪽 아래 연필.
     제목 줄은 따로 그리지 않는다 — 글의 h3.post-title 을 테마가 고정 제목 줄(뒤로 · 로고 + 제목 · 공유)로 만든다(디자인 가이드 2절 1)."""
     rows = "".join(item(c, True, f"t{k}", "mock_comments_thread.html") for k, c in enumerate(cmts))
-    more = f'<button class="cm-more" type="button">댓글 {total - len(cmts)}개 더 보기</button>' if total > len(cmts) else ""
-    if kind == "article" and total > len(cmts):   # 기사 댓글 화면 = 더 보기 규칙(10개씩 · 화살표 흰 버튼)
-        more = article_more(len(cmts), total)
+    more = page_more(ARTICLE_MORE if kind == "article" else cmts, len(cmts), total) if total > len(cmts) else ""   # 더 보기 규칙(10개씩 · 화살표 흰 버튼)
     mark = (f'<span data-title-back="{back}" data-title-back-label="돌아가기" hidden></span>'
             + ('<span data-kr-code="000660" hidden></span>' if kind == "stock" else ""))
     if kind == "issue" and os.path.exists(ISSUE_BASE):   # 원래 Hot Issue 머리 그대로 + 그 아래 댓글(틀은 git 에 없음 — 없는 PC 는 아래 예전 시안으로)
         return (issue_head() + f'<div data-design="2" style="font-family:var(--report-font);">{mark}{TAIL}'
-                f'<div class="comments is-open cc-page"><div class="cc-page-h">댓글 {total}</div>{guard()}<ol class="cv-list">{rows}</ol>{more}</div></div>')
+                f'{PAGE_CSS}<div class="comments is-open cc-page"><div class="cc-page-h">댓글 <span class="cc-n">{total}</span></div>{guard()}<ol class="cv-list">{rows}</ol>{more}</div></div>')
     return (f'<div data-design="2" style="font-family:var(--report-font);">{mark}{TAIL}{top(kind)}'
-            f'<div class="comments is-open cc-page{" cc-article" if kind == "article" else ""}"><div class="cc-page-h">댓글 <span class="cc-n">{total}</span></div>{guard()}<ol class="cv-list">{rows}</ol>{more}</div></div>')
+            f'{PAGE_CSS}<div class="comments is-open cc-page"><div class="cc-page-h">댓글 <span class="cc-n">{total}</span></div>{guard()}<ol class="cv-list">{rows}</ol>{more}</div></div>')
 
 
 def build_cc(name, base, cmts, total, page_link="", page=None):
@@ -1333,13 +1357,13 @@ def main():
     build_cc("mock_comments_card-one.html", BASE, [ONE_CMT], 1, "mock_comments_page.html")
     build_cc("mock_comments_page-stock.html", STOCK_BASE, STOCK_CMTS, STOCK_TOTAL, "mock_comments_page-stock.html",
              page=("SK하이닉스", "mock_comments_cards.html", "stock"))
-    build_cc("mock_comments_page-report.html", BASE, [ONE_CMT_R], 1, "mock_comments_page-report.html",
+    build_cc("mock_comments_page-report.html", BASE, REPORT_CMTS, REPORT_TOTAL, "mock_comments_page-report.html",
              page=("11.27 한국 증시 리포트", "../../kr-market-report/output/kr_report_mock.html", "report"))
-    build_cc("mock_comments_page.html", BASE, [ONE_CMT], 1, "mock_comments_page.html",
+    build_cc("mock_comments_page.html", BASE, STORY_CMTS, STORY_TOTAL, "mock_comments_page.html",
              page=("11.27 증시 시황", "mock_comments_card-one.html", "story"))
-    build_cc("mock_comments_page-issue.html", ISSUE_BASE, [ONE_CMT_I], 1, "mock_comments_page-issue.html",
+    build_cc("mock_comments_page-issue.html", ISSUE_BASE, ISSUE_CMTS, ISSUE_TOTAL, "mock_comments_page-issue.html",
              page=("Hot Issue", "../../issue_store/output/mock_issue_nvidia_ceo_public.html", "issue"))
-    build_cc("mock_comments_page-forecast.html", BASE, [ONE_CMT_F], 1, "mock_comments_page-forecast.html",
+    build_cc("mock_comments_page-forecast.html", BASE, FORECAST_CMTS, FORECAST_TOTAL, "mock_comments_page-forecast.html",
              page=("증시 전망", "../../issue_store/output/mock_real_forecast-nvda-2026q3.html", "forecast"))
     build_cc("mock_comments_page-article.html", BASE, ARTICLE_CMTS, ARTICLE_TOTAL, "mock_comments_page-article.html",
              page=("Newfact 기사", "../../news-posts/output/mock_news_photo_5.html", "article"))
