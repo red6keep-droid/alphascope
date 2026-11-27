@@ -88,6 +88,38 @@ def closed_through():
     return now.strftime("%Y-%m-%d") if now.hour * 60 + now.minute >= 15 * 60 + 40 else (now - datetime.timedelta(days=1)).strftime("%Y-%m-%d")
 
 
+# ── 시안(11-27): 제목 아래 자료 사진 크기 — 목업만. 사진 = 사용자 검수 끝난 완료 묶음에서 한 장(samples/, git 제외) ──
+PHOTO = os.path.join(SAMPLES, "photo_sample.jpg")
+PHOTO_CAP = ("Chongkian", "CC BY-SA 4.0", "https://creativecommons.org/licenses/by-sa/4.0/deed.ko", "https://commons.wikimedia.org/wiki/File:Iskandar_Investment_Esports_Carnival_2019.jpg", "e스포츠 대회장")
+
+
+def _tag(name, what):
+    return f'<div style="margin:0 0 8px;font-size:16px;line-height:24px;color:#111;"><b style="color:#7C3AED;">{name}</b><span style="color:#6B7280;"> — {what}</span></div>'
+
+
+def _figure(h):
+    who, lic, lic_url, src, what = PHOTO_CAP
+    a = 'style="color:#6B7280;text-decoration:underline;"'
+    return (f'<figure style="margin:0 0 26px;"><img src="../samples/photo_sample.jpg" alt="자료 사진: {what}" '
+            f'style="display:block;width:100%;height:{h}px;object-fit:cover;border-radius:10px;">'
+            f'<figcaption style="margin:7px 0 0;font-size:13px;line-height:19px;color:#6B7280;">자료 사진 · 사진: {who} · '
+            f'<a href="{lic_url}" {a}>{lic}</a> · <a href="{src}" {a}>위키미디어 공용</a></figcaption></figure>')
+
+
+def photo_variants(html):
+    if not os.path.exists(PHOTO):
+        return html
+    block = ('<div data-mock-draft="photo">'
+             + _tag("지금", "그림 없이 제목 바로 아래 요약 상자")
+             + _tag("A안 (추천)", "본문 폭 전체 · 높이 200 · 모서리 10 · 출처 줄 13/19 회색 · 사진과 7 · 요약 상자와 26") + _figure(200)
+             + _tag("B안", "본문 폭 전체 · 높이 240 — 화면 첫 칸에서 본문이 더 밀림") + _figure(240)
+             + _tag("C안", "높이 160 — 띠처럼 얇게") + _figure(160)
+             + '</div>')
+    i = html.find("data-headline")
+    j = html.find("</h2>", i)
+    return html if i < 0 or j < 0 else html[:j + 5] + block + html[j + 5:]
+
+
 if __name__ == "__main__":
     sys.stdout.reconfigure(encoding="utf-8")
     os.makedirs(OUT, exist_ok=True)
@@ -108,6 +140,8 @@ if __name__ == "__main__":
         market = NR.same_day(post, lists, closes_of, upto, themes=themes)
         _, html, meta = NR.render(post, market, lists, issues, forecasts)
         html = html.replace(dk.WRAP_OPEN, dk.WRAP_OPEN + LOGO_TPL, 1)   # 목업만: 머리 줄 로고가 없어 테마 JS 가 쓸 로고 원본
+        if name == "mock_news_post.html":
+            html = photo_variants(html)   # 시안(11-27): 자료 사진 크기
         out = os.path.join(OUT, name)
         print(dk.write_mock(html, out, NR.titles(post)[0]) or "index.html 없음", "· 기준", meta["basis"], "· 관련 종목", len(market["stocks"]), [s["name"] for s in market["stocks"]][:6],
               "· 함께 보는 페이지", [t for t, _ in NR.follow_links(post, market, lists, issues, forecasts)])
