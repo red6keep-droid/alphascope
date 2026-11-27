@@ -192,7 +192,23 @@ def sector_flow(snap, sym):
     pool = sectors + ([{"etf": "SMH", "name": "반도체", "rel": rel}] if etf == "SMH" else [])
     rank = 1 + sum(1 for x in pool if x["rel"] > rel)
     return {"etf": etf, "name": name, "state": "모이는 중" if rel >= pp else "빠져나가는 중" if rel <= -pp else "뚜렷하지 않음",
-            "rel_pp": rel, "days": n, "sectors": sectors, "rank": rank, "n_pool": len(pool)}
+            "rel_pp": rel, "days": n, "sectors": sectors, "rank": rank, "n_pool": len(pool), "fund": _etf_fund(etf)}
+
+
+_FUND_MEMO = {}
+
+
+def _etf_fund(etf):
+    """업종 ETF 로 실제 들어온 돈(운용사 좌수 이력, etf_flows.py) — 카드의 둘째 문장 · 줄. 운용사 자료가 없는 ETF · 실패는 None(카드는 그 줄 없이).
+    ETF 마다 한 실행에 한 번, 같은 날은 data/etf_flows.json 의 값을 다시 쓴다. 판정(state)에는 쓰지 않는다."""
+    if etf not in _FUND_MEMO:
+        try:
+            import etf_flows
+            _FUND_MEMO[etf] = etf_flows.fund(etf, os.path.dirname(STATE))
+        except Exception as ex:  # noqa: BLE001
+            print(f"[radar] {etf} 실제 순유입 없음: {str(ex)[:120]}")
+            _FUND_MEMO[etf] = None
+    return _FUND_MEMO[etf]
 
 
 def bollinger(bars):
