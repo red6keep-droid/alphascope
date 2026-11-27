@@ -332,7 +332,7 @@ def stock_row(x, row, slot, first, inline_sub=False, small=False, below="", belo
     right = (f'<span style="flex:none;display:flex;flex-direction:column;align-items:flex-end;white-space:nowrap;{"margin-top:10px;" if inline_sub else ""}">'
              f'<span style="font-size:{cs}px;line-height:24px;">{chg(v)}</span>'
              + (f'<span style="font-size:{ps}px;line-height:20px;color:{col};">{price}</span>' if price else "") + '</span>')
-    href = (row or {}).get("u") or (dk.stock_href(t) if not re.fullmatch(r"\d{6}", t) else "")
+    href = (row or {}).get("u") or dk.stock_url(t) or ""
     attr = f' data-row-link="1" data-href="{dk.esc(href)}"' if href else ""
     sep = "" if first else "border-top:1px solid #E2E8F0;"
     return (f'<span{attr} style="display:flex;justify-content:space-between;gap:12px;padding:{LIST_ROW_PAD}px 12px;white-space:nowrap;line-height:24px;align-items:{"flex-start" if inline_sub else "center"};{sep}">'

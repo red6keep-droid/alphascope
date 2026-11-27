@@ -461,12 +461,13 @@ _UK = None
 
 
 def _rec_href(sym):
-    """연관 종목 줄 링크 — 미국 정식(stocks.json) · 한국 정식(universe_kr.page_url), 없으면 간단 종목 전용 페이지(발행된 것만, dk.quick_href — 2026-11-17)."""
+    """연관 종목 줄 링크 — dk.stock_url 하나로(정식 · 간단 전부). 이름표를 못 읽은 날만 한국 정식 universe_kr.page_url 로."""
     global _UK
     if not sym:
         return None
-    if not sym.endswith((".KS", ".KQ")):
-        return _dk.stock_href(sym) or _dk.quick_href(sym)
+    href = _dk.stock_url(sym)
+    if href or not sym.endswith((".KS", ".KQ")):
+        return href
     if _UK is None:
         import importlib.util
         spec = importlib.util.spec_from_file_location("universe_kr_links", os.path.join(_HERE, "..", "kr-stocks", "universe_kr.py"))

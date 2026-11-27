@@ -1622,7 +1622,11 @@ def footer(data_line, disclaimer_line, indent=True):
 # ── 종목 링크 ──
 # 상세 페이지 목록 = 홈 종목 카드가 쓰는 gh-pages stocks.json 의 page 플래그 (stock-radar/home_feed.py · publish_pages 의 pages_live.json).
 # 없는 페이지로는 링크하지 않는다. 목록을 못 읽으면 링크 없이(안전).
-STOCK_LINK = "#7C3AED"   # 기사 속 종목 링크 — 보라색 · 굵게 아님
+STOCK_LINK = "#7C3AED"   # 옛 기사 속 종목 링크 색 — 문장 속 종목은 이제 STOCK_LINK_STYLE
+# 문장 속 종목 이름 = 검은 굵게 + 아주 연한 회색 점선(점 2px · 간격 5px · 글자 아래 2px). 보라는 색 강조와 겹쳐 쓰지 않는다 (2026-11-27 확정, 목업 `문장 속 종목 이름 링크`)
+STOCK_LINK_STYLE = ("color:#111;font-weight:700;text-decoration:none;padding-bottom:2px;"
+                    "background-image:linear-gradient(90deg,#D1D5DB 2px,transparent 2px);background-size:7px 1.5px;"
+                    "background-repeat:repeat-x;background-position:0 100%;")
 STOCK_BLOG = "https://www.newfact.app"
 _STOCKS_URL = "https://raw.githubusercontent.com/red6keep-droid/alphascope/gh-pages/stocks.json"
 _stock_pages = None
@@ -1650,7 +1654,65 @@ def stock_pages():
 
 
 def stock_href(sym):
-    return stock_pages().get(str(sym or "").strip().upper())
+    """종목 → 상세 페이지 주소. 우리 종목(정식 · 간단 전부)이면 주소, 아니면 None — stock_url 과 같다."""
+    return stock_url(sym)
+
+
+_NAMES_URL = "https://alpha-scope.pages.dev/names.json"   # 정식 · 간단 종목 전부의 이름 · 코드 · 주소 — quick-data 가 매일 올린다(site-search/build_names.py)
+_names_pages = None
+
+
+def _sym_key(sym):
+    """주소표 열쇠 — 한국 005930.KS → 005930, 미국은 티커 그대로(BRK-B 의 `-` 는 남긴다)."""
+    s = str(sym or "").strip().upper()
+    return s.rsplit(".", 1)[0] if s.endswith((".KS", ".KQ")) else s
+
+
+def names_pages():
+    """{열쇠: 주소} — names.json 의 모든 종목. 환경변수 NAMES_JSON(파일)이 있으면 그것. 못 읽으면 {}(→ stock_url 이 옛 순서로)."""
+    global _names_pages
+    if _names_pages is None:
+        _names_pages = {}
+        try:
+            path = os.environ.get("NAMES_JSON")
+            if path and os.path.exists(path):
+                with open(path, encoding="utf-8") as f:
+                    data = json.load(f)
+            else:
+                import urllib.request
+                with urllib.request.urlopen(urllib.request.Request(_NAMES_URL, headers={"User-Agent": "alphascope"}), timeout=15) as r:
+                    data = json.loads(r.read().decode("utf-8"))
+            for x in (data or {}).get("stocks") or []:
+                u = x.get("u")
+                if x.get("t") and isinstance(u, str) and u.startswith(STOCK_BLOG + "/p/"):
+                    _names_pages[str(x["t"]).upper()] = u
+        except Exception as e:  # noqa: BLE001
+            print(f"[design_kit] 종목 이름표 없음 — 아는 주소만: {str(e)[:80]}")
+    return _names_pages
+
+
+def stock_url(sym):
+    """종목 → 상세 페이지 주소 — 모든 화면이 이 함수 하나로 찾는다.
+    순서: ① 미국 정식(stocks.json, 발행된 것) ② 이름표(names.json — 한국 정식 · 간단 전용 페이지 · 아직 발행 전이면 /p/stock.html?s=코드)
+    ③ 간단 주소표(shells.json) ④ ETF 페이지(etf_universe 37개, 전부 발행). 우리 종목이 아니면(지수 · 목록 밖 회사) None — 링크 없이."""
+    s = str(sym or "").strip().upper()
+    if not s:
+        return None
+    return stock_pages().get(s) or names_pages().get(_sym_key(s)) or quick_href(s) or _etf_url(s)
+
+
+_etf_pages = None
+
+
+def _etf_url(sym):
+    global _etf_pages
+    if _etf_pages is None:
+        try:
+            import etf_universe as _E
+            _etf_pages = {_sym_key(k): _E.page_url(k) for k in _E.BY_SYM}
+        except Exception:  # noqa: BLE001 — 명단을 못 읽어도 종목 링크는 그대로
+            _etf_pages = {}
+    return _etf_pages.get(_sym_key(sym))
 
 
 _QUICK_URL = "https://alpha-scope.pages.dev/shells.json"   # 간단 종목 전용 페이지 주소표 {UBER · 259960: 주소} — quick-data 가 발행 뒤 올린다
@@ -1679,12 +1741,12 @@ def quick_href(sym):
 
 
 def stock_link(sym, text_html, color=True):
-    """종목 글자 → 상세 페이지 링크. color=True: 기사 속 종목(파란색 · 보통 굵기), False: 글자 색 그대로(카드 · 목록 줄).
-    페이지가 없으면 text_html 그대로 (기사 속은 검정)."""
+    """종목 글자 → 상세 페이지 링크. color=True: 문장 속 종목(검은 굵게 · 아주 연한 회색 점선 = STOCK_LINK_STYLE), False: 글자 색 그대로(카드 · 목록 줄).
+    우리 종목이 아니면 text_html 그대로."""
     href = stock_href(sym)
     if not href:
         return text_html
-    style = f"color:{STOCK_LINK};font-weight:400;text-decoration:none;" if color else "color:inherit;text-decoration:none;"
+    style = STOCK_LINK_STYLE if color else "color:inherit;text-decoration:none;"
     return f'<a href="{esc(href)}" data-stock="{esc(sym)}" style="{style}">{text_html}</a>'
 
 
