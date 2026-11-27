@@ -477,7 +477,9 @@ def stk_css():
             sels = ",".join(f'{sel}[src$="c_{k}.webp"]' for k in STK_SHRINK[pct])
             out += f"{sels}{{width:{px[col - 1]}px;height:{px[col - 1]}px;}}\n"
     tight = ",".join(f'.comments .cv-stk[src$="c_{k}.webp"]' for ks in STK_SHRINK.values() for k in ks)
-    out += f"{tight}{{margin-top:13px;}}\n"   # 몸이 칸을 꽉 채우는 컷 = 위 글자와 붙어 보임 → 8 + 5
+    out += f"{tight}{{margin-top:13px;}}\n"   # 몸이 칸을 꽉 채우는 컷 = 위 글자와 붙어 보임 → 8 + 5 (글 화면 · 붙인 스티커)
+    tight_in = ",".join(f'.cv-stk-in[src$="c_{k}.webp"]' for ks in STK_SHRINK.values() for k in ks)
+    out += f"{tight_in}{{margin-top:7px;}}\n"   # 목록 본문 안 스티커(cv-stk-in)도 같이 → 2 + 5 (11-28, 처음엔 cv-stk 에만 넣어 목록에 안 먹었다)
     return out
 
 
