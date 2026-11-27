@@ -748,7 +748,8 @@ img[src$="/CEG.svg"], img[src$="/CRCL.svg"], img[src$="/CRWV.svg"], img[src$="/C
 .news-sub .num { margin-left: 6px; }
 .news-labels > .news-sub:first-child { margin-left: 0; }   /* 라벨 없는 줄(Newfact 글)은 메타가 맨 앞 — 왼쪽 띄움 없음 (2026-11-25) */
 /* 한국 홈 `오늘의 Newfact` — 제목 위 +8(15 → 23) · 제목 한 줄 … ("한 줄로 하고 점점점") · 보조 글 두 줄까지 … (세 줄 안 됨) */
-body[data-home-mkt="kr"] .news-section { margin-top: 23px; }
+body[data-home-mkt] .news-section { margin-top: 23px; }   /* 미국 홈도 같은 `오늘의 Newfact` 제목 · 위 23 */
+body[data-home-mkt] .main-content > .news-section { margin-top: -4px; }   /* 블로그 = .main-content 가 세로 간격 27 을 두고 쌓음 → 23 − 27. 목업(간격 없는 칸)과 같은 자리 */
 body[data-home-mkt="kr"] #news-list .news-item a:not(.nf-post), body[data-home-mkt="kr"] #news-list .nf-post > span:last-child { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 body[data-home-mkt="kr"] #news-list .news-sum { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
 .news-item.load-status { color: var(--gray-400); }
@@ -4015,9 +4016,9 @@ html.as-lock, html.as-lock body { overflow: hidden; }
           return ((j && j.items) || []).filter(function (it) { return it.url && kday(it.published) === today; })
             .map(function (it) { return { title: it.title, summary_ko: it.summary || '', kind: 'post', slug: it.slug || '', tag: it.tag || '', source: 'Newfact', published: new Date(it.published).toISOString().slice(0, 19) + 'Z', link: it.url }; });
         }
-        if (HOME_MKT === 'kr') {   /* 한국 목록 제목 = `오늘의 Newfact` — 브랜드는 로고 글꼴(.brand-word) */
+        if (HOME_MKT) {   /* 미국 · 한국 목록 제목 = `오늘의 Newfact` — 브랜드는 로고 글꼴(.brand-word) */
           var nt = document.getElementById('news-title');
-          if (nt && nt.lastChild && nt.lastChild.nodeType === 3) { var ic = nt.querySelector('.report-icon'); if (ic) nt.removeChild(ic);   /* 한국 = 제목 앞 아이콘 없음 */
+          if (nt && nt.lastChild && nt.lastChild.nodeType === 3) { var ic = nt.querySelector('.report-icon'); if (ic) nt.removeChild(ic);   /* 미국 · 한국 = 제목 앞 아이콘 없음 */
     var tt = el('span', null, '오늘의 '); tt.appendChild(el('span', 'brand-word', 'Newfact')); nt.replaceChild(tt, nt.lastChild); }   /* 한 조각으로 — 제목 칸(flex)이 조각마다 세로 가운데를 따로 잡아 Newfact 가 내려가던 것 */
         }
         var NEWS_SHOWN = 5, NEWS_STEP = 10;   /* 홈 주요 뉴스 5건 + 누를 때마다 10건씩 */
