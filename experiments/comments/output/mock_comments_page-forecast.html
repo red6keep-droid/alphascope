@@ -2049,7 +2049,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
 /* P614 숫자 = Inter: 토론 칸 · 화면 전체 창 글꼴 = 테마 --report-font('AS Num' 맨 앞) · 숫자만 있는 자리 = --num */
 .comments,.cv-full,.cv-page{font-family:var(--report-font);}
 /* P615 날짜 = 가장 작은 글씨 13/19 */
-.comments .cm-date,.cv-pmeta,.cv-rtime{font-family:var(--num);font-size:13px;line-height:19px;font-variant-numeric:tabular-nums;}
+.comments .cm-date,.cv-pmeta,.cv-rtime{font-family:var(--num);font-size:12px;line-height:18px;font-variant-numeric:normal;}   /* 날짜 · 시각 = 12, 고정폭 숫자 끔(Inter 고정폭은 1 에 받침이 붙어 블로그 숫자와 달라 보임, 11-28 사용자) */
 .comments .cv-react span,.comments .cv-reply span,.cm-count,.cv-lab small,.cv-frow{font-family:var(--num);}
 .cv-mine small{font-size:13px;line-height:19px;}
 .comments .cv-head .cm-date{margin-left:auto;}
@@ -2061,8 +2061,8 @@ html.as-lock, html.as-lock body { overflow: hidden; }
 .comments .cv-list .cv-main .cv-title{margin:4px 0 0;font-size:16px;line-height:24px;}   /* 종목 카드 이름과 같은 16/24 굵게 */
 .comments .cv-list .cv-main .cv-text{margin:6px 0 0;color:#6B7280;}
 .comments .cv-foot{gap:16px;}
-.comments .cv-react{display:inline-flex;align-items:center;gap:6px;margin:0;padding:4px 0;background:none;border:0;font:inherit;font-size:14px;line-height:20px;color:#333;font-variant-numeric:tabular-nums;cursor:pointer;-webkit-tap-highlight-color:transparent;}
-.comments .cv-react svg{width:20px;height:20px;}
+.comments .cv-react{display:inline-flex;align-items:center;gap:6px;margin:0;padding:4px 0;background:none;border:0;font:inherit;font-size:13px;line-height:20px;color:#333;font-variant-numeric:normal;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.comments .cv-react svg{width:18px;height:18px;}   /* 아이콘 20 → 18(10% 작게, 11-28) */
 /* 누른 상태 = 좋아요 부드러운 빨강 #ED8E87 · 싫어요 부드러운 파랑 #82B1F0 채움 + 숫자 같은 색 굵게(dk.CHART_UP · CHART_DN, 11-27 사용자). 소매 선만 흰색 */
 .comments .cv-react.is-on span{font-weight:700;}
 .comments .cv-react[data-react="up"].is-on{color:#ED8E87;}
@@ -2099,9 +2099,9 @@ html.as-lock, html.as-lock body { overflow: hidden; }
 .comments .cm-avatar.is-hidden{background:#CBD5E1;color:#fff;}
 .comments .cm-avatar.is-hidden svg{width:14px;height:14px;display:block;}
 .comments .cv-foot{display:flex;align-items:center;margin:8px 0 0 31px;}
-.comments .cv-reply{display:inline-flex;align-items:center;gap:6px;padding:4px 8px 4px 0;color:#333;text-decoration:none;font-size:14px;line-height:20px;font-weight:700;font-variant-numeric:tabular-nums;-webkit-tap-highlight-color:transparent;}
+.comments .cv-reply{display:inline-flex;align-items:center;gap:6px;padding:4px 8px 4px 0;color:#333;text-decoration:none;font-size:13px;line-height:20px;font-weight:700;font-variant-numeric:normal;-webkit-tap-highlight-color:transparent;}
 .comments .cv-reply.has{color:#333;}
-.comments .cv-reply svg{width:20px;height:20px;}
+.comments .cv-reply svg{width:18px;height:18px;}
 .comments .cv-reply span,.comments .cv-react span{font-weight:400;}
 .comments .cv-pop{margin:6px 0 0 31px;padding:12px;border:0;border-radius:8px;background:#F3F4F6;}   /* 연한 회색 바탕 · 외곽선 없음(기준 상자와 같은 회색) */
 /* 신고 상자 = 왼쪽 칸(제목 → 그 아래 신고하기) · 오른쪽 칸(이유 칩). 칩은 제목 칸을 넘지 않고 오른쪽 칸 안에서 줄바꿈 */
@@ -2276,13 +2276,13 @@ html.as-lock, html.as-lock body { overflow: hidden; }
 .cc-one .cc-card{flex-basis:100%;}
 .cc-head{display:flex;align-items:center;gap:7px;min-height:24px;}
 .cc-head .cm-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px;line-height:20px;}
-.cc-date{margin-left:auto;flex:none;font-family:var(--num);font-size:13px;line-height:19px;color:#7A7A7A;font-variant-numeric:tabular-nums;}
+.cc-date{margin-left:auto;flex:none;font-family:var(--num);font-size:12px;line-height:18px;color:#7A7A7A;font-variant-numeric:normal;}
 .cc-title{margin:8px 0 0;font-size:16px;line-height:24px;font-weight:700;color:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .cc-new{display:inline-block;margin:0 5px 0 0;padding:0 5px;border-radius:4px;background:#DD0000;color:#fff;font-family:var(--num);font-size:11px;line-height:17px;font-weight:700;vertical-align:2px;}
 .cc-text{margin:4px 0 0;font-size:14px;line-height:22px;color:#6B7280;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.cc-foot{display:flex;align-items:center;gap:16px;margin:12px 0 0;font-family:var(--num);font-size:14px;line-height:20px;color:#333;font-variant-numeric:tabular-nums;}
+.cc-foot{display:flex;align-items:center;gap:16px;margin:12px 0 0;font-family:var(--num);font-size:13px;line-height:20px;color:#333;font-variant-numeric:normal;}
 .cc-foot span{display:inline-flex;align-items:center;gap:6px;}
-.cc-foot svg{width:20px;height:20px;}
+.cc-foot svg{width:18px;height:18px;}
 .cc-row{display:flex;align-items:center;gap:10px;}
 .cc-body{flex:1;min-width:0;}
 .cc-stk{flex:none;width:56px;height:56px;margin:6px 0 0;object-fit:contain;}
