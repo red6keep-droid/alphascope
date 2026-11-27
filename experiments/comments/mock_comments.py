@@ -451,6 +451,35 @@ STICKERS = [   # (탭 이름, [컷 …]) 그림 여섯 장(course/sheet_to_webp.
                 "mid_think", "mid_caution", "mid_explain"]),
     ("같이", ["pair_gym", "pair_game", "pair_trip", "pair_race", "pair_study", "pair_wonder", "pair_play", "pair_cheer"]),
 ]
+# 스티커 크기 고르기(11-28) — 그림은 모두 같은 칸(320 정사각)인데 캐릭터 혼자 있는 컷은 몸이 칸을 꽉 채워 크게,
+# 소품이 많은 컷은 작게 보인다. 컷마다 캐릭터 몸 색 넓이를 재서 같은 캐릭터 가운데값보다 큰 컷만 줄인다
+# (약 1.2배 이상 = 15% · 1.1배 안팎 = 10%). 작은 컷은 키우지 않는다(칸을 넘는다).
+STK_SHRINK = {
+    15: ["up_sweat", "up_panic", "up_buy", "up_chicken", "up_surprised",
+         "down_calm", "down_happy",
+         "mid_thanks", "mid_explain", "mid_think", "mid_clap", "mid_stretch"],
+    10: ["up_walk",
+         "down_shrug", "down_thumb", "down_grumpy", "down_frown", "down_sulky",
+         "mid_caution", "mid_eat", "mid_workout", "mid_music", "mid_photo"],
+}
+STK_BOX = {   # 자리마다 (선택자, 기본 px, 10% 줄인 px, 15% 줄인 px) — 모두 정수
+    "list": (".comments .cv-stk", 96, 86, 82),
+    "inline": (".cv-stk-in", 80, 72, 68),
+    "pick": (".cv-stk-pick img", 62, 56, 53),
+    "card": (".cc-stk", 56, 50, 48),
+}
+
+
+def stk_css():
+    out = "/* 스티커 크기 고르기 — 몸이 크게 든 컷만 10 · 15% 작게(STK_SHRINK) */\n"
+    for pct, col in ((10, 2), (15, 3)):
+        for sel, *px in STK_BOX.values():
+            sels = ",".join(f'{sel}[src$="c_{k}.webp"]' for k in STK_SHRINK[pct])
+            out += f"{sels}{{width:{px[col - 1]}px;height:{px[col - 1]}px;}}\n"
+    return out
+
+
+CSS = CSS.replace("</style>", stk_css() + "</style>", 1)
 TITLES = {   # 목업 목록에 보이는 이름
     "mock_comments_member.html": "댓글 목록 (로그인 뒤)",
     "mock_comments_guest.html": "댓글 목록 (로그인 전)",
@@ -1126,7 +1155,7 @@ ARTICLE_CSS = """<style>
 .cc-article .cc-page-h .cc-n{font-weight:400;}              /* 숫자는 굵게 빼기 */
 .cc-article .cv-guard{margin:5px 0 9px !important;background:none !important;border:1px solid #E2E8F0 !important;}   /* 위 14 → 7 → 5 · 아래(첫 댓글까지) 14 → 9 · 회색 면 빼고 회색 외곽선만 */
 .cc-article .cv-list .cv-main .cv-title{margin-top:1px;}    /* 이름 줄 ~ 제목 4 → 3 → 1 */
-.cc-article .cv-list .cv-main .cv-text{margin-top:4px;line-height:25px;color:#4D545E;}   /* 제목 아래 6 → 4 · 행간 26 → 25 · 글자 #6B7280 → #606773 → #565D68 → #4D545E(10%씩 세 번 진하게) */
+.cc-article .cv-list .cv-main .cv-text{margin-top:4px;line-height:25px;color:#454C55;}   /* 제목 아래 6 → 4 · 행간 26 → 25 · 글자 #6B7280 → #606773 → #565D68 → #4D545E → #454C55(10%씩 네 번 진하게) */
 .cc-article [data-cmore]{margin:8px 0 0;}
 .cc-article [data-cmore].is-open .acc-chev{transform:rotate(180deg);}
 </style>"""
