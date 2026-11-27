@@ -33,6 +33,11 @@ def _kst_day(iso):
         return str(iso)[:10]
 
 
+def pick_id(p):
+    """방송 의견 한 건의 id — 같은 영상 · 같은 사람 · 같은 종목이면 같다(영상 안 시각은 뺀다)."""
+    return hashlib.sha1(f"{p.get('url', '').split('&t=')[0].split('?t=')[0]}|{p.get('speaker')}|{p.get('ticker')}".encode()).hexdigest()[:12]
+
+
 def verdict_rows(date, source, s, got, picks=(), name=None):
     """한 종목의 판정 줄. got = {signal_groups 키: 함께 보기 줄(이름, 판정 말, 방향, 탭, 카드, 기간)} — 페이지와 같은 helper 로 만든 것."""
     sym, nm = s["sym"], name or s.get("name")
@@ -43,7 +48,7 @@ def verdict_rows(date, source, s, got, picks=(), name=None):
     if cells:
         rows.append(dict(base, id=f"{sym}/analysts", card="애널리스트 의견은?", family=SG.OUTSIDE, scheme=SG.SCHEME, close=s.get("close"), value=cells))
     for p in picks:
-        h = hashlib.sha1(f"{p.get('url', '').split('&t=')[0].split('?t=')[0]}|{p.get('speaker')}|{p.get('ticker')}".encode()).hexdigest()[:12]
+        h = pick_id(p)
         rows.append({"date": _kst_day(p.get("published_at")), "as_of": s.get("day") or date, "source": source, "target": sym, "sym": sym, "name": nm,
                      "id": f"{sym}/pick/{h}", "card": "방송 의견은?", "family": SG.OUTSIDE, "scheme": SG.SCHEME,
                      "state": p.get("action"), "direction": PICK_DIR.get(p.get("action"), SG.FLAT),

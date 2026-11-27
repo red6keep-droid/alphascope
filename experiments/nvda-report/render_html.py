@@ -802,7 +802,7 @@ def momentum_in(name, mom, rank, total, med, bench, bench_name, tip):
     return out
 
 
-def opinions_cards(name, cells, close, ps, money, together, m0=None, m2=None, broker=None, news_ops=None, closes=None):
+def opinions_cards(name, cells, close, ps, money, together, m0=None, m2=None, broker=None, news_ops=None, closes=None, change=None):
     """`의견` 탭 — 옛 한 장 `애널리스트 · 방송 의견은?`(P90)을 강조 카드 둘로 나눈다: `애널리스트 의견은?` · `방송 의견은?`.
     접힌 머리에서 두 답(예: 매수 · 매도)을 따로 보고, 누르면 그쪽 내용만 펼친다 — 둘 다 접힌 채로. 함께 보기는 두 카드 아래 따로 흰 카드.
     두 카드는 의견이 없어도 늘 둔다 — 답 `없음`.
@@ -813,7 +813,7 @@ def opinions_cards(name, cells, close, ps, money, together, m0=None, m2=None, br
     cards += news_opinion_card(name, news_ops) if news_ops is not None else ""
     t = together()
     cards += together_card(t)   # 데이터 전망 = 셋째 강조 카드 (P206)
-    summary = opinions_summary(name, cells, close, ps, broker, news_ops, (t if isinstance(t, dict) else {"items": t}).get("items"), money, closes=closes)   # 탭 맨 위 요약 문단 (P295 · P296 상황별 멘트)
+    summary = opinions_summary(name, cells, close, ps, broker, news_ops, (t if isinstance(t, dict) else {"items": t}).get("items"), money, closes=closes, change=change)   # 탭 맨 위 요약 문단 — 지난 기록일과 달라진 것부터 (change = op_change.for_stock)
     return summary + f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{cards}</div>'
 
 
@@ -1284,93 +1284,98 @@ def _b(s):
     return f'<b style="font-weight:700;">{s}</b>'
 
 
-def opinions_summary(name, cells, close, ps, broker, news_ops, items, money, closes=None, span=PICK_SPAN, broker_days=None):
-    """의견 탭 맨 위 요약 문단 (P295 → P296 → P297 쉬운 말, 숫자 없이).
- —
-    숫자는 아래 카드에 있으니 여기는 방향 말만. 상황 → 정해진 문장(AI 없음). 문장 셋 안팎 =
-    ① 전문가(애널리스트 다수 의견 · 평균 목표가 자리 · 증권사가 목표가를 올리는 중인지) ② 방송 · 뉴스 분위기 ③ 정리 = 주가 흐름 + 주변 분위기 vs 가격 흐름(Alpha Scope 신호).
-    증감 · 방향 말은 ▲ ▼ 색 · 굵게(공통 규칙). 예측 · 추천이 아니라 지금 분위기의 정리."""
-    import signal_groups as SG
-    nm = _esc(name)
-    sents, dirs = [], {}
+def _day_label(prev, day):
+    """지난 기록일을 부르는 말 — 달력으로 하루 전이면 `어제`, 아니면 `11월 20일`(주말 · 휴장 건너뛴 날)."""
+    import datetime
+    try:
+        a, b = datetime.date.fromisoformat(prev), datetime.date.fromisoformat(day)
+    except (TypeError, ValueError):
+        return "지난번"
+    return "어제" if (b - a).days == 1 else f"{a.month}월 {a.day}일"
+
+
+STREAK_WORD = {2: "이틀째", 3: "사흘째", 4: "나흘째", 5: "닷새째"}
+
+
+def opinions_summary(name, cells, close, ps, broker, news_ops, items, money, closes=None, span=PICK_SPAN, broker_days=None, change=None):
+    """의견 탭 맨 위 요약 문단 — 지난 기록일과 달라진 것부터 (2026-11-27, 옛 P295 ~ P299 = 전문가 · 방송 · 신호의 수준을 차례로).
+
+    매수 의견 · 목표가는 거의 늘 주가 위라 수준(`상승 추세`)을 말하면 어느 종목 어느 날이든 같은 문장이 된다 → 하루 변화를 말한다.
+    재료 셋 = ① 전문가 평균 목표가 ② 방송 새 의견 ③ Newfact 단기 신호. 달라진 것을 앞에(숫자와 함께), 그대로인 것은 뒤에 한 마디로.
+    비교 대상 = 이 종목의 지난 기준 거래일 값 — change(op_change.for_stock). change 가 없으면(간단 종목 · 기록 없음) 변화 말 없이 오늘 값만.
+    정해진 문장(AI 없음). 증감 말은 ▲ ▼ 색 · 굵게(공통 규칙). 예측 · 추천이 아니라 달라진 것의 정리.
+    broker · news_ops · closes · close 는 예전 문단이 쓰던 칸 — 부르는 쪽을 그대로 두려고 받기만 한다."""
+    import datetime
+    import op_change
+    import stock_records
+    ch = change or {}
+    day = ch.get("day")
     up_w = lambda w: f'<b style="font-weight:700;color:{UP};white-space:nowrap;">▲ {w}</b>'   # noqa: E731
     dn_w = lambda w: f'<b style="font-weight:700;color:{DOWN};white-space:nowrap;">▼ {w}</b>'   # noqa: E731 — ▲ · ▼ 와 말은 한 덩어리로 줄바꿈
-    # 문장 셋: ① 애널리스트 + 평균 목표가 ② 증권사 + 방송 · 뉴스 ③ 주가 + Alpha Scope 신호
-    # 브랜드를 숨기지 않는다 — `가격 흐름(Alpha Scope 신호)` → `Alpha Scope 신호는 중립이다`
-    # ① 전문가 — 애널리스트 다수 의견 + 평균 목표가 자리
-    cells = cells or []
-    rc = next((c["value"] for c in cells if c.get("key") == "rating_counts"), None) or {}
-    n_a = sum(rc.values())
-    pm = next((c["value"] for c in cells if c.get("key") == "pt_mean"), None)
-    if n_a:
-        buy = (rc.get("strongBuy", 0) + rc.get("buy", 0)) / n_a * 100
-        sell = (rc.get("sell", 0) + rc.get("strongSell", 0)) / n_a * 100
-        nmj = _esc(_dk.josa(name, "을"))
-        # (이어 쓰는 꼴, 끝맺는 꼴) — 말은 블로그 신호 용어 한 자로만 (P298 · P299)
-        if buy >= 70:
-            dirs["애널리스트"], an = 1, (f"전문가들은 {nmj} {up_w('상승 추세')}로 보고", f"전문가들은 {nmj} {up_w('상승 추세')}로 보고 있다.")
-        elif buy > 50:
-            dirs["애널리스트"], an = 1, (f"전문가들은 {nmj} {up_w('상승 추세')}로 보지만 한목소리는 아니고", f"전문가들은 {nmj} {up_w('상승 추세')}로 보지만 한목소리는 아니다.")
-        elif sell > 50:
-            dirs["애널리스트"], an = -1, (f"전문가들은 {nmj} {dn_w('하락 추세')}로 보고", f"전문가들은 {nmj} {dn_w('하락 추세')}로 보고 있다.")
+    money = money or (lambda v: f"${v:,.2f}")
+    # ① 전문가 평균 목표가 — 0.1% 넘게 달라졌으면 지난 값 → 오늘 값, 아니면 언제부터 이 값인지
+    pm = next((c["value"] for c in cells or [] if c.get("key") == "pt_mean"), None)
+    t_sent, t_changed = None, False
+    if pm:
+        hist = ch.get("pt") or []
+        cur = _b(money(pm))
+        if hist and abs(pm / hist[-1][1] - 1) >= op_change.PT_MIN:
+            d0, v0 = hist[-1]
+            pct = f"{abs(pm / v0 - 1) * 100:.1f}%"
+            ro = "으로" if money(pm).endswith("원") else "로"
+            t_changed = True
+            t_sent = f"전문가 평균 목표가가 {_day_label(d0, day)} {money(v0)}에서 오늘 {cur}{ro} {up_w(pct + ' 올랐다') if pm > v0 else dn_w(pct + ' 내렸다')}."
         else:
-            dirs["애널리스트"], an = 0, ("전문가 의견은 상승 쪽과 하락 쪽이 반반이고", "전문가 의견은 상승 쪽과 하락 쪽이 반반이다.")
-        gap = (pm / close - 1) * 100 if pm and close else None
-        if gap is not None:
-            where = ("보다 한참 위에" if gap >= 15 else "보다 조금 위에" if gap >= 5 else "와 거의 같은 자리에" if gap > -5 else "보다 아래에")
-            sents.append(f"{an[0]}, 평균 목표가는 지금 주가{where} 있다.")
+            since = None
+            for d0, v0 in reversed(hist):
+                if abs(pm / v0 - 1) >= op_change.PT_MIN:
+                    break
+                since = d0
+            if since and since == hist[0][0]:
+                since = None   # 기록 첫날부터 같은 값 — 언제 바뀌었는지 모른다
+            t_sent = f"전문가 평균 목표가는 {_day_label(since, day) if since else ''}{'부터 ' if since else ''}{cur}이다."
+    # ② 방송 새 의견 — 지난 기록일까지 화면에 없던 의견. 지난 기록이 없으면 오늘(KST) 올라온 의견
+    m_stem, m_changed = None, False
+    if ps is not None:
+        seen = ch.get("seen")
+        if seen is not None:
+            new = [p for p in ps if stock_records.pick_id(p) not in seen]
         else:
-            sents.append(an[1])
-    # ② 증권사(30일) + 방송 · 뉴스(5거래일)
-    br = None
-    if broker:
-        n = {k: sum(1 for c in broker if broker_move(c) == k) for k in MOVE_ORDER}
-        dirs["증권사"] = SG.vote([{"상향": 1, "하향": -1}.get(broker_move(c), 0) for c in broker])
-        br = ("최근 증권사들은 목표가를 올리는 곳이 더 많" if n["상향"] > n["하향"] else "최근 증권사들은 목표가를 내리는 곳이 더 많" if n["하향"] > n["상향"]
-              else "최근 증권사들은 목표가를 바꾸지 않고 그대로 두었" if not n["상향"]   # 전부 유지 — 0 = 0 을 `반반` 으로 쓰던 어긋남 (개선 1-16)
-              else "최근 증권사들은 목표가를 올리는 곳과 내리는 곳이 반반이")
-    ev = [{"매수": 1, "매도": -1}.get(p["action"], 0) for p in ps or []] + [{"positive": 1, "negative": -1}.get(x.get("direction"), 0) for x in news_ops or []]
-    where = "방송과 뉴스" if news_ops is not None else "방송"
-    md = None
-    if ps is None and news_ops is None:
-        pass   # 방송 · 뉴스를 보지 않는 화면(간단 정보, 2026-11-14) — `조용하다`고 말하면 틀린 말이 된다
-    elif not ev:
-        md = f"{where}에서는 요즘 {nm} 이야기가 조용하다."
-    else:
-        up, dn, mid = ev.count(1), ev.count(-1), ev.count(0)
-        dirs["방송 · 뉴스"] = SG.vote(ev)
-        many = len(ev) >= 5
-        if up > dn and up >= mid:
-            md = f"{where}에서도 {up_w('상승')} 쪽 의견이 {'많다' if many else '간간이 나온다'}."
-        elif dn > up and dn >= mid:
-            md = f"{where}에서는 {dn_w('하락')} 쪽 의견이 {'많다' if many else '간간이 나온다'}."
-        elif mid > up and mid > dn:
-            md = f"{where}에서는 {'말은 많지만' if many else '이야기가 조금 있지만'} 상승도 하락도 아닌 '지켜보자'가 대부분이다."
+            today = datetime.datetime.now(stock_records.KST).strftime("%Y-%m-%d")
+            new = [p for p in ps if stock_records._kst_day(p.get("published_at")) == today]
+        if new:
+            acts = {p.get("action") for p in new}
+            n = _b(f"{len(new)}건")
+            m_changed = True
+            m_stem = f"방송에서 오늘 {_esc(acts.pop())} 의견이 {n} 새로 나왔" if len(acts) == 1 and None not in acts else f"방송에서 오늘 새 의견이 {n} 나왔"
         else:
-            md = f"{where}에서는 상승 쪽 의견과 하락 쪽 의견이 반반이다."
-    if br and md:
-        sents.append(f"{br}고, {md}")
-    elif br or md:
-        sents.append(f"{br}다." if br else md)
-    # ③ AlphaScope 신호 + 주가 흐름 — 의견과 신호가 갈리면 그 뜻을 같은 문장 뒤에. 브랜드가 문장 맨 앞이라 앞에 색 글자가 붙지 않는다
-    cs = [c for c in (closes or []) if c is not None]
-    r5 = (cs[-1] / cs[0] - 1) * 100 if len(cs) >= 2 and cs[0] else None
-    # 주가 말 — 브랜드를 문장 앞에 두고 주가는 뒤에 이어 쓴다
-    price = (f"주가는 최근 며칠 {up_w('올랐다')}" if r5 is not None and r5 > 1 else f"주가는 최근 며칠 {dn_w('내렸다')}" if r5 is not None and r5 < -1
-             else "주가는 최근 며칠 크게 움직이지 않았다" if r5 is not None else "")
-    rows = [x for x in items or [] if x and x[1]]
-    sg = SG.horizon_votes(rows)["단기"][0] if rows else None
-    outside = [d for d in dirs.values() if d is not None]
-    o = SG.vote(outside) if outside else None
+            m_stem = "방송 새 의견은 없"
+    # ③ Newfact 단기 신호 — 지난 기록일과 다르면 바뀌었다, 같으면 며칠째
+    sg = op_change.signal_of(items)
+    s_stem, s_changed = None, False
     if sg is not None:
-        sig = {1: up_w("상승"), -1: dn_w("하락"), 0: "중립"}[sg]
-        # (이어 쓰는 꼴, 끝맺는 꼴) — 갈림 말은 신호 바로 뒤에 붙여 `가격`이 주가로 읽히지 않게 한다 (옛 `의견이 가격보다 앞서` 를 주가 말 뒤에 두면 주가와 엇갈려 읽혔다)
-        mid, end = {(1, 1): ("으로 의견과 같은 쪽이고", "으로 의견과 같은 쪽이다"), (1, -1): ("으로 의견이 신호보다 앞서 있고", "으로 의견이 신호보다 앞서 있는 구간이다"),
-                    (-1, 1): ("으로 의견과 엇갈리고", "으로 의견과 엇갈리는 구간이다"), (-1, -1): ("으로 의견과 같은 하락 쪽이고", "으로 의견과 같은 하락 쪽이다")}.get((o, sg), ("이고", "이다"))
-        head = f"{brand_mark(19)} 신호는 {'아직 ' if sg == -1 and o == 1 else ''}{sig}"
-        sents.append(f"{head}{mid}, {price}." if price else f"{head}{end}.")   # AlphaScope 신호는 아직 ▼ 하락으로 의견이 신호보다 앞서 있고, 주가는 최근 며칠 ▲ 올랐다.
-    elif price:
-        sents.append(price + ".")
+        word = {1: up_w("상승"), -1: dn_w("하락"), 0: "중립"}
+        hist = ch.get("sig") or []
+        if hist and hist[-1][1] != sg:
+            s_changed = True
+            also = "도" if t_changed and not m_changed else "는"   # 목표가에 이어 신호도 바뀐 날
+            s_stem = f"{brand_mark(19)} 신호{also} {_day_label(hist[-1][0], day)} {word[hist[-1][1]]}에서 오늘 {word[sg]}으로 바뀌었"
+        else:
+            n = 1
+            for _, v in reversed(hist):
+                if v != sg:
+                    break
+                n += 1
+            streak = STREAK_WORD.get(n) or (f"{n}일째" if n > 5 else "")
+            s_stem = f"{brand_mark(19)} 신호는 {streak + ' ' if streak else ''}{word[sg]}이"
+    # 달라진 것 먼저 — 목표가 문장, 방송 · 신호는 같은 쪽(달라짐 · 그대로)끼리 한 문장
+    sents = []
+    for flag in (True, False):
+        if t_sent and t_changed == flag:
+            sents.append(t_sent)
+        ms = [x for x, c in ((m_stem, m_changed), (s_stem, s_changed)) if x and c == flag]
+        if ms:
+            sents.append("고, ".join(ms) + "다.")
     if not sents:
         return ""
     return f'<p data-op-summary="1" style="{_dk.SEO_LEAD}{_dk.TAB_LEAD_GAP}">{_dk.emph_tri(" ".join(sents), _dk.PRICE_TRI, every=True)}</p>'   # ▲ · ▼ = 글자 19 의 80%

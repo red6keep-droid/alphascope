@@ -78,6 +78,11 @@ if __name__ == "__main__":
         except Exception as e:  # noqa: BLE001
             print(f"::warning::[kr] 기록 저장 실패 (페이지는 계속): {e!r}")
     pages = render_kr.write_all(a, OUT, snap, extra=extra)
+    if not cached:   # 의견 탭 요약 문단이 오늘 보여 준 값(신호 · 평균 목표가 · 방송 의견 id) → data/records/opinion — 내일 화면의 비교 대상
+        try:
+            render_kr.OC.save(render_kr.OP_STATE)
+        except Exception as e:  # noqa: BLE001
+            print(f"::warning::[kr] 의견 요약 기록 실패 (페이지는 계속): {e!r}")
     # 오늘(KST) 봉이 있나 — 휴장일 · 데이터 지연이면 0. 워크플로는 1일 때만 게시한다 (수동 실행은 강제 가능)
     import datetime
     from zoneinfo import ZoneInfo

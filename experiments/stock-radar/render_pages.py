@@ -23,6 +23,7 @@ import news_store  # noqa: E402  — 공용 뉴스 처리 (헤드라인 · 요�
 import chart_price as CP  # noqa: E402
 import render_html as R  # noqa: E402
 import signal_groups as SG  # noqa: E402 — 판정 묶음 분류표 (함께 보기, A5)
+import op_change as OC  # noqa: E402 — 의견 탭 요약 문단의 하루 변화 재료 (지난 기록일 값 읽기 · 오늘 값 기록)
 
 import universe as U  # noqa: E402
 import court  # noqa: E402 — 소송 일정 (P270)
@@ -819,8 +820,12 @@ def _picks(s):
 def card_opinions(s):
     """`애널리스트 의견은?` · `방송 의견은?` · 함께 보기 — 공용 R.opinions_cards."""
     ps = [p for p in PICKS if p["market"] == "US" and p["ticker"] == s["sym"]]
+    state = os.path.join(os.environ["STATE_DIR"], "radar") if os.environ.get("STATE_DIR") else None   # 상태 폴더가 없으면(목업) 변화 말 없이
+    ch = OC.for_stock(state, s["sym"], s.get("day"))   # 요약 문단 = 지난 기록일과 달라진 것 (2026-11-27)
+    OC.note(state, "radar", s["sym"], s["name"], s.get("day"), OC.signal_of(together_items(s)["items"]),
+            next((c.get("value") for c in s.get("analysts") or [] if c.get("key") == "pt_mean"), None), ps)   # 오늘 보여 준 값 — main 이 화면 뒤에 저장
     return R.opinions_cards(s["name"], s.get("analysts") or [], s.get("close"), ps, lambda v: f"${v:,.2f}", lambda: together_items(s),
-                            broker=s.get("broker") or [], news_ops=_news_opinions(s),
+                            broker=s.get("broker") or [], news_ops=_news_opinions(s), change=ch,
                             closes=[b["close"] for b in (BARS.get(s["sym"]) or [])[-R.PICK_SHOW_DAYS:]])   # 증권사 · 뉴스 의견 (P275) · 맨 위 요약 문단은 opinions_cards 안 (P295 · P296 주가 배경)
 
 
