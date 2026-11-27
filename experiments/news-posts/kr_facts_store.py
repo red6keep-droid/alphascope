@@ -84,7 +84,34 @@ def name_matches(e, facts):
     if not name:
         return True
     text = " ".join(f"{f.get('what') or ''} {f.get('line') or ''}" for f in facts) + " " + " ".join(x.get("name") or "" for x in e.get("stocks") or [])
-    return bool(name & _grams(text))
+    if not name & _grams(text):
+        return False
+    return not name_conflict(e.get("event") or "", text)
+
+
+def _kr_names():
+    """한국 종목 이름(853 명단 ref/quick_ref.json 의 ko) — 긴 이름 먼저."""
+    try:
+        with open(os.path.join(HERE, "..", "ref", "quick_ref.json"), encoding="utf-8") as f:
+            kr = json.load(f).get("kr") or {}
+    except (OSError, ValueError):
+        return []
+    return sorted({v["ko"] for v in kr.values() if len(v.get("ko") or "") >= 2}, key=len, reverse=True)
+
+
+KR_NAMES = _kr_names()
+OPPOSITE = [("상향", "하향"), ("인상", "인하"), ("상승", "하락"), ("급등", "급락"), ("증가", "감소"), ("확대", "축소"), ("흑자", "적자")]
+
+
+def name_conflict(name, text):
+    """이름이 사실에 없는 말을 하나 — ① 이름에 든 종목이 사실 · 종목 칸에 없음 ② 이름의 방향 낱말과 반대 낱말만 사실에 있음.
+    11-27 `에이피알 목표가 상향 및 알테오젠 저평가`(사실 = 에이피알 실적 · 다른 보도는 목표가 하향, 알테오젠 없음).
+    11-24 ~ 27 기록 서로 다른 이름 85개 시험: ① 1건(이 건) · ② 0건, 맞는 이름을 뺀 것 0. `매수 · 매도`는 `공매도` 에 걸려 넣지 않음."""
+    hit = [s for s in KR_NAMES if s in name]
+    hit = [s for s in hit if not any(s != o and s in o for o in hit)]   # `삼성` 이 `삼성전자` 안에 든 것은 셈 안 함
+    if any(s not in text for s in hit):
+        return True
+    return any(x in name and y in text and x not in text for a, b in OPPOSITE for x, y in ((a, b), (b, a)))
 
 
 DROPPED = []   # 이번 실행에서 이름 ↔ 사실이 어긋나 뺀 사건 이름 — 로그 한 줄 (원본은 kr_facts_raw 가 그대로 쌓는다)
