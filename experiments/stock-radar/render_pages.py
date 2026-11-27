@@ -825,6 +825,13 @@ def card_opinions(s):
 
 
 BROKER_TITLE_RE = re.compile(r"upgrade|downgrade|price target|target (cut|raised|lowered|bump)|initiat|reiterat|\brating\b", re.I)   # 증권사 등급 기사 = 증권사 카드와 같은 일
+# 의견이 아닌 매매 사실 기사 — `뉴스 의견은?` 에서만 뺀다(뉴스 목록엔 남음). 기관 지분 변동(13F 신고를 옮긴 `Shares Sold by ○○` 꼴) · 임원 매매 (개선 1-18)
+HOLDING_TITLE_RE = re.compile(r"\b(buys|purchases|acquires|sells|sold|bought)\s+[\d,]+\s+shares\b|"
+                              r"\b(shares|stock|stake|position|holdings?)\s+(bought|purchased|acquired|sold|raised|boosted|lifted|cut|trimmed|lowered|reduced|increased|decreased|grown)\s+by\b|"
+                              r"\b(boost|rais|lift|cut|trim|reduc|decreas|increas|lower|grow)\w*\s+(its\s+|their\s+)?(stake|position|holdings?)\b|"
+                              r"^[\d,]+\s+shares of .*\b(acquired|bought|purchased|sold)\s+by\b", re.I)
+INSIDER_TITLE_RE = re.compile(r"\binsider\s+(trades?|sells?|buys?|sold|bought)\b|following insider (selling|buying)|\binsider has\b|"
+                              r"\b(SVP|EVP|CEO|CFO|COO|CTO|director|board member|officer|chairman)\b[^.]*\b(sells?|sold|buys?|bought|cash(es|ed)? out|unloads?|dumps?)\b", re.I)
 
 
 def _news_opinions(s):
@@ -836,6 +843,8 @@ def _news_opinions(s):
     for x in (NEWS or {}).values():
         sc = next((c for c in x.get("scores") or [] if c["ticker"] == s["sym"]), None)
         if not sc or sc["relevance"] < 1 or _ts(x["published_at"]) < cut or BROKER_TITLE_RE.search(x["title"]):
+            continue
+        if HOLDING_TITLE_RE.search(x["title"]) or INSIDER_TITLE_RE.search(x["title"]):   # 지분 변동 · 임원 매매 = 사실 기사, 의견 아님
             continue
         src = (x.get("source") or "").lower()
         if not (any(p in src for p in labels.OPINION_PUBLISHERS) or labels.OPINION_TITLE_RE.search(x["title"])):
