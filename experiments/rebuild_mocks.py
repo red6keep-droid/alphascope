@@ -58,6 +58,7 @@ JOBS = [
     ("주식 공부 · 목록", ["experiments/course/render_list.py"]),
     ("홈 나누기", ["experiments/home-split/mock_home_split.py"]),   # 테마 미리보기(build_theme --preview) → 미국 · 한국 홈 — 주식 공부 배너 포함 (2026-11-15)
     ("홈 · 전체 메뉴 · 푸터", ["experiments/home-split/mock_menu.py"]),   # 홈 나누기 · 한국 종목 목업 뒤 — mock_home_* · kr-stocks mock_005930 에 새 헤더 · 전체 메뉴 · 푸터를 끼운다 (2026-11-27)
+    ("종목 의견 탭 요약 문단", ["experiments/kr-stocks/mock_op_summary.py"]),   # 한국 종목 목업(mock_000660) 뒤 — 요약 문단 자리에 상황 넷을 끼움
     ("홈 증시시황 C안", ["experiments/market-commentary/mock_home_commentary.py"]),   # 테마(index.html) 복사 → 미국 · 한국 홈 C안 (2026-11-17, 11-18 JOBS 추가)
     ("종목별 토론방", ["experiments/stock-board/mock_board.py"]),   # 엔비디아 목업 뒤에 돌아야 한다(미국 종목 · 목록 다음) (2026-11-20)
     ("시장 지도", ["experiments/market-map/mock_map.py"]),   # 받아 둔 목록 파일(output/lists_*.json)로 다시 그림 — 인터넷 0 (2026-11-22)
