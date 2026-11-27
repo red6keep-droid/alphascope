@@ -506,3 +506,26 @@
   setInterval(krLive, 60000);
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
+
+/* 차트 읽기 — 차트 카드 아래 [data-ct-btn] 을 누르면 바로 다음 [data-ct-box](캐릭터 채팅)를 여닫는다. 말풍선은 0.5초 간격으로 하나씩.
+   문서 클릭 위임이라 853종목 페이지처럼 조각을 나중에 끼워 넣어도 돈다. 새 호출 0 (캐릭터 그림은 열 때 처음 한 번 — loading=lazy). 한 번만 돈다. */
+(function () {
+  if (window.__asChartTalk) return;
+  window.__asChartTalk = 1;
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest && e.target.closest('[data-ct-btn]');
+    if (!b) return;
+    var x = b.nextElementSibling;
+    if (!x || !x.hasAttribute('data-ct-box')) return;
+    var open = x.hidden;
+    x.hidden = !open;
+    b.setAttribute('aria-expanded', open ? 'true' : 'false');
+    var w = b.querySelector('[data-ct-word]');
+    if (w) w.textContent = open ? '차트 읽기 접기' : '차트 읽기';
+    var rows = x.querySelectorAll('.ct-row');
+    for (var i = 0; i < rows.length; i++) {
+      rows[i].classList.remove('on');
+      if (open) (function (r, k) { setTimeout(function () { r.classList.add('on'); }, 120 + k * 500); })(rows[i], i);
+    }
+  });
+})();

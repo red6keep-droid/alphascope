@@ -106,7 +106,6 @@ PLAN = [   # (기능 이름, 남은 일 — 한 줄, 파일 패턴 "폴더/파�
     ("시장 지도 (업종 · 종목 네모 칸 지도, 손가락 확대 · 축소 · 전체 화면, 미국 · 한국 따로)", "목업 확인(사용자 판단) → 어디에 둘지 · 색 기준 정하기 → 한국 시가총액을 목록 파일에 채우기", ["market-map/mock_market_map_*"]),
     ("시장 전망 지도(가칭) — 미국 (투자회사 S&P 500 연말 목표 · 작년 전망과 지금)", "목업 확인 → 며칠 그림자 실행(구글 뉴스 제목만 · AI 0) → 기록 records/outlooks · 고정 페이지. 한국 = 수집기 요청 25절 답 대기", ["market-outlook/mock_outlook_us*"]),
     ("오늘 달라진 것 (홈 맨 위 카드 · 증시 리포트 첫 구획, 미국 · 한국 따로)", "목업 배치 확인(사용자 판단) → 며칠 계산만 돌려 줄 다듬기 → 테마 · 리포트에 붙이기", ["today-changes/mock_today_*"]),
-    ("차트 읽기 버튼 (종목 페이지 맨 위 차트 아래 · 캐릭터가 대화체로 설명)", "목업 확인(말투 · 캐릭터 설정 · 새 컷 그림 · 팽팽한 날 분석이) → 문장 틀을 종목 페이지에 붙이기 (블로그에 아직 없음 · AI 0)", ["chart-talk/mock_chart_talk_*"]),
     ("뉴스 글 자료 사진 (크기 A · B · C · 같은 기사에 경우 1~6: 없음 · 업종 · 회사 · 이름표 · 로고 크게)", "사용자가 크기 · 경우 고르기 → 운영지침 4-6 에 사진 크기 · 로고 규칙 → 올리기 스크립트(img.newfact.app) · 발행기 사진 고르기", ["news-posts/mock_news_photo_*"]),
     ("종목 이슈 (종목 페이지 가격 카드 아래 Hot Issue)", "목업 확인 → 뉴스 양으로 자동 열고 닫는 코드 (블로그에 아직 없음)", ["issue_store/mock_stock_issue*"]),
     ("회원 `내 종목`", "목업 3화면 → Firebase 규칙 게시 · 댓글 저장 확인이 먼저 → 고정 페이지 · 10명 열기", ["my-stocks/*"]),
@@ -125,6 +124,7 @@ LIVE = [
     ("문장 속 종목 이름 링크", ["stock-links/mock_stock_links.html"]),   # 모든 종목 이름 → 상세 페이지 (검은 굵게 · 연한 회색 점선), 1 ~ 4단계 · 테마 반영
     ("종목 모아보기", ["stock-lists/mock_stock-lists-live-kr.html", "stock-lists/mock_stock-lists-live-us.html"]),
     ("미국 종목 페이지", ["stock-radar/mock_NVDA.html", "stock-radar/mock_AAPL.html"]),
+    ("차트 읽기 버튼 (종목 페이지 맨 위 차트 아래 · 캐릭터가 대화체로 설명)", ["chart-talk/mock_chart_talk_down.html", "chart-talk/mock_chart_talk_up.html", "chart-talk/mock_chart_talk_mid.html"]),   # 하락 · 상승 · 팽팽한 날(분석이), 다시 = chart-talk/mock_chart_talk.py
     ("한국 종목 페이지", ["kr-stocks/mock_005930.html", "kr-stocks/mock_000660.html", "kr-stocks/mock_op_summary_000660.html"]),   # 셋째 = 의견 탭 맨 위 요약 문단(지난 기록일과 달라진 것부터, 2026-11-27)
     ("ETF 페이지", ["stock-etf/mock_etf_SPY.html", "stock-etf/mock_etf_069500.html"]),
     ("간단 종목 (종목을 누르면 나오는 페이지)", ["stock-quick/mock_qpage_UBER.html", "stock-quick/mock_qpage_011200.html", "stock-quick/mock_qpage_late_UBER.html"]),   # late = 늦은 날 기준일 상자(11-21 발행)

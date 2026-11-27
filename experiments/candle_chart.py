@@ -8,6 +8,7 @@ import html
 import json
 import os
 
+import chart_talk
 import design_kit as dk
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -64,11 +65,13 @@ def kr_live(code, always=False, url=None):
 def page_block(name, bars, dec=0, kr_code=None):
     """종목 페이지 맨 위 봉차트 한 덩이.
     목업 = `내 평단` 예시가 있는 차트, 발행 본문 = 없는 차트 — render_pages · render_kr 의 mock-only / real-only 표시로 가른다. 자료가 모자라면 "".
-    kr_code = 한국 종목 코드 → 차트 아래 장중 네이버 링크(kr_live, 목업은 늘 보임)."""
+    kr_code = 한국 종목 코드 → 차트 아래 장중 네이버 링크(kr_live, 목업은 늘 보임).
+    차트 카드 바로 아래 = `차트 읽기` 버튼(chart_talk.block) — 여닫기는 SCRIPT(candle_chart.js 끝)가 맡는다."""
     real = card(name, bars, dec, title="")
     if not real:
         return ""
     last = bars[-1]["close"]
     mock = card(name, bars, dec, avg={"price": round(last * MOCK_AVG, dec), "label": "내 평단"}, title="")
-    return ("<!--mock-only-->" + mock + kr_live(kr_code, always=True) + GAP + "<!--/mock-only--><!--real-only-->" + real + kr_live(kr_code) + GAP
+    talk = chart_talk.block(bars, name, "kr" if kr_code else "us")   # 차트 카드 바로 아래 `차트 읽기` 버튼 + 닫힌 캐릭터 채팅 (AI 0)
+    return ("<!--mock-only-->" + mock + talk + kr_live(kr_code, always=True) + GAP + "<!--/mock-only--><!--real-only-->" + real + talk + kr_live(kr_code) + GAP
             + "<!--/real-only-->" + SCRIPT)

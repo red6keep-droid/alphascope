@@ -26,6 +26,7 @@ ACCOUNT_ID = "a8718df7edc5f8f6ce88e75b6545e5cb"   # red6keep (블로그 계정)
 # (올릴 폴더, 원본 글롭 목록) — 올린 주소 = BASE_URL + 폴더 + "/" + 파일 이름
 SOURCES = [
     ("study", ["course/chars/*.webp", "course/icons/*.webp", "course/banner/*.webp", "course/banner/share_*.jpg"]),
+    ("chart", ["chart-talk/chars/*.webp"]),   # 종목 페이지 `차트 읽기` 캐릭터 컷 9장(chars/unused 는 올리지 않음) — chart_talk.IMG_BASE
 ]
 HEADERS = "/*\n  Cache-Control: public, max-age=604800\n"   # 일주일 — 같은 이름으로 그림을 바꿔도 길어야 일주일 뒤 반영
 

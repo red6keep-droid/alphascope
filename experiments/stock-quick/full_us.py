@@ -433,7 +433,7 @@ def body(s, bars_s, related_links, extra_today=""):
     ind = RP.sec_industry_tab(s)
     return RP._link_peers(s, RP.wrap(f'<div data-quick-title="{dk.esc(U.page_title(s["sym"]).replace(" · 실적 일정", ""))}">'   # wrap = 정식과 같은 틀 · 제목 정렬 · 합니다체
             + dk.report_stamp(dk.kst_close_day(s["day"], "US"), WHEN, close="새벽 마감", late=bool(LATE_DAY) and str(s["day"])[:10] < LATE_DAY)
-            + RP.lead(s) + CC.card(s["name"], bars_s, 2, title="") + '<div style="height:20px;"></div>'
+            + RP.lead(s) + CC.card(s["name"], bars_s, 2, title="") + CC.chart_talk.block(bars_s, s["name"], "us") + '<div style="height:20px;"></div>'
             + R._section("오늘", today, line=False, tab="오늘")
             + (RP.sec_today_tab(s, RP.NEWS) if news_mode else RP.sec_crash(s))   # 급락일에 버텼을 때만 (정식과 같은 자리 · 같은 카드) — 뉴스 있으면 sec_today_tab 이 급락 카드까지
             + (R._section("매수의견", op, tab="매수의견") if op else "")
