@@ -1,6 +1,6 @@
 # newfact-board — 토론(댓글) 쓰기 API
 
-기획: alphascope-docs `doc/기획/댓글-토론방-기획.md` · 앱 대비: [doc/운영/앱-대비-설계-원칙.md](../../doc/운영/앱-대비-설계-원칙.md)
+기획: alphascope-docs `doc/기획/댓글-토론방-기획.md` · 앱 대비: alphascope-docs `doc/운영/앱-대비-설계-원칙.md`
 
 ```
 읽기  방문자(블로그 · 앱) → board.newfact.app/v1/{열쇠}/index.json · b/{n}.json · t/{글 id}.json   (R2 공개 + Cloudflare 캐시 1분, Worker 안 거침)

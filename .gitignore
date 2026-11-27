@@ -77,3 +77,8 @@ experiments/news-posts/samples/
 # 토론 Worker 로컬 시험 값 (infra/board/test/run.sh 가 만들고 지움)
 infra/board/.dev.vars
 experiments/.mock_rebuilt
+# 검증 결과 · 옛 설계서는 비공개 문서 저장소(alphascope-docs 같은 경로)에 둔다 — 다시 돌려도 공개로 올리지 않음
+backtest/results/
+experiments/issue_store/results/*
+!experiments/issue_store/results/signal_centroids.json
+reference2/doc/
