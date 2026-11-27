@@ -2144,8 +2144,8 @@ def sector_lines(sf, bench):
     """업종 자금 카드 줄 — 미국(S&P 500) · 한국(KOSPI) 같은 모양 (2026-10-31 render_pages 에서 옮김)."""
     pp, rel, n = config.SECTOR_FLOW_PP, sf["rel_pp"], sf["days"]
     more = f"{abs(rel):.1f}%p 앞섰다" if rel > 0.05 else (f"{abs(rel):.1f}%p 뒤처졌다" if rel < -0.05 else "비슷하게 움직였다")
-    tail = {"모이는 중": f"차이가 +{pp:.0f}%p를 넘어 돈이 {sf['name']} 쪽으로 모이는 중이다.",
-            "빠져나가는 중": f"차이가 −{pp:.0f}%p 아래라 돈이 {sf['name']} 쪽에서 빠지는 중이다."}.get(sf["state"], f"차이가 ±{pp:.0f}%p 안이라 돈의 방향은 뚜렷하지 않다.")
+    tail = {"모이는 중": f"차이가 +{pp:.0f}%p를 넘어 주가 흐름으로 보면 돈이 {sf['name']} 쪽으로 모이는 중이다.",
+            "빠져나가는 중": f"차이가 −{pp:.0f}%p 아래라 주가 흐름으로 보면 돈이 {sf['name']} 쪽에서 빠지는 중이다."}.get(sf["state"], f"차이가 ±{pp:.0f}%p 안이라 돈의 방향은 뚜렷하지 않다.")
     lines = [(f"최근 {n}거래일 {sf['name']} ETF({sf.get('etf_label') or sf['etf']})가 {bench}보다 {more}. {tail}", "plain"),
              (flow_gauge(sf, sf["name"]), "html"),   # 엔비디아 반도체 자금 카드와 같은 막대
              ("row", f"{sf['name']} vs 시장 ({n}일)", f"{_sgn1(rel)}%p", f"+{pp:.0f}%p 넘으면 유입 · −{pp:.0f}%p 아래면 유출", False, True),
@@ -2155,6 +2155,11 @@ def sector_lines(sf, bench):
         lines.append(("row", "앞선 업계", "\n".join(f"{x['name']} {_sgn1(x['rel'])}%p" for x in secs[:2]), "시장보다 많이 오른 업계"))
         lines.append(("row", "뒤처진 업계", "\n".join(f"{x['name']} {_sgn1(x['rel'])}%p" for x in secs[-2:][::-1]), "시장보다 내린 업계"))
     return lines
+
+
+def sector_tip(bench):
+    """업종 자금 카드 제목 옆 ? — 재는 것은 수익률 차이이고 실제 금액이 아님을 알린다."""
+    return f"업종 ETF 수익률을 시장({bench})과 견준 값입니다. 실제로 들어오고 나간 금액을 센 것은 아닙니다."
 
 
 def sector_rule(sf):

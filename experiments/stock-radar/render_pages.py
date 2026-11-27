@@ -689,7 +689,7 @@ def sec_industry_tab(s):
     if sf:
         th, col = R.FLOW_THEME.get(sf["state"], ("neutral", R.MUTED))
         title = f"{sf['name']} 업계 자금 흐름은?"   # 옛 `○○ 업계 자금 흐름은?` — 앞날이 아니라 지난 20거래일, 회사 매출이 아니라 주식 쪽 돈
-        card = R._state_card(title, sf["state"], th, col, sector_lines(sf), "", fold=True, opened=True)   # 툴팁 없음 — 근거 줄에 유입 · 유출 기준 · 순위가 있다   # 탭 첫 강조 카드는 펼침 (P216)
+        card = R._state_card(title, sf["state"], th, col, sector_lines(sf), "", tip=R.sector_tip("S&P 500"), fold=True, opened=True)   # 툴팁 = 재는 것이 수익률 차이임을 알림. 유입 · 유출 기준 · 순위는 근거 줄에   # 탭 첫 강조 카드는 펼침 (P216)
     card += industry_cards(s) + card_related(s)
     if not card:
         return _dk.muted("이 종목은 업계 자료를 아직 연결하지 않았습니다.")

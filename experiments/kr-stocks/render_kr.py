@@ -617,7 +617,7 @@ def card_sector_flow(s):
     if not sf:
         return ""
     th, col = R.FLOW_THEME.get(sf["state"], ("neutral", R.MUTED))
-    return R._state_card(f"{sf['name']} 업계 자금 흐름은?", sf["state"], th, col, _kospi(R.sector_lines(sf, "KOSPI")), "", fold=True, opened=True)   # 탭 첫 강조 카드는 펼침 (P216)
+    return R._state_card(f"{sf['name']} 업계 자금 흐름은?", sf["state"], th, col, _kospi(R.sector_lines(sf, "KOSPI")), "", tip=R.sector_tip("KOSPI"), fold=True, opened=True)   # 탭 첫 강조 카드는 펼침 (P216)
 
 
 def card_related(s):
