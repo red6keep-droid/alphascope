@@ -523,7 +523,7 @@ def _ct(v):
     return f"{'순매수' if v >= 0 else '순매도'} {abs(v) / 10000:.1f}만 계약"
 
 
-def _man(v):
+def _man_ct(v):   # 선물 계약 수 — 실업수당 `_man`(건수)과 이름이 같아 덮어써 `21.6만 계약 건`이 나왔다 (2026-11-27)
     return f"{abs(v) / 10000:.1f}만 계약"
 
 
@@ -548,7 +548,7 @@ def _cftc_actor(cftc, ks, who):
         # 같은 쪽 같은 뜻 — 한 번만: `S&P 500 선물 0.5만 · 나스닥 100 선물 0.8만 계약을 순매수해 주식 비중을 늘렸습니다`
         nums = " · ".join(f"{n} 선물 {abs(c) / 10000:.1f}만" for n, c, _v in parts)
         return f"{name} {nums} 계약을 {act(parts[0][1])} {parts[0][2]}습니다."
-    seg = [(f"{n} 선물을 {_man(c)} {act(c)} " if c else f"{n} 선물은 ") + v for n, c, v in parts]
+    seg = [(f"{n} 선물을 {_man_ct(c)} {act(c)} " if c else f"{n} 선물은 ") + v for n, c, v in parts]
     return f"{name} " + ", ".join(t + ("습니다" if i == len(seg) - 1 else "고") for i, t in enumerate(seg)) + "."
 
 
@@ -576,7 +576,7 @@ def _cftc_trend(cftc, ks, who):
     tot = sum(v for _d, v in f)
     run = f"{n}주 연속 {'순매수' if last > 0 else '순매도'}" if n >= 2 else f"{len(f)}주 중 {sum(1 for _d, v in f if v > 0)}주 순매수"
     return (f"{cftc[k]['name']} 기준으로 {run}이고, 최근 {len(f)}주 합계는 "
-            + (f"{_man(tot)} {'순매수' if tot > 0 else '순매도'}입니다." if tot else "0입니다."))
+            + (f"{_man_ct(tot)} {'순매수' if tot > 0 else '순매도'}입니다." if tot else "0입니다."))
 
 
 def _cftc_weeks_chart(cftc, ks, who):

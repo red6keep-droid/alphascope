@@ -111,6 +111,9 @@ def question_card(title, state, theme, color, lines, tip="", fold=True, opened=F
         if (isinstance(t, tuple) and len(t) == 2 and t[1] == "html" and dk.CHART_MARK in t[0][:600]
                 and isinstance(prev, tuple) and len(prev) == 2 and prev[1] == "html" and dk.CHART_MARK in prev[0][:600]):
             h = h.replace('<li style="list-style:none;margin:6px 0 12px;">', f'<li style="list-style:none;margin:{12 + dk.CHART_STACK_GAP}px 0 12px;">', 1)
+        if isinstance(t, tuple) and len(t) == 2 and t[1] == "note" and isinstance(prev, tuple) and prev[0] == "row":
+            # 근거 줄 바로 아래 안내 — 위 여백 0 이라 줄에 붙어 보였다(경제 지표 카드, 2026-11-27). 근거 줄처럼 위 구분선 + 위 10
+            h = h.replace('<li data-note="1" style="', f'<li data-note="1" style="padding-top:10px;border-top:1px solid {bd_row};', 1)
         if k == len(lines) - 1 and isinstance(t, tuple) and len(t) == 2 and t[1] == "html" and _ends_white(t[0]):
             # 강조 카드가 흰 카드로 끝나면 아래 여백 = 좌우 여백 (가이드라인 7-1 끝 여백, 엔비디아 R._pull_end_chart 와 같은 결과).
             # li 아래 12 를 0 으로 — ul −9 와 겹쳐 보이는 아래 22 → 10 = 좌우 10

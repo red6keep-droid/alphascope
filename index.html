@@ -2067,6 +2067,9 @@ html.as-lock, html.as-lock body { overflow: hidden; }
 .post-shell.ends-text:not(.rel-first) .post-nav { margin-top: 40px !important; }
 .post-shell.rel-first > [data-related].is-moved { margin-top: 40px !important; }
 .post-shell.rel-first .post-nav { margin-top: 24px !important; }
+/* 줄바꿈 = 한글은 글자 단위, 숫자 · 영문은 통째로 (2026-11-27 결정) — normal = 한글 음절 사이에서 끊고 숫자 · 영문 낱말 안에서는 안 끊는다.
+   줄보다 긴 영문 · URL 만 break-word 로 넘긴다. 위의 keep-all · 글 안 인라인 keep-all 을 모두 덮는다 (break-all 은 숫자 · 영문까지 쪼개 쓰지 않는다) */
+body, body * { word-break: normal !important; overflow-wrap: break-word !important; }
 ]]></b:skin>
 
     <b:template-skin><![CDATA[
