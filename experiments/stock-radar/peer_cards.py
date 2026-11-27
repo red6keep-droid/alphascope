@@ -538,8 +538,9 @@ def _money(v):
     return f"${v:.2f}".replace("$-", "−$")
 
 
-def beat_card(name, e, rev_series, today, log=None):
-    """`발표 때 예상을 넘었나?` — (state, lines, tip) 또는 None."""
+def beat_card(name, e, rev_series, today, log=None, next_day=None):
+    """`발표 때 예상을 넘었나?` — (state, lines, tip) 또는 None.
+    next_day = 페이지가 쓰는 다음 실적 발표일(요약 문단 · `다음 실적 발표는?` 과 같은 일정). 있으면 그 날을 쓴다 — 일정이 둘이면 카드끼리 날짜가 갈렸다(개선 1-17)."""
     RP, R, dk = _mods()
     rows = [r for r in beat_rows(e, rev_series, log) if r["act"] is not None]
     if not rows:
@@ -583,6 +584,8 @@ def beat_card(name, e, rev_series, today, log=None):
     nxt = [x for x in e["dates"] if x["act"] is None and x["day"] >= today]
     fh_next = [x for x in e.get("finnhub") or [] if x.get("eps_act") is None and x["day"] >= today]
     est = (log or {}).get(max(log)) if log else {}
+    if next_day and next_day >= today:
+        nxt, fh_next = [{"day": next_day}], []
     if nxt or fh_next:
         day = (fh_next or nxt)[0]["day"]
         left = (datetime.date.fromisoformat(day) - datetime.date.fromisoformat(today)).days
@@ -781,7 +784,7 @@ def expect_cards(s):
     sym = s["sym"]
     e = (DATA.get("earn") or {}).get(sym)
     try:
-        got = beat_card(s["name"], e, REV.get(sym) or [], s["day"], (DATA.get("rev_log") or {}).get(sym)) if e else None
+        got = beat_card(s["name"], e, REV.get(sym) or [], s["day"], (DATA.get("rev_log") or {}).get(sym), (s.get("earnings") or {}).get("next")) if e else None
         if got:
             out["beat"] = {"state": got[0], "_lt": (got[1], got[2])}
     except Exception as ex:  # noqa: BLE001
