@@ -1185,10 +1185,12 @@ PAGE_CSS = """<style>
 .cc-page .cv-list .cv-main .cv-text{margin-top:4px;line-height:25px;color:#454C55;}   /* 제목 아래 6 → 4 · 행간 26 → 25 · 글자 #6B7280 → #606773 → #565D68 → #4D545E → #454C55(10%씩 네 번 진하게) */
 .cc-page [data-cmore]{margin:8px 0 0;}
 .cc-page [data-cmore].is-open .acc-chev{transform:rotate(180deg);}
-/* 종목 댓글 보기 맨 위(11-28) — 가격 28 → 26 · 그래프 아래 8 → 18 · `댓글 n` 위 4 → 14 (위가 그래프인 화면만) */
+/* 종목 댓글 보기 맨 위(11-28) — 가격 28 → 26 */
 .cc-px-one .cc-px-big{font-size:26px;line-height:34px;}
-.cc-px-one + .cc-chart{margin-bottom:18px;}
-.cc-px-one ~ .cc-page .cc-page-h{margin-top:14px;}
+/* `댓글 n` 바로 위가 외곽선 있는 카드 · 그래프인 화면(종목 · 리포트 · Hot Issue · 증시 전망) = 카드 아래 끝 ~ `댓글 n` 20 (11-28).
+   기사(사진) · 시황(배너 그림)은 예외 = 공통값 4. 위 카드의 아래 여백은 0 으로 두고 이 20 하나로 잰다 */
+.cc-page.cc-after-card{margin-top:0;}
+.cc-page.cc-after-card .cc-page-h{margin-top:20px;}
 </style>"""
 # 더 보기 = 디자인 키트 more_list 규칙(처음 5 · 누를 때마다 10 · 흰 버튼 FOLD_BTN 전체 폭 + 아래 화살표 · 다 펼치면 `접기`).
 # 목업은 아래 10개를 돌려 붙여 214까지 늘린다(실서비스 = 다음 10개를 서버에서 받음).
@@ -1271,6 +1273,9 @@ def issue_head():
     return head + "</div>"   # 맨 바깥 data-head-title 상자 닫기
 
 
+CARD_TOP = {"stock", "report", "issue", "forecast"}   # 맨 위가 외곽선 카드 · 그래프인 댓글 보기
+
+
 def comment_page(cmts, total, back, kind):
     """댓글 화면 본문 — 봉차트(종목 = 그 종목, 시황 = 코스피) → `댓글 n` → 안내 → 목록 → 더 보기. 쓰기 = 오른쪽 아래 연필.
     제목 줄은 따로 그리지 않는다 — 글의 h3.post-title 을 테마가 고정 제목 줄(뒤로 · 로고 + 제목 · 공유)로 만든다(디자인 가이드 2절 1)."""
@@ -1280,9 +1285,9 @@ def comment_page(cmts, total, back, kind):
             + ('<span data-kr-code="000660" hidden></span>' if kind == "stock" else ""))
     if kind == "issue" and os.path.exists(ISSUE_BASE):   # 원래 Hot Issue 머리 그대로 + 그 아래 댓글(틀은 git 에 없음 — 없는 PC 는 아래 예전 시안으로)
         return (issue_head() + f'<div data-design="2" style="font-family:var(--report-font);">{mark}{TAIL}'
-                f'{PAGE_CSS}<div class="comments is-open cc-page"><div class="cc-page-h">댓글 <span class="cc-n">{total}</span></div>{guard()}<ol class="cv-list">{rows}</ol>{more}</div></div>')
+                f'{PAGE_CSS}<div class="comments is-open cc-page{" cc-after-card" if kind in CARD_TOP else ""}"><div class="cc-page-h">댓글 <span class="cc-n">{total}</span></div>{guard()}<ol class="cv-list">{rows}</ol>{more}</div></div>')
     return (f'<div data-design="2" style="font-family:var(--report-font);">{mark}{TAIL}{top(kind)}'
-            f'{PAGE_CSS}<div class="comments is-open cc-page"><div class="cc-page-h">댓글 <span class="cc-n">{total}</span></div>{guard()}<ol class="cv-list">{rows}</ol>{more}</div></div>')
+            f'{PAGE_CSS}<div class="comments is-open cc-page{" cc-after-card" if kind in CARD_TOP else ""}"><div class="cc-page-h">댓글 <span class="cc-n">{total}</span></div>{guard()}<ol class="cv-list">{rows}</ol>{more}</div></div>')
 
 
 def build_cc(name, base, cmts, total, page_link="", page=None):
