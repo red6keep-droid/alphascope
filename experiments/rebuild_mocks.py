@@ -38,6 +38,7 @@ JOBS = [
     ("간단 종목", ["-c", QUICK_INLINE]),   # 카드 조각은 collect_quick(인터넷)이 만든다 — 여기선 받아 둔 조각(output/quick-data)으로 겉 페이지만 다시 감싼다
     ("미국 증시 리포트", ["experiments/daily-report/render_html.py"]),
     ("한국 증시 리포트", ["experiments/kr-market-report/main.py", "--cached"]),
+    ("증시에서 돈이 빠져나가나? 카드", ["experiments/kr-market-report/mock_money_flow.py"]),   # 수급 탭 맨 위 카드만 따로 — 자료 = kr-stocks/data/flows.json
     ("인물 발언", ["experiments/people-radar/render_html.py"]),
     ("테마", ["-c", THEME_INLINE]),
     ("증시 전망 · 페이지 · 목록", ["experiments/issue_store/hypo_pages.py"]),

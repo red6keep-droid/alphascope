@@ -102,7 +102,7 @@ def money_card(d):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--flows", required=True)
+    ap.add_argument("--flows", default=os.path.join(BASE, "..", "kr-stocks", "data", "flows.json"))   # 없으면 kr-state 에서 받은 파일을 --flows 로
     a = ap.parse_args()
     d = json.load(open(a.flows, encoding="utf-8"))
     body = (dk.muted("한국 증시 리포트 → 수급 탭 맨 위에 놓을 새 카드입니다(지금 수급 탭 카드 넷은 그 아래 그대로). 판정 기준 숫자는 시안입니다.")

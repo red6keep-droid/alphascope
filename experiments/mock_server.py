@@ -101,7 +101,6 @@ ARCHIVE_SEED = [
 # 발행 여부는 블로그 실제 페이지(www.newfact.app 글자 · 피드)와 origin/main 코드로 확인해 옮긴다 — 발행된 기능은 LIVE 로, 대표가 아닌 지난 시안은 표에서 빼 휴지통으로.
 # 11-26 대조: 업계상황 탭 · Newfact 뉴스(글 · 홈 카드 · 사실) · 종목 새 카드 넷 · 회사 소개 안내 줄 · 늦은 날 상자 · 푸터 링크 = 블로그에 있음 → 발행 예정에서 뺌.
 PLAN = [   # (기능 이름, 남은 일 — 한 줄, 파일 패턴 "폴더/파일")
-    ("증시에서 돈이 빠져나가나? (한국 증시 리포트 수급 탭 맨 위 새 카드)", "카드 이름 · 판정 기준 확인 → 수급 탭에 붙이기 · 기록 대장 한 줄", ["kr-market-report/mock_money_flow.html"]),
     ("개성 있는 아이 찾기 게임 — 평범의 범위 · 설정으로 나온 답 · 그림 확인", "기준 설정(80% · 20일 간격)에서 나온 그룹 후보를 여덟 명씩 그림으로 확인 · 길잡이 = 비공개 doc/기획/종목-그래프-패턴-분류-목적.md", ["stock-character/mock_*.html"]),
     ("주식마을 3D (날씨 도시 · 마을 · 행성 시안)", "날씨 도시 판 모델링 · 연출 다듬기(물에 잠김 · 남은 날씨 7가지) → 방향 확정 뒤 휴대폰 발열 줄이기 5가지 · 날씨 기준 정하기 · Blogger 모듈 스크립트 시험 (흰 도시 · 3D 시험 1판은 11-24 사용자 삭제)", ["fantasy-world/mock_city_weather.html", "fantasy-world/mock_village_flat.html", "fantasy-world/mock_village_polish.html", "fantasy-world/mock_village_3d_v2.html"]),
     ("시장 지도 (업종 · 종목 네모 칸 지도, 손가락 확대 · 축소 · 전체 화면, 미국 · 한국 따로)", "목업 확인(사용자 판단) → 어디에 둘지 · 색 기준 정하기 → 한국 시가총액을 목록 파일에 채우기", ["market-map/mock_market_map_*"]),
@@ -129,7 +128,7 @@ LIVE = [
     ("간단 종목 (종목을 누르면 나오는 페이지)", ["stock-quick/mock_qpage_UBER.html", "stock-quick/mock_qpage_011200.html", "stock-quick/mock_qpage_late_UBER.html"]),   # late = 늦은 날 기준일 상자(11-21 발행)
     ("업계상황 탭 (한국 · 미국 종목 — 사업 묶음 · 함께 볼 지표)", ["stock-quick/mock_industry_tab_kr.html", "stock-quick/mock_industry_tab_us.html"]),   # 11-25 main · 다시 = stock-quick/mock_industry_tab.py · mock_industry_tab_us.py · 이어가기 = 비공개 doc/기획/업종-묶음-이어가기.md
     ("Newfact 뉴스 (글 · 한국 홈 `오늘의 Newfact` · 리포트 뉴스 사실)", ["news-posts/mock_news_post.html", "news-posts/mock_news_post_5.html", "news-posts/mock_news_home_kr.html", "news-posts/mock_news_facts.html"]),   # 11-25 발행(피드 `Newfact 뉴스` 라벨 확인 11-26) · 표본 글 20여 개는 휴지통
-    ("미국 증시 리포트", ["daily-report/daily_mock.html"]), ("한국 증시 리포트", ["kr-market-report/kr_report_mock.html"]),
+    ("미국 증시 리포트", ["daily-report/daily_mock.html"]), ("한국 증시 리포트", ["kr-market-report/kr_report_mock.html", "kr-market-report/mock_money_flow.html"]),
     ("주요 인물 발언", ["people-radar/radar_mock.html"]), ("테마", ["theme-monitor/mock_theme-ai-capex.html"]),
     ("Hot Issue", ["issue_store/mock_issue_watch.html"]),
     ("증시 전망", ["issue_store/mock_forecast-list-eh.html", "issue_store/mock_forecast-2.html", "issue_store/mock_forecast-nvda-2026q3.html",
