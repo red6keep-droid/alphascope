@@ -1501,7 +1501,8 @@ def q_align(word, links, gs, oil_gr, oil_line, hist, asof):
     nd = f"{ns} 소식이 더 많았습니다" if ns else f"{g} · {b} 소식이 엇갈렸습니다"
     mv = [f"{josa(x['g'], ('이', '가'))} {x['side']} 쪽으로" for x in gs if x["side"] != "평소 범위"]
     calm = [x["g"] for x in gs if x["side"] == "평소 범위"]
-    md = (" · ".join(mv) + " 움직였습니다." if mv else "") + ((" " if mv else "") + f"{josa(' · '.join(calm), ('은', '는'))} 평소 범위입니다." if calm else "")
+    md = ((" · ".join(mv) + " 움직였습니다." + (f" {josa(' · '.join(calm), ('은', '는'))} 평소 범위입니다." if calm else "")) if mv else
+          f"{' · '.join(calm)} 모두 평소 범위입니다." if len(calm) > 1 else f"{josa(calm[0], ('이', '가'))} 평소 범위입니다." if calm else "")   # 움직인 것이 없으면 `시장은 ○ · ○ 모두` (은 · 는 겹침 X)
     verdict = ("" if mk == "평소 범위" or ns is None else " 뉴스와 시장이 같은 쪽을 가리킵니다." if ns == mk else " 뉴스와 시장이 서로 다른 쪽을 가리킵니다.")
     if split:
         names = " · ".join(n for n, _, _ in ps)
