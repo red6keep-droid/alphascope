@@ -170,6 +170,33 @@ def page(c, public=False):
     return dk.fix_colons(f'<div data-head-title="{IW.HEAD_TITLE}"{IW.H.head_date_attr()} data-seo-lead="{dk.esc(IW.HEAD_TITLE + " — " + ISS["q"] + " 뉴스와 주가 " + align)}">{body}</div>')
 
 
+RETURN_PAT = r"CEO ?(로 )?복귀|복귀(했|한|하고|하며|…|에|일|,| 후| 뒤)|경영 일선 복귀|return(s|ed)? as CEO|reinstat"   # 복귀 검토(이사회 대응)는 안 걸림
+RETURN_VARIANTS = [   # (이름표, 메뉴 · 홈 이름, 질문, 수습 사다리 셋째 칸)
+    ("지금", ISS["name"], ISS["q"], None),
+    ("A안 (추천)", "엔비디아 CEO 복귀", "젠슨 황 복귀, 엔비디아는 수습되나?", ("복귀 · 후임 확정", RETURN_PAT + r"|후임 (확정|선임|발표)|신임 CEO|새 CEO|정식 CEO|successor named")),
+    ("B안", "엔비디아 CEO 사임 · 복귀", "사임 뒤 복귀한 젠슨 황, 엔비디아는 수습되나?", ("복귀", RETURN_PAT)),
+]
+
+
+def return_variants(c):
+    """젠슨 황 복귀(11-23) 뒤 이름 · 질문 · 수습 사다리 시안 — 머리 줄 + `사태 진행 상황` 카드만 셋 나란히. 아래 본문은 `지금` 그대로."""
+    base = list(IW.C["stages"]["종전"])
+    out = ('<p style="margin:16px 6px 8px;font-size:14px;line-height:21px;color:#6B7280;word-break:keep-all;">'
+           '11-23 젠슨 황 CEO 복귀 뒤 시안입니다. 바꾸는 것 = 메뉴 · 홈 카드 이름, 페이지 질문, 수습 단계 셋째 칸. '
+           '단계는 기사 제목 글자로 정해지고(AI 0) 같은 값이 이슈 단계 기록에 쌓입니다. 주소(issue-nvidia-ceo)는 그대로입니다.</p>')
+    for k, (tag, name, q, step) in enumerate(RETURN_VARIANTS):
+        st = list(base)
+        if step:
+            st[2] = step
+        IW.C["stages"]["종전"] = st
+        ladder = " → ".join(s[0] for s in st)
+        out += (f'<div style="margin:{8 if k == 0 else 36}px 0 0;padding:0 6px;font-size:16px;line-height:24px;font-weight:700;color:#111;">{dk.esc(tag)}</div>'
+                f'<div style="padding:0 6px;font-size:13px;line-height:19px;color:#6B7280;word-break:keep-all;">메뉴 · 홈 카드 이름 = {dk.esc(name)} · 수습 단계 = {dk.esc(ladder)}</div>'
+                + IW.title_h2({**ISS, "q": q}) + f'<div style="margin:0 0 8px;">{IW.q_stage(c["evs"])}</div>')
+    IW.C["stages"]["종전"] = base
+    return out + '<div style="margin:40px 6px 0;padding-top:16px;border-top:2px solid #111;font-size:14px;color:#6B7280;">아래 = 지금 페이지 전체</div>'
+
+
 HOT_PILL = ("#EDE9FE", "#DDD6FE")   # `세부전망` 보라 라벨과 같은 바탕 · 테두리 (가이드라인 14절 증시 전망 P481)
 STOCK_PAGE = os.path.join(_HERE, "..", "stock-radar", "output", "NVDA.html")   # 종목 페이지 본문(목업 다시 그리기가 만든 것)
 PRICE_CARD = '<div data-cards="1" style="margin:0 0 8px;"><details data-acc="1"><summary style="list-style:none;cursor:pointer;display:block;">'
@@ -241,7 +268,7 @@ if __name__ == "__main__":
     os.makedirs(IW.OUT, exist_ok=True)
     c = collect()
     fn = IW.CFG["NVDA_CEO"]["file"]
-    print(dk.write_mock(page(c), os.path.join(IW.OUT, fn), IW.HEAD_TITLE))
+    print(dk.write_mock(return_variants(c) + page(c), os.path.join(IW.OUT, fn), IW.HEAD_TITLE))
     sp = stock_page(c, fn)
     # 버튼 글자 굵기 시안 A(굵게) · B(보통) — 펼친 카드 둘 나란히
     cmp_ = ('<p style="margin:16px 6px 20px;font-size:14px;line-height:21px;color:#6B7280;">종목 페이지 Hot Issue 카드의 `Hot Issue 자세히 보기` 버튼 글자 굵기 시안입니다. '
