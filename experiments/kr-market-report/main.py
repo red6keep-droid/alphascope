@@ -1329,10 +1329,60 @@ def household_card(m):
     return _monthly_card("개인은 살 돈이 있나?", state, (_dir(sur["yoy"])), lines, RK.sec_household(m), charts_arg=charts, tip=False)
 
 
+def money_card(m):
+    """`증시에서 돈이 빠져나가나?` — 수급 탭 맨 위 (개선 2번, 2026-11-27). 판정 = analyze_kr.money_state(몇 달 흐름 · 12개월 고점 대비).
+    아래 카드들(외국인 · 기관 개인 · 빚투 대기 자금)은 오늘 · 전달 대비라 몇 달 흐름은 여기서만 말한다. 상태까지만 — 앞날은 말하지 않는다."""
+    mn = m.get("money")
+    if not mn:
+        return ""
+    mo, dp, cr, fr = mn["month"], mn["deposits"], mn["credit"], mn["foreign"]
+    dep, dtop, crd, ctop = dp["v"] / 1e12, dp["top"] / 1e12, cr["v"] / 1e12, cr["top"] / 1e12
+    n, word, tot = fr["months"], "순매도" if fr["sign"] < 0 else "순매수", abs(fr["sum"]) / 1e6   # 백만 원 → 조 원
+    lines = [(f"주식을 사려고 기다리는 돈(투자자 예탁금)은 {_mo(mo)} 말 {dep:,.1f}조 원으로, 최근 12개월 중 가장 많았던 {_mo(dp['top_month'])}({dtop:,.1f}조 원)보다 "
+              f"{dtop - dep:,.1f}조 원({_s(dp['pct'], 1)}) 줄었습니다." if dp["pct"] <= -1 else
+              f"주식을 사려고 기다리는 돈(투자자 예탁금)은 {_mo(mo)} 말 {dep:,.1f}조 원으로, 최근 12개월 중 가장 많은 수준입니다.", "plain")]
+    second = (f"외국인은 유가증권시장에서 {_mo(fr['since'])}부터 {_mo(mo)}까지 {n}개월 연속 {word}했고, 합계는 {tot:,.1f}조 원입니다." if n > 1 else
+              f"외국인은 {_mo(mo)} 유가증권시장에서 {tot:,.1f}조 원 {word}했습니다.")
+    cur = fr.get("cur")
+    if cur:
+        v = cur["sum"] / 1e4   # 억 원 → 조 원
+        second += f" {_mo(cur['month'])}도 {int(cur['to_day'][8:])}일까지 {abs(v):,.1f}조 원 {'순매도' if v < 0 else '순매수'}입니다."
+    lines.append((second, "plain"))
+    se = mn.get("series") or {}
+    months = se.get("months") or []
+
+    def idx(vals):   # 저마다 12개월 고점 = 100
+        top = max((v for v in vals if v is not None), default=None)
+        return [None if v is None or not top else v / top * 100 for v in vals]
+    if len(months) >= 6:
+        lines.append((_dk.trend_card("최근 12개월 흐름 (저마다 가장 높았던 달 = 100)", [x[2:].replace("-", ".") for x in months],
+                                     [("대기 자금 (투자자 예탁금)", idx(se["deposits"]), _dk.CHART_MAIN, "solid"),
+                                      ("하루 평균 거래대금", idx(se["turnover"]), _dk.CHART_SERIES[1], "solid"),
+                                      ("코스피 (월말)", idx(se["kospi"]), _dk.CHART_CMP, "dash")], lambda v: f"{v:,.0f}"), "html"))
+    lines += [("row", "대기 자금", f"{dep:,.1f}조 원", f"12개월 고점({_mo(dp['top_month'])} {dtop:,.1f}조 원)보다 {_s(dp['pct'], 1)}"),
+              ("row", "외국인", f"{n}개월 연속 {word}", f"{_mo(fr['since'])} ~ {_mo(mo)} 합계 {tot:,.1f}조 원"),
+              ("row", "빚투 (신용융자)", f"{crd:,.1f}조 원", f"12개월 고점({_mo(cr['top_month'])} {ctop:,.1f}조 원)보다 {_s(cr['pct'], 1)}")]
+    tv = mn.get("turnover")
+    if tv:
+        lines.append(("row", "하루 평균 거래대금", f"{tv['v'] / 1e9:,.1f}조 원", f"12개월 고점({_mo(tv['top_month'])} {tv['top'] / 1e9:,.1f}조 원)의 {tv['v'] / tv['top'] * 100:.0f}% · 돈의 양이 아니라 사고파는 활기"))
+    ks = [(mm, v) for mm, v in zip(months, se.get("kospi") or []) if v]
+    if ks and ks[-1][0] == mo:
+        tm, tk = max(ks, key=lambda x: x[1])
+        lines.append(("row", "같은 기간 코스피", f"{ks[-1][1]:,.0f}", f"비교 대상 · {_mo(tm)} 말 {tk:,.0f}보다 {_s((ks[-1][1] / tk - 1) * 100, 1)}"))
+    rule = mn["rule"]
+    tip = ("주식시장에 들어와 있는 돈이 늘고 있는지 줄고 있는지, 몇 달 흐름으로 봅니다\n"
+           f"· 나누는 법 : 대기 자금이 12개월 고점보다 {rule['drop_pct']:.0f}% 넘게 줄었나, 외국인이 {rule['streak']}개월 이상 이어서 순매도했나, 빚투가 고점보다 {rule['drop_pct']:.0f}% 넘게 줄었나. 셋 중 둘 이상이면 빠져나가는 중\n"
+           "· 거래대금은 산 금액과 판 금액이 같아 돈이 빠졌는지를 말하지 않습니다. 활기로 같이 보여 줍니다\n"
+           "· 지금 상태를 말하며, 앞으로의 주가를 말하지 않습니다")
+    st = mn["state"]
+    return _qc("증시에서 돈이 빠져나가나?", f"{_mo(mo)}까지 {st}", *_dir(-1 if st == "빠져나가는 중" else 1 if st == "들어오는 중" else 0), lines,
+               tip=_dk.with_src(tip, RK.SRC), opened=True)
+
+
 def flow_tab(r):
     """수급 탭 — 누가 사고팔았나 · 살 돈이 있나. 매일 · 월별 · 분기가 섞여 있어 카드 문장에 기준 달을 적는다."""
     m = r["market"]
-    body = foreign_card(m) + investors_card(m) + funds_card(m) + household_card(m)   # 소제목 줄(매일 · 달마다 · 분기마다)은 뺐다 — 기준 시점은 답의 달 · 분기 이름이 말한다
+    body = money_card(m) + foreign_card(m) + investors_card(m) + funds_card(m) + household_card(m)   # 맨 위 = 몇 달 흐름 한 장(개선 2번), 그 아래 = 오늘 · 전달 대비   # 소제목 줄(매일 · 달마다 · 분기마다)은 뺐다 — 기준 시점은 답의 달 · 분기 이름이 말한다
     return _dk.section(TAB_FLOW, C.cards_grid(body), tab=TAB_FLOW) if body else ""
 
 

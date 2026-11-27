@@ -332,6 +332,58 @@ def _ewma_sd(vals, lam=FLOW_LAM):
     return math.sqrt(var) if var else None
 
 
+MONEY_DROP_PCT, MONEY_NEAR_PCT, MONEY_STREAK = 10.0, 5.0, 3   # `증시에서 돈이 빠져나가나?` 판정 — 대기 자금 · 신용 고점 대비 %, 외국인 연속 달 수
+
+
+def _peak12(ser):
+    """월별 [{month, v}] 최근 12개월 → (마지막 달, 마지막 값, 고점 달, 고점 값, 고점 대비 %)."""
+    w = ser[-12:]
+    last, top = w[-1], max(w, key=lambda x: x["v"])
+    return last["month"], last["v"], top["month"], top["v"], (last["v"] / top["v"] - 1) * 100 if top["v"] else 0.0
+
+
+def money_state(flow_data):
+    """`증시에서 돈이 빠져나가나?` — 대기 자금(예탁금) · 외국인 순매수 · 빚투(신용융자)를 몇 달 흐름(12개월 고점 대비 · 몇 달째)으로 묶은 상태.
+    셋 중 둘 이상: 예탁금 고점 대비 −10% 넘게 · 외국인 3개월 이상 연속 순매도 · 신용 고점 대비 −10% 넘게 = 빠져나가는 중.
+    반대(고점 5% 안 · 3개월 이상 연속 순매수)가 둘 이상 = 들어오는 중, 그 밖 = 뚜렷하지 않음. 거래대금은 활기라 판정 밖(같이 보여 주기만).
+    상태까지만 말한다 — 앞으로의 주가는 말하지 않는다. 수집 · AI 0(flows.json 그대로)."""
+    fm, im = flow_data.get("funds_m") or {}, flow_data.get("investor_m") or {}
+    ind, d = flow_data.get("industry") or {}, flow_data.get("daily") or {}
+    dep, crd, frg = fm.get("deposits") or [], fm.get("credit_loan") or [], im.get("foreign") or []
+    if len(dep) < 12 or len(crd) < 12 or len(frg) < 2:
+        return None
+    mo, dv, dmo, dtop, dpct = _peak12(dep)
+    _, cv, cmo, ctop, cpct = _peak12(crd)
+    sign = 1 if frg[-1]["v"] > 0 else -1
+    n, tot = 0, 0.0
+    for x in reversed(frg):
+        if (x["v"] > 0) != (sign > 0):
+            break
+        n, tot = n + 1, tot + x["v"]
+    out_ = sum([dpct <= -MONEY_DROP_PCT, sign < 0 and n >= MONEY_STREAK, cpct <= -MONEY_DROP_PCT])
+    in_ = sum([dpct >= -MONEY_NEAR_PCT, sign > 0 and n >= MONEY_STREAK, cpct >= -MONEY_NEAR_PCT])
+    state = "빠져나가는 중" if out_ >= 2 else "들어오는 중" if in_ >= 2 else "뚜렷하지 않음"
+    res = {"month": mo, "state": state, "rule": {"drop_pct": MONEY_DROP_PCT, "near_pct": MONEY_NEAR_PCT, "streak": MONEY_STREAK},
+           "deposits": {"v": dv, "top_month": dmo, "top": dtop, "pct": dpct},
+           "credit": {"v": cv, "top_month": cmo, "top": ctop, "pct": cpct},
+           "foreign": {"months": n, "sign": sign, "sum": tot, "since": frg[-n]["month"]}}   # 단위: 원 · 백만 원(순매수) 그대로
+    tov = ind.get("kospi_turnover") or []
+    if len(tov) >= 12:
+        _, tv, tmo, ttop, tpct = _peak12(tov)
+        res["turnover"] = {"month": tov[-1]["month"], "v": tv, "top_month": tmo, "top": ttop, "pct": tpct}   # 하루 평균 거래대금(천 원)
+    fk = d.get("foreign_kospi") or []
+    if fk and fk[-1]["day"][:7] > mo:   # 이번 달 — 일별(억 원)
+        cur = fk[-1]["day"][:7]
+        res["foreign"]["cur"] = {"month": cur, "to_day": fk[-1]["day"], "sum": sum(x["v"] for x in fk if x["day"].startswith(cur))}
+    ks = {}
+    for x in d.get("kospi") or []:
+        ks[x["day"][:7]] = x["v"]
+    months = [x["month"] for x in dep[-12:]]
+    tvm = {x["month"]: x["v"] for x in tov}
+    res["series"] = {"months": months, "deposits": [x["v"] for x in dep[-12:]], "turnover": [tvm.get(m) for m in months], "kospi": [ks.get(m) for m in months]}
+    return res
+
+
 def flows(flow_data, bench_bars):
     """외국인 일별 순매수(억원) → 오늘 · 20일 누적 · 평소 범위(EWMA) · 올해 누적. 투자자별 월별 · 증시자금 월별은 최근 값과 1년 범위."""
     if not flow_data:
@@ -383,6 +435,12 @@ def flows(flow_data, bench_bars):
             vals = [x["v"] for x in series[-12:]]
             return {"last": series[-1], "prev": series[-2] if len(series) > 1 else None, "hi12": max(vals), "lo12": min(vals), "series": series[-24:]}
         out["funds_m"] = {k: _rng(v) for k, v in fm.items() if v}
+    try:
+        mn = money_state(flow_data)
+        if mn:
+            out["money"] = mn
+    except Exception as ex:  # noqa: BLE001 — 카드 하나 때문에 시장 자료 전체가 빠지지 않게
+        print(f"[kr] 돈의 흐름 판정 못 함: {str(ex)[:120]}")
     k = d.get("kospi") or []
     if k:
         out["kospi"] = {"day": k[-1]["day"], "close": k[-1]["v"], "ret_1d": (k[-1]["v"] / k[-2]["v"] - 1) * 100 if len(k) > 1 else None,
