@@ -576,8 +576,7 @@ def guard():
 
 
 def note():
-    return dk.excl_note("회원이 쓴 의견이며 Newfact의 의견이 아닙니다. 투자 권유가 아니고, 판단과 책임은 읽는 분에게 있습니다. "
-                        "왕관이 붙은 글은 Newfact 캐릭터가 Newfact 자료를 바탕으로 AI 로 쓴 글입니다.", margin="14px 0 0")
+    return dk.excl_note("회원이 쓴 의견이며 Newfact의 의견이 아닙니다. 투자 권유가 아니고, 판단과 책임은 읽는 분에게 있습니다.", margin="14px 0 0")   # 왕관 글 = AI 문장은 뺌(11-27 사용자)
 
 
 def list_view(member, first):
@@ -845,12 +844,18 @@ STOCK_CMTS = [   # SK하이닉스 페이지에 달린 댓글 예시 (최신이 �
 STOCK_TOTAL = 27
 ONE_CMT = ("새내기", "11.27 14:52", "오늘 시황 잘 읽었습니다", "환율 설명이 쉬워서 이해가 잘 됐습니다[:mid_thanks:] 내일 미국 물가 발표 뒤 시황도 기다리겠습니다.", "", [])
 ONE_CMT_R = ("장기보유", "11.27 16:48", "외국인 순매수 표 잘 봤습니다", "수급 탭에서 외국인이 사흘 만에 순매수로 돌아선 걸 확인했습니다[:mid_proof:] 업종별로도 나눠 보면 좋겠네요.", "", [])
+ONE_CMT_I = ("조심조심", "11.27 09:12", "반도체 지수는 오르는데", "업계 전체는 괜찮은데 엔비디아만 빠지는 걸 보면 회사 일로 보는 게 맞겠네요.", "", [])
+ONE_CMT_F = ("장기보유", "11.27 10:30", "전망A 맞았네요", "발표 뒤에 더 오를 줄 알았는데 생각보다 조용했습니다[:mid_question:]", "", [])
+ONE_CMT_A = ("새내기", "11.27 11:05", "신작 일정 정리 좋습니다", "회사마다 출시 달을 한 번에 볼 수 있어서 편했습니다[:mid_thanks:]", "", [])
 TITLES.update({
     "mock_comments_page-report.html": "댓글 화면 — KOSPI 한 줄 · 홈 카드 하루 그래프 · 댓글 목록 · 쓰기 (한국 증시 리포트에서)",
     "mock_comments_cards.html": "글 아래 댓글 카드 — 2개 이상 = 좌우로 밀기 · 점 · 댓글 더 보기 (종목 페이지)",
     "mock_comments_card-one.html": "글 아래 댓글 카드 — 1개 = 카드 하나 · NEW (시황 글)",
     "mock_comments_page-stock.html": "댓글 화면 — 종목 가격 · 홈 카드 꼴 그래프 · 댓글 목록 · 쓰기 (종목 페이지에서)",
     "mock_comments_page.html": "댓글 화면 — 배너 그림 · 댓글 목록 · 쓰기 (시황 글에서)",
+    "mock_comments_page-issue.html": "댓글 화면 시안 — 종목 vs 비교 지수 한 줄 (핫이슈에서)",
+    "mock_comments_page-forecast.html": "댓글 화면 시안 — 세부 전망 · 판정 칩 (증시 전망에서)",
+    "mock_comments_page-article.html": "댓글 화면 시안 — 자료 사진 (Newfact 기사에서)",
 })
 CC_CSS = """<style>
 /* 글 아래 댓글 카드 — 흰 상자 · 모서리 12 · 옅은 그림자. 2개 이상이면 좌우로 밀기(옆 카드 끝이 살짝 보임) */
@@ -1066,12 +1071,53 @@ def report_top():
     return f'<div class="cc-px cc-px-one"><b>KOSPI</b> <span>{c:,.2f}</span> {chg}</div><div class="cc-chart">{day_chart(d)}</div>'
 
 
+def _chg(v):
+    up = v >= 0
+    return f'<span style="color:{dk.UP if up else dk.DOWN};">{dk.tri_span(up, 14)}{abs(v):.1f}%</span>'
+
+
+def issue_top():
+    """시안 — 핫이슈 댓글 화면 맨 위 = 이슈 페이지의 `주가도 같은 쪽인가?` 한 줄(그 종목 vs 비교 지수, 헌법 제1조 대조군) + 작은 회색 기준."""
+    return (f'<div class="cc-px cc-px-one">엔비디아 {_chg(-12.7)} <span style="color:#D1D5DB;">·</span> 반도체 지수 {_chg(8.1)}</div>'
+            '<div class="cc-px cc-px-sub">사건 뒤 전체 · 11.06 → 11.13 · 미국 11.13 종가 기준</div>')
+
+
+def forecast_top():
+    """시안 — 증시 전망 댓글 화면 맨 위 = 세부 전망마다 이름 + 판정 칩(전망 페이지 맨 위 표 그대로 줄여서)."""
+    chip = lambda t, on: (f'<span style="flex:none;padding:2px 8px;border-radius:6px;font-size:13px;line-height:19px;font-weight:700;'
+                          f'background:{"#F5F3FF" if on else "#F3F4F6"};color:{"#6D28D9" if on else "#6B7280"};">{t}</span>')
+    row = lambda n, t, c: (f'<div style="display:flex;gap:8px;align-items:center;justify-content:space-between;padding:8px 6px;border-bottom:1px solid #EEF1F5;">'
+                           f'<span style="font-size:16px;line-height:24px;font-weight:700;color:#111;word-break:keep-all;"><span style="color:#6B7280;font-weight:400;margin-right:6px;">{n}</span>{t}</span>{c}</div>')
+    return (row("전망A", "예상을 크게 넘으면", chip("실현됨", True)) + row("전망B", "예상을 크게 넘지 못하면", chip("해당 없음", False))
+            + '<div class="cc-px cc-px-sub" style="margin-top:6px;">결과 11.17 · 세부 판정은 원래 글에서</div>')
+
+
+def article_top():
+    """시안 — Newfact 기사 댓글 화면 맨 위 = 그 기사의 자료 사진(시황 글 배너와 같은 자리) + 출처 줄."""
+    return ('<figure style="margin:0 0 4px;"><img src="../../news-posts/output/mock_img/industry_game.jpg" alt="자료 사진: e스포츠 대회장" '
+            'style="display:block;width:100%;height:200px;object-fit:cover;border-radius:8px;">'
+            '<figcaption style="margin:6px 0 0;font-size:11px;line-height:16px;color:#9CA3AF;">자료 사진 · Chongkian · CC BY-SA 4.0</figcaption></figure>')
+
+
+TAIL_AB = """<div class="mock-ab" style="margin:0 0 12px;padding:8px 10px;border:1px dashed #A78BFA;border-radius:8px;font-size:13px;line-height:19px;color:#4B5563;">
+<b style="color:#7C3AED;">시안 · 제목 줄 꼬리</b> — 맨 위 제목 줄 끝에 작은 회색 `댓글` 을 붙일지
+<div style="display:flex;gap:6px;margin-top:6px;"><button type="button" data-ab="a" style="flex:1;min-height:36px;border-radius:6px;font:inherit;font-weight:700;">A 꼬리 없음 (지금)</button><button type="button" data-ab="b" style="flex:1;min-height:36px;border-radius:6px;font:inherit;font-weight:700;">B 작은 회색 꼬리 `댓글`</button></div></div>
+<script>(function(){var bs=document.querySelectorAll('[data-ab]');function set(k){var l=document.querySelector('.post-title-label')||document.querySelector('.post-title');if(!l)return;var t=l.querySelector('.mock-tail');if(k==='b'&&!t){t=document.createElement('span');t.className='post-title-sub mock-tail';t.textContent='댓글';l.appendChild(t);}if(k==='a'&&t)t.remove();bs.forEach(function(b){var on=b.getAttribute('data-ab')===k;b.style.background=on?'#6D28D9':'#fff';b.style.color=on?'#fff':'#111';b.style.border=on?'1px solid #6D28D9':'1px solid #D1D5DB';});}
+bs.forEach(function(b){b.addEventListener('click',function(){set(b.getAttribute('data-ab'));});});window.addEventListener('load',function(){setTimeout(function(){set('a');},300);});})();</script>"""
+
+
 def top(kind):
     """댓글 화면 맨 위 — 종목 = 가격 머리 + 그 종목 봉차트 · 리포트 = 코스피 한 줄 + 봉차트 · 시황 = 그 글의 배너 그림."""
     if kind == "stock":
         return stock_day(STOCK_REAL, "000660 코스피")
     if kind == "report":
         return report_top()
+    if kind == "issue":
+        return issue_top()
+    if kind == "forecast":
+        return forecast_top()
+    if kind == "article":
+        return article_top()
     return f'<img class="cc-banner" src="{STORY_BANNER}" alt="AI 생성 이미지" width="900" height="374">'
 
 
@@ -1082,7 +1128,7 @@ def comment_page(cmts, total, back, kind):
     more = f'<button class="cm-more" type="button">댓글 {total - len(cmts)}개 더 보기</button>' if total > len(cmts) else ""
     mark = (f'<span data-title-back="{back}" data-title-back-label="돌아가기" hidden></span>'
             + ('<span data-kr-code="000660" hidden></span>' if kind == "stock" else ""))
-    return (f'<div data-design="2" style="font-family:var(--report-font);">{mark}{top(kind)}'
+    return (f'<div data-design="2" style="font-family:var(--report-font);">{mark}{TAIL_AB}{top(kind)}'
             f'<div class="comments is-open cc-page"><div class="cc-page-h">댓글 {total}</div>{guard()}<ol class="cv-list">{rows}</ol>{more}</div></div>')
 
 
@@ -1166,6 +1212,12 @@ def main():
              page=("11.27 한국 증시 리포트", "../../kr-market-report/output/kr_report_mock.html", "report"))
     build_cc("mock_comments_page.html", BASE, [ONE_CMT], 1, "mock_comments_page.html",
              page=("11.27 증시 시황", "mock_comments_card-one.html", "story"))
+    build_cc("mock_comments_page-issue.html", BASE, [ONE_CMT_I], 1, "mock_comments_page-issue.html",
+             page=("젠슨 황 사임, 엔비디아는 수습되나?", "../../issue_store/output/mock_issue_nvidia_ceo_public.html", "issue"))
+    build_cc("mock_comments_page-forecast.html", BASE, [ONE_CMT_F], 1, "mock_comments_page-forecast.html",
+             page=("엔비디아 실적 뒤 반도체는?", "../../issue_store/output/mock_real_forecast-nvda-2026q3.html", "forecast"))
+    build_cc("mock_comments_page-article.html", BASE, [ONE_CMT_A], 1, "mock_comments_page-article.html",
+             page=("게임 업계, 연말 신작 몰린다", "../../news-posts/output/mock_news_photo_2.html", "article"))
 
 
 if __name__ == "__main__":
