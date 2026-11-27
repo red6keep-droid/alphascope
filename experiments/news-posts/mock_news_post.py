@@ -191,7 +191,8 @@ if __name__ == "__main__":
         if name == "mock_news_post.html":
             for cn, ct, ch in case_pages(html):   # 시안(11-27): 같은 기사 · 사진 경우별
                 dk.write_mock(ch, os.path.join(OUT, cn), ct)
-            html = photo_variants(html)   # 시안(11-27): 자료 사진 크기
+            if os.path.exists(os.path.join(IMG, "industry_game.jpg")):   # 시안(11-27): 자료 사진 크기 — 따로 한 장(발행된 대표 목업은 그대로)
+                dk.write_mock(photo_variants(html), os.path.join(OUT, "mock_news_photo_0.html"), "Newfact 주요 기사 · 사진 크기")
         out = os.path.join(OUT, name)
         print(dk.write_mock(html, out, NR.titles(post)[0]) or "index.html 없음", "· 기준", meta["basis"], "· 관련 종목", len(market["stocks"]), [s["name"] for s in market["stocks"]][:6],
               "· 함께 보는 페이지", [t for t, _ in NR.follow_links(post, market, lists, issues, forecasts)])
