@@ -333,7 +333,10 @@ def earnings_cal_card(a):
     eff = [(x["symbol"], x["effect"]) for x in items if x.get("effect")]
     if eff:
         mult = [e["median"] / e["normal"] for _, e in eff if e["normal"]]
-        lines.append((f"2010년 이후 이 회사들은 발표 다음 날 보통 그 종목 평소 하루의 {min(mult):.0f}~{max(mult):.0f}배를 움직였습니다. 내 종목의 실적 날은 평소와 다른 날입니다.", "plain"))
+        if mult:
+            lo, hi = f"{min(mult):.0f}", f"{max(mult):.0f}"
+            who, times = ("이 회사는", f"{lo}배") if len(mult) == 1 else ("이 회사들은", f"{lo}배" if lo == hi else f"{lo}~{hi}배")   # 한 곳 · 같은 값이면 `4~4배` 가 아니라 `4배`
+            lines.append((f"2010년 이후 {who} 발표 다음 날 보통 그 종목 평소 하루의 {times}를 움직였습니다. 내 종목의 실적 날은 평소와 다른 날입니다.", "plain"))
         groups = [(MEGA_SHORT[s], [e["median"], e["normal"]]) for s, e in eff]
         lines.append((C.chart_card("발표 다음 날 그 종목 움직임 (%)", groups, [C.amber, C.gray], [C.note_fg, C.note_fg],
                                    [("발표 다음 날", C.AMBER), ("그 종목 보통 날", C.GRAY_BAR)], fmt=lambda v: f"±{v:.1f}"), "html"))
