@@ -63,16 +63,34 @@ def history(sym, tries=2):
     return None
 
 
+def daily_flows(rows):
+    """[(날짜, 그날 순유입 달러)] — (오늘 좌수 − 어제 좌수 × 분할 비율) × 오늘 기준가.
+    주식 분할 · 병합 날(기준가가 1/k 로, 좌수가 k 배로 같이 뛴 날)은 어제 좌수를 k 배로 맞춰 센다 — 안 맞추면 분할이 통째로 유입으로 잡힌다."""
+    out = []
+    for i in range(1, len(rows)):
+        (_, n0, s0, _), (d, n1, s1, _) = rows[i - 1], rows[i]
+        k = 1.0
+        if n0 > 0 and n1 > 0 and s0 > 0:
+            pr, sr = n0 / n1, s1 / s0
+            for cand in (2, 3, 4, 5, 10, 1 / 2, 1 / 3, 1 / 4, 1 / 5, 1 / 10):
+                if abs(pr / cand - 1) < 0.12 and abs(sr / cand - 1) < 0.12:
+                    k = cand
+                    break
+        out.append((d, (s1 - s0 * k) * n1))
+    return out
+
+
 def summary(rows):
     """이력 → 마지막 날 값과 5 · 20 · 60거래일 순유입(달러 · 그 구간 첫날 순자산 대비 %)."""
     d, nav, sh, aum = rows[-1]
     out = {"as_of": d, "nav": nav, "units": sh, "aum": aum, "src": "ssga"}
+    fl = daily_flows(rows)
     for n in DAYS:
         if len(rows) > n:
-            w = rows[-n - 1:]
-            flow = sum((w[i][2] - w[i - 1][2]) * w[i][1] for i in range(1, len(w)))
+            flow = sum(v for _, v in fl[-n:])
+            base = rows[-n - 1][3]
             out[f"flow{n}"] = round(flow, 0)
-            out[f"flow{n}_pct"] = round(flow / w[0][3] * 100, 2) if w[0][3] else None
+            out[f"flow{n}_pct"] = round(flow / base * 100, 2) if base else None
     return out
 
 
