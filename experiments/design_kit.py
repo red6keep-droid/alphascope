@@ -1660,6 +1660,18 @@ def stock_href(sym):
 
 _NAMES_URL = "https://alpha-scope.pages.dev/names.json"   # 정식 · 간단 종목 전부의 이름 · 코드 · 주소 — quick-data 가 매일 올린다(site-search/build_names.py)
 _names_pages = None
+_names_label = {}   # {열쇠: 한글 이름} — 이름표의 n
+
+
+def names_label(sym):
+    """이름표(names.json)의 종목 이름 — 없으면 None."""
+    names_pages()
+    return _names_label.get(_sym_key(sym))
+
+
+def names_keys():
+    """이름표에 있는 모든 종목 열쇠(미국 티커 · 한국 6자리)."""
+    return set(names_pages())
 
 
 def _sym_key(sym):
@@ -1686,6 +1698,8 @@ def names_pages():
                 u = x.get("u")
                 if x.get("t") and isinstance(u, str) and u.startswith(STOCK_BLOG + "/p/"):
                     _names_pages[str(x["t"]).upper()] = u
+                    if x.get("n"):
+                        _names_label[str(x["t"]).upper()] = x["n"]
         except Exception as e:  # noqa: BLE001
             print(f"[design_kit] 종목 이름표 없음 — 아는 주소만: {str(e)[:80]}")
     return _names_pages
@@ -1748,6 +1762,132 @@ def stock_link(sym, text_html, color=True):
         return text_html
     style = STOCK_LINK_STYLE if color else "color:inherit;text-decoration:none;"
     return f'<a href="{esc(href)}" data-stock="{esc(sym)}" style="{style}">{text_html}</a>'
+
+
+NAME_LINK_NEVER = {"나스닥"}   # 종목 이름이지만 글에서는 거의 지수 뜻 — 링크하지 않는다
+_NAME_JOSA = ("으로", "에서", "보다", "처럼", "까지", "부터", "이나", "이랑", "이며", "이었", "이다", "에는", "와의", "과의", "로는",
+         "은", "는", "이", "가", "을", "를", "의", "도", "와", "과", "로", "에", "만", "나", "랑", "며", "였", "엔", "께")
+_SKIP_TAGS = {"a", "script", "style", "title", "h1", "h2", "h3", "h4", "h5", "h6", "summary", "button", "svg", "textarea", "select", "option"}
+_VOID_TAGS = {"br", "img", "input", "meta", "link", "hr", "source", "wbr", "col", "area", "base", "embed", "param", "track"}
+_SKIP_ATTRS = ("data-row-link", "data-href", "data-goto", 'role="link"', "onclick", "data-sub", " hidden")   # 이미 눌러서 어딘가로 가는 줄 · 소제목 · 숨김 — 그 안에 링크를 두지 않는다
+_TINTS = {"#d93025", "#1a73e8"}   # 증감 색 — 그 안의 이름은 색을 물려받는다
+_HTML_TOKENS = re.compile(r"(<script\b.*?</script\s*>|<style\b.*?</style\s*>|<!--.*?-->|<[!/]?[a-zA-Z][^>]*>)", re.S | re.I)
+
+
+def _name_end_ok(name, after):
+    """이름 바로 뒤가 낱말의 이어짐이 아닌가 — 한글로 끝나면 조사 · 한글 아닌 글자만, 영문 · 숫자로 끝나면 영문 · 숫자가 아닐 때만."""
+    if not after:
+        return True
+    if re.match(r"[가-힣]", name[-1]):
+        return not re.match(r"[가-힣]", after[0]) or after.startswith(_NAME_JOSA)
+    return not re.match(r"[0-9A-Za-z&]", after[0])
+
+
+def page_stock_names(data, extra=(), name_of=None):
+    """페이지 데이터(종목 dict 등)에 나온 우리 종목 → {종목: [이름, …]} — link_names 의 재료.
+    데이터 안 글자 값 · 키 가운데 종목 열쇠와 똑같은 것만(한 글자 티커는 extra 로만). name_of(sym) = 그 화면이 쓰는 이름, 모르면 None(티커로 대신 돌려주지 않는다)."""
+    keys = names_keys()
+    try:
+        import etf_universe as _E
+        keys |= {_sym_key(k) for k in _E.BY_SYM}
+        etf_names = {_sym_key(k): v[1] for k, v in _E.BY_SYM.items()}
+    except Exception:  # noqa: BLE001
+        etf_names = {}
+    found = set(x for x in extra if x)
+
+    def walk(v, depth):
+        if depth > 8:
+            return
+        if isinstance(v, str):
+            if 2 <= len(v) <= 12 and v == v.upper() and _sym_key(v) in keys:   # 대문자 티커 · 숫자 코드만 — 소문자 `ma`(이동평균)가 마스터카드로 읽히지 않게
+                found.add(v)
+        elif isinstance(v, dict):
+            for k, x in v.items():
+                walk(k, depth + 1)
+                walk(x, depth + 1)
+        elif isinstance(v, (list, tuple, set)):
+            for x in v:
+                walk(x, depth + 1)
+    walk(data, 0)
+    out = {}
+    for sym in found:
+        names = [names_label(sym), etf_names.get(_sym_key(sym))]
+        if name_of:
+            try:
+                names.append(name_of(sym))   # name_of 는 모르면 None — 티커로 대신 돌려주면 `정보기술(IT)` 이 가트너(IT)로 걸린다
+            except Exception:  # noqa: BLE001
+                pass
+        names = [n for n in names if n]
+        if names:
+            out[sym] = names
+    return out
+
+
+def link_names(html_text, names_by_sym, own=None):
+    """다 그린 HTML 의 글자 마디에서 종목 이름 → 상세 페이지 링크.
+    names_by_sym = {종목: [이름, …]} — 그 페이지 데이터에 실제로 나온 종목만(사전 전체로 찾지 않는다 — `볼` · `블록` 같은 낱말 겹침).
+    문장(<p> · 강조 카드 문장 줄) 안 = STOCK_LINK_STYLE(검은 굵게 · 연한 회색 점선, 증감 색 안이면 색은 물려받음),
+    그 밖(그래프 이름 · 표 줄 · 칩) = 글자 색 그대로 링크. 링크 · 제목 · 접기 머리(summary) · 줄 전체 링크 · 스크립트 안은 건드리지 않는다.
+    own = 이 페이지 종목(자기 이름은 링크 없음)."""
+    own_key = _sym_key(own) if own else None
+    pairs = []
+    for sym, names in (names_by_sym or {}).items():
+        if not sym or (own_key and _sym_key(sym) == own_key):
+            continue
+        href = stock_url(sym)
+        if not href:
+            continue
+        for n in dict.fromkeys(names or []):
+            if n and len(n) >= 2 and n not in NAME_LINK_NEVER:
+                pairs.append((esc(n), sym, href))
+    if not pairs:
+        return html_text
+    pairs.sort(key=lambda x: -len(x[0]))   # 긴 이름 먼저 — `SK하이닉스` 안의 `SK`
+    by_name = {}
+    for n, sym, href in pairs:
+        by_name.setdefault(n, (sym, href))
+    rx = re.compile(r"(?<![0-9A-Za-z가-힣&])(" + "|".join(re.escape(n) for n in by_name) + ")")
+
+    def sub_text(text, sent, tinted):
+        def one(m):
+            if not _name_end_ok(html_mod.unescape(m.group(1)), html_mod.unescape(text[m.end():m.end() + 3])):
+                return m.group(0)
+            sym, href = by_name[m.group(1)]
+            st = (STOCK_LINK_STYLE.replace("color:#111;", "color:inherit;") if tinted else STOCK_LINK_STYLE) if sent else "color:inherit;text-decoration:none;"
+            return f'<a href="{esc(href)}" data-stock="{esc(sym)}" style="{st}">{m.group(1)}</a>'
+        return rx.sub(one, text)
+
+    out, stack = [], []   # stack = [(태그, 건너뜀, 문장, 색)]
+    for part in _HTML_TOKENS.split(html_text):
+        if not part:
+            continue
+        if part.startswith("<") and _HTML_TOKENS.fullmatch(part):
+            out.append(part)
+            if part[:7].lower() in ("<script", "<style>", "<style ") or part.startswith("<!--"):
+                continue   # 스크립트 · 스타일 · 주석 = 통째로 지나간다(안의 `<` 비교식을 태그로 읽지 않게)
+            m = re.match(r"<\s*(/)?\s*([a-zA-Z0-9]+)", part)
+            if not m:
+                continue
+            tag = m.group(2).lower()
+            if m.group(1):   # 닫는 태그 — 같은 이름까지 꺼낸다
+                for i in range(len(stack) - 1, -1, -1):
+                    if stack[i][0] == tag:
+                        del stack[i:]
+                        break
+                continue
+            if tag in _VOID_TAGS or part.rstrip().endswith("/>"):
+                continue
+            low = part.lower()
+            cm = re.search(r"(?<![-\w])color\s*:\s*(#[0-9a-f]{3,6}|inherit)", low)
+            stack.append((tag, tag in _SKIP_TAGS or any(k in low for k in _SKIP_ATTRS),
+                          tag == "p" or "data-emph-sent" in low or "data-seo-lead" in low, cm.group(1) if cm else None))
+            continue
+        if any(x[1] for x in stack) or not part.strip():
+            out.append(part)
+            continue
+        color = next((x[3] for x in reversed(stack) if x[3] and x[3] != "inherit"), None)
+        out.append(sub_text(part, any(x[2] for x in stack), color in _TINTS))
+    return "".join(out)
 
 
 def stock_row_link(row_html, sym):

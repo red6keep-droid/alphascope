@@ -1308,13 +1308,23 @@ def _josa(t):
 
 def detail_body(s, today, news=None):
     """NVDA 리포트 순서 : 맨 위 요약 → 그래프 → 가격 카드(펼치면 1층 · 2층) → 상태 카드. 갱신 날짜 줄은 뺐다 — 요약 첫 마디에 날짜가 있다."""
-    return wrap(_dk.price_stamp(s["day"], "US") + lead(s) + sec_chart(s) + R.day_path_chart(s["tech"].get("path"), s["tech"].get("bench_path"), s["name"], "S&P 500") + price_card(s, today) + PC.rank_section(s) + sec_regime(s) + sec_tech(s) + sec_pairs(s) + sec_states(s) + sec_targets(s)
+    return _link_peers(s, wrap(_dk.price_stamp(s["day"], "US") + lead(s) + sec_chart(s) + R.day_path_chart(s["tech"].get("path"), s["tech"].get("bench_path"), s["name"], "S&P 500") + price_card(s, today) + PC.rank_section(s) + sec_regime(s) + sec_tech(s) + sec_pairs(s) + sec_states(s) + sec_targets(s)
                 + sec_today_tab(s, news or {})
                 + R._section("매수의견", sec_opinions(s), tab="매수의견")   # 애널리스트 · 방송 의견 — 오늘 탭에서 옮김 · 탭 이름 붙여 쓴 `매수의견` (P203)
                 + R._section("실적", sec_earnings_tab(s), tab="실적")   # 옛 `일정` 탭을 합침 (P196)
                 + R._section("업계상황", sec_industry_tab(s), tab="업계상황")   # 한국과 같은 탭
                 + R._section("기업", sec_company(s), tab="기업")   # 한국과 같은 탭
-                + related(s) + list_marker(U.STOCKS_URL))   # 출처 · 투자 권유 꼬리말은 뺐다 — 블로그 공통 푸터가 맡는다
+                + related(s) + list_marker(U.STOCKS_URL)))   # 출처 · 투자 권유 꼬리말은 뺐다 — 블로그 공통 푸터가 맡는다
+
+
+def _link_peers(s, html):
+    """페이지 안 비교 종목 이름 → 그 종목 페이지. 이 종목 데이터 · 함께 보는 회사 · 같은 업종 묶음에 나온 종목만."""
+    try:
+        extra = list(U.PEERS.get(s["sym"]) or {}) + list((PC._group(s["sym"]) or (None, []))[1])
+        return _dk.link_names(html, _dk.page_stock_names(s, extra, lambda x: U.BY_SYM[x][1] if x in U.BY_SYM else U.PEER_KO.get(x)), own=s["sym"])
+    except Exception as e:  # noqa: BLE001 — 링크를 못 걸어도 페이지는 그대로
+        print(f"::warning::[link] {s.get('sym')} 종목 이름 링크 실패: {e!r}")
+        return html
 
 
 # ---------------------------------------------------------------- 소송 일정 (P270)

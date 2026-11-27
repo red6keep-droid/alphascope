@@ -1545,7 +1545,13 @@ def detail_body(s, a):
             + R._section("업계상황", sec_industry_tab(s), tab="업계상황")   # 업종 → 업계 상황 (P151) → 붙여 쓴 업계상황
             + R._section("기업", sec_company(s), tab="기업")   # `최근 공시는?` 뺐다 · 기업정보 → 기업 (2026-10-31 P145: 탭은 짧게 — 360px 폰에서 다섯째 탭이 잘렸다)
             + related(s) + list_marker(U.STOCKS_URL))
-    return wrap(body)
+    html = wrap(body)
+    try:   # 페이지 안 비교 종목 이름 → 그 종목 페이지 — 이 종목 데이터 · 연결 짝에 나온 종목만
+        extra = list((U.PAIRS.get(s["sym"]) or ([], ""))[0])
+        return _dk.link_names(html, _dk.page_stock_names(s, extra, lambda x: U.name(x) if x in U.BY_SYM else USU.name(x) if x in USU.BY_SYM else USU.PEER_KO.get(x)), own=s["sym"])
+    except Exception as e:  # noqa: BLE001 — 링크를 못 걸어도 페이지는 그대로
+        print(f"::warning::[link] {s.get('sym')} 종목 이름 링크 실패: {e!r}")
+        return html
 
 
 # ---------------------------------------------------------------- 자금 흐름 (목록 페이지 · 홈 한국 시장 흐름 탭의 재료)
