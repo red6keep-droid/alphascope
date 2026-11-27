@@ -1,6 +1,137 @@
 {
-  "updated_at": "2026-11-26 21:46:23 UTC",
+  "updated_at": "2026-11-27 12:46:25 UTC",
   "items": [
+    {
+      "title": "The Tech Download: Will Jensen Huang’s return be the spark the shaky AI market needs?",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/27/tech-download-jensen-huang-ai-market.html",
+      "published": "2026-11-27 12:00:22",
+      "title_ko": "기술 다운로드: 젠슨 황의 복귀가 흔들리는 AI 시장에 필요한 불꽃이 될 것인가",
+      "summary_ko": "AI 붐의 지속 가능성에 대한 투자자들의 의문이 커지면서 최근 AI 관련 주가가 하락",
+      "lines": [
+        "최근 엔비디아 주가 변동으로 1조 달러 이상 시가총액 하락 및 회복",
+        "엔비디아 최고경영자 젠슨 황의 사임 및 2주 내 복귀",
+        "최근 한 달간 ARM 및 AMD 등 반도체 주식 하락"
+      ]
+    },
+    {
+      "title": "Tech German software major SAP is reportedly weighing cutting at least 10,000 jobs in AI push",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/27/sap-job-cuts-ai-restructuring.html",
+      "published": "2026-11-27 11:49:18",
+      "title_ko": "독일 소프트웨어 대기업 SAP, AI 추진 속에서 최소 1만 명 감원 검토 중인 것으로 알려져",
+      "summary_ko": "SAP가 소프트웨어 사업을 AI 중심으로 재편하는 과정에서 1만 명의 감원을 고려 중인 것으로 보도",
+      "lines": [
+        "독일 소프트웨어 기업 SAP의 인공지능 사업 재편에 따른 1만 개 일자리 감축 검토",
+        "SAP 사이버 보안 공격 발생 및 고객 데이터 무단 접근 증거 미발견"
+      ]
+    },
+    {
+      "title": "Inflation has shoppers hunting for value. That bodes well for Black Friday",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/27/black-friday-2026-inflation-value-deals.html",
+      "published": "2026-11-27 11:00:01",
+      "title_ko": "인플레이션으로 쇼핑객들이 가성비를 찾고 있다, 블랙프라이데이에 청신호",
+      "summary_ko": "소비자들이 거시경제적 역풍에 직면해 있음에도 불구하고 소매업체들은 블랙프라이데이를 비롯한 연말 쇼핑 시즌의 탄탄한 지출을 예상",
+      "lines": [
+        "10월 소비자물가지수 0.4% 상승 (예상)",
+        "10월 개인소비지출 물가지수 전년 대비 3.8% 상승 (예상)"
+      ]
+    },
+    {
+      "title": "SpaceX shares jump 4% amid tech rally and after Musk says he will expand on Trump Account share donations",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/27/spacex-shares-musk-donations.html",
+      "published": "2026-11-27 10:20:39",
+      "title_ko": "기술주 반등 속 머스크의 트럼프 계정 주식 기부 발언에 스페이스X 주가 4% 급등",
+      "summary_ko": "일론 머스크가 X를 통해 매년 미국 어린이들에게 주식을 기부하겠다고 밝힌 후 프리마켓 거래에서 주가 급등",
+      "lines": [
+        "일론 머스크의 스페이스엑스 주식 기부 계획 발표",
+        "블루오션 ATS 시간외 거래에서 스페이스엑스 7% 이상 급등"
+      ]
+    },
+    {
+      "title": "Private markets are more accessible than ever for investors. Getting out is another matter",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/27/private-markets-retail-investors-liquidity.html",
+      "published": "2026-11-27 08:05:09",
+      "title_ko": "사모 시장이 그 어느 때보다 투자자에게 접근하기 쉬워졌지만 빠져나오는 것은 별개의 문제다",
+      "summary_ko": "상환 한도로 인해 유동성 위험이 주목받는 가운데 PwC는 교육이 뒤처져 있다고 진단",
+      "lines": [
+        "프라이빗 펀드 유통사의 77% 투자자 접근성 중요성 평가",
+        "자산운용사의 15%만 소매 투자자 대상 포괄적 교육 제공"
+      ]
+    },
+    {
+      "title": "AI 팩터의 자산시장 영향력 확대",
+      "title_ko": "AI 팩터의 자산시장 영향력 확대",
+      "summary_ko": "AI 산업에 대한 금융 시장의 의존도가 높아짐에 따라 하이일드 채권과 인프라 자산을 통한 위험 전이 경로를 모니터링해야 함",
+      "source": "한국투자증권 리서치톡톡",
+      "link": "https://www.youtube.com/watch?v=m5D5DA9Y96I",
+      "published": "2026-11-27 07:49:45",
+      "kind": "media",
+      "tag": "AI 투자 · 반도체 수요",
+      "direction": "neutral",
+      "n_channels": 1,
+      "lines": [
+        "미 연준 분석에 따르면 작년 1~3분기 전체 GDP 성장률 중 AI 산업이 차지한 비중은 약 30%",
+        "한국투자증권 애널리스트 발언 : AI 팩터가 단순 IT 섹터를 넘어 전반적인 자산군 수익률 변동을 설명하는 체계적인 영향력으로"
+      ]
+    },
+    {
+      "title": "채권 금리 매력도 상승과 자산 배분",
+      "title_ko": "채권 금리 매력도 상승과 자산 배분",
+      "summary_ko": "금리 상승으로 채권의 기대 수익률이 높아져 안전자산 중심의 다각화 전략이 유리함",
+      "source": "한국투자증권 리서치톡톡",
+      "link": "https://www.youtube.com/watch?v=m5D5DA9Y96I",
+      "published": "2026-11-27 07:49:45",
+      "kind": "media",
+      "tag": "금리 · 연준",
+      "direction": "positive",
+      "n_channels": 1,
+      "lines": [
+        "미국채 10년물 금리 고점 5.1% 대에서 약 4.9% 안팎으로 하락",
+        "한국투자증권 애널리스트 발언 : 금리가 높아져 위험 자산을 크게 늘리지 않고도 채권 투자만으로 목표 수익률 달성 가능"
+      ]
+    },
+    {
+      "title": "Spain’s Pablo Hernández de Cos set to lead European Central Bank",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/26/pablo-hernandez-de-cos-ecb-president.html",
+      "published": "2026-11-27 06:50:38",
+      "title_ko": "스페인의 파블로 에르난데스 데 코스, 유럽중앙은행 수장으로 임명 예정",
+      "summary_ko": "크리스틴 라가르드의 뒤를 이을 지지를 확보",
+      "lines": [
+        "파블로 에르난데스 데 코스 유럽중앙은행 차기 총재 내정",
+        "유럽연합 정상회의에서 유로존 지도자들의 지지 확보",
+        "네덜란드의 클래스 노트 지지 철회 합의"
+      ]
+    },
+    {
+      "title": "Fast cars, big money: Why sportswear races into Formula 1 as sponsorship spending soars 75%",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/27/nike-formula-1-sportswear-brands-sponsorship-adidas-puma.html",
+      "published": "2026-11-27 05:46:04",
+      "title_ko": "빠른 자동차와 큰 돈: 후원 지출이 75% 급증하면서 스포츠웨어가 포뮬러 1에 뛰어드는 이유",
+      "summary_ko": "스포츠의 문화적 영향력이 커지고 젊은 관중들의 매력이 높아짐에 따라 나이키, 아디다스, 푸마가 포뮬러 1에 대규모 투자",
+      "lines": [
+        "F1 스포츠웨어 후원 지출 2년 만에 75% 급증",
+        "2026년 F1 스포츠웨어 후원금 2억 달러 상회",
+        "나이키, 2027년부터 F1 스태프 유니폼 공급 예정"
+      ]
+    },
+    {
+      "title": "Two Italians killed in Kuwait drone attack; Trump says Iran war ends ‘whenever I want it’",
+      "source": "CNBC",
+      "link": "https://www.cnbc.com/2026/11/27/us-iran-war-trump-hormuz-italian-killed-trump.html",
+      "published": "2026-11-27 03:30:23",
+      "title_ko": "쿠웨이트 드론 공격으로 이탈리아인 2명 사망, 트럼프는 이란 전쟁은 내가 원할 때 끝난다고 말해",
+      "summary_ko": "이란 외무장관 압바스 아라그치는 이번 사건이 의심스러우며 전쟁을 위한 사전 조작된 각본 같다고 언급",
+      "lines": [
+        "쿠웨이트 내 이란 공격으로 이탈리아인 2명 사망",
+        "쿠웨이트 군 당국, 미사일 파편으로 인한 사망 발생 발표"
+      ]
+    },
     {
       "title": "Trump demands probe into ‘record setting error’ after third-quarter GDP data gets massive revision higher",
       "source": "CNBC",
@@ -14,158 +145,19 @@
       ]
     },
     {
-      "title": "Trump, NATO chief caution Russia as attacks on Ukraine’s energy infrastructure intensify",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/26/trump-nato-rutte-russia-ukraine-war.html",
-      "published": "2026-11-26 16:12:47",
-      "title_ko": "트럼프와 NATO 수장, 우크라이나 에너지 인프라 공격 격화 속 러시아에 경고",
-      "summary_ko": "우크라이나 에너지 인프라 공격 심화 속 평화적 해결 요구",
-      "lines": [
-        "도널드 트럼프 미국 대통령과 마르크 뤼터 나토 사무총장의 러시아에 대한 확전 자제 촉구 공동 성명 발표",
-        "도널드 트럼프 미국 대통령과 마르크 뤼터 나토 사무총장의 플로리다주 팜비치 마르아라고 회동 진행"
-      ]
-    },
-    {
-      "title": "Buyer beware? Nvidia's volatile swings expose risks of single-stock ETFs",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/26/nvidias-volatile-swings-expose-risks-of-single-stock-etfs.html",
-      "published": "2026-11-26 16:00:01",
-      "title_ko": "구매자 주의보? 엔비디아의 변동성 장세가 단일 종목 ETF의 위험성 노출",
-      "summary_ko": "전문가들이 엔비디아의 급락과 반등에 대해 논평",
-      "lines": [
-        "그래니셰어스의 2배 숏 엔비디아 일일 ETF 63% 하락",
-        "그래니셰어스의 2배 롱 엔비디아 ETF 62% 급등",
-        "젠슨 황의 엔비디아 최고경영자 재임명",
-        "월요일 세션 동안 엔비디아 주가 31% 상승"
-      ]
-    },
-    {
-      "title": "Spain’s Pablo Hernández de Cos set to lead European Central Bank",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/26/pablo-hernandez-de-cos-ecb-president.html",
-      "published": "2026-11-26 15:28:26",
-      "title_ko": "스페인의 파블로 에르난데스 데 코스, 유럽중앙은행 수장으로 임명 예정",
-      "summary_ko": "크리스틴 라가르드의 뒤를 이을 지지를 확보",
-      "lines": [
-        "파블로 에르난데스 데 코스 유럽중앙은행 차기 총재 내정",
-        "유럽연합 정상회의에서 유로존 지도자들의 지지 확보",
-        "네덜란드의 클래스 노트 지지 철회 합의"
-      ]
-    },
-    {
-      "title": "What is ‘texture-maxxing’? The food trend putting crunch on the menu",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/26/texture-maxxing-food-trends-gen-z.html",
-      "published": "2026-11-26 13:34:51",
-      "title_ko": "'텍스처 맥싱'이란 무엇인가? 메뉴에 바삭함을 더하는 식품 트렌드",
-      "summary_ko": "",
-      "lines": [
-        "웨이트로스의 연례 식품 보고서 발표",
-        "텍스처 맥싱 식품 트렌드 부상"
-      ]
-    },
-    {
-      "title": "Planes, trains and automobiles: The best ways to beat travel fatigue—so you can come home feeling rested and fulfilled",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/make-it/2026/11/26/travel-fatigue-holiday-tips.html",
-      "published": "2026-11-26 13:00:01",
-      "title_ko": "비행기, 기차, 자동차: 여행 피로를 극복하고 편안하게 귀가하는 최고의 방법",
-      "summary_ko": "",
-      "lines": [
-        "추수감사절 기간 50마일 이상 이동 미국인 8,150만 명 전망",
-        "11월 24일부터 11월 30일까지 여행 기간 설정",
-        "연료 가격 전년 동기 대비 약 17% 상승 기록"
-      ]
-    },
-    {
-      "title": "U.S. tariff-hike threats pile pressure on partners to sign trade deals",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/26/us-tariffs-hike-trade-agreement.html",
-      "published": "2026-11-26 12:46:55",
-      "title_ko": "미국의 관세 인상 위협, 무역 협정 체결 압박 가중",
-      "summary_ko": "미국, 무역 협정 체결 국가에 더 낮은 관세율 제시",
-      "lines": [
-        "미국 정부의 14개 교역 상대국 대상 신규 관세 부과 계획",
-        "유럽연합, 한국, 스위스, 대만 등 15% 관세 제안",
-        "베트남 최대 35% 관세 부과 직면",
-        "무역 협정 체결국 대상 관세 상한 하향 조정 방침"
-      ]
-    },
-    {
-      "title": "Global stocks rally as investors shrug off U.S. tariffs and AI jitters to 'fish for bargains'",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/26/stock-markets-today-.html",
-      "published": "2026-11-26 12:22:25",
-      "title_ko": "미국 관세와 AI 불안을 딛고 투자자들이 저가 매수에 나서며 글로벌 증시 랠리",
-      "summary_ko": "백악관이 수십 개 주요 교역국을 겨냥한 새로운 관세 조치를 발표했으나 투자자들은 동요하지 않음",
-      "lines": [
-        "목요일 미국 증시 추수감사절 휴장",
-        "수요일 정규 세션에서 다우지수 0.33% 상승",
-        "수요일 나스닥 종합지수 0.62% 하락",
-        "수요일 S&P 500 지수 0.25% 하락"
-      ]
-    },
-    {
-      "title": "연준 금리 인상 및 생활비 위기",
-      "title_ko": "연준 금리 인상 및 생활비 위기",
-      "summary_ko": "인플레이션 압박 지속에 따라 연준의 추가 금리 인상 가능성이 제기됨",
+      "title": "ECB 차기 총재 데 코스 내정",
+      "title_ko": "ECB 차기 총재 데 코스 내정",
+      "summary_ko": "파블로 에르난데스 데 코스가 유럽중앙은행 차기 총재로 내정됨",
       "source": "블룸버그",
-      "link": "https://www.youtube.com/watch?v=1BFeWg0wYPU",
-      "published": "2026-11-26 11:56:50",
+      "link": "https://www.youtube.com/watch?v=g-he9QWCKH8",
+      "published": "2026-11-26 14:07:14",
       "kind": "media",
       "tag": "금리 · 연준",
       "direction": "neutral",
-      "n_channels": 6,
+      "n_channels": 1,
       "lines": [
-        "인플레이션 수치가 쉽게 하락하지 않으면서 연준이 다음 달 금리를 인상할 것으로 예상됨",
-        "매사추세츠 대학교 애머스트 부교수 발언 : 기업들의 가격 결정력이 인플레이션의 주요 요인으로 작용하고 있으며 중앙은행의 금리"
-      ]
-    },
-    {
-      "title": "미국 신규 관세 발표 및 무역 긴장",
-      "title_ko": "미국 신규 관세 발표 및 무역 긴장",
-      "summary_ko": "미국이 유럽연합과 중국 등을 타겟으로 새로운 관세 인상을 예고하며 무역 긴장이 고조됨",
-      "source": "블룸버그",
-      "link": "https://www.youtube.com/watch?v=1BFeWg0wYPU",
-      "published": "2026-11-26 11:56:50",
-      "kind": "media",
-      "tag": "관세 · 무역",
-      "direction": "negative",
-      "n_channels": 4,
-      "lines": [
-        "미국이 유럽연합과 중국 등을 겨냥한 새로운 관세 인상안을 발표",
-        "블룸버그 브렌단 머레이 발언 : 대부분의 국가들이 관세가 불공정하다고 보며 보복보다는 협상을 통해 해결하려는 움직임을 보임",
-        "미국 고위 관리가 블룸버그에 양국 간 협상 결렬 시 관세율이 두 배로 인상될 수 있다고 언급",
-        "블룸버그 브렌단 머레이 발언 : 트럼프 행정부가 대중국 수출 경쟁을 벌이는 남아시아 국가들을 포함해 관세율 인상에 유연성을"
-      ]
-    },
-    {
-      "title": "이집트 경제 성장 및 민간 투자",
-      "title_ko": "이집트 경제 성장 및 민간 투자",
-      "summary_ko": "이집트가 IMF와의 예비 합의를 바탕으로 경제 회복과 민간 부문 투자 유치에 주력함",
-      "source": "블룸버그",
-      "link": "https://www.youtube.com/watch?v=1BFeWg0wYPU",
-      "published": "2026-11-26 11:56:50",
-      "kind": "media",
-      "tag": "경기 · 고용 · 소비",
-      "direction": "positive",
-      "n_channels": 4,
-      "lines": [
-        "이집트가 추가 자금 조달을 위해 IMF와 20억 달러 규모의 예비 합의에 도달함",
-        "이집트 정부 기획경제개발부 장관 발언 : 경제 불확실성 속에서도 탄력적인 다각화를 바탕으로 향후 회계연도 경제 성장률이"
-      ]
-    },
-    {
-      "title": "Switzerland’s biggest bank set for showdown with lawmakers as capital fight intensifies amid crisis planning",
-      "source": "CNBC",
-      "link": "https://www.cnbc.com/2026/11/26/ubs-swiss-capital-rules-finma-crisis-plan.html",
-      "published": "2026-11-26 11:17:39",
-      "title_ko": "스위스 최대 은행, 위기 계획 수립 속 자본 규제 싸움으로 입법부와 격돌 예고",
-      "summary_ko": "더 엄격한 자본 요건을 둘러싼 의회와의 갈등 지속",
-      "lines": [
-        "스위스 금융시장감독청 UBS 위기 해결 전략 집행 가능 평가",
-        "해외 자회사 자본 보유 요건 강화 관련 의회 심의 직면",
-        "크레디트 스위스 통합 이후 UBS 위기 대응 능력 개선"
+        "파블로 에르난데스 데 코스 유럽중앙은행 차기 총재 내정",
+        "블룸버그 조 슈나이비스 발언 : 프랑스와 독일 간의 합의로 데 코스의 총재 인선이 최종 결정됨"
       ]
     }
   ]
