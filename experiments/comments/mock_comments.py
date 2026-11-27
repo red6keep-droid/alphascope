@@ -317,21 +317,24 @@ ME = "주린이탈출"
 AVA_TABS = [("동물", "a"), ("일반", "p")]
 ME_AVA = "a12"   # 목업: 나 = 오리
 # 캐릭터 10명 — 자기 이름으로 쓰고 이름 옆 왕관으로 회원과 갈린다. 이름 · 그림 · 왕관을 누르면 소개 페이지의 그 캐릭터 자리로.
-# (이름, 그림, 동물, 보는 것 한 줄, 소개, 흐름 자리). 그림은 캐릭터 몫으로 예약 — 회원 자동 배정에서 뺀다.
+# (이름, 그림, 종류(히어로 판), 보는 것 한 줄, 소개, 흐름 자리). 그림은 캐릭터 몫으로 예약 — 회원 자동 배정에서 뺀다.
 CHARS = [
-    ("기록이", "a07", "부엉이", "지난 비슷한 때", "오늘 같은 날이 전에도 있었는지 기록에서 꺼내 옵니다. 날짜는 꼭 붙입니다.", "기록"),
-    ("견줌이", "a04", "너구리", "비교 대상", "숫자가 나오면 일단 묻는다. 무엇과 견준 건데? 비교 대상이 없으면 없다고 말하는 편.", "비교"),
-    ("실적이", "a06", "곰", "실적 · 이익 예상", "실적과 이익 예상, 그것만 봐요. 얼마나 바뀌었는지요. 음, 나머지는 다음 실적 때 다시 볼게요.", "종목"),
-    ("물결이", "a09", "수달", "가격 · 거래량", "가격이 움직이면 거래량부터 봐요! 따라왔는지, 시장 전체가 움직인 날인지 바로 가려요.", "종목"),
-    ("엇박이", "a05", "여우", "갈리는 지표", "다들 같은 쪽을 볼 때, 반대쪽을 가리키는 지표는 없을까요? 그걸 찾아서 되물어요.", "갈림"),
-    ("새싹이", "a02", "토끼", "처음 보는 말", "이 말은 무슨 뜻이에요? 어려운 말이 나오면 제가 대신 물어볼게요.", "입문"),
-    ("돈길이", "a01", "다람쥐", "실제 돈의 흐름", "돈이 어디로 가는지… 그게 제일 궁금하네요. 업종 ETF 에 실제로 들어온 돈을 운용사 값으로 세어 봐요. 급할 건 없어요, 내일도 셀 거니까요.", "돈의 흐름"),
-    ("채점이", "a08", "거북이", "미리 적은 전망", "미리 적어 둔 가설을 센다. 판정일까지 며칠. 지금 어느 쪽. 그것만.", "전망 · 결과"),
-    ("소식이", "a10", "사슴", "이슈 단계", "새 소식은 방향과 단계만 전한다고 해요. 확정인지, 아직 논의 중인지요.", "이슈"),
-    ("이음이", "a11", "판다", "미국과 한국", "밤새 미국이 이랬는데 오늘 한국은 어땠나, 둘을 이어서 보면 재밌더라고요.", "함께 움직인 것"),
+    ("기록이", "p01", "로봇", "지난 비슷한 때", "오늘 같은 날이 전에도 있었는지 기록에서 꺼내 옵니다. 날짜는 꼭 붙입니다.", "기록"),
+    ("견줌이", "p07", "요원", "비교 대상", "숫자가 나오면 일단 묻는다. 무엇과 견준 건데? 비교 대상이 없으면 없다고 말하는 편.", "비교"),
+    ("실적이", "p09", "바이킹", "실적 · 이익 예상", "실적과 이익 예상, 그것만 봐요. 얼마나 바뀌었는지요. 음, 나머지는 다음 실적 때 다시 볼게요.", "종목"),
+    ("물결이", "p02", "가면 히어로", "가격 · 거래량", "가격이 움직이면 거래량부터 봐요! 따라왔는지, 시장 전체가 움직인 날인지 바로 가려요.", "종목"),
+    ("엇박이", "p04", "선글라스 고양이", "갈리는 지표", "다들 같은 쪽을 볼 때, 반대쪽을 가리키는 지표는 없을까요? 그걸 찾아서 되물어요.", "갈림"),
+    ("새싹이", "p05", "외계인", "처음 보는 말", "이 말은 무슨 뜻이에요? 어려운 말이 나오면 제가 대신 물어볼게요.", "입문"),
+    ("돈길이", "p12", "공룡", "실제 돈의 흐름", "돈이 어디로 가는지… 그게 제일 궁금하네요. 업종 ETF 에 실제로 들어온 돈을 운용사 값으로 세어 봐요. 급할 건 없어요, 내일도 셀 거니까요.", "돈의 흐름"),
+    ("채점이", "p08", "마녀", "미리 적은 전망", "미리 적어 둔 가설을 센다. 판정일까지 며칠. 지금 어느 쪽. 그것만.", "전망 · 결과"),
+    ("소식이", "p10", "토끼 귀 소녀", "이슈 단계", "새 소식은 방향과 단계만 전한다고 해요. 확정인지, 아직 논의 중인지요.", "이슈"),
+    ("이음이", "p06", "우주인", "미국과 한국", "밤새 미국이 이랬는데 오늘 한국은 어땠나, 둘을 이어서 보면 재밌더라고요.", "함께 움직인 것"),
 ]
 CHAR = {c[0]: c for c in CHARS}
 CHAR_AVAS = {c[1] for c in CHARS}
+# 캐릭터 그림 = 히어로 판(11-27). 공주(p03) · 왕(p11)은 머리 왕관이 캐릭터 왕관 표시와 헷갈려
+# 캐릭터에도 회원 그림에도 안 씀(자동 배정 · 고르기 둘 다 뺌).
+CROWN_AVAS = {"p03", "p11"}
 CHAR_PAGE = "mock_comments_characters.html"
 CROWN = ('<svg class="cv-crown" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">'   # 왕관 = 금색 · 끝 구슬 셋 · 아래 띠(시안 A)
          '<path d="M4 18.5h16v2H4z" fill="#E0A21B"/><path d="M4 17 3 8l5 4 4-7 4 7 5-4-1 9z" fill="#F4B942" stroke="#C9870F" stroke-width="1" stroke-linejoin="round"/>'
@@ -361,7 +364,7 @@ def ava_of(name):
         return ME_AVA
     if name in CHAR:
         return CHAR[name][1]
-    pool = [k for k in [f"a{i:02d}" for i in range(1, 13)] + [f"p{i:02d}" for i in range(1, 13)] if k not in CHAR_AVAS and k != ME_AVA]
+    pool = [k for k in [f"a{i:02d}" for i in range(1, 13)] + [f"p{i:02d}" for i in range(1, 13)] if k not in CHAR_AVAS | CROWN_AVAS and k != ME_AVA]
     return pool[int(hashlib.md5(name.encode()).hexdigest(), 16) % len(pool)]
 
 
@@ -373,7 +376,7 @@ def ava_picker(on):
     tabs = "".join(f'<button class="cv-stk-tab" type="button" role="tab" data-atab="{p}" aria-selected="{str(p == on[0]).lower()}">{n}</button>' for n, p in AVA_TABS)
     grids = "".join(f'<div class="cv-ava-grid" data-agrid="{p}"{"" if p == on[0] else " hidden"}>'
                     + "".join(f'<button class="cv-ava-pick{" is-on" if f"{p}{i:02d}" == on else ""}" type="button" data-ava="{p}{i:02d}" aria-label="{n} 그림 {i}">'
-                              f'<img src="{ava_src(f"{p}{i:02d}")}" alt="" width="48" height="48"></button>' for i in range(1, 13))
+                              f'<img src="{ava_src(f"{p}{i:02d}")}" alt="" width="48" height="48"></button>' for i in range(1, 13) if f"{p}{i:02d}" not in CROWN_AVAS)
                     + '</div>' for n, p in AVA_TABS)
     return f'<div class="cv-lab">프로필 그림</div><div class="cv-stk-tabs" role="tablist">{tabs}</div>{grids}'
 GUARD = "신고가 3번 쌓인 댓글은 자동으로 가려집니다. 오픈채팅 · 텔레그램 주소와 연락처는 등록되지 않습니다."
@@ -857,9 +860,9 @@ TITLES.update({
     "mock_comments_card-one.html": "글 아래 댓글 카드 — 1개 = 카드 하나 · NEW (시황 글)",
     "mock_comments_page-stock.html": "댓글 화면 — 종목 가격 · 홈 카드 꼴 그래프 · 댓글 목록 · 쓰기 (종목 페이지에서)",
     "mock_comments_page.html": "댓글 화면 — 배너 그림 · 댓글 목록 · 쓰기 (시황 글에서)",
-    "mock_comments_page-issue.html": "댓글 화면 시안 — 종목 vs 비교 지수 한 줄 (핫이슈에서)",
-    "mock_comments_page-forecast.html": "댓글 화면 시안 — 세부 전망 · 판정 칩 (증시 전망에서)",
-    "mock_comments_page-article.html": "댓글 화면 시안 — 자료 사진 (Newfact 기사에서)",
+    "mock_comments_page-issue.html": "댓글 화면 시안 — 이슈 제목 · 종목 vs 비교 지수 한 줄 (핫이슈에서)",
+    "mock_comments_page-forecast.html": "댓글 화면 시안 — 전망 제목 · 전망A · B 카드 (증시 전망에서)",
+    "mock_comments_page-article.html": "댓글 화면 시안 — 기사 제목 · 자료 사진 (Newfact 기사에서)",
 })
 CC_CSS = """<style>
 /* 글 아래 댓글 카드 — 흰 상자 · 모서리 12 · 옅은 그림자. 2개 이상이면 좌우로 밀기(옆 카드 끝이 살짝 보임) */
@@ -1086,25 +1089,34 @@ def _chg(v):
     return f'<span style="color:{dk.UP if up else dk.DOWN};">{dk.tri_span(up, 14)}{abs(v):.1f}%</span>'
 
 
+PTITLE = '<h2 style="margin:4px 0 12px;padding:0 0 0 6px;font-size:22px;line-height:30px;font-weight:700;color:#111;word-break:keep-all;">{}</h2>'   # 긴 글 제목 = 제목 줄이 아니라 본문 맨 위(원래 글과 같게, 11-27 사용자)
+
+
 def issue_top():
-    """시안 — 핫이슈 댓글 화면 맨 위 = 이슈 페이지의 `주가도 같은 쪽인가?` 한 줄(그 종목 vs 비교 지수, 헌법 제1조 대조군) + 작은 회색 기준."""
-    return (f'<div class="cc-px cc-px-one">엔비디아 {_chg(-12.7)} <span style="color:#D1D5DB;">·</span> 반도체 지수 {_chg(8.1)}</div>'
+    """시안 — 핫이슈 댓글 화면 맨 위 = 이슈 제목 → `주가도 같은 쪽인가?` 한 줄(그 종목 vs 비교 지수, 헌법 제1조 대조군) + 작은 회색 기준."""
+    return (PTITLE.format("젠슨 황 사임, 엔비디아는 수습되나?")
+            + f'<div class="cc-px cc-px-one">엔비디아 {_chg(-12.7)} <span style="color:#D1D5DB;">·</span> 반도체 지수 {_chg(8.1)}</div>'
             '<div class="cc-px cc-px-sub">사건 뒤 전체 · 11.06 → 11.13 · 미국 11.13 종가 기준</div>')
 
 
 def forecast_top():
-    """시안 — 증시 전망 댓글 화면 맨 위 = 세부 전망마다 이름 + 판정 칩(전망 페이지 맨 위 표 그대로 줄여서)."""
-    chip = lambda t, on: (f'<span style="flex:none;padding:2px 8px;border-radius:6px;font-size:13px;line-height:19px;font-weight:700;'
-                          f'background:{"#F5F3FF" if on else "#F3F4F6"};color:{"#6D28D9" if on else "#6B7280"};">{t}</span>')
-    row = lambda n, t, c: (f'<div style="display:flex;gap:8px;align-items:center;justify-content:space-between;padding:8px 6px;border-bottom:1px solid #EEF1F5;">'
-                           f'<span style="font-size:16px;line-height:24px;font-weight:700;color:#111;word-break:keep-all;"><span style="color:#6B7280;font-weight:400;margin-right:6px;">{n}</span>{t}</span>{c}</div>')
-    return (row("전망A", "예상을 크게 넘으면", chip("실현됨", True)) + row("전망B", "예상을 크게 넘지 못하면", chip("해당 없음", False))
-            + '<div class="cc-px cc-px-sub" style="margin-top:6px;">결과 11.17 · 세부 판정은 원래 글에서</div>')
+    """시안 — 증시 전망 댓글 화면 맨 위 = 전망 제목 → 전망A · 전망B 카드(전망 페이지 갈래 카드를 줄인 판: 연한 주황 상자 · 전망 꼬리표 · 갈래 이름 · 오른쪽 판정, 접기 · 세부 줄 없음).
+    판정이 난 갈래 = 빨강 꼬리표 + 빨강 판정, 해당 없는 갈래 = 회색(원래 글과 같은 흐림)."""
+    def card(lab, name, verdict, on):
+        tag = (f'<span style="flex:none;display:inline-flex;align-items:center;padding:3px 7px 2px;border-radius:4px;font-size:13px;line-height:17px;font-weight:700;white-space:nowrap;'
+               + ('background:#FDE8E8;border:1px solid #F6CACA;color:#B91C1C;' if on else 'background:#F3F5F8;border:1px solid #E9ECF0;color:#9CA3AF;') + f'">{lab}</span>')
+        return (f'<div style="display:flex;align-items:center;gap:8px;margin:0 0 6px;padding:11px 12px;background:#FFF7EE;border:1px solid #FEE6CA;border-radius:10px;">{tag}'
+                f'<span style="flex:1 1 auto;min-width:0;font-size:16px;line-height:24px;font-weight:500;color:{"#111" if on else "#9CA3AF"};word-break:keep-all;">{name}</span>'
+                f'<span style="flex:none;font-size:16px;line-height:24px;font-weight:700;color:{"#d93025" if on else "#9CA3AF"};white-space:nowrap;">{verdict}</span></div>')
+    return (PTITLE.format("엔비디아 실적 뒤 반도체는?")
+            + card("전망A", "예상을 크게 넘으면", "실현됨", True) + card("전망B", "예상을 크게 넘지 못하면", "해당 없음", False)
+            + '<div class="cc-px cc-px-sub" style="margin-top:2px;">결과 11.17</div>')
 
 
 def article_top():
-    """시안 — Newfact 기사 댓글 화면 맨 위 = 그 기사의 자료 사진(시황 글 배너와 같은 자리) + 출처 줄."""
-    return ('<figure style="margin:0 0 4px;"><img src="../../news-posts/output/mock_img/industry_game.jpg" alt="자료 사진: e스포츠 대회장" '
+    """시안 — Newfact 기사 댓글 화면 맨 위 = 기사 제목 → 그 기사의 자료 사진(시황 글 배너와 같은 자리) + 출처 줄."""
+    return (PTITLE.format("게임 업계, 연말 신작 몰린다")
+            + '<figure style="margin:0 0 4px;"><img src="../../news-posts/output/mock_img/industry_game.jpg" alt="자료 사진: e스포츠 대회장" '
             'style="display:block;width:100%;height:200px;object-fit:cover;border-radius:8px;">'
             '<figcaption style="margin:6px 0 0;font-size:11px;line-height:16px;color:#9CA3AF;">자료 사진 · Chongkian · CC BY-SA 4.0</figcaption></figure>')
 
@@ -1220,11 +1232,11 @@ def main():
     build_cc("mock_comments_page.html", BASE, [ONE_CMT], 1, "mock_comments_page.html",
              page=("11.27 증시 시황", "mock_comments_card-one.html", "story"))
     build_cc("mock_comments_page-issue.html", BASE, [ONE_CMT_I], 1, "mock_comments_page-issue.html",
-             page=("젠슨 황 사임, 엔비디아는 수습되나?", "../../issue_store/output/mock_issue_nvidia_ceo_public.html", "issue"))
+             page=("Hot Issue", "../../issue_store/output/mock_issue_nvidia_ceo_public.html", "issue"))
     build_cc("mock_comments_page-forecast.html", BASE, [ONE_CMT_F], 1, "mock_comments_page-forecast.html",
-             page=("엔비디아 실적 뒤 반도체는?", "../../issue_store/output/mock_real_forecast-nvda-2026q3.html", "forecast"))
+             page=("증시 전망", "../../issue_store/output/mock_real_forecast-nvda-2026q3.html", "forecast"))
     build_cc("mock_comments_page-article.html", BASE, [ONE_CMT_A], 1, "mock_comments_page-article.html",
-             page=("게임 업계, 연말 신작 몰린다", "../../news-posts/output/mock_news_photo_2.html", "article"))
+             page=("Newfact 기사", "../../news-posts/output/mock_news_photo_2.html", "article"))
 
 
 if __name__ == "__main__":
