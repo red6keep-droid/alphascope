@@ -1,7 +1,7 @@
 {
  "id": "hypo-card",
  "label": "증시 전망",
- "generated": "2026-11-27T07:12:36Z",
+ "generated": "2026-11-27T21:44:18Z",
  "list_url": "https://www.newfact.app/p/forecast-list.html",
  "open": [
   {
@@ -16,7 +16,7 @@
    ],
    "event": "11.23 엔비디아 급등",
    "market": "us",
-   "lean": 0
+   "lean": -1
   },
   {
    "no": 1,
@@ -72,7 +72,7 @@
    ],
    "event": "11.13 한국전력 급락",
    "market": "kr",
-   "lean": 0
+   "lean": 1
   }
  ],
  "done_count": {
