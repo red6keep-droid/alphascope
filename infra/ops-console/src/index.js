@@ -482,8 +482,11 @@ async function fillMemos(dash, env) {
 
 async function memoPost(req, url, env, session) {
   // 같은 주소에서 온 양식만 — 쿠키는 SameSite=Lax 라 다른 사이트 POST 엔 안 실리지만 한 번 더 막는다
+  // 이 화면은 Referrer-Policy: no-referrer 라 브라우저가 Origin 을 `null` 로 보낸다 → Sec-Fetch-Site(항상 옴)로 본다
+  const site = req.headers.get("Sec-Fetch-Site");
   const origin = req.headers.get("Origin");
-  if (origin && origin !== url.origin) return deny("다른 곳에서 온 요청입니다.", 403);
+  const sameSite = site ? site === "same-origin" : !origin || origin === "null" || origin === url.origin;
+  if (!sameSite) return deny("다른 곳에서 온 요청입니다.", 403);
   if (!env.OPS_KV) return deny("저장소(KV)가 연결되지 않았습니다.", 500);
   const f = await req.formData();
   const text = String(f.get(url.pathname === "/memo" ? "text" : "note") || "").trim();
