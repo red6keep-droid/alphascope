@@ -1120,15 +1120,27 @@ def forecast_top():
             + '<div class="cc-px cc-px-sub" style="margin-top:2px;">결과 11.17</div>')
 
 
+ARTICLE_CSS = """<style>
+/* 기사 댓글 화면만(11-28) — 다른 댓글 화면은 그대로. 넓힐지는 사용자 확인 뒤 */
+.cc-article .cc-page-h{margin-top:9px;}                     /* `댓글 n` 위 18 → 9 */
+.cc-article .cc-page-h .cc-n{font-weight:400;}              /* 숫자는 굵게 빼기 */
+.cc-article .cv-guard{margin-top:7px !important;background:none !important;border:1px solid #E2E8F0 !important;}   /* 아래 14 → 7 · 회색 면 빼고 회색 외곽선만 */
+.cc-article .cv-list .cv-main .cv-title{margin-top:3px;}    /* 이름 줄 ~ 제목 4 → 3 */
+.cc-article .cv-list .cv-main .cv-text{margin-top:4px;line-height:25px;color:#606773;}   /* 제목 아래 6 → 4 · 행간 26 → 25 · 글자 #6B7280 → 10% 진하게 */
+</style>"""
+
+
 def article_top():
-    """Newfact 기사 댓글 화면 맨 위 = 원래 기사 제목(문장 그대로, 22 굵게 · 두 줄까지) → 그 기사의 자료 사진 + 출처 줄.
+    """Newfact 기사 댓글 화면 맨 위 = 원래 기사 제목(문장 그대로, 기사와 같은 26/38 굵게) → 그 기사의 자료 사진 + 출처 줄.
     사진 = 뉴스 글 목업 `사진 5`(최신 기사 · 확정 규칙)와 같은 값: 높이 200 · 모서리 10 · 회사 기사인데 회사 사진 없음 = 업종 사진 + 오른쪽 아래 흰 이름표(로고 24 + 이름 14 굵게, 높이 32)
     · 출처 줄 = `자료 사진 · 사진가 · 이용 조건` 11/16 연회색 오른쪽 정렬, 링크 밑줄 없음."""
     tag = ('<span style="position:absolute;right:12px;bottom:12px;display:flex;align-items:center;height:32px;padding:0 12px 0 4px;border-radius:16px;background:#fff;'
            'font-size:14px;line-height:20px;font-weight:700;color:#111;"><img src="https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/images/logos/KR_259960.svg?v=2" '
            'alt="" width="24" height="24" loading="lazy" style="display:inline-block;width:24px;height:24px;border-radius:50%;flex:none;margin-right:6px;background:#fff;'
            'object-fit:cover;outline:1px solid #E2E8F0;outline-offset:-1px;">크래프톤</span>')
-    return (PTITLE.format("크래프톤, 자체 개발 거대언어모델 정식 출시")
+    return (ARTICLE_CSS
+            + '<h2 style="margin:4px 0 12px;padding:0 0 0 6px;font-size:26px;line-height:38px;font-weight:700;color:#111;word-break:keep-all;">'   # 기사 제목 = 원래 기사(data-headline)와 같은 26/38(폰은 테마가 22로)
+              '<span style="display:block;font-size:26px;line-height:38px;">크래프톤, 자체 개발 거대언어모델 정식 출시</span></h2>'
             + '<figure style="margin:0 0 4px;"><div style="position:relative;"><img src="../../news-posts/output/mock_img/industry_game.jpg" alt="자료 사진: e스포츠 대회장" '
             f'style="display:block;width:100%;height:200px;object-fit:cover;border-radius:10px;">{tag}</div>'
             '<figcaption style="margin:6px 0 0;font-size:11px;line-height:16px;color:#9CA3AF;text-align:right;">자료 사진 · '
@@ -1163,7 +1175,7 @@ def comment_page(cmts, total, back, kind):
     mark = (f'<span data-title-back="{back}" data-title-back-label="돌아가기" hidden></span>'
             + ('<span data-kr-code="000660" hidden></span>' if kind == "stock" else ""))
     return (f'<div data-design="2" style="font-family:var(--report-font);">{mark}{TAIL}{top(kind)}'
-            f'<div class="comments is-open cc-page"><div class="cc-page-h">댓글 {total}</div>{guard()}<ol class="cv-list">{rows}</ol>{more}</div></div>')
+            f'<div class="comments is-open cc-page{" cc-article" if kind == "article" else ""}"><div class="cc-page-h">댓글 <span class="cc-n">{total}</span></div>{guard()}<ol class="cv-list">{rows}</ol>{more}</div></div>')
 
 
 def build_cc(name, base, cmts, total, page_link="", page=None):
