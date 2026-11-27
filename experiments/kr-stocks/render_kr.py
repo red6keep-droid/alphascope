@@ -528,6 +528,31 @@ def _release_txt(r):
     return f" · 다음 발표 {int(n['day'][5:7])}월 {int(n['day'][8:])}일" if n else ""
 
 
+SPLIT = [None]   # 1-3 시안 (목업만): None = 지금 · "A" = 답 `엇갈림` · "B" = 답 그대로 + 고점 문장
+
+
+def peak_split(r0, state, mode):
+    """1년 전 대비 판정과 최근 고점이 갈리나 — (고점 달, 고점 값, 지금 ÷ 고점, 줄어든 달 수) 또는 None.
+    갈림 = 판정이 `늘고 있음` 류인데 지금이 최근 12개월 고점의 70% 이하이고 3개월 넘게 연달아 줄어듦. 한 달 기준(months=1) · 금액 · 물량 지표만."""
+    xs = r0.get("series") or []
+    if r0["kind"] == "pct" or len(xs) < 12 or state != BIZ_WORDS[mode][0]:
+        return None
+    last12 = xs[-12:]
+    top = max(last12, key=lambda x: x["v"])
+    ratio = xs[-1]["v"] / top["v"] if top["v"] else 1
+    if ratio > 0.7:
+        return None
+    n = 0
+    for a, b in zip(xs[::-1], xs[-2::-1]):
+        if a["v"] < b["v"]:
+            n += 1
+        else:
+            break
+    if n < 3:   # 계절 지표(보험 생산지수 = 12월에 튐)가 고점 한 달 때문에 걸리지 않게 — 석 달 넘게 연달아 줄 때만
+        return None
+    return top["month"], top["v"], ratio, n
+
+
 def card_industry_work(s):
     """업종 실물 지표 카드 — 2026-10-31 부터 사업 묶음(U.BIZ)마다 질문 · 지표 · 답 낱말 · 비교 기간 (doc/검증/한국-업종지표-재선정.md).
     옛 제목 `이 업종에 일감이 늘고 있나?` 는 묶음이 없는 종목에만. 답 = 1년 전보다 5% 넘게(금리는 0.5%p) 늘면 늘고 있음 · 줄면 줄고 있음."""
@@ -554,6 +579,16 @@ def card_industry_work(s):
         head = (f"{_name_josa(r0['name'], '은')} {r0['month'][:4]}년 {int(r0['month'][5:])}월 "
                 + (f"{_dk.josa(v0, '로')} 작년 같은 달보다 {_sgn(chg, 1)}{unit}입니다." if chg is not None else f"{v0}입니다."))
         why = ""
+    sp = peak_split(r0, state, b["mode"]) if SPLIT[0] and months == 1 else None
+    if sp:
+        pm, pv, ratio, n = sp
+        pv_txt = _ind_value(dict(r0, v=pv))
+        tail = f"{n}개월째 줄었습니다"
+        if SPLIT[0] == "A":
+            state, theme, col = "엇갈림", "neutral", R.MUTED
+            head += f" 다만 최근 고점({int(pm[5:])}월 {pv_txt})의 {ratio * 100:.0f}% 수준으로 {tail}. 작년보다는 많고 고점보다는 적어 둘이 갈립니다."
+        else:
+            head += f" 다만 최근 고점({int(pm[5:])}월 {pv_txt})의 {ratio * 100:.0f}% 수준으로 {tail}."
     up_w, dn_w = BIZ_WORDS[b["mode"]]
     lim = "0.5%p" if r0["kind"] == "pct" else "5%"
     base = "작년 같은 3개월" if months > 1 and chg is not None else "작년 같은 달"

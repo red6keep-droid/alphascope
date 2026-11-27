@@ -97,6 +97,58 @@ def fetch_new(flows):
             bsi[ind] = {k: sorted(v, key=lambda r: r["month"]) for k, v in got.items()}
 
 
+def _card_input(s, e, flows):
+    rep = F.rep_of(s, e)
+    if s not in K.BY_SYM:
+        K.CANDIDATES.append((s, e["ko"], "q", e.get("sector") or "기타", list(K.groups(rep)) if rep else []))
+        K.BY_SYM[s] = K.CANDIDATES[-1]
+    c = F.code_of(s)
+    if not rep and F.CARD.get(c) in K.BIZ:
+        K.BIZ_OF[c] = F.CARD[c]
+    return {"sym": s, "code": c, "name": e["ko"], "sector": e.get("sector"), "industry": analyze_kr.industry_rows(s, flows),
+            "bsi": [], "fin": [], "related": [], "sector_flow": None}
+
+
+def split_variants(flows, ref):
+    """1-3 시안 — 증권 업계 카드: 1년 전 대비 `늘고 있음` 인데 최근 고점의 41%. 지금 · A(답 엇갈림) · B(답 그대로 + 고점 문장).
+    아래 표 = 같은 규칙(판정 `늘고 있음` 류 + 지금 ≤ 최근 12개월 고점 70%)에 걸리는 다른 묶음 — 1-6."""
+    x = _card_input("039490.KS", ref["039490.KS"], flows)
+    out = ('<div style="margin:0 0 8px;font-size:14px;line-height:21px;color:#6B7280;word-break:keep-all;">'
+           '1-3 시안 — 키움증권 업계상황 탭 `증권 업계 증시 거래는?`. 판정은 작년 같은 달 대비인데, 그래프는 6월 고점에서 넉 달째 내려옴. '
+           '갈림 = 판정이 늘어나는 쪽인데 지금 값이 최근 12개월 고점의 70% 이하이고 3개월 넘게 연달아 줄어듦(보험 생산지수처럼 12월에만 튀는 계절 지표는 안 걸리게).</div>')
+    rows = [(None, "지금", "작년 같은 달 대비 하나로 답합니다."),
+            ("A", "A안 (추천)", "갈리면 답을 `엇갈림`(회색)으로, 문장에 고점 대비와 줄어든 달 수를 씁니다."),
+            ("B", "B안", "답은 그대로 두고, 문장 끝에 고점 대비와 줄어든 달 수만 더합니다.")]
+    for k, (mode, tag, how) in enumerate(rows):
+        render_kr.SPLIT[0] = mode
+        out += (f'<div style="margin:{8 if k == 0 else 28}px 0 0;font-size:16px;line-height:24px;font-weight:700;color:#111;">{html.escape(tag)}</div>'
+                f'<div style="margin:0 0 6px;font-size:13px;line-height:19px;color:#6B7280;">{html.escape(how)}</div>' + R.small_rows(render_kr.card_industry_work(x)))
+    render_kr.SPLIT[0] = None
+    hits, checked = [], []
+    ind = flows.get("industry") or {}
+    for g, b in K.BIZ.items():   # 종목을 거치지 않고 묶음마다 첫 지표 계열을 직접 (카드 판정과 같은 첫 줄)
+        if b.get("months", 1) != 1 or not b.get("inds"):
+            continue
+        key = b["inds"][0]
+        if key not in K.INDICATORS or len(ind.get(key) or []) < 13:
+            continue
+        xs = ind[key]
+        r0 = {"series": xs[-24:], "month": xs[-1]["month"], "kind": K.INDICATORS[key][3], "name": K.INDICATORS[key][2]}
+        chg, _ = render_kr._window_change(r0, 1)
+        lim = 0.5 if r0["kind"] == "pct" else 5
+        up_w, dn_w = render_kr.BIZ_WORDS[b["mode"]]
+        st = "판단 유보" if chg is None else up_w if chg >= lim else dn_w if chg <= -lim else "비슷함"
+        checked.append(g)
+        sp = render_kr.peak_split(r0, st, b["mode"])
+        if sp:
+            hits.append(f'{g} — {r0["name"]} : 작년 같은 달보다 {chg:+.1f}% ({st}), 지금 = 최근 고점({int(sp[0][5:])}월)의 {sp[2] * 100:.0f}% · {sp[3]}개월째 줄어')
+    out += ('<div style="margin:28px 0 0;font-size:16px;line-height:24px;font-weight:700;color:#111;">같은 규칙에 걸리는 업계 카드 — 한 달 기준 묶음 전체, 지금 자료 (1-6)</div>'
+            + "".join(f'<div style="font-size:14px;line-height:21px;color:#374151;">· {html.escape(h)}</div>' for h in hits)
+            if hits else '<div style="margin:28px 0 0;font-size:14px;color:#6B7280;">같은 규칙에 걸리는 업계 카드 없음 (1-6)</div>')
+    out += f'<div style="font-size:13px;color:#6B7280;">살펴본 묶음 {len(checked)}개 / 한 달 기준 묶음 {sum(1 for b in K.BIZ.values() if b.get("months", 1) == 1)}개</div>'
+    return out + '<div style="margin:40px 0 0;padding-top:16px;border-top:2px solid #111;font-size:14px;color:#6B7280;">아래 = 지금 목업 전체</div>'
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--flows", default="")
@@ -106,6 +158,7 @@ def main():
     ref = json.load(open(os.path.join(EXP, "ref", "quick_ref.json"), encoding="utf-8"))["kr"]
     body = ['<div style="margin:0 0 16px;">' + dk.muted("한국 간단 종목 업계상황 탭 — 업종 고침 뒤 모습. 지표 값은 실제 ECOS · 관세청 값. "
                                                        "업계 자금 흐름 카드(업종 ETF)는 이 목업에서 뺐습니다 — 운영 화면에는 대표 종목이 있는 묶음(반도체 등)에 나옵니다.") + "</div>"]
+    body.append(split_variants(flows, ref))
     for s, note in SAMPLES:
         e = ref[s]
         rep = F.rep_of(s, e)
