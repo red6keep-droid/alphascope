@@ -4,6 +4,7 @@
     python experiments/ops-dashboard/memo.py list --all      # 해결한 것까지
     python experiments/ops-dashboard/memo.py note 3 --status 확인 중 --text "원인 찾는 중"
     python experiments/ops-dashboard/memo.py note 3 --status 해결 --text "원인 … · 고친 것 … · 커밋 abc1234"
+    python experiments/ops-dashboard/memo.py add --kind 리스크 --text "점검하다 찾은 것"
 
 wrangler 로그인(npx wrangler login)으로 읽고 쓴다 — 키를 파일 · 환경값에 두지 않는다. 메모는 지우지 않는다(상태 · 답만 덧붙임).
 """
@@ -62,6 +63,9 @@ def main():
     sub = ap.add_subparsers(dest="cmd", required=True)
     ls = sub.add_parser("list")
     ls.add_argument("--all", action="store_true")
+    ad = sub.add_parser("add")   # Claude 가 점검하다 찾은 문제 · 리스크를 메모로 남김
+    ad.add_argument("--kind", choices=("문제", "리스크"), default="리스크")
+    ad.add_argument("--text", required=True)
     nt = sub.add_parser("note")
     nt.add_argument("id", type=int)
     nt.add_argument("--status", choices=STATES)
@@ -80,6 +84,13 @@ def main():
                 print(f"   → {stamp(l['at'])} {'Claude' if l.get('by') == 'Claude' else '관리자'}"
                       + (f" · {l['status']}" if l.get("status") else "") + (f" — {l['note']}" if l.get("note") else ""))
         return
+    now = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.000Z")
+    if a.cmd == "add":
+        m["items"].append({"id": m["next"], "kind": a.kind, "text": a.text.strip(), "at": now, "by": "Claude", "status": "열림", "log": []})
+        m["next"] += 1
+        save(m)
+        print(f"#{m['next'] - 1} 남김")
+        return
     x = next((i for i in m["items"] if i["id"] == a.id), None)
     if not x:
         sys.exit(f"#{a.id} 메모 없음")
@@ -87,7 +98,7 @@ def main():
         sys.exit("--status 나 --text 중 하나는 넣어야 합니다")
     if a.status:
         x["status"] = a.status
-    x.setdefault("log", []).append({"at": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.000Z"),
+    x.setdefault("log", []).append({"at": now,
                                     "by": "Claude", "status": a.status or "", "note": a.text.strip()})
     save(m)
     print(f"#{a.id} → {x['status']} 저장")

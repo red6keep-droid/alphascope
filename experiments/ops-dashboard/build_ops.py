@@ -736,12 +736,12 @@ OPEN_STATES = ("열림", "확인 중", "보류")
 
 
 def week_fails(now):
-    """정기 실행마다 최근 7일 실패 — {파일: [실패 시각 …]}. 워크플로마다 GitHub API 1번."""
+    """정기 실행마다 최근 7일 끝난 실행 — {파일: [(시각, 결과) …] 시간순}. 워크플로마다 GitHub API 1번."""
     since = (now - dt.timedelta(days=7)).astimezone(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     out = {}
     for _, f, _, _ in WORKFLOWS:
-        j = gh(f"/actions/workflows/{f}/runs", {"created": f">={since}", "status": "failure", "per_page": 100})
-        out[f] = [parse_time(r["created_at"]) for r in j.get("workflow_runs") or []]
+        j = gh(f"/actions/workflows/{f}/runs", {"created": f">={since}", "status": "completed", "per_page": 100})
+        out[f] = sorted((parse_time(r["created_at"]), r.get("conclusion")) for r in j.get("workflow_runs") or [] if r.get("created_at"))
     return out
 
 
@@ -758,12 +758,21 @@ def risk_tab(now, I, fails, kv_writes):
     if fails is None:
         frows = [("최근 7일 실패", warn("읽지 못함"), "GitHub 실행 목록")]
     else:
+        calm = []
         for name, f, _, _ in WORKFLOWS:
-            ts = sorted(t for t in fails.get(f) or [] if t)
-            if len(ts) >= 2:
+            runs = fails.get(f) or []
+            ts = [t for t, c in runs if c == "failure"]
+            if len(ts) < 2:
+                continue
+            after = [c for t, c in runs if t > ts[-1]]
+            ok_after = len(after) if after and all(c in ("success", "skipped") for c in after) else 0
+            when = f"{f.replace('.yml', '')} · " + " · ".join(f"{md(t)} {hm(t)}" for t in ts)
+            if ok_after >= 2:   # 마지막 실패 뒤 2번 넘게 연이어 정상 — 원인이 풀린 것으로 보고 리스크에서 내림(줄은 남김)
+                calm.append((name, idle(f"{len(ts)}번 · 그 뒤 정상"), f"{when} · 그 뒤 {ok_after}번 정상"))
+            else:
                 rep.append(name)
-                frows.append((name, warn(f"{len(ts)}번"), f"{f.replace('.yml', '')} · " + " · ".join(f"{md(t)} {hm(t)}" for t in ts)))
-        frows = frows or [("되풀이 실패", ok("없음"), "최근 7일 같은 실행이 2번 넘게 실패한 곳 없음")]
+                frows.append((name, warn(f"{len(ts)}번"), when + (f" · 그 뒤 {len(after)}번" if after else " · 마지막 실행이 실패")))
+        frows = (frows or [("되풀이 실패", ok("없음"), "최근 7일 2번 넘게 실패하고 아직 풀리지 않은 실행 없음")]) + calm
     for n in rep:
         I.add(f"{n} 되풀이 실패", warn("리스크"), "리스크 탭 → 되풀이 실패", need=False)
     bits = ([f"한도 80% 넘음 {len(hot)}곳"] if hot else []) + ([f"되풀이 실패 {len(rep)}곳"] if rep else [])
@@ -774,7 +783,7 @@ def risk_tab(now, I, fails, kv_writes):
     return (dk.h2("리스크", tab="리스크") + head
             + dk.sub_label("한도 여유", "하루 한도 · 저장 한도 가운데 이미 쓴 비율. 80% 를 넘으면 주황.")
             + white_card(lrows or [("한도", warn("읽지 못함"), "")], fold_at=5, noun="한도")
-            + dk.sub_label("되풀이 실패", "최근 7일 같은 정기 실행이 2번 넘게 실패. 한 번은 우연, 되풀이는 원인이 남아 있다는 뜻.")
+            + dk.sub_label("되풀이 실패", "최근 7일 같은 정기 실행이 2번 넘게 실패. 한 번은 우연, 되풀이는 원인이 남아 있다는 뜻. 마지막 실패 뒤 2번 넘게 연이어 정상이면 회색 `그 뒤 정상`.")
             + white_card(frows, fold_at=5, noun="실행")
             + dk.sub_label("적어 둔 리스크", "메모 탭에서 종류를 `리스크` 로 쓴 것 가운데 해결되지 않은 것.")
             + "<!--RISK_MEMOS-->")
