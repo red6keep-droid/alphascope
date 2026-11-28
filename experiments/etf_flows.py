@@ -22,6 +22,7 @@ SSGA = {"SPY", "XLK", "XLF", "XLE", "XLV", "XLP", "XLY", "XLU", "XLI", "XLB", "X
 SSGA_URL = "https://www.ssga.com/us/en/intermediary/library-content/products/fund-data/etfs/us/navhist-us-en-{}.xlsx"
 SRC_NAME = "State Street"
 DAYS = (5, 20, 60)
+YEAR_N = 252
 GAP_S = 1.0
 _last_call = [0.0]
 
@@ -109,6 +110,11 @@ def summary(rows):
             base = rows[-n - 1][3]
             out[f"flow{n}"] = round(flow, 0)
             out[f"flow{n}_pct"] = round(flow / base * 100, 2) if base else None
+    v = [x for _, x in fl[-YEAR_N - 20:]]
+    if len(v) > 60:   # 비교 대상 — 지난 1년 20거래일 순유입의 아래 4분의 1 · 가운데 · 위 4분의 1 (ETF 페이지 `이 ETF에 돈이 들어오나?`)
+        s20 = sorted(sum(v[i:i + 20]) for i in range(len(v) - 20))
+        q = lambda p: s20[min(len(s20) - 1, int(p * (len(s20) - 1)))]  # noqa: E731
+        out["flow20_q"] = [round(q(0.25), 0), round(q(0.5), 0), round(q(0.75), 0)]
     return out
 
 
@@ -124,7 +130,7 @@ def fund(sym, cache_dir=None):
             cache = json.load(open(path, encoding="utf-8"))
         except ValueError:
             cache = {}
-    if cache.get("day") == today and sym in (cache.get("funds") or {}):
+    if cache.get("day") == today and "flow20_q" in ((cache.get("funds") or {}).get(sym) or {}):   # 비교 대상 칸이 없는 옛 요약은 다시
         return cache["funds"][sym]
     rows = history(sym)
     if not rows:

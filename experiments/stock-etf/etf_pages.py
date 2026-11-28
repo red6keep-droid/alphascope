@@ -382,6 +382,100 @@ US_BASE = {"SOXL": "SOXX", "TQQQ": "QQQ", "SQQQ": "QQQ"}   # 레버리지 · 인
 TOP_MIN = 3.0   # 비중 1위가 이보다 작으면(러셀 2000 · 프리미엄 인컴) 그 종목 하나가 ETF 를 말하지 않는다
 
 
+# ── 새 카드 셋 (2026-11-28 개선 방안 6-38 · 6-45 · 6-41) ──
+LEV_BASE = {"SOXL": ("SOXX", 3), "TQQQ": ("QQQ", 3), "SQQQ": ("QQQ", -3), "122630.KS": ("069500.KS", 2)}   # 레버리지 · 인버스 → (같은 지수 1배 ETF, 배수). 같은 지수 1배가 우리 목록에 없으면 카드 없음
+LEV_PERIODS = (("1주", 5), ("1달", 21), ("3달", 63), ("1년", 252))
+YEAR = 252
+
+
+def _ret(bars, n):
+    """마지막 종가 기준 n거래일 수익률(%). 일봉이 모자라면 None."""
+    return (bars[-1]["close"] / bars[-1 - n]["close"] - 1) * 100 if bars and len(bars) > n and bars[-1 - n]["close"] else None
+
+
+def _ret_between(bars, start, end):
+    """start · end 날짜(그날이 없으면 그 앞 마지막 거래일) 종가 사이 수익률(%) — 한국 ETF 와 미국 짝 · 환율을 같은 날짜 구간으로 잰다."""
+    a = [x for x in bars or [] if x["day"] <= start]
+    b = [x for x in bars or [] if x["day"] <= end]
+    return (b[-1]["close"] / a[-1]["close"] - 1) * 100 if a and b and a[-1]["close"] else None
+
+
+def _p(v):
+    return f"{'+' if v >= 0 else '−'}{abs(v):.1f}%"
+
+
+def cards_row(*cards):
+    cards = [c for c in cards if c]
+    return f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{"".join(cards)}</div>' if cards else ""
+
+
+def lev_card(sym, bars_all):
+    """`오래 들고 있으면 3배가 되나?` — 같은 지수 1배 ETF × 배수 vs 이 ETF 실제, 1주 · 1달 · 3달 · 1년. 비교 대상 = 1배 × 배수."""
+    if sym not in LEV_BASE:
+        return ""
+    base, k = LEV_BASE[sym]
+    b, b1 = bars_all.get(sym) or [], bars_all.get(base) or []
+    rows = [(nm, _ret(b, n), _ret(b1, n)) for nm, n in LEV_PERIODS]
+    rows = [x for x in rows if x[1] is not None and x[2] is not None]
+    if not rows or rows[-1][0] != "1년":
+        return ""
+    word = f"{abs(k)}배" if k > 0 else f"반대 {abs(k)}배"
+    one, me = rows[-1][2], rows[-1][1]
+    bn, nm = E.BY_SYM[base][1], E.BY_SYM[sym][1]
+    lines = [(f"최근 1년 같은 지수를 1배로 따라가는 {dk.josa(bn, '은')} {_p(one)}였습니다. {word}면 {_p(one * k)}일 것 같지만 {dk.josa(nm, '은')} {_p(me)}였습니다. "
+              f"날마다 {word}를 다시 맞추기 때문에, 오르내림이 클수록 오래 들고 있을 때 {word}와 멀어집니다.", "plain")]
+    ks = f"{'' if k > 0 else '−'}{abs(k)}"
+    lines += [("row", p, _p(v), f"1배 {_p(o)} × {ks} = {_p(o * k)}") for p, v, o in rows]
+    lines.append((f"오른쪽 = 이 ETF 실제 · 아래 회색 = 같은 기간 1배 ETF × {ks}", "note"))
+    return C.question_card(f"오래 들고 있으면 {word}가 되나?", "기간이 길수록 달라짐", "neutral", "#111", lines)
+
+
+def fx_card(sym, bars_all, us_bars):
+    """`미국 ○○와 수익률이 왜 다른가?` — 한국 상장 미국 지수 ETF(환율 막지 않은 것): 같은 지수 미국 ETF(달러) · 원/달러 · 원화로 바꾸면 · 이 ETF 실제, 1년.
+    비교 대상 = 같은 지수 미국 ETF 를 원화로 바꾼 값."""
+    name = E.BY_SYM[sym][1]
+    twin = next((t[0] for t in E.US if t[2] == E.BY_SYM[sym][2]), None)
+    if not sym.endswith(".KS") or "미국" not in name or "(H)" in name or not twin:
+        return ""
+    b = bars_all.get(sym) or []
+    if len(b) <= YEAR:
+        return ""
+    start, end = b[-1 - YEAR]["day"], b[-1]["day"]   # 이 ETF 의 1년 구간과 같은 날짜로
+    us, fx, me = _ret_between(us_bars.get(twin), start, end), _ret_between(us_bars.get("KRW=X"), start, end), _ret(b, YEAR)
+    if None in (us, fx, me):
+        return ""
+    won = ((1 + us / 100) * (1 + fx / 100) - 1) * 100
+    lines = [(f"최근 1년 같은 지수를 따라가는 미국 {twin}는 달러로 {_p(us)}였습니다. 같은 1년 원/달러 환율이 {_p(fx)} 움직여, 원화로 바꾸면 {_p(won)}입니다. "
+              f"{name}의 실제 1년 수익률은 {_p(me)}입니다.", "plain"),
+             ("row", f"{E.BY_SYM[twin][2].replace(' 지수', '')} (미국 {twin}, 달러)", _p(us), "최근 1년"),
+             ("row", "원/달러 환율", _p(fx), "원화 값이 오르면 −"),
+             ("row", "원화로 바꾸면", _p(won), "두 줄을 곱한 값"),
+             ("row", f"{name} (이 ETF)", _p(me), "실제, 분배금 제외"),
+             ("환율을 막아 둔 상품(이름 끝 `(H)`)은 이 차이가 거의 없습니다", "note")]
+    return C.question_card(f"미국 {twin}와 수익률이 왜 다른가?", f"환율 {_p(fx)}", "neutral", "#111", lines)
+
+
+def _usd(x):
+    return f"{'+' if x >= 0 else '−'}{abs(x) / 1e8:,.0f}억 달러"
+
+
+def flow_card(sym, fl):
+    """`이 ETF에 돈이 들어오나?` — 운용사 좌수 이력(etf_flows, SPDR 만)의 최근 5 · 20 · 60거래일 순유입. 비교 대상 = 같은 ETF 지난 1년 20거래일 순유입의 가운데 절반."""
+    if not fl or fl.get("flow20") is None or not fl.get("flow20_q"):
+        return ""
+    lo, _mid, hi = fl["flow20_q"]
+    now = fl["flow20"]
+    where = "평소보다 많이 들어옴" if now > hi else "평소보다 많이 빠짐" if now < lo else "평소 범위"
+    d = fl.get("as_of") or ""
+    lines = [(f"최근 20거래일 {sym}에 {_usd(now)}{'가 들어왔습니다' if now >= 0 else '가 빠졌습니다'}" + (f"(순자산의 {abs(fl['flow20_pct']):.1f}%)" if fl.get("flow20_pct") is not None else "")
+              + f". 지난 1년 20거래일 순유입의 가운데 절반은 {_usd(lo)} ~ {_usd(hi)}였습니다.", "plain")]
+    for n in (5, 20, 60):
+        if fl.get(f"flow{n}") is not None:
+            lines.append(("row", f"최근 {n}거래일", _usd(fl[f"flow{n}"]), f"지난 1년 가운데 절반 {_usd(lo)} ~ {_usd(hi)}" if n == 20 else ""))
+    lines.append((f"운용사가 날마다 내는 좌수 × 기준가로 계산" + (f" · {int(d[5:7])}월 {int(d[8:10])}일까지" if len(d) >= 10 else "") + " · ETF 한 개로 들어온 돈이지 시장 전체의 돈이 아닙니다", "note"))
+    return C.question_card("이 ETF에 돈이 들어오나?", where, "neutral", "#111", lines)
+
+
 def us_move_card(sym, snap, f, s):
     """미국 ETF `함께 움직이는 종목은?`.
     비교 = 레버리지 · 인버스면 같은 지수 1배 ETF, 아니면 담은 비중 1위 종목(TOP_MIN% 이상, 일봉이 있을 때). 없으면(채권 · 금 · 고르게 담은 ETF) 카드 없음."""
@@ -466,9 +560,16 @@ def us_pages(snap, live, fund):
             f = fund.get(sym) or {}
             s["industry_us"] = industry_us.build(sym, fred) if industry else None
             mv = us_move_card(sym, snap, f, s)
+            try:
+                import etf_flows
+                fl = etf_flows.fund(sym, data_dir("us")) if sym in etf_flows.SSGA else None
+            except Exception as e:  # noqa: BLE001
+                print(f"[etf] {sym} 순유입 없음: {str(e)[:80]}")
+                fl = None
+            extra = cards_row(flow_card(sym, fl), lev_card(sym, snap["bars"]))
             today = (R.day_path_chart(s["tech"].get("path"), s["tech"].get("bench_path"), name, "S&P 500")
                      + RP.price_card(s, s["day"]) + RP.sec_regime(s) + RP.sec_tech(s)
-                     + (f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{mv}</div>' if mv else "") + RP.sec_states(s))
+                     + (f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{mv}</div>' if mv else "") + extra + RP.sec_states(s))
             ind = RP.sec_industry_tab(s) if (s["sector_flow"] or s["industry_us"]) else ""
             hold = tab_holdings(f, name=name)
             cmp = compare_card(sym, snap["bars"], fund)   # 구성 탭 끝 (한국 ETF 와 같은 자리), 구성 탭이 없으면 기본 정보 끝
@@ -603,7 +704,7 @@ def move_card(sym, snap, stocks, K, s=None):
     return R._state_card("함께 움직이는 종목은?", state, theme, col, lines, "", fold=True, opened=True)
 
 
-def kr_pages(snap, flows, hist, live, us_fund, kfund=None):
+def kr_pages(snap, flows, hist, live, us_fund, kfund=None, us_bars=None):
     kfund = kfund or {}
     sys.path.insert(0, os.path.join(EXP, "kr-stocks"))
     import universe_kr as K
@@ -655,6 +756,7 @@ def kr_pages(snap, flows, hist, live, us_fund, kfund=None):
             cut = nxt is not None
             if cut:   # 오늘 탭 뒤(매수의견 · 실적 · 업계상황 · 기업 …)는 회사 자료라 뺀다 — 업계상황은 아래에서 ETF 것으로 다시 붙인다
                 body = body[:nxt.start()]
+            body += cards_row(fx_card(sym, snap["bars"], us_bars or {}), lev_card(sym, snap["bars"]))   # 오늘 탭 끝
             # 구성 · 보수 · 순자산 = 운용사 상품 페이지 (2026-11-13 P547 · P540, 운영지침 D4-15-2). 레버리지 · 인버스는 선물로 배수를 만들어 담은 종목 표가 움직임을 말하지 않아 구성 탭을 뺀다
             kf = dict(kfund.get(sym) or {})
             lev = "2배" in E.BY_SYM[sym][2]
@@ -697,6 +799,22 @@ def write(pages, mock=True):
     print(f"[etf] 페이지 {len(pages)}개 → {OUT}")
 
 
+def us_bars_for_kr():
+    """한국 상장 미국 지수 ETF 의 `미국 ○○와 수익률이 왜 다른가?` 재료 — 같은 지수 미국 ETF · 원/달러 일봉 1년 남짓(야후, 한 번에). 실패하면 {} (카드 없음)."""
+    syms = sorted({t[0] for k in E.KR if "미국" in k[1] for t in E.US if t[2] == k[2]}) + ["KRW=X"]
+    try:
+        import yfinance as yf
+        df = yf.download(syms, period="15mo", interval="1d", auto_adjust=False, progress=False, group_by="ticker", threads=False)
+        out = {}
+        for s_ in syms:
+            c = df[s_]["Close"].dropna()
+            out[s_] = [{"day": i.strftime("%Y-%m-%d"), "close": float(v)} for i, v in c.items()]
+        return out
+    except Exception as e:  # noqa: BLE001
+        print(f"[etf] 미국 짝 · 환율 일봉 없음: {str(e)[:80]}")
+        return {}
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--market", choices=("us", "kr"), required=True)
@@ -714,7 +832,7 @@ def main():
         twins = sorted({t[0] for k in E.KR if "미국" in k[1] for t in E.US if t[2] == k[2]})
         import kr_holdings as KH   # 운용사 상품 페이지 구성 · 보수 · 순자산, 주 1회 (2026-11-13 P547)
         kfund = KH.fetch_all(E.KR_SYMS, os.path.join(data_dir("kr"), "etf_kr_holdings.json"))
-        pages = kr_pages(snap, flows, hist, live, funds("kr", twins), kfund)
+        pages = kr_pages(snap, flows, hist, live, funds("kr", twins), kfund, us_bars_for_kr())
     write(pages)
     # 본문이 너무 적으면 자료가 덜 받아진 날 — 실패 코드(발행 단계는 continue-on-error 로 건너뜀)
     want = {"us": len(E.US) // 2, "kr": len(E.KR) // 2}[a.market]
