@@ -1257,9 +1257,13 @@ def top(kind):
         return forecast_top()
     if kind == "article":
         return article_top()
-    # 제목 줄(.pr-sticky) 바로 아래가 배너 그림 = 제목 줄 구분선을 뺀다(시황 글 story_render 와 같은 규칙, 11-28). 여백 14 는 둔다(배너가 둥근 카드 꼴)
-    return ('<style>body:has(.cc-banner) .pr-sticky{border-bottom:0;}</style>'
-            f'<img class="cc-banner" src="{STORY_BANNER}" alt="AI 생성 이미지" width="900" height="374">')
+    # 시황 글 맨 위 배너를 그대로(11-28 사용자: 댓글을 누르면 배너는 남고 그 아래로 댓글이 펼쳐지는 꼴 — Hot Issue · 증시 전망과 같은 방식).
+    # = story_render 와 같은 값: 제목 줄 구분선 · 아래 여백 14 없앰 + 흰 바탕을 좌우 14 만큼 화면 끝까지, 배너는 화면 폭 꽉(좌우 -14) · 모서리 0
+    side = 14
+    return ('<style>body:has(.cc-banner) .pr-sticky{border-bottom:0;margin-bottom:0;'
+            f'box-shadow:-{side}px 0 0 var(--surface,#fff),{side}px 0 0 var(--surface,#fff);}}</style>'
+            f'<figure data-bleed="1" style="margin:0 -{side}px;"><img class="cc-banner" src="{STORY_BANNER}" alt="AI 생성 이미지" width="900" height="374" '
+            'style="display:block;width:100%;height:auto;border-radius:0;"></figure>')
 
 
 ISSUE_BASE = os.path.join(HERE, "..", "issue_store", "output", "mock_issue_nvidia_ceo_public.html")   # Hot Issue 원래 페이지(목업)
