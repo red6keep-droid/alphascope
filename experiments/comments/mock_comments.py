@@ -963,7 +963,7 @@ CC_CSS = """<style>
 .cc-px-one .cc-px-big{font-size:28px;line-height:36px;font-weight:700;}   /* 종목 가격 = 크게 */
 .cc-px-one .cc-px-big small{margin-left:1px;font-family:var(--report-font);font-size:19px;font-weight:700;}
 .cc-days{display:flex;justify-content:space-between;padding:0 10px 6px;font-family:var(--num);font-size:13px;line-height:19px;color:#6B7280;font-variant-numeric:tabular-nums;}   /* 그래프 안 아래 날짜 = 가장 작은 글씨 */   /* 등락 = 종가보다 2 작게 */
-.cc-banner{display:block;width:100%;height:auto;margin:0;border-radius:8px;}   /* 아래 여백은 cc-after-card 20 하나로(11-29) */
+.cc-banner{display:block;width:100%;height:auto;margin:0;border-radius:8px;}   /* 아래 여백은 cc-after-card 20 하나로(11-28) */
 .cc-px-sub{font-size:13px;line-height:19px;color:#6B7280;}
 .cc-px-name{margin:2px 0 0;font-family:var(--report-font);font-size:19px;line-height:28px;font-weight:700;}
 .cc-px-now{margin:2px 0 0;font-size:30px;line-height:38px;font-weight:700;font-variant-numeric:tabular-nums;}
@@ -1184,12 +1184,12 @@ PAGE_CSS = """<style>
 .cc-page .cc-page-h .cc-n{font-weight:400;}              /* 숫자는 굵게 빼기 */
 .cc-page .cv-guard{margin:5px 0 9px !important;background:none !important;border:1px solid #E2E8F0 !important;}   /* 위 14 → 7 → 5 · 아래(첫 댓글까지) 14 → 9 · 회색 면 빼고 회색 외곽선만 */
 .cc-page .cv-list .cv-main .cv-title{margin-top:1px;}    /* 이름 줄 ~ 제목 4 → 3 → 1 */
-.cc-page .cv-list .cv-main .cv-text{margin-top:4px;line-height:24px;color:#454C55;}   /* 제목 아래 6 → 4 · 행간 26 → 25 → 24(16px 글자 = 짝수 행간, 11-29) · 글자 #6B7280 → #606773 → #565D68 → #4D545E → #454C55(10%씩 네 번 진하게) */
+.cc-page .cv-list .cv-main .cv-text{margin-top:4px;line-height:24px;color:#454C55;}   /* 제목 아래 6 → 4 · 행간 26 → 25 → 24(16px 글자 = 짝수 행간, 11-28) · 글자 #6B7280 → #606773 → #565D68 → #4D545E → #454C55(10%씩 네 번 진하게) */
 .cc-page [data-cmore]{margin:8px 0 0;}
 .cc-page [data-cmore].is-open .acc-chev{transform:rotate(180deg);}
 /* 종목 댓글 보기 맨 위(11-28) — 가격 28 → 26 */
 .cc-px-one .cc-px-big{font-size:26px;line-height:34px;}
-/* `댓글 n` 바로 위가 외곽선 있는 카드 · 그래프 · 배너 그림인 화면(종목 · 리포트 · Hot Issue · 증시 전망 · 시황) = 위 끝 ~ `댓글 n` 20 (11-28, 시황 11-29).
+/* `댓글 n` 바로 위가 외곽선 있는 카드 · 그래프 · 배너 그림인 화면(종목 · 리포트 · Hot Issue · 증시 전망 · 시황) = 위 끝 ~ `댓글 n` 20 (11-28, 시황 11-28).
    기사(사진)만 예외 = 공통값 4. 위 카드의 아래 여백은 0 으로 두고 이 20 하나로 잰다 */
 .cc-page.cc-after-card{margin-top:0;}
 .cc-page.cc-after-card .cc-page-h{margin-top:20px;}
@@ -1293,7 +1293,7 @@ def forecast_head():
     """증시 전망 댓글 화면 맨 위 = 증시 전망 보기 페이지와 같은 꼴(11-28 사용자) — 제목(아이콘) · 급락일 줄 · 전망A · 전망B 카드까지.
     카드는 펼치지 않는다: 오른쪽 펼치기 버튼과 펼쳐야 보이는 안쪽(단계 · 관련 주식 정보 · 뉴스 · 신호)을 빼고 머리 줄만. 그 아래(Timeline …)는 잘라 내고 댓글."""
     t = open(FORECAST_BASE, encoding="utf-8").read()
-    m = re.search(r'border-top:2px solid #111;[^"]*">' + re.escape(FORECAST_PAGE) + r'[^<]*, 바꾼 뒤</div>', t)   # 괄호 안 꼬리(· 기록 뚜렷 등)가 바뀌어도 찾게(11-29)
+    m = re.search(r'border-top:2px solid #111;[^"]*">' + re.escape(FORECAST_PAGE) + r'[^<]*, 바꾼 뒤</div>', t)   # 괄호 안 꼬리(· 기록 뚜렷 등)가 바뀌어도 찾게(11-28)
     a = t.index("</div>", m.end()) + 6   # 라벨 아래 설명 줄 건너뜀
     e = t.find('border-top:2px solid #111;', a)
     g = t[a:e if e > 0 else t.index('<div class="post-share-buttons', a)]   # 다음 편 라벨 또는 페이지 끝까지
@@ -1306,7 +1306,7 @@ def forecast_head():
     return head + "</div>"   # 맨 바깥 data-head-title 상자 닫기
 
 
-CARD_TOP = {"stock", "report", "issue", "forecast", "story"}   # 맨 위가 외곽선 카드 · 그래프 · 배너 그림인 댓글 보기(시황 11-29 추가)
+CARD_TOP = {"stock", "report", "issue", "forecast", "story"}   # 맨 위가 외곽선 카드 · 그래프 · 배너 그림인 댓글 보기(시황 11-28 추가)
 
 
 def comment_page(cmts, total, back, kind):
