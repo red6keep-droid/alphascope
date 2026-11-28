@@ -485,8 +485,8 @@ def stk_css():
 
 CSS = CSS.replace("</style>", stk_css() + "</style>", 1)
 TITLES = {   # 목업 목록에 보이는 이름
-    "mock_comments_member.html": "댓글 목록 (로그인 뒤)",
-    "mock_comments_guest.html": "댓글 목록 (로그인 전)",
+    "mock_comments_member.html": "댓글 보기 — 로그인 뒤 · 신고 · 가려진 글 · 내 글 · 날짜 꼬리표 (시황 글에서)",
+    "mock_comments_guest.html": "댓글 보기 — 로그인 전 · 연필 = 로그인 창 (시황 글에서)",
     "mock_comments_thread.html": "댓글 글 화면 · 답글 · 스티커 붙은 모습 (로그인 뒤)",
     "mock_comments_thread-guest.html": "댓글 글 화면 (로그인 전)",
     "mock_comments_first.html": "댓글 처음 쓸 때 · 프로필 만들기 · 운영 원칙",
@@ -664,7 +664,7 @@ def thread_page(member):
         rows += (f'<li class="cv-item">{head(who, rwhen, f"r{k}", member, date=False, mine=who == ME)}<p class="cv-text">{rich(rtext)}</p>{extras(rtext)}'
                  f'<div class="cv-rtime">{rwhen}</div><div class="cv-foot">{reacts(who + rtext, member)}</div>'
                  f'{menu_box(f"r{k}", who == ME) if member and who != "owner" else ""}</li>')
-    return (f'<div class="cv-full cv-page" data-win="thread">{top}<div class="cv-full-body"><div class="comments is-open">{post}'
+    return (f'<div class="cv-full cv-page" data-win="thread">{top}<div class="cv-full-body"><div class="comments is-open cc-page">{post}'
             f'<div class="cv-count">답글 {rcount(name + title)}</div>{box}{guard()}<ol class="cv-list cv-rlist">{rows}</ol>{note()}</div></div></div>')
 
 
@@ -830,22 +830,12 @@ def write_out(name, page):
 
 
 def build(name, member=True, first=False, thread=False, demo=""):
-    page = open(BASE, encoding="utf-8").read()
-    n, body = list_view(member, first and not thread)
-    sec = f'<section class="comments is-foldable is-open" id="comments-mock"><div class="comments-panel">{body}</div></section>'
-    fab = "" if thread else (f'<button class="cv-fab" type="button" aria-label="댓글 쓰기"{"" if member else " data-guest"}{" data-first" if first else ""}>{PENCIL}</button>')
-    nav = '<p class="post-nav">'
-    i = page.index(nav) + len(nav)   # 버튼 줄 왼쪽 끝 `댓글 n` — 댓글이 있으면 검정
-    page = (page[:i] + f'<button class="post-nav-cm{" has-cm" if n else ""}" type="button" data-cm-toggle aria-controls="comments-mock">{BUBBLE}'
-            f'<span class="cm-label">댓글 {n}</span></button>' + page[i:])
-    end = page.index("</p>", i) + 4
-    page = page[:end] + CSS + sec + page[end:]
-    js = JS.replace("__NICK_A__", json.dumps(NICK_A, ensure_ascii=False)).replace("__NICK_B__", json.dumps(NICK_B, ensure_ascii=False)).replace("__RLEFT__", str(REACT_LEFT)).replace("__STK_MAX__", str(STK_MAX))
-    if demo:
-        page = re.sub(r"<body", f'<body data-demo="{demo}"', page, count=1)
-    page = page.replace("</body>", fab + (thread_page(member) if thread else "") + windows(member, first) + (profile_page() if demo == "profile" else "") + js + "</body>", 1)
-    page = re.sub(r"<title>[^<]*</title>", f"<title>{TITLES[name]} — 목업</title>", page, count=1)   # 목업 목록에서 화면을 이름으로 찾게
-    write_out(name, page)
+    """로그인 전 · 뒤 · 처음 쓸 때 · 글쓰기 · 내 프로필 · 글 화면 = 확정된 시황 댓글 보기(배너 그대로 · 댓글 n · 안내 · 목록) 위에 그 상태로(11-28 사용자: 옛 글 아래 목록 틀 폐지).
+    목록 = DAYS 예시(신고 · 가려진 글 · 내 글 · 날짜 꼬리표 그대로)."""
+    cmts = [c for _, cs in DAYS for c in cs]
+    tags = [d.replace("에 달린 댓글", "") for d, cs in DAYS for _ in cs]   # 날짜를 넘어 이어지는 시황 댓글 = 글마다 꼬리표
+    build_cc(name, BASE, cmts, STORY_TOTAL, name, page=("11.27 증시 시황", "mock_comments_card-one.html", "story"),
+             member=member, first=first, thread=thread, demo=demo, tags=tags)
 
 
 # ── 글 아래 댓글 카드 · 댓글 화면 ─────────────────────────────────────────────
@@ -1326,10 +1316,11 @@ def forecast_head():
 CARD_TOP = {"stock", "report", "issue", "forecast", "story"}   # 맨 위가 외곽선 카드 · 그래프 · 배너 그림인 댓글 보기(시황 11-28 추가)
 
 
-def comment_page(cmts, total, back, kind):
+def comment_page(cmts, total, back, kind, member=True, tags=None):
     """댓글 화면 본문 — 봉차트(종목 = 그 종목, 시황 = 코스피) → `댓글 n` → 안내 → 목록 → 더 보기. 쓰기 = 오른쪽 아래 연필.
     제목 줄은 따로 그리지 않는다 — 글의 h3.post-title 을 테마가 고정 제목 줄(뒤로 · 로고 + 제목 · 공유)로 만든다(디자인 가이드 2절 1)."""
-    rows = "".join(item(c, True, f"t{k}", "mock_comments_thread.html") for k, c in enumerate(cmts))
+    link = "mock_comments_thread.html" if member else "mock_comments_thread-guest.html"
+    rows = "".join(item(c, member, f"t{k}", link, (tags or [""] * len(cmts))[k]) for k, c in enumerate(cmts))
     more = page_more(ARTICLE_MORE if kind == "article" else cmts, len(cmts), total) if total > len(cmts) else ""   # 더 보기 규칙(10개씩 · 화살표 흰 버튼)
     mark = (f'<span data-title-back="{back}" data-title-back-label="돌아가기" hidden></span>'
             + ('<span data-kr-code="000660" hidden></span>' if kind == "stock" else ""))
@@ -1341,7 +1332,7 @@ def comment_page(cmts, total, back, kind):
             f'{PAGE_CSS}<div class="comments is-open cc-page{" cc-after-card" if kind in CARD_TOP else ""}"><div class="cc-page-h">댓글 <span class="cc-n">{total}</span></div>{guard()}<ol class="cv-list">{rows}</ol>{more}</div></div>')
 
 
-def build_cc(name, base, cmts, total, page_link="", page=None):
+def build_cc(name, base, cmts, total, page_link="", page=None, member=True, first=False, thread=False, demo="", tags=None):
     """page=None → 글 끝에 카드 칸 · page=(제목, 돌아갈 곳, 종목?) → 그 글 틀에 본문만 댓글 화면으로 바꾼 새 페이지."""
     if not os.path.exists(base):   # 종목 페이지 틀(kr-stocks/output)이 없는 PC = 시황 글 틀로(제목 줄 로고만 빠진다)
         print(f"[댓글] {os.path.basename(base)} 없음 → 시황 글 틀로 그림")
@@ -1354,9 +1345,12 @@ def build_cc(name, base, cmts, total, page_link="", page=None):
         op = '<div class="post-body entry-content">'
         a = p.index(op) + len(op)
         e = p.index('</div><div class="post-share-buttons', a)
-        p = p[:a] + CSS + CC_CSS + comment_page(cmts, total, back, kind) + p[e:]
-        fab = f'<button class="cv-fab" type="button" aria-label="댓글 쓰기">{PENCIL}</button>'
-        p = p.replace("</body>", fab + windows(True, False) + js + "</body>", 1)
+        p = p[:a] + CSS + CC_CSS + comment_page(cmts, total, back, kind, member, tags) + p[e:]
+        fab = "" if thread else (f'<button class="cv-fab" type="button" aria-label="댓글 쓰기"{"" if member else " data-guest"}{" data-first" if first else ""}>{PENCIL}</button>')
+        if demo:
+            p = re.sub(r"<body", f'<body data-demo="{demo}"', p, count=1)
+        p = p.replace("</body>", fab + (thread_page(member) if thread else "") + windows(member, first)
+                      + (profile_page() if demo == "profile" else "") + js + "</body>", 1)
     else:
         nav = '<p class="post-nav">'
         i = p.index(nav) + len(nav)
