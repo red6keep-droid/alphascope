@@ -1359,7 +1359,7 @@ def _history_card(fc):
     L = fc.get("line", 3.0)
     what = _re.sub(r"하루\s*[\d.]+\s*%p?\s*넘게", "하루에 크게", h["what"])   # '하루 3% 넘게' → '하루에 크게'
     if h.get("vs_base"):   # 평소와 나란히 (2026-11-07 검증: 평소 비교 없는 '10번 중 6번 올랐다' 는 아무 달과 같은 숫자였다)
-        lead = f'{wordify(what, L)} {h["since"]}년부터 {h["n"]}번 있었습니다. 그 뒤를 평소(아무 날이나 고른 때)와 나란히 놓았습니다.'
+        lead = f'{wordify(what, L)} {h["since"]}년부터 {h["n"]}번 있었습니다. 그 뒤를 {h["since"]}년부터의 전체 거래일과 나란히 놓았습니다.'
     else:
         lead = f'{wordify(what, L)} {h["since"]}년부터 여러 번 있었습니다. 그 뒤 오른 일이 얼마나 흔했는지입니다.'
     rows = []
@@ -1368,7 +1368,7 @@ def _history_card(fc):
             nm, m, n, bp = r
             ten = lambda pct: f"10번 중 {round(pct / 10)}번" if pct >= 5 else "10번 중 1번 미만"
             same = _binom_p(m, n, bp / 100) >= 0.1   # 우연으로 볼 만한 차이면 숫자를 나란히 두지 않고 `평소와 비슷` — 10번 기준 반올림이 1 vs 2 처럼 차이를 부풀린다 (2026-11-07)
-            rows.append((nm, "평소와 비슷" if same else ten(m / n * 100), f"{ten(m / n * 100)} · 평소 {ten(bp)}" if same else f"평소 {ten(bp)}"))
+            rows.append((nm, "평소와 비슷" if same else ten(m / n * 100), f"{ten(m / n * 100)} · 전체 거래일 {ten(bp)}" if same else f"전체 거래일 {ten(bp)}"))
             continue
         if len(r) == 2:
             rows.append((wordify(r[0], L), wordify(r[1], L), ""))

@@ -605,7 +605,7 @@ def overheat_events(oh):
             span = f"약 {max(10, round(yrs / 10) * 10)}년"
         except (KeyError, TypeError, ValueError):
             span = "과거"
-        tail = f" · {span} 진입 {st['n']}회, 20일 뒤 상승 {st['up20']}% (아무 날 {base.get('up20')}%)" if st and base else ""
+        tail = f" · {span} 진입 {st['n']}회, 20일 뒤 상승 {st['up20']}% (같은 {span} 엔비디아 전체 거래일 {base.get('up20')}%)" if st and base else ""
         out.append(_ev("Flows", "price", f"과열 지표 진입 : {config.OVERHEAT_KEYS[k]}",
                        f"{config.OVERHEAT_KEYS[k]} (현재 {v:.1f}{'%' if k != 'rsi80' else ''}){tail}", direction="uncertain", source="yfinance"))
     return out

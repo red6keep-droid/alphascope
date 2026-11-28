@@ -2,8 +2,8 @@
 
 자료: 이 저장소의 30년 저장소 data/store/bars/<종목>.parquet 가 있으면 그것(수정주가), 없으면 yfinance 전체 기간. 두 곳 모두 yfinance auto_adjust 라 같다.
 
-볼린저(20, 2σ) 하단 이하·상단 이상 '진입일'(연속 구간 첫날)의 20·60거래일 뒤 수익률과, 비교용 '아무 날' 값.
-과거 빈도이지 예측이 아니다 — 리포트는 n·아무 날 비율과 함께만 보여 준다.
+볼린저(20, 2σ) 하단 이하·상단 이상 '진입일'(연속 구간 첫날)의 20·60거래일 뒤 수익률과, 비교용 전체 거래일 값.
+과거 빈도이지 예측이 아니다 — 리포트는 n · 전체 거래일 비율과 함께만 보여 준다.
 """
 
 import datetime
@@ -117,7 +117,7 @@ def main():
              "ret20_25": stat(ret20 >= config.OVERHEAT_RET20_PCT / 100), "rsi30": stat(rsi <= 30),
              "drawdown": drawdown_stats(),
              "generated_at": datetime.date.today().isoformat(),
-             "note": "각 조건 '진입일'(연속 구간 첫날)의 20·60거래일 뒤 수익률. base = 아무 날. 과거 빈도이지 예측이 아니다."}
+             "note": "각 조건 '진입일'(연속 구간 첫날)의 20·60거래일 뒤 수익률. base = 같은 기간 전체 거래일(화면 표기도 `전체 거래일`). 과거 빈도이지 예측이 아니다."}
     with open(config.HISTORY_STATS_PATH, "w", encoding="utf-8") as f:
         json.dump(stats, f, ensure_ascii=False, indent=1)
     print(json.dumps(stats, ensure_ascii=False))

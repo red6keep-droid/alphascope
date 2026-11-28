@@ -79,7 +79,7 @@ def korea(normal, stats):
         rec = (p.get("buckets") or {}).get(b) if b in ("up", "down", "normal") else None
         out.append({"kr": p["kr"], "kr_name": p["kr_name"], "us": p["us"], "us_name": p["us_name"],
                     "us_ret": n["ret_pct"], "us_z": n["z"], "bucket": b, "beta": p["beta_gap"], "corr": p["corr_gap"],
-                    "r2": p["r2_gap"], "intra_any": p["intra_any"], "first": p["first"], "record": rec,
+                    "r2": p["r2_gap"], "intra_any": p["intra_any"], "n_all": p["n"], "first": p["first"], "record": rec,
                     "buckets": {k: {"gap": v["gap"], "intra": v["intra"], "n": v["n"]} for k, v in (p.get("buckets") or {}).items()}})
     return out
 

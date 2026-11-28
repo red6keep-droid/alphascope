@@ -119,7 +119,7 @@ def shock_card(a):
 
 # ── 한국장 탭 ───────────────────────────────────────────────────────────
 
-DIFF_MIN = 0.10   # 시기별 장중이 아무 날과 이만큼(%p) 넘게 달라야 "그 시기에 있었다"로 본다
+DIFF_MIN = 0.10   # 시기별 장중이 그 시기 전체 거래일 평균과 이만큼(%p) 넘게 달라야 "그 시기에 있었다"로 본다
 
 
 def _decade_check(rec):
@@ -144,9 +144,9 @@ def _bucket_text(p, who):
     if b in ("up", "down") and rec and rec["n"] >= MIN_BUCKET and _decade_check(rec) is not None:
         word = "오른" if b == "up" else "내린"
         return (f"미국 쪽이 평소의 2배 넘게 {word} 밤 다음 날, {eun(who)} 평균 {_s(rec['gap'])}로 시작했고 시작 뒤 장중에는 평균 {_s(rec['intra'])}였습니다 "
-                f"(아무 날 {_s(p['intra_any'])}, {rec['n']}번). 시작 뒤 반대로 간 날이 {rec['against']}%였습니다.", _decade_check(rec))
+                f"(이런 밤 {rec['n']}번 · {p['first'][:4]}년부터 전체 거래일 {p.get('n_all', 0):,}일 평균 {_s(p['intra_any'])}). 시작 뒤 반대로 간 날이 {rec['against']}%였습니다.", _decade_check(rec))
     if b == "normal" and rec:
-        return (f"오늘처럼 평범한 밤 다음 날 {eun(who)} 평균 {_s(rec['gap'])}로 시작했고, 시작 뒤 장중 흐름은 아무 날과 같았습니다.", "")
+        return (f"오늘처럼 평범한 밤 다음 날 {eun(who)} 평균 {_s(rec['gap'])}로 시작했고, 시작 뒤 장중 흐름은 전체 거래일 평균과 같았습니다.", "")
     if b in ("up", "down"):   # 기록이 시기마다 엇갈림 — 크기만 말한다
         return (f"오늘 미국 쪽 움직임은 평소의 {_times(p['us_z'])}였습니다. 이런 밤 다음 날 장중 흐름은 시기마다 엇갈려 경향으로 보지 않습니다.", "")
     if b == "mid":
