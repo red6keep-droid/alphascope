@@ -2103,7 +2103,7 @@ html.as-lock, html.as-lock body { overflow: hidden; }
 .comments .cv-reply.has{color:#333;}
 .comments .cv-reply svg{width:18px;height:18px;}
 .comments .cv-reply span,.comments .cv-react span{font-weight:400;}
-.comments .cv-pop{margin:6px 0 0 31px;padding:12px;border:0;border-radius:8px;background:#F3F4F6;}   /* 연한 회색 바탕 · 외곽선 없음(기준 상자와 같은 회색) */
+.comments .cv-pop{margin:6px 0 0;padding:12px;border:0;border-radius:8px;background:#F3F4F6;}   /* 연한 회색 바탕 · 외곽선 없음(기준 상자와 같은 회색) · 왼쪽 31(아바타 자리 비움) → 0 = 본문 폭 꽉(11-28 사용자) */
 /* 신고 상자 = 왼쪽 칸(제목 → 그 아래 신고하기) · 오른쪽 칸(이유 칩). 칩은 제목 칸을 넘지 않고 오른쪽 칸 안에서 줄바꿈 */
 .comments .cv-pop:has(.cv-chips){display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-rows:auto 1fr;column-gap:12px;row-gap:10px;align-items:start;}
 .comments .cv-pop:has(.cv-chips) .cv-pop-h{grid-column:1;grid-row:1;display:flex;align-items:center;gap:4px;white-space:nowrap;padding:6px 0 0;}   /* 왼쪽 여백 = 상자 안쪽 12 하나(오른쪽과 같게, 11-28) */

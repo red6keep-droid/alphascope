@@ -125,7 +125,7 @@ CSS = """<style>
 .comments .cv-reply.has{color:#333;}
 .comments .cv-reply svg{width:18px;height:18px;}
 .comments .cv-reply span,.comments .cv-react span{font-weight:400;}
-.comments .cv-pop{margin:6px 0 0 31px;padding:12px;border:0;border-radius:8px;background:#F3F4F6;}   /* 연한 회색 바탕 · 외곽선 없음(기준 상자와 같은 회색) */
+.comments .cv-pop{margin:6px 0 0;padding:12px;border:0;border-radius:8px;background:#F3F4F6;}   /* 연한 회색 바탕 · 외곽선 없음(기준 상자와 같은 회색) · 왼쪽 31(아바타 자리 비움) → 0 = 본문 폭 꽉(11-28 사용자) */
 /* 신고 상자 = 왼쪽 칸(제목 → 그 아래 신고하기) · 오른쪽 칸(이유 칩). 칩은 제목 칸을 넘지 않고 오른쪽 칸 안에서 줄바꿈 */
 .comments .cv-pop:has(.cv-chips){display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-rows:auto 1fr;column-gap:12px;row-gap:10px;align-items:start;}
 .comments .cv-pop:has(.cv-chips) .cv-pop-h{grid-column:1;grid-row:1;display:flex;align-items:center;gap:4px;white-space:nowrap;padding:6px 0 0;}   /* 왼쪽 여백 = 상자 안쪽 12 하나(오른쪽과 같게, 11-28) */
@@ -906,6 +906,35 @@ FORECAST_CMTS = [ONE_CMT_F,
     ("데이터센터", "11.27 09:52", "급락일 숫자가 바로 보여서 좋습니다", "평소의 몇 배였는지 같이 적혀 있어서 비교가 쉬웠습니다.", "", []),
     ("반도체곰", "11.27 09:40", "다음 전망도 기다리겠습니다", "크게 빠질 때마다 이렇게 정리되면 좋겠네요[:mid_clap:]", "", []),
 ]
+TODAY_MORE = [   # 시황 글마다 따로(11-28 사용자 1번) 시안 — 오늘 댓글이 많은 날(20개)용 예시
+    ("주린이탈출", "11.27 13:58", "코스피 2% 넘게 오른 날이네요", "오랜만에 크게 올라서 시황부터 찾아봤습니다.", "", []),
+    ("장투러", "11.27 13:41", "외국인 순매수 숫자가 크네요", "며칠째 이어지는지 다음 시황에서도 보고 싶습니다.", "", []),
+    ("오늘도출근", "11.27 13:20", "점심시간에 읽기 좋았습니다", "짧게 핵심만 있어서 금방 읽었습니다[:mid_thanks:]", "", []),
+    ("차트보는곰", "11.27 12:55", "거래대금도 같이 늘었네요", "오른 날 거래대금이 같이 늘었는지 늘 궁금했는데 적혀 있어서 좋습니다.", "", []),
+    ("새벽시장", "11.27 12:31", "미국 장 영향은 어땠나요", "밤사이 미국 장이 내렸는데도 오른 게 신기합니다.", "", []),
+    ("천천히", "11.27 12:10", "환율 설명이 쉬웠습니다", "원화가 강해지면 왜 외국인이 사는지 이제 알겠네요.", "", []),
+    ("숫자확인", "11.27 11:48", "업종별 숫자 고맙습니다", "어느 업종이 끌어올렸는지 한눈에 보입니다[:mid_clap:]", "", []),
+    ("퇴근길", "11.27 11:22", "내일도 이어질까요", "오늘 같은 날 다음 날은 어땠는지 지난 기록도 궁금합니다.", "", []),
+]
+YDAY_CMTS = [   # 어제(11.26) 시황 글 댓글 예시
+    ("관찰중", "11.26 17:40", "오늘은 조용한 하루였네요", "지수가 거의 안 움직여서 시황도 짧았네요.", "", []),
+    ("장기보유", "11.26 17:12", "환율이 다시 올랐네요", "환율이 오르는 날 외국인이 판다는 설명이 이해됐습니다.", "", []),
+    ("반도체곰", "11.26 16:55", "반도체만 내린 날", "다른 업종은 괜찮은데 반도체만 빠진 이유가 정리돼 있네요.", "", []),
+    ("새내기", "11.26 16:30", "용어 풀이 고맙습니다", "공매도라는 말을 처음 제대로 알았습니다[:mid_thanks:]", "", []),
+    ("데이터센터", "11.26 16:02", "내일 일정 확인했습니다", "내일 밤 미국 발표 시각을 따로 찾지 않아도 되네요.", "", []),
+    ("조심조심", "11.26 15:48", "거래가 적은 날이었네요", "거래대금이 평소보다 적었다는 줄을 보고 알았습니다.", "", []),
+    ("게임좋아", "11.26 15:31", "마감 뒤 바로 올라왔네요", "장 끝나고 바로 읽을 수 있어서 좋습니다.", "", []),
+    ("주린이탈출", "11.26 15:10", "개인만 샀네요", "외국인 · 기관이 팔고 개인만 산 날이라고 적혀 있네요[:mid_think:]", "", []),
+    ("장투러", "11.26 14:52", "이런 날도 있죠", "크게 안 움직이는 날도 기록해 두니 나중에 비교하기 좋겠습니다.", "", []),
+    ("천천히", "11.26 14:30", "그래프 보기 편합니다", "하루 흐름이 그래프로 보여서 이해가 쉬웠습니다.", "", []),
+    ("숫자확인", "11.26 14:05", "업종 순위 고맙습니다", "어느 업종이 버텼는지 보기 좋네요.", "", []),
+    ("퇴근길", "11.26 13:40", "내일 다시 볼게요", "내일 시황도 기다리겠습니다.", "", []),
+]
+DAY2_CMTS = [   # 그제(11.25) 시황 글 댓글 예시
+    ("차트보는곰", "11.25 17:20", "급하게 내린 날이네요", "장 막판에 많이 빠진 이유가 궁금했는데 정리돼 있네요.", "", []),
+    ("새벽시장", "11.25 16:48", "미국 금리 얘기가 나왔네요", "금리 발표가 우리 장에도 바로 영향을 주는군요.", "", []),
+    ("오늘도출근", "11.25 16:15", "출근길에 다시 읽었습니다", "어제 장을 다시 정리하기 좋았습니다.", "", []),
+]
 REPORT_TOTAL, STORY_TOTAL, ISSUE_TOTAL, FORECAST_TOTAL = 148, 263, 512, 137   # 목업 댓글 수 = 세 자리
 TITLES.update({
     "mock_comments_page-report.html": "댓글 화면 — KOSPI 한 줄 · 홈 카드 하루 그래프 · 댓글 목록 · 쓰기 (한국 증시 리포트에서)",
@@ -917,6 +946,8 @@ TITLES.update({
     "mock_comments_page-issue.html": "댓글 화면 — Hot Issue 제목 · 게이지 카드 그대로 · 아래 댓글 (핫이슈에서)",
     "mock_comments_page-forecast.html": "댓글 화면 시안 — 전망 제목 · 전망A · B 카드 (증시 전망에서)",
     "mock_comments_page-article.html": "댓글 화면 시안 — 기사 제목 · 자료 사진 (Newfact 기사에서)",
+    "mock_comments_page-days-few.html": "시황 댓글 시안 — 글마다 따로 · 오늘 5개 → 11.26 증시 시황 댓글 보기 → 그 전날",
+    "mock_comments_page-days-many.html": "시황 댓글 시안 — 글마다 따로 · 오늘 20개 = 10개씩 더 보기 → 끝나면 11.26 증시 시황 댓글 보기",
 })
 CC_CSS = """<style>
 /* 글 아래 댓글 카드 — 흰 상자 · 모서리 12 · 옅은 그림자. 2개 이상이면 좌우로 밀기(옆 카드 끝이 살짝 보임) */
@@ -1223,6 +1254,27 @@ def page_more(pool, shown, total):
             "shown+=n;label();});})();</script>")
 
 
+def days_more(groups, shown0):
+    """시황 = 글마다 따로(11-28 사용자 1번) + 지난날 이어 보기 시안. groups = [(날짜 이름 | None(오늘), 댓글들)].
+    처음 = 오늘 댓글 5개 → `댓글 n개 더 보기`(10개씩) → 오늘이 끝나면 버튼이 `11.26 증시 시황 댓글 보기` 로 바뀌고,
+    누르면 날짜 줄 + 그날 댓글 10개 → 그날도 10개씩 → 또 끝나면 그 전날. 맨 끝 = `접기`."""
+    tpls = "".join(f'<template id="dm-{i}">' + "".join(item(c, True, f"d{i}m{k}", "mock_comments_thread.html") for k, c in enumerate(cs)) + '</template>'
+                   for i, (_, cs) in enumerate(groups))
+    meta = json.dumps([{"label": l, "n": len(cs)} for l, cs in groups], ensure_ascii=False)
+    return (tpls + f'<button type="button" data-dmore style="{dk.FOLD_BTN}width:100%;margin:8px 0 0;"><span></span> {dk.ACC_CHEV}</button>'
+            "<script>(function(){var b=document.querySelector('[data-dmore]');if(!b)return;var list=document.querySelector('.cc-page .cv-list'),"
+            f"G={meta},gi=0,shown={shown0},step=10;"
+            "function rem(){return G[gi].n-shown;}"
+            "function label(){var t;if(rem()>0)t='댓글 '+Math.min(step,rem())+'개 더 보기';else if(gi+1<G.length)t=G[gi+1].label+' 댓글 보기';else t='접기';"
+            "b.querySelector('span').textContent=t;b.classList.toggle('is-open',t==='접기');}"
+            "function add(n){var src=document.getElementById('dm-'+gi).content.querySelectorAll('li.cv-item');for(var i=0;i<n;i++){var li=src[shown+i].cloneNode(true);li.classList.add('dm-add');list.appendChild(li);}shown+=n;}"
+            "b.addEventListener('click',function(){if(rem()>0){add(Math.min(step,rem()));}"
+            "else if(gi+1<G.length){gi++;shown=0;var d=document.createElement('li');d.className='cv-day dm-add';d.textContent=G[gi].label+'에 달린 댓글';list.appendChild(d);add(Math.min(step,rem()));}"
+            "else{list.querySelectorAll('.dm-add').forEach(function(x){x.remove();});gi=0;shown="
+            f"{shown0}"
+            ";b.scrollIntoView({block:'center'});}label();});label();})();</script>")
+
+
 def article_top():
     """Newfact 기사 댓글 화면 맨 위 = 원래 기사 제목(문장 그대로, 기사와 같은 26/38 굵게) → 그 기사의 자료 사진 + 출처 줄.
     사진 = 뉴스 글 목업 `사진 5`(최신 기사 · 확정 규칙)와 같은 값: 높이 200 · 모서리 10 · 회사 기사인데 회사 사진 없음 = 업종 사진 + 오른쪽 아래 흰 이름표(로고 24 + 이름 14 굵게, 높이 32)
@@ -1314,12 +1366,14 @@ def forecast_head():
 CARD_TOP = {"stock", "report", "issue", "forecast", "story"}   # 맨 위가 외곽선 카드 · 그래프 · 배너 그림인 댓글 보기(시황 11-28 추가)
 
 
-def comment_page(cmts, total, back, kind, member=True, tags=None):
+def comment_page(cmts, total, back, kind, member=True, tags=None, more_html=None):
     """댓글 화면 본문 — 봉차트(종목 = 그 종목, 시황 = 코스피) → `댓글 n` → 안내 → 목록 → 더 보기. 쓰기 = 오른쪽 아래 연필.
     제목 줄은 따로 그리지 않는다 — 글의 h3.post-title 을 테마가 고정 제목 줄(뒤로 · 로고 + 제목 · 공유)로 만든다(디자인 가이드 2절 1)."""
     link = "mock_comments_thread.html" if member else "mock_comments_thread-guest.html"
     rows = "".join(item(c, member, f"t{k}", link, (tags or [""] * len(cmts))[k]) for k, c in enumerate(cmts))
     more = page_more(ARTICLE_MORE if kind == "article" else cmts, len(cmts), total) if total > len(cmts) else ""   # 더 보기 규칙(10개씩 · 화살표 흰 버튼)
+    if more_html is not None:
+        more = more_html
     mark = (f'<span data-title-back="{back}" data-title-back-label="돌아가기" hidden></span>'
             + ('<span data-kr-code="000660" hidden></span>' if kind == "stock" else ""))
     heads = {"issue": (ISSUE_BASE, issue_head), "forecast": (FORECAST_BASE, forecast_head)}   # 원래 페이지 머리 그대로(틀은 git 에 없음 — 없는 PC 는 아래 예전 시안으로)
@@ -1330,7 +1384,7 @@ def comment_page(cmts, total, back, kind, member=True, tags=None):
             f'{PAGE_CSS}<div class="comments is-open cc-page{" cc-after-card" if kind in CARD_TOP else ""}"><div class="cc-page-h">댓글 <span class="cc-n">{total}</span></div>{guard()}<ol class="cv-list">{rows}</ol>{more}</div></div>')
 
 
-def build_cc(name, base, cmts, total, page_link="", page=None, member=True, first=False, thread=False, demo="", tags=None):
+def build_cc(name, base, cmts, total, page_link="", page=None, member=True, first=False, thread=False, demo="", tags=None, more_html=None):
     """page=None → 글 끝에 카드 칸 · page=(제목, 돌아갈 곳, 종목?) → 그 글 틀에 본문만 댓글 화면으로 바꾼 새 페이지."""
     if not os.path.exists(base):   # 종목 페이지 틀(kr-stocks/output)이 없는 PC = 시황 글 틀로(제목 줄 로고만 빠진다)
         print(f"[댓글] {os.path.basename(base)} 없음 → 시황 글 틀로 그림")
@@ -1343,7 +1397,7 @@ def build_cc(name, base, cmts, total, page_link="", page=None, member=True, firs
         op = '<div class="post-body entry-content">'
         a = p.index(op) + len(op)
         e = p.index('</div><div class="post-share-buttons', a)
-        p = p[:a] + CSS + CC_CSS + comment_page(cmts, total, back, kind, member, tags) + p[e:]
+        p = p[:a] + CSS + CC_CSS + comment_page(cmts, total, back, kind, member, tags, more_html) + p[e:]
         fab = "" if thread else (f'<button class="cv-fab" type="button" aria-label="댓글 쓰기"{"" if member else " data-guest"}{" data-first" if first else ""}>{PENCIL}</button>')
         if demo:
             p = re.sub(r"<body", f'<body data-demo="{demo}"', p, count=1)
@@ -1415,6 +1469,13 @@ def main():
              page=("SK하이닉스", "mock_comments_cards.html", "stock"))
     build_cc("mock_comments_page-report.html", BASE, REPORT_CMTS, REPORT_TOTAL, "mock_comments_page-report.html",
              page=("11.27 한국 증시 리포트", "../../kr-market-report/output/kr_report_mock.html", "report"))
+    few = [(None, STORY_CMTS), ("11.26 증시 시황", YDAY_CMTS), ("11.25 증시 시황", DAY2_CMTS)]   # 오늘 5개뿐인 날
+    build_cc("mock_comments_page-days-few.html", BASE, STORY_CMTS, len(STORY_CMTS), "mock_comments_page-days-few.html",
+             page=("11.27 증시 시황", "mock_comments_card-one.html", "story"), more_html=days_more(few, len(STORY_CMTS)))
+    today20 = STORY_CMTS + [TODAY_MORE[k % len(TODAY_MORE)] for k in range(15)]   # 오늘 20개인 날(예시는 8개를 돌려 씀)
+    many = [(None, today20), ("11.26 증시 시황", YDAY_CMTS), ("11.25 증시 시황", DAY2_CMTS)]
+    build_cc("mock_comments_page-days-many.html", BASE, today20[:5], 20, "mock_comments_page-days-many.html",
+             page=("11.27 증시 시황", "mock_comments_card-one.html", "story"), more_html=days_more(many, 5))
     build_cc("mock_comments_page.html", BASE, STORY_CMTS, STORY_TOTAL, "mock_comments_page.html",
              page=("11.27 증시 시황", "mock_comments_card-one.html", "story"))
     build_cc("mock_comments_page-issue.html", ISSUE_BASE, ISSUE_CMTS, ISSUE_TOTAL, "mock_comments_page-issue.html",
