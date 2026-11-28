@@ -88,6 +88,7 @@ IND = [
     ("백화점|유통|소매|전문점|의류|신발|명품|여가|대형마트|쇼핑", "유통_·_대형마트"), ("전자|하드웨어|카메라|디스플레이|계측|가전|커넥터|기판", "반도체"),
 ]
 GAME = {"259960", "251270", "263750", "036570", "112040", "293490", "225570", "194480", "078340", "EA", "TTWO", "RBLX"}   # 게임 회사 — 세부 업종이 `패키지 소프트웨어` 라 소프트웨어 사진이 가던 것(11-28 사용자: 크래프톤)
+EVENT = [(r"총파업|파업|노조|쟁의|노사 갈등", "파업_·_노동"), (r"휴업|폐점|영업 중단|운영 중단|매장 철수|문 닫", "임시_휴업_·_폐점")]
 ONLINE = {"AMZN": "온라인_쇼핑_·_배송", "EBAY": "온라인_쇼핑_·_배송"}   # 세부 업종 `종합 유통` 인 온라인 쇼핑 회사 — 대형마트 사진 X(11-28 점검)
 SECTOR_FALLBACK = {"산업재": "로봇_·_기계", "금융": "증권_·_투자"}   # 세부 업종이 어느 폴더에도 안 맞는 것(서비스 · 지주 11곳) — 이름표가 회사를 말한다
 HANGUL = "가-힣A-Za-z0-9"
@@ -188,6 +189,9 @@ def pick(post, stocks=()):
                 if k == "정상회담" and re.search(r"미국|美|미중", title) and re.search(r"중국|中|미중", title):
                     f = "미중_관계"
                 return out(folders.get(f) or [], kind, k)   # 낱말은 맞았는데 폴더가 비면 사진 없음(아래 분류로 내려가 엉뚱한 사진 X — 11-28 한국은행 → 연준 건물)
+    for pat, f in EVENT:   # 사건 낱말 — 분류(기업 사건 등)보다 먼저(11-28 파업 · 휴업 폴더 이음)
+        if re.search(pat, title):
+            return out(folders.get(f) or [], "사건", re.search(pat, title).group(0))
     cat = post.get("cat") or ""
     f = industry(post.get("sector")) if cat in ("CORP_EVENT", "EARNINGS") else None
     if f and folders.get(f):
