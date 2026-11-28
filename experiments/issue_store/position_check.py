@@ -81,19 +81,14 @@ def episodes(sig):
 
 
 def spaced_random(k, pool):
-    picks, tries = [], 0
-    while len(picks) < k and tries < 50:
-        cand = np.sort(rng.choice(pool, size=min(len(pool), k * 3), replace=False))
-        last = -10 ** 9
-        picks = []
-        for i in cand:
-            if i - last > GAP:
-                picks.append(i)
-                last = i
+    """서로 GAP 넘게 떨어진 날 k개 — 섞은 순서대로 받아 기간 전체에 고르게(날짜순 앞에서 자르면 앞쪽 해에 쏠린다, 2026-11-28 고침)."""
+    picks = []
+    for i in rng.permutation(pool):
+        if all(abs(i - j) > GAP for j in picks):
+            picks.append(i)
             if len(picks) >= k:
                 break
-        tries += 1
-    return np.array(picks[:k])
+    return np.array(picks)
 
 
 def rate(m, ix, cut):
