@@ -301,13 +301,13 @@ def history():
     try:
         with open(HIST, encoding="utf-8") as f:
             h = json.load(f)
-        if (datetime.date.today() - datetime.date.fromisoformat(h["built"])).days < HIST_MAX_AGE_DAYS and h.get("method") == HS.DD_METHOD:   # 사이클 정의가 바뀌면 7일을 기다리지 않고 다시
+        if (datetime.date.today() - datetime.date.fromisoformat(h["built"])).days < HIST_MAX_AGE_DAYS and h.get("method") == HS.DD_METHOD and h.get("etf"):   # 사이클 정의가 바뀌면 7일을 기다리지 않고 다시 · ETF 가 빠진 옛 파일도 다시
             return h
     except (OSError, ValueError, KeyError):
         pass
-    syms = [c[0] for c in U.CANDIDATES] + [U.BENCH]
+    syms = [c[0] for c in U.CANDIDATES] + sorted(set(etf_universe.KR_SYMS) - {c[0] for c in U.CANDIDATES}) + [U.BENCH]   # 한국 ETF 페이지 고점 회복 카드도 (미국 ETF 와 같게)
     df = yf.download(syms, start="1999-01-01", interval="1d", auto_adjust=False, group_by="ticker", progress=False, threads=3)
-    out = {"built": datetime.date.today().isoformat(), "method": HS.DD_METHOD, "bench": U.BENCH, "stats": {}}
+    out = {"built": datetime.date.today().isoformat(), "method": HS.DD_METHOD, "bench": U.BENCH, "stats": {}, "etf": True}
     try:
         bench = df[U.BENCH]["Close"].dropna()
     except KeyError:

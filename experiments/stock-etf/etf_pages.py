@@ -268,17 +268,19 @@ def tab_basic(sym, f, bars=None):
 def theme_of(sym):
     """비교 묶음 — 같은 지수, 또는 같은 테마(지수 이름에 `2차전지` · `반도체`가 들고 한국 지수끼리). 레버리지 · 인버스는 따로."""
     idx = E.BY_SYM[sym][2]
-    if "2배" in idx:
+    if "배" in idx:   # 레버리지 · 인버스(2배 · 3배 · 반대)는 지수가 같아야만
         return idx
-    for k in ("2차전지",):
+    for k in ("2차전지",) + (("반도체",) if not sym.endswith(".KS") else ()):   # 미국 반도체 ETF 는 지수가 달라도(NYSE · MarketVector) 한 묶음
         if k in idx:
             return k
     return idx
 
 
 def compare_card(sym, bars_all, kfund):
-    """`비슷한 ETF와 비교하면?` (2026-11-13 P548) — 같은 묶음 한국 상장 ETF 의 1년 등락 · 보수 · 순자산. 추천 X, 차이만. 둘 이상일 때만."""
-    peers = [t[0] for t in E.KR if theme_of(t[0]) == theme_of(sym)]
+    """`비슷한 ETF와 비교하면?` (2026-11-13 P548) — 같은 묶음 같은 시장 ETF 의 1년 등락 · 보수 · 순자산. 추천 X, 차이만. 둘 이상일 때만.
+    한국 = kr_holdings(aum_krw), 미국 = etf_fund(aum 달러) — 미국 ETF 에도 같은 카드 (2026-11-28 개선 방안 6-39)."""
+    kr = sym.endswith(".KS")
+    peers = [t[0] for t in (E.KR if kr else E.US) if theme_of(t[0]) == theme_of(sym)]
     if len(peers) < 2:
         return ""
     rows = []
@@ -291,7 +293,9 @@ def compare_card(sym, bars_all, kfund):
         bits = [f"보수 {fee_text(f['fee'])}"] if f.get("fee") is not None else []
         if f.get("aum_krw"):
             bits.append(f"순자산 {_big_krw(f['aum_krw'])}")
-        name = E.BY_SYM[p][1]
+        elif f.get("aum"):
+            bits.append(f"순자산 {_big_usd(f['aum'])}")
+        name = E.BY_SYM[p][1] if kr or p in E.BY_SYM[p][1].split() else f"{E.BY_SYM[p][1]} {p}"   # `인베스코 QQQ` 처럼 이름에 티커가 있으면 그대로
         nm = dk.esc(name) + (f' <span style="font-weight:400;font-size:14px;color:{dk.NOTE};">(이 ETF)</span>' if p == sym else "")
         sub = " · ".join(bits) + (f" · 따라가는 지수 {dk.esc(E.BY_SYM[p][2])}" if E.BY_SYM[p][2] != E.BY_SYM[sym][2] else "")
         val = _R()._arrow(r1, 1)   # 1년 수익률 — 기간은 제목 괄호에, 증감 = ▲▼ + 색 (가이드라인 5절)
@@ -309,7 +313,7 @@ def compare_card(sym, bars_all, kfund):
     # 제목 = 그래프 제목 꼴 ※ (구획 h2 · 밑줄 없이), 구성 탭 안
     title = (f'<div style="margin:28px 0 {dk.CHART_TITLE_GAP}px;padding-left:{dk.ALIGN_PX}px;">{dk.CHART_TITLE}비슷한 ETF와 비교하면? '
              f'<span style="font-weight:400;font-size:{dk.TINY};color:{dk.NOTE};">(1년 수익률)</span></span></div>')
-    return title + card + dk.muted("같은 것을 담는 한국 상장 ETF 입니다. 1년 수익률은 분배금을 빼고 계산했습니다.").replace(dk.INFO_ICON, "", 1)   # 아이콘 없이
+    return title + card + dk.muted(f"같은 것을 담는 {'한국' if kr else '미국'} 상장 ETF 입니다. 1년 수익률은 분배금을 빼고 계산했습니다.").replace(dk.INFO_ICON, "", 1)   # 아이콘 없이
 
 
 def related(sym, live, href=None):
@@ -467,12 +471,13 @@ def us_pages(snap, live, fund):
                      + (f'<div data-cards="1" data-grid="cards" style="margin:0 0 8px;">{mv}</div>' if mv else "") + RP.sec_states(s))
             ind = RP.sec_industry_tab(s) if (s["sector_flow"] or s["industry_us"]) else ""
             hold = tab_holdings(f, name=name)
+            cmp = compare_card(sym, snap["bars"], fund)   # 구성 탭 끝 (한국 ETF 와 같은 자리), 구성 탭이 없으면 기본 정보 끝
             body = (dk.price_stamp(s["day"], "US") + RP.lead(s)
                     + candle(name, b0, 2)   # 차트 = 탭 위
                     + R._section("오늘", today, line=False, tab="오늘") + RP.sec_crash(s)
                     + (R._section("업계상황", ind, tab="업계상황") if ind else "")   # 한국 ETF 와 같은 자리 (2026-11-14)
-                    + (R._section("구성", hold, tab="구성") if hold else "")
-                    + R._section("기본 정보", tab_basic(sym, f, b0), tab="기본 정보")
+                    + (R._section("구성", hold + cmp, tab="구성") if hold else "")
+                    + R._section("기본 정보", tab_basic(sym, f, b0) + ("" if hold else cmp), tab="기본 정보")
                     + related(sym, live))
             if sym in E.BY_SYM[sym][1].split():   # `인베스코 QQQ` 처럼 티커가 이름의 일부 — 테마가 제목 티커를 꼬리로 옮기지 않게
                 body = '<span data-title-keep-ticker="1" hidden></span>' + body
