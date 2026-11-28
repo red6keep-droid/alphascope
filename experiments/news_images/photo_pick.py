@@ -88,6 +88,7 @@ IND = [
     ("백화점|유통|소매|전문점|의류|신발|명품|여가|대형마트|쇼핑", "유통_·_대형마트"), ("전자|하드웨어|카메라|디스플레이|계측|가전|커넥터|기판", "반도체"),
 ]
 GAME = {"259960", "251270", "263750", "036570", "112040", "293490", "225570", "194480", "078340", "EA", "TTWO", "RBLX"}   # 게임 회사 — 세부 업종이 `패키지 소프트웨어` 라 소프트웨어 사진이 가던 것(11-28 사용자: 크래프톤)
+ONLINE = {"AMZN": "온라인_쇼핑_·_배송", "EBAY": "온라인_쇼핑_·_배송"}   # 세부 업종 `종합 유통` 인 온라인 쇼핑 회사 — 대형마트 사진 X(11-28 점검)
 SECTOR_FALLBACK = {"산업재": "로봇_·_기계", "금융": "증권_·_투자"}   # 세부 업종이 어느 폴더에도 안 맞는 것(서비스 · 지주 11곳) — 이름표가 회사를 말한다
 HANGUL = "가-힣A-Za-z0-9"
 
@@ -172,7 +173,7 @@ def pick(post, stocks=()):
         if own:
             return out(own, "회사 사진", name)
         rec = _stock_rec(t, mk) if mk else None
-        f = "게임_·_엔터테인먼트" if t.upper() in GAME else (industry((rec or {}).get("sub")) or industry((rec or {}).get("sector")) or SECTOR_FALLBACK.get((rec or {}).get("sector"))
+        f = "게임_·_엔터테인먼트" if t.upper() in GAME else ONLINE.get(t.upper()) or (industry((rec or {}).get("sub")) or industry((rec or {}).get("sector")) or SECTOR_FALLBACK.get((rec or {}).get("sector"))
              if rec else industry(post.get("sector")))
         logo = ((t + ".KS") if mk == "kr" else t) if t else ""
         if f and folders.get(f):
@@ -199,6 +200,8 @@ def pick(post, stocks=()):
         return out(pool, "시장", f"주가 전광판({'미국' if us else '한국'})")
     if f == "금리_·_연준" and not us:   # 금리 폴더 = 미국 연준 건물 → 한국 금리 기사는 한국은행 사진(없으면 사진 없음)
         return out(folders.get("한국은행") or [], "분류", "RATES_FED(한국)")
+    if f == "재정_·_정치_·_선거" and not us and folders.get("한국_국회"):   # 한국 재정 · 정치 기사에 미국 의사당 · 스웨덴 투표함 X → 한국 국회(11-28 점검)
+        return out(folders["한국_국회"], "분류", "FISCAL_POLITICS(한국)")
     if f and f != "@none" and folders.get(f):
         return out(folders[f], "분류", cat)
     return None
