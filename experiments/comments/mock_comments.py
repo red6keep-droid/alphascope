@@ -1257,7 +1257,9 @@ def top(kind):
         return forecast_top()
     if kind == "article":
         return article_top()
-    return f'<img class="cc-banner" src="{STORY_BANNER}" alt="AI 생성 이미지" width="900" height="374">'
+    # 제목 줄(.pr-sticky) 바로 아래가 배너 그림 = 제목 줄 구분선을 뺀다(시황 글 story_render 와 같은 규칙, 11-28). 여백 14 는 둔다(배너가 둥근 카드 꼴)
+    return ('<style>body:has(.cc-banner) .pr-sticky{border-bottom:0;}</style>'
+            f'<img class="cc-banner" src="{STORY_BANNER}" alt="AI 생성 이미지" width="900" height="374">')
 
 
 ISSUE_BASE = os.path.join(HERE, "..", "issue_store", "output", "mock_issue_nvidia_ceo_public.html")   # Hot Issue 원래 페이지(목업)
