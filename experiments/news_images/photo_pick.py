@@ -64,6 +64,8 @@ BOARD = {   # 주가 전광판 = 이웃 폴더 빌려 쓰기(11-28 사용자) �
     "us": ["주가_전광판", "나스닥", "월가", "뉴욕증권거래소"],
 }
 US_WORDS = r"미국|美|뉴욕|나스닥|S&P|다우|월가|연준"
+KR_BORROW = {"증권_·_투자": ["여의도"]}   # 한국 회사인데 업종 폴더가 전부 외국 거래소일 때 빌릴 폴더(증권사 → 여의도, 11-28)
+FOREIGN = r"Tokyo|Tokio|Japan|NYSE|Nasdaq|Wall Street|New York|Shanghai|Hong Kong"   # 한국 기사 전광판 사진에서 뺄 외국 거래소 사진(제목 기준)
 NEED = {
     "대만": r"해협|양안|군사|침공|중국.*(압박|훈련)", "러시아": r"우크라|전쟁|휴전|드론|공격|파병", "대법원": r"미국|美|연방",
     "국방부": r"미국|美|펜타곤", "의회": r"미국|美|하원|상원", "정상회담": r"정상", "다우": r"지수|뉴욕|증시|마감",
@@ -85,6 +87,7 @@ IND = [
     ("담배|주류|양조", "담배_·_주류"), ("음료|식품|사탕|육류|농산물|제과|급식|수산", "식품_·_음료"), ("화장품|개인 관리|가정|생활용품", "화장품"),
     ("백화점|유통|소매|전문점|의류|신발|명품|여가|대형마트|쇼핑", "유통_·_대형마트"), ("전자|하드웨어|카메라|디스플레이|계측|가전|커넥터|기판", "반도체"),
 ]
+GAME = {"259960", "251270", "263750", "036570", "112040", "293490", "225570", "194480", "078340", "EA", "TTWO", "RBLX"}   # 게임 회사 — 세부 업종이 `패키지 소프트웨어` 라 소프트웨어 사진이 가던 것(11-28 사용자: 크래프톤)
 SECTOR_FALLBACK = {"산업재": "로봇_·_기계", "금융": "증권_·_투자"}   # 세부 업종이 어느 폴더에도 안 맞는 것(서비스 · 지주 11곳) — 이름표가 회사를 말한다
 HANGUL = "가-힣A-Za-z0-9"
 
@@ -152,8 +155,8 @@ def pick(post, stocks=()):
 
     for k, f in PEOPLE.items():
         m = word_re(k).search(title)
-        if m and folders.get(f) and not re.match(SKIP_AFTER, title[m.end():]):
-            return out(folders[f], "인물", k)
+        if m and not re.match(SKIP_AFTER, title[m.end():]):
+            return out(folders.get(f) or [], "인물", k)
     first = (post.get("stocks") or [None])[0]   # 수집기 글 첫 종목 = 주인공(블로그 목록 밖이어도 둘째로 넘어가지 않는다)
     hit = None
     if first:
@@ -169,25 +172,33 @@ def pick(post, stocks=()):
         if own:
             return out(own, "회사 사진", name)
         rec = _stock_rec(t, mk) if mk else None
-        f = (industry((rec or {}).get("sub")) or industry((rec or {}).get("sector")) or SECTOR_FALLBACK.get((rec or {}).get("sector"))
+        f = "게임_·_엔터테인먼트" if t.upper() in GAME else (industry((rec or {}).get("sub")) or industry((rec or {}).get("sector")) or SECTOR_FALLBACK.get((rec or {}).get("sector"))
              if rec else industry(post.get("sector")))
         logo = ((t + ".KS") if mk == "kr" else t) if t else ""
         if f and folders.get(f):
-            return out(folders[f], "업종 사진 + 이름표", f"{name} → {f}" + ("" if rec else " (글 업종)"), (logo, name))
+            pool = folders[f]
+            if mk == "kr":   # 한국 회사에 외국 거래소 사진 X(11-28 삼성증권 → 도쿄증권거래소) — 다 빠지면 그대로
+                pool = ([p for p in pool if not re.search(FOREIGN, p.get("title") or "")]
+                        or [p for g in KR_BORROW.get(f, []) for p in folders.get(g, [])] or pool)
+            return out(pool, "업종 사진 + 이름표", f"{name} → {f}" + ("" if rec else " (글 업종)"), (logo, name))
     for kind, table in (("기관", INST), ("국제", WORLD), ("시장", MARKET)):
         for k, f in table.items():
-            if word_re(k).search(title) and folders.get(f) and (k not in NEED or re.search(NEED[k], title)):
+            if word_re(k).search(title) and (k not in NEED or re.search(NEED[k], title)):
                 if k == "정상회담" and re.search(r"미국|美|미중", title) and re.search(r"중국|中|미중", title):
                     f = "미중_관계"
-                return out(folders[f], kind, k)
+                return out(folders.get(f) or [], kind, k)   # 낱말은 맞았는데 폴더가 비면 사진 없음(아래 분류로 내려가 엉뚱한 사진 X — 11-28 한국은행 → 연준 건물)
     cat = post.get("cat") or ""
     f = industry(post.get("sector")) if cat in ("CORP_EVENT", "EARNINGS") else None
     if f and folders.get(f):
         return out(folders[f], "업종 사진", f"글 업종 '{post.get('sector')}'")
     f = CAT.get(cat)
+    us = bool(re.search(US_WORDS, title))
     if f == "@board":
-        mk = "us" if re.search(US_WORDS, title) else "kr"
-        return out([p for g in BOARD[mk] for p in folders.get(g, [])], "시장", f"주가 전광판({'미국' if mk == 'us' else '한국'})")
+        mk = "us" if us else "kr"
+        pool = [p for g in BOARD[mk] for p in folders.get(g, []) if mk == "us" or not re.search(FOREIGN, p.get("title") or "")]
+        return out(pool, "시장", f"주가 전광판({'미국' if us else '한국'})")
+    if f == "금리_·_연준" and not us:   # 금리 폴더 = 미국 연준 건물 → 한국 금리 기사는 한국은행 사진(없으면 사진 없음)
+        return out(folders.get("한국은행") or [], "분류", "RATES_FED(한국)")
     if f and f != "@none" and folders.get(f):
         return out(folders[f], "분류", cat)
     return None
