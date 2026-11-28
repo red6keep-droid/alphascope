@@ -83,21 +83,15 @@ def episodes(sig):
 
 
 def spaced_random(n_days, k, valid):
-    """서로 GAP 넘게 떨어진 아무 날 k개 (valid = 결과가 있는 날)."""
+    """서로 GAP 넘게 떨어진 아무 날 k개 (valid = 결과가 있는 날).
+    섞은 순서대로 받아 기간 전체에 고르게 뽑는다 — 날짜순으로 정렬해 앞에서 자르면 앞쪽 해에 쏠린다(2026-11-28 고침)."""
     picks = []
-    tries = 0
-    while len(picks) < k and tries < 50:
-        cand = rng.choice(valid, size=k * 3, replace=False)
-        cand.sort()
-        last = -10 ** 9
-        for i in cand:
-            if i - last > GAP:
-                picks.append(i)
-                last = i
+    for i in rng.permutation(valid):
+        if all(abs(i - j) > GAP for j in picks):
+            picks.append(i)
             if len(picks) >= k:
                 break
-        tries += 1
-    return np.array(picks[:k])
+    return np.array(picks)
 
 
 def stats(m, big, ix):
