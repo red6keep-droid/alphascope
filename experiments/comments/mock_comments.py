@@ -923,6 +923,7 @@ TITLES.update({
     "mock_comments_page-report.html": "댓글 화면 — KOSPI 한 줄 · 홈 카드 하루 그래프 · 댓글 목록 · 쓰기 (한국 증시 리포트에서)",
     "mock_comments_cards.html": "글 아래 댓글 카드 — 2개 이상 = 좌우로 밀기 · 점 · 댓글 더 보기 (종목 페이지)",
     "mock_comments_card-one.html": "글 아래 댓글 카드 — 1개 = 카드 하나 · NEW (시황 글)",
+    "mock_comments_cards-empty.html": "글 아래 댓글 카드 시안 — 댓글 0 = 안내 카드 한 장 (종목 페이지)",
     "mock_comments_page-stock.html": "댓글 화면 — 종목 가격 · 홈 카드 꼴 그래프 · 댓글 목록 · 쓰기 (종목 페이지에서)",
     "mock_comments_page.html": "댓글 화면 — 배너 그림 · 댓글 목록 · 쓰기 (시황 글에서)",
     "mock_comments_page-issue.html": "댓글 화면 — Hot Issue 제목 · 게이지 카드 그대로 · 아래 댓글 (핫이슈에서)",
@@ -1020,14 +1021,18 @@ def card(c, link):
 
 
 def cards_block(cmts, page_link):
-    """글 아래 댓글 칸 — 카드(최신 CARD_N 개, 가려진 글 빼고) + 점(2개 이상) + `댓글 더 보기`."""
+    """글 아래 댓글 칸 — 카드(최신 CARD_N 개, 가려진 글 빼고) + 점(2개 이상). 댓글 0 = 안내 카드 한 장."""
     shown = [c for c in cmts if c[4] != "hidden"][:CARD_N]
+    if not shown:   # 댓글 0 = 같은 카드 꼴 한 장에 안내 두 줄, 누르면 댓글 화면(쓰기 연필이 있는 곳) — 시안(11-28)
+        return (f'<div data-cc class="cc-one"><div class="cc-track"><a class="cc-card cc-empty" href="{page_link}">'
+                '<div class="cc-title" style="margin:0;color:#6B7280;">아직 댓글이 없습니다</div>'
+                '<p class="cc-text">첫 댓글을 남겨 보세요</p></a></div></div>')
     one = len(shown) == 1
     dots = "" if one else ('<div class="cc-dots">' + "".join(
         f'<button class="cc-dot" type="button" aria-label="{i + 1}번째 댓글"></button>' for i in range(len(shown))) + "</div>")
     return (f'<div data-cc class="{"cc-one" if one else ""}"><div class="cc-track">'
             + "".join(card(c, "mock_comments_thread.html") for c in shown)
-            + f'</div>{dots}<a class="cc-more" href="{page_link}">댓글 더 보기</a></div>')
+            + f'</div>{dots}</div>')   # `댓글 더 보기` 버튼 뺌(11-28 사용자) — 댓글 화면은 버튼 줄 `댓글 n` · 카드로 간다
 
 
 def price_head(name, sub, bars, dec, won, one=False):
@@ -1349,10 +1354,11 @@ def build_cc(name, base, cmts, total, page_link="", page=None):
     else:
         nav = '<p class="post-nav">'
         i = p.index(nav) + len(nav)
-        p = (p[:i] + f'<a class="post-nav-cm has-cm" href="{page_link}" style="text-decoration:none;" aria-label="댓글 {total}개 · 댓글 화면으로">{BUBBLE}'   # 버튼 줄 `댓글 n` = 댓글 화면으로
+        p = (p[:i] + f'<a class="post-nav-cm{" has-cm" if total else ""}" href="{page_link}" style="text-decoration:none;" aria-label="댓글 {total}개 · 댓글 화면으로">{BUBBLE}'   # 버튼 줄 `댓글 n` = 댓글 화면으로
              f'<span class="cm-label">댓글 {total}</span></a>' + p[i:])
         end = p.index("</p>", i) + 4
-        sec = f'<section class="comments is-foldable is-open" id="comments-mock"><div class="comments-panel">{cards_block(cmts, page_link)}</div></section>'
+        sec = ('<style>.post-shell .post-nav,.post-shell.ends-text .post-nav{border-bottom:0 !important;}</style>'   # `댓글 n` 버튼 줄 아래 구분선 뺌(11-28 사용자)
+               f'<section class="comments is-foldable is-open" id="comments-mock"><div class="comments-panel">{cards_block(cmts, page_link)}</div></section>')
         p = p[:end] + CSS + CC_CSS + sec + p[end:]
         p = p.replace("</body>", windows(True, False) + js + CC_JS + "</body>", 1)
     p = re.sub(r"<title>[^<]*</title>", f"<title>{TITLES[name]} — 목업</title>", p, count=1)
@@ -1404,6 +1410,7 @@ def main():
     build_chars("mock_comments_characters.html")
     build_cc("mock_comments_cards.html", STOCK_BASE, STOCK_CMTS, STOCK_TOTAL, "mock_comments_page-stock.html")
     build_cc("mock_comments_card-one.html", BASE, [ONE_CMT], 1, "mock_comments_page.html")
+    build_cc("mock_comments_cards-empty.html", STOCK_BASE, [], 0, "mock_comments_page-stock.html")
     build_cc("mock_comments_page-stock.html", STOCK_BASE, STOCK_CMTS, STOCK_TOTAL, "mock_comments_page-stock.html",
              page=("SK하이닉스", "mock_comments_cards.html", "stock"))
     build_cc("mock_comments_page-report.html", BASE, REPORT_CMTS, REPORT_TOTAL, "mock_comments_page-report.html",
