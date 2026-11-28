@@ -393,7 +393,7 @@ def screen_tab(now, I):
             pages.append((f"{label} {kind} 페이지", val, f"최근 값 {newest[5:].replace('-', '.')} 기준 · 색인 {key}" if newest else "가격 날짜 없음"))
             if fresh_n < len(items):
                 I.add(f"{label} {kind} 페이지 지난 값", over(f"{len(items) - fresh_n}개"), f"{len(items)}개 중 최근 값 {fresh_n}개", need=False)
-    return (dk.h2("화면", tab="화면") + fresh
+    return (dk.h2("화면", tab="화면", line=False) + fresh
             + dk.sub_label("고정 페이지 최근 값", "종목 검색 색인(search/us.json · kr.json)의 가격 날짜로 셉니다. 정식 페이지가 있는 종목 · ETF 만.")
             + white_card(pages))
 
@@ -535,7 +535,7 @@ def collect_tab(recs, I, feeds=None, now=None):
     rows = [("row", n, over(f"{len(ls)}줄"), ls[0][:70]) for n, ls in srcs[:4]]
     head = QC.question_card("막힌 수집 소스가 있나?", state, "neutral", "#111", [(head_line, "plain")] + rows, opened=True)
     every = [(n, f"{len(ls)}줄", ls[0][:90]) for n, ls in srcs]
-    return (dk.h2("수집", tab="수집") + feeds_card(now or now_kst(), feeds, I) + head
+    return (dk.h2("수집", tab="수집", line=False) + feeds_card(now or now_kst(), feeds, I) + head
             + (dk.sub_label("소스별 실패 줄", "운영 기록의 수집 경고(cat=collect)와 운영 알림(notify)을 소스 이름으로 묶었습니다. 오늘(KST) 실행만.")
                + white_card(every, fold_at=3, noun="소스") if every else ""))
 
@@ -544,7 +544,7 @@ def ai_tab(now, recs2, I):
     """recs2 = 어제 · 오늘 운영 기록 (Gemini 창은 태평양 자정부터, Groq · NVIDIA 는 최근 24시간)."""
     if recs2 is None:
         I.area["AI 한도"] = (warn("읽지 못함"), "운영 기록")
-        return dk.h2("AI", tab="AI") + white_card([("운영 기록", warn("읽지 못함"), "OPS_CF 설정 확인")])
+        return dk.h2("AI", tab="AI", line=False) + white_card([("운영 기록", warn("읽지 못함"), "OPS_CF 설정 확인")])
     pt_now = now.astimezone(dt.timezone(dt.timedelta(hours=PT_OFFSET)))
     pt_start = pt_now.replace(hour=0, minute=0, second=0, microsecond=0)
     win = {"pt": pt_start, "24h": now - dt.timedelta(hours=24)}
@@ -615,7 +615,7 @@ def ai_tab(now, recs2, I):
           ("사슬 전체 실패", over(f"{events['전부 실패']}번") if events["전부 실패"] else V("0번"), "모든 모델이 답하지 못함")]
     if events["전부 실패"]:
         I.add("AI 사슬 전체 실패", over(f"{events['전부 실패']}번"), "AI 탭 → 예비전환")
-    return (dk.h2("AI", tab="AI") + head
+    return (dk.h2("AI", tab="AI", line=False) + head
             + dk.sub_label("모델별") + dk.card_of(mrows, fold_at=2, noun="모델") + hour_chart
             + dk.sub_label("예비전환") + white_card(ev, fold_at=3, noun="항목"))
 
@@ -663,7 +663,7 @@ def record_tab(now, heads, I):
     head = QC.question_card("기록이 제때 쌓이나?", f"{len(late)}곳 늦음" if late else "제때", "neutral", "#111",
                             [("상태 저장소(비공개) 브랜치의 마지막 저장 시각입니다. 정기 실행이 있는 브랜치는 30시간(주말 +48) 넘게 그대로면 늦음.", "plain")]
                             + [("row", n, v, s) for n, v, s in rows[:3]], opened=True)
-    return (dk.h2("기록", tab="기록") + head
+    return (dk.h2("기록", tab="기록", line=False) + head
             + records_status_card(now)
             + dk.sub_label("상태 브랜치") + white_card(rows, fold_at=3, noun="브랜치")
             + dk.sub_label("gh-pages") + white_card(size_row) + size_html), hist
@@ -720,7 +720,7 @@ def forecast_tab(now, I):
                             [(f"공개된 전망 {len(live)}건이 진행 중입니다. 판정이 2거래일 넘게 안 쌓이거나 사건 뒤 결과 칸이 비면 아래 `판정 멈춤` 에 올라옵니다.", "plain")]
                             + [("row", mk, f"{n}건", " · ".join(t for t, m, _ in rows if m == mk)[:60])
                                for mk, n in Counter(m for _, m, _ in rows).items()], opened=True)
-    return (dk.h2("전망", tab="전망") + head
+    return (dk.h2("전망", tab="전망", line=False) + head
             + dk.sub_label("판정 멈춤") + white_card(stall_rows or [("멈춘 전망", "없음", "매일 아침 전망 실행이 검사")])
             + dk.sub_label("진행중") + white_card(rows or [("진행 중인 전망", "없음", "")], fold_at=3, noun="전망")
             + dk.sub_label("끝난 전망") + white_card([(f"{'미국' if k == 'us' else '한국'}", V(f"{v}건"), "목록의 끝난 전망") for k, v in done.items()] or [("끝난 전망", "없음", "")]))

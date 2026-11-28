@@ -31,7 +31,7 @@ H2_SIZE = "22px"   # 구획 제목 21 → 22
 LH_BODY, LH_CARD, LH_TINY, LH_H2 = "35px", "24px", "20px", "28px"   # 구획 제목 22px → 행간 28 (2026-10-13)   # 행간은 px 정수만. 본문(카드 밖 문단·글머리표)·툴팁 34 · 카드 안 18·16px 24 · 16px 카드 이름도 24 · 14px 안내 20 · 21px 구획 제목 27. 행간 숫자를 직접 적지 말고 이 상수만
 H2 = f"position:relative;color:#111;font-size:{H2_SIZE};font-weight:700;line-height:{LH_H2};margin:28px 0 11px;padding:0;display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px;"
 H2_LINE = "border-bottom:2px solid #eee;padding-bottom:6px;"
-_NO_LINE_START = re.compile(r'^\s*(<(?:div|ul) style="(?:overflow-x:auto;|background:)|<div data-cards|<div data-lead|<img\b|<details\b)')
+_NO_LINE_START = re.compile(r'^\s*(<(?:div|ul) style="(?:overflow-x:auto;|background:)|<div style="[^"]*border:1px solid[^"]*border-radius|<div data-cards|<div data-lead|<img\b|<details\b)')   # 외곽선 + 둥근 모서리 카드로 시작해도 선 없음(11-29, 모의투자 순위 · 계정)
 CARD = f"background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:{14 - VP}px 14px;line-height:{LH_CARD};"   # 보이는 위아래 14px
 CARD_DIR = {"positive": ("#FFF7EE", "#FEE6CA"), "negative": ("#EFF6FF", "#D6E8FE"), "neutral": ("#F8FAFC", "#E2E8F0"), "uncertain": ("#F5F3FF", "#E8E4FE")}   # 테두리 positive · negative 10% · uncertain 15% 밝게
 PILL = {"area": ("#CBD5E1", "#334155"), "positive": ("#FCA5A5", "#B91C1C"), "negative": ("#93C5FD", "#1D4ED8"),

@@ -122,7 +122,7 @@ def screen_tab():
         ("미국 ETF 페이지", f'{V("18개")} 중 {V("18개")}', "오늘 갱신"),
         ("한국 ETF 페이지", f'{V("19개")} 중 {V("19개")}', "오늘 갱신"),
     ]
-    return (dk.h2("화면", tab="화면")
+    return (dk.h2("화면", tab="화면", line=False)
             + QC.cards_grid(fresh + theme)
             + dk.sub_label("고정 페이지 갱신")
             + white_card(pages))
@@ -200,7 +200,7 @@ def collect_tab():
     people = [("트럼프", 14), ("파월", 3), ("머스크", 6), ("젠슨 황", 2)]
     pw = dk.bar_widths([n for n, _ in people], [f"{v}건" for _, v in people])
     prow = [dk.bar_row(esc(n), v / 14, dk.CHART_MAIN, f"{v}건", pw, first=(i == 0)) for i, (n, v) in enumerate(people)]
-    return (dk.h2("수집", tab="수집")
+    return (dk.h2("수집", tab="수집", line=False)
             + blocked
             + dk.sub_label("소스")
             + white_card(sources, fold_at=2, noun="소스")
@@ -236,7 +236,7 @@ def ai_tab():
                           [(h, [v]) for h, v in (("0", 0.4), ("3", 0.2), ("6", 3.1), ("7", 5.2), ("8", 4.4), ("9", 0.6),
                                                  ("13", 1.2), ("16", 2.8), ("21", 0.9))],
                           [QC.amber], [lambda v: "#111"], [], fmt=lambda v: f"{v:.1f}")
-    return (dk.h2("AI", tab="AI")
+    return (dk.h2("AI", tab="AI", line=False)
             + head
             + dk.sub_label("모델별")
             + dk.card_of(mrows, fold_at=2, noun="모델")
@@ -272,7 +272,7 @@ def record_tab():
                          [("gh-pages", [31, 33, 36, 38, 41, 42], dk.CHART_MAIN, "solid"),
                           ("jsDelivr 제한", [50] * 6, dk.CHART_CMP, "dash")],
                          lambda v: f"{v:.0f}")
-    return (dk.h2("기록", tab="기록")
+    return (dk.h2("기록", tab="기록", line=False)
             + head
             + dk.sub_label("상태 브랜치")
             + white_card(branches, fold_at=2, noun="브랜치")
@@ -297,7 +297,7 @@ def forecast_tab():
         ("자료 누락", "11.12", "코스피 하루 건너뜀"),
         ("늦은 등록", "11.10", "한국 전망 1건 · 사건 하루 뒤 등록"),
     ]
-    return (dk.h2("전망", tab="전망")
+    return (dk.h2("전망", tab="전망", line=False)
             + soon
             + dk.sub_label("진행중")
             + white_card(live)

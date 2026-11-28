@@ -615,7 +615,7 @@ def mypage(held):
     body = (prof
             + dk.section("내 것", mine, one_line=True)
             + dk.section("모의투자 설정", swcard + reset, one_line=True)
-            + dk.section("계정", acct, one_line=True))
+            + dk.section("계정", acct, line=False, one_line=True))   # 바로 아래 버튼 = 구분선 없음(11-29)
     write(body, "mock_invest-mypage.html", label="내 정보", nav=("b", "me"), share=False,
           tail=RESET_POP.replace("__B1__", MS.WHITE_BTN).replace("__B2__", MS.WHITE_BTN + f"color:{dk.UP};"))
 
