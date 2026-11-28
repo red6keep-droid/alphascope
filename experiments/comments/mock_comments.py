@@ -134,6 +134,16 @@ CSS = """<style>
 .comments .cv-pop:has(.cv-chips) [data-report-send]{grid-column:1;grid-row:2;align-self:start;justify-self:start;margin:0;padding:6px 14px;background:#fff;border:1px solid #888;border-radius:8px;color:#111;font:inherit;font-size:14px;line-height:20px;font-weight:700;cursor:pointer;}
 .comments .cv-pop:has(.cv-chips) [data-report-send]:hover{border-color:#111;}   /* 늘 진한 테두리 · 진한 글자(흐리게 하지 않음) — 이유 없이 누르면 안내 띠 */
 .comments .cv-pop .cv-done{grid-column:1 / -1;}
+/* 신고 상자 시안(11-28) — 이유 두 줄 고정: 1줄 개인정보 · 거짓 정보 · 시세 조종 의심 / 2줄 리딩방 · 광고 · 욕설 · 비방 · 기타.
+   A = 제목 → 이유 두 줄 → 신고하기(아래) · B = 제목 줄 오른쪽에 신고하기 → 이유 두 줄 */
+.comments .cv-pop.rp{display:block;}
+.comments .rp .rp-head{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.comments .rp .cv-pop-h{display:flex;align-items:center;gap:4px;white-space:nowrap;}
+.comments .rp-row{display:flex;flex-wrap:wrap;gap:6px;}
+.comments .rp-chips{margin:10px 0 0;}
+.comments .rp-row + .rp-row{margin-top:6px;}
+.comments .rp [data-report-send]{margin:0;padding:6px 14px;background:#fff;border:1px solid #888;border-radius:8px;color:#111;font:inherit;font-size:14px;line-height:20px;font-weight:700;cursor:pointer;}
+.comments .rp-a [data-report-send]{margin-top:12px;}
 .comments .cv-pop[hidden]{display:none;}
 .comments .cv-pop-h{font-size:14px;line-height:20px;font-weight:700;color:#111;}
 .comments .cv-chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 12px;}
@@ -544,6 +554,19 @@ def menu_box(key, mine):
             f'<div class="cv-chips">{chips}</div><button class="cm-btn" type="button" data-report-send>신고하기</button></div>')
 
 
+REASON_ROWS = (("개인정보", "거짓 정보 · 시세 조종 의심"), ("리딩방 · 광고", "욕설 · 비방", "기타"))   # 신고 이유 두 줄(11-28 사용자 순서)
+
+
+def report_box(v):
+    """신고 상자 시안 — v = "a"(신고하기 아래) · "b"(제목 줄 오른쪽)."""
+    rows = "".join('<div class="rp-row">' + "".join(f'<button class="cv-chip" type="button" data-pick>{esc(t)}</button>' for t in r) + "</div>" for r in REASON_ROWS)
+    send = '<button class="cm-btn" type="button" data-report-send>신고하기</button>'
+    head = f'<div class="cv-pop-h">{SIREN}신고하는 이유</div>'
+    if v == "b":
+        return f'<div class="cv-pop rp rp-b"><div class="rp-head">{head}{send}</div><div class="rp-chips">{rows}</div></div>'
+    return f'<div class="cv-pop rp rp-a">{head}<div class="rp-chips">{rows}</div>{send}</div>'
+
+
 STK_TOKEN = re.compile(r"\[:([a-z]+_[a-z]+):\]")
 
 
@@ -946,6 +969,7 @@ TITLES.update({
     "mock_comments_page-issue.html": "댓글 화면 — Hot Issue 제목 · 게이지 카드 그대로 · 아래 댓글 (핫이슈에서)",
     "mock_comments_page-forecast.html": "댓글 화면 시안 — 전망 제목 · 전망A · B 카드 (증시 전망에서)",
     "mock_comments_page-article.html": "댓글 화면 시안 — 기사 제목 · 자료 사진 (Newfact 기사에서)",
+    "mock_comments_report-cases.html": "신고 상자 시안 A · B — 이유 두 줄(개인정보 · 거짓 정보 / 리딩방 · 욕설 · 기타), 신고하기 아래 · 오른쪽",
     "mock_comments_page-days-few.html": "시황 댓글 시안 — 글마다 따로 · 오늘 5개 → 11.26 증시 시황 댓글 보기 → 그 전날",
     "mock_comments_page-days-many.html": "시황 댓글 시안 — 글마다 따로 · 오늘 20개 = 10개씩 더 보기 → 끝나면 11.26 증시 시황 댓글 보기",
 })
@@ -1476,6 +1500,11 @@ def main():
     many = [(None, today20), ("11.26 증시 시황", YDAY_CMTS), ("11.25 증시 시황", DAY2_CMTS)]
     build_cc("mock_comments_page-days-many.html", BASE, today20[:5], 20, "mock_comments_page-days-many.html",
              page=("11.27 증시 시황", "mock_comments_card-one.html", "story"), more_html=days_more(many, 5))
+    lab = '<div style="margin:18px 0 6px;font-size:13px;line-height:19px;font-weight:700;color:#B91C1C;">{}</div>'
+    cases = ('<div class="comments is-open" style="padding:0;">' + lab.format("시안 A · 신고하는 이유 → 이유 두 줄 → 신고하기") + report_box("a")
+             + lab.format("시안 B · 신고하는 이유 줄 오른쪽에 신고하기 → 이유 두 줄") + report_box("b") + "</div>")
+    build_cc("mock_comments_report-cases.html", BASE, STORY_CMTS[:2], 2, "mock_comments_report-cases.html",
+             page=("11.27 증시 시황", "mock_comments_card-one.html", "story"), more_html=cases)
     build_cc("mock_comments_page.html", BASE, STORY_CMTS, STORY_TOTAL, "mock_comments_page.html",
              page=("11.27 증시 시황", "mock_comments_card-one.html", "story"))
     build_cc("mock_comments_page-issue.html", ISSUE_BASE, ISSUE_CMTS, ISSUE_TOTAL, "mock_comments_page-issue.html",
