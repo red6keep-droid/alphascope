@@ -57,6 +57,7 @@ def main():
         _v, _i = record_store.radar_rows(radar, render_html.today_kst())
         record_store.append(a.state, "verdicts", _v)
         record_store.append(a.state, "issues", _i)
+        record_store.append(a.state, "actions", _action_rows(conn))   # 말과 행동 재료 — 원본(statements)은 30일만 남는다
     narrative_path = os.path.join(config.OUTPUT_DIR, "narrative.json")
     if os.path.exists(narrative_path):
         os.remove(narrative_path)   # 지난 실행의 문장이 오늘 카드에 붙지 않게
@@ -69,6 +70,23 @@ def main():
     import stock_mentions   # 종목 페이지 · 미국 증시 리포트용 발언 — 게시 뒤(그 글 주소를 `○○ 발언 더 보기` 에 쓴다, P371). 상태 폴더 → radar-state
     stock_mentions.update(os.path.join(config.OUTPUT_DIR, "radar.json"), narrative_path, os.path.join(a.state, "people_mentions.json") if a.state else stock_mentions.OUT,
                           post_url_path=os.path.join(config.OUTPUT_DIR, "post_url.txt") if a.publish else None)
+
+
+ACTION_DAYS = state_io.STATE_KEEP_DAYS   # 실행마다 원본이 남아 있는 30일 치를 다시 넣는다(같은 (date, id) 는 바꿔 쓴다) — 첫 실행이 30일을 메우고, 하루 빠져도 메운다
+
+
+def _action_rows(conn):
+    """행동 기록 — 기관 발표(행정명령 · 포고문 · 재무부 · USTR · 연준 발표)와 ARK 매매 공시 전부를 길게 남긴다.
+    발언 신호(issues)는 시장 관련도로 거른 일부만 남아, 90일 뒤 `말과 행동`(말 → 그 뒤 행동) 짝 맞추기 재료가 모자랐다(2026-11-28 확인)."""
+    since = (datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=ACTION_DAYS)).strftime("%Y-%m-%dT%H:%M:%SZ")
+    cols = ("id", "speaker", "sub_speaker", "attribution", "collector", "publisher", "published_at", "title", "url",
+            "ai_topic", "ai_subtopic", "ai_issue", "ai_direction", "ai_mentioned_companies", "ai_target_country", "noise_reason")
+    rows = []
+    for r in conn.execute(f"SELECT {', '.join(cols)} FROM statements WHERE attribution IN ('office', 'trade') AND published_at >= ? ORDER BY published_at", (since,)):
+        d = dict(zip(cols, r))
+        kst = datetime.datetime.strptime(d["published_at"], "%Y-%m-%dT%H:%M:%SZ") + datetime.timedelta(hours=9)
+        rows.append({"date": kst.strftime("%Y-%m-%d"), "source": "radar-action", **d})
+    return rows
 
 
 def _madmoney_ids(radar):
