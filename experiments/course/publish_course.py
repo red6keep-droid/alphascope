@@ -138,6 +138,17 @@ def build(files, urls):
     return out
 
 
+def _find(NP, t, url=None):
+    """같은 제목 글 — 최근 50건 안에서, 없으면 발행 때 적어 둔 주소로(posts/bypath). 뉴스 글이 많아 지난 편은 50건 밖으로 밀린다."""
+    found = NP.find_post_id(t, max_results=50)
+    if found or not url:
+        return found
+    import urllib.parse
+    requests, base, headers = NP._api()
+    r = requests.get(f"{base}/posts/bypath", params={"path": urllib.parse.urlparse(url).path, "fetchBodies": "false"}, headers=headers, timeout=30)
+    return {"id": r.json()["id"], "url": r.json().get("url")} if r.ok else None
+
+
 def main(dry, published_only=False):
     _env()
     src = next((p for p in RC._SRC_CANDIDATES if os.path.isdir(p)), None)   # RC.SRC 는 명령 인자(--dry)를 폴더로 읽는다 — 여기선 후보 폴더만
@@ -161,7 +172,7 @@ def main(dry, published_only=False):
     urls = json.load(open(pj, encoding="utf-8")) if os.path.exists(pj) else {}
     blocked = False
     for name, t, body in posts:   # 1바퀴: 없으면 올린다 — 새 글이 거절되면(429 등) 거기서 새 글만 멈추고, 올라간 편까지 2바퀴 (2026-11-21: 11-20 4편 429)
-        found = NP.find_post_id(t, max_results=50)
+        found = _find(NP, t, urls.get(name))
         if found:
             urls[name] = found["url"]
             print(f"[있음] {t} → {found['url']}")
@@ -180,7 +191,7 @@ def main(dry, published_only=False):
                 print(f"[거절] {t} — {e}")
     done = [f for f in files if os.path.basename(f) in urls]
     for name, t, body in build(done, urls):   # 2바퀴: 편끼리 링크를 채워 올라간 편 전부 갱신
-        found = NP.find_post_id(t, max_results=50)
+        found = _find(NP, t, urls.get(name))
         url = NP.update_post(found["id"], t, body, LABELS)
         print(f"[갱신] {t} → {url}")
     json.dump(urls, open(pj, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
