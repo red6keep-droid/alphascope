@@ -186,6 +186,36 @@ def _asset_name(sym):
         return sym
 
 
+KR_MAX = 3   # 한국 연관 종목 — 시가총액 순 셋까지
+_KR = {}
+
+
+def _kr_of(assets):
+    """미국 연결 자산 → 한국 연관 종목 (한국 종목 페이지 `미국 연관 종목` 짝 universe_kr.PAIRS 를 거꾸로, 한국 목록 순 = 시가총액 순). 없으면 []."""
+    if not _KR:
+        try:
+            sys.path.insert(0, os.path.join(config.BASE_DIR, "..", "kr-stocks"))
+            import universe_kr as UK
+            order = {k: i for i, k in enumerate(UK.BY_SYM)}
+            for k, (us, _why) in UK.PAIRS.items():
+                for u in us:
+                    _KR.setdefault(u, []).append((order.get(k, 999), k, UK.name(k)))
+        except Exception as e:  # noqa: BLE001
+            print(f"[html] 한국 연관 종목 표 없음: {str(e)[:80]}")
+            _KR["_"] = []
+    out = []
+    for a in assets or []:
+        for _o, k, nm in sorted(_KR.get(a, [])):
+            if k not in [x[0] for x in out]:
+                out.append((k, nm))
+    return out[:KR_MAX]
+
+
+def _kr_html(assets):
+    ks = _kr_of(assets)
+    return " · ".join(dk.stock_link(k, _esc(nm)) for k, nm in ks) if ks else ""
+
+
 def _path_line(s, card):
     """`테슬라(TSLA) : 장기 인도량 목표 상향, 생산 규모 · 점유율 기대 자극`.
     AI 구절이 없으면 `자산 : 경로 이름`."""
@@ -195,9 +225,11 @@ def _path_line(s, card):
     # 종목은 상세 페이지가 있으면 파란색 링크 · 없으면 검정, 굵게 없음. ETF · 지수 · 유가 · 환율은 검정
     names = " · ".join(dk.stock_link(a, _esc(_asset_name(a))) for a in pth["assets"])
     why = dk.headline((card or {}).get("path") or "")
+    kr = _kr_html(pth["assets"])
+    krl = [_sub(dk.keep_tone(f"한국 연관 종목 : {kr}"), "#111")] if kr else []   # 한국 독자의 다음 질문 — 엔비디아 발언 → 삼성전자 · SK하이닉스
     if not why:   # AI 구절이 없으면 `관련 종목 : 로켓랩(RKLB)` — 옛 `로켓랩(RKLB) : 관심 경로`
-        return [_sub(dk.keep_tone(f'{paths.related_label(pth["assets"])} : {names}'), "#111")]
-    return [_sub(dk.keep_tone(f'{names} : {_esc(why)}'), "#111")]
+        return [_sub(dk.keep_tone(f'{paths.related_label(pth["assets"])} : {names}'), "#111")] + krl
+    return [_sub(dk.keep_tone(f'{names} : {_esc(why)}'), "#111")] + krl
 
 
 def _reaction_line(s):
@@ -363,6 +395,7 @@ def _list_row(p, cards, first, u=None):
         f'<span style="display:block;font-size:{dk.SMALL};line-height:25px;"><b>{_esc(p["name_ko"])}</b> <span style="color:{dk.SUB};font-size:{dk.TINY};line-height:20px;">{_esc(p["title_ko"])} · {cnt}</span></span>'
         + (f'<span {dk.SAID_MARK}="1" style="display:block;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:#111;margin-top:2px;word-break:keep-all;">{dk.keep_tone(_esc(head))}</span>' if head else "")
         + (f'<span style="display:block;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.SUB};margin-top:2px;">연결 자산 : {_esc(touch)}</span>' if touch else "")
+        + (f'<span style="display:block;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.SUB};margin-top:2px;">한국 연관 종목 : {kr}</span>' if (kr := _kr_html(pth["assets"]) if pth else "") else "")
         + f'</span><span style="flex:none;color:#94A3B8;display:inline-flex;margin-top:10px;">{chev}</span></a>')
 
 
