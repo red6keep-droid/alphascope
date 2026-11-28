@@ -380,10 +380,10 @@ def row(d, f, t, show_dir=False, stars=(), restore=False, names=None, ref=0, new
     on = f"{d}/{f}" in stars
     if restore:   # 쓰지 않는 목업 화면 — 별 대신 복원
         return (f'<div class="row"><a class="go" href="{href}">'
-                f'<span class="name">{name}</span><span class="sub">{OLD_TAG if t < ref and not restore else ""}{html.escape(sub)}</span></a>'
+                f'<span class="name">{name}</span></a>'
                 f'<button class="back" data-k="{key}" aria-label="휴지통에서 꺼내기">복원</button></div>')
     return (f'<div class="row"><a class="go" href="{href}">'
-            f'<span class="name">{name}</span><span class="sub">{OLD_TAG if t < ref and not restore else ""}{html.escape(sub)}</span></a>'
+            f'<span class="name">{name}</span></a>'
             f'<button class="star{" on" if on else ""}" data-k="{key}" aria-label="즐겨찾기">{"★" if on else "☆"}</button>'
             f'<button class="mv" data-k="{key}" aria-label="휴지통으로 옮기기">휴지통</button></div>')
 
@@ -427,9 +427,9 @@ def index_page(mode="main"):
     n_old = sum(1 for x in items if x[2] < ref)
     W = lambda x: lc[f"{x[0]}/{x[1]}"][0]
     parts = []
-    nav_week = f'<a class="big" href="/week">보관 중인 목업 <span>확정 · 발행된 목업 {len(stale)}개 ›</span></a>'
-    nav_main = f'<a class="big" href="/">← 진행 중인 목업 <span>{len(recent)}개</span></a>'
-    nav_trash = f'<a class="big" href="/archive"><b class="ti">{TRASH_ICON}휴지통</b> <span>{len(old) + len(ARCHIVED_LINKS)}개 ›</span></a>'
+    nav_week = '<a class="big" href="/week">보관 중인 목업 ›</a>'
+    nav_main = '<a class="big" href="/">← 진행 중인 목업</a>'
+    nav_trash = f'<a class="big" href="/archive"><b class="ti">{TRASH_ICON}휴지통</b> ›</a>'
     if archive:
         parts.append('<a class="big" href="/">← 목업 목록으로</a>')
         tn = prefs["trash_note"]
@@ -445,13 +445,11 @@ def index_page(mode="main"):
     else:
         every_key = {f"{d}/{f}": (d, f, t) for d, f, t in every}
         if mode == "main":
-            parts.append('<div class="cut">진행 중인 목업만 보입니다 · 확정 · 발행된 목업은 맨 아래 <a href="/week">보관 중인 목업</a></div>')
             fav = [every_key[k] for k in stars if k in every_key and k not in arch]   # 즐겨찾기는 날짜와 상관없이 첫 화면에 (누른 순서대로)
             if fav:
                 parts += ['<section><h2>★ 즐겨찾기</h2>', *(row(*x, show_dir=True, stars=stars, names=names, ref=ref, when_t=W(x)) for x in fav), "</section>"]
         else:
             parts.append(nav_main)
-            parts.append('<div class="cut">확정 · 발행된 목업입니다. 다시 진행하는 기능은 발행 예정으로 옮기면 첫 화면에 보입니다.</div>')
         plan, live = {}, {}
         for x in items:
             st = stage_of(x[0], x[1])
@@ -461,21 +459,19 @@ def index_page(mode="main"):
             last = max(W(x) for x in rows)
             note = next((lc[f"{x[0]}/{x[1]}"][1] for x in rows if lc[f"{x[0]}/{x[1]}"][1]), "")
             when = f'{ago(last)} 고침' if last else "고친 기록 없음"
-            out = [f'<details{" open" if opened else ""}><summary>{f"""<span class="st{" hold" if tag == "보류" else " done" if tag == "확정" else ""}">{tag}</span>""" if tag else ""}{html.escape(name)} <span class="n">{len(rows)}</span>'
-                   f'<span class="when">{when}{" · " + html.escape(note) if note else ""}</span>'
-                   + (f'<span class="todo">{html.escape(todo)}</span>' if todo else "") + '</summary>']
+            out = [f'<details{" open" if opened else ""}><summary>{f"""<span class="st{" hold" if tag == "보류" else " done" if tag == "확정" else ""}">{tag}</span>""" if tag else ""}{html.escape(name)}</summary>']
             out += [row(*x, stars=stars, names=names, ref=ref, when_t=W(x)) for x in rows]
             out.append("</details>")
             return out
 
         order = lambda dct: sorted(dct, key=lambda i: -max(W(x) for x in dct[i]))   # 최근에 고친 기능이 위로
         if plan or (mode == "main" and PLAN_NOMOCK):
-            parts.append('<h2 class="zone">발행 예정 <span class="zs">아직 확정 전 · 확정되면 보관 중인 목업(발행된 화면)으로 옮기고 지난 시안은 휴지통</span></h2>')
+            parts.append('<h2 class="zone">발행 예정</h2>')
             for n, i in enumerate(order(plan)):
                 parts += block(PLAN[i][0], PLAN[i][1], plan[i], mode == "main" and n == 0, tag=PLAN[i][3] if len(PLAN[i]) > 3 else "미확정")
             if mode == "main":
                 for name, todo in PLAN_NOMOCK:
-                    parts.append(f'<div class="nomock"><b>{html.escape(name)}</b><span class="todo">{html.escape(todo)}</span></div>')
+                    parts.append(f'<div class="nomock"><b>{html.escape(name)}</b></div>')
         if live:
             parts.append('<h2 class="zone">발행된 화면</h2>')
             for i in order(live):
@@ -514,7 +510,7 @@ body.edit .edit-btn:not(.reload-btn){{background:#1d2127;border-color:#1d2127;co
 .when{{display:block;margin-top:4px;color:#2563EB;font-size:13px;font-weight:400}} .cut{{color:#5b6370;font-size:13px;margin:-6px 0 16px}} .cut a{{color:#2563EB}}
 .foot{{margin-top:24px}} details.more{{background:none;border:0}} details.more>summary{{padding:10px 14px;color:#2563EB;font-weight:600;font-size:14px}} details.more .row{{border:1px solid #e3e6eb;border-radius:10px;margin-bottom:8px}} .big.dark{{background:#1d2127;border-color:#1d2127;color:#fff}} .big.dark span{{color:#c3c8d0}}
 </style></head><body>
-<div class="top"><h1>{"휴지통" if archive else "목업 목록" if mode == "main" else "보관 중인 목업"}</h1><span class="tbtns">{RELOAD_BTN}{"" if archive else EDIT_BTN}</span></div><div class="meta">{len(items)}개 · 불러온 시각 {now} · 새로고침하면 최신 목록{"" if archive or not n_old else f" · 옛 버전 {n_old}개(공통 디자인보다 먼저 만듦 — rebuild_mocks.py 로 다시 그림)"}</div>
+<div class="top" style="margin-bottom:16px"><h1>{"휴지통" if archive else "목업 목록" if mode == "main" else "보관 중인 목업"}</h1><span class="tbtns">{RELOAD_BTN}{"" if archive else EDIT_BTN}</span></div>
 {''.join(parts)}
 <script>
 const ds = [...document.querySelectorAll('details')];
