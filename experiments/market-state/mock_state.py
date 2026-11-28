@@ -1,7 +1,7 @@
-"""시장 상태판 — 목업 (거시 흐름 지도 0-6 `다음 = 상태판 설계`).
+"""시장 상태판 — 목업 (거시 흐름 지도 0-6 `다음 = 상태판 설계`). 11-28 홈 카드 뺌 → 홈은 자리가 바뀐 날만 `오늘 달라진 것` 한 줄.
 
     .venv/bin/python experiments/market-state/mock_state.py
-→ output/mock_state_home_us.html · mock_state_home_kr.html (홈 맨 위 짧은 카드)
+→ (홈 짧은 카드는 11-28 뺌 — mock_state_home_* 는 휴지통)
   output/mock_state_detail.html (증시 리포트 첫 구획 자리 — 자세히, 미국 · 한국 + 정할 것 A안 · B안)
 
 검증에서 살아남은 축만 판정에 쓴다(비공개 doc/기획/거시-흐름-지도.md 0-4 `검증 일곱 묶음 끝` 표):
@@ -30,11 +30,13 @@ import main as M  # noqa: E402 — 질문 카드(M._qc) · 묶음(M.C.cards_grid
 
 NAME = {"상승": "상승", "하락": "하락", "안정": "소강", "회복": "반등"}   # 독자 말 — `안정`은 V8 에서 오히려 더 빠진 쪽이라 오해를 부른다
 STEPS = ["상승", "하락", "소강", "반등"]
+BASE = {"us": "1990년부터 전체 거래일", "kr": "1997년부터 전체 거래일"}
+BASE_N = {"us": "1990년부터의 전체 거래일(9,169일)", "kr": "1997년부터의 전체 거래일(7,237일)"}   # 뒤 여섯 달이 있는 날 — 자료 11-27
 CONFIRM = 3   # 10% 선을 사흘 이어서 넘어야 자리를 바꾼다(11-28 사용자 A안)
 STEP_NOTE = {"상승": "최고점에서 10% 안", "하락": "사흘 넘게 10% 아래 · 새 최저가", "소강": "새 최저가 없이 20거래일", "반등": "최저가보다 10% 넘게 위"}
 FOREIGN = {"^N225": "닛케이", "^HSI": "항셍", "000001.SS": "상하이", "^TWII": "대만", "^GDAXI": "독일", "^STOXX50E": "유로 50"}
 SECTORS = {"XLK": "기술", "XLE": "에너지", "XLI": "산업재", "XLF": "금융", "XLV": "헬스케어", "XLY": "임의소비재", "XLP": "필수소비재", "XLU": "유틸리티", "XLB": "소재"}
-# 지난 기록 — 검증 문서(비공개 doc/검증/) 값. (여섯 달 뒤 상승 m/n, 아무 날 %, 한마디)
+# 지난 기록 — 검증 문서(비공개 doc/검증/) 값. (여섯 달 뒤 상승 m/n, 비교 대상, 한마디) — 비교 대상 이름은 BASE(헌법 제1조 6항)
 HIST = {   # 사흘 규칙(confirm=3)으로 다시 센 값 — results/cycle_position_c3.md (11-28)
     "us": {"상승": ("평소와 같음", "여섯 달 뒤 중앙 +6.1% · 아무 날 +5.7% · 날의 64%가 이 자리", "평소와 같았습니다"),
            "하락": ("16번 중 12번 상승", "여섯 달 뒤 중앙 +15.0% · 아무 날 +5.7%", "막 들어간 날 뒤는 오히려 좋았습니다"),
@@ -170,25 +172,8 @@ def first_sentence(m, mk):
 
 def hist_lines(mk, cur):
     a, b, c = HIST[mk][cur]
+    b = b.replace("아무 날", BASE[mk])
     return (f"지난 기록에서 {'미국' if mk == 'us' else '한국'} 증시가 {cur} 자리였을 때는 {c}.", (b.split(" · 날의")[0] if a == "평소와 같음" else a), b)
-
-
-def home_card(mk, m):
-    nm = "미국 증시는 지금 어디쯤?" if mk == "us" else "한국 증시는 지금 어디쯤?"
-    color = "#111" if m["cur"] == "상승" else dk.DOWN
-    h1, a, b = hist_lines(mk, m["cur"])
-    dep = f"{m['depth'] * 100:+.1f}%".replace("-", "−")
-    body = (f'<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:17px;line-height:26px;">'
-            f'<b style="color:#111;">{"S&P 500" if mk == "us" else "코스피"} {dep}' + f'<span style="font-weight:400;font-size:14px;color:{dk.NOTE};"> 최고점 대비</span></b>'
-            f'<b style="color:{color};">{answer_word(m)}</b></div>'
-            + strip(m["cur"])
-            + f'<div style="margin:10px 0 0;font-size:15px;line-height:23px;color:#333;word-break:keep-all;">{esc(h1)} <span style="color:{dk.NOTE};">({esc(a)})</span></div>')
-    icon = ('<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'
-            '<circle cx="8" cy="8" r="5.5"/><path d="M8 8l3-2"/></svg>')
-    return ('<div class="report-col" id="state-col">'
-            f'<h3 class="report-title"><span class="report-icon" style="background:#334155;" aria-hidden="true">{icon}</span>{esc(nm)}'
-            f'<span class="report-card-date">{m["asof"].month:02d}.{m["asof"].day:02d} 종가</span></h3>'
-            f'<a class="report-card" href="mock_state_detail.html#{mk}" style="display:block;padding:12px 16px;text-decoration:none;">{body}</a></div>')
 
 
 def detail_card(mk, m, cr, wr, sec):
@@ -198,6 +183,7 @@ def detail_card(mk, m, cr, wr, sec):
     # 자리마다 지난 기록 네 줄 — 지금 자리는 굵게
     for s in STEPS:
         x, y, z = HIST[mk][s]
+        y = y.replace("아무 날", BASE[mk])
         lines.append(("row", f'<span style="{"font-weight:700;" if s == m["cur"] else ""}">{s} 자리{" (지금)" if s == m["cur"] else ""}</span>', x, y))
     # 그래프 — 2년 종가 + 최고점 −10% 선
     c = m["c"].iloc[-504:]
@@ -227,7 +213,7 @@ def detail_card(mk, m, cr, wr, sec):
     lines.append(("row", "전쟁 · 정책 걱정 (지난 5년 중)", f"{wr[0] * 100:.0f} · {wr[1] * 100:.0f} 분위", "지정학 위험 지수 · 경제정책 불확실성 지수, 높음 = 80 분위 넘음"))
     if mk == "kr":
         lines.append(("row", "돈의 흐름", "증시에서 돈이 빠져나가나?", "한국 증시 리포트 수급 탭 카드로 이어집니다"))
-    lines.append(("자리는 종가로 정하고, 10% 선을 사흘 이어서 넘어야 바꿉니다. 지난 기록은 미국 1990년 뒤 · 한국 1997년 뒤이고, 같은 자리에 63거래일 넘게 없다가 다시 들어간 날을 한 번으로 셉니다. 지금 상태를 말하며 앞으로의 주가를 말하지 않습니다.", "note"))
+    lines.append((f"자리는 종가로 정하고, 10% 선을 사흘 이어서 넘어야 바꿉니다. 비교 대상은 {BASE_N[mk]}이고, 같은 자리에 63거래일 넘게 없다가 다시 들어간 날을 한 번으로 셉니다. 지금 상태를 말하며 앞으로의 주가를 말하지 않습니다.", "note"))
     color = "#111" if m["cur"] == "상승" else dk.DOWN
     theme = "neutral" if m["cur"] == "상승" else "negative"
     tip = ("시장이 되풀이하는 네 자리(상승 · 하락 · 소강 · 반등) 중 지금 어디인지 종가로 정합니다\n"
@@ -237,10 +223,30 @@ def detail_card(mk, m, cr, wr, sec):
     return M._qc(nm, answer_word(m), theme, color, lines, tip=tip, opened=True)
 
 
-def variant_box(title, rows):
-    inner = "".join(f'<div style="padding:10px 0;border-top:1px solid #E2E8F0;font-size:15px;line-height:23px;color:#111;word-break:keep-all;">{r}</div>' for r in rows)
-    return (f'<div style="margin:0 0 16px;padding:6px 14px 4px;border:1px dashed #94A3B8;border-radius:8px;background:#fff;">'
-            f'<div style="padding:6px 0 8px;font-size:14px;line-height:20px;font-weight:700;color:#334155;">목업 안내 · 정할 것 — {esc(title)}</div>{inner}</div>')
+def change_rows():
+    """홈 `오늘 달라진 것` 한 줄 — 자리가 바뀐 날에만(바뀌지 않은 날엔 홈에 없음). 예시 = 실제로 자리가 바뀐 최근 날."""
+    ex = [("S&P 500 하락 자리로", "2025년 4월 7일", "사흘째 최고점보다 10% 넘게 아래",
+           "지난 기록 : 하락 자리에 막 들어간 16번 중 여섯 달 뒤 12번 상승 · 1990년부터의 전체 거래일 75%"),
+          ("S&P 500 상승 자리로", "2025년 5월 1일", "사흘째 최고점에서 10% 안",
+           "상승 자리 = 1990년부터의 전체 거래일과 같은 범위"),
+          ("코스피 하락 자리로", "2026년 10월 15일", "소강 뒤 최저가를 새로 씀",
+           "지난 기록 : 하락 자리에 막 들어간 24번 중 여섯 달 뒤 15번 상승 · 1997년부터의 전체 거래일 57%")]
+    out = ""
+    for what, day, why, cmp_ in ex:
+        out += (f'<div style="display:flex;align-items:flex-start;gap:8px;padding:10px 0;border-top:1px solid #EEF2F6;">'
+                f'<span style="flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:2px;">'
+                f'<span style="display:flex;flex-wrap:wrap;align-items:center;gap:2px 8px;font-size:16px;line-height:24px;">'
+                f'<span style="flex:none;padding:1px 6px;border:1px solid #E2E8F0;border-radius:4px;background:#F8FAFC;font-size:12px;line-height:18px;font-weight:600;color:#334155;">상태</span>'
+                f'<b style="font-weight:700;word-break:keep-all;">{esc(what)}</b><span>{esc(why)}</span></span>'
+                f'<span style="font-size:13px;line-height:19px;color:{dk.SUB};word-break:keep-all;">{esc(cmp_)}</span>'
+                f'<span style="font-size:12px;line-height:18px;color:{dk.NOTE};">예시 · 그날 = {esc(day)}</span></span>'
+                f'<span aria-hidden="true" style="flex:none;color:#333;font-size:18px;line-height:24px;">›</span></div>')
+    return out.replace("border-top:1px solid #EEF2F6;", "", 1)
+
+
+def guide_box(title, html):
+    return (f'<div style="margin:0 0 20px;padding:6px 14px 6px;border:1px dashed #94A3B8;border-radius:8px;background:#fff;">'
+            f'<div style="padding:6px 0 8px;font-size:14px;line-height:20px;font-weight:700;color:#334155;">목업 안내 — {esc(title)}</div>{html}</div>')
 
 
 def main():
@@ -249,43 +255,15 @@ def main():
     cr = credit()
     wr = worry(us["c"].index)
     sec = sectors()
-
-    # 홈
-    for mk, m in (("us", us), ("kr", kr)):
-        src = os.path.join(ROOT, "experiments", "home-split", "output", f"mock_home_{mk}.html")
-        t = open(src, encoding="utf-8").read()
-        key = '<div class="report-col" id='
-        i = t.index(key)
-        t = t[:i] + home_card(mk, m) + t[i:]
-        for a, b in (("mock_home_us.html", "mock_state_home_us.html"), ("mock_home_kr.html", "mock_state_home_kr.html")):
-            t = t.replace(f'href="{a}"', f'href="{b}"')
-        t = t.replace(f"<title>홈 나누기 — {'미국' if mk == 'us' else '한국'} 화면</title>", f"<title>시장 상태판 — 홈 {'미국' if mk == 'us' else '한국'} 화면 맨 위 카드</title>", 1)
-        p = os.path.join(OUT, f"mock_state_home_{mk}.html")
-        open(p, "w", encoding="utf-8").write(t)
-        print(p)
-
-    # 자세히
-    b60, h60 = cr["b60"], cr["h60"]
-    run_note = "사흘 연속" if us["days_below_recent"] < 3 else ""
-    v1 = variant_box("10% 선에 하루만 닿은 날도 하락 자리로 보나", [
-        tag("A안", True) + f"종가가 <b>사흘 이어서</b> 10% 선 아래일 때만 하락 자리로 바꿉니다. 지금 S&P 500 은 {md(us['last_below'])} 하루만 닿아 그대로 상승 자리 — 상승이 시작된 지 <b>1.6년</b>(2025년 4월 29일부터)으로 이어집니다. "
-        f'<span style="color:{dk.NOTE};">하루짜리 출렁임에 자리가 바뀌지 않습니다. 고르면 지난 기록 숫자를 이 규칙으로 다시 셉니다.</span>',
-        tag("B안") + f"하루라도 닿으면 하락 자리(검증에 쓴 규칙 그대로). 지금 S&P 500 은 {md(us['last_below'])} 하루 하락 자리였다가 상승 자리로 돌아왔고, 상승은 <b>0년</b>부터 다시 셉니다.",
-    ])
-    v2 = variant_box("신용 줄 — 하이일드를 어떻게 읽나", [
-        tag("A안", True) + f"회사채 · 하이일드 <b>둘 다</b> 보여 주고, 둘이 갈리면 <b>엇갈림</b>. 지금 = 회사채 60일 {b60:+.2f}%p(평온) · 하이일드 대리 {h60 * 100:+.1f}%(2007년 뒤 아래 {cr['hpct'] * 100:.0f}%, 벌어지는 중) → <b>엇갈림</b>. "
-        f'<span style="color:{dk.NOTE};">긴 하락을 가른 것으로 검증된 선은 회사채(+0.20%p)뿐이라 판정 글자는 회사채로, 하이일드는 값과 분위로.</span>'.replace("-", "−"),
-        tag("B안") + f"하이일드 선 하나로 판정 — 아래 10%({cr['cut10'] * 100:.1f}%)면 지금 <b>평온</b>, 아래 20%({cr['cut20'] * 100:.1f}%)면 지금 <b>벌어짐</b>. 같은 날도 선에 따라 답이 바뀝니다.".replace("-", "−"),
-    ])
-    v3 = variant_box("놓일 자리", [
-        tag("A안", True) + "홈 맨 위 = 짧은 카드(자리 · 지난 기록 한 줄, 누르면 자세히) · 증시 리포트 첫 구획 = 이 화면처럼 자세히. 미국 화면 · 한국 화면 따로.",
-        tag("B안") + "홈에는 넣지 않고 증시 리포트에만 — 홈 맨 위는 `오늘 달라진 것`(목업 확인 중)에 맡깁니다.",
-    ])
+    home = guide_box("홈에는 자리가 바뀐 날에만 · `오늘 달라진 것` 카드의 한 줄로",
+                     f'<div style="padding:0 0 8px;font-size:14px;line-height:20px;color:{dk.SUB};word-break:keep-all;">자리는 일부러 천천히 바뀌게 만든 판정이라(10% 선을 사흘 이어서), 홈에 늘 두면 몇 주 · 몇 달 같은 말이 뜹니다. 바뀐 날에만 아래처럼 한 줄 — 바뀌지 않은 날엔 홈에 나오지 않습니다. 누르면 증시 리포트의 이 판으로.</div>'
+                     + change_rows())
+    place = guide_box("놓일 자리 · 증시 리포트 안", f'<div style="padding:0 0 8px;font-size:14px;line-height:20px;color:{dk.SUB};word-break:keep-all;">미국 · 한국 증시 리포트에서 그날 움직임 구획들 <b>뒤</b>, `큰 흐름` 자리. 리포트를 여는 독자도 먼저 오늘 무엇이 움직였는지를 보고, 그 다음 배경으로 읽습니다.</div>')
     body = (f'<div data-head-title="시장 상태판">'
-            + dk.muted("미국 · 한국 증시 리포트 첫 구획 자리에 놓을 카드입니다(홈 맨 위에는 짧은 카드). 숫자는 11월 27일 종가로 검증 저장소에서 계산했습니다. 11-28 정한 것 = 사흘 규칙 · 신용 둘 다 보여 주고 갈리면 엇갈림 · 홈 짧게 + 리포트 자세히.")
-
-            + f'<a id="us"></a>' + dk.section("미국 증시는 지금 어디쯤?", M.C.cards_grid(detail_card("us", us, cr, wr, sec)), line=False)
-            + f'<a id="kr"></a>' + dk.section("한국 증시는 지금 어디쯤?", M.C.cards_grid(detail_card("kr", kr, cr, wr, sec)), line=False)
+            + dk.muted("숫자는 11월 27일 종가로 검증 저장소에서 계산했습니다. 점선 상자는 목업에서만 보입니다.")
+            + home + place
+            + f'<a id="us"></a>' + dk.section("큰 흐름 — 미국 증시는 지금 어디쯤?", M.C.cards_grid(detail_card("us", us, cr, wr, sec)), line=False)
+            + f'<a id="kr"></a>' + dk.section("큰 흐름 — 한국 증시는 지금 어디쯤?", M.C.cards_grid(detail_card("kr", kr, cr, wr, sec)), line=False)
             + '</div>')
     p = os.path.join(OUT, "mock_state_detail.html")
     print(dk.write_mock(body, p, "시장 상태판 — 지금 어디쯤?"))
