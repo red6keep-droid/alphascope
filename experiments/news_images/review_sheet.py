@@ -15,15 +15,19 @@ LIST = os.path.join(TRASH, "사용안함-목록.csv")
 IMG = (".jpg", ".jpeg", ".png", ".webp", ".gif")
 # 업종 폴더 최소 장수(운영지침 4-6, 11-28): 회사 30곳 이상 들어가는 업종 = 5, 나머지 = 3
 BIG = {"반도체", "제약_·_바이오", "건설_·_부동산", "로봇_·_기계", "인터넷_·_소프트웨어", "의료기기_·_병원", "은행"}
+# 쓰임 많은 시장 · 사건 폴더 목표(11-28 미리 돌려 보기: 기업 사건 24% · AI 투자 7.6% · 전광판 4.8% · 코스피 4.1% …)
+GOAL = {"기업_사건_·_인수합병": 8, "AI_투자": 5, "규제_·_소송": 5, "주가_전광판": 5, "한국거래소_·_코스피": 5, "뉴욕증권거래소": 5,
+        "나스닥": 3, "월가": 3, "여의도": 3, "환율": 5, "금융_·_신용_·_은행": 5, "관세_·_무역": 5, "부동산_·_주택": 5, "경기_·_고용": 5, "실적_발표": 5}
 
 
 def done_note(g):
     """폴더 제목 옆 — 완료에 이미 몇 장 · 목표 몇 장(업종만)."""
     d = os.path.join(ROOT, "완료", g)
     have = len([f for f in os.listdir(d) if f.lower().endswith(IMG)]) if os.path.isdir(d) else 0
-    if not g.startswith("3_업종"):
+    b = os.path.basename(g)
+    if not g.startswith("3_업종") and b not in GOAL:
         return f" <span class=dn>완료 {have}장</span>"
-    goal = 5 if os.path.basename(g) in BIG else 3
+    goal = GOAL.get(b) or (5 if b in BIG else 3)
     return f" <span class=dn>완료 {have}장 · 목표 {goal}장 → <b>{max(goal - have, 0)}장 더</b> 남기기</span>"
 
 
