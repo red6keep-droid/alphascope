@@ -88,6 +88,8 @@ def shrink(src, dst):
 
 def build():
     os.makedirs(CACHE, exist_ok=True)
+    tp = os.path.join(os.path.dirname(SRC), "글자.json")   # photo_text.py — 사진 속 읽히는 외국 글자(없으면 빈 칸)
+    texts = {k: v["text"] for k, v in json.load(open(tp, encoding="utf-8")).items()} if os.path.exists(tp) else {}
     rows = list(csv.DictReader(open(os.path.join(SRC, "출처.csv"), encoding="utf-8-sig")))
     out, seen, size = [], set(), 0
     for r in rows:
@@ -113,7 +115,8 @@ def build():
             "license_url": LIC_URL.get(lic, r["source"]),   # 조건 주소가 없는 것(퍼블릭 도메인 · 저작자 표시)은 원본 페이지
             "source": r["source"],
             "title": r["title"][:120],
-            "crop": "일부 자름" in (r.get("note") or ""),   # 미리 잘라 저장한 사진 = 출처 줄 끝에 `· 일부 자름`
+            "crop": "일부 자름" in (r.get("note") or ""),
+            "text": texts.get("완료/" + rel, []),   # 미리 잘라 저장한 사진 = 출처 줄 끝에 `· 일부 자름`
         })
     # AI 생성 이미지(11-28 사용자 — 코스피 · 코스닥 기사가 많아 실제 사진이 모자람): AI_코스피/상승 · 하락 · 보합.
     # 출처 줄 = `AI 생성 이미지`(운영지침 4-6 생성 이미지 표시), 저작자 · 조건 없음. 방향은 글 direction 으로 고른다(photo_pick).
@@ -131,7 +134,8 @@ def build():
                 w, h = shrink(f, dst)
             size += os.path.getsize(dst)
             out.append({"id": i, "group": "9_AI/코스피_" + os.path.basename(dp), "sym": "", "w": w, "h": h, "ai": True,
-                        "artist": "", "license": "AI 생성 이미지", "license_url": "", "source": "", "title": "증권사 딜링룸 · 시세 화면", "crop": False})
+                        "artist": "", "license": "AI 생성 이미지", "license_url": "", "source": "", "title": "증권사 딜링룸 · 시세 화면", "crop": False,
+                        "text": texts.get("AI_코스피/" + os.path.relpath(f, AI_SRC), [])})
     # 파일만 있고 출처 줄이 없는 사진 = 올리지 않음(출처 없이 쓸 수 없음)
     orphan = [os.path.relpath(os.path.join(dp, n), SRC) for dp, _, fs in os.walk(SRC) for n in fs
               if n.lower().endswith((".jpg", ".jpeg", ".png", ".webp")) and os.path.relpath(os.path.join(dp, n), SRC) not in seen]

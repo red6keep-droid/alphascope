@@ -65,6 +65,8 @@ BOARD = {   # 주가 전광판 = 이웃 폴더 빌려 쓰기(11-28 사용자) �
 }
 US_WORDS = r"미국|美|뉴욕|나스닥|S&P|다우|월가|연준"
 KR_BORROW = {"증권_·_투자": ["여의도"]}   # 한국 회사인데 업종 폴더가 전부 외국 거래소일 때 빌릴 폴더(증권사 → 여의도, 11-28)
+KR_BRAND = r"KOREA|SEOUL|BUSAN|HANA|SAMSUNG|HYUNDAI|\bLG\b|OLG|\bSK\b|\bKIA\b|I ?PARK|LOTTE|HANWHA|POSCO|NAVER|KAKAO|SHINHAN|WOORI|\bKB\b|CC-?BY|SHINSEGAE|KOSPI|KRX"   # 사진 글자 중 문제없는 것(한국 회사 로마자 · 사진 저작자 표시)
+KOREA = r"Korea|Seoul|Busan|Incheon|Ulsan|Daegu|Gwangju|Daejeon|Yeouido|Pangyo|Gangnam|Myeongdong|Changwon|Pohang|Geoje|Hanok|한국|서울|부산|인천|울산|여의도|판교|강남|창원|포항|거제|대한민국"   # 사진 이름(원본 제목)에 한국 땅 이름
 FOREIGN = r"Tokyo|Tokio|Japan|NYSE|Nasdaq|Wall Street|New York|Shanghai|Hong Kong"   # 한국 기사 전광판 사진에서 뺄 외국 거래소 사진(제목 기준)
 NEED = {
     "대만": r"해협|양안|군사|침공|중국.*(압박|훈련)", "러시아": r"우크라|전쟁|휴전|드론|공격|파병", "대법원": r"미국|美|연방",
@@ -133,6 +135,11 @@ def _stock_rec(ticker, mk):
     return ref["us"].get(ticker)
 
 
+def _foreign_text(p):
+    """사진 속 읽히는 외국 글자(photo_text.py) — 한국 회사 이름 로마자(KOREAN AIR · I PARK · Hana · LG …)는 괜찮다."""
+    return [t for t in p.get("text") or [] if not re.search(KR_BRAND, t, re.I)]
+
+
 def _ai(post):
     """AI 생성 이미지 — 글 방향(direction up · down)에 맞는 색만(상승 = 빨강 · 하락 = 파랑, 한국식). 방향 없으면 보합."""
     d = (post.get("direction") or "").lower()
@@ -159,13 +166,19 @@ def pick(post, stocks=()):
     title = post.get("title") or ""
     key = post.get("id") or post.get("slug") or title
 
-    def out(photos, kind, why, label=None):
+    korean = not re.search(US_WORDS, title)
+
+    def out(photos, kind, why, label=None, kr=None):
+        if photos and (kr if kr is not None else korean):   # 한국 기사 · 한국 회사 = 외국 글자(간판 · 상품 · 시세)가 읽히는 사진 빼기(11-28 사용자 홈플러스), 다 빠지면 그대로
+            photos = [p for p in photos if not _foreign_text(p)] or photos
         return {"photo": _choose(photos, key), "label": label, "kind": kind, "why": why} if photos else None
 
     for k, f in PEOPLE.items():
         m = word_re(k).search(title)
         if m and not re.match(SKIP_AFTER, title[m.end():]):
-            return out(folders.get(f) or [], "인물", k)
+            ph = folders.get(f) or []
+            wide = [p for p in ph if p["w"] >= p["h"] * 1.2]   # 인물 = 가로 사진만(세로 사진은 높이 200 띠에서 얼굴이 잘림, 11-28 사용자 젠슨 황)
+            return out(wide or ph, "인물", k)
     first = (post.get("stocks") or [None])[0]   # 수집기 글 첫 종목 = 주인공(블로그 목록 밖이어도 둘째로 넘어가지 않는다)
     hit = None
     if first:
@@ -189,7 +202,7 @@ def pick(post, stocks=()):
             if mk == "kr":   # 한국 회사에 외국 거래소 사진 X(11-28 삼성증권 → 도쿄증권거래소) — 다 빠지면 그대로
                 pool = ([p for p in pool if not re.search(FOREIGN, p.get("title") or "")]
                         or [p for g in KR_BORROW.get(f, []) for p in folders.get(g, [])] or pool)
-            return out(pool, "업종 사진 + 이름표", f"{name} → {f}" + ("" if rec else " (글 업종)"), (logo, name))
+            return out(pool, "업종 사진 + 이름표", f"{name} → {f}" + ("" if rec else " (글 업종)"), (logo, name), kr=(mk == "kr"))
     for kind, table in (("기관", INST), ("국제", WORLD), ("시장", MARKET)):
         for k, f in table.items():
             if word_re(k).search(title) and (k not in NEED or re.search(NEED[k], title)):
@@ -198,13 +211,13 @@ def pick(post, stocks=()):
                 if f == "한국거래소_·_코스피":   # 코스피 · 코스닥 기사 = 실제 사진 + 글 방향에 맞는 AI 생성 이미지(11-28)
                     return out((folders.get(f) or []) + _ai(post), kind, k)
                 return out(folders.get(f) or [], kind, k)   # 낱말은 맞았는데 폴더가 비면 사진 없음(아래 분류로 내려가 엉뚱한 사진 X — 11-28 한국은행 → 연준 건물)
-    for pat, f in EVENT:   # 사건 낱말 — 분류(기업 사건 등)보다 먼저(11-28 파업 · 휴업 폴더 이음)
-        if re.search(pat, title):
-            return out(folders.get(f) or [], "사건", re.search(pat, title).group(0))
     cat = post.get("cat") or ""
     f = industry(post.get("sector")) if cat in ("CORP_EVENT", "EARNINGS") else None
     if f and folders.get(f):
         return out(folders[f], "업종 사진", f"글 업종 '{post.get('sector')}'")
+    for pat, f in EVENT:   # 사건 낱말 — 글 업종 사진 다음 · 분류보다 먼저(11-28: 홈플러스 휴업 기사 = 유통 사진이 먼저)
+        if re.search(pat, title):
+            return out(folders.get(f) or [], "사건", re.search(pat, title).group(0))
     f = CAT.get(cat)
     us = bool(re.search(US_WORDS, title))
     if f == "@board":
@@ -235,10 +248,11 @@ def figure(pick, logo_html=None):
         chip = (f'<span style="position:absolute;right:12px;bottom:12px;display:flex;align-items:center;gap:6px;height:32px;padding:0 12px 0 4px;'
                 f'border-radius:16px;background:#fff;font-size:14px;line-height:20px;font-weight:700;color:#111;">{logo}{_h.escape(name)}</span>')
     a = 'style="color:inherit;text-decoration:none;"'
+    pos = "object-position:center 30%;" if p["h"] > p["w"] * 0.8 else ""   # 세로에 가까운 사진 = 위쪽 1/3 기준으로 잘라 얼굴 · 간판이 남게
     if p.get("ai"):   # 생성 이미지 = 출처 줄에 `AI 생성 이미지`만(운영지침 4-6)
         return (f'<figure data-news-photo="{p["id"]}" style="margin:0 0 26px;"><div style="position:relative;">'
                 f'<img src="{p["url"]}" alt="AI 생성 이미지: {_h.escape(p["title"])}" width="{p["w"]}" height="{p["h"]}" loading="eager" '
-                f'style="display:block;width:100%;height:200px;object-fit:cover;border-radius:10px;">{chip}</div>'
+                f'style="display:block;width:100%;height:200px;object-fit:cover;{pos}border-radius:10px;">{chip}</div>'
                 f'<figcaption style="margin:6px 0 0;font-size:11px;line-height:16px;color:#9CA3AF;text-align:right;">AI 생성 이미지</figcaption></figure>')
     cap = (f'자료 사진 · <a href="{_h.escape(p["source"])}" {a} rel="nofollow noopener" target="_blank">{_h.escape(p["artist"])}</a>'
            f' · <a href="{_h.escape(p["license_url"])}" {a} rel="nofollow noopener" target="_blank">{_h.escape(p["license"])}</a>'
@@ -246,5 +260,5 @@ def figure(pick, logo_html=None):
     what = re.sub(r"^(File:|flickr: )", "", p.get("title") or "").rsplit(".", 1)[0] if (p.get("title") or "").startswith("File:") else re.sub(r"^flickr: ", "", p.get("title") or "")
     return (f'<figure data-news-photo="{p["id"]}" style="margin:0 0 26px;"><div style="position:relative;">'
             f'<img src="{p["url"]}" alt="자료 사진: {_h.escape(what)}" width="{p["w"]}" height="{p["h"]}" loading="eager" '
-            f'style="display:block;width:100%;height:200px;object-fit:cover;border-radius:10px;">{chip}</div>'
+            f'style="display:block;width:100%;height:200px;object-fit:cover;{pos}border-radius:10px;">{chip}</div>'
             f'<figcaption style="margin:6px 0 0;font-size:11px;line-height:16px;color:#9CA3AF;text-align:right;">{cap}</figcaption></figure>')
