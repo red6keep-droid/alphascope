@@ -1,6 +1,6 @@
 """과거 참고치 — 인물 × 주제의 "그런 날 하루" 시장 움직임 (기획 8절, 2026-10-25 축소안).
 
-예측이 아니라 참고치다: "과거에 이런 발언이 있던 날 S&P 500 은 보통 얼마나 움직였나"를 아무 날과 나란히 둔다.
+예측이 아니라 참고치다: "과거에 이런 발언이 있던 날 S&P 500 은 보통 얼마나 움직였나"를 그런 일이 없던 날(이름 · 기간 · 날 수를 밝힌 대조군)과 나란히 둔다.
 플라시보 검정 · 두 기간 지속 확인은 "검증해" 단계 — 여기는 중앙값 · 오른 날 비율만 (단순 비교라고 화면에 밝힌다).
 
 둘만 만든다 (기획 8절: CEO 발언 × 가격은 접음, 5 · 20일 창도 접음):
@@ -40,12 +40,30 @@ def _bars():
     return df.dropna(subset=["ret"])
 
 
-def _stats(df, days):
-    sub = df.loc[df.index.isin(list(days))]
-    base = df
-    return {"n": int(len(sub)), "med_abs": round(float(sub["ret"].abs().median()) * 100, 2),
-            "base_abs": round(float(base["ret"].abs().median()) * 100, 2),
-            "up_pct": round(float((sub["ret"] > 0).mean()) * 100), "base_up": round(float((base["ret"] > 0).mean()) * 100)}
+def _med(sub):
+    return round(float(sub["ret"].abs().median()) * 100, 2)
+
+
+def _stats(df, days, alt=None):
+    """그런 날 vs 대조군. 대조군 = 같은 기간 그런 일이 없던 날(그런 날을 뺀 나머지 전부). alt = (이름, 날 집합) — 비슷한 큰 일정 날(그런 날은 뺌)."""
+    hit = df.index.isin(list(days))
+    sub, base = df.loc[hit], df.loc[~hit]
+    out = {"n": int(len(sub)), "med_abs": _med(sub), "base_n": int(len(base)), "base_abs": _med(base),
+           "up_pct": round(float((sub["ret"] > 0).mean()) * 100), "base_up": round(float((base["ret"] > 0).mean()) * 100)}
+    if alt:
+        a = df.loc[df.index.isin(list(alt[1])) & ~hit]
+        out["alt"] = {"label": alt[0], "n": int(len(a)), "med_abs": _med(a), "up": round(float((a["ret"] > 0).mean()) * 100)}
+    return out
+
+
+def _release_days(df, subkinds):
+    """경제지표 발표일 (data/store/calendar/econ_releases.csv) — subkinds 중 하나라도 있던 거래일."""
+    days = set()
+    with open(os.path.join(os.path.dirname(FOMC), "econ_releases.csv"), encoding="utf-8") as f:
+        for r in csv.DictReader(f):
+            if r["subkind"] in subkinds and r["day"] in df.index:
+                days.add(r["day"])
+    return days
 
 
 def _tweet_days(df):
@@ -90,9 +108,9 @@ def build():
         "generated_at": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "symbol": "S&P 500",
         "trump": {"Trade": dict(_stats(first_term, _tweet_days(first_term)),
-                                label="관세 발언이 있던 날", period="2017~2020년 트윗", base_label="그 기간 아무 날")},
-        "fed": {"Fed": dict(_stats(df.loc["1994-01-01":], _fomc_days(df)),
-                            label="FOMC 금리 결정일", period="1994년부터", base_label="아무 날")},
+                                label="관세 발언이 있던 날", period="2017 ~ 2020년", base_label="관세 발언이 없던 날")},
+        "fed": {"Fed": dict(_stats(df.loc["1994-01-01":], _fomc_days(df), ("CPI · 고용 보고서 발표일", _release_days(df, {"CPI", "고용 보고서"}))),
+                            label="FOMC 금리 결정일", period="1994년부터", base_label="FOMC가 없던 날")},
     }
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     with open(OUT, "w", encoding="utf-8") as f:
@@ -100,7 +118,7 @@ def build():
     for sp, d in out.items():
         if isinstance(d, dict):
             for t, v in d.items():
-                print(f"[refs] {sp} × {t}: {v['n']}일 · 보통 ±{v['med_abs']}% (아무 날 ±{v['base_abs']}%) · 오른 날 {v['up_pct']}% (아무 날 {v['base_up']}%)")
+                print(f"[refs] {sp} × {t}: {v['n']}일 · 보통 ±{v['med_abs']}% ({v['base_label']} {v['base_n']}일 ±{v['base_abs']}%) · 오른 날 {v['up_pct']}% ({v['base_up']}%) · 비슷한 날 {v.get('alt')}")
     return out
 
 
