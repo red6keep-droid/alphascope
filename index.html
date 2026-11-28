@@ -1424,6 +1424,7 @@ body.item-view .post-title-meta .post-title-basis { font-size: 13px; line-height
 body.detail-nav .navbar { display: none; }
 body.detail-nav .pr-sticky .nav-toggle { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; flex: none; padding: 0; background: #fff; border: 1px solid var(--border-strong); border-radius: 8px; color: var(--gray-600); }   /* 글 보기: 로고 줄은 스크롤되어 사라지고 제목 줄(.pr-sticky)만 맨 위에 고정 */
 .pr-sticky { position: sticky; top: 0; z-index: 40; display: flex; align-items: center; gap: 12px; margin: 0 0 14px; padding: 4px 0 12px; background: var(--surface, #fff); border-bottom: 1px solid #E2E8F0; }
+body.pr-flat .pr-sticky { border-bottom: 0; }   /* 제목 줄 바로 아래가 그림 · 카드 = 선 없음 (11-28, 본문 첫 요소 판정 JS) */
 .pr-sticky .post-title { margin: 0; min-width: 0; }
 .nf-title { display: inline-flex; align-items: center; gap: 8px; }
 .post-title:has(.nf-title) .post-title-text, .post-title:has(.nf-title) .post-title-label { display: flex; align-items: center; line-height: 22px; }   /* 로고 · 주요 기사 · 오른쪽 11.23 기사를 한 가로선에 — 제목 줄 행간(48)이 로고 칸을 아래로 밀던 것 */
@@ -5181,6 +5182,46 @@ body, body * { word-break: normal !important; overflow-wrap: break-word !importa
         var s = document.createElement('span'); s.className = 'post-title-basis'; s.textContent = b.textContent.trim();
         meta.insertBefore(s, meta.querySelector('.title-share'));
         b.parentNode.removeChild(b);
+      })();
+
+      /* ============================================================ 제목 줄 구분선 = 바로 아래가 그림 · 카드면 뺀다 (11-28)
+         본문의 첫 보이는 요소(꾸밈 없는 감싸개는 안으로 들어가 봄)가 그림(img · figure · svg · canvas · video)이거나
+         네 변 외곽선 카드 · 색 바탕 카드면 body.pr-flat → .pr-sticky 아래 선을 지운다. 카드 테두리와 선이 겹쳐 보이던 것.
+         글마다 따로 지우던 것(시황 · 기사 렌더러의 :has 스타일)은 그대로 둔다 */
+      (function () {
+        'use strict';
+        var body = document.querySelector('.post-body');
+        if (!body || !document.querySelector('.pr-sticky')) return;
+        function shown(el) {
+          if (/^(STYLE|SCRIPT|TEMPLATE|LINK|META|BR)$/.test(el.tagName) || el.hidden) return false;
+          var cs = getComputedStyle(el);
+          return cs.display !== 'none' && cs.visibility !== 'hidden' && el.getBoundingClientRect().height > 0;
+        }
+        function first(p) { for (var c = p.firstElementChild; c; c = c.nextElementSibling) if (shown(c)) return c; return null; }
+        function painted(cs) { var b = cs.backgroundColor; return b && b !== 'transparent' && !/^rgba\(.*,\s*0\)$/.test(b) && !/^rgb\(255,\s*255,\s*255\)$/.test(b); }
+        function boxed(cs) { return parseFloat(cs.borderTopWidth) > 0 && parseFloat(cs.borderBottomWidth) > 0 && parseFloat(cs.borderLeftWidth) > 0; }
+        function check() {
+          var el = first(body), n = 0;
+          while (el && n++ < 8) {
+            if (el.getBoundingClientRect().width < body.getBoundingClientRect().width * 0.6) { el = null; break; }   /* 아이콘 · 배지 같은 작은 것은 카드가 아님 */
+            if (/^(IMG|FIGURE|PICTURE|SVG|svg|CANVAS|VIDEO)$/.test(el.tagName)) break;
+            var cs = getComputedStyle(el);
+            if (boxed(cs) || painted(cs)) break;
+            if (/^(H[1-6]|P|UL|OL|LI|TABLE|BLOCKQUOTE|SPAN|A|LABEL|BUTTON|DETAILS|SUMMARY)$/.test(el.tagName)) { el = null; break; }   /* 글자 요소 = 맨 위가 글자 */
+            if (parseFloat(cs.paddingTop) > 0 || parseFloat(cs.borderTopWidth) > 0 || el.textContent.trim() && !first(el)) { el = null; break; }
+            var c = first(el);
+            if (!c) { el = null; break; }
+            /* 감싸개 안 첫 요소 앞에 글자가 있으면 그 글자가 맨 위 */
+            var t = '', k = el.firstChild;
+            while (k && k !== c) { if (k.nodeType === 3) t += k.textContent; k = k.nextSibling; }
+            if (t.trim()) { el = null; break; }
+            el = c;
+          }
+          var s = getComputedStyle(el || body);
+          document.body.classList.toggle('pr-flat', !!el && (/^(IMG|FIGURE|PICTURE|SVG|svg|CANVAS|VIDEO)$/.test(el.tagName) || boxed(s) || painted(s)));
+        }
+        check();
+        window.addEventListener('load', check);
       })();
 
       /* ============================================================ `함께 보는 페이지` 자리

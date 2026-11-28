@@ -3600,6 +3600,46 @@ function newsStrip(box, track, dotBox) {
   b.parentNode.removeChild(b);
 })();
 
+/* ============================================================ 제목 줄 구분선 = 바로 아래가 그림 · 카드면 뺀다 (11-28)
+   본문의 첫 보이는 요소(꾸밈 없는 감싸개는 안으로 들어가 봄)가 그림(img · figure · svg · canvas · video)이거나
+   네 변 외곽선 카드 · 색 바탕 카드면 body.pr-flat → .pr-sticky 아래 선을 지운다. 카드 테두리와 선이 겹쳐 보이던 것.
+   글마다 따로 지우던 것(시황 · 기사 렌더러의 :has 스타일)은 그대로 둔다 */
+(function () {
+  'use strict';
+  var body = document.querySelector('.post-body');
+  if (!body || !document.querySelector('.pr-sticky')) return;
+  function shown(el) {
+    if (/^(STYLE|SCRIPT|TEMPLATE|LINK|META|BR)$/.test(el.tagName) || el.hidden) return false;
+    var cs = getComputedStyle(el);
+    return cs.display !== 'none' && cs.visibility !== 'hidden' && el.getBoundingClientRect().height > 0;
+  }
+  function first(p) { for (var c = p.firstElementChild; c; c = c.nextElementSibling) if (shown(c)) return c; return null; }
+  function painted(cs) { var b = cs.backgroundColor; return b && b !== 'transparent' && !/^rgba\(.*,\s*0\)$/.test(b) && !/^rgb\(255,\s*255,\s*255\)$/.test(b); }
+  function boxed(cs) { return parseFloat(cs.borderTopWidth) > 0 && parseFloat(cs.borderBottomWidth) > 0 && parseFloat(cs.borderLeftWidth) > 0; }
+  function check() {
+    var el = first(body), n = 0;
+    while (el && n++ < 8) {
+      if (el.getBoundingClientRect().width < body.getBoundingClientRect().width * 0.6) { el = null; break; }   /* 아이콘 · 배지 같은 작은 것은 카드가 아님 */
+      if (/^(IMG|FIGURE|PICTURE|SVG|svg|CANVAS|VIDEO)$/.test(el.tagName)) break;
+      var cs = getComputedStyle(el);
+      if (boxed(cs) || painted(cs)) break;
+      if (/^(H[1-6]|P|UL|OL|LI|TABLE|BLOCKQUOTE|SPAN|A|LABEL|BUTTON|DETAILS|SUMMARY)$/.test(el.tagName)) { el = null; break; }   /* 글자 요소 = 맨 위가 글자 */
+      if (parseFloat(cs.paddingTop) > 0 || parseFloat(cs.borderTopWidth) > 0 || el.textContent.trim() && !first(el)) { el = null; break; }
+      var c = first(el);
+      if (!c) { el = null; break; }
+      /* 감싸개 안 첫 요소 앞에 글자가 있으면 그 글자가 맨 위 */
+      var t = '', k = el.firstChild;
+      while (k && k !== c) { if (k.nodeType === 3) t += k.textContent; k = k.nextSibling; }
+      if (t.trim()) { el = null; break; }
+      el = c;
+    }
+    var s = getComputedStyle(el || body);
+    document.body.classList.toggle('pr-flat', !!el && (/^(IMG|FIGURE|PICTURE|SVG|svg|CANVAS|VIDEO)$/.test(el.tagName) || boxed(s) || painted(s)));
+  }
+  check();
+  window.addEventListener('load', check);
+})();
+
 /* ============================================================ `함께 보는 페이지` 자리 (2026-11-10 사용자: 홈 · TOP 버튼 줄 아래로)
    렌더러는 본문 맨 끝에 [data-related] 를 둔다 — 이미 게시된 글까지 테마가 버튼 줄(+ 댓글 판) 아래로 옮긴다.
    본문 끝 구분선 판정(아래 .ends-text)보다 먼저 옮겨야 옮긴 뒤 본문 끝으로 정한다 */
