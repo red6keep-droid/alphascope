@@ -84,3 +84,4 @@ experiments/issue_store/results/*
 reference2/doc/
 experiments/news-posts/output/mock_img/
 experiments/news_images/output/
+experiments/market-state/output/   # 시장 상태판 목업 — 블로그 테마를 통째로 품어 공개 저장소 검사에 걸림, mock_state.py 로 다시 그림
