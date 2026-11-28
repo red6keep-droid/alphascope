@@ -139,11 +139,11 @@ TOPICS = {
         "뉴욕증권거래소": ["New York Stock Exchange facade", "NYSE trading floor", "Wall Street flags", "Fearless Girl statue", "Lower Manhattan skyline", "Federal Hall Wall Street", "Manhattan financial district street", "Brooklyn Bridge Manhattan skyline"],
         "나스닥": ["Nasdaq MarketSite Times Square", "Times Square night", "Silicon Valley", "Apple Park", "Googleplex"],
         "월가": ["Wall Street sign", "Charging Bull", "Wall Street street sign", "Broad Street New York", "Trinity Church Wall Street"],
-        "한국거래소 · 코스피": ["Korea Exchange Yeouido", "Korea Exchange building Busan", "Korea Exchange", "KRX Korea Exchange Seoul", "Busan International Financial Center", "Yeouido IFC Seoul", "Yeouido night skyline", "Han River Yeouido", "63 Building Seoul", "Busan International Finance Center", "Seoul skyline sunset", "Yeouido Park"],
+        "한국거래소 · 코스피": ["Korea Exchange Yeouido", "Korea Exchange building Busan", "Korea Exchange", "KRX Korea Exchange Seoul", "Busan International Financial Center", "Yeouido IFC Seoul", "Yeouido night skyline", "Han River Yeouido", "63 Building Seoul", "Busan International Finance Center", "Seoul skyline sunset", "Yeouido Park", "Yeouido skyline Han River", "Seoul financial district skyline", "Yeouido buildings", "Seoul skyline night"],
         "여의도": ["Yeouido skyline", "Yeouido IFC", "Yeouido financial district", "Yeouido Hangang Park"],
         "도쿄 증시": ["Tokyo Stock Exchange Arrowhead"],
         "상하이 · 홍콩 증시": ["Hong Kong Exchanges building", "Shanghai Lujiazui skyline"],
-        "주가 전광판": ["stock ticker board", "stock market chart screen", "Times Square screens night", "trader monitors", "LED ticker display", "stock app smartphone", "financial district night lights", "stock exchange board Tokyo", "digital numbers display"],
+        "주가 전광판": ["stock ticker board", "stock market chart screen", "Times Square screens night", "trader monitors", "LED ticker display", "stock app smartphone", "financial district night lights", "stock exchange board Tokyo", "digital numbers display", "stock market graph screen", "candlestick chart monitor", "stock prices red green display", "trading screen numbers", "financial chart laptop", "stock quotes board"],
     },
     "8_사건-분류": {
         "금리 · 연준": ["Federal Reserve Eccles building", "FOMC meeting"],
@@ -153,11 +153,11 @@ TOPICS = {
         "환율": ["United States dollar banknotes", "South Korean won banknotes", "currency exchange board", "currency exchange office sign", "money exchange booth airport", "foreign currency banknotes colorful", "currency exchange booth", "foreign exchange rate board", "airport currency exchange", "euro banknotes", "Japanese yen", "coins pile", "passport banknotes travel"],
         "유가 · 원자재": ["gold bars", "copper cathodes", "crude oil barrels", "oil refinery", "oil pumpjack field", "gold bullion", "copper mine open pit", "iron ore stockpile"],
         "AI 투자": ["AI data center", "Nvidia GPU", "server room blue light", "fiber optic light", "circuit board macro", "humanoid robot exhibition", "robot hand", "data center cooling towers", "tech conference keynote stage", "silicon wafer reflection", "supercomputer"],
-        "실적 발표": ["earnings conference call", "annual report charts", "press conference microphones", "annual general meeting", "presentation stage screen audience", "calculator financial documents", "corporate earnings presentation"],
-        "기업 사건 · 인수합병": ["handshake business deal", "corporate headquarters lobby", "boardroom meeting table", "contract signing ceremony", "glass office tower reflection", "shareholders meeting hall", "businessman briefcase crosswalk", "skyscrapers looking up", "corporate lobby", "chess pieces board game", "business people walking city"],
+        "실적 발표": ["earnings conference call", "annual report charts", "press conference microphones", "annual general meeting", "presentation stage screen audience", "calculator financial documents", "corporate earnings presentation", "financial charts paper", "coins stack graph", "bar chart coins", "financial report pen", "spreadsheet numbers", "calculator money", "growth chart arrow"],
+        "기업 사건 · 인수합병": ["handshake business deal", "corporate headquarters lobby", "boardroom meeting table", "contract signing ceremony", "glass office tower reflection", "shareholders meeting hall", "businessman briefcase crosswalk", "skyscrapers looking up", "corporate lobby", "chess pieces board game", "business people walking city", "business handshake", "corporate headquarters tower", "glass skyscraper facade", "signing documents pen", "business district skyline"],
         "규제 · 소송": ["courtroom", "judge gavel", "scales of justice statue", "Lady Justice", "courthouse columns", "law books library", "parliamentary hearing room", "official stamp documents", "Supreme Court of Korea building"],
         "재정 · 정치 · 선거": ["ballot box election", "United States Capitol dome"],
-        "금융 · 신용 · 은행": ["bank vault", "bank run queue", "credit cards", "bank sign night", "ATM machine", "piggy bank coins", "Korean bank branch"],
+        "금융 · 신용 · 은행": ["bank vault", "bank run queue", "credit cards", "bank sign night", "ATM machine", "piggy bank coins", "Korean bank branch", "bank branch interior", "counting banknotes", "bank building facade", "credit card payment terminal", "bank queue customers"],
         "암호화폐": ["Bitcoin coin", "cryptocurrency mining rig"],
         "부동산 · 주택": ["Seoul apartments Gangnam", "housing construction suburb", "real estate agency Seoul", "apartment balconies Korea", "house keys", "Seoul apartment complex aerial", "new town apartments"],
         "파업 · 노동": ["labor union strike rally"],
@@ -540,6 +540,7 @@ def main():
     ap.add_argument("--only", choices=["companies", "topics", "openverse", "rebuild"])
     ap.add_argument("--limit", type=int)
     ap.add_argument("--topics", help="쉼표로 주제 이름 — 그 주제만 다시 받아 후보를 더한다")
+    ap.add_argument("--per", type=int, default=4, help="플리커 주제마다 최대 장수")
     a = ap.parse_args()
     os.makedirs(OUT, exist_ok=True)
     stats = {}
@@ -549,7 +550,7 @@ def main():
         if a.only == "rebuild":
             stats["복구"] = rebuild_topics()
         if a.only == "openverse":
-            stats["플리커"] = openverse(only=set(a.topics.split(",")) if a.topics else None)
+            stats["플리커"] = openverse(per_topic=a.per, only=set(a.topics.split(",")) if a.topics else None)
         if a.only in (None, "companies"):
             stats["회사"] = companies(a.limit)
     finally:
