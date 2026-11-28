@@ -247,7 +247,7 @@ def person_counts(sigs):
     return out
 
 
-CAL_DIR = os.path.join(config.BASE_DIR, "..", "..", "data", "store", "calendar")   # 30년 저장소 캘린더 (로컬만 — CI 엔 없어 그 줄만 빠진다)
+CAL_DIR = os.path.join(config.BASE_DIR, "..", "..", "data", "store", "calendar")   # 30년 저장소 캘린더 (로컬만 — 없으면 _next_fomc · _next_earn 이 저장소 파일 · 검색 색인에서 읽는다)
 CEO_TICKER = {"huang": "NVDA", "musk": "TSLA"}   # CEO 군 자사 티커 (올트먼 OpenAI 는 비상장)
 # 자사 티커는 발언이 그 회사 이야기일 때만 붙인다 (: 머스크의 Grok(xAI) 지연 · 앤트로픽 칭찬이 테슬라 발언으로 집계됐다).
 # 분류가 그 티커를 직접 짚었거나, 세부 주제 · 제목 · 인용 · 함께 보도된 제목에 회사 · 제품 이름이 있을 때. xAI · 스페이스X · X 는 비상장 — 연결 종목 없음
@@ -282,6 +282,45 @@ def _next_cal(path, today, **where):
     return {"day": r["day"], "days_left": d, **{k: r[k] for k in ("eps_est", "decision") if k in r}}
 
 
+DAILY_STATS = os.path.join(config.BASE_DIR, "..", "daily-report", "static", "daily_stats.json")   # 저장소에 있는 FOMC 예정일(fomc_upcoming)
+SEARCH_US = "https://raw.githubusercontent.com/red6keep-droid/alphascope/gh-pages/search/us.json"   # 블로그 검색 색인 — 종목마다 다음 실적일(ne)
+_search_ne = None
+
+
+def _days_left(day, today):
+    return (datetime.date.fromisoformat(day) - datetime.date.fromisoformat(today)).days
+
+
+def _next_fomc(today):
+    """다음 FOMC 정기 결정일 — 로컬 저장소 캘린더, 없으면(정기 실행) 저장소의 daily_stats.json."""
+    r = _next_cal(os.path.join(CAL_DIR, "fomc.csv"), today, scheduled="True")
+    if r:
+        return r
+    try:
+        with open(DAILY_STATS, encoding="utf-8") as f:
+            fut = [d for d in json.load(f).get("fomc_upcoming") or [] if d >= today]
+    except (OSError, ValueError):
+        return None
+    return {"day": min(fut), "days_left": _days_left(min(fut), today)} if fut else None
+
+
+def _next_earn(sym, today):
+    """다음 자사 실적일 — 블로그 검색 색인(종목 페이지와 같은 값, 하루 한 번 갱신), 받지 못하면 로컬 저장소 캘린더."""
+    global _search_ne
+    if _search_ne is None:
+        _search_ne = {}
+        try:
+            import urllib.request
+            with urllib.request.urlopen(SEARCH_US, timeout=15) as resp:
+                _search_ne = {x.get("s"): x.get("ne") for x in json.load(resp).get("stocks") or [] if x.get("ne")}
+        except Exception as e:  # noqa: BLE001
+            print(f"[aggregate] 검색 색인 실적일 없음 — 로컬 캘린더로: {str(e)[:80]}")
+    ne = _search_ne.get(sym)
+    if ne and ne >= today:
+        return {"day": ne, "days_left": _days_left(ne, today)}
+    return _next_cal(os.path.join(CAL_DIR, "earnings.csv"), today, symbol=sym)
+
+
 def _ark_trades(conn, since):
     """우드 — ARK 매매 공시 최근 줄 (제목 "ARK trades YYYY-MM-DD: buy A, B / sell C")  → [{day, buy[], sell[]}] 최신 순 3일."""
     out = []
@@ -308,7 +347,7 @@ def profiles(conn, sigs30=None):
     if sigs30 is None:
         sigs30 = build_signals(_labeled(conn, _ago(days=STRIP_DAYS)))
     today = _now().astimezone(datetime.timezone(datetime.timedelta(hours=9))).strftime("%Y-%m-%d")
-    fomc = _next_cal(os.path.join(CAL_DIR, "fomc.csv"), today, scheduled="True")
+    fomc = _next_fomc(today)
     out = {}
     for s in sigs30:
         p = out.setdefault(s["speaker"], {"n": 0, "dirs": {"positive": 0, "negative": 0, "neutral": 0}, "paths": {},
@@ -334,7 +373,7 @@ def profiles(conn, sigs30=None):
             p["trades"] = _ark_trades(conn, _ago(days=STRIP_DAYS))
         if g == "ceo" and sp in CEO_TICKER:
             p["ticker"] = CEO_TICKER[sp]
-            p["next_earnings"] = _next_cal(os.path.join(CAL_DIR, "earnings.csv"), today, symbol=CEO_TICKER[sp])
+            p["next_earnings"] = _next_earn(CEO_TICKER[sp], today)
     return out
 
 
@@ -357,7 +396,7 @@ def enrich(people, out):
     """발언마다 (기획 9-4): path = 경로표(paths.resolve) · reaction = 닿는 자산의 D 일 등락 · novelty · next = 다음 날짜(FOMC · 자사 실적).
     가격은 prices.ensure 로 한 번에 받는다 (yfinance 가 막히면 캐시, 없으면 그 자산 줄만 빠진다)."""
     today = _now().astimezone(datetime.timezone(datetime.timedelta(hours=9))).strftime("%Y-%m-%d")
-    fomc = _next_cal(os.path.join(CAL_DIR, "fomc.csv"), today, scheduled="True")
+    fomc = _next_fomc(today)
     earn = {}
     need = set()
     for p in people:
@@ -388,7 +427,7 @@ def enrich(people, out):
             elif p["group"] == "ceo" and p["speaker"] in CEO_TICKER:
                 t = CEO_TICKER[p["speaker"]]
                 if t not in earn:
-                    earn[t] = _next_cal(os.path.join(CAL_DIR, "earnings.csv"), today, symbol=t)
+                    earn[t] = _next_earn(t, today)
                 if earn[t]:
                     nxt = {"kind": f"{t} 실적", **earn[t]}
             s["next"] = nxt if (nxt and nxt["days_left"] > 0) else None
