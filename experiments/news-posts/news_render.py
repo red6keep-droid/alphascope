@@ -365,7 +365,7 @@ def titles(post):
     return NAME, f"{NAME} : {post['title'].strip()}"
 
 
-def render(post, market, lists=None, issues=(), forecasts=()):
+def render(post, market, lists=None, issues=(), forecasts=(), photo_html=""):
     """lists = 한국 · 미국 목록을 합친 {티커: 행(mk = kr | us)}. → (저장 제목, 본문 HTML, meta). summary 가 비면 본문 첫 문장(요청 12절 대체 규칙). 종목이 안 맞으면 지수만."""
     lists = lists or {}
     th = SR.MOOD_THEME["flat"]   # 글 전체 = 보라 테마 하나 — 기사 방향으로 색을 바꾸지 않는다(방향은 라벨이 말한다)
@@ -383,6 +383,8 @@ def render(post, market, lists=None, issues=(), forecasts=()):
     body.append(f'<h2 data-headline="1" style="margin:0 0 18px;padding:25px 0 0 {dk.ALIGN_PX}px;font-size:26px;line-height:38px;font-weight:700;color:#111;word-break:keep-all;">'
                 f'<span style="display:block;font-size:26px;line-height:38px;">{SR.emph(dk.esc(post["title"]), False)}</span></h2>')   # 폰 테마가 h2 에 20/26 !important — 크기는 안쪽 span 이 갖는다
     # 제목 아래 라벨(분야 `기업 사건` · 방향 `긍정적`) 뺌. 제목 아래 = 18 로 요약 상자와 띄움
+    if photo_html:   # 자료 사진(운영지침 4-6) — 제목 바로 아래 · 요약 상자와 26 (news_images/photo_pick.figure)
+        body.append(photo_html)
     summary = (post.get("summary") or "").strip() or _first_sentence(post.get("body"))
     body.append(f'<div style="background:{th["card"]};border-radius:10px;padding:{23 - dk.VP}px 19px;margin:0 0 26px;">'
                 f'<p data-seo-lead="1" data-lead="1" style="margin:0;{SR.BODY_WRAP}font-weight:700;color:#111;">{prose(SR.emph(summary, False), False)}</p></div>')

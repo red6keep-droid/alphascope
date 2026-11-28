@@ -88,85 +88,29 @@ def closed_through():
     return now.strftime("%Y-%m-%d") if now.hour * 60 + now.minute >= 15 * 60 + 40 else (now - datetime.timedelta(days=1)).strftime("%Y-%m-%d")
 
 
-# ── 시안(11-27): 자료 사진 크기 · 경우별 배치 — 목업만. 그림 = output/mock_img/(git 제외, 목업 서버는 output 안만 내줌) ──
-IMG = os.path.join(OUT, "mock_img")
-_A = 'style="color:#6B7280;text-decoration:underline;"'
-PICS = {   # 파일, 사진가, 조건, 조건 주소, 원본 주소, 설명
-    "game": ("industry_game.jpg", "Chongkian", "CC BY-SA 4.0", "https://creativecommons.org/licenses/by-sa/4.0/deed.ko",
-             "https://commons.wikimedia.org/wiki/File:Iskandar_Investment_Esports_Carnival_2019.jpg", "e스포츠 대회장"),
-    "lg": ("company_lg.jpg", "螺钉", "CC BY-SA 4.0", "https://creativecommons.org/licenses/by-sa/4.0/deed.ko",
-           "https://commons.wikimedia.org/wiki/File:LG_Twin_Towers,Beijing_China.jpg", "LG 트윈타워"),
-}
+# ── 자료 사진(11-28) — 목업만: 실제 사진 저장소(photo.newfact.app) + 고르기 규칙(news_images/photo_pick.py)으로 글마다 붙여 본다.
+# 발행기(publish_news.py)는 아직 사진 없이 낸다 — NR.render(photo_html=…) 를 넘길 때만 들어간다. 확정 뒤 발행기에 붙인다.
+sys.path.insert(0, os.path.join(BASE, "..", "news_images"))
+import photo_pick as PP  # noqa: E402
 
 
 def _tag(name, what):
-    return f'<div style="margin:0 0 8px;font-size:16px;line-height:24px;color:#111;"><b style="color:#7C3AED;">{name}</b><span style="color:#6B7280;"> — {what}</span></div>'
+    return f'<div style="margin:0 0 8px;font-size:14px;line-height:20px;color:#111;"><b style="color:#7C3AED;">{name}</b><span style="color:#6B7280;"> — {what}</span></div>'
 
 
-def _cap(key):
-    f, who, lic, lic_url, src, what = PICS[key]
-    # 짧게(11-27): 자료 사진 · 사진가 · 이용 조건. 밑줄 없음 — 사진가 = 원본 페이지, 조건 = 조건 글(CC 표시 의무: 저작자 · 조건 주소 · 원본)
-    a = 'style="color:inherit;text-decoration:none;"'
-    return (f'<figcaption style="margin:6px 0 0;font-size:11px;line-height:16px;color:#9CA3AF;text-align:right;">자료 사진 · '
-            f'<a href="{src}" {a}>{who}</a> · <a href="{lic_url}" {a}>{lic}</a></figcaption>')
-
-
-def _figure(h, key="game", name_sym=None, name="", side="left"):
-    f, *_, what = PICS[key]
-    chip = ""
-    if name_sym:   # 흰 이름표 — 우리 종목 로고 24 + 회사 이름 14 굵게, 사진 왼쪽 아래 12 띄움
-        logo = dk.ticker_logo(name_sym, 24).replace("vertical-align:-4px;", "flex:none;")
-        chip = (f'<span style="position:absolute;{side}:12px;bottom:12px;display:flex;align-items:center;height:32px;padding:0 12px 0 4px;'
-                f'border-radius:16px;background:#fff;font-size:14px;line-height:20px;font-weight:700;color:#111;">{logo}{name}</span>')
-    return (f'<figure style="margin:0 0 26px;"><div style="position:relative;"><img src="mock_img/{f}" alt="자료 사진: {what}" '
-            f'style="display:block;width:100%;height:{h}px;object-fit:cover;border-radius:10px;">{chip}</div>{_cap(key)}</figure>')
-
-
-def _big_logo():
-    return ('<figure style="margin:0 0 26px;"><div style="height:200px;border:1px solid #E5E7EB;border-radius:10px;display:flex;'
-            'align-items:center;justify-content:center;background:#fff;"><img src="mock_img/logo_lg.png" alt="" style="width:200px;height:auto;"></div></figure>')
-
-
-def _after_headline(html, block):
-    i = html.find("data-headline")
-    j = html.find("</h2>", i)
-    return html if i < 0 or j < 0 else html[:j + 5] + block + html[j + 5:]
-
-
-def photo_variants(html):
-    if not os.path.exists(os.path.join(IMG, "industry_game.jpg")):
-        return html
-    return _after_headline(html, '<div data-mock-draft="photo">'
-        + _tag("지금", "그림 없이 제목 바로 아래 요약 상자")
-        + _tag("A안 (추천)", "본문 폭 전체 · 높이 200 · 모서리 10 · 출처 줄 11/16 연회색 오른쪽 정렬 · 사진과 6 · 요약 상자와 26") + _figure(200)
-        + _tag("B안", "본문 폭 전체 · 높이 240 — 화면 첫 칸에서 본문이 더 밀림") + _figure(240)
-        + _tag("C안", "높이 160 — 띠처럼 얇게") + _figure(160)
-        + '</div>')
-
-
-# 같은 기사에 사진만 바꿔 끼운 경우별 전체 화면(기사 내용은 보지 않음). 회사 사진 경우는 사진이 있는 LG전자로 보여 준다.
-CASES = [
-    ("1", "사진 없음", "지금 블로그 그대로", ""),
-    ("2", "업종 사진만", "업종 · 시장 전체 기사(회사 하나가 주인공이 아닐 때) — 업종 폴더에서 한 장", "industry"),
-    ("3", "회사 사진만", "회사 사진이 있는 회사(지금 265곳) — 예: LG전자 사진", "company"),
-    ("4", "회사 사진 + 흰 이름표", "회사 사진 위 왼쪽 아래에 로고 24 + 이름 — 예: LG전자", "company_chip"),
-    ("5", "업종 사진 + 흰 이름표 (추천)", "회사 사진이 없는 회사 — 업종 사진 + 오른쪽 아래 로고 24 + 이름 · 예: 크래프톤", "industry_chip"),
-    ("6", "로고 크게 (권하지 않음)", "로고를 사진 자리에 — 상표가 주인공처럼 보여 홍보물 같음 · 예: LG전자", "logo"),
-]
-
-
-def case_pages(html):
-    if not os.path.exists(os.path.join(IMG, "industry_game.jpg")):
-        return []
-    fig = {"": "", "industry": _figure(200), "company": _figure(200, "lg"),
-           "company_chip": _figure(200, "lg", "066570.KS", "LG전자"),
-           "industry_chip": _figure(200, "game", "259960.KS", "크래프톤", side="right"), "logo": _big_logo()}
-    out = []
-    for n, name, what, k in CASES:
-        out.append((f"mock_news_photo_{n}.html", f"Newfact 주요 기사 · 사진 {n}",
-                    _after_headline(html, _tag(f"경우 {n} · {name}", what) + fig[k])))
-    return out
-
+def photo_gallery(rows):
+    """글 17편 사진을 한 화면에 — 제목 · 고른 규칙 · 사진(글과 같은 꼴). 제목을 누르면 사진 붙인 글 전체."""
+    import html as _h
+    cards = []
+    for name, post, pick in rows:
+        rule = f'{pick["kind"]} · {pick["why"]}' if pick else "사진 없음"
+        fig = PP.figure(pick, dk.ticker_logo) if pick else '<div style="margin:0 0 26px;font-size:14px;color:#9CA3AF;">(그림 없이 발행)</div>'
+        cards.append(f'<div style="margin:0 0 34px;">{_tag(rule.split(" · ")[0], " · ".join(rule.split(" · ")[1:]) or "-")}'
+                     f'<a href="{name}" data-row-link="1" style="display:block;margin:0 0 12px;font-size:20px;line-height:30px;font-weight:700;color:#111;text-decoration:none;word-break:keep-all;">{_h.escape(post["title"])}</a>'
+                     f'{fig}</div>')
+    head = ('<p style="margin:25px 0 26px;font-size:14px;line-height:22px;color:#6B7280;">수집기 실제 글 ' + str(len(rows)) +
+            '편에 규칙대로 붙인 사진입니다. 보라 글자 = 고른 규칙. 제목을 누르면 사진 붙인 글 전체 화면.</p>')
+    return dk.WRAP_OPEN + head + "".join(cards) + dk.WRAP_CLOSE
 
 if __name__ == "__main__":
     sys.stdout.reconfigure(encoding="utf-8")
@@ -188,14 +132,19 @@ if __name__ == "__main__":
         market = NR.same_day(post, lists, closes_of, upto, themes=themes)
         _, html, meta = NR.render(post, market, lists, issues, forecasts)
         html = html.replace(dk.WRAP_OPEN, dk.WRAP_OPEN + LOGO_TPL, 1)   # 목업만: 머리 줄 로고가 없어 테마 JS 가 쓸 로고 원본
-        if name == "mock_news_post.html":
-            for cn, ct, ch in case_pages(html):   # 시안(11-27): 같은 기사 · 사진 경우별
-                dk.write_mock(ch, os.path.join(OUT, cn), ct)
-            if os.path.exists(os.path.join(IMG, "industry_game.jpg")):   # 시안(11-27): 자료 사진 크기 — 따로 한 장(발행된 대표 목업은 그대로)
-                dk.write_mock(photo_variants(html), os.path.join(OUT, "mock_news_photo_0.html"), "Newfact 주요 기사 · 사진 크기")
         out = os.path.join(OUT, name)
         print(dk.write_mock(html, out, NR.titles(post)[0]) or "index.html 없음", "· 기준", meta["basis"], "· 관련 종목", len(market["stocks"]), [s["name"] for s in market["stocks"]][:6],
               "· 함께 보는 페이지", [t for t, _ in NR.follow_links(post, market, lists, issues, forecasts)])
+    photo_rows = []   # 자료 사진 시안(11-28): 글마다 사진 붙인 전체 화면 + 한 화면 모음
+    for name, post in jobs:
+        pick = PP.pick(post, NR.match_stocks(post, lists))
+        pname = name.replace("mock_news_post", "mock_news_photo_post")
+        market = NR.same_day(post, lists, closes_of, upto, themes=themes)
+        _, html, _ = NR.render(post, market, lists, issues, forecasts, photo_html=PP.figure(pick, dk.ticker_logo))
+        dk.write_mock(html.replace(dk.WRAP_OPEN, dk.WRAP_OPEN + LOGO_TPL, 1), os.path.join(OUT, pname), NR.titles(post)[0])
+        photo_rows.append((pname, post, pick))
+    print(dk.write_mock(photo_gallery(photo_rows), os.path.join(OUT, "mock_news_photo_all.html"), "Newfact 주요 기사 · 자료 사진 모음"),
+          "· 사진", sum(1 for *_, p in photo_rows if p), "/", len(photo_rows))
     docs, real_h = load("headlines.json", SAMPLE_HEADLINES)
     day = max(str(it.get("publishedAt") or it.get("foundAt") or "")[:10] for d in docs for it in d.get("items") or [])
     sec = NR.headlines_section(docs, day)

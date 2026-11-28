@@ -112,6 +112,7 @@ def build():
             "license_url": LIC_URL.get(lic, r["source"]),   # 조건 주소가 없는 것(퍼블릭 도메인 · 저작자 표시)은 원본 페이지
             "source": r["source"],
             "title": r["title"][:120],
+            "crop": "일부 자름" in (r.get("note") or ""),   # 미리 잘라 저장한 사진 = 출처 줄 끝에 `· 일부 자름`
         })
     # 파일만 있고 출처 줄이 없는 사진 = 올리지 않음(출처 없이 쓸 수 없음)
     orphan = [os.path.relpath(os.path.join(dp, n), SRC) for dp, _, fs in os.walk(SRC) for n in fs
