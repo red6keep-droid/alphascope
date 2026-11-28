@@ -19,7 +19,6 @@ TOPIC_KO = {"Trade": "무역", "Fed": "연준 · 금리", "Tax": "세금", "Ener
             "Geopolitics": "지정학", "Company": "기업", "Stock Call": "종목 의견", "Position": "매매", "Sector Call": "업종 의견",
             "Macro Warning": "거시 경고", "Market Outlook": "시장 전망", "Policy": "정책 의견", "Product": "제품", "Investment": "투자",
             "Earnings": "실적", "Deal": "거래 · 제휴", "Industry View": "업계 평가", "Politics": "정치"}   # people-radar/config.TOPIC_KO 와 같게
-DIR_KO = {"positive": "긍정", "negative": "부정", "neutral": "중립"}
 DIR_NOTE = "▲ 상승 의견 = 주가에 유리하게 본 발언, ▼ 하락 의견 = 불리하게 본(경고한) 발언"   # 카드 안내 줄은 뺐다 — 문장이 이미 `주가에 유리 · 불리하게 본` 으로 풀어 쓴다. 요약 카드 안내
 _data = None
 
@@ -54,8 +53,7 @@ def _row(it):
         meta.append(it["publisher"])
     d = it["direction"]
     pills = [dk.pill(dk.ISSUE_KO.get(it.get("issue") or "OTHER", "그 밖"), bare=True),   # 분야 라벨 = 기록 이슈 코드 이름
-             dk.pill(DIR_KO.get(d, d), d if d in ("positive", "negative") else "neutral", bare=True),   # 기사 줄 라벨은 옛 모양 그대로
-             dk.pill(f"강도 {it['intensity']}", bare=True)]
+             dir_box(d)]   # 요약 카드와 같은 `▲ 상승 의견` 상자 · 강도는 싣지 않는다
     row = dk.news_item(dk.esc(it["headline"]), it["url"], it["detail"], (), " ".join(pills), meta)
     if it.get("avatar"):   # 왼쪽 얼굴 동그라미
         row = f'<div style="display:flex;gap:12px;align-items:flex-start;">{it["avatar"]}<div style="flex:1 1 auto;min-width:0;">{row}</div></div>'
@@ -132,6 +130,15 @@ def _box(kind, text):
     """긍정 · 부정 라벨 = 기술지표 상승 · 하락 라벨과 같은 상자(삼각형 + 글자, tech_signals.box) — 긍정 = 상승 색 ▲, 부정 = 하락 색 ▼, 중립 = 가로 막대."""
     import tech_signals as TS
     return TS.box(kind, text, dk.esc, fit=True)
+
+
+DIR_BOX = {"positive": ("up", "상승 의견"), "negative": ("down", "하락 의견")}
+
+
+def dir_box(d):
+    """발언 한 줄의 쪽 라벨 — 요약 카드 근거 줄과 같은 상자. 상승 · 하락 아니면 `— 중립`."""
+    kind, word = DIR_BOX.get(d, ("flat", "중립"))
+    return _box(kind, word)
 
 
 PILL_STACK_GAP = dk.PILL_PAIR_GAP   # 위아래로 쌓은 상승 · 하락 라벨 사이 = 라벨끼리 어디서나 2px 규칙 (P533)

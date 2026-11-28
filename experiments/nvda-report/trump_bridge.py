@@ -18,7 +18,7 @@ import sys
 
 import config
 
-DIR_KO = {"positive": "긍정", "negative": "부정", "uncertain": "불확실", "neutral": "중립"}
+DIR_KO = {"positive": "상승 의견", "negative": "하락 의견", "uncertain": "판단 유보", "neutral": "중립"}   # 인물 발언과 같은 말
 HORIZON_KO = {"next_close": "다음 날 종가", "close": "당일 종가", "d3": "3일", "d5": "5일", "immediate": "직후"}
 
 
@@ -75,7 +75,7 @@ def events(day):
     out = []
     for e in select(state, day):
         topic = f"{e.get('topic')}" + (f"/{e.get('subtopic')}" if e.get("subtopic") else "")
-        title = (f"트럼프 발언 : {topic} · 강도 {e.get('intensity')} · {DIR_KO.get(e.get('direction'), e.get('direction'))}"
+        title = (f"트럼프 발언 : {topic} · {DIR_KO.get(e.get('direction'), e.get('direction'))}"
                  + (f" · {e['path_text']}" if e.get("path_text") else "") + stale)
         stat = robust_stat(state, e)
         area = "Corporate" if e.get("topic") == "Company" else "Regulation"

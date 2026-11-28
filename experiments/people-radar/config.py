@@ -81,7 +81,6 @@ TOPIC_KO = {"Trade": "무역", "Fed": "연준 · 금리", "Tax": "세금", "Ener
 SECTOR_KO = {"Semiconductor": "반도체", "Technology": "기술", "Financials": "금융", "Energy": "에너지", "Healthcare": "헬스케어",
              "Industrials": "산업", "Consumer": "소비", "Autos": "자동차", "Defense": "방산", "Materials": "소재",
              "Real Estate": "부동산", "Utilities": "유틸리티", "Crypto": "가상자산", "Bonds/Rates": "채권 · 금리", "Broad Market": "시장 전체"}
-DIR_KO = {"positive": "긍정", "negative": "부정", "neutral": "중립"}
 # 트럼프 Truth Social 은 trump-trend 가 매일 분류한 라벨을 그대로 쓴다 (trump-state 브랜치). 없으면 정책군 프롬프트로
 TRUMP_LABELS_PATH = os.path.join(BASE_DIR, "..", "trump-trend", "output", "state", "classifications.jsonl")
 TRUMP_LABELS_GIT = "state/trump-state:experiments/trump-trend/output/state/classifications.jsonl"

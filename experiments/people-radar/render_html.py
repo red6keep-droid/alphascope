@@ -130,7 +130,9 @@ def _topic(t):
 
 
 def _dir_pill(d):
-    return dk.pill(config.DIR_KO.get(d, d), d if d in ("positive", "negative") else "neutral", bare=True)
+    """발언 쪽 라벨 = 요약 카드와 같은 상자 `▲ 상승 의견` · `▼ 하락 의견` · `— 중립` (people_section.dir_box)."""
+    import people_section
+    return people_section.dir_box(d)
 
 
 def _card(s, cards):
@@ -262,7 +264,7 @@ def _signal_item(p, s, cards):
         targets = [x for x in s["companies"][:4]] + [config.SECTOR_KO.get(x, x) for x in s["sectors"][:2]]
         if targets:
             subs.append(_sub("대상 : " + _esc(" · ".join(targets))))
-    pills = [dk.pill(dk.ISSUE_KO.get(s.get("issue") or "OTHER", "그 밖"), bare=True), _dir_pill(s["direction"]), dk.pill(f"강도 {s['intensity']}", bare=True)]   # 분야 라벨 = 기록 이슈 코드 이름
+    pills = [dk.pill(dk.ISSUE_KO.get(s.get("issue") or "OTHER", "그 밖"), bare=True), _dir_pill(s["direction"])]   # 분야 라벨 = 기록 이슈 코드 이름 · 강도(순서 매기기용 내부 점수)는 화면에 싣지 않는다
     # 누르면 요약 팝업 — 종목 페이지 인물 발언(people_section)과 같은 재료 · 같은 팝업.
     # 한 줄(요약만)이면 싣지 않는다 — 뉴스와 같은 규칙(11-10). 수집 · 기록은 그대로.
     import stock_mentions
