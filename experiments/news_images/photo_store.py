@@ -1,4 +1,4 @@
-"""뉴스 글 자료 사진 저장소 — Cloudflare Pages 프로젝트 `newfact-photo` (주소 https://newfact-photo.pages.dev, 나중에 photo.newfact.app).
+"""뉴스 글 자료 사진 저장소 — Cloudflare Pages 프로젝트 `newfact-photo` (주소 https://photo.newfact.app, 예비 https://newfact-photo.pages.dev).
 
     python3 experiments/news_images/photo_store.py --dry   # 줄이기 · 목록만 (올리지 않음)
     python3 experiments/news_images/photo_store.py         # 줄이기 · 목록 · 올리기
@@ -27,7 +27,7 @@ SRC = os.path.expanduser("~/Desktop/Newfact-그림-검수/완료")
 CACHE = os.path.expanduser("~/Desktop/Newfact-그림-검수/.webp-1000")   # 줄인 사진 보관(다시 줄이지 않게)
 INDEX = os.path.join(HERE, "photo_index.json")
 PROJECT = "newfact-photo"
-BASE_URL = "https://newfact-photo.pages.dev/"
+BASE_URL = "https://photo.newfact.app/"   # 예비 = https://newfact-photo.pages.dev/ (11-28 사용자 도메인 연결)
 ACCOUNT_ID = "a8718df7edc5f8f6ce88e75b6545e5cb"   # red6keep (블로그 계정)
 WIDTH, QUALITY = 1000, 80
 HEADERS = "/*\n  Cache-Control: public, max-age=2592000\n"   # 30일 — 같은 id 는 같은 사진(바뀌지 않음)
