@@ -923,7 +923,7 @@ TITLES.update({
     "mock_comments_page-report.html": "댓글 화면 — KOSPI 한 줄 · 홈 카드 하루 그래프 · 댓글 목록 · 쓰기 (한국 증시 리포트에서)",
     "mock_comments_cards.html": "글 아래 댓글 카드 — 2개 이상 = 좌우로 밀기 · 점 · 댓글 더 보기 (종목 페이지)",
     "mock_comments_card-one.html": "글 아래 댓글 카드 — 1개 = 카드 하나 · NEW (시황 글)",
-    "mock_comments_cards-empty.html": "글 아래 댓글 카드 시안 — 댓글 0 = 캐릭터 먼저 · 안내 두 줄, 시안 A~E (종목 페이지)",
+    "mock_comments_cards-empty.html": "글 아래 댓글 카드 — 댓글 0 = 손 흔드는 하락이 · 첫 댓글을 남겨 보세요 (종목 페이지)",
     "mock_comments_page-stock.html": "댓글 화면 — 종목 가격 · 홈 카드 꼴 그래프 · 댓글 목록 · 쓰기 (종목 페이지에서)",
     "mock_comments_page.html": "댓글 화면 — 배너 그림 · 댓글 목록 · 쓰기 (시황 글에서)",
     "mock_comments_page-issue.html": "댓글 화면 — Hot Issue 제목 · 게이지 카드 그대로 · 아래 댓글 (핫이슈에서)",
@@ -1020,26 +1020,19 @@ def card(c, link):
             f'<span aria-label="답글 {rcount(name + title)}개">{BUBBLE}{rcount(name + title)}</span></div></a>')
 
 
-EMPTY_CASES = [   # 댓글 0 카드 시안(11-28) — (이름표, (스티커, 제목, 보조 줄))
-    ("시안 A · 커피 마시는 상승이", ("up_coffee", "아직 댓글이 없습니다", "커피 한 잔 하면서 첫 댓글을 남겨 보세요")),
-    ("시안 B · 빈 칠판 앞 분석이", ("mid_chalk", "아직 댓글이 없습니다", "비어 있는 칠판에 첫 글을 남겨 보세요")),
-    ("시안 C · 손 흔드는 하락이", ("down_happy", "첫 댓글을 남겨 보세요", "가볍게 한마디도 좋아요")),
-    ("시안 D · 신문 읽는 상승이", ("up_news", "아직 댓글이 없습니다", "이 종목을 보고 든 생각을 먼저 들려주세요")),
-    ("시안 E · 응원하는 상승이 · 하락이", ("pair_cheer", "첫 댓글을 남겨 보세요", "첫 이야기를 함께 응원할게요")),
-]
+EMPTY_CARD = ("down_happy", "첫 댓글을 남겨 보세요", "가볍게 한마디도 좋아요")   # 댓글 0 카드 = 시안 C 확정(11-28 사용자, 손 흔드는 하락이). 기각: 커피 상승이 · 빈 칠판 분석이 · 신문 상승이 · 응원 둘
 
 
 def cards_block(cmts, page_link):
     """글 아래 댓글 칸 — 카드(최신 CARD_N 개, 가려진 글 빼고) + 점(2개 이상). 댓글 0 = 안내 카드 한 장."""
     shown = [c for c in cmts if c[4] != "hidden"][:CARD_N]
-    if not shown:   # 댓글 0 = 같은 카드 꼴 한 장: 캐릭터 먼저(왼쪽) → 제목 · 보조 한 줄. 카드 전체 = 댓글 화면(쓰기 연필) — 11-28 사용자, 시안 다섯 중 고르기
+    if not shown:   # 댓글 0 = 같은 카드 꼴 한 장: 캐릭터 먼저(왼쪽) → 제목 · 보조 한 줄. 카드 전체 = 댓글 화면(쓰기 연필) — 11-28 사용자 시안 C
         def empty(k, title, sub):
             return (f'<a class="cc-card cc-empty" href="{page_link}"><div class="cc-row">'
                     f'<img class="cc-stk" src="stickers/c_{k}.webp" alt="" width="56" height="56" style="margin:0;">'
                     f'<div class="cc-body"><div class="cc-title" style="margin:0;white-space:normal;">{title}</div>'
                     f'<p class="cc-text" style="white-space:normal;">{sub}</p></div></div></a>')
-        lab = '<div style="margin:16px 0 6px;font-size:13px;line-height:19px;font-weight:700;color:#B91C1C;">{}</div>'
-        return "".join(lab.format(n) + f'<div data-cc class="cc-one"><div class="cc-track" style="margin-top:0;">{empty(*v)}</div></div>' for n, v in EMPTY_CASES)
+        return f'<div data-cc class="cc-one"><div class="cc-track">{empty(*EMPTY_CARD)}</div></div>'
     one = len(shown) == 1
     dots = "" if one else ('<div class="cc-dots">' + "".join(
         f'<button class="cc-dot" type="button" aria-label="{i + 1}번째 댓글"></button>' for i in range(len(shown))) + "</div>")
