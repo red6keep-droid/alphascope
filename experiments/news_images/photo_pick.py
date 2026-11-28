@@ -65,6 +65,8 @@ BOARD = {   # 주가 전광판 = 이웃 폴더 빌려 쓰기(11-28 사용자) �
 }
 US_WORDS = r"미국|美|뉴욕|나스닥|S&P|다우|월가|연준"
 KR_BORROW = {"증권_·_투자": ["여의도"]}   # 한국 회사인데 업종 폴더가 전부 외국 거래소일 때 빌릴 폴더(증권사 → 여의도, 11-28)
+SHARED = ("3_업종/", "8_사건-분류/")   # 여러 회사 · 기사가 같이 쓰는 사진 폴더 — 글자 없는 사진만. 회사 · 기관 · 인물 · 시장 · 국제 사진은 글자 괜찮음(그 대상 자신)
+SHARED_OK = ("금리_·_연준",)   # 사건 분류지만 기관 건물 사진(연준) — 글자 괜찮음
 KR_BRAND = r"KOREA|SEOUL|BUSAN|HANA|SAMSUNG|HYUNDAI|\bLG\b|OLG|\bSK\b|\bKIA\b|I ?PARK|LOTTE|HANWHA|POSCO|NAVER|KAKAO|SHINHAN|WOORI|\bKB\b|CC-?BY|SHINSEGAE|KOSPI|KRX"   # 사진 글자 중 문제없는 것(한국 회사 로마자 · 사진 저작자 표시)
 KOREA = r"Korea|Seoul|Busan|Incheon|Ulsan|Daegu|Gwangju|Daejeon|Yeouido|Pangyo|Gangnam|Myeongdong|Changwon|Pohang|Geoje|Hanok|한국|서울|부산|인천|울산|여의도|판교|강남|창원|포항|거제|대한민국"   # 사진 이름(원본 제목)에 한국 땅 이름
 FOREIGN = r"Tokyo|Tokio|Japan|NYSE|Nasdaq|Wall Street|New York|Shanghai|Hong Kong"   # 한국 기사 전광판 사진에서 뺄 외국 거래소 사진(제목 기준)
@@ -169,6 +171,9 @@ def pick(post, stocks=()):
     korean = not re.search(US_WORDS, title)
 
     def out(photos, kind, why, label=None, kr=None):
+        shared = [p for p in photos if p["group"].startswith(SHARED) and not p["group"].endswith(SHARED_OK)]
+        if shared:   # 업종 · 사건 분류 사진 = 여러 회사 · 기사가 같이 씀 → 글자(상표 · 회사 이름, 한글 포함)가 읽히면 X — 글자가 특정 회사를 가리킴(11-28 사용자 크래프톤 → BLACKPINK)
+            photos = [p for p in photos if not (p["group"].startswith(SHARED) and not p["group"].endswith(SHARED_OK) and p.get("text"))] or photos
         if photos and (kr if kr is not None else korean):   # 한국 기사 · 한국 회사 = 외국 글자(간판 · 상품 · 시세)가 읽히는 사진 빼기(11-28 사용자 홈플러스), 다 빠지면 그대로
             photos = [p for p in photos if not _foreign_text(p)] or photos
         return {"photo": _choose(photos, key), "label": label, "kind": kind, "why": why} if photos else None
