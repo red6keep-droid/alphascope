@@ -83,3 +83,4 @@ experiments/issue_store/results/*
 !experiments/issue_store/results/signal_centroids.json
 reference2/doc/
 experiments/news-posts/output/mock_img/
+experiments/news_images/output/
