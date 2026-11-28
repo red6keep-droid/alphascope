@@ -26,6 +26,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 SRC = os.path.expanduser("~/Desktop/Newfact-그림-검수/완료")
 CACHE = os.path.expanduser("~/Desktop/Newfact-그림-검수/.webp-1000")   # 줄인 사진 보관(다시 줄이지 않게)
 INDEX = os.path.join(HERE, "photo_index.json")
+AI_SRC = os.path.expanduser("~/Desktop/Newfact-그림-검수/AI_코스피")   # 사용자가 만든 AI 생성 이미지(방향별 폴더)
 PROJECT = "newfact-photo"
 BASE_URL = "https://photo.newfact.app/"   # 예비 = https://newfact-photo.pages.dev/ (11-28 사용자 도메인 연결)
 ACCOUNT_ID = "a8718df7edc5f8f6ce88e75b6545e5cb"   # red6keep (블로그 계정)
@@ -114,6 +115,23 @@ def build():
             "title": r["title"][:120],
             "crop": "일부 자름" in (r.get("note") or ""),   # 미리 잘라 저장한 사진 = 출처 줄 끝에 `· 일부 자름`
         })
+    # AI 생성 이미지(11-28 사용자 — 코스피 · 코스닥 기사가 많아 실제 사진이 모자람): AI_코스피/상승 · 하락 · 보합.
+    # 출처 줄 = `AI 생성 이미지`(운영지침 4-6 생성 이미지 표시), 저작자 · 조건 없음. 방향은 글 direction 으로 고른다(photo_pick).
+    for dp, _, fs in os.walk(AI_SRC):
+        for n in sorted(fs):
+            if not n.lower().endswith((".jpg", ".jpeg", ".png", ".webp")):
+                continue
+            f = os.path.join(dp, n)
+            rel = "AI/" + os.path.relpath(f, AI_SRC)
+            i = pid(rel)
+            dst = os.path.join(CACHE, i + ".webp")
+            if os.path.exists(dst) and os.path.getmtime(dst) >= os.path.getmtime(f):
+                w, h = Image.open(dst).size
+            else:
+                w, h = shrink(f, dst)
+            size += os.path.getsize(dst)
+            out.append({"id": i, "group": "9_AI/코스피_" + os.path.basename(dp), "sym": "", "w": w, "h": h, "ai": True,
+                        "artist": "", "license": "AI 생성 이미지", "license_url": "", "source": "", "title": "증권사 딜링룸 · 시세 화면", "crop": False})
     # 파일만 있고 출처 줄이 없는 사진 = 올리지 않음(출처 없이 쓸 수 없음)
     orphan = [os.path.relpath(os.path.join(dp, n), SRC) for dp, _, fs in os.walk(SRC) for n in fs
               if n.lower().endswith((".jpg", ".jpeg", ".png", ".webp")) and os.path.relpath(os.path.join(dp, n), SRC) not in seen]

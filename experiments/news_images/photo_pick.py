@@ -133,6 +133,13 @@ def _stock_rec(ticker, mk):
     return ref["us"].get(ticker)
 
 
+def _ai(post):
+    """AI 생성 이미지 — 글 방향(direction up · down)에 맞는 색만(상승 = 빨강 · 하락 = 파랑, 한국식). 방향 없으면 보합."""
+    d = (post.get("direction") or "").lower()
+    key = "코스피_상승" if d == "up" else "코스피_하락" if d == "down" else "코스피_보합"
+    return list(_load()["folder"].get(key, []))
+
+
 def _ref_find(code, name):
     """853종목에서 코드 또는 한글 이름으로 → (ticker, name, mk)."""
     ref = _load()["ref"]
@@ -188,6 +195,8 @@ def pick(post, stocks=()):
             if word_re(k).search(title) and (k not in NEED or re.search(NEED[k], title)):
                 if k == "정상회담" and re.search(r"미국|美|미중", title) and re.search(r"중국|中|미중", title):
                     f = "미중_관계"
+                if f == "한국거래소_·_코스피":   # 코스피 · 코스닥 기사 = 실제 사진 + 글 방향에 맞는 AI 생성 이미지(11-28)
+                    return out((folders.get(f) or []) + _ai(post), kind, k)
                 return out(folders.get(f) or [], kind, k)   # 낱말은 맞았는데 폴더가 비면 사진 없음(아래 분류로 내려가 엉뚱한 사진 X — 11-28 한국은행 → 연준 건물)
     for pat, f in EVENT:   # 사건 낱말 — 분류(기업 사건 등)보다 먼저(11-28 파업 · 휴업 폴더 이음)
         if re.search(pat, title):
@@ -201,6 +210,8 @@ def pick(post, stocks=()):
     if f == "@board":
         mk = "us" if us else "kr"
         pool = [p for g in BOARD[mk] for p in folders.get(g, []) if mk == "us" or not re.search(FOREIGN, p.get("title") or "")]
+        if mk == "kr":
+            pool += _ai(post)
         return out(pool, "시장", f"주가 전광판({'미국' if us else '한국'})")
     if f == "금리_·_연준" and not us:   # 금리 폴더 = 미국 연준 건물 → 한국 금리 기사는 한국은행 사진(없으면 사진 없음)
         return out(folders.get("한국은행") or [], "분류", "RATES_FED(한국)")
@@ -224,6 +235,11 @@ def figure(pick, logo_html=None):
         chip = (f'<span style="position:absolute;right:12px;bottom:12px;display:flex;align-items:center;gap:6px;height:32px;padding:0 12px 0 4px;'
                 f'border-radius:16px;background:#fff;font-size:14px;line-height:20px;font-weight:700;color:#111;">{logo}{_h.escape(name)}</span>')
     a = 'style="color:inherit;text-decoration:none;"'
+    if p.get("ai"):   # 생성 이미지 = 출처 줄에 `AI 생성 이미지`만(운영지침 4-6)
+        return (f'<figure data-news-photo="{p["id"]}" style="margin:0 0 26px;"><div style="position:relative;">'
+                f'<img src="{p["url"]}" alt="AI 생성 이미지: {_h.escape(p["title"])}" width="{p["w"]}" height="{p["h"]}" loading="eager" '
+                f'style="display:block;width:100%;height:200px;object-fit:cover;border-radius:10px;">{chip}</div>'
+                f'<figcaption style="margin:6px 0 0;font-size:11px;line-height:16px;color:#9CA3AF;text-align:right;">AI 생성 이미지</figcaption></figure>')
     cap = (f'자료 사진 · <a href="{_h.escape(p["source"])}" {a} rel="nofollow noopener" target="_blank">{_h.escape(p["artist"])}</a>'
            f' · <a href="{_h.escape(p["license_url"])}" {a} rel="nofollow noopener" target="_blank">{_h.escape(p["license"])}</a>'
            + (" · 일부 자름" if p.get("crop") else ""))
