@@ -399,16 +399,16 @@ def ava_picker(on):
 GUARD = "신고가 3번 쌓인 댓글은 자동으로 가려집니다. 오픈채팅 · 텔레그램 주소와 연락처는 등록되지 않습니다."
 
 # 글 = (별명, 날짜, 제목, 글, 상태, [답글 (별명, 날짜, 글)…]) · 상태: "" · "hidden" 가려짐 · "me" 내 글. 답글 별명이 "" 이면 가려진 답글
-THREAD = ("반도체곰", "11.18 16:10", "오늘은 반도체 두 종목만 오른 날",
+THREAD = ("반도체곰", "11.27 16:10", "오늘은 반도체 두 종목만 오른 날",
           "오늘 오른 건 반도체 두 종목 덕이고 나머지는 조용했던 것 같습니다. 오른 종목 수도 같이 보여 주시면 좋겠어요.", "", [
-              ("데이터센터", "11.18 16:31", "저도 그게 궁금했습니다. 지수만 보면 다 오른 줄 알겠더라고요."),
-              ("새내기", "11.18 16:40", "오른 종목 수는 어디서 볼 수 있나요?"),
-              ("owner", "11.18 16:58", "코스피 리포트의 `오른 종목이 많았나?` 칸에 오른 종목 수와 내린 종목 수가 있습니다."),
-              ("반도체곰", "11.18 17:03", "찾았습니다[:mid_proof:] 오른 종목이 절반이 안 됐네요[:down_calm:]"),
-              ("물결이", "11.18 17:08", "두 종목 거래량, 평소(20일 평균)의 2.1배! 지수가 오른 날 거래량이 두 종목에만 몰린 건 11월 들어 두 번째예요."),
-              ("", "11.18 17:15", ""),
-              ("장기보유", "11.18 17:30", "지수는 올랐는데 제 계좌는 그대로였던 이유가 있었네요."),
-              (ME, "11.18 17:44", "저도 리포트에서 같이 보고 왔습니다. 감사합니다[:mid_thanks:]"),
+              ("데이터센터", "11.27 16:31", "저도 그게 궁금했습니다. 지수만 보면 다 오른 줄 알겠더라고요."),
+              ("새내기", "11.27 16:40", "오른 종목 수는 어디서 볼 수 있나요?"),
+              ("owner", "11.27 16:58", "코스피 리포트의 `오른 종목이 많았나?` 칸에 오른 종목 수와 내린 종목 수가 있습니다."),
+              ("반도체곰", "11.27 17:03", "찾았습니다[:mid_proof:] 오른 종목이 절반이 안 됐네요[:down_calm:]"),
+              ("물결이", "11.27 17:08", "두 종목 거래량, 평소(20일 평균)의 2.1배! 지수가 오른 날 거래량이 두 종목에만 몰린 건 11월 들어 두 번째예요."),
+              ("", "11.27 17:15", ""),
+              ("장기보유", "11.27 17:30", "지수는 올랐는데 제 계좌는 그대로였던 이유가 있었네요."),
+              (ME, "11.27 17:44", "저도 리포트에서 같이 보고 왔습니다. 감사합니다[:mid_thanks:]"),
           ])
 # 날짜 묶음(최신 날이 위)
 DAYS = [
@@ -673,7 +673,7 @@ def list_view(member, first):
                    f'<button class="cm-more" type="button">댓글 {TOTAL - k}개 더 보기</button>' + note())
 
 
-def thread_page(member):
+def thread_page(member, as_page=False):
     """글 화면 = 새 페이지. 목록 칸을 누르면 열린다.
     실제는 Blogger 페이지 하나(/p/comment.html?post=…&c=…)가 주소의 번호로 글을 읽어 그린다 — 댓글마다 주소가 생겨 공유도 된다.
     위 줄(뒤로 · 어느 글 › · 공유) → 글쓴이 → 제목 → 날짜 → 본문 → 좋아요 · 싫어요 상자 → 답글 n → 내 이름 · 내 프로필 → 쓰는 칸 → 안내 → 답글들."""
@@ -704,8 +704,11 @@ def thread_page(member):
         rows += (f'<li class="cv-item">{head(who, rwhen, f"r{k}", member, date=False, mine=who == ME)}<p class="cv-text">{rich(rtext)}</p>{extras(rtext)}'
                  f'<div class="cv-rtime">{rwhen}</div><div class="cv-foot">{reacts(who + rtext, member)}</div>'
                  f'{menu_box(f"r{k}", who == ME) if member and who != "owner" else ""}</li>')
-    return (f'<div class="cv-full cv-page" data-win="thread">{top}<div class="cv-full-body"><div class="comments is-open cc-page">{post}'
-            f'<div class="cv-count">답글 {rcount(name + title)}</div>{box}{guard()}<ol class="cv-list cv-rlist">{rows}</ol>{note()}</div></div></div>')
+    inner = (f'<div class="comments is-open cc-page">{post}'
+             f'<div class="cv-count">답글 {rcount(name + title)}</div>{box}{guard()}<ol class="cv-list cv-rlist">{rows}</ol>{note()}</div>')
+    if as_page:   # 11-28 사용자: 위 줄도 디자인 규칙대로 = 테마 고정 제목 줄(뒤로 · 제목 · 공유), 따로 그린 네모 버튼 줄은 안 씀
+        return f'<div class="cv-page">{inner}</div>'
+    return f'<div class="cv-full cv-page" data-win="thread">{top}<div class="cv-full-body">{inner}</div></div>'
 
 
 def win(wid, title, body, cls=""):
@@ -874,7 +877,8 @@ def write_out(name, page):
 def build(name, member=True, first=False, thread=False, demo=""):
     """로그인 전 · 뒤 · 처음 쓸 때 · 글쓰기 · 내 프로필 · 글 화면 = 확정된 시황 댓글 보기(배너 그대로 · 댓글 n · 안내 · 목록) 위에 그 상태로(11-28 사용자: 옛 글 아래 목록 틀 폐지).
     목록 = 확정된 시황 댓글 보기와 똑같은 댓글(STORY_CMTS) · 꼬리표 없음(11-28 사용자: 확정 목록과 똑같이). 다른 것은 로그인 상태(연필 · 점 세 개 메뉴)뿐."""
-    build_cc(name, BASE, STORY_CMTS, STORY_TOTAL, name, page=("11.27 증시 시황", "mock_comments_card-one.html", "story"),
+    link = name if not thread else ("mock_comments_member.html" if member else "mock_comments_guest.html")   # 글 화면 뒤로 = 그 댓글 보기
+    build_cc(name, BASE, STORY_CMTS, STORY_TOTAL, link, page=("11.27 증시 시황", "mock_comments_card-one.html", "story"),
              member=member, first=first, thread=thread, demo=demo)
 
 
@@ -1440,11 +1444,16 @@ def build_cc(name, base, cmts, total, page_link="", page=None, member=True, firs
         op = '<div class="post-body entry-content">'
         a = p.index(op) + len(op)
         e = p.index('</div><div class="post-share-buttons', a)
-        p = p[:a] + CSS + CC_CSS + comment_page(cmts, total, back, kind, member, tags, more_html) + p[e:]
+        if thread:   # 글 화면 = 그 댓글 하나 + 답글, 제목 줄 = 테마(뒤로 → 댓글 보기), 꼬리 `댓글`
+            body = (f'<div data-design="2" style="font-family:var(--report-font);"><span data-title-back="{page_link}" data-title-back-label="댓글 보기로" hidden></span>'
+                    + TAIL.replace("'댓글 보기'", "'댓글'") + PAGE_CSS + thread_page(member, as_page=True) + '</div>')
+        else:
+            body = comment_page(cmts, total, back, kind, member, tags, more_html)
+        p = p[:a] + CSS + CC_CSS + body + p[e:]
         fab = "" if thread else (f'<button class="cv-fab" type="button" aria-label="댓글 쓰기"{"" if member else " data-guest"}{" data-first" if first else ""}>{PENCIL}</button>')
         if demo:
             p = re.sub(r"<body", f'<body data-demo="{demo}"', p, count=1)
-        p = p.replace("</body>", fab + (thread_page(member) if thread else "") + windows(member, first)
+        p = p.replace("</body>", fab + windows(member, first)
                       + (profile_page() if demo == "profile" else "") + js + "</body>", 1)
     else:
         nav = '<p class="post-nav">'
