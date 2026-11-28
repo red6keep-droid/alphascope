@@ -34,19 +34,34 @@ POS = ["상승", "하락", "안정", "회복"]
 rng = np.random.default_rng(20261128)
 
 
-def positions(c, vix):
+def positions(c, vix, confirm=1):
+    """confirm = 10% 선을 며칠 이어서 넘어야 자리를 바꾸나(들어갈 때 · 나올 때 같게). 1 = 검증 V8 그대로(하루),
+    3 = 상태판 규칙(11-28 사용자 A안 — 하루짜리 출렁임에 자리가 바뀌지 않게)."""
     v = c.values
     vx = vix.reindex(c.index).ffill(limit=5).values
     out = np.empty(len(v), dtype=object)
     peak = v[0]
+    below, cnt = False, 0
     low = low_i = None
     for i, x in enumerate(v):
         peak = max(peak, x)
-        if x >= peak * 0.9:
+        under = x < peak * 0.9
+        if under != below:
+            cnt += 1
+            if cnt >= confirm:
+                below, cnt = under, 0
+                if below:   # 들어간 날까지 이어진 날들 중 최저가
+                    j = i - confirm + 1
+                    k = j + int(np.argmin(v[j:i + 1]))
+                    low, low_i = v[k], k
+                else:
+                    low = low_i = None
+        else:
+            cnt = 0
+        if not below:
             out[i] = "상승"
-            low = low_i = None
             continue
-        if low is None or x < low:
+        if x < low:
             low, low_i = x, i
         if x > low * 1.10:
             out[i] = "회복"
@@ -142,7 +157,9 @@ def main():
     vix = load_close("^VIX")
     spx = load_close("^GSPC")
     ks = load_close("^KS11")
-    ps, pk = positions(spx, vix), positions(ks, vix)
+    conf = int(sys.argv[sys.argv.index("--confirm") + 1]) if "--confirm" in sys.argv else 1
+    tag = "" if conf == 1 else f"_c{conf}"
+    ps, pk = positions(spx, vix, conf), positions(ks, vix, conf)
     res = pd.concat([study("S&P 500", spx, ps, "1990-01-02"), study("코스피", ks, pk, "1997-01-01")])
 
     pct = lambda v: "" if pd.isna(v) else f"{v * 100:+.1f}%"
@@ -172,9 +189,9 @@ def main():
     lines.append("|---|" + "---|" * len(POS))
     for y, r in yr.iterrows():
         lines.append(f"| {y} | " + " | ".join(f"{r.get(p, 0) * 100:.0f}%" for p in POS) + " |")
-    with open(os.path.join(OUT, "cycle_position.md"), "w", encoding="utf-8") as f:
+    with open(os.path.join(OUT, f"cycle_position{tag}.md"), "w", encoding="utf-8") as f:
         f.write("\n".join(lines) + "\n")
-    pd.DataFrame({"S&P 500": ps, "코스피": pk}).to_csv(os.path.join(OUT, "cycle_position_days.csv"))
+    pd.DataFrame({"S&P 500": ps, "코스피": pk}).to_csv(os.path.join(OUT, f"cycle_position_days{tag}.csv"))
     print("\n".join(lines[:4 + 2 + len(res)]))
     print("\n".join(l for l in lines if l.startswith("- ") and "**" in l))
 
