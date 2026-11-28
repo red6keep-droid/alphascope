@@ -722,7 +722,6 @@ CHAIN_FS = 17   # 갈래 카드 고리 줄 이름(`급락 폭의 4분의 1 회�
 WHY_FS, WHY_LH = 16, 26
 SIG_NAME = "Newfact 신호"   # 독자 문장에서 `우리 신호` 대신
 WHY_NOTE = "관련 주식 정보는 갈래마다 기사를 모은 것입니다. 기사로 어느 쪽이 맞을지 고르지는 않습니다."   # 대상 = 기사 (페이지 안 `우리가 고른` 과 부딪히지 않게)
-NEXT = [False]   # 6-23② 성적표 비교 대상 · 6-26 과거 기록 카드 시안 (목업만)
 EXCL_ICON = ('<svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true" style="flex:none;display:block;" fill="none" stroke="currentColor" stroke-width="1.6">'
              '<circle cx="8" cy="8" r="6.5"/><path d="M8 4.6v4.4" stroke-linecap="round"/><circle cx="8" cy="11.2" r=".9" fill="currentColor" stroke="none"/></svg>')   # 느낌표 = INFO_ICON(i) 뒤집은 모양
 
@@ -2270,7 +2269,7 @@ def forecast_body(reg, state=None, fc=None, others=None, op=None):
                             why=side_why(fc, sc, dk.CARD_DIR[branch_view(fc, st, sc)["theme"]][1])) for i, sc in enumerate(order))
              + (_third_card(third[0], third[1], fc.get("line", 3.0)) if third else "") + "</div>")   # 셋째 카드 = `선반영` (사건 전) · `제자리` (충격 뒤)
     now = "" if before else _fold_row("현재 증시는?", _stock_now(fc, st) + _compare_chart(fc, st) + _now_plain(fc, st), side=_close_day(st), icon="pulse")   # 종목 전망 = 맨 위 종목 줄 · 바로가기   # 옛 `지금은?` 구획 → 접는 줄, 기록 줄과 한 묶음 (P418) · 카드 없이 · 한국 카드 삭제 (P425)
-    more = (_event_chart(reg) if fc.get("event_chart") else "") + _fold_group(_reasons_card(fc) + _broke_card(fc) + now + _history_card(fc) + (_odds_history(fc) if NEXT[0] else ""))   # 어디서 끊겼나 = 접는 줄 묶음 맨 위 (P435)   # `앞으로 볼 것은?` 삭제 — 안내 문구 · 내부 방법 설명뿐, 위험 · 다음 일은 갈래 카드 안에 (P394)
+    more = (_event_chart(reg) if fc.get("event_chart") else "") + _fold_group(_reasons_card(fc) + _broke_card(fc) + now + _history_card(fc) + _odds_history(fc))   # 어디서 끊겼나 = 접는 줄 묶음 맨 위 (P435)   # `앞으로 볼 것은?` 삭제 — 안내 문구 · 내부 방법 설명뿐, 위험 · 다음 일은 갈래 카드 안에 (P394)
     # 질문 제목 = 날짜 줄 위. 구획 제목 글씨(22/28 · 폰 20/26), 아래가 날짜 줄이라 밑줄 없음
     # 질문 줄 = 왼쪽 질문 · 오른쪽 결과 발표 날짜 한 줄, 질문이 길면 날짜 칸을 침범하지 않고 왼쪽 칸 안에서 두 줄. 날짜는 질문 첫 줄 글자 바닥에 맞춘다(baseline)
     # 질문 앞 = 증시 전망 저울 아이콘(배경 = 홈 `시장 흐름과 종목` 아이콘 청록 #0E7490, P457) 24 · 모서리 6 · 그림 16, P456). 한 줄 높이(1lh = 22/28 · 폰 20/26)를 아이콘 · 날짜 칸이 물려받아 첫 줄 가운데, 둘째 줄은 아이콘 아래로 들어가지 않는다
@@ -2486,7 +2485,7 @@ def split_done(pub, states):
     score["n"] += score["watch"]
     if picked[1] >= 5:   # 1개 중 1개를 `대부분` 이라 하지 않게 — 다섯 개부터 (2026-11-12)
         score["picked_hit"] = tuple(picked)
-    if NEXT[0] and expect[1]:
+    if expect[1]:
         score["expect"] = (expect[0], expect[1], expect[2])
     rows.sort(key=lambda x: x[4], reverse=True)   # 최근 끝난 것 먼저
     return opened, [x[:4] for x in rows], score
