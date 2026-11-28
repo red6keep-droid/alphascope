@@ -485,7 +485,7 @@ def stk_css():
 
 CSS = CSS.replace("</style>", stk_css() + "</style>", 1)
 TITLES = {   # 목업 목록에 보이는 이름
-    "mock_comments_member.html": "댓글 보기 — 로그인 뒤 · 신고 · 가려진 글 · 내 글 · 날짜 꼬리표 (시황 글에서)",
+    "mock_comments_member.html": "댓글 보기 — 로그인 뒤 · 점 세 개 = 신고 (시황 글에서)",
     "mock_comments_guest.html": "댓글 보기 — 로그인 전 · 연필 = 로그인 창 (시황 글에서)",
     "mock_comments_thread.html": "댓글 글 화면 · 답글 · 스티커 붙은 모습 (로그인 뒤)",
     "mock_comments_thread-guest.html": "댓글 글 화면 (로그인 전)",
@@ -831,11 +831,9 @@ def write_out(name, page):
 
 def build(name, member=True, first=False, thread=False, demo=""):
     """로그인 전 · 뒤 · 처음 쓸 때 · 글쓰기 · 내 프로필 · 글 화면 = 확정된 시황 댓글 보기(배너 그대로 · 댓글 n · 안내 · 목록) 위에 그 상태로(11-28 사용자: 옛 글 아래 목록 틀 폐지).
-    목록 = DAYS 예시(신고 · 가려진 글 · 내 글 · 날짜 꼬리표 그대로)."""
-    cmts = [c for _, cs in DAYS for c in cs]
-    tags = [d.replace("에 달린 댓글", "") for d, cs in DAYS for _ in cs]   # 날짜를 넘어 이어지는 시황 댓글 = 글마다 꼬리표
-    build_cc(name, BASE, cmts, STORY_TOTAL, name, page=("11.27 증시 시황", "mock_comments_card-one.html", "story"),
-             member=member, first=first, thread=thread, demo=demo, tags=tags)
+    목록 = 확정된 시황 댓글 보기와 똑같은 댓글(STORY_CMTS) · 꼬리표 없음(11-28 사용자: 확정 목록과 똑같이). 다른 것은 로그인 상태(연필 · 점 세 개 메뉴)뿐."""
+    build_cc(name, BASE, STORY_CMTS, STORY_TOTAL, name, page=("11.27 증시 시황", "mock_comments_card-one.html", "story"),
+             member=member, first=first, thread=thread, demo=demo)
 
 
 # ── 글 아래 댓글 카드 · 댓글 화면 ─────────────────────────────────────────────
