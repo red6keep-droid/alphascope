@@ -70,7 +70,7 @@ def _row(it):
                 + (f'<a href="{dk.esc(it["url"])}" target="_blank" rel="noopener" data-trhelp="skip" style="margin-left:auto;font-size:13px;line-height:19px;color:{dk.SUB};text-decoration:underline;text-underline-offset:3px;white-space:nowrap;">'
                    f'원문 보기{f" ({dk.esc(src)})" if src else ""} {dk.LINK_ICON}</a>' if it.get("url") else "") + "</span>")
         row = dk.news_pop_wrap(row, pid) + body[:-len("</div>")] + btns + "</div>"
-    return row
+    return f'<div {dk.SAID_MARK}="1">{row}</div>'   # 발언 = 그 사람의 말 — 안의 `60% 상승` 에 우리 등락 색을 붙이지 않는다
 
 
 def _list(ids, items):

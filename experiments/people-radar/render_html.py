@@ -319,7 +319,7 @@ def sec_people(r, cards):
             # 펼친 목록의 첫 기사 위에도 구분선
             ml = dk.item_rules(more, indent=dk.ALIGN_PX).replace(f"padding:2px {dk.ALIGN_PX}px ", f"padding:{dk.RULE_GAP - dk.NEWS_VP}px {dk.ALIGN_PX}px ", 1).replace("line-height:" + dk.LH_BODY + ";", "line-height:" + dk.LH_BODY + ";box-shadow:inset 0 1px 0 #E2E8F0;", 1)
             page.append(dk.fold(f"{p['name_ko']} 발언 {len(more)}건 더 보기", ml).replace("margin-top:8px;margin-bottom:8px;", "margin:0 0 8px;", 1))
-        out.append(f'<div data-person-page="{p["speaker"]}">{_pop_li("".join(page))}</div>')
+        out.append(f'<div data-person-page="{p["speaker"]}" {dk.SAID_MARK}="1">{_pop_li("".join(page))}</div>')   # 발언 = 그 사람의 말 — `60% 상승 기대` 에 우리 등락 색을 붙이지 않는다
     return "".join(out)
 
 
@@ -340,7 +340,7 @@ def _list_row(p, cards, first):
         f'{_avatar(p)}'
         f'<span style="flex:1 1 auto;min-width:0;">'
         f'<span style="display:block;font-size:{dk.SMALL};line-height:25px;"><b>{_esc(p["name_ko"])}</b> <span style="color:{dk.SUB};font-size:{dk.TINY};line-height:20px;">{_esc(p["title_ko"])} · 오늘 {n}건</span></span>'
-        + (f'<span style="display:block;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:#111;margin-top:2px;word-break:keep-all;">{dk.keep_tone(_esc(head))}</span>' if head else "")
+        + (f'<span {dk.SAID_MARK}="1" style="display:block;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:#111;margin-top:2px;word-break:keep-all;">{dk.keep_tone(_esc(head))}</span>' if head else "")
         + (f'<span style="display:block;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.SUB};margin-top:2px;">연결 자산 : {_esc(touch)}</span>' if touch else "")
         + f'</span><span style="flex:none;color:#94A3B8;display:inline-flex;margin-top:10px;">{chev}</span></a>')
 

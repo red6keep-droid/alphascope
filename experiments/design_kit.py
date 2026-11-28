@@ -808,6 +808,7 @@ _DN_COLS = {"#1a73e8", "#2196f3"}
 _TRI_SIGNED = re.compile(r"(?<![\w.~])(?<!~ )([+\-−])(\d[\d,]*(?:\.\d+)?)" + _UNITS + r"(?![A-Za-z])(?!\s*~)(?!\s*(?:넘|아래|이상|이하|미만|초과|안팎|안쪽|밖|까지|부터))")
 _PAINTED = re.compile(r'(<span style="color:(#[0-9A-Fa-f]{6});[^"]*">)([^<]*)(</span>)')
 _CHART_MARKS = ("data-lscroll", "data-range-gauge", "data-chart-top", "data-ichart", "data-no-tri")
+SAID_MARK = "data-said"   # 남이 한 말(인물 발언 헤드라인 · 요약) — 안의 `60% 상승` 은 그 사람의 말이라 우리 등락 색 · ▲ 를 붙이지 않는다
 _VOID = {"br", "img", "hr", "input", "meta", "link", "wbr", "source", "col", "area"}
 _COLOR_RE = re.compile(r"(?:^|[;\s\"])color:\s*(#[0-9A-Fa-f]{6})")
 _FS_RE = re.compile(r"font-size:\s*(\d+)px")
@@ -862,7 +863,7 @@ def fix_colons(html):
     숫자 앞 빼기(−3)는 그린 줄(MINUS_BAR)로, 툴팁 속 빼기는 엔 대시(–)로."""
     out, skip, svg, sent = [], False, False, False
     tri_end = False   # 앞 글자 노드가 ▲ · ▼ 로 끝났나 — 다음 노드 첫 띄어쓰기도 붙인다(`<span>▲</span> 올랐습니다`)
-    stack = []   # (태그 이름, 증감 색 여부, 글자 px, 그래프 안) — 삼각형 크기 · 그래프 건너뛰기용
+    stack = []   # (태그 이름, 증감 색 여부, 글자 px, 그래프 안, 남이 한 말 안) — 삼각형 크기 · 그래프 건너뛰기용
     for part in _TAG.split(html):
         if part.startswith("<") and part.endswith(">"):
             low = part[:8].lower()
@@ -875,12 +876,12 @@ def fix_colons(html):
                             del stack[k:]
                             break
                 elif name not in _VOID and not part.endswith("/>") and not name.startswith("!"):
-                    par = stack[-1] if stack else ("", None, BODY_PX, False)
+                    par = stack[-1] if stack else ("", None, BODY_PX, False, False)
                     mc, mf = _COLOR_RE.search(part), _FS_RE.search(part)
                     col = mc.group(1).lower() if mc else None
                     colored = (col in _UP_COLS or col in _DN_COLS) if col else par[1]
                     stack.append((name, colored, int(mf.group(1)) if mf else par[2],
-                                  par[3] or name == "svg" or any(k in part for k in _CHART_MARKS)))
+                                  par[3] or name == "svg" or any(k in part for k in _CHART_MARKS), par[4] or SAID_MARK in part))
             if low.startswith("<li") and SENT_ATTR in part:
                 sent = True   # 강조 카드 문장 — 여기서 붙이는 증감 숫자는 굵게
             elif low.startswith("</li"):
@@ -893,13 +894,23 @@ def fix_colons(html):
                 svg = True
             elif low.startswith("</svg"):
                 svg = False
-            out.append(_TIP_ATTR.sub(lambda m: m.group(1) + _MINUS_NUM.sub("–", (_tri_plain if m.group(1).startswith("data-tip") else (lambda x: x))(_sign_text(_space_dots(_space_colons(_no_dash(m.group(2)))), False))).replace("▲ ", "▲\u00a0").replace("▼ ", "▼\u00a0") + m.group(3), part))   # 툴팁 글은 HTML 을 못 넣어 엔 대시로 · 툴팁 증감 = `▲ 1.2%` 글자 (2026-11-12)
+            said = SAID_MARK in part or bool(stack and stack[-1][4])   # 남이 한 말 안의 툴팁 · 제목 속성도 증감 부호를 붙이지 않는다
+
+            def _attr(m, said=said):
+                v = _space_dots(_space_colons(_no_dash(m.group(2))))
+                if not said:
+                    v = _sign_text(v, False)
+                    v = _tri_plain(v) if m.group(1).startswith("data-tip") else v
+                return m.group(1) + _MINUS_NUM.sub("–", v).replace("▲ ", "▲\u00a0").replace("▼ ", "▼\u00a0") + m.group(3)
+            out.append(_TIP_ATTR.sub(_attr, part))   # 툴팁 글은 HTML 을 못 넣어 엔 대시로 · 툴팁 증감 = `▲ 1.2%` 글자 (2026-11-12)
         elif skip:
             out.append(part)
         else:
-            t = _sign_text(_space_dots(_space_colons(_no_dash(_ASCII_MINUS.sub("−", part) if not svg else part))), not svg, sent)
-            top = stack[-1] if stack else ("", None, BODY_PX, False)
-            if not svg and not top[3]:
+            top = stack[-1] if stack else ("", None, BODY_PX, False, False)
+            t = _space_dots(_space_colons(_no_dash(_ASCII_MINUS.sub("−", part) if not svg else part)))
+            if not top[4]:   # 남이 한 말 안은 증감 부호 · 색을 붙이지 않는다
+                t = _sign_text(t, not svg, sent)
+            if not svg and not top[3] and not top[4]:
                 t = _tri_in_text(t, top[2], bool(top[1]), sent)   # 증감 색 숫자 → 삼각형, 그래프 안은 그대로
             if not svg:   # ▲ · ▼ 와 뒤 말은 한 덩어리로 줄바꿈 — 삼각형 뒤 띄어쓰기 = 줄바꿈 없는 칸
                 t = _TRI_GAP.sub(lambda m: m.group(1) + "\u00a0", t)
