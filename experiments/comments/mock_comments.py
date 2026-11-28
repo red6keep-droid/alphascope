@@ -103,7 +103,16 @@ CSS = """<style>
 .cv-ptitle{margin:14px 0 0;font-size:22px;line-height:32px;font-weight:700;color:#111;word-break:keep-all;overflow-wrap:anywhere;}
 .cv-pmeta{margin:4px 0 0;color:#7A7A7A;}
 .cv-ptext{margin:18px 0 0;font-size:16px;line-height:26px;color:#333;white-space:pre-wrap;word-break:keep-all;overflow-wrap:anywhere;}
-.cv-big-react{display:flex;gap:12px;margin:16px 0 0;padding:0 0 16px;border-bottom:1px solid #E2E8F0;}   /* P617 목록과 같은 아이콘 꼴 */
+.cv-big-react{display:flex;justify-content:center;gap:10px;margin:20px 0 0;padding:0 0 20px;border-bottom:1px solid #E2E8F0;}   /* 글 화면 좋아요 · 싫어요 = 가운데 외곽선 상자 둘(11-28 사용자, 네이버 글 화면 참고) */
+.cv-big-react .cv-react{justify-content:center;gap:8px;min-width:112px;padding:10px 20px;border:1px solid #E2E8F0;border-radius:10px;font-size:16px;line-height:24px;}
+.cv-big-react .cv-react svg{width:22px;height:22px;}
+.cv-rbox{padding:8px 12px;border:1px solid #111;border-radius:8px;}
+.cv-rbox .cm-input{border:0 !important;padding:4px 0 !important;min-height:110px;}
+.cv-rquick{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;margin:6px -4px 0;padding:8px 0 0;border-top:1px solid #E2E8F0;}
+.cv-rquick::-webkit-scrollbar{display:none;}
+.cv-rquick button{flex:none;margin:0;padding:2px;background:none;border:0;cursor:pointer;}
+.cv-rquick img{display:block;width:40px;height:40px;object-fit:contain;}
+.cv-rbox [data-rstk] img{width:64px;height:64px;cursor:pointer;}
 .cv-me{display:flex;align-items:center;gap:7px;margin:0 0 10px;}
 .cv-myprof{margin-left:auto;padding:5px 11px;border-radius:8px;background:#fff;border:1px solid #111;color:#111;font-size:13px;line-height:19px;font-weight:700;text-decoration:none;}
 .cv-page .comments .cv-rlist .cv-text{margin:6px 0 0;}
@@ -244,7 +253,12 @@ CSS = """<style>
 .cv-full ::placeholder{color:#94A3B8;font-weight:400;}
 .cv-full input.cv-title-in{font-weight:700;color:#111;}
 .cv-full textarea.cv-in{min-height:180px;resize:none;}
-.cv-tools{display:flex;gap:6px;margin:8px 0;}
+.cv-tools{display:flex;gap:6px;margin:16px 0 8px;}   /* 글 아래(11-28) */
+.cv-stk-menu{position:absolute;z-index:5;display:flex;gap:4px;padding:4px;background:#fff;border:1px solid #E2E8F0;border-radius:8px;box-shadow:0 2px 8px rgba(15,23,42,.12);}
+.cv-stk-menu button{margin:0;padding:4px 10px;background:#fff;border:1px solid #E2E8F0;border-radius:6px;font:inherit;font-size:14px;line-height:20px;font-weight:700;color:#111;cursor:pointer;}
+.cv-stk-menu button.is-del{color:#B91C1C;}
+.cv-edbox{position:relative;}
+.cv-stk-row img.is-sel{outline:2px solid #111;outline-offset:2px;border-radius:8px;}
 .cv-tool{display:inline-flex;align-items:center;gap:6px;margin:0;padding:6px 12px;background:#fff;border:1px solid #E2E8F0;border-radius:8px;font:inherit;font-size:14px;line-height:20px;font-weight:700;color:#111;cursor:pointer;-webkit-tap-highlight-color:transparent;}
 .cv-tool.is-on{border-color:#111;}
 .cv-tool svg{width:16px;height:16px;}
@@ -453,16 +467,20 @@ STOCKS = {
     "000660": ("SK하이닉스", "000660 · 코스피", "612,000원", "+4.26%", True, [30, 28, 31, 27, 25, 26, 22, 20, 21, 17, 15, 16, 12, 10]),
     "005930": ("삼성전자", "005930 · 코스피", "98,700원", "+2.81%", True, [28, 29, 26, 27, 24, 22, 23, 20, 21, 18, 17, 15, 14, 12]),
     "NVDA": ("엔비디아", "NVDA · 나스닥", "$125.53", "-14.01%", False, [10, 12, 11, 14, 15, 14, 16, 15, 17, 16, 22, 26, 29, 31]),
+    "AAPL": ("애플", "AAPL · 나스닥", "$231.20", "+1.12%", True, [20] * 14),   # 실서비스 = 블로그 검색 색인(853종목)에서 찾는다 — 목업은 몇 개만
+    "TSLA": ("테슬라", "TSLA · 나스닥", "$342.10", "-2.35%", False, [20] * 14),
+    "035420": ("NAVER", "035420 · 코스피", "214,500원", "+0.94%", True, [20] * 14),
 }
+CHART_TALK = {'up_hello': 'up_hello', 'up_middle': 'up_mid', 'up_byebye': 'up_bye', 'down_hello': 'down_hello', 'down_middle': 'down_mid', 'down_byebye': 'down_bye', 'mid_hello': 'mid_hello', 'mid_middle': 'mid_mid', 'mid_byebye': 'mid_bye'}   # 스티커 이름 → 차트 읽기 캐릭터 컷(experiments/chart-talk/chars) — 주식 공부 컷 이름과 겹치지 않게
 STICKERS = [   # (탭 이름, [컷 …]) 그림 여섯 장(course/sheet_to_webp.py 로 자름) 먼저, 그 뒤 옛 주식 공부 컷
-    ("상승이", ["up_flip", "up_panic", "up_throw", "up_box", "up_flat", "up_chicken", "up_night",
+    ("상승이", ["up_hello", "up_middle", "up_byebye", "up_flip", "up_panic", "up_throw", "up_box", "up_flat", "up_chicken", "up_night",
                 "up_pray", "up_treadmill", "up_recheck", "up_flowers",
                 "up_laptop", "up_search", "up_book", "up_coffee", "up_walk", "up_news", "up_tablet", "up_ponder",
                 "up_surprised", "up_cry", "up_sweat", "up_regret", "up_relief", "up_wait", "up_wonder", "up_buy"]),
-    ("하락이", ["down_hammock", "down_nap", "down_extinguish", "down_airport", "down_piggy", "down_noear", "down_shrug", "down_spa",
+    ("하락이", ["down_hello", "down_middle", "down_byebye", "down_hammock", "down_nap", "down_extinguish", "down_airport", "down_piggy", "down_noear", "down_shrug", "down_spa",
                 "down_thumb", "down_frown", "down_float", "down_bye",
                 "down_happy", "down_calm", "down_grumpy", "down_sulky"]),
-    ("분석이", ["mid_whistle", "mid_balance", "mid_chalk", "mid_egg", "mid_measure", "mid_gavel",
+    ("분석이", ["mid_hello", "mid_middle", "mid_byebye", "mid_whistle", "mid_balance", "mid_chalk", "mid_egg", "mid_measure", "mid_gavel",
                 "mid_question", "mid_clap", "mid_proof", "mid_peace", "mid_hourglass", "mid_thanks",
                 "mid_travel", "mid_workout", "mid_sleep", "mid_music", "mid_eat", "mid_photo", "mid_map", "mid_stretch",
                 "mid_think", "mid_caution", "mid_explain"]),
@@ -613,8 +631,7 @@ def stock_card(sym, tag="a"):
     return (f'<{tag} class="cv-stock"{" href=" + chr(34) + "#" + chr(34) if tag == "a" else ""}><span class="cv-stock-top">{dk.name_logo(sym + ".KS" if sym.isdigit() else sym, name, 32)}'
             f'<span class="cv-stock-name"><b>{esc(name)}</b><span>{esc(sub)}</span></span>'
             f'<span class="cv-stock-px"><b>{px}</b><span style="color:{ink};">{dk.tri_span(up, 14)}{chg.lstrip("+-")}</span></span></span>'
-            f'<svg class="cv-spark" viewBox="0 0 300 40" preserveAspectRatio="none" aria-hidden="true"><polyline points="{path}" fill="none" stroke="{line}" stroke-width="2" '
-            f'stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/></svg>'
+            # 작은 선 그래프는 뺌(11-28 사용자: 선만 있어 이상하다) — 이름 · 값 · 등락 · 기준일만
             f'<span class="cv-stock-note" style="display:block;">11.18 종가 기준</span></{tag}>')
 
 
@@ -673,6 +690,9 @@ def list_view(member, first):
                    f'<button class="cm-more" type="button">댓글 {TOTAL - k}개 더 보기</button>' + note())
 
 
+RQUICK = ("up_hello", "down_hello", "mid_hello", "up_surprised", "down_happy", "mid_thanks", "mid_clap", "up_cry")   # 답글 칸 아래 스티커 한 줄(11-28, 네이버 이모지 줄 참고) — 더 많은 건 연필(댓글 쓰기)에서
+
+
 def thread_page(member, as_page=False):
     """글 화면 = 새 페이지. 목록 칸을 누르면 열린다.
     실제는 Blogger 페이지 하나(/p/comment.html?post=…&c=…)가 주소의 번호로 글을 읽어 그린다 — 댓글마다 주소가 생겨 공유도 된다.
@@ -689,7 +709,9 @@ def thread_page(member, as_page=False):
     if member:
         me = f'<div class="cv-me">{avatar(ME)}<span class="cm-name">{ME}</span><a class="cv-myprof" href="mock_comments_profile.html">내 프로필</a></div>'
         box = (me + '<button class="cv-fake" type="button" data-open-rform>의견을 남겨 보세요</button>'
-               '<div data-rform hidden><form class="cm-form" onsubmit="return false"><textarea class="cm-input" data-ta maxlength="2000" rows="4" placeholder="의견을 남겨 보세요" aria-label="답글 쓰기"></textarea>'
+               '<div data-rform hidden><form class="cm-form cv-rbox" onsubmit="return false"><div class="cv-stk-row" data-rstk></div>'
+               '<textarea class="cm-input" data-ta maxlength="2000" rows="5" placeholder="다른 사람을 헐뜯거나 거짓 정보 · 연락처 · 오픈채팅 주소를 쓰면 가려지거나 지워질 수 있습니다." aria-label="답글 쓰기"></textarea>'
+               + '<div class="cv-rquick">' + "".join(f'<button type="button" data-rq="{k}" aria-label="스티커 넣기"><img src="stickers/c_{k}.webp" alt="" width="40" height="40"></button>' for k in RQUICK) + '</div>'
                '<div class="cm-foot"><div class="cm-count-row"><span class="cm-count" data-count>0 / 2000</span><span class="cm-left">오늘 남은 댓글 28개</span></div>'
                '<div class="cm-foot-btns"><button class="cm-submit" type="submit" data-send disabled>등록</button></div></div>'
                '<div class="cv-err" data-err hidden>오픈채팅 · 텔레그램 주소와 연락처는 올릴 수 없습니다. 지우고 다시 등록해 주세요.</div></form></div>')
@@ -735,19 +757,22 @@ def write_full(left):
     rows = f'<div class="cv-stk-tabs" role="tablist">{tabs}</div>{grids}'
     syms = "".join(f'<button class="cv-sym-row" type="button" data-sym="{k}">{dk.name_logo(k + ".KS" if k.isdigit() else k, v[0], 24)}{esc(v[0])}<small>{esc(v[1])}</small></button>' for k, v in STOCKS.items())
     cards = "".join(f'<template data-card="{k}">{stock_card(k, "div")}</template>' for k in STOCKS)
-    return (f'<div class="cv-full" data-win="write" hidden>{bar("글쓰기", "등록하기", "data-wsend")}<div class="cv-full-body">'
-            '<p class="cv-where">한국 증시 시황에 쓰는 글</p>'
+    # 11-28 사용자: 제목 `댓글 쓰기` · 스티커 · 종목 붙이기는 안 쓰는 사람도 있으니 글 아래로 · 내용 칸 안내 = 지켜 달라는 말
+    return (f'<div class="cv-full" data-win="write" hidden>{bar("댓글 쓰기", "등록하기", "data-wsend")}<div class="cv-full-body">'
+            '<p class="cv-where">11.27 증시 시황에 쓰는 댓글</p>'
             '<input class="cv-in cv-title-in" data-wtitle maxlength="40" placeholder="제목" aria-label="제목">'
-            f'<div class="cv-tools"><button class="cv-tool" type="button" data-tool="stk">{SMILE}스티커</button>'
-            f'<button class="cv-tool" type="button" data-tool="sym">{CHART}종목 붙이기</button></div>'
-            f'<div class="cv-panel is-stk" data-panel="stk" hidden>{rows}</div>'
-            f'<div class="cv-panel" data-panel="sym" hidden><input class="cv-in" placeholder="종목 이름 · 코드" aria-label="종목 찾기" style="margin:0 0 4px;">{syms}</div>'
             f'<div class="cv-attach" data-att="sym" hidden><div data-att-body></div><button class="cv-attach-x" type="button" aria-label="종목 빼기" data-att-x>{X_ICON}</button></div>'
             '<div class="cv-edbox"><div class="cv-stk-row" data-stk-top></div>'
-            '<div class="cv-ed" data-wta contenteditable="true" role="textbox" aria-multiline="true" aria-label="내용" data-ph="내용을 입력하세요. 스티커는 글 위나 아래 줄에 3개까지 들어갑니다."></div>'
+            '<div class="cv-ed" data-wta contenteditable="true" role="textbox" aria-multiline="true" aria-label="내용" '
+            'data-ph="다른 사람을 헐뜯거나 거짓 정보 · 연락처 · 오픈채팅 주소를 쓰면 가려지거나 지워질 수 있습니다."></div>'
             '<div class="cv-stk-row" data-stk-bot></div></div>'
             f'<div class="cv-frow"><span data-wcount>0 / 2000</span><span>오늘 남은 댓글 {left}개</span></div>'
             '<p class="cv-err" data-werr hidden>오픈채팅 · 텔레그램 주소와 연락처는 올릴 수 없습니다. 지우고 다시 등록해 주세요.</p>'
+            f'<div class="cv-tools"><button class="cv-tool" type="button" data-tool="stk">{SMILE}스티커</button>'
+            f'<button class="cv-tool" type="button" data-tool="sym">{CHART}종목 붙이기</button></div>'
+            f'<div class="cv-panel is-stk" data-panel="stk" hidden>{rows}</div>'
+            f'<div class="cv-panel" data-panel="sym" hidden><input class="cv-in" data-symq placeholder="종목 이름 · 코드" aria-label="종목 찾기" style="margin:0 0 4px;">{syms}'
+            '<p class="cv-hint" data-symnone hidden>찾는 종목이 없습니다.</p></div>'
             f'{cards}</div></div>')
 
 
@@ -827,6 +852,7 @@ qa('.rp-cancel').forEach(function(b){b.addEventListener('click',function(){b.clo
 qa('[data-report-send]').forEach(function(b){b.addEventListener('click',function(){if(!q('[data-pick].is-on',b.closest('.cv-pop'))){say('신고하는 이유를 골라 주세요.');return;}b.closest('.cv-pop').innerHTML='<p class=\\"cv-done\\">신고를 받았습니다. 같은 댓글에 신고가 3번 쌓이면 자동으로 가리고 운영자가 확인합니다.</p>';});});
 var of=q('[data-open-rform]');if(of)of.addEventListener('click',function(){of.style.display='none';q('[data-rform]').hidden=false;q('[data-ta]').focus();});
 var ta=q('[data-ta]'),send=q('[data-send]'),err=q('[data-err]');
+qa('[data-rq]').forEach(function(b){b.addEventListener('click',function(){var row=q('[data-rstk]');if(qa('img',row).length>=__STK_MAX__){say('스티커는 __STK_MAX__개까지 넣을 수 있습니다.');return;}var im=document.createElement('img');im.src='stickers/c_'+b.getAttribute('data-rq')+'.webp';im.alt='';im.title='누르면 빠집니다';im.addEventListener('click',function(){im.remove();});row.appendChild(im);});});
 if(ta){ta.addEventListener('input',function(){q('[data-count]').textContent=ta.value.length+' / 2000';send.disabled=!ta.value.trim();err.hidden=true;});
 send.addEventListener('click',function(){if(BAD.test(ta.value)){err.hidden=false;return;}alert('목업: 등록하면 답글 맨 아래에 바로 붙습니다.');});}
 qa('[data-go]').forEach(function(b){b.addEventListener('click',function(){qa('[data-win]').forEach(function(w){w.hidden=true;});openWin(b.getAttribute('data-go'));if(b.getAttribute('data-go')==='pset')roll();});});
@@ -841,7 +867,17 @@ function putStk(k){if(qa('img',stop).length+qa('img',sbot).length>=__STK_MAX__){
 var im=document.createElement('img');im.className='cv-stk-in';im.src='stickers/c_'+k+'.webp';im.alt='';im.width=80;im.height=80;im.setAttribute('data-k',k);im.title='누르면 빠집니다';
 var before='x';if(wrange){var r=document.createRange();r.selectNodeContents(wed);r.setEnd(wrange.startContainer,wrange.startOffset);before=r.toString();}
 ((!before.trim()&&wed.textContent.trim())?stop:sbot).appendChild(im);
-im.addEventListener('click',function(){im.parentNode.removeChild(im);if(window.cvChk)cvChk();});if(window.cvChk)cvChk();}
+im.title='누르면 위로 · 아래로 · 빼기';im.addEventListener('click',function(e){e.stopPropagation();stkMenu(im);});
+qa('[data-panel]').forEach(function(p){p.hidden=true;});qa('[data-tool]').forEach(function(x){x.classList.remove('is-on');});   /* 넣으면 스티커 판 닫기(11-28) */
+if(window.cvChk)cvChk();}
+/* 스티커를 누르면 작은 메뉴 — 위로(글 위 줄) · 아래로(글 아래 줄) · 빼기 (11-28 사용자: 한 번 더 누르면 바로 빠지던 것) */
+var smenu=null;function closeMenu(){if(smenu){smenu.remove();smenu=null;}qa('.cv-stk-row img.is-sel').forEach(function(x){x.classList.remove('is-sel');});}
+function stkMenu(im){closeMenu();im.classList.add('is-sel');var box=im.closest('.cv-edbox');smenu=document.createElement('div');smenu.className='cv-stk-menu';
+var top=im.parentNode===stop;smenu.innerHTML=(top?'<button type="button" data-m="dn">↓ 아래로</button>':'<button type="button" data-m="up">↑ 위로</button>')+'<button type="button" class="is-del" data-m="x">빼기</button>';
+var r=im.getBoundingClientRect(),b=box.getBoundingClientRect();smenu.style.left=(r.left-b.left)+'px';smenu.style.top=(r.bottom-b.top+6)+'px';box.appendChild(smenu);
+smenu.addEventListener('click',function(e){var m=e.target.getAttribute('data-m');if(!m)return;e.stopPropagation();if(m==='x')im.remove();else (m==='up'?stop:sbot).appendChild(im);closeMenu();if(window.cvChk)cvChk();});}
+document.addEventListener('click',function(e){if(smenu&&!smenu.contains(e.target))closeMenu();});
+var sq=q('[data-symq]');if(sq)sq.addEventListener('input',function(){var v=sq.value.trim().toLowerCase(),n=0;qa('[data-sym]').forEach(function(b){var hit=!v||b.textContent.toLowerCase().indexOf(v)>=0||b.getAttribute('data-sym').toLowerCase().indexOf(v)>=0;b.hidden=!hit;if(hit)n++;});q('[data-symnone]').hidden=n>0;});
 qa('[data-stk]').forEach(function(b){b.addEventListener('mousedown',function(e){e.preventDefault();});b.addEventListener('click',function(){putStk(b.getAttribute('data-stk'));});});
 qa('[data-stab]').forEach(function(t){t.addEventListener('click',function(){var i=t.getAttribute('data-stab');qa('[data-stab]').forEach(function(x){x.setAttribute('aria-selected',String(x===t));});qa('[data-sgrid]').forEach(function(g){g.hidden=g.getAttribute('data-sgrid')!==i;});});});
 qa('[data-atab]').forEach(function(t){t.addEventListener('click',function(){var p=t.getAttribute('data-atab');qa('[data-atab]').forEach(function(x){x.setAttribute('aria-selected',String(x===t));});qa('[data-agrid]').forEach(function(g){g.hidden=g.getAttribute('data-agrid')!==p;});});});
@@ -862,7 +898,7 @@ function wtext(){var o='';wa.childNodes.forEach(function f(n){if(n.nodeType===3)
 if(wa){var chk=window.cvChk=function(){var t=wtext();q('[data-wcount]').textContent=t.length+' / 2000';ws.disabled=!(wt.value.trim()&&t.trim());we.hidden=true;};
 wt.addEventListener('input',chk);wa.addEventListener('input',chk);wa.addEventListener('paste',function(e){e.preventDefault();document.execCommand('insertText',false,(e.clipboardData||window.clipboardData).getData('text'));});
 ws.addEventListener('click',function(){if(BAD.test(wt.value+' '+wa.textContent)){we.hidden=false;return;}alert('목업: 등록하면 목록 맨 위에 바로 붙습니다.');});}
-var demo=document.body.getAttribute('data-demo');if(demo==='write'){openWin('write');wt.value='하이닉스 오늘 왜 이렇게 올랐나요';attach('sym',q('template[data-card="000660"]').innerHTML);wa.textContent='외국인이 많이 샀다던데 내일도 이어질지 궁금합니다 ';wrange=null;putStk('up_surprised');putStk('mid_question');wa.blur();q('[data-tool="stk"]').click();chk();}
+var demo=document.body.getAttribute('data-demo');if(demo==='write'){openWin('write');wt.value='하이닉스 오늘 왜 이렇게 올랐나요';attach('sym',q('template[data-card="000660"]').innerHTML);wa.textContent='외국인이 많이 샀다던데 내일도 이어질지 궁금합니다 ';wrange=null;putStk('up_surprised');putStk('mid_question');wa.blur();chk();}
 })();</script>"""
 
 
@@ -1503,9 +1539,11 @@ def build_chars(name):
 
 def main():
     os.makedirs(os.path.join(OUT, "stickers"), exist_ok=True)
-    for _, ks in STICKERS:   # 스티커 줄에 든 컷만 course/chars 에서 사본
+    for _, ks in STICKERS:   # 스티커 줄에 든 컷만 course/chars 에서 사본 · 차트 읽기 캐릭터 9컷(11-28 추가)은 chart-talk/chars 에서
         for k in ks:
-            shutil.copyfile(os.path.join(HERE, "..", "course", "chars", f"c_{k}.webp"), os.path.join(OUT, "stickers", f"c_{k}.webp"))
+            src = (os.path.join(HERE, "..", "chart-talk", "chars", CHART_TALK[k] + ".webp") if k in CHART_TALK
+                   else os.path.join(HERE, "..", "course", "chars", f"c_{k}.webp"))
+            shutil.copyfile(src, os.path.join(OUT, "stickers", f"c_{k}.webp"))
     build("mock_comments_member.html")
     build("mock_comments_guest.html", member=False)
     build("mock_comments_thread.html", thread=True)

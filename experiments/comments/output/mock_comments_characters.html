@@ -2081,7 +2081,16 @@ html.as-lock, html.as-lock body { overflow: hidden; }
 .cv-ptitle{margin:14px 0 0;font-size:22px;line-height:32px;font-weight:700;color:#111;word-break:keep-all;overflow-wrap:anywhere;}
 .cv-pmeta{margin:4px 0 0;color:#7A7A7A;}
 .cv-ptext{margin:18px 0 0;font-size:16px;line-height:26px;color:#333;white-space:pre-wrap;word-break:keep-all;overflow-wrap:anywhere;}
-.cv-big-react{display:flex;gap:12px;margin:16px 0 0;padding:0 0 16px;border-bottom:1px solid #E2E8F0;}   /* P617 목록과 같은 아이콘 꼴 */
+.cv-big-react{display:flex;justify-content:center;gap:10px;margin:20px 0 0;padding:0 0 20px;border-bottom:1px solid #E2E8F0;}   /* 글 화면 좋아요 · 싫어요 = 가운데 외곽선 상자 둘(11-28 사용자, 네이버 글 화면 참고) */
+.cv-big-react .cv-react{justify-content:center;gap:8px;min-width:112px;padding:10px 20px;border:1px solid #E2E8F0;border-radius:10px;font-size:16px;line-height:24px;}
+.cv-big-react .cv-react svg{width:22px;height:22px;}
+.cv-rbox{padding:8px 12px;border:1px solid #111;border-radius:8px;}
+.cv-rbox .cm-input{border:0 !important;padding:4px 0 !important;min-height:110px;}
+.cv-rquick{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;margin:6px -4px 0;padding:8px 0 0;border-top:1px solid #E2E8F0;}
+.cv-rquick::-webkit-scrollbar{display:none;}
+.cv-rquick button{flex:none;margin:0;padding:2px;background:none;border:0;cursor:pointer;}
+.cv-rquick img{display:block;width:40px;height:40px;object-fit:contain;}
+.cv-rbox [data-rstk] img{width:64px;height:64px;cursor:pointer;}
 .cv-me{display:flex;align-items:center;gap:7px;margin:0 0 10px;}
 .cv-myprof{margin-left:auto;padding:5px 11px;border-radius:8px;background:#fff;border:1px solid #111;color:#111;font-size:13px;line-height:19px;font-weight:700;text-decoration:none;}
 .cv-page .comments .cv-rlist .cv-text{margin:6px 0 0;}
@@ -2222,7 +2231,12 @@ html.as-lock, html.as-lock body { overflow: hidden; }
 .cv-full ::placeholder{color:#94A3B8;font-weight:400;}
 .cv-full input.cv-title-in{font-weight:700;color:#111;}
 .cv-full textarea.cv-in{min-height:180px;resize:none;}
-.cv-tools{display:flex;gap:6px;margin:8px 0;}
+.cv-tools{display:flex;gap:6px;margin:16px 0 8px;}   /* 글 아래(11-28) */
+.cv-stk-menu{position:absolute;z-index:5;display:flex;gap:4px;padding:4px;background:#fff;border:1px solid #E2E8F0;border-radius:8px;box-shadow:0 2px 8px rgba(15,23,42,.12);}
+.cv-stk-menu button{margin:0;padding:4px 10px;background:#fff;border:1px solid #E2E8F0;border-radius:6px;font:inherit;font-size:14px;line-height:20px;font-weight:700;color:#111;cursor:pointer;}
+.cv-stk-menu button.is-del{color:#B91C1C;}
+.cv-edbox{position:relative;}
+.cv-stk-row img.is-sel{outline:2px solid #111;outline-offset:2px;border-radius:8px;}
 .cv-tool{display:inline-flex;align-items:center;gap:6px;margin:0;padding:6px 12px;background:#fff;border:1px solid #E2E8F0;border-radius:8px;font:inherit;font-size:14px;line-height:20px;font-weight:700;color:#111;cursor:pointer;-webkit-tap-highlight-color:transparent;}
 .cv-tool.is-on{border-color:#111;}
 .cv-tool svg{width:16px;height:16px;}
