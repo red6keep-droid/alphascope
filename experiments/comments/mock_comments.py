@@ -1030,8 +1030,8 @@ def cards_block(cmts, page_link):
         def empty(k, title, sub):
             return (f'<a class="cc-card cc-empty" href="{page_link}"><div class="cc-row" style="justify-content:center;">'   # 캐릭터 + 두 줄을 한 묶음으로 카드 가운데(11-28 사용자)
                     f'<img class="cc-stk" src="stickers/c_{k}.webp" alt="" width="56" height="56" style="margin:0;">'
-                    f'<div class="cc-body" style="flex:0 1 auto;"><div class="cc-title" style="margin:0;white-space:normal;">{title}</div>'
-                    f'<p class="cc-text" style="white-space:normal;">{sub}</p></div></div></a>')
+                    f'<div class="cc-body" style="flex:0 1 auto;"><div class="cc-title" style="margin:0;white-space:normal;font-weight:400;">{title}</div>'   # 굵게 빼기(11-28)
+                    f'<p class="cc-text" style="margin-top:2px;white-space:normal;">{sub}</p></div></div></a>')
         return f'<div data-cc class="cc-one"><div class="cc-track">{empty(*EMPTY_CARD)}</div></div>'
     one = len(shown) == 1
     dots = "" if one else ('<div class="cc-dots">' + "".join(
