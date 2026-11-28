@@ -15,9 +15,9 @@
   `/archive` 에서는 줄마다 `복원`. 파일은 지우지 않는다.
 -. Claude 가 목업을 만들거나 고치면
       python experiments/mock_server.py --new "stock-lists/mock_stock-lists-guest-kr.html" "stock-lists/mock_stock-lists-member.html" --note "무엇을 바꿨나 한 줄"
-  로 표시한다(파일 패턴 가능, 서버가 꺼져 있어도 됨). 목록 맨 위 `N 새로 바뀐 목업` 에 메모와 함께 모이고, 그 목업을 한 번 열면 표시가 사라진다.
-  rebuild_mocks 다시 그리기처럼 내용이 그대로인 갱신은 표시하지 않는다. 기록 = .mock_prefs.json "new".
--. 첫 화면 = 진행 중인 목업만(PLAN = 발행 예정 · 미확정 · 보류 + 즐겨찾기 + N 표시). 확정 · 발행된 목업(LIVE)은 날짜와 상관없이
+  로 고친 기록을 남긴다(파일 패턴 가능, 서버가 꺼져 있어도 됨). 기록 = .mock_prefs.json "changed" — 목록의 고친 순서 · 보관 판정에 쓴다.
+  rebuild_mocks 다시 그리기처럼 내용이 그대로인 갱신은 기록하지 않는다.
+-. 첫 화면 = 진행 중인 목업만(PLAN = 발행 예정 · 미확정 · 보류 + 즐겨찾기). 확정 · 발행된 목업(LIVE)은 날짜와 상관없이
   맨 아래 버튼 `보관 중인 목업`(/week) 으로. `쓰지 않는 목업` 은 휴지통(/archive)으로 이름을 바꿨다 — 시안이 확정되면 Claude 가
   대표 목업을 PLAN 에서 LIVE 로 옮기고(= 보관 중인 목업), 지난 시안은
       python experiments/mock_server.py --trash "stock-board/mock_board_*" --note "11-22 시안 A 확정"
@@ -366,9 +366,6 @@ def design_mtime():
 OLD_TAG = '<span class="old">옛 버전</span>'
 
 
-NEW_TAG = '<span class="nb">N</span>'
-
-
 def row(d, f, t, show_dir=False, stars=(), restore=False, names=None, ref=0, new=None, note="", when_t=None):
     """큰 검은 글씨 = 목업 이름(종목 이름 · 전망 질문 · 페이지 제목), 작은 회색 = 묶음 이름 · 파일 이름 · 수정 시각"""
     href = f"/{quote(d)}/output/{quote(f)}"
@@ -376,7 +373,7 @@ def row(d, f, t, show_dir=False, stars=(), restore=False, names=None, ref=0, new
     title = (names or {}).get((d, f)) or f[:-5]
     label = ((names or {}).get(("label", d, f)) or LABELS.get(d, d)) if show_dir else ""
     sub = " · ".join(x for x in (label, f[:-5], when) if x)
-    name = (NEW_TAG if new and f"{d}/{f}" in new else "") + html.escape(title)
+    name = html.escape(title)
     if note:
         sub = note + " · " + sub
     key = html.escape(f"{d}/{f}")
@@ -418,10 +415,9 @@ def index_page(mode="main"):
     old = [x for x in items if f"{x[0]}/{x[1]}" in arch]
     kept = [x for x in items if f"{x[0]}/{x[1]}" not in arch]
     lc = last_change(every, prefs)
-    newd = prefs["new"]
     wk = prefs["week"]   # --week 로 넘긴 목업 = 그 뒤에 다시 고치기 전까지 `보관 중인 목업`
     # 첫 화면 = 진행 중인 것(발행 예정)만 — 확정 · 발행된 목업(LIVE)은 날짜와 상관없이 `보관 중인 목업`
-    recent = [x for x in kept if stage_of(x[0], x[1])[0] == "plan" and not ((k := f"{x[0]}/{x[1]}") in wk and wk[k] >= lc[k][0] and k not in newd)]
+    recent = [x for x in kept if stage_of(x[0], x[1])[0] == "plan" and not ((k := f"{x[0]}/{x[1]}") in wk and wk[k] >= lc[k][0])]
     ref = design_mtime()
     stale = [x for x in kept if x not in recent]
     items = old if archive else recent if mode == "main" else stale
@@ -450,16 +446,9 @@ def index_page(mode="main"):
         every_key = {f"{d}/{f}": (d, f, t) for d, f, t in every}
         if mode == "main":
             parts.append('<div class="cut">진행 중인 목업만 보입니다 · 확정 · 발행된 목업은 맨 아래 <a href="/week">보관 중인 목업</a></div>')
-            fresh = sorted((k for k in newd if k in every_key and k not in arch), key=lambda k: -newd[k].get("t", 0))
-            if fresh:   # Claude 가 만들거나 고친 목업 — 열면 사라짐
-                parts += [f'<section><div class="newh"><h2>{NEW_TAG}새로 바뀐 목업 <span class="n">{len(fresh)}</span></h2><button class="clr">모두 확인</button></div>',
-                          *(row(*every_key[k], show_dir=True, stars=stars, names=names, ref=ref, new=newd, note=newd[k].get("note", ""), when_t=lc[k][0]) for k in fresh[:5]),
-                          *([f'<details class="more"><summary>N 목업 {len(fresh) - 5}개 더 보기</summary>',
-                             *(row(*every_key[k], show_dir=True, stars=stars, names=names, ref=ref, new=newd, note=newd[k].get("note", ""), when_t=lc[k][0]) for k in fresh[5:]),
-                             "</details>"] if len(fresh) > 5 else []), "</section>"]   # 5개 펼침 + 나머지 접기 (2026-11-22)
             fav = [every_key[k] for k in stars if k in every_key and k not in arch]   # 즐겨찾기는 날짜와 상관없이 첫 화면에 (누른 순서대로)
             if fav:
-                parts += ['<section><h2>★ 즐겨찾기</h2>', *(row(*x, show_dir=True, stars=stars, names=names, ref=ref, new=newd, when_t=W(x)) for x in fav), "</section>"]
+                parts += ['<section><h2>★ 즐겨찾기</h2>', *(row(*x, show_dir=True, stars=stars, names=names, ref=ref, when_t=W(x)) for x in fav), "</section>"]
         else:
             parts.append(nav_main)
             parts.append('<div class="cut">확정 · 발행된 목업입니다. 다시 진행하는 기능은 발행 예정으로 옮기면 첫 화면에 보입니다.</div>')
@@ -475,7 +464,7 @@ def index_page(mode="main"):
             out = [f'<details{" open" if opened else ""}><summary>{f"""<span class="st{" hold" if tag == "보류" else " done" if tag == "확정" else ""}">{tag}</span>""" if tag else ""}{html.escape(name)} <span class="n">{len(rows)}</span>'
                    f'<span class="when">{when}{" · " + html.escape(note) if note else ""}</span>'
                    + (f'<span class="todo">{html.escape(todo)}</span>' if todo else "") + '</summary>']
-            out += [row(*x, stars=stars, names=names, ref=ref, new=newd, when_t=W(x)) for x in rows]
+            out += [row(*x, stars=stars, names=names, ref=ref, when_t=W(x)) for x in rows]
             out.append("</details>")
             return out
 
@@ -511,8 +500,6 @@ details .row{{border:0;border-top:1px solid #eef0f3;border-radius:0;margin:0}}
 .row{{display:flex;align-items:stretch;min-height:48px;background:#fff;border:1px solid #e3e6eb;border-radius:10px;margin-bottom:8px}}
 .go{{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:2px;padding:10px 4px 10px 14px;color:inherit;text-decoration:none}}
 .go:active{{background:#eef2f8}} .name{{color:#1d2127;font-size:16px;font-weight:600;word-break:keep-all;overflow-wrap:anywhere}} .sub{{color:#8a919c;font-size:12px;word-break:break-all}} .old{{display:inline-block;margin-right:6px;padding:0 5px;border-radius:4px;background:#FEF3C7;color:#92400E;font-size:11px;font-weight:600}}
-.nb{{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;margin-right:6px;border-radius:4px;background:#E5484D;color:#fff;font-size:12px;font-weight:700;vertical-align:2px}}
-.newh{{display:flex;justify-content:space-between;align-items:center}} .clr{{border:0;background:none;color:#5b6370;font-size:13px;cursor:pointer;padding:6px 0 6px 12px}}
 .star{{flex:0 0 48px;border:0;background:none;font-size:22px;color:#c3c8d0;cursor:pointer;padding:0}} .star.on{{color:#f5a623}}
 .mv{{display:none;flex:0 0 auto;border:0;border-left:1px solid #eef0f3;background:none;font-size:13px;color:#5b6370;cursor:pointer;padding:0 14px;white-space:nowrap}}
 body.edit .mv{{display:block}}
@@ -531,8 +518,6 @@ body.edit .edit-btn:not(.reload-btn){{background:#1d2127;border-color:#1d2127;co
 {''.join(parts)}
 <script>
 const ds = [...document.querySelectorAll('details')];
-const clr = document.querySelector('.clr');
-if (clr) clr.addEventListener('click', async () => {{ await fetch('/seen?k=*', {{method: 'POST'}}); location.reload(); }});
 document.querySelectorAll('.back').forEach(b => b.addEventListener('click', async () => {{
   await fetch('/archive?k=' + encodeURIComponent(b.dataset.k), {{method: 'POST'}}); location.reload();
 }}));
@@ -1062,19 +1047,16 @@ class Handler(SimpleHTTPRequestHandler):
 
     def do_POST(self):
         u = urlparse(self.path)
-        if u.path not in ("/star", "/archive", "/seen"):
+        if u.path not in ("/star", "/archive"):
             self.send_error(404)
             return
         key = u.path[1:]
         k = unquote(dict(x.split("=", 1) for x in u.query.split("&") if "=" in x).get("k", ""))
         with _lock:
             p = load_prefs()
-            if key == "seen":   # N 표시 지우기 — k = * 이면 전부
-                p["new"] = {} if k == "*" else {x: v for x, v in p["new"].items() if x != k}
-            else:
-                p[key] = [x for x in p[key] if x != k] if k in p[key] else p[key] + [k]
-                if key == "archive" and k not in p[key]:   # 휴지통에서 복원하면 이유 메모도 지움
-                    p["trash_note"].pop(k, None)
+            p[key] = [x for x in p[key] if x != k] if k in p[key] else p[key] + [k]
+            if key == "archive" and k not in p[key]:   # 휴지통에서 복원하면 이유 메모도 지움
+                p["trash_note"].pop(k, None)
             save_prefs(p)
         self.send_response(204)
         self.end_headers()
@@ -1106,7 +1088,6 @@ class Handler(SimpleHTTPRequestHandler):
             return
         fp = os.path.join(BASE, *seg)
         if len(seg) == 3 and fp.endswith(".html") and os.path.isfile(fp):
-            mark_seen(f"{seg[0]}/{seg[2]}")
             with open(fp, encoding="utf-8", errors="replace") as fh:
                 page = fh.read()
             if journey:
@@ -1136,17 +1117,8 @@ class Handler(SimpleHTTPRequestHandler):
         pass
 
 
-def mark_seen(k):
-    """목업을 한 번 열면 N 표시를 지운다."""
-    with _lock:
-        p = load_prefs()
-        if k in p["new"]:
-            del p["new"][k]
-            save_prefs(p)
-
-
 def mark_new(pats, note):
-    """--new 패턴… --note 메모 — Claude 가 만들거나 고친 목업에 N 표시. 서버가 꺼져 있어도 기록만 남긴다."""
+    """--new 패턴… --note 메모 — Claude 가 만들거나 고친 목업의 고친 기록. 서버가 꺼져 있어도 기록만 남긴다."""
     from fnmatch import fnmatch
     import time
     keys = [f"{d}/{f}" for d, f, _ in mockups()]
@@ -1154,10 +1126,9 @@ def mark_new(pats, note):
     with _lock:
         p = load_prefs()
         for k in hit:
-            p["new"][k] = {"t": time.time(), "note": note}
             p["changed"][k] = {"t": time.time(), "note": note}   # 열어도 남는 고친 기록 — 첫 화면(최근 7일) 판정 (2026-11-22)
         save_prefs(p)
-    print(f"N 표시 {len(hit)}개: " + ", ".join(hit) if hit else f"맞는 목업 없음: {pats}")
+    print(f"고친 기록 {len(hit)}개: " + ", ".join(hit) if hit else f"맞는 목업 없음: {pats}")
 
 
 def mark_trash(pats, note):
