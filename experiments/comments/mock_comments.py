@@ -1023,10 +1023,9 @@ def card(c, link):
 def cards_block(cmts, page_link):
     """글 아래 댓글 칸 — 카드(최신 CARD_N 개, 가려진 글 빼고) + 점(2개 이상). 댓글 0 = 안내 카드 한 장."""
     shown = [c for c in cmts if c[4] != "hidden"][:CARD_N]
-    if not shown:   # 댓글 0 = 같은 카드 꼴 한 장 + 캐릭터(발 구르며 기다리는 상승이) + 웃긴 안내 두 줄, 누르면 댓글 화면(쓰기 연필) — 11-28 사용자
+    if not shown:   # 댓글 0 = 같은 카드 꼴 한 장 + 평범한 한 줄 `첫 댓글을 남겨 주세요` + 캐릭터(기다리는 상승이), 카드 전체 = 댓글 화면(쓰기 연필) — 11-28 사용자(웃긴 문구는 과하다)
         return (f'<div data-cc class="cc-one"><div class="cc-track"><a class="cc-card cc-empty" href="{page_link}">'
-                '<div class="cc-row"><div class="cc-body"><div class="cc-title" style="margin:0;white-space:normal;">상승이가 첫 댓글을 기다리다 지쳤습니다</div>'
-                '<p class="cc-text" style="white-space:normal;">발 구르는 소리가 더 커지기 전에 한마디 남겨 주세요</p></div>'
+                '<div class="cc-row"><div class="cc-body"><div class="cc-title" style="margin:0;white-space:normal;">첫 댓글을 남겨 주세요</div></div>'
                 '<img class="cc-stk" src="stickers/c_up_wait.webp" alt="" width="56" height="56"></div></a></div></div>')
     one = len(shown) == 1
     dots = "" if one else ('<div class="cc-dots">' + "".join(
@@ -1359,7 +1358,8 @@ def build_cc(name, base, cmts, total, page_link="", page=None):
              f'<span class="cm-label">댓글 {total}</span></a>' + p[i:])
         end = p.index("</p>", i) + 4
         sec = ('<style>.post-shell .post-nav,.post-shell.ends-text .post-nav{border-bottom:0 !important;padding-bottom:0 !important;}'   # `댓글 n` 버튼 줄 아래 구분선 뺌(11-28 사용자)
-               '#comments-mock .cc-track{margin-top:11px;}</style>'   # 버튼 줄 글자 아래 ~ 카드 위 38 → 23(40% 줄임, 11-28): 줄 아래 12 → 0 · 카드 위 14 → 11
+               '#comments-mock .cc-track{margin-top:11px;}'
+               '.post-body .rt-tabs{border-bottom:0 !important;}</style>'   # 종목 페이지 탭(주가 · 실적 · 일정) 바로 아래가 회색 기준 상자 = 탭 아래 선 뺌(11-28 사용자)   # 버튼 줄 글자 아래 ~ 카드 위 38 → 23(40% 줄임, 11-28): 줄 아래 12 → 0 · 카드 위 14 → 11
                f'<section class="comments is-foldable is-open" id="comments-mock"><div class="comments-panel">{cards_block(cmts, page_link)}</div></section>')
         p = p[:end] + CSS + CC_CSS + sec + p[end:]
         p = p.replace("</body>", windows(True, False) + js + CC_JS + "</body>", 1)
