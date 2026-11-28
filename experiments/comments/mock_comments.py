@@ -1198,8 +1198,8 @@ PAGE_CSS = """<style>
 .cc-page .cv-list .cv-main .cv-text{margin-top:4px;line-height:24px;color:#454C55;}   /* 제목 아래 6 → 4 · 행간 26 → 25 → 24(16px 글자 = 짝수 행간, 11-28) · 글자 #6B7280 → #606773 → #565D68 → #4D545E → #454C55(10%씩 네 번 진하게) */
 .cc-page [data-cmore]{margin:8px 0 0;}
 .cc-page [data-cmore].is-open .acc-chev{transform:rotate(180deg);}
-/* 종목 댓글 보기 맨 위(11-28) — 가격 28 → 26 → 22(오후 사용자), 전날 대비 17 그대로 */
-.cc-px-one .cc-px-big{font-size:22px;line-height:30px;}
+/* 종목 댓글 보기 맨 위(11-28) — 가격 28 → 26 → 22 → 20(오후 사용자), 전날 대비 17 그대로 */
+.cc-px-one .cc-px-big{font-size:20px;line-height:28px;}
 /* `댓글 n` 바로 위가 외곽선 있는 카드 · 그래프 · 배너 그림인 화면(종목 · 리포트 · Hot Issue · 증시 전망 · 시황) = 위 끝 ~ `댓글 n` 20 (11-28, 시황 11-28).
    기사(사진)만 예외 = 공통값 4. 위 카드의 아래 여백은 0 으로 두고 이 20 하나로 잰다 */
 .cc-page.cc-after-card{margin-top:0;}
