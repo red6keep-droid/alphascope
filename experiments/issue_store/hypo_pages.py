@@ -721,9 +721,8 @@ WHY_HEAD_FS, WHY_HEAD_LH = 17, 28   # 갈래 카드 `근거` 제목 = 고리 줄
 CHAIN_FS = 17   # 갈래 카드 고리 줄 이름(`급락 폭의 4분의 1 회복`) — 카드 줄 18 에서 한 단계 작게
 WHY_FS, WHY_LH = 16, 26
 SIG_NAME = "Newfact 신호"   # 독자 문장에서 `우리 신호` 대신
-WHY_NOTE = "전망에 따른 주식 정보를 모은 것입니다. 판단하거나 어느 쪽이 맞을지 고른 것은 아닙니다."   # P498, 문구
-FIX = [False]   # 6-22 · 6-23 · 6-25 시안 (목업만): 판정 기한 한 줄 · 성적표 안내 · 안내 문장 대상 좁히기
-WHY_NOTE_FIX = "관련 주식 정보는 갈래마다 기사를 모은 것입니다. 기사로 어느 쪽이 맞을지 고르지는 않습니다."
+WHY_NOTE = "관련 주식 정보는 갈래마다 기사를 모은 것입니다. 기사로 어느 쪽이 맞을지 고르지는 않습니다."   # 대상 = 기사 (페이지 안 `우리가 고른` 과 부딪히지 않게)
+NEXT = [False]   # 6-23② 성적표 비교 대상 · 6-26 과거 기록 카드 시안 (목업만)
 EXCL_ICON = ('<svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true" style="flex:none;display:block;" fill="none" stroke="currentColor" stroke-width="1.6">'
              '<circle cx="8" cy="8" r="6.5"/><path d="M8 4.6v4.4" stroke-linecap="round"/><circle cx="8" cy="11.2" r=".9" fill="currentColor" stroke="none"/></svg>')   # 느낌표 = INFO_ICON(i) 뒤집은 모양
 
@@ -1387,6 +1386,31 @@ def _history_card(fc):
     return _plain_sec("과거 기록에서 비슷한 때는?", lead, rows, "기록은 눈금일 뿐 이번이 그대로 되풀이된다는 뜻은 아닙니다.", icon="clock")
 
 
+def _odds_history(fc):
+    """과거 기록에서 비슷한 때는? (자동 등록) — 등록 때 센 같은 종류 · 같은 방향 사건 수(sc["odds"])를 `n번 중 m번` 으로.
+    비교 대상 = 같은 종류 지난 사건 전부(되찾음 vs 못 되찾음을 나란히). 반반이면 반반이라고 말한다(헌법 제1조)."""
+    if fc.get("history") or fc.get("gap") is None:
+        return ""
+    sc = next((x for x in fc["scenarios"] if x.get("odds")), None)
+    if not sc:
+        return ""
+    m, n, _ = sc["odds"]
+    if not n:
+        return ""
+    if sc is not fc["scenarios"][0]:   # 등록 = 첫째 갈래(되찾음 쪽) 횟수가 m, 둘째 갈래만 적혔으면 n − m 이 되찾은 횟수 (forecast_register.build)
+        m = n - m
+    up = fc["gap"] > 0
+    shock = SHOCK[1 if up else -1]
+    back = "급등 폭의 절반을 되돌림" if up else "급락 폭의 절반을 되찾음"
+    subj = fc.get("subj_ga") or (fc.get("subject", "") + "이")
+    lead = (f'{subj} 이번처럼 하루에 {fc["cmp"] + " " if fc.get("cmp") else ""}크게 {"오른" if up else "내린"} 일은 지난 기록에 {n}번 있었습니다(같은 종류 · 같은 방향). '
+            f'그 뒤 20거래일 안에 {"오른 폭의 절반을 되돌렸는지" if up else "내린 폭의 절반을 되찾았는지"} 셌습니다.')
+    rows = [(back, f"{n}번 중 {m}번", ""), (back.replace("되찾음", "되찾지 못함").replace("되돌림", "되돌리지 않음"), f"{n}번 중 {n - m}번", "")]
+    even = not odds_meaningful(m, n) and not odds_meaningful(n - m, n)
+    note = ("두 쪽 횟수가 비슷해 기록만으로는 어느 쪽이 될지 가르기 어렵습니다. " if even else "") + "기록은 눈금일 뿐 이번이 그대로 되풀이된다는 뜻은 아닙니다."
+    return _plain_sec("과거 기록에서 비슷한 때는?", lead, rows, note, icon="clock")
+
+
 def _binom_p(k, n, p):
     """양쪽 정확 이항 p (validate_fomc_history.binom_p 와 같은 셈)."""
     import math
@@ -1642,7 +1666,7 @@ def _date_row(fc, out=False):
     return (f'<span style="display:flex;flex:none;flex-direction:column;align-items:flex-end;font-size:{dk.TINY};font-weight:400;color:{dk.SUB};">'
             # 결과 날짜 = 늘 검정 (P471, 옛 P413 결과 뒤 보라는 없앰) — 글자 `결과 :` 는 회색
             + "".join(f'<span style="white-space:nowrap;">{dk.esc(k)} : <span style="color:#111;">{dk.esc(wordify(v))}</span>{_shock_size(fc) if fc["kind"] != "pre" else ""}</span>' for k, v in items)
-            + (f'<span style="white-space:nowrap;">판정 : <span style="color:#111;">{end_txt(fc)}까지</span></span>' if FIX[0] and fc.get("end_day") and not fc.get("_done") else "")
+            + (f'<span style="white-space:nowrap;">판정 : <span style="color:#111;">{end_txt(fc)}까지</span></span>' if fc.get("end_day") and not fc.get("_done") else "")
             + (f'<span>{proof}</span>' if proof else "") + "</span>")
 
 
@@ -1886,7 +1910,7 @@ def why_note_html(fc):
     if "good" not in w and not w.get("our_signals"):
         return ""
     return (f'<div data-why-note="1" style="display:flex;align-items:flex-start;gap:4px;margin:12px 0 0;padding:0 {dk.ALIGN_PX}px;font-size:13px;line-height:19px;color:{dk.SUB};word-break:keep-all;">'
-            f'<span style="flex:none;display:flex;align-items:center;height:19px;">{EXCL_ICON}</span><span>{WHY_NOTE_FIX if FIX[0] else WHY_NOTE}</span></div>')
+            f'<span style="flex:none;display:flex;align-items:center;height:19px;">{EXCL_ICON}</span><span>{WHY_NOTE}</span></div>')
 
 
 def _waiting(log, unit="%", subj="", fc=None):
@@ -2246,7 +2270,7 @@ def forecast_body(reg, state=None, fc=None, others=None, op=None):
                             why=side_why(fc, sc, dk.CARD_DIR[branch_view(fc, st, sc)["theme"]][1])) for i, sc in enumerate(order))
              + (_third_card(third[0], third[1], fc.get("line", 3.0)) if third else "") + "</div>")   # 셋째 카드 = `선반영` (사건 전) · `제자리` (충격 뒤)
     now = "" if before else _fold_row("현재 증시는?", _stock_now(fc, st) + _compare_chart(fc, st) + _now_plain(fc, st), side=_close_day(st), icon="pulse")   # 종목 전망 = 맨 위 종목 줄 · 바로가기   # 옛 `지금은?` 구획 → 접는 줄, 기록 줄과 한 묶음 (P418) · 카드 없이 · 한국 카드 삭제 (P425)
-    more = (_event_chart(reg) if fc.get("event_chart") else "") + _fold_group(_reasons_card(fc) + _broke_card(fc) + now + _history_card(fc))   # 어디서 끊겼나 = 접는 줄 묶음 맨 위 (P435)   # `앞으로 볼 것은?` 삭제 — 안내 문구 · 내부 방법 설명뿐, 위험 · 다음 일은 갈래 카드 안에 (P394)
+    more = (_event_chart(reg) if fc.get("event_chart") else "") + _fold_group(_reasons_card(fc) + _broke_card(fc) + now + _history_card(fc) + (_odds_history(fc) if NEXT[0] else ""))   # 어디서 끊겼나 = 접는 줄 묶음 맨 위 (P435)   # `앞으로 볼 것은?` 삭제 — 안내 문구 · 내부 방법 설명뿐, 위험 · 다음 일은 갈래 카드 안에 (P394)
     # 질문 제목 = 날짜 줄 위. 구획 제목 글씨(22/28 · 폰 20/26), 아래가 날짜 줄이라 밑줄 없음
     # 질문 줄 = 왼쪽 질문 · 오른쪽 결과 발표 날짜 한 줄, 질문이 길면 날짜 칸을 침범하지 않고 왼쪽 칸 안에서 두 줄. 날짜는 질문 첫 줄 글자 바닥에 맞춘다(baseline)
     # 질문 앞 = 증시 전망 저울 아이콘(배경 = 홈 `시장 흐름과 종목` 아이콘 청록 #0E7490, P457) 24 · 모서리 6 · 그림 16, P456). 한 줄 높이(1lh = 22/28 · 폰 20/26)를 아이콘 · 날짜 칸이 물려받아 첫 줄 가운데, 둘째 줄은 아이콘 아래로 들어가지 않는다
@@ -2300,7 +2324,7 @@ def _row(fc, st):
             + f'{title_for(fc, 18)}</a>'
             f'<span style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin:8px 0 1px;line-height:1;min-width:0;">{tags.replace("white-space:nowrap;", "flex-wrap:wrap;", 1)}'
             f'<span style="color:{dk.SUB};font-size:{dk.TINY};line-height:{dk.LH_TINY};">{dk.esc(fc["posted"])} 게시'
-            + (f' · {end_txt(fc)}까지 봄' if FIX[0] and fc.get("end_day") else "") + '</span>'
+            + (f' · {end_txt(fc)}까지 봄' if fc.get("end_day") else "") + '</span>'
             # `등록 기록` 링크 삭제
             + "</span>")
     lab = e["label"][len(fc["subject"]) + 1:] if fc.get("subject") and e["label"].startswith(fc["subject"] + " ") else e["label"]   # 대상 이름은 제목에 있으니 뺀다 — `에너지 업종 조정 우세` 이 카드 밖으로 넘쳤다 (P464, 타임라인 P440 과 같은 규칙)
@@ -2429,6 +2453,7 @@ def split_done(pub, states):
         (done if res else opened).append((r, fc))
     score = {"n": 0, "hit": 0, "miss": 0, "neither": 0, "watch": 0, "hold": 0, "void": 0}   # 목업 note(`사건 뒤에 적은 보기는 넣지 않습니다`)는 뺐다 — 급락 · 급등 뒤 전망도 우리가 고른 쪽을 채점한다
     picked = [0, 0]
+    expect = [0.0, 0, 0]   # (기대 맞음 합, 전망 수, 실제 맞음)
     rows = []
     for r, fc in done:
         st = states[fc["slug"]]
@@ -2450,14 +2475,19 @@ def split_done(pub, states):
         if fc.get("pick") and k in ("hit", "miss"):
             picked[1] += 1
             picked[0] += k == "hit"
+            if fc.get("pick_prob") is not None:   # 고를 때 적어 둔 기록상 비율 = 기대한 맞음 (6-23② 비교 대상)
+                expect[0] += fc["pick_prob"]
+                expect[1] += 1
+                expect[2] += k == "hit"
     score["watch"] = sum(1 for _, fc in opened if not is_stock_fc(fc))
-    if FIX[0]:   # 6-23 ① 끝난 전망 수와 성적표 수가 왜 다른지
-        k = sum(1 for _, fc in done if is_stock_fc(fc))
-        score["note"] = ("종목 전망은 매수 · 매도 권유가 되지 않게 우리가 어느 쪽도 고르지 않아 성적표에 넣지 않습니다."
-                         + (f" 끝난 전망 {len(done)}개 중 {k}개가 종목 전망입니다." if k else ""))
+    k = sum(1 for _, fc in done if is_stock_fc(fc))   # 끝난 전망 수와 성적표 수가 왜 다른지
+    score["note"] = ("종목 전망은 매수 · 매도 권유가 되지 않게 우리가 어느 쪽도 고르지 않아 성적표에 넣지 않습니다."
+                     + (f" 끝난 전망 {len(done)}개 중 {k}개가 종목 전망입니다." if k else ""))
     score["n"] += score["watch"]
     if picked[1] >= 5:   # 1개 중 1개를 `대부분` 이라 하지 않게 — 다섯 개부터 (2026-11-12)
         score["picked_hit"] = tuple(picked)
+    if NEXT[0] and expect[1]:
+        score["expect"] = (expect[0], expect[1], expect[2])
     rows.sort(key=lambda x: x[4], reverse=True)   # 최근 끝난 것 먼저
     return opened, [x[:4] for x in rows], score
 
@@ -2472,6 +2502,9 @@ def scoreboard_card(sc):
     if sc.get("picked_hit") and "반반" not in share_word(*sc["picked_hit"]):   # 반반 줄 삭제 (P522)
         m, n = sc["picked_hit"]
         lines.append(("row", "우리가 고른 쪽이 맞은 일", share_word(m, n).replace("이었습니다", ""), "급락 · 급등 뒤 전망만"))
+    if sc.get("expect"):   # 비교 대상 = 고를 때 적어 둔 기록상 비율대로라면 몇 개가 맞았어야 했나 (헌법 제1조)
+        e, n, h = sc["expect"]
+        lines.append(("row", "기록대로라면", f"{n}개 중 {round(e)}개쯤", f"우리가 고른 전망 {n}개를 고를 때 적어 둔 기록상 비율로 센 값 · 실제로는 {h}개 맞음"))
     if sc.get("crowded"):   # 겹침이 2개를 넘은 전망 — 맞음 · 틀림에 넣지 않음 (2026-11-08)
         lines.append(("row", "여러 사건이 겹친 전망", f'{sc["crowded"]}개', "세지 않음"))
     if sc.get("note"):
