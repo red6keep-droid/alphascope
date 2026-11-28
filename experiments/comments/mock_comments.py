@@ -143,7 +143,14 @@ CSS = """<style>
 .comments .rp-chips{margin:10px 0 0;}
 .comments .rp-row + .rp-row{margin-top:6px;}
 .comments .rp [data-report-send]{margin:0;padding:6px 14px;background:#fff;border:1px solid #888;border-radius:8px;color:#111;font:inherit;font-size:14px;line-height:20px;font-weight:700;cursor:pointer;}
-.comments .rp-a [data-report-send]{margin-top:12px;}
+.comments .cv-pop.rp-a{display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:12px;row-gap:10px;align-items:start;}
+.comments .rp-a .cv-pop-h{grid-column:1;grid-row:1;padding:6px 0 0;}
+.comments .rp-a [data-report-send]{grid-column:1;grid-row:2;justify-self:start;}
+.comments .rp-a .rp-chips{grid-column:2;grid-row:1 / span 2;margin:0;}
+.comments .rp-note{margin:6px 0 0;font-size:14px;line-height:20px;color:#6B7280;}
+.comments .rp-btns{display:flex;justify-content:flex-end;gap:8px;margin:12px 0 0;}
+.comments .rp [data-report-go]{margin:0;padding:6px 14px;background:#fff;border:1px solid #111;border-radius:8px;color:#111;font:inherit;font-size:14px;line-height:20px;font-weight:700;cursor:pointer;}
+.comments .rp .rp-cancel{margin:0;padding:6px 14px;background:#fff;border:1px solid #B5BAC0;border-radius:8px;color:#6B7280;font:inherit;font-size:14px;line-height:20px;font-weight:700;cursor:pointer;}
 .comments .cv-pop[hidden]{display:none;}
 .comments .cv-pop-h{font-size:14px;line-height:20px;font-weight:700;color:#111;}
 .comments .cv-chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 12px;}
@@ -558,12 +565,20 @@ REASON_ROWS = (("개인정보", "거짓 정보 · 시세 조종 의심"), ("리�
 
 
 def report_box(v):
-    """신고 상자 시안 — v = "a"(신고하기 아래) · "b"(제목 줄 오른쪽)."""
-    rows = "".join('<div class="rp-row">' + "".join(f'<button class="cv-chip" type="button" data-pick>{esc(t)}</button>' for t in r) + "</div>" for r in REASON_ROWS)
+    """신고 상자 시안(11-28) — a = 제목 왼쪽 · 오른쪽에 이유 두 줄(1줄 개인정보 · 거짓 정보 / 2줄 리딩방 · 욕설 · 기타) · 신고하기는 제목 아래
+    b = 제목 줄 오른쪽에 신고하기 · 이유는 그 아래 한 줄로 이어 씀(줄 나눔 없이 차례대로) · c = 이유 고르기 없음(안내 한 줄 + 취소 · 신고하기)."""
+    chip = lambda t: f'<button class="cv-chip" type="button" data-pick>{esc(t)}</button>'
     send = '<button class="cm-btn" type="button" data-report-send>신고하기</button>'
     head = f'<div class="cv-pop-h">{SIREN}신고하는 이유</div>'
+    if v == "c":
+        return ('<div class="cv-pop rp rp-c"><div class="cv-pop-h">' + SIREN + '이 댓글을 신고할까요?</div>'
+                '<p class="rp-note">신고가 3번 쌓이면 자동으로 가려지고, 운영자가 확인합니다.</p>'
+                '<div class="rp-btns"><button class="cm-btn rp-cancel" type="button">취소</button>'
+                '<button class="cm-btn" type="button" data-report-go>신고하기</button></div></div>')
     if v == "b":
-        return f'<div class="cv-pop rp rp-b"><div class="rp-head">{head}{send}</div><div class="rp-chips">{rows}</div></div>'
+        flow = "".join(chip(t) for r in REASON_ROWS for t in r)
+        return f'<div class="cv-pop rp rp-b"><div class="rp-head">{head}{send}</div><div class="rp-chips"><div class="rp-row">{flow}</div></div></div>'
+    rows = "".join('<div class="rp-row">' + "".join(chip(t) for t in r) + "</div>" for r in REASON_ROWS)
     return f'<div class="cv-pop rp rp-a">{head}<div class="rp-chips">{rows}</div>{send}</div>'
 
 
@@ -969,7 +984,7 @@ TITLES.update({
     "mock_comments_page-issue.html": "댓글 화면 — Hot Issue 제목 · 게이지 카드 그대로 · 아래 댓글 (핫이슈에서)",
     "mock_comments_page-forecast.html": "댓글 화면 시안 — 전망 제목 · 전망A · B 카드 (증시 전망에서)",
     "mock_comments_page-article.html": "댓글 화면 시안 — 기사 제목 · 자료 사진 (Newfact 기사에서)",
-    "mock_comments_report-cases.html": "신고 상자 시안 A · B — 이유 두 줄(개인정보 · 거짓 정보 / 리딩방 · 욕설 · 기타), 신고하기 아래 · 오른쪽",
+    "mock_comments_report-cases.html": "신고 상자 시안 A · B · C — 이유 오른쪽 두 줄 · 이유 한 줄로 이어서 · 이유 고르기 없음",
     "mock_comments_page-days-few.html": "시황 댓글 시안 — 글마다 따로 · 오늘 5개 → 11.26 증시 시황 댓글 보기 → 그 전날",
     "mock_comments_page-days-many.html": "시황 댓글 시안 — 글마다 따로 · 오늘 20개 = 10개씩 더 보기 → 끝나면 11.26 증시 시황 댓글 보기",
 })
@@ -1501,8 +1516,9 @@ def main():
     build_cc("mock_comments_page-days-many.html", BASE, today20[:5], 20, "mock_comments_page-days-many.html",
              page=("11.27 증시 시황", "mock_comments_card-one.html", "story"), more_html=days_more(many, 5))
     lab = '<div style="margin:18px 0 6px;font-size:13px;line-height:19px;font-weight:700;color:#B91C1C;">{}</div>'
-    cases = ('<div class="comments is-open" style="padding:0;">' + lab.format("시안 A · 신고하는 이유 → 이유 두 줄 → 신고하기") + report_box("a")
-             + lab.format("시안 B · 신고하는 이유 줄 오른쪽에 신고하기 → 이유 두 줄") + report_box("b") + "</div>")
+    cases = ('<div class="comments is-open" style="padding:0;">' + lab.format("시안 A · 신고하는 이유 오른쪽에 이유 두 줄 · 신고하기는 제목 아래") + report_box("a")
+             + lab.format("시안 B · 신고하는 이유 줄 오른쪽에 신고하기 · 이유는 아래 한 줄로 이어서") + report_box("b")
+             + lab.format("시안 C · 이유 고르기 없음 — 안내 한 줄 + 취소 · 신고하기 (추천)") + report_box("c") + "</div>")
     build_cc("mock_comments_report-cases.html", BASE, STORY_CMTS[:2], 2, "mock_comments_report-cases.html",
              page=("11.27 증시 시황", "mock_comments_card-one.html", "story"), more_html=cases)
     build_cc("mock_comments_page.html", BASE, STORY_CMTS, STORY_TOTAL, "mock_comments_page.html",
