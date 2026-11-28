@@ -1023,10 +1023,11 @@ def card(c, link):
 def cards_block(cmts, page_link):
     """글 아래 댓글 칸 — 카드(최신 CARD_N 개, 가려진 글 빼고) + 점(2개 이상). 댓글 0 = 안내 카드 한 장."""
     shown = [c for c in cmts if c[4] != "hidden"][:CARD_N]
-    if not shown:   # 댓글 0 = 같은 카드 꼴 한 장 + 평범한 한 줄 `첫 댓글을 남겨 주세요` + 캐릭터(기다리는 상승이), 카드 전체 = 댓글 화면(쓰기 연필) — 11-28 사용자(웃긴 문구는 과하다)
+    if not shown:   # 댓글 0 = 같은 카드 꼴 한 장 + 부드러운 제목 · 보조 한 줄 + 캐릭터(말풍선 풍선을 든 분석이 = 이야기를 기다림), 카드 전체 = 댓글 화면(쓰기 연필) — 11-28 사용자(웃긴 문구 과함 · 한 줄은 딱딱함)
         return (f'<div data-cc class="cc-one"><div class="cc-track"><a class="cc-card cc-empty" href="{page_link}">'
-                '<div class="cc-row"><div class="cc-body"><div class="cc-title" style="margin:0;white-space:normal;">첫 댓글을 남겨 주세요</div></div>'
-                '<img class="cc-stk" src="stickers/c_up_wait.webp" alt="" width="56" height="56"></div></a></div></div>')
+                '<div class="cc-row"><div class="cc-body"><div class="cc-title" style="margin:0;white-space:normal;">아직 조용하네요</div>'
+                '<p class="cc-text" style="white-space:normal;">이 종목 이야기, 먼저 꺼내 보시겠어요?</p></div>'
+                '<img class="cc-stk" src="stickers/c_mid_question.webp" alt="" width="56" height="56"></div></a></div></div>')
     one = len(shown) == 1
     dots = "" if one else ('<div class="cc-dots">' + "".join(
         f'<button class="cc-dot" type="button" aria-label="{i + 1}번째 댓글"></button>' for i in range(len(shown))) + "</div>")
