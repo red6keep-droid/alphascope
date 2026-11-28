@@ -1357,7 +1357,8 @@ def build_cc(name, base, cmts, total, page_link="", page=None):
         p = (p[:i] + f'<a class="post-nav-cm{" has-cm" if total else ""}" href="{page_link}" style="text-decoration:none;" aria-label="댓글 {total}개 · 댓글 화면으로">{BUBBLE}'   # 버튼 줄 `댓글 n` = 댓글 화면으로
              f'<span class="cm-label">댓글 {total}</span></a>' + p[i:])
         end = p.index("</p>", i) + 4
-        sec = ('<style>.post-shell .post-nav,.post-shell.ends-text .post-nav{border-bottom:0 !important;}</style>'   # `댓글 n` 버튼 줄 아래 구분선 뺌(11-28 사용자)
+        sec = ('<style>.post-shell .post-nav,.post-shell.ends-text .post-nav{border-bottom:0 !important;padding-bottom:0 !important;}'   # `댓글 n` 버튼 줄 아래 구분선 뺌(11-28 사용자)
+               '#comments-mock .cc-track{margin-top:11px;}</style>'   # 버튼 줄 글자 아래 ~ 카드 위 38 → 23(40% 줄임, 11-28): 줄 아래 12 → 0 · 카드 위 14 → 11
                f'<section class="comments is-foldable is-open" id="comments-mock"><div class="comments-panel">{cards_block(cmts, page_link)}</div></section>')
         p = p[:end] + CSS + CC_CSS + sec + p[end:]
         p = p.replace("</body>", windows(True, False) + js + CC_JS + "</body>", 1)
