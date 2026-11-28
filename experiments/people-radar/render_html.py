@@ -34,7 +34,6 @@ MAX_SIGNALS_PER_PERSON = 3
 SEO_LEAD_MAX = 120
 COLLECT_SINCE = "2026-10-22"   # record_store 가 발언 · 신호를 쌓기 시작한 날 (데이터-기록-계획 A3-1 2번)
 COLLECT_OPEN = "2027-01-20"    # 90일 뒤 — 말 대 행동 · 신뢰 기록을 여는 날
-REF_DIFF = 1.15   # 과거 참고: 발언 날 중앙값이 아무 날의 이 배수 이상일 때만 "더 움직였다", 아니면 "차이 없음" (판단 유보 규칙)
 REL_BIG = 1.5     # 그날 시장: 평소의 이 배수 이상이면 "평소의 n배" 를 쓴다
 
 PREVIEW = """<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8">
@@ -68,6 +67,10 @@ PHOTO_BASE = "https://cdn.jsdelivr.net/gh/red6keep-droid/alphascope@gh-pages/ima
 # 사진 쓰는 인물 — 2026-10-21 공직자만 →으로 민간인도 위키미디어 공용 자유 라이선스 사진(fetch_photos.py). 버리 · 티미라오스는 사용자 제공 사진(manual, CC 아님 → 출처 줄 없음)
 PHOTO_PUBLIC = {"trump", "bessent", "lutnick", "greer", "fed", "wood", "ackman", "cramer", "musk", "altman", "huang", "burry", "timiraos"}
 REFS_PATH = os.path.join(config.BASE_DIR, "ref", "reaction_refs.json")   # 과거 참고치 (reaction_refs.py) — 인물 × 주제, 지금은 트럼프 × 무역 · 연준 × Fed 둘
+REF_CARDS = {   # 인물 → (참고치 주제, 카드 질문, 안내 줄) — 인물 페이지 맨 위 과거 참고치 카드
+    "fed": ("Fed", "FOMC 결정일, 시장은 평소보다 움직였나?", ""),
+    "trump": ("Trade", "관세 발언 날, 시장은 평소보다 움직였나?", "트럼프 1기(2017 ~ 2020년) 트윗 기록입니다. 지금 발언과 다를 수 있습니다"),
+}
 PATH_KO = {"self": "본인 글", "office": "기관 발표", "trade": "매매 공시", "report": "보도"}
 
 
@@ -364,22 +367,6 @@ def sec_people_list(r, cards):
     return f'<div data-people-list="1" style="margin:0 0 8px;">{"".join(rows)}</div>' + credit
 
 
-def _ref_text(sp, prof, refs):
-    """과거 참고 — 참고치가 있는 인물 × 주제면 한 줄, 없으면 "정보 수집 중"."""
-    have = refs.get(sp) or {}
-    topic = next((t["name"] for t in prof["topics"] if t["name"] in have), None)
-    if not topic:
-        return ("정보 수집 중 · 이 인물의 주제별 발언이 90일 쌓이면 \"같은 종류의 발언이 있던 날 시장\"을 보여 드립니다.", "")
-    v = have[topic]
-    sym = refs.get("symbol", "S&P 500")
-    if v["base_abs"] and v["med_abs"] / v["base_abs"] >= REF_DIFF:
-        text = f'{v["label"]} {sym} 은 보통 ±{v["med_abs"]}% 움직였습니다. {v["base_label"]} ±{v["base_abs"]}% 보다 컸습니다.'
-    else:
-        text = f'{v["label"]} {sym} 은 보통 ±{v["med_abs"]}% 움직였습니다. {v["base_label"]}(±{v["base_abs"]}%)과 차이가 없었습니다.'
-    sub = f'{v["period"]} {v["n"]}일 · 오른 날 {v["up_pct"]}% ({v["base_label"]} {v["base_up"]}%) · 단순 비교, 플라시보 검정 전'
-    return (text, sub)
-
-
 def _head_row(title, body_html, first, right=""):
     return (f'<span style="display:block;padding:{17 - dk.VP}px 12px;{"" if first else dk.MULTI_SEP}">'
             f'<span style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;">'
@@ -399,10 +386,14 @@ def _person_cards(r):
         spec.loader.exec_module(C)
         p7 = r.get("person7") or {}
 
+        refs = _refs()
+
         def one(p, report_only=False, nxt=None):
             nx = (korean_md(nxt["day"]), nxt["kind"], nxt["days_left"]) if nxt else None
+            q = REF_CARDS.get(p["speaker"])
+            v = (refs.get(p["speaker"]) or {}).get(q[0]) if q else None
             return people_section.person_cards(C.question_card, stock_mentions.person_summary(p["signals"], p7.get(p["speaker"])), p["name_ko"],
-                                               report_only=report_only, next_event=nx)
+                                               report_only=report_only, next_event=nx, ref=(q[1], v, q[2]) if v and "base_n" in v else None)
         return one
     except Exception as e:  # noqa: BLE001
         print(f"[html] 인물 카드 건너뜀: {e}")
@@ -411,8 +402,8 @@ def _person_cards(r):
 
 def sec_person_head(r):
     """인물 페이지 맨 위 (테마 JS 가 이름 제목 아래로 옮긴다, data-person-strip 이름은 테마 JS 호환용) = 요약 강조 카드(오늘 · 7일 이슈 · 7일 종목)
-    + 일정이 있으면 `다음 일정은?` 카드. 옛 `이 사람 말 읽는 법` 카드(발언 경로 · 과거 참고 · 다음 날짜)는 뺐다 — 안내 · `정보 수집 중` 빈 답이 대부분.
-    발언이 모두 보도(언론이 옮긴 말)인 인물은 7일 이슈 카드 안내 줄에 한 줄. 과거 참고 계산(_ref_text)은 90일 기록이 쌓이면 다시 쓴다."""
+    + 일정이 있으면 `다음 일정은?` 카드 + 참고치가 있는 인물은 `○○ 날, 시장은 평소보다 움직였나?` 카드. 옛 `이 사람 말 읽는 법` 카드(발언 경로 · 과거 참고 · 다음 날짜)는 뺐다 — 안내 · `정보 수집 중` 빈 답이 대부분.
+    발언이 모두 보도(언론이 옮긴 말)인 인물은 7일 이슈 카드 안내 줄에 한 줄. 연준 · 트럼프는 과거 참고치 카드(REF_CARDS, 대조군 = 그 일이 없던 날 · 비슷한 큰 일정 날)."""
     out = []
     pc = _person_cards(r)
     for p in r["people"]:

@@ -210,7 +210,7 @@ def summary_card(qcard, sm=None, faces=None):
     return f'<div style="margin:0 0 {PEOPLE_CARDS_GAP}px;">{"".join(out)}</div>' if out else ""
 
 
-def person_cards(qcard, ps, name, report_only=False, next_event=None):
+def person_cards(qcard, ps, name, report_only=False, next_event=None, ref=None):
     """인물 페이지 맨 위 강조 카드(질문 카드) — `오늘 가장 많이 말한 이슈는?` · `최근 7일 가장 많이 말한 이슈는?` · `최근 7일 많이 언급한 종목은?`
 . ps = stock_mentions.person_summary. 재료가 없는 카드는 뺀다(빈 답 금지): 이슈 · 종목은 2건 이상만. 파이썬 셈만, AI 없음."""
     out = []
@@ -261,7 +261,39 @@ def person_cards(qcard, ps, name, report_only=False, next_event=None):
         day, kind, left = next_event
         out.append(qcard("다음 일정은?", f"D-{left}", "neutral", "#111",
                          [(f"{day} {dk.josa(kind, '이')} 있습니다. 오늘부터 {left}일 남았습니다.", "plain"), ("row", kind, day, "")]))
+    if ref:   # 과거 참고치 — 그런 날 vs 이름 있는 대조군(그 일이 없던 날 · 비슷한 큰 일정 날)
+        out.append(ref_card(qcard, *ref))
     return f'<div data-person-cards="1" style="margin:0 0 {PEOPLE_CARDS_GAP}px;">{"".join(out)}</div>' if out else ""
+
+
+REF_DIFF = 1.15   # 그런 날 움직임이 대조군의 이 배수 이상일 때만 "컸다", 아니면 "차이 없음 · 비슷"
+REF_NOTE = "움직임 = 하루 등락 폭(오르든 내리든)의 가운데 값입니다. 방향을 알려 주는 숫자가 아닙니다"
+
+
+def ref_card(qcard, q, v, extra_note=""):
+    """`○○ 날, 시장은 평소보다 움직였나?` — v = people-radar/ref/reaction_refs.json 한 칸.
+    대조군 = 같은 기간 그 일이 없던 날(base_label · base_n), 있으면 비슷한 큰 일정 날(alt). `아무 날` 이라고 쓰지 않는다."""
+    def big(a, b):
+        return bool(b) and a / b >= REF_DIFF
+    more, alt = big(v["med_abs"], v["base_abs"]), v.get("alt")
+    first = f"기록상 {v['label']}에 S&P 500은 하루 보통 {v['med_abs']:.2f}% 움직였습니다. "
+    ans = "평소보다 큼" if more else "평소와 비슷"
+    if alt:
+        same = not big(v["med_abs"], alt["med_abs"])
+        first += (f"{v['base_label']}({v['base_abs']:.2f}%)보다 " + ("컸고" if more else "차이가 없었고")
+                  + f", {alt['label']}({alt['med_abs']:.2f}%)" + ("과는 비슷했습니다. 큰 발표가 있는 날이면 대체로 이만큼 움직였습니다." if same else "보다도 컸습니다."))
+        if same and more:
+            ans = "큰 발표일 수준"
+    else:
+        first += f"{v['base_label']}({v['base_abs']:.2f}%)" + ("보다 컸습니다." if more else "과 차이가 없었습니다.")
+    lines = [(first, "plain"), ("row", v["label"].replace("이 있던 날", " 날"), f"{v['med_abs']:.2f}%", f"{v['period']} {v['n']:,}일")]
+    if alt:
+        lines.append(("row", alt["label"], f"{alt['med_abs']:.2f}%", f"{alt['n']:,}일"))
+    lines += [("row", v["base_label"], f"{v['base_abs']:.2f}%", f"{v['base_n']:,}일"),
+              ("row", "오른 날 비율", f"{v['up_pct']}%", f"{v['base_label']} {v['base_up']}%"), (REF_NOTE, "note")]
+    if extra_note:
+        lines.append((extra_note, "note"))
+    return qcard(q, ans, "neutral", "#111", lines)
 
 
 PERSON_MIN, PERSON_ROWS = 2, 3
