@@ -556,9 +556,11 @@ def head(name, when, key, member, date=True, mine=False):
 def menu_box(key, mine):
     if mine:
         return f'<div class="cv-pop" data-menu-box="{key}" hidden><button class="cm-btn" type="button">삭제</button></div>'
-    chips = "".join(f'<button class="cv-chip" type="button" data-pick>{esc(t)}</button>' for t in REASONS)
-    return (f'<div class="cv-pop" data-menu-box="{key}" hidden><div class="cv-pop-h">{SIREN}신고하는 이유</div>'
-            f'<div class="cv-chips">{chips}</div><button class="cm-btn" type="button" data-report-send>신고하기</button></div>')
+    # 신고 = 시안 C 확정(11-28 사용자): 이유 고르기 없음 — 안내 한 줄 + 취소 · 신고하기. 이유 칩(REASONS)은 쓰지 않는다
+    return (f'<div class="cv-pop rp rp-c" data-menu-box="{key}" hidden><div class="cv-pop-h">{SIREN}이 댓글을 신고할까요?</div>'
+            '<p class="rp-note">신고가 3번 쌓이면 자동으로 가려지고, 운영자가 확인합니다.</p>'
+            '<div class="rp-btns"><button class="cm-btn rp-cancel" type="button">취소</button>'
+            '<button class="cm-btn" type="button" data-report-go>신고하기</button></div></div>')
 
 
 REASON_ROWS = (("개인정보", "거짓 정보 · 시세 조종 의심"), ("리딩방 · 광고", "욕설 · 비방", "기타"))   # 신고 이유 두 줄(11-28 사용자 순서)
@@ -817,6 +819,8 @@ var lg=q('[data-login-go]');if(lg)lg.addEventListener('click',function(){alert('
 if(fab)fab.addEventListener('click',function(){openWin(fab.hasAttribute('data-guest')?'login':fab.hasAttribute('data-first')?'pask':'write');});
 qa('[data-menu]').forEach(function(b){if(b.hasAttribute('data-need-login'))return;b.addEventListener('click',function(){var x=q('[data-menu-box="'+b.getAttribute('data-menu')+'"]');if(x)x.hidden=!x.hidden;});});
 qa('[data-pick]').forEach(function(b){b.addEventListener('click',function(){var box=b.closest('.cv-pop');qa('[data-pick]',box).forEach(function(x){x.classList.remove('is-on');});b.classList.add('is-on');});});
+qa('[data-report-go]').forEach(function(b){b.addEventListener('click',function(){b.closest('.cv-pop').innerHTML='<p class=\\"cv-done\\">신고를 받았습니다. 같은 댓글에 신고가 3번 쌓이면 자동으로 가리고 운영자가 확인합니다.</p>';});});
+qa('.rp-cancel').forEach(function(b){b.addEventListener('click',function(){b.closest('.cv-pop').hidden=true;});});
 qa('[data-report-send]').forEach(function(b){b.addEventListener('click',function(){if(!q('[data-pick].is-on',b.closest('.cv-pop'))){say('신고하는 이유를 골라 주세요.');return;}b.closest('.cv-pop').innerHTML='<p class=\\"cv-done\\">신고를 받았습니다. 같은 댓글에 신고가 3번 쌓이면 자동으로 가리고 운영자가 확인합니다.</p>';});});
 var of=q('[data-open-rform]');if(of)of.addEventListener('click',function(){of.style.display='none';q('[data-rform]').hidden=false;q('[data-ta]').focus();});
 var ta=q('[data-ta]'),send=q('[data-send]'),err=q('[data-err]');
