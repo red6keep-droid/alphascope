@@ -289,10 +289,29 @@ def _pop_li(html):
 
 # ── 구획 ────────────────────────────────────────────────────────────────
 
+USUAL_DAYS = range(1, 31)   # 건수 비교 대상 = 어제부터 30일 하루 평균(오늘은 뺀다, 수집이 빈 날도 뺀다)
+
+
+def _usual(r):
+    """(하루 평균 건수, 하루 평균 인물 수, {인물: 하루 평균 건수}, 날 수) — radar.json strips(aggregate.history). 없으면 None."""
+    st = r.get("strips") or {}
+    if not st:
+        return None
+    days = [d for d in USUAL_DAYS if any(len(c) > d and c[d]["n"] for c in st.values())]
+    if not days:
+        return None
+    n = len(days)
+    return (round(sum(c[d]["n"] for c in st.values() for d in days) / n), round(sum(1 for c in st.values() for d in days if c[d]["n"]) / n),
+            {sp: sum(c[d]["n"] for d in days) / n for sp, c in st.items()}, n)
+
+
 def sec_seo_lead(r, d, cards):
     """글 맨 앞 한 줄 = 작은 회색 안내(ⓘ) `날짜 기준 최근 24시간 시장 발언 n건 · n명`."""
     _, m, dd = d.split("-")
     line = f"{int(m)}월 {int(dd)}일 기준 최근 24시간 시장 발언 {r['event_count']}건 · {r['people_count']}명"
+    u = _usual(r)
+    if u:   # 비교 대상 (헌법 제1조) — 지난 30일 하루 평균
+        line += f" · 지난 {u[3]}일 하루 평균 {u[0]}건 · {u[1]}명"
     if r.get("only_reports"):
         line += " · 오늘은 보도된 발언만"
     return f'<p data-seo-lead="1" style="margin:0 0 12px;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.NOTE};word-break:keep-all;">{dk.INFO_ICON}{line}</p>'
@@ -323,7 +342,7 @@ def sec_people(r, cards):
     return "".join(out)
 
 
-def _list_row(p, cards, first):
+def _list_row(p, cards, first, u=None):
     """인물 목록 한 줄 (기획 9-4): 동그라미 · 이름 · 직함, 아래 오늘 가장 강한 발언 헤드라인, 그 아래 닿는 곳 자산. 건수 · 7일 비교는 없다."""
     top = p["signals"][0]
     c = _card(top, cards) or {}
@@ -334,12 +353,14 @@ def _list_row(p, cards, first):
             '<path d="M6 4l4 4-4 4"/></svg>')
     photo = (' data-photo="' + PHOTO_BASE + _esc(_photos()[p["speaker"]]["file"]) + '"') if p["speaker"] in _photos() else ""
     n = len(p["signals"])
+    avg = u[2].get(p["speaker"], 0) if u else None   # 비교 대상 — 그 인물의 지난 30일 하루 평균
+    cnt = f"오늘 {n}건" + ("" if avg is None else f" · {u[3]}일 평균 {avg:.0f}건" if avg >= 1 else f" · {u[3]}일 평균 1건 미만")
     return (
         f'<a href="#" data-person="{p["speaker"]}" data-name="{_esc(p["name_ko"])}" data-title="{_esc(p["title_ko"])}"{photo} '
         f'style="display:flex;align-items:flex-start;gap:12px;padding:13px {dk.ALIGN_PX}px;{"" if first else "border-top:1px solid #E2E8F0;"}color:#111;text-decoration:none;cursor:pointer;">'
         f'{_avatar(p)}'
         f'<span style="flex:1 1 auto;min-width:0;">'
-        f'<span style="display:block;font-size:{dk.SMALL};line-height:25px;"><b>{_esc(p["name_ko"])}</b> <span style="color:{dk.SUB};font-size:{dk.TINY};line-height:20px;">{_esc(p["title_ko"])} · 오늘 {n}건</span></span>'
+        f'<span style="display:block;font-size:{dk.SMALL};line-height:25px;"><b>{_esc(p["name_ko"])}</b> <span style="color:{dk.SUB};font-size:{dk.TINY};line-height:20px;">{_esc(p["title_ko"])} · {cnt}</span></span>'
         + (f'<span {dk.SAID_MARK}="1" style="display:block;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:#111;margin-top:2px;word-break:keep-all;">{dk.keep_tone(_esc(head))}</span>' if head else "")
         + (f'<span style="display:block;font-size:{dk.TINY};line-height:{dk.LH_TINY};color:{dk.SUB};margin-top:2px;">연결 자산 : {_esc(touch)}</span>' if touch else "")
         + f'</span><span style="flex:none;color:#94A3B8;display:inline-flex;margin-top:10px;">{chev}</span></a>')
@@ -364,7 +385,8 @@ def sec_summary_cards(r):
 
 
 def sec_people_list(r, cards):
-    rows = [_list_row(p, cards, i == 0) for i, p in enumerate(r["people"])]
+    u = _usual(r)
+    rows = [_list_row(p, cards, i == 0, u) for i, p in enumerate(r["people"])]
     credit = photo_credit([p["speaker"] for p in r["people"]], {p["speaker"]: p["name_ko"] for p in r["people"]})
     return f'<div data-people-list="1" style="margin:0 0 8px;">{"".join(rows)}</div>' + credit
 
