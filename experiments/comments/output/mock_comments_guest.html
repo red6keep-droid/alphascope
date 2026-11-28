@@ -2112,6 +2112,16 @@ html.as-lock, html.as-lock body { overflow: hidden; }
 .comments .cv-pop:has(.cv-chips) [data-report-send]{grid-column:1;grid-row:2;align-self:start;justify-self:start;margin:0;padding:6px 14px;background:#fff;border:1px solid #888;border-radius:8px;color:#111;font:inherit;font-size:14px;line-height:20px;font-weight:700;cursor:pointer;}
 .comments .cv-pop:has(.cv-chips) [data-report-send]:hover{border-color:#111;}   /* 늘 진한 테두리 · 진한 글자(흐리게 하지 않음) — 이유 없이 누르면 안내 띠 */
 .comments .cv-pop .cv-done{grid-column:1 / -1;}
+/* 신고 상자 시안(11-28) — 이유 두 줄 고정: 1줄 개인정보 · 거짓 정보 · 시세 조종 의심 / 2줄 리딩방 · 광고 · 욕설 · 비방 · 기타.
+   A = 제목 → 이유 두 줄 → 신고하기(아래) · B = 제목 줄 오른쪽에 신고하기 → 이유 두 줄 */
+.comments .cv-pop.rp{display:block;}
+.comments .rp .rp-head{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.comments .rp .cv-pop-h{display:flex;align-items:center;gap:4px;white-space:nowrap;}
+.comments .rp-row{display:flex;flex-wrap:wrap;gap:6px;}
+.comments .rp-chips{margin:10px 0 0;}
+.comments .rp-row + .rp-row{margin-top:6px;}
+.comments .rp [data-report-send]{margin:0;padding:6px 14px;background:#fff;border:1px solid #888;border-radius:8px;color:#111;font:inherit;font-size:14px;line-height:20px;font-weight:700;cursor:pointer;}
+.comments .rp-a [data-report-send]{margin-top:12px;}
 .comments .cv-pop[hidden]{display:none;}
 .comments .cv-pop-h{font-size:14px;line-height:20px;font-weight:700;color:#111;}
 .comments .cv-chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 12px;}
@@ -2144,11 +2154,11 @@ html.as-lock, html.as-lock body { overflow: hidden; }
 /* 창 — 테마 팝업(.rt-pop*) 틀 그대로, 짧은 창 폭 400 */
 .cv-win .rt-pop-box{max-width:400px;}
 .cv-win::before{content:"";position:fixed;left:0;right:0;top:-100px;bottom:-100px;background:rgba(15,23,42,.45);}
-.cv-win .rt-pop-head{border-bottom:1px solid #E2E8F0;}
-.cv-win .cv-win-body{padding:26px 20px 20px;font-size:19px;line-height:28px;color:#333;word-break:keep-all;overflow-y:auto;}
-.cv-btns{display:flex;gap:8px;margin:24px 0 0;}
-.cv-btns button{flex:1;margin:0;padding:11px 12px;border-radius:8px;font:inherit;font-size:16px;line-height:24px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;}
-.cv-no{background:#fff;border:1px solid #B5BAC0;color:#111;}
+/* 제목 아래 선 = 테마 .rt-pop-head::after 하나(우리 border-bottom 을 겹쳐 두 줄이던 것 뺌, 11-28) */
+.cv-win .cv-win-body{padding:26px 20px 20px;font-size:18px;line-height:26px;color:#333;word-break:keep-all;overflow-y:auto;}
+.cv-btns{display:flex;justify-content:flex-end;gap:8px;margin:24px 0 0;}   /* 창 안 버튼(11-28 사용자) = 오른쪽에 작게 · 15/22 · 안쪽 6 16 — 창 폭을 나눠 꽉 채우지 않음 */
+.cv-btns button{flex:none;margin:0;padding:6px 16px;border-radius:8px;font:inherit;font-size:15px;line-height:22px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.cv-no{background:#fff;border:1px solid #B5BAC0;color:#6B7280;}   /* 물러서는 버튼 = 회색 글자 · 회색 테두리(앞으로 가는 버튼 검정과 대비) */
 .cv-yes{background:#fff;border:1px solid #111;color:#111;}
 .cv-write input,.cv-write textarea{display:block;width:100%;box-sizing:border-box;margin:0;padding:11px 12px;background:#fff;border:1px solid #E2E8F0;border-radius:8px;font:inherit;font-size:16px;line-height:26px;color:#333;}
 .cv-write input{margin:0 0 8px;font-weight:700;color:#111;}
@@ -5913,7 +5923,7 @@ window.addEventListener('load',function(){setTimeout(set,300);});})();</script><
           latest(a.getAttribute('data-latest')).then(go);
         }, true);
       })();
-      </script><button class="cv-fab" type="button" aria-label="댓글 쓰기" data-guest><svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6"><path d="M10.5 2.5l3 3L6 13H3v-3z"/><path d="M9 14h4.5"/></svg></button><div class="rt-pop cv-win " data-win="login" hidden><div class="rt-pop-box" role="dialog" aria-modal="true" aria-label="로그인하시겠습니까?"><div class="rt-pop-head"><div class="rt-pop-title">로그인하시겠습니까?</div><button type="button" class="rt-pop-close" aria-label="닫기" data-win-close>×</button></div><div class="cv-win-body">로그인이 필요한 서비스입니다.<div class="cv-btns"><button class="cv-no" type="button" data-win-close>아니오</button><button class="cv-yes" type="button" data-login-go>로그인하기</button></div></div></div></div><script>(function(){
+      </script><button class="cv-fab" type="button" aria-label="댓글 쓰기" data-guest><svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6"><path d="M10.5 2.5l3 3L6 13H3v-3z"/><path d="M9 14h4.5"/></svg></button><div class="rt-pop cv-win " data-win="login" hidden><div class="rt-pop-box" role="dialog" aria-modal="true" aria-label="로그인하시겠습니까?"><div class="rt-pop-head"><div class="rt-pop-title">로그인하시겠습니까?</div><button type="button" class="rt-pop-close" aria-label="닫기" data-win-close>×</button></div><div class="cv-win-body">로그인이 필요한 서비스입니다.<div class="cv-btns"><button class="cv-no" type="button" data-win-close>아니요</button><button class="cv-yes" type="button" data-login-go>로그인하기</button></div></div></div></div><script>(function(){
 var q=function(s,r){return (r||document).querySelector(s);},qa=function(s,r){return [].slice.call((r||document).querySelectorAll(s));};
 var BAD=/open\.kakao|t\.me\/|telegram|band\.us|텔레그램|오픈채팅|01[016789][- ]?\d{3,4}[- ]?\d{4}/i;
 var sec=q('#comments-mock'),tg=q('[data-cm-toggle]'),fab=q('.cv-fab');

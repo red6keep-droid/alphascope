@@ -176,11 +176,11 @@ CSS = """<style>
 /* 창 — 테마 팝업(.rt-pop*) 틀 그대로, 짧은 창 폭 400 */
 .cv-win .rt-pop-box{max-width:400px;}
 .cv-win::before{content:"";position:fixed;left:0;right:0;top:-100px;bottom:-100px;background:rgba(15,23,42,.45);}
-.cv-win .rt-pop-head{border-bottom:1px solid #E2E8F0;}
-.cv-win .cv-win-body{padding:26px 20px 20px;font-size:19px;line-height:28px;color:#333;word-break:keep-all;overflow-y:auto;}
-.cv-btns{display:flex;gap:8px;margin:24px 0 0;}
-.cv-btns button{flex:1;margin:0;padding:11px 12px;border-radius:8px;font:inherit;font-size:16px;line-height:24px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;}
-.cv-no{background:#fff;border:1px solid #B5BAC0;color:#111;}
+/* 제목 아래 선 = 테마 .rt-pop-head::after 하나(우리 border-bottom 을 겹쳐 두 줄이던 것 뺌, 11-28) */
+.cv-win .cv-win-body{padding:26px 20px 20px;font-size:18px;line-height:26px;color:#333;word-break:keep-all;overflow-y:auto;}
+.cv-btns{display:flex;justify-content:flex-end;gap:8px;margin:24px 0 0;}   /* 창 안 버튼(11-28 사용자) = 오른쪽에 작게 · 15/22 · 안쪽 6 16 — 창 폭을 나눠 꽉 채우지 않음 */
+.cv-btns button{flex:none;margin:0;padding:6px 16px;border-radius:8px;font:inherit;font-size:15px;line-height:22px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.cv-no{background:#fff;border:1px solid #B5BAC0;color:#6B7280;}   /* 물러서는 버튼 = 회색 글자 · 회색 테두리(앞으로 가는 버튼 검정과 대비) */
 .cv-yes{background:#fff;border:1px solid #111;color:#111;}
 .cv-write input,.cv-write textarea{display:block;width:100%;box-sizing:border-box;margin:0;padding:11px 12px;background:#fff;border:1px solid #E2E8F0;border-radius:8px;font:inherit;font-size:16px;line-height:26px;color:#333;}
 .cv-write input{margin:0 0 8px;font-weight:700;color:#111;}
@@ -747,7 +747,7 @@ def profile_set():
 
 def windows(member, first):
     login = win("login", "로그인하시겠습니까?",
-                '로그인이 필요한 서비스입니다.<div class="cv-btns"><button class="cv-no" type="button" data-win-close>아니오</button>'
+                '로그인이 필요한 서비스입니다.<div class="cv-btns"><button class="cv-no" type="button" data-win-close>아니요</button>'
                 '<button class="cv-yes" type="button" data-login-go>로그인하기</button></div>')
     if not member:
         return login
